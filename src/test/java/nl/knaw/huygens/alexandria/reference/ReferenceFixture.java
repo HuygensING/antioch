@@ -15,10 +15,6 @@ public class ReferenceFixture {
     references.add(id);
   }
 
-  public String createReference() {
-    return createReference(null);
-  }
-
   public String createReference(final String id) {
     if (Strings.isNullOrEmpty(id)) {
       return "400 Bad Request";
