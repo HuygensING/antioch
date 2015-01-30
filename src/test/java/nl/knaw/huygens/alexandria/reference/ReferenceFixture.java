@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria;
+package nl.knaw.huygens.alexandria.reference;
 
 import java.util.List;
 

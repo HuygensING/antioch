@@ -1,4 +1,5 @@
 <html xmlns:concordion="http://www.concordion.org/2007/concordion">
+<title>References</title>
 <body>
 
 <h1>References</h1>
@@ -8,23 +9,6 @@
 <p>
     Before a reference can be given any annotations, it first needs to be created.
 </p>
-
-<div class="example">
-    <h3>Requirements for creating a reference</h3>
-
-    <p>Irrespective of what is in the database:</p>
-
-    <ul>
-        <li>
-            Creating a reference with a <code>null</code> id
-            returns <span concordion:assertEquals="createReference()">400 Bad Request</span>.
-        </li>
-        <li>
-            Creating a reference with an <span concordion:set="#id"></span>empty (<code>""</code>) id
-            returns <span concordion:assertEquals="createReference(#id)">400 Bad Request</span>.
-        </li>
-    </ul>
-</div>
 
 <div class="example">
     <h3>Interaction with existing references</h3>
@@ -51,8 +35,6 @@
         </li>
     </ul>
 </div>
-
-<a concordion:run="concordion" href="Annotation.html">Annotation tests</a>
 
 </body>
 </html>

@@ -35,6 +35,7 @@ public class AnnotationFixture {
     annotatedReferences.put(id, tag);
     return "201 Created";
   }
+
   public MultiValueResult getAnnotation(String id) {
     if (Strings.isNullOrEmpty(id)) {
       return multiValueResult().with("status", "400 Bad Request");
