@@ -1,0 +1,58 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+<body>
+
+<h1>Annotations</h1>
+
+<div class="example">
+    <h3>Annotation requirements</h3>
+
+    <p>Irrespective of what is in the database:</p>
+
+    <ul>
+        <li>
+            Adding annotation <span concordion:set="#tag">some_annotation</span> to a reference with a <code>null</code>
+            id
+            returns <span concordion:assertEquals="addAnnotation(#tag)">400 Bad Request</span>.
+        </li>
+        <li>
+            Creating annotation <span concordion:set="#tag">some_annotation</span> to a reference with an <span
+                concordion:set="#id"></span>empty (<code>""</code>) id
+            returns <span concordion:assertEquals="addAnnotation(#id, #tag)">400 Bad Request</span>.
+        </li>
+    </ul>
+</div>
+
+<div class="example">
+    <h3>Interaction with existing references</h3>
+
+    <p>Given this reference in the database:</p>
+
+    <table concordion:execute="setUpAnnotation(#id, #tag)">
+        <tr>
+            <th concordion:set="#id">Id</th>
+            <th concordion:set="#tag">Tag</th>
+        </tr>
+        <tr>
+            <td>dpo.8111</td>
+            <td>some annotation</td>
+        </tr>
+    </table>
+
+    <ul>
+        <li>
+            Adding the annotation "<span concordion:set="#tag">some annotation</span>"
+            to a reference with id<span concordion:set="#id">dpo.3456</span>
+            returns <span concordion:assertEquals="addAnnotation(#id,#tag)">201 Created</span>.
+        </li>
+        <li>
+            Adding the annotation "<span concordion:set="#tag">some annotation</span>"
+            to a reference with id<span concordion:set="#id">dpo.8111</span>
+            returns <span concordion:assertEquals="addAnnotation(#id,#tag)">201 Created</span>.
+        </li>
+    </ul>
+</div>
+
+<a concordion:run="concordion" href="Reference.html">Reference tests</a>
+
+</body>
+</html>

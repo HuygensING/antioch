@@ -1,0 +1,58 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+<body>
+
+<h1>References</h1>
+
+<p>A reference in Alexandria refers to an external object that can be annotated.</p>
+
+<p>
+    Before a reference can be given any annotations, it first needs to be created.
+</p>
+
+<div class="example">
+    <h3>Requirements for creating a reference</h3>
+
+    <p>Irrespective of what is in the database:</p>
+
+    <ul>
+        <li>
+            Creating a reference with a <code>null</code> id
+            returns <span concordion:assertEquals="createReference()">400 Bad Request</span>.
+        </li>
+        <li>
+            Creating a reference with an <span concordion:set="#id"></span>empty (<code>""</code>) id
+            returns <span concordion:assertEquals="createReference(#id)">400 Bad Request</span>.
+        </li>
+    </ul>
+</div>
+
+<div class="example">
+    <h3>Interaction with existing references</h3>
+
+    <p>Given this reference in the database:</p>
+
+    <table concordion:execute="setUpReference(#id)">
+        <tr>
+            <th concordion:set="#id">Id</th>
+        </tr>
+        <tr>
+            <td>dpo.8111</td>
+        </tr>
+    </table>
+
+    <ul>
+        <li>
+            Adding the reference <span concordion:set="#id">dpo.3456</span>
+            returns <span concordion:assertEquals="createReference(#id)">201 Created</span>.
+        </li>
+        <li>
+            Adding the reference <span concordion:set="#id">dpo.8111</span>
+            returns <span concordion:assertEquals="createReference(#id)">409 Conflict</span>.
+        </li>
+    </ul>
+</div>
+
+<a concordion:run="concordion" href="Annotation.html">Annotation tests</a>
+
+</body>
+</html>
