@@ -95,6 +95,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.concordion</groupId>
             <artifactId>concordion</artifactId>
             <version>${concordion.version}</version>
@@ -119,6 +124,7 @@
         <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
 
         <!-- Software versions -->
+        <guava.version>18.0</guava.version>
         <jdk.version>1.8</jdk.version>
         <junit.version>4.12</junit.version>
         <maven-build-helper.version>1.7</maven-build-helper.version>
