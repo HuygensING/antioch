@@ -6,34 +6,45 @@
 
 <p>A reference in Alexandria refers to an external object that can be annotated.</p>
 
-<p>
-    Before a reference can be given any annotations, it first needs to be created.
-</p>
+<p>Before a reference can be given any annotations, it first needs to be created.</p>
 
 <div class="example">
     <h3>Interaction with existing references</h3>
 
-    <p>Given this reference in the database:</p>
+    <p>Given the following references in the database:</p>
 
-    <table concordion:execute="setUpReference(#id)">
+    <table concordion:execute="createReference(#id)">
         <tr>
             <th concordion:set="#id">Id</th>
+        </tr>
+        <tr>
+            <td>dpo.1234</td>
         </tr>
         <tr>
             <td>dpo.8111</td>
         </tr>
     </table>
 
-    <ul>
-        <li>
-            Adding the reference <span concordion:set="#id">dpo.3456</span>
-            returns <span concordion:assertEquals="createReference(#id)">201 Created</span>.
-        </li>
-        <li>
-            Adding the reference <span concordion:set="#id">dpo.8111</span>
-            returns <span concordion:assertEquals="createReference(#id)">409 Conflict</span>.
-        </li>
-    </ul>
+    <p>Then these are the results of trying to add references given unused or existing Ids:</p>
+
+    <table>
+        <tr>
+            <th>Use case</th>
+            <th>Id</th>
+            <th>Result</th>
+        </tr>
+        <tr concordion:execute="#result = createReference(#id)">
+            <td>Create a reference with unused Id</td>
+            <td concordion:set="#id">dpo.3456</td>
+            <td concordion:assertEquals="#result">201 Created</td>
+        </tr>
+        <tr concordion:execute="#result = createReference(#id)">
+            <td>Create a reference with existing Id</td>
+            <td concordion:set="#id">dpo.8111</td>
+            <td concordion:assertEquals="#result">409 Conflict</td>
+        </tr>
+    </table>
+
 </div>
 
 </body>

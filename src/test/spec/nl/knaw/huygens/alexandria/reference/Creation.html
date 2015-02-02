@@ -1,5 +1,6 @@
 <html xmlns:concordion="http://www.concordion.org/2007/concordion">
 <title>References</title>
+
 <body>
 
 <h1>References</h1>
@@ -13,20 +14,29 @@
 <div class="example">
     <h3>Requirements for creating a reference</h3>
 
-    <p>Irrespective of what is in the database:</p>
-
-    <ul>
-        <li>
-            Creating a reference with an <span concordion:set="#id"></span>empty (<code>""</code>) id
-            returns <span concordion:assertEquals="createReference(#id)">400 Bad Request</span>.
-        </li>
-        <li>
-            Creating the reference <span concordion:set="#id">dpo.3456</span>
-            returns <span concordion:assertEquals="createReference(#id)">201 Created</span>.
-        </li>
-
-    </ul>
+    <table>
+        <tr>
+            <th>Use case</th>
+            <th>Id</th>
+            <th>Result</th>
+        </tr>
+        <tr concordion:execute="#result = createReference(#id)">
+            <td>Create a reference with valid Id</td>
+            <td concordion:set="#id">dpo.3456</td>
+            <td concordion:assertEquals="#result">201 Created</td>
+        </tr>
+        <tr concordion:execute="#result = createReference(#id)">
+            <td>Create a reference with invalid (empty) Id</td>
+            <td><span concordion:set="#id"></span><code>""</code></td>
+            <td concordion:assertEquals="#result">400 Bad Request</td>
+        </tr>
+    </table>
 </div>
 
+<h3>What is a valid identifier? (-> discussion)</h3>
+<ul>
+    <li>URI?</li>
+    <li>Max. length?</li>
+</ul>
 </body>
 </html>
