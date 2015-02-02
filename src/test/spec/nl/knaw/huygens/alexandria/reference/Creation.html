@@ -16,19 +16,19 @@
 
     <table>
         <tr>
-            <th>Use case</th>
             <th>Id</th>
             <th>Result</th>
+            <th>Use case</th>
         </tr>
         <tr concordion:execute="#result = createReference(#id)">
-            <td>Create a reference with valid Id</td>
             <td concordion:set="#id">dpo.3456</td>
             <td concordion:assertEquals="#result">201 Created</td>
+            <td>Create a reference with valid Id</td>
         </tr>
         <tr concordion:execute="#result = createReference(#id)">
-            <td>Create a reference with invalid (empty) Id</td>
             <td><span concordion:set="#id"></span><code>""</code></td>
             <td concordion:assertEquals="#result">400 Bad Request</td>
+            <td>Create a reference with invalid (empty) Id</td>
         </tr>
     </table>
 </div>

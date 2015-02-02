@@ -29,19 +29,19 @@
 
     <table>
         <tr>
-            <th>Use case</th>
             <th>Id</th>
             <th>Result</th>
+            <th>Use case</th>
         </tr>
         <tr concordion:execute="#result = createReference(#id)">
-            <td>Create a reference with unused Id</td>
             <td concordion:set="#id">dpo.3456</td>
             <td concordion:assertEquals="#result">201 Created</td>
+            <td>Create a reference with unused Id</td>
         </tr>
         <tr concordion:execute="#result = createReference(#id)">
-            <td>Create a reference with existing Id</td>
             <td concordion:set="#id">dpo.8111</td>
             <td concordion:assertEquals="#result">409 Conflict</td>
+            <td>Create a reference with existing Id</td>
         </tr>
     </table>
 
