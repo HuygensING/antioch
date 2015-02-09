@@ -23,72 +23,112 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire.version}</version>
-                <configuration>
-                    <skip>true</skip>
-                    <systemProperties>
-                        <property>
-                            <name>concordion.output.dir</name>
-                            <value>${concordion.output.dir}</value>
-                        </property>
-                    </systemProperties>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>unit-tests</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                        <configuration>
-                            <skip>false</skip>
-                            <includes>
-                                <include>**/*Test.java</include>
-                            </includes>
-                        </configuration>
-                    </execution>
-
-                    <execution>
-                        <id>acceptance-tests</id>
-                        <phase>integration-test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                        <configuration>
-                            <skip>false</skip>
-                            <includes>
-                                <include>**/*Fixture.java</include>
-                            </includes>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <version>${maven-build-helper.version}</version>
                 <executions>
                     <execution>
-                        <id>add-concordion-html-specs-to-test-resources</id>
+                        <id>add-integration-test-sources</id>
                         <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${spec.testSourceDir}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-integration-test-resources</id>
+                        <phase>generate-test-resources</phase>
                         <goals>
                             <goal>add-test-resource</goal>
                         </goals>
                         <configuration>
                             <resources>
                                 <resource>
-                                    <directory>${concordion.spec.dir}</directory>
-                                    <includes>
-                                        <include>**/*.html</include>
-                                    </includes>
+                                    <directory>${spec.docDir}</directory>
+                                    <targetPath>${integration.testOutputDir}</targetPath>
                                 </resource>
                             </resources>
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>move-integration-tests</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${integration.testOutputDir}"/>
+                                <move todir="${integration.testOutputDir}">
+                                    <fileset dir="${project.build.testOutputDirectory}">
+                                        <include name="**/*.class"/>
+                                        <present targetdir="${spec.testSourceDir}">
+                                            <mapper type="glob" from="*.class" to="*.java"/>
+                                        </present>
+                                    </fileset>
+                                </move>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven-failsafe.version}</version>
+                <configuration>
+                    <includes>
+                        <!-- **/*.java or, e.g., **/*Fixture.java for a stricter match -->
+                        <include>**/*.java</include>
+                    </includes>
+                    <testClassesDirectory>${integration.testOutputDir}</testClassesDirectory>
+                    <additionalClasspathElements>
+                        <additionalClasspathElement>${project.build.testOutputDirectory}</additionalClasspathElement>
+                    </additionalClasspathElements>
+                    <systemPropertyVariables>
+                        <concordion.output.dir>${concordion.reportDir}</concordion.output.dir>
+                    </systemPropertyVariables>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>verify></id>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.4</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.doxia</groupId>
+                        <artifactId>doxia-module-xhtml</artifactId>
+                        <version>1.6</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
@@ -113,96 +153,29 @@
     </dependencies>
 
     <properties>
-        <!-- Concordion automated Specification by Example in Java (http://concordion.org>) -->
-        <concordion.version>1.4.7</concordion.version>
-        <concordion.spec.dir>${basedir}/src/test/spec</concordion.spec.dir>
-        <concordion.output.dir>target/spec</concordion.output.dir>
-
         <!-- Encoding: everything UTF-8 please -->
         <encoding>UTF-8</encoding>
         <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
 
         <!-- Software versions -->
+        <concordion.version>1.4.7</concordion.version>
         <guava.version>18.0</guava.version>
         <jdk.version>1.8</jdk.version>
         <junit.version>4.12</junit.version>
+
+        <!-- Maven plugin versions -->
         <maven-build-helper.version>1.7</maven-build-helper.version>
         <maven-compiler.version>3.2</maven-compiler.version>
-        <maven-surefire.version>2.16</maven-surefire.version>
+        <maven-failsafe.version>2.18.1</maven-failsafe.version>
         <maven-reports.version>2.6</maven-reports.version>
+        <maven-surefire.version>2.16</maven-surefire.version>
 
-        <spec.directory>src/spec</spec.directory>
-        <spec.docDirectory>${spec.directory}/resources</spec.docDirectory>
-        <site.directory>src/site</site.directory>
-        <site.xhtmlDirectory>${site.directory}/xhtml</site.xhtmlDirectory>
+        <spec.dir>src/spec</spec.dir>
+        <spec.testSourceDir>${spec.dir}/java</spec.testSourceDir>
+        <spec.docDir>${spec.dir}/resources</spec.docDir>
+        <integration.testOutputDir>${project.build.directory}/integration-test-classes</integration.testOutputDir>
+        <concordion.reportDir>${project.build.directory}/concordion-reports</concordion.reportDir>
     </properties>
-
-    <profiles>
-        <profile>
-            <id>site</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-project-info-reports-plugin</artifactId>
-                        <version>${maven-reports.version}</version>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.6</version>
-                        <executions>
-                            <execution>
-                                <id>add-specifications</id>
-                                <phase>pre-site</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <target>
-                                        <mkdir dir="${site.xhtmlDirectory}"/>
-                                        <copy todir="${site.xhtmlDirectory}">
-                                            <fileset dir="${spec.docDirectory}"/>
-                                            <mapper type="glob" from="*.html" to="*.xhtml"/>
-                                        </copy>
-                                    </target>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>cleanup-temporary-specifications</id>
-                                <phase>post-site</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <target>
-                                        <delete dir="${site.xhtmlDirectory}"/>
-                                    </target>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-site-plugin</artifactId>
-                        <version>3.4</version>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.apache.maven.doxia</groupId>
-                                <artifactId>doxia-module-xhtml</artifactId>
-                                <version>1.6</version>
-                            </dependency>
-                        </dependencies>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
 </project>

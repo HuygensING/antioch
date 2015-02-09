@@ -1,10 +1,10 @@
 <project xmlns="http://maven.apache.org/DECORATION/1.6.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/DECORATION/1.6.0 http://maven.apache.org/xsd/decoration-1.6.0.xsd">
-	<body>
-		<menu name="Overview">
-			<item name="Introduction" href="index.html"/>
-			<item name="Sample Page" href="page.html"/>
-		</menu>
-	</body>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/DECORATION/1.6.0 http://maven.apache.org/xsd/decoration-1.6.0.xsd">
+    <body>
+        <menu name="Overview">
+            <item name="Introduction" href="index.html"/>
+            <item name="Sample Page" href="page.html"/>
+        </menu>
+    </body>
 </project>
