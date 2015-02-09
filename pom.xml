@@ -130,5 +130,79 @@
         <maven-build-helper.version>1.7</maven-build-helper.version>
         <maven-compiler.version>3.2</maven-compiler.version>
         <maven-surefire.version>2.16</maven-surefire.version>
+        <maven-reports.version>2.6</maven-reports.version>
+
+        <spec.directory>src/spec</spec.directory>
+        <spec.docDirectory>${spec.directory}/resources</spec.docDirectory>
+        <site.directory>src/site</site.directory>
+        <site.xhtmlDirectory>${site.directory}/xhtml</site.xhtmlDirectory>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>site</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-project-info-reports-plugin</artifactId>
+                        <version>${maven-reports.version}</version>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>add-specifications</id>
+                                <phase>pre-site</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <mkdir dir="${site.xhtmlDirectory}"/>
+                                        <copy todir="${site.xhtmlDirectory}">
+                                            <fileset dir="${spec.docDirectory}"/>
+                                            <mapper type="glob" from="*.html" to="*.xhtml"/>
+                                        </copy>
+                                    </target>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>cleanup-temporary-specifications</id>
+                                <phase>post-site</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <delete dir="${site.xhtmlDirectory}"/>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-site-plugin</artifactId>
+                        <version>3.4</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.apache.maven.doxia</groupId>
+                                <artifactId>doxia-module-xhtml</artifactId>
+                                <version>1.6</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>
