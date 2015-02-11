@@ -83,6 +83,10 @@
             <url>${huygens-repo}</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
+        <site>
+            <id>huygens.site</id>
+            <url>${huygens-site}</url>
+        </site>
     </distributionManagement>
 
     <repositories>
@@ -103,6 +107,13 @@
     </repositories>
 
     <build>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>2.7</version>
+            </extension>
+        </extensions>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
