@@ -48,6 +48,16 @@
         </developer>
     </developers>
 
+    <issueManagement>
+        <system>JIRA</system>
+        <url>http://test173.huygens.knaw.nl/</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>jenkins</system>
+        <url>http://ci.huygens.knaw.nl</url>
+    </ciManagement>
+
     <organization>
         <name>Huygens ING (KNAW)</name>
         <url>http://www.huygens.knaw.nl</url>
