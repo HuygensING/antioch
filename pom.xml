@@ -7,6 +7,7 @@
     <version>1.0-SNAPSHOT</version>
     <name>Alexandria Text Repository</name>
     <url>http://alexandria.huygens.knaw.nl</url>
+    <inceptionYear>2015</inceptionYear>
 
     <organization>
         <name>Huygens ING (KNAW)</name>
