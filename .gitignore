@@ -1,8 +1,9 @@
+# Atlassian
+atlassian-ide-plugin.xml
+
 # IntelliJ
 .idea/
-workspace.xml
 *.iml
-*.iws
 
 # Maven
 **/target/
