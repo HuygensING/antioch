@@ -176,6 +176,36 @@
                             </target>
                         </configuration>
                     </execution>
+
+                    <execution>
+                        <id>copy-specifications</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${site.xhtmlDir}"/>
+                                <copy todir="${site.xhtmlDir}">
+                                    <fileset dir="${spec.docDir}"/>
+                                    <mapper type="glob" from="*.html" to="*.xhtml"/>
+                                </copy>
+                            </target>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>cleanup-copied-specifications</id>
+                        <phase>post-site</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <delete dir="${site.xhtmlDir}"/>
+                            </target>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -258,11 +288,13 @@
         <jdk.version>1.8</jdk.version>
         <junit.version>4.12</junit.version>
 
-        <spec.dir>src/spec</spec.dir>
-        <spec.testSourceDir>${spec.dir}/java</spec.testSourceDir>
-        <spec.docDir>${spec.dir}/resources</spec.docDir>
-        <integration.testOutputDir>${project.build.directory}/integration-test-classes</integration.testOutputDir>
         <concordion.reportDir>${project.build.directory}/concordion-reports</concordion.reportDir>
+        <integration.testOutputDir>${project.build.directory}/integration-test-classes</integration.testOutputDir>
+        <site.dir>src/site</site.dir>
+        <site.xhtmlDir>${site.dir}/xhtml</site.xhtmlDir>
+        <spec.dir>src/spec</spec.dir>
+        <spec.docDir>${spec.dir}/resources</spec.docDir>
+        <spec.testSourceDir>${spec.dir}/java</spec.testSourceDir>
     </properties>
 
     <reporting>

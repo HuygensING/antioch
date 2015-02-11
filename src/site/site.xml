@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/DECORATION/1.4.0 http://maven.apache.org/xsd/decoration-1.4.0.xsd">
     <body>
         <menu name="Overview">
-            <item name="Introduction" href="index.html"/>
-            <item name="Sample Page" href="page.html"/>
+            <item name="User stories" href="nl/knaw/huygens/alexandria/Alexandria.html"/>
+            <item name="Concordion" href="../concordion-reports/nl/knaw/huygens/alexandria/Alexandria.html"/>
         </menu>
         <menu ref="reports"/>
     </body>
