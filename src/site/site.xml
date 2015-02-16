@@ -2,18 +2,100 @@
 <project xmlns="http://maven.apache.org/DECORATION/1.4.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/DECORATION/1.4.0 http://maven.apache.org/xsd/decoration-1.4.0.xsd">
+
+    <publishDate position="bottom" />
+    <version position="bottom" />
+
+    <bannerLeft>
+        <name><![CDATA[<span class="color-highlight">Alexandria</span> Text Repository]]>
+        </name>
+        <href>http://HuygensING.github.io/alexandria</href>
+    </bannerLeft>
+    
     <skin>
-        <groupId>org.apache.maven.skins</groupId>
-        <artifactId>maven-fluido-skin</artifactId>
-        <version>1.3.1</version>
+        <groupId>lt.velykis.maven.skins</groupId>
+        <artifactId>reflow-maven-skin</artifactId>
+        <version>1.1.1</version>
     </skin>
+
     <body>
-        <!--
-        <menu name="Overview">
-            <item name="User stories" href="nl/knaw/huygens/alexandria/Alexandria.html"/>
-            <item name="Concordion" href="../concordion-reports/nl/knaw/huygens/alexandria/Alexandria.html"/>
+        <links>
+            <item name="Download" href="skin/index.html#Usage"/>
+            <item name="GitHub project" href="http://github.com/HuygensING/alexandria/"/>
+        </links>
+
+        <breadcrumbs>
+            <item name="Alexandria" href="/"/>
+        </breadcrumbs>
+
+        <menu name="Main" inherit="top">
+            <item name="Home" href="./"/>
+            <item name="GitHub project" href="http://github.com/HuygensING/alexandria/"/>
+            <item name="Release notes" href="release-notes.html"/>
         </menu>
-        -->
-        <menu ref="reports"/>
+        <menu name="Download" inherit="top">
+            <item name="Download" href="skin/index.html#Usage"/>
+            <item name="License" href="license.html"/>
+        </menu>
+
+        <menu name="Documentation" inherit="bottom">
+            <item name="Usage" href="skin/"/>
+            <item name="Configuration" href="skin/config.html"/>
+        </menu>
+        <menu name="Maven documentation" ref="reports" inherit="bottom"/>
     </body>
+
+    <custom>
+        <reflowSkin>
+            <protocolRelativeURLs>false</protocolRelativeURLs>
+            <smoothScroll>true</smoothScroll>
+            <!--<theme>bootswatch-united</theme>-->
+            <theme>default</theme>
+            <highlightJs>true</highlightJs>
+            <highlightJsTheme>github</highlightJsTheme>
+            <brand>
+                <name>
+                    <![CDATA[<span class="color-highlight">Alexandria</span>
+                     Heterogeneous Text Annotation Repository]]>
+                </name>
+                <href>http://alexandria.huygens.knaw.nl</href>
+            </brand>
+            <slogan>Text Annotations Anywhere</slogan>
+            <titleTemplate>%2$s | %1$s</titleTemplate>
+            <toc>top</toc>
+            <topNav>Download|reports</topNav>
+            <bottomNav>
+                <column>Main</column>
+                <column>Download</column>
+                <column>Documentation</column>
+                <column>reports</column>
+            </bottomNav>
+            <bottomDescription>
+                <![CDATA[<span class="color-highlight">Alexandria</span>: Heterogeneous Text Annotation Repository]]>
+            </bottomDescription>
+            <pages>
+                <index project="alexandria">
+                    <shortTitle>Welcome</shortTitle>
+                    <breadcrumbs>false</breadcrumbs>
+                    <markPageHeader>false</markPageHeader>
+                    <toc>false</toc>
+                    <sections>
+                        <!--<carousel/>-->
+                        <body/>
+                        <!--<sidebar/>-->
+                        <!--<thumbs>2</thumbs>-->
+                        <!--<columns>3</columns>-->
+                    </sections>
+                </index>
+                <issue-tracking>
+                    <highlightJs>false</highlightJs>
+                    <toc>false</toc>
+                </issue-tracking>
+                <license>
+                    <highlightJs>false</highlightJs>
+                    <toc>false</toc>
+                </license>
+            </pages>
+        </reflowSkin>
+    </custom>
 </project>
