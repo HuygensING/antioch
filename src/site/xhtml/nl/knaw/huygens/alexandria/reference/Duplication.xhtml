@@ -1,0 +1,51 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+<title>References</title>
+<body>
+
+<h1>References</h1>
+
+<p>A reference in Alexandria refers to an external object that can be annotated.</p>
+
+<p>Before a reference can be given any annotations, it first needs to be created.</p>
+
+<div class="example">
+    <h3>Interaction with existing references</h3>
+
+    <p>Given the following references in the database:</p>
+
+    <table concordion:execute="createReference(#id)">
+        <tr>
+            <th concordion:set="#id">Id</th>
+        </tr>
+        <tr>
+            <td>dpo.1234</td>
+        </tr>
+        <tr>
+            <td>dpo.8111</td>
+        </tr>
+    </table>
+
+    <p>Then these are the results of trying to add references given unused or existing Ids:</p>
+
+    <table>
+        <tr>
+            <th>Id</th>
+            <th>Result</th>
+            <th>Use case</th>
+        </tr>
+        <tr concordion:execute="#result = createReference(#id)">
+            <td concordion:set="#id">dpo.3456</td>
+            <td concordion:assertEquals="#result">201 Created</td>
+            <td>Create a reference with unused Id</td>
+        </tr>
+        <tr concordion:execute="#result = createReference(#id)">
+            <td concordion:set="#id">dpo.8111</td>
+            <td concordion:assertEquals="#result">409 Conflict</td>
+            <td>Create a reference with existing Id</td>
+        </tr>
+    </table>
+
+</div>
+
+</body>
+</html>
