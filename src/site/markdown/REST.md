@@ -10,6 +10,7 @@ Create a resource
 Authorization: auth-token-1234
 
 {
+    "id": "some-uuid-1",
     "ref": "http://meertens.knaw.nl/titles/some-uuid-1",
     "createdBy": "root"                         # Who decides?
 }
@@ -31,6 +32,7 @@ Authorization: auth-token-1234
 => 200 (Ok)
 
 {
+    "id": "some-uuid-1",
     "ref": "http://meertens.knaw.nl/titles/some-uuid-1",
     "annotations": [],
     "createdBy": "root",
@@ -120,20 +122,22 @@ Authorization: auth-token-1234
 ```
 => 200 (Ok)
 
-[
-    {
-        "emotion": "happy",
-        "annotations": [],
-        "createdBy": "root",
-        "createdOn": "2015-02-17 07:48:50+01:00"
-    },
-    {
-        "emotion": "cheerful",
-        "annotations": [],
-        "createdBy": "root",
-        "createdOn": "2015-02-17 08:11:24+01:00"
-    }
-]
+{
+	"annotations": [
+		{
+			"emotion": "happy",
+			"annotations": [],
+			"createdBy": "root",
+			"createdOn": "2015-02-17 07:48:50+01:00"
+		},
+		{
+			"emotion": "cheerful",
+			"annotations": [],
+			"createdBy": "root",
+			"createdOn": "2015-02-17 08:11:24+01:00"
+		}
+	]
+}
 ```
 
 Get resource `some-uuid-1` again
@@ -147,6 +151,7 @@ Authorization: auth-token-1234
 => 200 (Ok)
 
 {
+    "id": "some-uuid-1",
     "ref": "http://meertens.knaw.nl/titles/some-uuid-1",
     "annotations": [
         {
