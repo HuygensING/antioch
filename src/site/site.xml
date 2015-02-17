@@ -39,6 +39,7 @@
         </menu>
 
         <menu name="Documentation" inherit="bottom">
+            <item name="REST" href="REST.html"/>
             <item name="Usage" href="skin/"/>
             <item name="Configuration" href="skin/config.html"/>
         </menu>
