@@ -5,14 +5,17 @@ Base url: `https://alexandria.huygens.knaw.nl`
 
 Create a resource
 -----------------
-```html
+```
 /resources (POST)
-Authorization: auth-token-1234
+Authorization: auth-token-1234                      # Some token identifying 'nederlab'
 
 {
-    "id": "some-uuid-1",
-    "ref": "http://meertens.knaw.nl/titles/some-uuid-1",
-    "createdBy": "root"                         # Who decides?
+    "resource": {
+        "id": "some-uuid-1",
+        "ref": "http://nederlab.nl/titles/some-uuid-1",
+        "createdBy": "root",                        # root  when unspecified, may be overriden (unchecked)
+        "createdOn": "2015-02-17 07:48:50+01:00"    # now() when unspecified, may be overridden (RFC-3339)
+    }
 }
 ```
 
@@ -32,11 +35,13 @@ Authorization: auth-token-1234
 => 200 (Ok)
 
 {
-    "id": "some-uuid-1",
-    "ref": "http://meertens.knaw.nl/titles/some-uuid-1",
-    "annotations": [],
-    "createdBy": "root",
-    "createdOn": "2015-02-17 07:48:50+01:00"      # RFC-3339 in {date,seconds,ns}
+    "resource": {
+        "id": "some-uuid-1",
+        "ref": "http://meertens.knaw.nl/titles/some-uuid-1",
+        "annotations": [],
+        "createdBy": "root",
+        "createdOn": "2015-02-17 07:48:50+01:00"
+    }
 }
 ```
 
@@ -47,9 +52,11 @@ Add an annotation
 Authorization: auth-token-1234
 
 {
-    "emotion": "happy",
-    "createdBy": "root"
-
+    "annotation": {
+        "type": "emotion",
+        "value": "happy",
+        "createdBy": "nederlab-user-1"
+    }
 }
 ```
 
@@ -69,10 +76,13 @@ Authorization: auth-token-1234
 => 200 (Ok)
 
 {
-    "emotion": "happy",
-    "annotations": [],
-    "createdBy": "root",
-    "createdOn": "2015-02-17 07:56:04+01:00"
+    "annotation": {
+        "type": "emotion",
+        "value": "happy",
+        "annotations": [],
+        "createdBy": "nederlab-user-1",
+        "createdOn": "2015-02-17 07:56:04+01:00"
+    }
 }
 ```
 
@@ -86,14 +96,17 @@ Authorization: auth-token-1234
 ```
 => 200 (Ok)
 
-[
-    {
-        "annotations": [],
-        "createdBy": "root",
-        "createdOn": "2015-02-17 07:48:50+01:00",
-        "emotion": "happy"
-    }
-]
+{
+    "annotations": [
+        {
+            "type": "emotion",
+            "value": "happy",
+            "annotations": [],
+            "createdBy": "nederlab-user-1",
+            "createdOn": "2015-02-17 07:48:50+01:00"
+        }
+    ]
+}
 ```
 
 Add another annotation
@@ -103,7 +116,10 @@ Add another annotation
 Authorization: auth-token-1234
 
 {
-    "emotion": "cheerful"
+    "annotation": {
+        "type": "emotion",
+        "value": "cheerful"
+    }
 }
 ```
 
@@ -125,13 +141,15 @@ Authorization: auth-token-1234
 {
 	"annotations": [
 		{
-			"emotion": "happy",
+		    "type": "emotion",
+		    "value": "happy",
 			"annotations": [],
-			"createdBy": "root",
+			"createdBy": "nederlab-user-1",
 			"createdOn": "2015-02-17 07:48:50+01:00"
 		},
 		{
-			"emotion": "cheerful",
+		    "type": "emotion",
+		    "value": "cheerful",
 			"annotations": [],
 			"createdBy": "root",
 			"createdOn": "2015-02-17 08:11:24+01:00"
@@ -155,19 +173,21 @@ Authorization: auth-token-1234
     "ref": "http://meertens.knaw.nl/titles/some-uuid-1",
     "annotations": [
         {
-            "emotion": "happy",
+            "type": "emotion",
+            "value": "happy",
             "annotations": [],
-            "createdBy": "root",
+            "createdBy": "nederlab-user-1",
             "createdOn": "2015-02-17 07:48:50+01:00"
         },
         {
-            "emotion": "cheerful",
+            "type": "emotion",
+            "value": "cheerful",
             "annotations": [],
             "createdBy": "root",
             "createdOn": "2015-02-17 08:11:24+01:00"
         }
     ],
-    "createdBy": "root",
+    "createdBy": "nederlab-user-1",
     "createdOn": "2015-02-17 07:48:50+01:00",
     "updatedOn": "2015-02-17 08:11:24+01:00"
 }

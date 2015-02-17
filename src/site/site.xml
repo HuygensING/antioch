@@ -49,7 +49,7 @@
         <reflowSkin>
             <protocolRelativeURLs>false</protocolRelativeURLs>
             <smoothScroll>true</smoothScroll>
-            <!--<theme>bootswatch-united</theme>-->
+            <!--<theme>bootswatch-spacelab</theme>-->
             <theme>default</theme>
             <highlightJs>true</highlightJs>
             <highlightJsTheme>github</highlightJsTheme>
