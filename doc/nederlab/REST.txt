@@ -1,15 +1,17 @@
 Base url: https://alexandria.huygens.knaw.nl
+================================================================================
+
 
 Create a resource:
 /resources (POST)
 Authorization: auth-token-1234
 
 {
-    ref: 'http://meertens.knaw.nl/titles/some-uuid-1'
+    ref: 'http://meertens.knaw.nl/titles/some-uuid-1',
+    createdBy: 'root'                           # Who decides?
 }
 
-=>
-201 (Created)
+=> 201 (Created)
 Location: https://alexandria.huygens.knaw.nl/resources/some-uuid-1
 
 ================================================================================
@@ -18,6 +20,7 @@ Get a resource:
 Authorization: auth-token-1234
 
 => 200 (Ok)
+
 {
     ref: 'http://meertens.knaw.nl/titles/some-uuid-1',
     annotations: [],
@@ -30,11 +33,11 @@ Add an annotation:
 Authorization: auth-token-1234
 
 {
-    emotion: 'happy'
+    emotion: 'happy',
+    createdBy / createdOn
 }
 
-=>
-201 (Created)
+=> 201 (Created)
 Location: https://alexandria.huygens.knaw.nl/annotations/anno-id-1
 
 ================================================================================
@@ -42,8 +45,8 @@ Get a specific annotation:
 /annotations/anno-id-1 (GET)
 Authorization: auth-token-1234
 
-=>
-200 (Ok)
+=> 200 (Ok)
+
 {
     emotion: 'happy',
     annotations: [],
@@ -56,8 +59,8 @@ Get annotations on specific resource:
 /resources/some-uuid-1/annotations (GET)
 Authorization: auth-token-1234
 
-=>
-200 (Ok)
+=> 200 (Ok)
+
 [
     {
         emotion: 'happy',
@@ -66,3 +69,68 @@ Authorization: auth-token-1234
         createdOn: '2015-02-17 07:48:50+01:00'
     }
 ]
+
+================================================================================
+Add another annotation:
+/resouces/some-uuid-1/annotations (POST)
+Authorization: auth-token-1234
+
+{
+    emotion: 'cheerful'
+}
+
+=>
+201 (Created)
+Location: https://alexandria.huygens.knaw.nl/annotations/anno-id-2
+
+================================================================================
+Get annotations on some-uuid-1 again:
+
+/resources/some-uuid-1/annotations (GET)
+Authorization: auth-token-1234
+
+=> 200 (Ok)
+
+[
+    {
+        emotion: 'happy',
+        annotations: [],
+        createdBy: 'root',
+        createdOn: '2015-02-17 07:48:50+01:00'
+    },
+    {
+        emotion: 'cheerful',
+        annotations: [],
+        createdBy: 'root',
+        createdOn: '2015-02-17 08:11:24+01:00'
+    }
+]
+
+================================================================================
+Get resource some-uuid-1 again:
+
+/resources/some-uuid-1 (GET)
+Authorization: auth-token-1234
+
+=> 200 (Ok)
+
+{
+    ref: 'http://meertens.knaw.nl/titles/some-uuid-1',
+    annotations: [
+        {
+            emotion: 'happy',
+            annotations: [],
+            createdBy: 'root',
+            createdOn: '2015-02-17 07:48:50+01:00'
+        },
+        {
+            emotion: 'cheerful',
+            annotations: [],
+            createdBy: 'root',
+            createdOn: '2015-02-17 08:11:24+01:00'
+        }
+    ],
+    createdBy: 'root',
+    createdOn: '2015-02-17 07:48:50+01:00',
+    updatedOn: '2015-02-17 08:11:24+01:00'
+}
