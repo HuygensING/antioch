@@ -14,6 +14,13 @@ public class ReferenceFixture {
   }
 
   public String createReference(final String id) {
-    return service.createReference(id);
+    try {
+      service.createReference(id);
+      return "201 Created";
+    } catch (IllegalReferenceException e) {
+      return "400 Bad Request";
+    } catch (ReferenceExistsException e) {
+      return "409 Conflict";
+    }
   }
 }

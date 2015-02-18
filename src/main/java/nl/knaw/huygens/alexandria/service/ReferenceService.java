@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.service;
 
+import com.google.common.base.Strings;
 import nl.knaw.huygens.alexandria.reference.IllegalReferenceException;
 import nl.knaw.huygens.alexandria.reference.ReferenceExistsException;
 import nl.knaw.huygens.alexandria.reference.ReferenceStore;
@@ -11,14 +12,13 @@ public class ReferenceService {
     this.referenceStore = referenceStore;
   }
 
-  public String createReference(final String id) {
-    try {
-      referenceStore.createReference(id);
-      return "201 Created";
-    } catch (IllegalReferenceException e) {
-      return "400 Bad Request";
-    } catch (ReferenceExistsException e) {
-      return "409 Conflict";
+  public void createReference(final String id) throws IllegalReferenceException, ReferenceExistsException {
+    if (Strings.isNullOrEmpty(id)) {
+      throw new IllegalReferenceException(id);
+    }
+
+    if (!referenceStore.createReference(id)) {
+      throw new ReferenceExistsException(id);
     }
   }
 }

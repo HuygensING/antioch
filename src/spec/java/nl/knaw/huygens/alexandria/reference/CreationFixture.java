@@ -4,5 +4,5 @@ import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.runner.RunWith;
 
 @RunWith(ConcordionRunner.class)
-public class CreationTest extends ReferenceFixture {
+public class CreationFixture extends ReferenceFixture {
 }
