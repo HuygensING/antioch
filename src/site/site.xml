@@ -74,7 +74,7 @@
                 is a repository for adding and querying heterogeneous annotations on any kind of text
                 or segment of a text.
                 Both texts maintained by the repository as well as texts registered at the repository
-                but maintained elsewhere can be annotated (and queried).
+                but maintained elsewhere can be annotated and queried.
             </bottomDescription>
             <pages>
                 <index project="alexandria">
