@@ -1,5 +1,5 @@
-Example REST calls:
-===================
+RESTful Alexandria
+==================
 
 Base url: `https://alexandria.huygens.knaw.nl`
 
