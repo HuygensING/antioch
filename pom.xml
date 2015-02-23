@@ -238,6 +238,23 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-publish-plugin</artifactId>
+                <version>${plugin.scm-publish.version}</version>
+                <inherited>true</inherited>
+                <configuration>
+                    <checkoutDirectory>${scmPublish.checkoutDirectory}</checkoutDirectory>
+                    <checkinComment>Publishing Site Docs for ${project.artifactId}:${project.version}
+                    </checkinComment>
+                    <!-- Plugins defaults to "target/staging" and since the distributionManagement section is a pain in the ass for site docs, this is easier -->
+                    <content>${scm-publish.siteDocOuputDirectory}</content>
+                    <skipDeletedFiles>true</skipDeletedFiles>
+                    <pubScmUrl>${scm-publish.pubScmUrl}</pubScmUrl>
+                    <scmBranch>${scm-publish.scmBranch}</scmBranch>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -271,6 +288,7 @@
         <guava.version>18.0</guava.version>
         <jdk.version>1.8</jdk.version>
         <junit.version>4.12</junit.version>
+        <plugin.scm-publish.version>1.0</plugin.scm-publish.version>
 
         <concordion.reportDir>${project.build.directory}/concordion-reports</concordion.reportDir>
         <integration.testOutputDir>${project.build.directory}/integration-test-classes</integration.testOutputDir>
@@ -279,6 +297,13 @@
         <spec.dir>src/spec</spec.dir>
         <spec.docDir>${spec.dir}/resources</spec.docDir>
         <spec.testSourceDir>${spec.dir}/java</spec.testSourceDir>
+
+        <!-- @OVERRIDE [This is the branch that the web "pages" are located in. For GitHub, gh-pages; for BitBucket, master] -->
+        <scm-publish.scmBranch>gh-pages</scm-publish.scmBranch>
+        <!-- @OVERRIDE [SCM location for documentation repository] -->
+        <scm-publish.pubScmUrl>scm:git:git@github.com:huygensING/alexandria.git</scm-publish.pubScmUrl>
+        <scm-publish.siteDocOuputDirectory>${project.reporting.outputDirectory}</scm-publish.siteDocOuputDirectory>
+        <scmPublish.checkoutDirectory>${project.build.directory}/scmpublish</scmPublish.checkoutDirectory>
     </properties>
 
     <reporting>
