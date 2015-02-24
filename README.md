@@ -1,3 +1,4 @@
-See the [Maven generated documentation](http://huygensING.github.io/alexandria).
+See the [generated Maven site](http://huygensING.github.io/alexandria) for documentation on Alexandria.
 
-```mvn clean verify site:site scm-publish:publish-scm```
+### Note to self
+	mvn clean verify site:site scm-publish:publish-scm
