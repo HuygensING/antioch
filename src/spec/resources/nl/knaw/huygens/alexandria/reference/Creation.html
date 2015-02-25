@@ -1,36 +1,35 @@
-<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+<html xmlns:c="http://www.concordion.org/2007/concordion">
 <title>References</title>
 
 <body>
 
-<h1>References</h1>
-
-<p>A reference in Alexandria refers to an external object that can be annotated.</p>
-
-<p>
-    Before a reference can be given any annotations, it first needs to be created.
-</p>
+<h1>Resource Endpoint</h1>
 
 <div class="example">
-    <h3>Requirements for creating a reference</h3>
+    <h3>How can I create a reference resource?</h3>
 
-    <table>
-        <tr>
-            <th>Id</th>
-            <th>Result</th>
-            <th>Use case</th>
-        </tr>
-        <tr concordion:execute="#result = createReference(#id)">
-            <td concordion:set="#id">dpo.3456</td>
-            <td concordion:assertEquals="#result">201 Created</td>
-            <td>Create a reference with valid Id</td>
-        </tr>
-        <tr concordion:execute="#result = createReference(#id)">
-            <td><span concordion:set="#id"></span><code>""</code></td>
-            <td concordion:assertEquals="#result">400 Bad Request</td>
-            <td>Create a reference with invalid (empty) Id</td>
-        </tr>
-    </table>
+    <p>Given a base URI of <code c:set="#baseURI">https://alexandria.huygens.knaw.nl</code></p>
+
+    <p>When I <code c:set="#method">POST</code> the following body to <code c:set="#path">/resources</code>:</p>
+
+    <code c:set="#body">{
+        "resource": {
+        "ref": "http://nederlab.nl/titles/path/to/title/resource"
+        }
+        }</code>
+
+    <p>Then <span c:execute="#response = rest(#method, #baseURI, #path, #body)">the response</span></p>
+    <ul>
+        <li>status should be <b c:assertEquals="#response.status">201 Created</b></li>
+        <li>should contain a Location header</li>
+            <ul>
+                <li>starting with <b c:assertEquals="#response.locationStart">https://alexandria.huygens.knaw.nl/resources/</b>
+                </li>
+                <li>ending with a <b c:assertEquals="#response.locationId">valid UUID</b></li>
+            </ul>
+        <li>body is <b c:assertEquals="#response.body"></b> (empty)</li>
+    </ul>
+
 </div>
 </body>
 </html>

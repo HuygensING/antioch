@@ -265,6 +265,17 @@
             <version>${guava.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
+            <artifactId>jersey-test-framework-inmemory</artifactId>
+            <version>${jersey.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.concordion</groupId>
             <artifactId>concordion</artifactId>
             <version>${concordion.version}</version>
@@ -287,6 +298,7 @@
         <concordion.version>1.4.7</concordion.version>
         <guava.version>18.0</guava.version>
         <jdk.version>1.8</jdk.version>
+        <jersey.version>1.19</jersey.version>
         <junit.version>4.12</junit.version>
         <plugin.scm-publish.version>1.0</plugin.scm-publish.version>
 
