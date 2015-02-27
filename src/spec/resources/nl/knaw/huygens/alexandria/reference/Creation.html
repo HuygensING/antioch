@@ -3,32 +3,33 @@
 
 <body>
 
-<h1>Resource Endpoint</h1>
+<h1>Resources Endpoint</h1>
 
 <div class="example">
-    <h3>How can I create a reference resource?</h3>
+    <h3>How can I create a resource?</h3>
 
-    <p>Given a base URI of <code c:set="#baseURI">https://alexandria.huygens.knaw.nl</code></p>
+    <p>Given a (e.g., title) resource located at <code>http://www.example.com/titles/path/to/title/resource</code></p>
+    
+    <p>When I <b c:set="#method">POST</b></p>
+<pre><code c:set="#body">{
+    "resource": {
+        "ref": "http://www.example.com/titles/path/to/title/resource"
+    }
+}</code></pre>
 
-    <p>When I <code c:set="#method">POST</code> the following body to <code c:set="#path">/resources</code>:</p>
+    <p>to <code c:set="#path"><b>/resources</b></code></p>
 
-    <code c:set="#body">{
-        "resource": {
-        "ref": "http://nederlab.nl/titles/path/to/title/resource"
-        }
-        }</code>
-
-    <p>Then <span c:execute="#response = rest(#method, #baseURI, #path, #body)">the response</span></p>
-    <ul>
-        <li>status should be <b c:assertEquals="#response.status">201 Created</b></li>
-        <li>should contain a Location header</li>
-            <ul>
-                <li>starting with <b c:assertEquals="#response.locationStart">https://alexandria.huygens.knaw.nl/resources/</b>
-                </li>
-                <li>ending with a <b c:assertEquals="#response.locationId">valid UUID</b></li>
-            </ul>
-        <li>body is <b c:assertEquals="#response.body"></b> (empty)</li>
-    </ul>
+    <p c:execute="#response = rest(#method, #path, #body)">Then:</p>
+    <ol>
+        <li>the response status should be <b c:assertEquals="#response.status">201 Created</b>;</li>
+        <li>the response <b c:assertEquals="#response.locationPresent">contains a Location header</b>:</li>
+        <ol>
+            <li>with the <b c:assertEquals="#response.locationScheme">https</b> scheme;</li>
+            <li>ending in <b c:assertEquals="#response.locationStart">/resources/</b> plus a (randomly generated)
+                <b c:assertEquals="#response.locationId">well-formed UUID</b>.</li>
+        </ol>
+        <li>the response body is <b c:assertEquals="#response.body"></b> (empty).</li>
+    </ol>
 
 </div>
 </body>

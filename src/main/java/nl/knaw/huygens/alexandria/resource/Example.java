@@ -6,8 +6,8 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.UUID;
 
-@Path("/resources")
-public class Blaat {
+@Path("/example")
+public class Example {
   @POST
   public Response postIt() {
     return Response.created(URI.create(UUID.randomUUID().toString())).build();
