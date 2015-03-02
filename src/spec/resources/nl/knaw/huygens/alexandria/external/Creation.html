@@ -32,6 +32,11 @@
         <li>the response body is <b c:assertEquals="#response.body"></b> (empty).</li>
     </ol>
 
+    <p><b>TODO:</b> Officially, If a resource has been created on the origin server, the response SHOULD be 201
+        (Created) and <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.5">contain an entity which
+            describes the status of the request and refers to the new resource</a>. Should we support this?
+    </p>
+
 </div>
 
 
@@ -64,6 +69,13 @@
 
 
 <div class="example">
+    <h3>Links:</h3>
+    <ul>
+        <li>
+            <a href="http://www.codingpedia.org/ama/tutorial-rest-api-design-and-implementation-in-java-with-jersey-and-spring/#3211_Design">POST
+                vs PUT (idempotency)</a></li>
+    </ul>
+
     <h3>Todo:</h3>
     <ul>
         <li>show what happens when a POST is done where JSON body contains an id</li>
