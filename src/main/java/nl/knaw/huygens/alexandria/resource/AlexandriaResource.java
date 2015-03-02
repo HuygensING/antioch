@@ -6,10 +6,10 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.UUID;
 
-@Path("/example")
-public class Example {
+@Path("/resources")
+public class AlexandriaResource {
   @POST
-  public Response postIt() {
+  public Response createResourceWithoutGivenID() {
     return Response.created(URI.create(UUID.randomUUID().toString())).build();
   }
 }

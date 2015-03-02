@@ -9,7 +9,7 @@
     <h3>How can I create a resource?</h3>
 
     <p>Given a (e.g., title) resource located at <code>http://www.example.com/titles/path/to/title/resource</code></p>
-    
+
     <p>When I <b c:set="#method">POST</b></p>
 <pre><code c:set="#body">{
     "resource": {
@@ -26,7 +26,8 @@
         <ol>
             <li>with the <b c:assertEquals="#response.locationScheme">https</b> scheme;</li>
             <li>ending in <b c:assertEquals="#response.locationStart">/resources/</b> plus a (randomly generated)
-                <b c:assertEquals="#response.locationId">well-formed UUID</b>.</li>
+                <b c:assertEquals="#response.locationId">well-formed UUID</b>.
+            </li>
         </ol>
         <li>the response body is <b c:assertEquals="#response.body"></b> (empty).</li>
     </ol>

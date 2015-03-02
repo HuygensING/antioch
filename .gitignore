@@ -5,7 +5,8 @@ atlassian-ide-plugin.xml
 .idea/
 *.iml
 
+# MacBook
+.DS_Store
+
 # Maven
 **/target/
-
-.DS_Store
