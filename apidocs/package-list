@@ -1,4 +1,5 @@
 nl.knaw.huygens.alexandria
-nl.knaw.huygens.alexandria.reference
+nl.knaw.huygens.alexandria.external
 nl.knaw.huygens.alexandria.resource
 nl.knaw.huygens.alexandria.service
+nl.knaw.huygens.alexandria.util
