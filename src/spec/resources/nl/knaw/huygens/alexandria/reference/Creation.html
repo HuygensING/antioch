@@ -6,7 +6,7 @@
 <h1>Resources Endpoint</h1>
 
 <div class="example">
-    <h3>How can I create a resource?</h3>
+    <h3>How can I create a resource without having to specify an ID?</h3>
 
     <p>Given a (e.g., title) resource located at <code>http://www.example.com/titles/path/to/title/resource</code></p>
 
@@ -33,5 +33,33 @@
     </ol>
 
 </div>
+
+<div class="example">
+    <h3>How can I create a resource with a specific UUID?</h3>
+
+    <p>Given a (e.g., title) resource located at <code>http://www.example.com/titles/path/to/title/resource</code>,
+        which is to be stored as UUID <code>6e56c868-c0a9-11e4-a762-cb9a664afc01</code>, and <b>no</b> resource
+        with that UUID exists yet</p>
+
+    <p>When I <b c:set="#method">PUT</b></p>
+<pre><code c:set="#body">{
+    "resource": {
+        "id": "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+        "ref": "http://www.example.com/titles/path/to/title/resource"
+    }
+}</code></pre>
+
+    <p>to <code c:set="#path"><b>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</b></code></p>
+
+    <p c:execute="#response = rest(#method, #path, #body)">Then:</p>
+    <ol>
+        <li>the response status should be <b c:assertEquals="#response.status">201 Created</b>;</li>
+        <li>with the <b c:assertEquals="#response.locationScheme">https</b> scheme;</li>
+        <li>ending in <b c:assertEquals="#response.locationPath">/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</b>
+        </li>
+    </ol>
+    <li>the response body is <b c:assertEquals="#response.body"></b> (empty).</li>
+</div>
+
 </body>
 </html>

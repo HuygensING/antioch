@@ -1,24 +1,26 @@
 package nl.knaw.huygens.alexandria;
 
-import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import nl.knaw.huygens.alexandria.reference.ReferenceStore;
 
 public class InMemoryReferenceStore implements ReferenceStore {
-  private final List<String> references = Lists.newArrayList();
+  private final Map<UUID, String> references = Maps.newConcurrentMap();
 
   @Override
-  public boolean createReference(final String id) {
-    Preconditions.checkNotNull(id, "id must not be null");
-    Preconditions.checkArgument(!id.isEmpty(), "id must not be empty");
-    
-    if (references.contains(id)) {
+  public boolean createReference(final UUID uuid, final String ref) {
+    Preconditions.checkNotNull(uuid, "id must not be null");
+    Preconditions.checkArgument(!Strings.isNullOrEmpty(ref), "ref must not be null or empty");
+
+    if (references.containsKey(uuid)) {
       return false;
     }
 
-    references.add(id);
+    references.put(uuid, ref);
     return true;
   }
 }

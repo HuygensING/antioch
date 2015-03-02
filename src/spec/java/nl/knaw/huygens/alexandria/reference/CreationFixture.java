@@ -27,6 +27,7 @@ public class CreationFixture extends RestFixture {
       result.with("locationPresent", "contains a Location header");
       result.with("locationScheme", uri.getScheme());
       final String locationPath = uri.getPath();
+      result.with("locationPath", locationPath);
       result.with("locationStart", extractBaseURI(locationPath));
       final String uuid = extractUUID(locationPath);
       result.with("locationId", UUIDValidator.of(uuid).whenValid("well-formed UUID").orElse("malformed UUID: " + uuid));
