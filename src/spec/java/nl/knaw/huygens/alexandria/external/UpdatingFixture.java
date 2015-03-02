@@ -7,5 +7,5 @@ import org.junit.runner.RunWith;
 
 @ExpectedToFail
 @RunWith(ConcordionRunner.class)
-public class QueryingFixture extends RestFixture {
+public class UpdatingFixture extends RestFixture {
 }

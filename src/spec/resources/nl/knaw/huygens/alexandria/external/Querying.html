@@ -13,7 +13,7 @@
     <p>When I <b c:set="#method">GET</b> <code><b
             c:set="#path">/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</b></code></p>
 
-    <p c:execute="#response = testGET(#method, #path)">Then:</p>
+    <p c:execute="#response = invokeREST(#method, #path)">Then:</p>
     <ol>
         <li>the response status should be <b c:assertEquals="#response.status">200 OK</b>;</li>
         <li>the response body is
@@ -30,7 +30,7 @@
     <p>When I <b c:set="#method">GET</b> <code><b
             c:set="#path">/resources/3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</b></code></p>
 
-    <p c:execute="#response = testGET(#method, #path)">Then:</p>
+    <p c:execute="#response = invokeREST(#method, #path)">Then:</p>
     <ol>
         <li>the response status should be <b c:assertEquals="#response.status">404 Not Found</b>;</li>
         <li>the response body is <b c:assertEquals="#response.body"></b> (empty).</li>
