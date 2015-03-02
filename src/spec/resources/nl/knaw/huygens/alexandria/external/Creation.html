@@ -1,5 +1,5 @@
 <html xmlns:c="http://www.concordion.org/2007/concordion">
-<title>Creating Resources</title>
+<title>Creating External Resources</title>
 
 <body>
 
@@ -34,6 +34,7 @@
 
 </div>
 
+
 <div class="example">
     <h3>How can I create an external resource with a specific UUID?</h3>
 
@@ -59,6 +60,15 @@
         </li>
     </ol>
     <li>the response body is <b c:assertEquals="#response.body"></b> (empty).</li>
+</div>
+
+
+<div class="example">
+    <h3>Todo:</h3>
+    <ul>
+        <li>show what happens when a POST is done where JSON body contains an id</li>
+        <li>show what happens when a PUT is done where id in JSON body differs from id in /resources/{id} path</li>
+    </ul>
 </div>
 
 </body>

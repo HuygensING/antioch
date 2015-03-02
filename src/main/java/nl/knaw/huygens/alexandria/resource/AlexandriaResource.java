@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.resource;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -19,6 +20,12 @@ public class AlexandriaResource {
   public static final URI HERE = URI.create("");
 
   private final ReferenceService referenceService = new ReferenceService(new InMemoryReferenceStore());
+  
+  @GET
+  @Path("/{uuid}")
+  public Response getResourceByID(@PathParam("uuid") final String uuid) {
+    return Response.ok("{ \"resource\":{\"body\": \"to be fixed\"} }").build();
+  }
 
   @POST
   public Response createResourceWithoutGivenID(String body) {
