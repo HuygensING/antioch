@@ -7,3 +7,5 @@ atlassian-ide-plugin.xml
 
 # Maven
 **/target/
+
+.DS_Store
