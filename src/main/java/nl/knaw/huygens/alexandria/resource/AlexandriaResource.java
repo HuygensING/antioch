@@ -19,6 +19,7 @@ import nl.knaw.huygens.alexandria.service.ReferenceService;
 public class AlexandriaResource {
   public static final URI HERE = URI.create("");
 
+  // TODO: @Inject
   private final ReferenceService referenceService = new ReferenceService(new InMemoryReferenceStore());
   
   @GET

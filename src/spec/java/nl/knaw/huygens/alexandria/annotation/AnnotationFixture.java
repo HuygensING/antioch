@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria;
+package nl.knaw.huygens.alexandria.annotation;
 
 import static org.concordion.api.MultiValueResult.multiValueResult;
 
@@ -8,15 +8,20 @@ import java.util.Map;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import nl.knaw.huygens.alexandria.RestFixture;
 import org.concordion.api.MultiValueResult;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.runner.RunWith;
 
 @RunWith(ConcordionRunner.class)
-public class AnnotationFixture {
-
+public class AnnotationFixture extends RestFixture {
   private final Map<String, List<String>> annotatedReferences = Maps.newHashMap();
 
+  public MultiValueResult testAnno(String key, String value) {
+    invokeREST("POST", "/annotations", key + ":" + value);
+    return invokeREST("GET", "/annotations/1");
+  }
+  
   public void setUpAnnotation(String id, String tag) {
     List<String> tags = annotatedReferences.get(id);
 

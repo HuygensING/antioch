@@ -1,0 +1,91 @@
+<html xmlns:c="http://www.concordion.org/2007/concordion">
+<body>
+
+<h1>Annotations</h1>
+
+<div class="example">
+    <div c:set="#aap">Aap</div> <div c:set="#noot">Noot</div>
+    <b c:execute="#response = testAnno(#aap, #noot)"></b>
+</div>
+
+<div class="example">
+    <h3>Requirements for adding an annotation to a reference</h3>
+
+    <table>
+        <tr>
+            <th>Id</th>
+            <th>Tag</th>
+            <th>Result</th>
+            <th>Use case</th>
+        </tr>
+        <tr c:execute="#result = addAnnotation(#id,#tag)">
+            <td><span c:set="#id"></span><code>""</code></td>
+            <td c:set="#tag">some annotation</td>
+            <td c:assertEquals="#result">400 Bad Request</td>
+            <td>Add annotation on empty reference id</td>
+        </tr>
+        <tr c:execute="#result = addAnnotation(#id,#tag)">
+            <td c:set="#id">dpo.8111</td>
+            <td><span c:set="#tag"></span><code>""</code></td>
+            <td c:assertEquals="#result">400 Bad Request</td>
+            <td>Add empty annotation on valid reference id</td>
+        </tr>
+        <tr c:execute="#result = addAnnotation(#id,#tag)">
+            <td c:set="#id">dpo.8111</td>
+            <td c:set="#tag">some annotation</td>
+            <td c:assertEquals="#result">201 Created</td>
+            <td>Add valid annotation on valid reference id</td>
+        </tr>
+    </table>
+</div>
+
+<div class="example">
+    <h3>Interaction with existing references</h3>
+
+    <p>Given this reference in the database:</p>
+
+    <table c:execute="setUpAnnotation(#id, #tag)">
+        <tr>
+            <th c:set="#id">Id</th>
+            <th c:set="#tag">Tag</th>
+        </tr>
+        <tr>
+            <td>dpo.8111</td>
+            <td>some annotation</td>
+        </tr>
+    </table>
+
+    <p>Then this happens when trying to add the following annotations:</p>
+
+    <table>
+        <tr>
+            <th>Id</th>
+            <th>Tag</th>
+            <th>Result</th>
+            <th>Use case</th>
+        </tr>
+        <tr c:execute="#result = addAnnotation(#id,#tag)">
+            <td c:set="#id">dpo.8111</td>
+            <td c:set="#tag">some annotation</td>
+            <td c:assertEquals="#result">409 Conflict</td>
+            <td>Add existing annotation (again)</td>
+        </tr>
+        <tr c:execute="#result = addAnnotation(#id,#tag)">
+            <td c:set="#id">dpo.8111</td>
+            <td c:set="#tag">another annotation</td>
+            <td c:assertEquals="#result">201 Created</td>
+            <td>Add <i>new</i> annotation to reference with other annotations</td>
+        </tr>
+        <tr c:execute="#result = addAnnotation(#id,#tag)">
+            <td c:set="#id">dpo.3456</td>
+            <td c:set="#tag">some annotation</td>
+            <td c:assertEquals="#result">201 Created</td>
+            <td>Add annotation to reference <i>without</i> annotations</td>
+        </tr>
+    </table>
+
+</div>
+
+
+</body>
+</html>
