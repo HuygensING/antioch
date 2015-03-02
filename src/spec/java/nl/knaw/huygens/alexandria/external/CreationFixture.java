@@ -1,11 +1,11 @@
-package nl.knaw.huygens.alexandria.reference;
+package nl.knaw.huygens.alexandria.external;
 
 import java.net.URI;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import nl.knaw.huygens.alexandria.RestFixture;
-import nl.knaw.huygens.alexandria.UUIDValidator;
+import nl.knaw.huygens.alexandria.util.UUIDParser;
 import org.concordion.api.MultiValueResult;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.runner.RunWith;
@@ -16,7 +16,7 @@ public class CreationFixture extends RestFixture {
     return s.substring(0, s.lastIndexOf('/') + 1);
   }
 
-  private static String extractUUID(String s) {
+  private static String tailOf(String s) {
     return Iterables.getLast(Splitter.on('/').split(s));
   }
 
@@ -29,8 +29,10 @@ public class CreationFixture extends RestFixture {
       final String locationPath = uri.getPath();
       result.with("locationPath", locationPath);
       result.with("locationStart", extractBaseURI(locationPath));
-      final String uuid = extractUUID(locationPath);
-      result.with("locationId", UUIDValidator.of(uuid).whenValid("well-formed UUID").orElse("malformed UUID: " + uuid));
+
+      final String idStr = tailOf(locationPath);
+      result.with("locationId", UUIDParser.fromString(idStr).get().map(uuid -> "well-formed UUID")
+                                          .orElse("malformed UUID: " + idStr));
     });
 
     return result;

@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.reference;
+package nl.knaw.huygens.alexandria.external;
 
 public class ReferenceExistsException extends Exception {
   public ReferenceExistsException(String id) {

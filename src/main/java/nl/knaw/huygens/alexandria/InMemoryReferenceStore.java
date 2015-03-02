@@ -6,7 +6,7 @@ import java.util.UUID;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
-import nl.knaw.huygens.alexandria.reference.ReferenceStore;
+import nl.knaw.huygens.alexandria.external.ReferenceStore;
 
 public class InMemoryReferenceStore implements ReferenceStore {
   private final Map<UUID, String> references = Maps.newConcurrentMap();

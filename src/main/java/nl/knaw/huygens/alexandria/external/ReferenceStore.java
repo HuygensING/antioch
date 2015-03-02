@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.reference;
+package nl.knaw.huygens.alexandria.external;
 
 import java.util.UUID;
 

@@ -10,7 +10,8 @@ import java.net.URI;
 import java.util.UUID;
 
 import nl.knaw.huygens.alexandria.InMemoryReferenceStore;
-import nl.knaw.huygens.alexandria.reference.ReferenceExistsException;
+import nl.knaw.huygens.alexandria.external.IllegalReferenceException;
+import nl.knaw.huygens.alexandria.external.ReferenceExistsException;
 import nl.knaw.huygens.alexandria.service.ReferenceService;
 
 @Path("/resources")
@@ -26,29 +27,17 @@ public class AlexandriaResource {
   }
 
   @PUT
-  @Path("/{id}")
-  public Response createResourceAtSpecificID(@PathParam("id") final String id, String body) {
-    final UUID uuid;
+  @Path("/{uuid}")
+  public Response createResourceAtSpecificID(@PathParam("uuid") final String uuid, String body) {
     try {
-      uuid = UUID.fromString(id);
-    } catch (IllegalArgumentException e) {
-      return Response.status(Status.BAD_REQUEST).entity("Not a valid UUID: " + id).build();
-    }
-    
-    if (resourceBelongsToID(body, id)) {
-      try {
-        referenceService.createReference(uuid, body);
-      } catch (ReferenceExistsException e) {
-        return Response.status(Status.CONFLICT).entity(body).build();
-      }
+      referenceService.createReference(uuid, body);
       return Response.created(HERE).build();
+    } catch (IllegalReferenceException e) {
+      // TODO: improve by making parameter uuid of type UUID and adding a Jersey level converter
+      return Response.status(Status.BAD_REQUEST).entity("Malformed UUID: " + uuid).build();
+    } catch (ReferenceExistsException e) {
+      return Response.status(Status.CONFLICT).entity(body).build();
     }
-
-    return Response.status(Status.BAD_REQUEST).entity("Id '" + id + "' not present in body").build();
   }
 
-  // TODO: JSONify
-  private boolean resourceBelongsToID(String body, String id) {
-    return body.contains(id);
-  }
 }
