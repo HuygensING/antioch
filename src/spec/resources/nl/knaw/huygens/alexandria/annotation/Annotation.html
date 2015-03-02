@@ -4,8 +4,13 @@
 <h1>Annotations</h1>
 
 <div class="example">
-    <div c:set="#aap">Aap</div> <div c:set="#noot">Noot</div>
-    <b c:execute="#response = testAnno(#aap, #noot)"></b>
+    WORK IN PROGRESS:
+    <div c:set="#key">Emotion</div> <div c:set="#value">Happy</div>
+    <b c:execute="#response = testAnno(#key, #value)"></b>
+    <ol>
+        <li c:assertEquals="#response.key">key=Emotion</li>
+        <li c:assertEquals="#response.value">value=Happy</li>
+    </ol>
 </div>
 
 <div class="example">

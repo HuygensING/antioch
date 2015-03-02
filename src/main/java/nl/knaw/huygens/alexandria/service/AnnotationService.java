@@ -45,7 +45,7 @@ public class AnnotationService {
     
     @Override
     public String toString() {
-      return String.format("Annotation[key=%s,value=%s]", key, value);
+      return String.format("key=%s,value=%s", key, value);
     }
 
     @Override

@@ -5,7 +5,9 @@ import static org.concordion.api.MultiValueResult.multiValueResult;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import nl.knaw.huygens.alexandria.RestFixture;
@@ -19,9 +21,13 @@ public class AnnotationFixture extends RestFixture {
 
   public MultiValueResult testAnno(String key, String value) {
     invokeREST("POST", "/annotations", key + ":" + value);
-    return invokeREST("GET", "/annotations/1");
+    final MultiValueResult response = invokeREST("GET", "/annotations/1");
+    String body = (String)response.get("body");
+    response.with("key", Splitter.on(',').split(body).iterator().next());
+    response.with("value", Iterables.getLast(Splitter.on(',').split(body)));
+    return response;
   }
-  
+
   public void setUpAnnotation(String id, String tag) {
     List<String> tags = annotatedReferences.get(id);
 
