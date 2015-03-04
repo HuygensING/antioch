@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.service;
 
+import javax.ws.rs.core.Context;
 import java.util.UUID;
 
 import nl.knaw.huygens.alexandria.external.IllegalReferenceException;
@@ -10,7 +11,7 @@ import nl.knaw.huygens.alexandria.util.UUIDParser;
 public class ReferenceService {
   private final ReferenceStore referenceStore;
 
-  public ReferenceService(final ReferenceStore referenceStore) {
+  public ReferenceService(@Context ReferenceStore referenceStore) {
     this.referenceStore = referenceStore;
   }
 
@@ -30,5 +31,10 @@ public class ReferenceService {
       throws IllegalReferenceException, ReferenceExistsException {
     UUID uuid = UUIDParser.fromString(id).get().orElseThrow(IllegalReferenceException::new);
     createReference(uuid, ref);
+  }
+
+  public String getReference(String id) throws IllegalReferenceException {
+    UUID uuid = UUIDParser.fromString(id).get().orElseThrow(IllegalReferenceException::new);
+    return referenceStore.getReference(uuid);
   }
 }

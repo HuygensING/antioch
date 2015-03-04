@@ -180,6 +180,7 @@
                                 <move todir="${integration.testOutputDir}">
                                     <fileset dir="${project.build.testOutputDirectory}">
                                         <include name="**/*.class"/>
+                                        <!-- the following fails to copy inner classes (Xyz$1.class) -->
                                         <present targetdir="${spec.testSourceDir}">
                                             <mapper type="glob" from="*.class" to="*.java"/>
                                         </present>
@@ -258,77 +259,6 @@
         </plugins>
     </build>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-            <version>${guice.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.inject.extensions</groupId>
-            <artifactId>guice-servlet</artifactId>
-            <version>${guice.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>${jersey.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.jersey-test-framework</groupId>
-            <artifactId>jersey-test-framework-inmemory</artifactId>
-            <version>${jersey.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.concordion</groupId>
-            <artifactId>concordion</artifactId>
-            <version>${concordion.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
-    <properties>
-        <!-- Encoding: everything UTF-8 please -->
-        <encoding>UTF-8</encoding>
-        <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
-
-        <!-- Software versions -->
-        <concordion.version>1.4.7</concordion.version>
-        <guava.version>18.0</guava.version>
-        <guice.version>3.0</guice.version>
-        <jdk.version>1.8</jdk.version>
-        <jersey.version>1.19</jersey.version>
-        <junit.version>4.12</junit.version>
-        <plugin.scm-publish.version>1.0</plugin.scm-publish.version>
-
-        <concordion.reportDir>${project.build.directory}/concordion-reports</concordion.reportDir>
-        <integration.testOutputDir>${project.build.directory}/integration-test-classes</integration.testOutputDir>
-        <site.dir>src/site</site.dir>
-        <site.xhtmlDir>${site.dir}/xhtml</site.xhtmlDir>
-        <spec.dir>src/spec</spec.dir>
-        <spec.docDir>${spec.dir}/resources</spec.docDir>
-        <spec.testSourceDir>${spec.dir}/java</spec.testSourceDir>
-
-        <!-- @OVERRIDE [This is the branch that the web "pages" are located in. For GitHub, gh-pages; for BitBucket, master] -->
-        <scm-publish.scmBranch>gh-pages</scm-publish.scmBranch>
-        <!-- @OVERRIDE [SCM location for documentation repository] -->
-        <scm-publish.pubScmUrl>scm:git:git@github.com:huygensING/alexandria.git</scm-publish.pubScmUrl>
-        <scm-publish.siteDocOuputDirectory>${project.reporting.outputDirectory}</scm-publish.siteDocOuputDirectory>
-        <scmPublish.checkoutDirectory>${project.build.directory}/scmpublish</scmPublish.checkoutDirectory>
-    </properties>
-
     <reporting>
         <plugins>
             <plugin>
@@ -392,5 +322,90 @@
             </plugin>
         </plugins>
     </reporting>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>${guice.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-servlet</artifactId>
+            <version>${guice.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
+		<!-- Tests -->
+        <dependency>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
+            <artifactId>jersey-test-framework-inmemory</artifactId>
+            <version>${jersey.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.concordion</groupId>
+            <artifactId>concordion</artifactId>
+            <version>${concordion.version}</version>
+			<scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hamcrest</groupId>
+                    <artifactId>hamcrest-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <!-- Encoding: everything UTF-8 please -->
+        <encoding>UTF-8</encoding>
+        <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
+
+        <!-- Software versions -->
+        <concordion.version>1.4.7</concordion.version>
+        <guava.version>18.0</guava.version>
+        <guice.version>3.0</guice.version>
+        <jdk.version>1.8</jdk.version>
+        <jersey.version>1.19</jersey.version>
+        <junit.version>4.12</junit.version>
+        <mockito.version>1.10.19</mockito.version>
+        <plugin.scm-publish.version>1.0</plugin.scm-publish.version>
+
+        <concordion.reportDir>${project.build.directory}/concordion-reports</concordion.reportDir>
+        <integration.testOutputDir>${project.build.directory}/integration-test-classes</integration.testOutputDir>
+        <site.dir>src/site</site.dir>
+        <site.xhtmlDir>${site.dir}/xhtml</site.xhtmlDir>
+        <spec.dir>src/spec</spec.dir>
+        <spec.docDir>${spec.dir}/resources</spec.docDir>
+        <spec.testSourceDir>${spec.dir}/java</spec.testSourceDir>
+
+        <scm-publish.scmBranch>gh-pages</scm-publish.scmBranch>
+        <scm-publish.pubScmUrl>scm:git:git@github.com:huygensING/alexandria.git</scm-publish.pubScmUrl>
+        <scm-publish.siteDocOuputDirectory>${project.reporting.outputDirectory}</scm-publish.siteDocOuputDirectory>
+        <scmPublish.checkoutDirectory>${project.build.directory}/scmpublish</scmPublish.checkoutDirectory>
+    </properties>
 
 </project>

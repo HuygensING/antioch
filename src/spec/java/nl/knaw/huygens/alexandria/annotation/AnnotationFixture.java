@@ -11,20 +11,28 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import nl.knaw.huygens.alexandria.RestFixture;
+import nl.knaw.huygens.alexandria.resource.Annotations;
 import org.concordion.api.MultiValueResult;
 import org.concordion.integration.junit4.ConcordionRunner;
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 
 @RunWith(ConcordionRunner.class)
 public class AnnotationFixture extends RestFixture {
+  private final Splitter COMMA_SPLITTER = Splitter.on(',');
+  
   private final Map<String, List<String>> annotatedReferences = Maps.newHashMap();
 
+  @BeforeClass
+  public static void setup() {
+    addClass(Annotations.class);
+  }
+  
   public MultiValueResult testAnno(String key, String value) {
     invokeREST("POST", "/annotations", key + ":" + value);
     final MultiValueResult response = invokeREST("GET", "/annotations/1");
-    String body = (String)response.get("body");
-    response.with("key", Splitter.on(',').split(body).iterator().next());
-    response.with("value", Iterables.getLast(Splitter.on(',').split(body)));
+    response.with("key", COMMA_SPLITTER.split(body()).iterator().next());
+    response.with("value", Iterables.getLast(COMMA_SPLITTER.split(body())));
     return response;
   }
 

@@ -5,31 +5,39 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.net.URI;
 import java.util.UUID;
 
-import nl.knaw.huygens.alexandria.InMemoryReferenceStore;
 import nl.knaw.huygens.alexandria.external.IllegalReferenceException;
 import nl.knaw.huygens.alexandria.external.ReferenceExistsException;
 import nl.knaw.huygens.alexandria.service.ReferenceService;
 
 @Path("/resources")
-public class AlexandriaResource {
+public class Resources {
   public static final URI HERE = URI.create("");
 
-  // TODO: @Inject
-  private final ReferenceService referenceService = new ReferenceService(new InMemoryReferenceStore());
-  
+  private final ReferenceService referenceService;
+
+  public Resources(@Context ReferenceService referenceService) {
+    this.referenceService = referenceService;
+  }
+
   @GET
   @Path("/{uuid}")
   public Response getResourceByID(@PathParam("uuid") final String uuid) {
-    return Response.ok("{ \"resource\":{\"body\": \"to be fixed\"} }").build();
+    try {
+      return Response.ok(referenceService.getReference(uuid)).build();
+    } catch (IllegalReferenceException e) {
+      return Response.status(Status.BAD_REQUEST).entity("Malformed UUID: " + uuid).build();
+    }
   }
 
   @POST
   public Response createResourceWithoutGivenID(String body) {
+    System.err.println("createResourceWithoutGivenID: referenceService=" + referenceService);
     final UUID uuid = referenceService.createReference(body);
     return Response.created(URI.create(uuid.toString())).build();
   }
@@ -37,6 +45,7 @@ public class AlexandriaResource {
   @PUT
   @Path("/{uuid}")
   public Response createResourceAtSpecificID(@PathParam("uuid") final String uuid, String body) {
+    System.err.println("createResourceAtSpecificID: referenceService=" + referenceService);
     try {
       referenceService.createReference(uuid, body);
       return Response.created(HERE).build();

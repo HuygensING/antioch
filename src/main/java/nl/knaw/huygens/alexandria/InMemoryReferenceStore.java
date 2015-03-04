@@ -23,4 +23,9 @@ public class InMemoryReferenceStore implements ReferenceStore {
     references.put(uuid, ref);
     return true;
   }
+
+  @Override
+  public String getReference(UUID uuid) {
+    return references.get(uuid);
+  }
 }
