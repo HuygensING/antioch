@@ -181,9 +181,9 @@
                                     <fileset dir="${project.build.testOutputDirectory}">
                                         <include name="**/*.class"/>
                                         <!-- the following fails to copy inner classes (Xyz$1.class) -->
-                                        <present targetdir="${spec.testSourceDir}">
-                                            <mapper type="glob" from="*.class" to="*.java"/>
-                                        </present>
+                                        <!--<present targetdir="${spec.testSourceDir}">-->
+                                            <!--<mapper type="glob" from="*.class" to="*.java"/>-->
+                                        <!--</present>-->
                                     </fileset>
                                 </move>
                             </target>
@@ -325,6 +325,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-json-provider</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
@@ -344,6 +349,7 @@
             <artifactId>jersey-client</artifactId>
             <version>${jersey.version}</version>
         </dependency>
+
 
 		<!-- Tests -->
         <dependency>
@@ -388,6 +394,7 @@
         <concordion.version>1.4.7</concordion.version>
         <guava.version>18.0</guava.version>
         <guice.version>3.0</guice.version>
+        <jackson.version>2.5.1</jackson.version>
         <jdk.version>1.8</jdk.version>
         <jersey.version>1.19</jersey.version>
         <junit.version>4.12</junit.version>

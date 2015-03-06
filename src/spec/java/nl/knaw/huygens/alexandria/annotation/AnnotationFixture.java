@@ -10,7 +10,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import nl.knaw.huygens.alexandria.RestFixture;
+import nl.knaw.huygens.alexandria.helpers.RESTJerseyTest;
 import nl.knaw.huygens.alexandria.resource.Annotations;
 import org.concordion.api.MultiValueResult;
 import org.concordion.integration.junit4.ConcordionRunner;
@@ -18,13 +18,15 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 
 @RunWith(ConcordionRunner.class)
-public class AnnotationFixture extends RestFixture {
+public class AnnotationFixture extends RESTJerseyTest {
   private final Splitter COMMA_SPLITTER = Splitter.on(',');
   
   private final Map<String, List<String>> annotatedReferences = Maps.newHashMap();
 
   @BeforeClass
   public static void setup() {
+    System.err.println("AnnotationFixture::setup");
+
     addClass(Annotations.class);
   }
   

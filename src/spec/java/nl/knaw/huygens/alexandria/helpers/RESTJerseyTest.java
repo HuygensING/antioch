@@ -1,11 +1,14 @@
-package nl.knaw.huygens.alexandria;
+package nl.knaw.huygens.alexandria.helpers;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -14,12 +17,10 @@ import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.LowLevelAppDescriptor;
 import org.concordion.api.MultiValueResult;
 import org.junit.After;
+import org.junit.BeforeClass;
 
-public class RestFixture extends JerseyTest {
-  private static ResourceConfig resourceConfig = new DefaultResourceConfig();
-
-  private ClientResponse response;
-  private String responseBody;
+public class RESTJerseyTest extends JerseyTest {
+  private static ResourceConfig resourceConfig;
 
   public static void addClass(Class<?> resourceClass) {
     resourceConfig.getClasses().add(resourceClass);
@@ -33,6 +34,21 @@ public class RestFixture extends JerseyTest {
     addSingleton(new SingletonContextProvider<>(contextClass, contextObject));
   }
 
+  @BeforeClass
+  public static void resetStaticFields() {
+    resourceConfig = new DefaultResourceConfig();
+  }
+
+  private ClientResponse response;
+
+  private String responseBody;
+
+  @After
+  public void resetInstanceFields() {
+    response = null;
+    responseBody = null;
+  }
+
   @Override
   protected AppDescriptor configure() {
     return new LowLevelAppDescriptor.Builder(resourceConfig).build();
@@ -43,7 +59,7 @@ public class RestFixture extends JerseyTest {
     return UriBuilder.fromUri(super.getBaseURI()).scheme("https").build();
   }
 
-  public MultiValueResult invokeREST(String method, String path) {
+  protected MultiValueResult invokeREST(String method, String path) {
     response = client() //
         .resource(getBaseURI()) //
         .path(path) //
@@ -53,7 +69,7 @@ public class RestFixture extends JerseyTest {
     return new MultiValueResult().with("status", status()).with("body", body());
   }
 
-  public MultiValueResult invokeREST(String method, String path, String body) {
+  protected MultiValueResult invokeREST(String method, String path, String body) {
     response = client() //
         .resource(getBaseURI()) //
         .path(path) //
@@ -72,19 +88,20 @@ public class RestFixture extends JerseyTest {
     return Optional.ofNullable(response.getHeaders().getFirst(name));
   }
 
+  protected Optional<String> location() {
+    return header(HttpHeaders.LOCATION);
+  }
+
   protected String body() {
     return responseBody; // cached because response.getEntity() consumes it.
   }
 
-  @After
-  public void resetFixture() {
-    System.err.println("resetFixture");
-    response = null;
-    responseBody = null;
-  }
-
-  protected Optional<String> location() {
-    return header(HttpHeaders.LOCATION);
+  protected Optional<JsonNode> json() {
+    try {
+      return Optional.ofNullable(new ObjectMapper().readTree(body()));
+    } catch (IOException e) {
+      return Optional.empty();
+    }
   }
 
 }

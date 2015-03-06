@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria;
+package nl.knaw.huygens.alexandria.helpers;
 
 import javax.ws.rs.core.Context;
 import java.lang.reflect.Type;
