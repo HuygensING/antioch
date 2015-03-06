@@ -60,12 +60,15 @@ public class RESTJerseyTest extends JerseyTest {
   }
 
   protected MultiValueResult invokeREST(String method, String path) {
+    // TODO: fold with method below, passing null as body (this is what happens inside Jersey anyway).
+    // cleans up this duplication.
     response = client() //
         .resource(getBaseURI()) //
         .path(path) //
         .method(method, ClientResponse.class);
 
-    responseBody = response.getEntity(String.class);
+    System.err.println("HEADERS: " + response.getHeaders());
+    responseBody = response.getEntity(String.class); // TODO: response.bufferEntity();
     return new MultiValueResult().with("status", status()).with("body", body());
   }
 
@@ -75,7 +78,8 @@ public class RESTJerseyTest extends JerseyTest {
         .path(path) //
         .method(method, ClientResponse.class, body);
 
-    responseBody = response.getEntity(String.class);
+    System.err.println("HEADERS: " + response.getHeaders());
+    responseBody = response.getEntity(String.class); // TODO: response.bufferEntity();
     return new MultiValueResult().with("status", status()).with("body", body());
   }
 
@@ -89,7 +93,7 @@ public class RESTJerseyTest extends JerseyTest {
   }
 
   protected Optional<String> location() {
-    return header(HttpHeaders.LOCATION);
+    return header(HttpHeaders.LOCATION); // TODO: response.getLocation() can do this for us
   }
 
   protected String body() {
