@@ -8,13 +8,14 @@
 <!--http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html-->
 <!--http://en.wikipedia.org/wiki/List_of_HTTP_status_codes#2xx_Success-->
 
-<div class="example">
+<div class="examples">
+    <div c:execute="clear()" class="example">
 
-    <h3>How can I update an external resource by its ID?</h3>
+        <h3>How can I update an external resource by its ID?</h3>
 
-    <p>Given a resource identified by ID <code>c6b96360-c0c9-11e4-b947-6bc57448d166</code></p>
+        <p>Given a resource identified by ID <code>c6b96360-c0c9-11e4-b947-6bc57448d166</code></p>
 
-    <p>When I <b c:set="#method">PUT</b></p>
+        <p>When I <b c:set="#method">PUT</b></p>
 <pre c:execute="body(#TEXT)">{
     "resource": {
         "id": "c6b96360-c0c9-11e4-b947-6bc57448d166",
@@ -22,22 +23,15 @@
     }
 }</pre>
 
-    <p>to <code c:set="#endpoint"><b>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</b></code></p>
+        <p>to <code c:set="#endpoint"><b>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</b></code></p>
 
-    <p c:execute="#response = rest(#method, #endpoint)">Then:</p>
-    <ol>
-        <li>the response status should be <b c:assertEquals="#response.status">204 No Content</b>;</li>
-        <li>the response body is <b c:assertEquals="#response.body"></b> (empty);</li>
-        <li><b>TODO</b>: a subsequent GET shows an updated "ref" property in the JSON response body.</li>
-    </ol>
-</div>
-
-<div class="example">
-    <h3>Links:</h3>
-    <ul>
-    <li><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html">RFC 2616 Section 9</a></li>
-    <li><a href="http://en.wikipedia.org/wiki/List_of_HTTP_status_codes#2xx_Success">HTTP Status Codes</a></li>
-    </ul>
+        <p c:execute="#response = rest(#method, #endpoint)">Then:</p>
+        <ol>
+            <li>the response status should be <b c:assertEquals="#response.status">204 No Content</b>;</li>
+            <li>the response body is <b c:assertEquals="#response.body"></b> (empty);</li>
+            <li><b>TODO</b>: a subsequent GET shows an updated "ref" property in the JSON response body.</li>
+        </ol>
+    </div>
 </div>
 
 </body>

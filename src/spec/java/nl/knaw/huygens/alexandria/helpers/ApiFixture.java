@@ -12,17 +12,18 @@ import java.util.Optional;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.LowLevelAppDescriptor;
 import org.concordion.api.MultiValueResult;
-import org.junit.After;
 import org.junit.BeforeClass;
 
 public class ApiFixture extends JerseyTest {
   private static ResourceConfig resourceConfig;
+  private MediaType contentType;
 
   public static void addClass(Class<?> resourceClass) {
     resourceConfig.getClasses().add(resourceClass);
@@ -41,14 +42,19 @@ public class ApiFixture extends JerseyTest {
     resourceConfig = new DefaultResourceConfig();
   }
 
+  private WebResource request;
+
   private String body;
 
   private ClientResponse response;
 
   private String entity;
 
-  @After
-  public void resetInstanceFields() {
+  //  @After
+  public void clear() {
+    System.err.println("*** ApiFixture.CLEAR ***");
+    request = client().resource(getBaseURI());
+    contentType = MediaType.APPLICATION_JSON_TYPE;
     body = null;
     response = null;
     entity = null;
@@ -65,22 +71,27 @@ public class ApiFixture extends JerseyTest {
   }
 
   public MultiValueResult invokeREST(String method, String path) {
-    response = client() //
-        .resource(getBaseURI()) //
+    System.err.println("*** ApiFixture.invokeREST: method=" + method + ", path=" + path);
+
+    response = request //
         .path(path) //
-        .type(MediaType.APPLICATION_JSON_TYPE) //
-        .method(method, ClientResponse.class, this.body);
+        .type(contentType) //
+        .method(method, ClientResponse.class, body);
 
     entity = response.getEntity(String.class); // .replaceAll(hostInfo(), "{host}") ?
 
-    return new MultiValueResult().with("status", status()).with("body", response());
+    return new MultiValueResult().with("status", status()).with("body", entity());
   }
 
   public void body(String body) {
     this.body = body;
   }
 
-  public String response() {
+  public void contentType(String type) {
+    this.contentType = MediaType.valueOf(type);
+  }
+
+  public String entity() {
     return entity;
   }
 
@@ -99,7 +110,7 @@ public class ApiFixture extends JerseyTest {
 
   public Optional<JsonNode> json() {
     try {
-      return Optional.ofNullable(new ObjectMapper().readTree(response()));
+      return Optional.ofNullable(new ObjectMapper().readTree(entity()));
     } catch (IOException e) {
       return Optional.empty();
     }
