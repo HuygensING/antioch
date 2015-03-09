@@ -64,31 +64,15 @@ public class ApiFixture extends JerseyTest {
     return UriBuilder.fromUri(super.getBaseURI()).scheme("https").build();
   }
 
-  protected MultiValueResult invokeREST(String method, String path) {
-    return invokeREST(method, path, body);
-    /*
-    // TODO: fold with method below, passing null as body (this is what happens inside Jersey anyway).
-    // cleans up this duplication.
-    response = client() //
-        .resource(getBaseURI()) //
-        .path(path) //
-        .method(method, ClientResponse.class);
-
-    System.err.println("HEADERS: " + response.getHeaders());
-    responseBody = response.getEntity(String.class); // TODO: response.bufferEntity();
-    return new MultiValueResult().with("status", status()).with("body", body());*/
-  }
-
-  protected MultiValueResult invokeREST(String method, String path, String body) {
+  public MultiValueResult invokeREST(String method, String path) {
     response = client() //
         .resource(getBaseURI()) //
         .path(path) //
         .type(MediaType.APPLICATION_JSON_TYPE) //
         .method(method, ClientResponse.class, this.body);
+
     entity = response.getEntity(String.class); // .replaceAll(hostInfo(), "{host}") ?
 
-    System.err.println("HEADERS: " + response.getHeaders());
-    System.err.println("ENTITY : " + entity);
     return new MultiValueResult().with("status", status()).with("body", response());
   }
 

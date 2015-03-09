@@ -20,7 +20,7 @@ import org.junit.runner.RunWith;
 @RunWith(ConcordionRunner.class)
 public class AnnotationFixture extends ApiFixture {
   private final Splitter COMMA_SPLITTER = Splitter.on(',');
-  
+
   private final Map<String, List<String>> annotatedReferences = Maps.newHashMap();
 
   @BeforeClass
@@ -29,9 +29,10 @@ public class AnnotationFixture extends ApiFixture {
 
     addClass(Annotations.class);
   }
-  
+
   public MultiValueResult testAnno(String key, String value) {
-    invokeREST("POST", "/annotations", key + ":" + value);
+    body(key + ":" + value);
+    invokeREST("POST", "/annotations");
     final MultiValueResult response = invokeREST("GET", "/annotations/1");
     response.with("key", COMMA_SPLITTER.split(response()).iterator().next());
     response.with("value", Iterables.getLast(COMMA_SPLITTER.split(response())));
