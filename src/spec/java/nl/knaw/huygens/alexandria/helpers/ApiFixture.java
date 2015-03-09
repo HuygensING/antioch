@@ -1,6 +1,8 @@
 package nl.knaw.huygens.alexandria.helpers;
 
-import javax.ws.rs.core.HttpHeaders;
+import static java.lang.String.format;
+
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
@@ -19,7 +21,7 @@ import org.concordion.api.MultiValueResult;
 import org.junit.After;
 import org.junit.BeforeClass;
 
-public class RESTJerseyTest extends JerseyTest {
+public class ApiFixture extends JerseyTest {
   private static ResourceConfig resourceConfig;
 
   public static void addClass(Class<?> resourceClass) {
@@ -39,14 +41,17 @@ public class RESTJerseyTest extends JerseyTest {
     resourceConfig = new DefaultResourceConfig();
   }
 
+  private String body;
+
   private ClientResponse response;
 
-  private String responseBody;
+  private String entity;
 
   @After
   public void resetInstanceFields() {
+    body = null;
     response = null;
-    responseBody = null;
+    entity = null;
   }
 
   @Override
@@ -60,6 +65,8 @@ public class RESTJerseyTest extends JerseyTest {
   }
 
   protected MultiValueResult invokeREST(String method, String path) {
+    return invokeREST(method, path, body);
+    /*
     // TODO: fold with method below, passing null as body (this is what happens inside Jersey anyway).
     // cleans up this duplication.
     response = client() //
@@ -69,43 +76,62 @@ public class RESTJerseyTest extends JerseyTest {
 
     System.err.println("HEADERS: " + response.getHeaders());
     responseBody = response.getEntity(String.class); // TODO: response.bufferEntity();
-    return new MultiValueResult().with("status", status()).with("body", body());
+    return new MultiValueResult().with("status", status()).with("body", body());*/
   }
 
   protected MultiValueResult invokeREST(String method, String path, String body) {
     response = client() //
         .resource(getBaseURI()) //
         .path(path) //
-        .method(method, ClientResponse.class, body);
+        .type(MediaType.APPLICATION_JSON_TYPE) //
+        .method(method, ClientResponse.class, this.body);
+    entity = response.getEntity(String.class); // .replaceAll(hostInfo(), "{host}") ?
 
     System.err.println("HEADERS: " + response.getHeaders());
-    responseBody = response.getEntity(String.class); // TODO: response.bufferEntity();
-    return new MultiValueResult().with("status", status()).with("body", body());
+    System.err.println("ENTITY : " + entity);
+    return new MultiValueResult().with("status", status()).with("body", response());
   }
 
-  protected String status() {
+  public void body(String body) {
+    this.body = body;
+  }
+
+  public String response() {
+    return entity;
+  }
+
+  public String headerContent(String name) {
+    return header(name).map(content -> format("%s:%s", name, content)).orElse("(no name)");
+  }
+
+  public String location() {
+    return responseLocation().map(l -> l.replaceAll(hostInfo(), "{host}")).orElse("no-location");
+  }
+
+  public String status() {
     final StatusType statusInfo = response.getStatusInfo();
-    return String.format("%s %s", statusInfo.getStatusCode(), statusInfo.getReasonPhrase());
+    return format("%s %s", statusInfo.getStatusCode(), statusInfo.getReasonPhrase());
   }
 
-  protected Optional<String> header(String name) {
-    return Optional.ofNullable(response.getHeaders().getFirst(name));
-  }
-
-  protected Optional<String> location() {
-    return header(HttpHeaders.LOCATION); // TODO: response.getLocation() can do this for us
-  }
-
-  protected String body() {
-    return responseBody; // cached because response.getEntity() consumes it.
-  }
-
-  protected Optional<JsonNode> json() {
+  public Optional<JsonNode> json() {
     try {
-      return Optional.ofNullable(new ObjectMapper().readTree(body()));
+      return Optional.ofNullable(new ObjectMapper().readTree(response()));
     } catch (IOException e) {
       return Optional.empty();
     }
+  }
+
+  private Optional<String> header(String header) {
+    return Optional.ofNullable(response.getHeaders().getFirst(header));
+  }
+
+  private String hostInfo() {
+    final URI baseURI = getBaseURI();
+    return format("%s:%d", baseURI.getHost(), baseURI.getPort());
+  }
+
+  private Optional<String> responseLocation() {
+    return Optional.ofNullable(response.getLocation()).map(URI::toString);
   }
 
 }

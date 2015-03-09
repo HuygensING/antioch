@@ -15,16 +15,16 @@
     <p>Given a resource identified by ID <code>c6b96360-c0c9-11e4-b947-6bc57448d166</code></p>
 
     <p>When I <b c:set="#method">PUT</b></p>
-<pre c:set="#body">{
+<pre c:execute="body(#TEXT)">{
     "resource": {
         "id": "c6b96360-c0c9-11e4-b947-6bc57448d166",
         "ref": "http://www.example.com/titles/path/to/UPDATED/title/resource"
     }
 }</pre>
 
-    <p>to <code c:set="#path"><b>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</b></code></p>
+    <p>to <code c:set="#endpoint"><b>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</b></code></p>
 
-    <p c:execute="#response = invokeREST(#method, #path, #body)">Then:</p>
+    <p c:execute="#response = rest(#method, #endpoint)">Then:</p>
     <ol>
         <li>the response status should be <b c:assertEquals="#response.status">204 No Content</b>;</li>
         <li>the response body is <b c:assertEquals="#response.body"></b> (empty);</li>

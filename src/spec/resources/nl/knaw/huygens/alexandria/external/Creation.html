@@ -5,83 +5,62 @@
 
 <h1>Creating external resources</h1>
 
-<div class="example">
-    <h3>How can I create an external resource without specifying an ID?</h3>
+<div class="examples">
+    <div class="example">
+        <h3>How can I create an external resource without specifying an ID?</h3>
 
-    <p>Given a (e.g., title) resource located at <code>http://www.example.com/titles/path/to/title/resource</code></p>
+        <ul>
+            <li>Given some resource located at <code>http://www.example.com/titles/path/to/title/resource</code></li>
 
-    <p>When I <b c:set="#method">POST</b></p>
-<pre c:set="#body">{
+            <li>When I <b c:set="#method">POST</b>
+<pre c:execute="body(#TEXT)">{
     "resource": {
         "ref": "http://www.example.com/titles/path/to/title/resource"
     }
 }</pre>
+                to <code c:set="#path"><b>/resources</b></code></li>
 
-    <p>to <code c:set="#path"><b>/resources</b></code></p>
-
-    <p c:execute="#response = rest(#method, #path, #body)">Then:</p>
-    <ol>
-        <li>the response status should be <b c:assertEquals="#response.status">201 Created</b>;</li>
-        <li>the response <b c:assertEquals="#response.locationPresent">contains a Location header</b>:</li>
-        <ol>
-            <li>with the <b c:assertEquals="#response.locationScheme">https</b> scheme;</li>
-            <li>ending in <b c:assertEquals="#response.locationStart">/resources/</b> plus a (randomly generated)
-                <b c:assertEquals="#response.locationId">well-formed UUID</b>.
+            <li c:execute="rest(#method, #path)">Then the response
+                <ol>
+                    <li>status should be <b c:assertEquals="status()">201 Created</b>;</li>
+                    <li>contains a Location header: <b c:assertEquals="base()">https://{host}/resources/</b>
+                        followed by a <b c:assertEquals="uuidQuality()">well-formed UUID</b>;
+                    </li>
+                    <li>the response body is <b c:assertEquals="response()"></b> (empty).</li>
+                </ol>
             </li>
-        </ol>
-        <li>the response body is <b c:assertEquals="#response.body"></b> (empty).</li>
-    </ol>
-
-    <p><b>TODO:</b> Officially, If a resource has been created on the origin server, the response SHOULD be 201
-        (Created) and <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.5">contain an entity which
-            describes the status of the request and refers to the new resource</a>. Should we support this?
-    </p>
-
-</div>
+        </ul>
+    </div>
 
 
-<div class="example">
-    <h3>How can I create an external resource with a specific UUID?</h3>
+    <div class="example">
+        <h3>How can I create an external resource with a specific UUID?</h3>
 
-    <p>Given a (e.g., title) resource located at <code>http://www.example.com/titles/path/to/title/resource</code>,
-        which is to be stored as UUID <code>6e56c868-c0a9-11e4-a762-cb9a664afc01</code>, and <b>no</b> resource
-        with that UUID exists yet</p>
+        <ul>
+            <li>Given a resource located at <code>http://www.example.com/titles/path/to/title/resource</code>,
+                which is to be stored as UUID <code>6e56c868-c0a9-11e4-a762-cb9a664afc01</code>, and <b>no</b> resource
+                with that UUID exists yet
+            </li>
 
-    <p>When I <b c:set="#method">PUT</b></p>
-<pre c:set="#body">{
+            <li>When I <b c:set="#method">PUT</b>
+<pre c:execute="body(#TEXT)">{
     "resource": {
         "id": "6e56c868-c0a9-11e4-a762-cb9a664afc01",
         "ref": "http://www.example.com/titles/path/to/title/resource"
     }
 }</pre>
+                to <code c:set="#path"><b>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</b></code></li>
 
-    <p>to <code c:set="#path"><b>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</b></code></p>
-
-    <p c:execute="#response = rest(#method, #path, #body)">Then:</p>
-    <ol>
-        <li>the response status should be <b c:assertEquals="#response.status">201 Created</b>;</li>
-        <li>with the <b c:assertEquals="#response.locationScheme">https</b> scheme;</li>
-        <li>ending in <b c:assertEquals="#response.locationPath">/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</b>
-        </li>
-    </ol>
-    <li>the response body is <b c:assertEquals="#response.body"></b> (empty).</li>
+            <li c:execute="#response = rest(#method, #path)">Then the response
+                <ol>
+                    <li>status should be <b c:assertEquals="status()">201 Created</b>;</li>
+                    <li>contains the Location header <b c:assertEquals="location()">https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</b>
+                    </li>
+                    <li>is <b c:assertEquals="response()"></b> (empty) otherwise.</li>
+                </ol>
+            </li>
+        </ul>
+    </div>
 </div>
-
-
-<div class="example">
-    <h3>Links:</h3>
-    <ul>
-        <li>
-            <a href="http://www.codingpedia.org/ama/tutorial-rest-api-design-and-implementation-in-java-with-jersey-and-spring/#3211_Design">POST
-                vs PUT (idempotency)</a></li>
-    </ul>
-
-    <h3>Todo:</h3>
-    <ul>
-        <li>show what happens when a POST is done where JSON body contains an id</li>
-        <li>show what happens when a PUT is done where id in JSON body differs from id in /resources/{id} path</li>
-    </ul>
-</div>
-
 </body>
 </html>

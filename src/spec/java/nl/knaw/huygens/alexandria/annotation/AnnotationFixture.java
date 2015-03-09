@@ -10,7 +10,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import nl.knaw.huygens.alexandria.helpers.RESTJerseyTest;
+import nl.knaw.huygens.alexandria.helpers.ApiFixture;
 import nl.knaw.huygens.alexandria.resource.Annotations;
 import org.concordion.api.MultiValueResult;
 import org.concordion.integration.junit4.ConcordionRunner;
@@ -18,7 +18,7 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 
 @RunWith(ConcordionRunner.class)
-public class AnnotationFixture extends RESTJerseyTest {
+public class AnnotationFixture extends ApiFixture {
   private final Splitter COMMA_SPLITTER = Splitter.on(',');
   
   private final Map<String, List<String>> annotatedReferences = Maps.newHashMap();
@@ -33,8 +33,8 @@ public class AnnotationFixture extends RESTJerseyTest {
   public MultiValueResult testAnno(String key, String value) {
     invokeREST("POST", "/annotations", key + ":" + value);
     final MultiValueResult response = invokeREST("GET", "/annotations/1");
-    response.with("key", COMMA_SPLITTER.split(body()).iterator().next());
-    response.with("value", Iterables.getLast(COMMA_SPLITTER.split(body())));
+    response.with("key", COMMA_SPLITTER.split(response()).iterator().next());
+    response.with("value", Iterables.getLast(COMMA_SPLITTER.split(response())));
     return response;
   }
 
