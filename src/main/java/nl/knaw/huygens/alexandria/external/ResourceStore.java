@@ -2,8 +2,8 @@ package nl.knaw.huygens.alexandria.external;
 
 import java.util.UUID;
 
-public interface ReferenceStore {
-  boolean createReference(UUID uuid,  String ref);
+public interface ResourceStore {
+  boolean createResource(UUID uuid, String res);
 
   String getReference(UUID uuid);
 }

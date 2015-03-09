@@ -12,13 +12,13 @@
         <p>Given a resource identified by ID <code>c6b96360-c0c9-11e4-b947-6bc57448d166</code></p>
 
         <p>When I <b c:set="#method">GET</b> <code><b
-                c:set="#path">/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</b></code></p>
+                c:set="#endpoint">/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</b></code></p>
 
-        <p c:execute="#response = rest(#method, #path)">Then:</p>
+        <p c:execute="request(#method, #endpoint)">Then:</p>
         <ol>
-            <li>the response status should be <b c:assertEquals="#response.status">200 OK</b>;</li>
+            <li>the response status should be <b c:assertEquals="status()">200 OK</b>;</li>
             <li>the response body is
-                <code c:assertEquals="#response.body"><pre>{ "resource":{"body": "to be fixed"} }</pre></code></li>
+                <code c:assertEquals="entity()"><pre>{ "resource":{"body": "to be fixed"} }</pre></code></li>
         </ol>
 
     </div>
@@ -29,12 +29,12 @@
         <p>Given that no resource exists with ID <code>3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</code></p>
 
         <p>When I <b c:set="#method">GET</b> <code><b
-                c:set="#path">/resources/3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</b></code></p>
+                c:set="#endpoint">/resources/3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</b></code></p>
 
-        <p c:execute="#response = rest(#method, #path)">Then:</p>
+        <p c:execute="request(#method, #endpoint)">Then:</p>
         <ol>
-            <li>the response status should be <b c:assertEquals="#response.status">404 Not Found</b>;</li>
-            <li>the response body is <b c:assertEquals="#response.body"></b> (empty).</li>
+            <li>the response status should be <b c:assertEquals="status()">404 Not Found</b>;</li>
+            <li>the response body is <b c:assertEquals="entity()"></b> (empty).</li>
         </ol>
     </div>
 </div>

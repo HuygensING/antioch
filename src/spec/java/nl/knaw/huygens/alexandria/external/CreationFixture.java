@@ -8,16 +8,17 @@ import java.util.UUID;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
-import org.concordion.api.MultiValueResult;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.runner.RunWith;
 
 @RunWith(ConcordionRunner.class)
 public class CreationFixture extends ResourcesFixture {
-  public MultiValueResult rest(String method, String path) {
-    doReturn(UUID.randomUUID()).when(referenceService()).createReference(anyString());
+  @Override
+  public void request(String method, String path) {
 
-    return invokeREST(method, path);
+    doReturn(UUID.randomUUID()).when(resourceService()).createResource(anyString());
+
+    super.request(method, path);
   }
 
   public String base() {

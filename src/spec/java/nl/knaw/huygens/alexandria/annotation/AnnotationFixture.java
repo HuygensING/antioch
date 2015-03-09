@@ -32,8 +32,9 @@ public class AnnotationFixture extends ApiFixture {
 
   public MultiValueResult testAnno(String key, String value) {
     body(key + ":" + value);
-    invokeREST("POST", "/annotations");
-    final MultiValueResult response = invokeREST("GET", "/annotations/1");
+    request("POST", "/annotations");
+    request("GET", "/annotations/1");
+    MultiValueResult response = new MultiValueResult();
     response.with("key", COMMA_SPLITTER.split(entity()).iterator().next());
     response.with("value", Iterables.getLast(COMMA_SPLITTER.split(entity())));
     return response;

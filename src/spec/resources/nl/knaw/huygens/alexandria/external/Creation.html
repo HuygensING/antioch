@@ -18,9 +18,9 @@
         "ref": "http://www.example.com/titles/path/to/title/resource"
     }
 }</pre>
-                to <code c:set="#path"><b>/resources</b></code></li>
+                to <code c:set="#endpoint"><b>/resources</b></code></li>
 
-            <li c:execute="rest(#method, #path)">Then the response
+            <li c:execute="request(#method, #endpoint)">Then the response
                 <ol>
                     <li>status should be <b c:assertEquals="status()">201 Created</b>;</li>
                     <li>contains a Location header: <b c:assertEquals="base()">https://{host}/resources/</b>
@@ -49,9 +49,9 @@
         "ref": "http://www.example.com/titles/path/to/title/resource"
     }
 }</pre>
-                to <code c:set="#path"><b>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</b></code></li>
+                to <code c:set="#endpoint"><b>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</b></code></li>
 
-            <li c:execute="#response = rest(#method, #path)">Then the response
+            <li c:execute="request(#method, #endpoint)">Then the response
                 <ol>
                     <li>status should be <b c:assertEquals="status()">201 Created</b>;</li>
                     <li>contains the Location header <b c:assertEquals="location()">https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</b>
