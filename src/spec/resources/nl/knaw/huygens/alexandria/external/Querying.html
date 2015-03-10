@@ -40,7 +40,7 @@
         <p c:execute="request(#method, #endpoint)">Then:</p>
         <ol>
             <li>the response status should be <b c:assertEquals="status()">404 Not Found</b>;</li>
-            <li>the response body is <b c:assertEquals="response()"/> (empty).</li>
+            <li>the response body is <b c:assertEquals="responseOrEmpty()">empty</b>.</li>
         </ol>
     </div>
 </div>

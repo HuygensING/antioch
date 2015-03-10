@@ -8,6 +8,7 @@ import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.Optional;
 
+import com.google.common.base.Strings;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;
@@ -21,8 +22,6 @@ import org.junit.BeforeClass;
 @Extensions(ApiExtension.class)
 public class ApiFixture extends JerseyTest {
   private static ResourceConfig resourceConfig;
-  private MediaType contentType;
-
   public static void addClass(Class<?> resourceClass) {
     resourceConfig.getClasses().add(resourceClass);
   }
@@ -41,6 +40,8 @@ public class ApiFixture extends JerseyTest {
   }
 
   private WebResource request;
+
+  private MediaType contentType;
 
   private String body;
 
@@ -79,6 +80,10 @@ public class ApiFixture extends JerseyTest {
 
   public String response() {
     return entity;
+  }
+
+  public String responseOrEmpty() {
+    return Optional.ofNullable(Strings.emptyToNull(response())).orElse("empty");
   }
 
   public String headerContent(String name) {

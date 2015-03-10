@@ -27,7 +27,7 @@
                         <b c:assertEquals="base()">https://{host}/resources/</b>
                         followed by a <b c:assertEquals="uuidQuality()">well-formed UUID</b>;
                     </li>
-                    <li>the response body is <b c:assertEquals="response()"/> (empty).</li>
+                    <li>the response body is <b c:assertEquals="responseOrEmpty()">empty</b>.</li>
                 </ol>
             </li>
         </ul>
@@ -58,7 +58,7 @@
                     <li>the response contains the Location header:
                         <b c:assertEquals="location()">https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</b>;
                     </li>
-                    <li>the response body is <b c:assertEquals="response()"/> (empty).</li>
+                    <li>the response body is <b c:assertEquals="responseOrEmpty()">empty</b>.</li>
                 </ol>
             </li>
         </ul>
