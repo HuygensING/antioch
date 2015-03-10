@@ -13,10 +13,9 @@ public class QueryingFixture extends ResourcesFixture {
   @Override
   public void request(String method, String path) {
 
-    doReturn("{ \"resource\":{\"body\": \"to be fixed\"} }").when(resourceService()).getResource(Mockito.anyString());
+    doReturn("{ \"resource\":{\"body\": \"to be fixed\", \"createdOn\": \"2015-03-10 11:25:24+01:00\"} }")
+        .when(resourceService()).getResource(Mockito.anyString());
 
     super.request(method, path);
-
-//    json().ifPresent((json) -> System.err.println("JSON: " + json.findPath("body")));
   }
 }

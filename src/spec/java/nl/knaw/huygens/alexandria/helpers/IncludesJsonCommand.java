@@ -25,8 +25,10 @@ public class IncludesJsonCommand extends AbstractCommand {
   public void verify(CommandCall commandCall, Evaluator evaluator, ResultRecorder resultRecorder) {
     final Element element = commandCall.getElement();
     final String expected = element.getText();
+//    System.err.println("IncludesJsonCommand: expected=" + expected);
 
     final String actual = (String) evaluator.evaluate(commandCall.getExpression());
+//    System.err.println("IncludesJsonCommand: actual=" + actual);
 
     if (includesJson(actual, expected)) {
       resultRecorder.record(Result.SUCCESS);
