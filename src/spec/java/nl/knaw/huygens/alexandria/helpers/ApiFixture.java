@@ -18,8 +18,10 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.LowLevelAppDescriptor;
+import org.concordion.api.extension.Extensions;
 import org.junit.BeforeClass;
 
+@Extensions(ApiExtension.class)
 public class ApiFixture extends JerseyTest {
   private static ResourceConfig resourceConfig;
   private MediaType contentType;
@@ -78,7 +80,7 @@ public class ApiFixture extends JerseyTest {
     this.contentType = MediaType.valueOf(type);
   }
 
-  public String entity() {
+  public String response() {
     return entity;
   }
 
@@ -95,9 +97,9 @@ public class ApiFixture extends JerseyTest {
     return format("%s %s", statusInfo.getStatusCode(), statusInfo.getReasonPhrase());
   }
 
-  public Optional<JsonNode> json() {
+  private Optional<JsonNode> json() {
     try {
-      return Optional.ofNullable(new ObjectMapper().readTree(entity()));
+      return Optional.ofNullable(new ObjectMapper().readTree(response()));
     } catch (IOException e) {
       return Optional.empty();
     }

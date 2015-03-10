@@ -1,4 +1,5 @@
-<html xmlns:c="http://www.concordion.org/2007/concordion">
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:json="https://alexandria.huygens.knaw.nl">
 <title>Querying External Resources</title>
 
 <body>
@@ -17,8 +18,13 @@
         <p c:execute="request(#method, #endpoint)">Then:</p>
         <ol>
             <li>the response status should be <b c:assertEquals="status()">200 OK</b>;</li>
-            <li>the response body is
-                <code c:assertEquals="entity()"><pre>{ "resource":{"body": "to be fixed"} }</pre></code></li>
+            <li>And the response body looks like:
+<pre json:includesJson="response()">{
+    "resource": {
+        "body": "to be fixed"
+    }
+}</pre>
+            </li>
         </ol>
 
     </div>
@@ -34,7 +40,7 @@
         <p c:execute="request(#method, #endpoint)">Then:</p>
         <ol>
             <li>the response status should be <b c:assertEquals="status()">404 Not Found</b>;</li>
-            <li>the response body is <b c:assertEquals="entity()"></b> (empty).</li>
+            <li>the response body is <b c:assertEquals="response()"/> (empty).</li>
         </ol>
     </div>
 </div>

@@ -26,7 +26,7 @@
                     <li>contains a Location header: <b c:assertEquals="base()">https://{host}/resources/</b>
                         followed by a <b c:assertEquals="uuidQuality()">well-formed UUID</b>;
                     </li>
-                    <li>is otherwise <b c:assertEquals="entity()"/> (empty).</li>
+                    <li>body is <b c:assertEquals="response()"/> (empty).</li>
                 </ol>
             </li>
         </ul>
@@ -56,7 +56,7 @@
                     <li>status should be <b c:assertEquals="status()">201 Created</b>;</li>
                     <li>contains the Location header <b c:assertEquals="location()">https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</b>
                     </li>
-                    <li>is otherwise <b c:assertEquals="entity()"/> (empty).</li>
+                    <li>body is <b c:assertEquals="response()"/> (empty).</li>
                 </ol>
             </li>
         </ul>

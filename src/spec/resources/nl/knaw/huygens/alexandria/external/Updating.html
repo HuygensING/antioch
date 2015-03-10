@@ -28,7 +28,7 @@
         <p c:execute="request(#method, #endpoint)">Then:</p>
         <ol>
             <li>the response status should be <b c:assertEquals="status()">204 No Content</b>;</li>
-            <li>the response body is <b c:assertEquals="entity()"></b> (empty);</li>
+            <li>the response body is <b c:assertEquals="response()"></b> (empty);</li>
             <li><b>TODO</b>: a subsequent GET shows an updated "ref" property in the JSON response body.</li>
         </ol>
     </div>

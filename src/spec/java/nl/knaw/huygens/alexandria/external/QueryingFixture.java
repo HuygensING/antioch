@@ -17,6 +17,6 @@ public class QueryingFixture extends ResourcesFixture {
 
     super.request(method, path);
 
-    json().ifPresent((json) -> System.err.println("JSON: " + json.findPath("body")));
+//    json().ifPresent((json) -> System.err.println("JSON: " + json.findPath("body")));
   }
 }
