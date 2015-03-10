@@ -1,0 +1,66 @@
+/* Huygens ING extension to Concordion CSS (gleaned from https://github.com/Pragmatists/OpenTrapp) */
+
+.examples {
+    overflow: hidden;
+}
+
+.example {
+/*    float: left;*/
+    margin-top: 0;
+    margin-left: 0;
+    margin-right: 20px;
+    margin-bottom: 20px;
+/*    min-width: 580px;*/
+}
+
+.example ul {
+    padding-left: 20px;
+}
+
+.example ul.li {
+    list-style-type: none;
+}
+
+.example th {
+    min-width: 160px;
+}
+
+.example pre {
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+.header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    border-bottom-style: solid;
+    border-bottom-width: 5px;
+    border-bottom-color: #AAAAAA;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background-color: #000000;
+    color: #FFFFFF;
+}
+
+.header h1 {
+    font-size: 20px;
+    margin: 0;
+    padding: 0;
+}
+
+.header p {
+    font-size: 12px;
+    margin: 0;
+}
+
+body {
+    padding-top: 70px;
+}
+
+.hide {
+    display: none;
+}
