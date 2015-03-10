@@ -5,12 +5,9 @@ import static java.lang.String.format;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
-import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;
@@ -95,14 +92,6 @@ public class ApiFixture extends JerseyTest {
   public String status() {
     final StatusType statusInfo = response.getStatusInfo();
     return format("%s %s", statusInfo.getStatusCode(), statusInfo.getReasonPhrase());
-  }
-
-  private Optional<JsonNode> json() {
-    try {
-      return Optional.ofNullable(new ObjectMapper().readTree(response()));
-    } catch (IOException e) {
-      return Optional.empty();
-    }
   }
 
   protected URI getSecureBaseURI() {
