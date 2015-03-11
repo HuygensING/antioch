@@ -1,40 +1,17 @@
 package nl.knaw.huygens.alexandria.service;
 
-import javax.ws.rs.core.Context;
 import java.util.UUID;
 
-import nl.knaw.huygens.alexandria.external.IllegalResourceException;
-import nl.knaw.huygens.alexandria.external.ResourceExistsException;
-import nl.knaw.huygens.alexandria.external.ResourceStore;
-import nl.knaw.huygens.alexandria.util.UUIDParser;
+import nl.knaw.huygens.alexandria.exception.IllegalResourceException;
+import nl.knaw.huygens.alexandria.exception.ResourceExistsException;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 
-public class ResourceService {
-  private final ResourceStore resourceStore;
+public interface ResourceService {
+  AlexandriaResource createResource(AlexandriaResource protoType);
 
-  public ResourceService(@Context ResourceStore resourceStore) {
-    this.resourceStore = resourceStore;
-  }
+  void createResource(UUID uuid, String ref) throws ResourceExistsException;
 
-  public UUID createResource(final String ref) {
-    final UUID uuid = UUID.randomUUID();
-    resourceStore.createResource(uuid, ref);
-    return uuid;
-  }
+  void createResource(String id, String ref) throws IllegalResourceException, ResourceExistsException;
 
-  public void createResource(final UUID uuid, final String ref) throws ResourceExistsException {
-    if (!resourceStore.createResource(uuid, ref)) {
-      throw new ResourceExistsException();
-    }
-  }
-
-  public void createResource(final String id, final String ref)
-      throws IllegalResourceException, ResourceExistsException {
-    UUID uuid = UUIDParser.fromString(id).get().orElseThrow(IllegalResourceException::new);
-    createResource(uuid, ref);
-  }
-
-  public String getResource(String id) throws IllegalResourceException {
-    UUID uuid = UUIDParser.fromString(id).get().orElseThrow(IllegalResourceException::new);
-    return resourceStore.getReference(uuid);
-  }
+  String getResource(String id) throws IllegalResourceException;
 }

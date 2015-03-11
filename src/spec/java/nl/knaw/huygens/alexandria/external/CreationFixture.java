@@ -1,12 +1,12 @@
 package nl.knaw.huygens.alexandria.external;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
-
-import java.util.UUID;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.runner.RunWith;
@@ -15,8 +15,7 @@ import org.junit.runner.RunWith;
 public class CreationFixture extends ResourcesFixture {
   @Override
   public void request(String method, String path) {
-
-    doReturn(UUID.randomUUID()).when(resourceService()).createResource(anyString());
+    when(resourceService().createResource(any(AlexandriaResource.class))).then(returnsFirstArg());
 
     super.request(method, path);
   }

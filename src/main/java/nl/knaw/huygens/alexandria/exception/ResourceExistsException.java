@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.external;
+package nl.knaw.huygens.alexandria.exception;
 
 import javax.ws.rs.WebApplicationException;
 

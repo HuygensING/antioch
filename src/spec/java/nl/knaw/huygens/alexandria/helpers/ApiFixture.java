@@ -16,12 +16,14 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.LowLevelAppDescriptor;
+import nl.knaw.huygens.alexandria.util.ObjectMapperProvider;
 import org.concordion.api.extension.Extensions;
 import org.junit.BeforeClass;
 
 @Extensions(ApiExtension.class)
 public class ApiFixture extends JerseyTest {
   private static ResourceConfig resourceConfig;
+
   public static void addClass(Class<?> resourceClass) {
     resourceConfig.getClasses().add(resourceClass);
   }
@@ -37,6 +39,7 @@ public class ApiFixture extends JerseyTest {
   @BeforeClass
   public static void resetStaticFields() {
     resourceConfig = new DefaultResourceConfig();
+    addClass(ObjectMapperProvider.class);
   }
 
   private WebResource request;

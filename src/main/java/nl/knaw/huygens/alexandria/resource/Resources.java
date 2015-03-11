@@ -1,18 +1,21 @@
 package nl.knaw.huygens.alexandria.resource;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.net.URI;
-import java.util.UUID;
 
-import nl.knaw.huygens.alexandria.external.IllegalResourceException;
-import nl.knaw.huygens.alexandria.external.ResourceExistsException;
+import nl.knaw.huygens.alexandria.exception.IllegalResourceException;
+import nl.knaw.huygens.alexandria.exception.ResourceExistsException;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.ResourceService;
 
 @Path("/resources")
@@ -36,24 +39,29 @@ public class Resources {
   }
 
   @POST
-  public Response createResourceWithoutGivenID(String body) {
-    System.err.println("createResourceWithoutGivenID: referenceService=" + resourceService);
-    final UUID uuid = resourceService.createResource(body);
-    return Response.created(URI.create(uuid.toString())).build();
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response createResourceWithoutGivenID(AlexandriaResource protoType) {
+    System.err.println("createResourceWithoutGivenID: protoType=" + protoType);
+    System.err.println("annotations: " + protoType.getAnnotations());
+    final AlexandriaResource res = new AlexandriaResource(protoType);//resourceService.createResource(protoType);
+    final String id = res.getId().toString();
+    return Response.created(URI.create(id)).entity(res).build();
   }
 
   @PUT
   @Path("/{uuid}")
-  public Response createResourceAtSpecificID(@PathParam("uuid") final String uuid, String body) {
-    System.err.println("createResourceAtSpecificID: referenceService=" + resourceService);
+  public Response createResourceAtSpecificID(@PathParam("uuid") final String uuid, AlexandriaResource protoType) {
+    System.err.println("createResourceAtSpecificID: uuid=" + uuid + " vs protoType.id=" + protoType.getId());
+
     try {
-      resourceService.createResource(uuid, body);
+      resourceService.createResource(protoType);
       return Response.created(HERE).build();
     } catch (IllegalResourceException e) {
       // TODO: improve by making parameter uuid of type UUID and adding a Jersey level converter
       return Response.status(Status.BAD_REQUEST).entity("Malformed UUID: " + uuid).build();
     } catch (ResourceExistsException e) {
-      return Response.status(Status.CONFLICT).entity(body).build();
+      return Response.status(Status.CONFLICT).entity(protoType).build();
     }
   }
 

@@ -1,4 +1,5 @@
-<html xmlns:c="http://www.concordion.org/2007/concordion">
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+        xmlns:json="https://alexandria.huygens.knaw.nl">
 <title>Creating External Resources</title>
 
 <body>
@@ -27,7 +28,14 @@
                         <b c:assertEquals="base()">https://{host}/resources/</b>
                         followed by a <b c:assertEquals="uuidQuality()">well-formed UUID</b>;
                     </li>
-                    <li>the response body is <b c:assertEquals="responseOrEmpty()">empty</b>.</li>
+                    <li>the response body looks like:
+<pre json:includesJson="responseOrEmpty()">{
+    "resource": {
+        "ref": "http://www.example.com/titles/path/to/title/resource",
+        "annotations": [],
+        "createdOn": "{date.beforeNow}"
+    }
+}</pre></li>
                 </ol>
             </li>
         </ul>

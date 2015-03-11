@@ -1,6 +1,8 @@
 package nl.knaw.huygens.alexandria.helpers;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -60,12 +62,28 @@ public class IncludesJsonCommand extends AbstractCommand {
   }
 
   private boolean includesJson(JsonNode actual, JsonNode expected) {
+    System.err.println("includesJson.actual  =" + actual);
+    System.err.println("includesJson.expected=" + expected);
     if (expected.isArray()) {
       return includesJsonArray(actual, expected);
     }
 
     if (expected.isObject()) {
       return includesJsonObject(actual, expected);
+    }
+
+    if (expected.isTextual()) {
+      // TODO: rather than if-else store these in a mapping from "{format}" to a JsonChecker (to be written) per format
+      if ("{date.beforeNow}".equals(expected.asText())) {
+        System.err.println("Parsing [" + actual.asText() + "] as Instant");
+        try {
+          final Instant when = Instant.parse(actual.asText());
+          return when.isBefore(Instant.now());
+        } catch (DateTimeParseException e) {
+          System.err.println("DateTimeParseException: " + e.getMessage());
+          return false;
+        }
+      }
     }
 
     return actual.equals(expected);
