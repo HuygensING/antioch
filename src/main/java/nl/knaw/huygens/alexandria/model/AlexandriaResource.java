@@ -1,11 +1,11 @@
 package nl.knaw.huygens.alexandria.model;
 
 import static java.time.Instant.now;
+import static nl.knaw.huygens.alexandria.util.OfNullableRenaming.ifPresent;
 
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -19,11 +19,11 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 public class AlexandriaResource {
   private final UUID id;
 
-  private String ref;
-
-  private Set<AlexandriaAnnotation> annotations = new HashSet<>();
+  private final Set<AlexandriaAnnotation> annotations = new HashSet<>();
 
   private final Instant createdOn;
+
+  private String ref;
 
   public AlexandriaResource() {
     this(UUID.randomUUID());
@@ -39,9 +39,9 @@ public class AlexandriaResource {
   }
 
   public AlexandriaResource(AlexandriaResource protoType) {
-    id = Optional.ofNullable(protoType.id).orElse(UUID.randomUUID());
+    id = ifPresent(protoType.id).orElse(UUID.randomUUID());
     ref = protoType.ref;
-    createdOn = Optional.ofNullable(protoType.createdOn).orElse(now());
+    createdOn = ifPresent(protoType.createdOn).orElse(now());
     annotations.addAll(protoType.annotations);
   }
 
