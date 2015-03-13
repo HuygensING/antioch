@@ -39,8 +39,11 @@ public class Resources {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public Response createResourceWithoutGivenID(AlexandriaResource protoType) {
+    Optional.ofNullable(protoType).orElseThrow(MissingEntityException::new);
+
     System.err.println("createResourceWithoutGivenID: protoType=" + protoType);
     System.err.println("annotations: " + protoType.getAnnotations());
+
     final AlexandriaResource res = new AlexandriaResource(protoType);//resourceService.createResource(protoType);
     final String id = res.getId().toString();
     return Response.created(URI.create(id)).entity(res).build();
