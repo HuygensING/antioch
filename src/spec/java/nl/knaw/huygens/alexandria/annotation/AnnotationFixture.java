@@ -10,8 +10,9 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import nl.knaw.huygens.alexandria.exception.ResourceExistsException;
 import nl.knaw.huygens.alexandria.helpers.ApiFixture;
-import nl.knaw.huygens.alexandria.resource.Annotations;
+import nl.knaw.huygens.alexandria.endpoint.Annotations;
 import org.concordion.api.MultiValueResult;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.BeforeClass;
@@ -30,7 +31,7 @@ public class AnnotationFixture extends ApiFixture {
     addClass(Annotations.class);
   }
 
-  public MultiValueResult testAnno(String key, String value) {
+  public MultiValueResult testAnno(String key, String value) throws ResourceExistsException {
     body(key + ":" + value);
     request("POST", "/annotations");
     request("GET", "/annotations/1");

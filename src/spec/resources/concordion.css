@@ -15,10 +15,11 @@
 
 .example ul {
     padding-left: 20px;
+    list-style-type: square;
 }
 
-.example ul.li {
-    list-style-type: none;
+.example ol {
+    list-style-type: lower-roman;
 }
 
 .example th {

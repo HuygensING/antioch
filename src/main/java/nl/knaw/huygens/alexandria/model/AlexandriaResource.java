@@ -1,7 +1,7 @@
 package nl.knaw.huygens.alexandria.model;
 
 import static java.time.Instant.now;
-import static nl.knaw.huygens.alexandria.util.OfNullableRenaming.ifPresent;
+import static nl.knaw.huygens.alexandria.util.OfNullableRenaming.ifProvided;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -39,9 +39,9 @@ public class AlexandriaResource {
   }
 
   public AlexandriaResource(AlexandriaResource protoType) {
-    id = ifPresent(protoType.id).orElse(UUID.randomUUID());
+    id = ifProvided(protoType.id).orElse(UUID.randomUUID());
     ref = protoType.ref;
-    createdOn = ifPresent(protoType.createdOn).orElse(now());
+    createdOn = ifProvided(protoType.createdOn).orElse(now());
     annotations.addAll(protoType.annotations);
   }
 

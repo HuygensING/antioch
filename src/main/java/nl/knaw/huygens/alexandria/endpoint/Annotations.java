@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.resource;
+package nl.knaw.huygens.alexandria.endpoint;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
