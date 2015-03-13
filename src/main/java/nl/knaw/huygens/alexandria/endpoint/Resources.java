@@ -31,8 +31,8 @@ public class Resources {
 
   @GET
   @Path("/{uuid}")
-  public Response getResourceByID(@PathParam("uuid") final String uuid) {
-    return Response.ok(resourceService.getResource(uuid)).build();
+  public Response getResourceByID(@PathParam("uuid") final UUIDParam uuid) {
+    return Response.ok(resourceService.getResource(uuid.getValue())).build();
   }
 
   @POST
