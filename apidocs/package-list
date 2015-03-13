@@ -1,5 +1,6 @@
 nl.knaw.huygens.alexandria
-nl.knaw.huygens.alexandria.external
-nl.knaw.huygens.alexandria.resource
+nl.knaw.huygens.alexandria.endpoint
+nl.knaw.huygens.alexandria.exception
+nl.knaw.huygens.alexandria.model
 nl.knaw.huygens.alexandria.service
 nl.knaw.huygens.alexandria.util

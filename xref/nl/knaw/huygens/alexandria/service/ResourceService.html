@@ -8,44 +8,16 @@
 <div id="overview"><a href="../../../../../../apidocs/nl/knaw/huygens/alexandria/service/ResourceService.html">View Javadoc</a></div><pre>
 <a class="jxr_linenumber" name="L1" href="#L1">1</a>   <strong class="jxr_keyword">package</strong> nl.knaw.huygens.alexandria.service;
 <a class="jxr_linenumber" name="L2" href="#L2">2</a>   
-<a class="jxr_linenumber" name="L3" href="#L3">3</a>   <strong class="jxr_keyword">import</strong> javax.ws.rs.core.Context;
-<a class="jxr_linenumber" name="L4" href="#L4">4</a>   <strong class="jxr_keyword">import</strong> java.util.UUID;
-<a class="jxr_linenumber" name="L5" href="#L5">5</a>   
-<a class="jxr_linenumber" name="L6" href="#L6">6</a>   <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.external.IllegalResourceException;
-<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.external.ResourceExistsException;
-<a class="jxr_linenumber" name="L8" href="#L8">8</a>   <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.external.ResourceStore;
-<a class="jxr_linenumber" name="L9" href="#L9">9</a>   <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.util.UUIDParser;
+<a class="jxr_linenumber" name="L3" href="#L3">3</a>   <strong class="jxr_keyword">import</strong> java.util.UUID;
+<a class="jxr_linenumber" name="L4" href="#L4">4</a>   
+<a class="jxr_linenumber" name="L5" href="#L5">5</a>   <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.exception.IllegalResourceException;
+<a class="jxr_linenumber" name="L6" href="#L6">6</a>   <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaResource;
+<a class="jxr_linenumber" name="L7" href="#L7">7</a>   
+<a class="jxr_linenumber" name="L8" href="#L8">8</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">interface</strong> <a href="../../../../../nl/knaw/huygens/alexandria/service/ResourceService.html">ResourceService</a> {
+<a class="jxr_linenumber" name="L9" href="#L9">9</a>     <a href="../../../../../nl/knaw/huygens/alexandria/model/AlexandriaResource.html">AlexandriaResource</a> createResource(<a href="../../../../../nl/knaw/huygens/alexandria/model/AlexandriaResource.html">AlexandriaResource</a> protoType);
 <a class="jxr_linenumber" name="L10" href="#L10">10</a>  
-<a class="jxr_linenumber" name="L11" href="#L11">11</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/service/ResourceService.html">ResourceService</a> {
-<a class="jxr_linenumber" name="L12" href="#L12">12</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../nl/knaw/huygens/alexandria/external/ResourceStore.html">ResourceStore</a> resourceStore;
-<a class="jxr_linenumber" name="L13" href="#L13">13</a>  
-<a class="jxr_linenumber" name="L14" href="#L14">14</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../nl/knaw/huygens/alexandria/service/ResourceService.html">ResourceService</a>(@Context <a href="../../../../../nl/knaw/huygens/alexandria/external/ResourceStore.html">ResourceStore</a> resourceStore) {
-<a class="jxr_linenumber" name="L15" href="#L15">15</a>      <strong class="jxr_keyword">this</strong>.resourceStore = resourceStore;
-<a class="jxr_linenumber" name="L16" href="#L16">16</a>    }
-<a class="jxr_linenumber" name="L17" href="#L17">17</a>  
-<a class="jxr_linenumber" name="L18" href="#L18">18</a>    <strong class="jxr_keyword">public</strong> UUID createResource(<strong class="jxr_keyword">final</strong> String ref) {
-<a class="jxr_linenumber" name="L19" href="#L19">19</a>      <strong class="jxr_keyword">final</strong> UUID uuid = UUID.randomUUID();
-<a class="jxr_linenumber" name="L20" href="#L20">20</a>      resourceStore.createResource(uuid, ref);
-<a class="jxr_linenumber" name="L21" href="#L21">21</a>      <strong class="jxr_keyword">return</strong> uuid;
-<a class="jxr_linenumber" name="L22" href="#L22">22</a>    }
-<a class="jxr_linenumber" name="L23" href="#L23">23</a>  
-<a class="jxr_linenumber" name="L24" href="#L24">24</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> createResource(<strong class="jxr_keyword">final</strong> UUID uuid, <strong class="jxr_keyword">final</strong> String ref) <strong class="jxr_keyword">throws</strong> ResourceExistsException {
-<a class="jxr_linenumber" name="L25" href="#L25">25</a>      <strong class="jxr_keyword">if</strong> (!resourceStore.createResource(uuid, ref)) {
-<a class="jxr_linenumber" name="L26" href="#L26">26</a>        <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../nl/knaw/huygens/alexandria/external/ResourceExistsException.html">ResourceExistsException</a>();
-<a class="jxr_linenumber" name="L27" href="#L27">27</a>      }
-<a class="jxr_linenumber" name="L28" href="#L28">28</a>    }
-<a class="jxr_linenumber" name="L29" href="#L29">29</a>  
-<a class="jxr_linenumber" name="L30" href="#L30">30</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> createResource(<strong class="jxr_keyword">final</strong> String id, <strong class="jxr_keyword">final</strong> String ref)
-<a class="jxr_linenumber" name="L31" href="#L31">31</a>        <strong class="jxr_keyword">throws</strong> IllegalResourceException, <a href="../../../../../nl/knaw/huygens/alexandria/external/ResourceExistsException.html">ResourceExistsException</a> {
-<a class="jxr_linenumber" name="L32" href="#L32">32</a>      UUID uuid = UUIDParser.fromString(id).get().orElseThrow(IllegalResourceException::<strong class="jxr_keyword">new</strong>);
-<a class="jxr_linenumber" name="L33" href="#L33">33</a>      createResource(uuid, ref);
-<a class="jxr_linenumber" name="L34" href="#L34">34</a>    }
-<a class="jxr_linenumber" name="L35" href="#L35">35</a>  
-<a class="jxr_linenumber" name="L36" href="#L36">36</a>    <strong class="jxr_keyword">public</strong> String getResource(String id) <strong class="jxr_keyword">throws</strong> IllegalResourceException {
-<a class="jxr_linenumber" name="L37" href="#L37">37</a>      UUID uuid = UUIDParser.fromString(id).get().orElseThrow(IllegalResourceException::<strong class="jxr_keyword">new</strong>);
-<a class="jxr_linenumber" name="L38" href="#L38">38</a>      <strong class="jxr_keyword">return</strong> resourceStore.getReference(uuid);
-<a class="jxr_linenumber" name="L39" href="#L39">39</a>    }
-<a class="jxr_linenumber" name="L40" href="#L40">40</a>  }
+<a class="jxr_linenumber" name="L11" href="#L11">11</a>    String getResource(UUID uuid) <strong class="jxr_keyword">throws</strong> IllegalResourceException;
+<a class="jxr_linenumber" name="L12" href="#L12">12</a>  }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2015 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
