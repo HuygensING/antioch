@@ -56,7 +56,7 @@ public class Resources {
     System.err.println("createResourceAtSpecificID: paramId=" + paramId + " vs protoType.id=" + protoType.getId());
 
     Optional.ofNullable(protoType.getId()).ifPresent(protoId -> {
-      if (!protoId.equals(paramId)) {
+      if (!protoId.equals(paramId.getValue())) {
         throw new IdMismatchException(paramId.getValue(), protoType.getId());
       }
     });
