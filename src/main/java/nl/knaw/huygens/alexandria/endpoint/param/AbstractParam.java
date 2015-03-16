@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.util;
+package nl.knaw.huygens.alexandria.endpoint.param;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;

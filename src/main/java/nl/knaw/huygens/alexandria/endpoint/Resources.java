@@ -17,7 +17,7 @@ import nl.knaw.huygens.alexandria.exception.IdMismatchException;
 import nl.knaw.huygens.alexandria.exception.MissingEntityException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.ResourceService;
-import nl.knaw.huygens.alexandria.util.UUIDParam;
+import nl.knaw.huygens.alexandria.endpoint.param.UUIDParam;
 
 @Path("/resources")
 public class Resources {
