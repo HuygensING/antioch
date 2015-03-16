@@ -5,11 +5,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 public class IllegalResourceException extends WebApplicationException {
-  public IllegalResourceException(Response response) {
-    super(response);
-  }
-
-  public IllegalResourceException(String msg) {
-    super(Response.status(Status.CONFLICT).entity(msg).build());
+  public IllegalResourceException(String message) {
+    super(Response.status(Status.CONFLICT).entity(message).build());
   }
 }

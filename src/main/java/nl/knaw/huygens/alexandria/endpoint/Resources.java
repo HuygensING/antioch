@@ -26,7 +26,7 @@ public class Resources extends JSONEndpoint {
   @GET
   @Path("/{uuid}")
   public Response getResourceByID(@PathParam("uuid") final UUIDParam uuid) {
-    return Response.ok(resourceService.getResource(uuid.getValue())).build();
+    return Response.ok(resourceService.readResource(uuid.getValue())).build();
   }
 
   @POST
