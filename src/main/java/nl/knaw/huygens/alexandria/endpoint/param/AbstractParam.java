@@ -1,19 +1,17 @@
 package nl.knaw.huygens.alexandria.endpoint.param;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import nl.knaw.huygens.alexandria.exception.BadRequestException;
 
 public abstract class AbstractParam<V> {
   private final V value;
   private final String originalParam;
 
-  public AbstractParam(String param) throws WebApplicationException {
+  public AbstractParam(String param) throws BadRequestException {
     this.originalParam = param;
     try {
       this.value = parse(param);
     } catch (Throwable e) {
-      throw new WebApplicationException(onError(param, e));
+      throw new BadRequestException(getErrorMessage(param, e));
     }
   }
 
@@ -31,10 +29,6 @@ public abstract class AbstractParam<V> {
   }
 
   protected abstract V parse(String param) throws Throwable;
-
-  protected Response onError(String param, Throwable e) {
-    return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(param, e)).build();
-  }
 
   // TODO: wrap error message in a proper error object, so it can be converted to JSON
   protected String getErrorMessage(String param, Throwable e) {

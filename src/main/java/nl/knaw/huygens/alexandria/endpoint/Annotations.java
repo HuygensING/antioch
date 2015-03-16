@@ -11,7 +11,7 @@ import java.net.URI;
 import nl.knaw.huygens.alexandria.service.AnnotationService;
 
 @Path("/annotations")
-public class Annotations {
+public class Annotations extends JSONEndpoint {
   private final AnnotationService service = new AnnotationService();
 
   @POST

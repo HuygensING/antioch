@@ -1,10 +1,9 @@
 package nl.knaw.huygens.alexandria.endpoint.param;
 
-import javax.ws.rs.WebApplicationException;
 import java.util.UUID;
 
 public class UUIDParam extends AbstractParam<UUID> {
-  public UUIDParam(String param) throws WebApplicationException {
+  public UUIDParam(String param) {
     super(param);
   }
 

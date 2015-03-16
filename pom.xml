@@ -353,6 +353,12 @@
 
 		<!-- Tests -->
         <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.sun.jersey.jersey-test-framework</groupId>
             <artifactId>jersey-test-framework-inmemory</artifactId>
             <version>${jersey.version}</version>
@@ -391,6 +397,7 @@
         <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
 
         <!-- Software versions -->
+        <assertj.version>2.0.0</assertj.version>
         <concordion.version>1.4.7</concordion.version>
         <guava.version>18.0</guava.version>
         <guice.version>3.0</guice.version>

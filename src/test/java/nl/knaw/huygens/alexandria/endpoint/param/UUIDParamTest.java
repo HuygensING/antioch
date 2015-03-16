@@ -2,15 +2,15 @@ package nl.knaw.huygens.alexandria.endpoint.param;
 
 import static org.junit.Assert.assertEquals;
 
-import javax.ws.rs.WebApplicationException;
 import java.util.UUID;
 
+import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import org.junit.Test;
 
 public class UUIDParamTest {
   private static final String A_VALID_UUID = "ea71773e-cbaf-11e4-a5af-473cb94dfabd";
 
-  @Test(expected = WebApplicationException.class)
+  @Test(expected = BadRequestException.class)
   public void testConstructorRejectsInvalidUUID() {
     new UUIDParam("invalid-uuid");
   }
