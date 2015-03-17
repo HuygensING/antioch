@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint;
+package nl.knaw.huygens.alexandria.util;
 
 import java.util.Optional;
 import java.util.UUID;

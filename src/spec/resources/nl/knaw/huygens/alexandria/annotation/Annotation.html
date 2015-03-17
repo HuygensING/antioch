@@ -5,11 +5,11 @@
 
 <div c:execute="clear()" class="example">
     WORK IN PROGRESS:
-    <div c:set="#key">Emotion</div> <div c:set="#value">Happy</div>
-    <b c:execute="#response = testAnno(#key, #value)"></b>
+    <div c:set="#key">Emotion</div> <div c:set="#uuid">Happy</div>
+    <b c:execute="#response = testAnno(#key, #uuid)"></b>
     <ol>
         <li c:assertEquals="#response.key">key=Emotion</li>
-        <li c:assertEquals="#response.value">value=Happy</li>
+        <li c:assertEquals="#response.uuid">uuid=Happy</li>
     </ol>
 </div>
 

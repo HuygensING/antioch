@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 
 import nl.knaw.huygens.alexandria.endpoint.param.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.MissingEntityException;
+import nl.knaw.huygens.alexandria.util.IdentityCompatibilityArbiter;
 
 @Consumes(MediaType.APPLICATION_JSON) // rfc4627: JSON text SHALL be encoded in Unicode. The default encoding is UTF-8.
 @Produces(MediaType.APPLICATION_JSON)

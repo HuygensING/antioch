@@ -54,7 +54,7 @@ Authorization: auth-token-1234
 {
     "annotation": {
         "type": "emotion",
-        "value": "happy",
+        "uuid": "happy",
         "createdBy": "nederlab-user-1"
     }
 }
@@ -78,7 +78,7 @@ Authorization: auth-token-1234
 {
     "annotation": {
         "type": "emotion",
-        "value": "happy",
+        "uuid": "happy",
         "annotations": [],
         "createdBy": "nederlab-user-1",
         "createdOn": "2015-02-17 07:56:04+01:00"
@@ -100,7 +100,7 @@ Authorization: auth-token-1234
     "annotations": [
         {
             "type": "emotion",
-            "value": "happy",
+            "uuid": "happy",
             "annotations": [],
             "createdBy": "nederlab-user-1",
             "createdOn": "2015-02-17 07:48:50+01:00"
@@ -118,7 +118,7 @@ Authorization: auth-token-1234
 {
     "annotation": {
         "type": "emotion",
-        "value": "cheerful"
+        "uuid": "cheerful"
     }
 }
 ```
@@ -142,14 +142,14 @@ Authorization: auth-token-1234
 	"annotations": [
 		{
 		    "type": "emotion",
-		    "value": "happy",
+		    "uuid": "happy",
 			"annotations": [],
 			"createdBy": "nederlab-user-1",
 			"createdOn": "2015-02-17 07:48:50+01:00"
 		},
 		{
 		    "type": "emotion",
-		    "value": "cheerful",
+		    "uuid": "cheerful",
 			"annotations": [],
 			"createdBy": "root",
 			"createdOn": "2015-02-17 08:11:24+01:00"
@@ -174,14 +174,14 @@ Authorization: auth-token-1234
     "annotations": [
         {
             "type": "emotion",
-            "value": "happy",
+            "uuid": "happy",
             "annotations": [],
             "createdBy": "nederlab-user-1",
             "createdOn": "2015-02-17 07:48:50+01:00"
         },
         {
             "type": "emotion",
-            "value": "cheerful",
+            "uuid": "cheerful",
             "annotations": [],
             "createdBy": "root",
             "createdOn": "2015-02-17 08:11:24+01:00"
