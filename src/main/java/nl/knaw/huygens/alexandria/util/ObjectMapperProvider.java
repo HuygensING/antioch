@@ -5,13 +5,15 @@ import javax.ws.rs.ext.Provider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 //import com.fasterxml.jackson.datatype.joda.JodaModule;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 
 @Provider
 public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
-  //  private static final Logger log = LoggerFactory.getLogger(ObjectMapperProvider.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ObjectMapperProvider.class);
   private static final ObjectMapper OBJECT_MAPPER = objectMapper();
 
   @Override
@@ -22,7 +24,7 @@ public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
 
   private static ObjectMapper objectMapper() {
     ObjectMapper mapper = new ObjectMapper();
-    System.err.println("Setting up Jackson ObjectMapper: [" + mapper + "]");
+    LOG.debug("Setting up Jackson ObjectMapper: [" + mapper + "]");
 
     // These are 'dev' settings giving us human readable output.
     mapper.configure(SerializationFeature.INDENT_OUTPUT, true);

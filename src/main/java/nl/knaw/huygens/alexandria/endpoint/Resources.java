@@ -12,14 +12,19 @@ import java.net.URI;
 import nl.knaw.huygens.alexandria.endpoint.param.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.ResourceService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Path("/resources")
 public class Resources extends JSONEndpoint {
-  public static final URI HERE = URI.create("");
+  private static final URI HERE = URI.create("");
+
+  private static final Logger LOG = LoggerFactory.getLogger(Resources.class);
 
   private final ResourceService resourceService;
 
   public Resources(@Context ResourceService resourceService) {
+    LOG.trace("Resources created, resourceService=[{}]", resourceService);
     this.resourceService = resourceService;
   }
 
@@ -33,8 +38,8 @@ public class Resources extends JSONEndpoint {
   public Response createResourceWithoutGivenID(AlexandriaResource protoType) {
     requireValidEntity(protoType);
 
-    System.err.println("createResourceWithoutGivenID: protoType=" + protoType);
-    System.err.println("annotations: " + protoType.getAnnotations());
+    LOG.debug("createResourceWithoutGivenID: protoType=[{}]", protoType);
+    LOG.debug("annotations: [{}]", protoType.getAnnotations());
 
     final AlexandriaResource res = new AlexandriaResource(protoType);//resourceService.createResource(protoType);
     final String id = res.getId().toString();
@@ -47,7 +52,7 @@ public class Resources extends JSONEndpoint {
     requireValidEntity(protoType);
     requireCompatibleIds(paramId, protoType::getId);
 
-    System.err.println("createResourceAtSpecificID: paramId=" + paramId + " vs protoType.id=" + protoType.getId());
+    LOG.debug("createResourceAtSpecificID: paramId=[{}] vs protoType.id=[{}]", paramId, protoType.getId());
 
     resourceService.createResource(protoType);
 

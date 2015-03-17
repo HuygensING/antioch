@@ -10,12 +10,16 @@ import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWith(ConcordionRunner.class)
 public class CreationFixture extends ResourcesFixture {
+  private static final Logger LOG = LoggerFactory.getLogger(CreationFixture.class);
+
   @Override
   public void request(String method, String path) {
-    System.err.println(String.format("CreationFixture.request(%s,%s)", method, path));
+    LOG.trace("CreationFixture.request({},{})", method, path);
 
     when(resourceService().createResource(any(AlexandriaResource.class))).then(returnsFirstArg());
 

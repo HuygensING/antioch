@@ -19,9 +19,13 @@ import com.sun.jersey.test.framework.LowLevelAppDescriptor;
 import nl.knaw.huygens.alexandria.util.ObjectMapperProvider;
 import org.concordion.api.extension.Extensions;
 import org.junit.BeforeClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Extensions(ApiExtension.class)
 public class ApiFixture extends JerseyTest {
+  private static final Logger LOG = LoggerFactory.getLogger(ApiFixture.class);
+
   private static ResourceConfig resourceConfig;
 
   public static void addClass(Class<?> resourceClass) {
@@ -66,7 +70,7 @@ public class ApiFixture extends JerseyTest {
   }
 
   public void request(String method, String path) {
-    System.err.println("*** ApiFixture.invokeREST: method=" + method + ", path=" + path);
+    LOG.debug("request: method=[{}], path=[{}]", method, path);
 
     response = request.path(path).type(contentType).method(method, ClientResponse.class, body);
 

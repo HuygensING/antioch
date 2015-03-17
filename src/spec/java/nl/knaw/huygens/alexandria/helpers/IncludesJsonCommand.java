@@ -19,18 +19,22 @@ import org.concordion.api.listener.AssertEqualsListener;
 import org.concordion.api.listener.AssertFailureEvent;
 import org.concordion.api.listener.AssertSuccessEvent;
 import org.concordion.internal.util.Announcer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IncludesJsonCommand extends AbstractCommand {
+  private static final Logger LOG = LoggerFactory.getLogger(IncludesJsonCommand.class);
+
   private Announcer<AssertEqualsListener> listeners = Announcer.to(AssertEqualsListener.class);
 
   @Override
   public void verify(CommandCall commandCall, Evaluator evaluator, ResultRecorder resultRecorder) {
     final Element element = commandCall.getElement();
     final String expected = element.getText();
-//    System.err.println("IncludesJsonCommand: expected=" + expected);
+//    LOG.trace("IncludesJsonCommand: expected=[{}]", expected);
 
     final String actual = (String) evaluator.evaluate(commandCall.getExpression());
-//    System.err.println("IncludesJsonCommand: actual=" + actual);
+//    LOG.trace("IncludesJsonCommand: actual=[{}]", actual);
 
     if (includesJson(actual, expected)) {
       resultRecorder.record(Result.SUCCESS);
@@ -62,8 +66,8 @@ public class IncludesJsonCommand extends AbstractCommand {
   }
 
   private boolean includesJson(JsonNode actual, JsonNode expected) {
-    System.err.println("includesJson.actual  =" + actual);
-    System.err.println("includesJson.expected=" + expected);
+    LOG.trace("includesJson.actual  =[{}]", actual);
+    LOG.trace("includesJson.expected=[{}]", expected);
     if (expected.isArray()) {
       return includesJsonArray(actual, expected);
     }
@@ -75,12 +79,12 @@ public class IncludesJsonCommand extends AbstractCommand {
     if (expected.isTextual()) {
       // TODO: rather than if-else store these in a mapping from "{format}" to a JsonChecker (to be written) per format
       if ("{date.beforeNow}".equals(expected.asText())) {
-        System.err.println("Parsing [" + actual.asText() + "] as Instant");
+        LOG.trace("Parsing [{}] as Instant", actual.asText());
         try {
           final Instant when = Instant.parse(actual.asText());
           return when.isBefore(Instant.now());
         } catch (DateTimeParseException e) {
-          System.err.println("DateTimeParseException: " + e.getMessage());
+          LOG.trace("DateTimeParseException: [{}]", e.getMessage());
           return false;
         }
       }
