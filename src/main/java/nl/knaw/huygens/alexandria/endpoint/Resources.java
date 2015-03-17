@@ -38,6 +38,7 @@ public class Resources extends JSONEndpoint {
 
     /*
       return Response.ok(annotations).build() unfortunately yields:
+
       [{ "id" : "42f22020-cc82-11e4-aec9-1be06e873083", "annotations" : []},
        { "id" : "92af4396-cc77-11e4-9b9b-1f1561a91434", "annotations" : []}]
 
