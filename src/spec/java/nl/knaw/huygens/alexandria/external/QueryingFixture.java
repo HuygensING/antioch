@@ -10,7 +10,6 @@ import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.runner.RunWith;
 
-//@ExpectedToFail
 @RunWith(ConcordionRunner.class)
 public class QueryingFixture extends ResourcesFixture {
   private AlexandriaResource resource;
@@ -25,7 +24,7 @@ public class QueryingFixture extends ResourcesFixture {
     resource.setRef(reference);
   }
 
-  public void addAnnotation(String id) {
+  public void withAnnotation(String id) {
     resource.addAnnotation(new AlexandriaAnnotation(UUID.fromString(id)));
   }
 
