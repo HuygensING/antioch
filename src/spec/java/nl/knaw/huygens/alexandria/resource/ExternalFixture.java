@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.external;
+package nl.knaw.huygens.alexandria.resource;
 
 import nl.knaw.huygens.alexandria.helpers.ApiExtension;
 import org.concordion.api.extension.Extensions;

@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.external;
+package nl.knaw.huygens.alexandria.resource;
 
 import static org.mockito.Mockito.when;
 
