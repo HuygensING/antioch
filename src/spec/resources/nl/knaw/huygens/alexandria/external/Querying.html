@@ -10,40 +10,58 @@
     <div c:execute="clear()" class="example">
         <h3>How can I query an external resource by its ID?</h3>
 
-        <p>Given a resource identified by ID <code>c6b96360-c0c9-11e4-b947-6bc57448d166</code></p>
+        <ul>
+            <li c:execute="existingResource(#id)">Given an existing resource
+                <ul>
+                    <li>identified by <code c:set="#id">c6b96360-c0c9-11e4-b947-6bc57448d166</code>;</li>
+                    <li>with a <code c:execute="withReference(#ref)">ref</code> set to
+                        <code c:set="#ref">http://www.example.com/titles/path/to/title/resource</code>;</li>
+                    <li>with <span c:execute="addAnnotation(#annoId)">an annotation
+                        identified by <code c:set="#annoId">92af4396-cc77-11e4-9b9b-1f1561a91434</code></span>.</li>
+                </ul>
+            </li>
+            <li>When I <b c:set="#method">GET</b> <code><b
+                    c:set="#endpoint">/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</b></code></li>
 
-        <p>When I <b c:set="#method">GET</b> <code><b
-                c:set="#endpoint">/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</b></code></p>
-
-        <p c:execute="request(#method, #endpoint)">Then:</p>
-        <ol>
-            <li>the response status should be <b c:assertEquals="status()">200 OK</b>;</li>
-            <li>And the response body looks like:
+            <li c:execute="request(#method, #endpoint)">Then:
+                <ol>
+                    <li>the response status should be <b c:assertEquals="status()">200 OK</b>;</li>
+                    <li>And the response body looks like:
 <pre json:includesJson="response()">{
     "resource": {
         "id": "c6b96360-c0c9-11e4-b947-6bc57448d166",
-        "annotations": [],
+        "ref": "http://www.example.com/titles/path/to/title/resource",
+        "annotations": [{
+            "annotation": {
+                "id": "92af4396-cc77-11e4-9b9b-1f1561a91434"
+            }
+        }],
         "createdOn": "{date.beforeNow}"
     }
 }</pre>
+                    </li>
+                </ol>
             </li>
-        </ol>
-
+        </ul>
     </div>
 
     <div c:execute="clear()" class="example">
         <h3>What happens when I try to GET a non-existent resource?</h3>
 
-        <p>Given that no resource exists with ID <code>3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</code></p>
+        <ul>
+            <li>Given that no resource exists with ID
+                <span c:execute="noSuchResource(#id)"><code
+                        c:set="#id">3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</code></span></li>
 
-        <p>When I <b c:set="#method">GET</b> <code><b
-                c:set="#endpoint">/resources/3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</b></code></p>
+            <li>When I <b c:set="#method">GET</b> <code><b
+                    c:set="#endpoint">/resources/3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</b></code></li>
 
-        <p c:execute="request(#method, #endpoint)">Then:</p>
-        <ol>
-            <li>the response status should be <b c:assertEquals="status()">404 Not Found</b>;</li>
-            <li>the response body is <b c:assertEquals="responseOrEmpty()">empty</b>.</li>
-        </ol>
+            <li c:execute="request(#method, #endpoint)">Then:</li>
+            <ol>
+                <li>the response status should be <b c:assertEquals="status()">404 Not Found</b>;</li>
+                <li>the response body is <b c:assertEquals="responseOrEmpty()">empty</b>.</li>
+            </ol>
+        </ul>
     </div>
 </div>
 </body>

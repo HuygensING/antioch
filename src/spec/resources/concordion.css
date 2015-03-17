@@ -15,7 +15,11 @@
 
 .example ul {
     padding-left: 20px;
-    list-style-type: square;
+    list-style-type: none;
+}
+
+.example ul ul {
+    list-style-type: disc;
 }
 
 .example ol {
