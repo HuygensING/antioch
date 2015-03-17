@@ -1,9 +1,31 @@
-<html xmlns:c="http://www.concordion.org/2007/concordion">
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+        >
+<title>Accessing Annotations</title>
+
 <body>
 
-<h1>Annotations</h1>
+<h1>Accessing annotations</h1>
 
 <div class="examples">
+    <div c:execute="clear()" class="example">
+        <h3>What happens when I try to GET a non-existent annotation?</h3>
+
+        <ul>
+            <li>Given that no annotation exists with ID
+                <span c:execute="noSuchAnnotation(#id)"><code
+                        c:set="#id">3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</code></span></li>
+
+            <li>When I <b c:set="#method">GET</b> <code><b
+                    c:set="#endpoint">/annotations/3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</b></code></li>
+
+            <li c:execute="request(#method, #endpoint)">Then:</li>
+            <ol>
+                <li>the response status should be <b c:assertEquals="status()">404 Not Found</b>;</li>
+                <li>the response body is <b c:assertEquals="responseOrEmpty()">empty</b>.</li>
+            </ol>
+        </ul>
+    </div>
+
     <div c:execute="clear()" class="example">
         WORK IN PROGRESS:
         <div c:set="#key">Emotion</div>

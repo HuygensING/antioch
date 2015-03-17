@@ -7,11 +7,8 @@ import java.util.UUID;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import org.concordion.integration.junit4.ConcordionRunner;
-import org.junit.runner.RunWith;
 
-@RunWith(ConcordionRunner.class)
-public class QueryingFixture extends ResourcesFixture {
+public class QueryingFixture extends ResourceFixture {
   private AlexandriaResource resource;
 
   public void existingResource(String id) {

@@ -1,9 +1,12 @@
 package nl.knaw.huygens.alexandria.annotation;
 
 import static org.concordion.api.MultiValueResult.multiValueResult;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -11,18 +14,20 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import nl.knaw.huygens.alexandria.endpoint.Annotations;
+import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.exception.ResourceExistsException;
 import nl.knaw.huygens.alexandria.helpers.ApiFixture;
+import nl.knaw.huygens.alexandria.service.AnnotationService;
 import org.concordion.api.MultiValueResult;
-import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RunWith(ConcordionRunner.class)
 public class AnnotationFixture extends ApiFixture {
   private static final Logger LOG = LoggerFactory.getLogger(AnnotationFixture.class);
+
+  private static AnnotationService ANNOTATION_SERVICE_MOCK = mock(AnnotationService.class);
 
   private final Splitter COMMA_SPLITTER = Splitter.on(',');
 
@@ -30,9 +35,23 @@ public class AnnotationFixture extends ApiFixture {
 
   @BeforeClass
   public static void setup() {
-    LOG.trace("AnnotationFixture::setup");
-
     addClass(Annotations.class);
+    addProviderForContext(AnnotationService.class, ANNOTATION_SERVICE_MOCK);
+  }
+
+  @Override
+  public void clear() {
+    super.clear();
+    Mockito.reset(ANNOTATION_SERVICE_MOCK);
+  }
+
+  protected AnnotationService annotationService() {
+    return ANNOTATION_SERVICE_MOCK;
+  }
+
+  public void noSuchAnnotation(String id) {
+    UUID uuid = UUID.fromString(id);
+    when(annotationService().getAnnotation(uuid)).thenThrow(new NotFoundException());
   }
 
   public MultiValueResult testAnno(String key, String value) throws ResourceExistsException {

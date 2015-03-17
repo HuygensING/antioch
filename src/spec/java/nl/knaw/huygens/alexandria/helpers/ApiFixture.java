@@ -18,11 +18,14 @@ import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.LowLevelAppDescriptor;
 import nl.knaw.huygens.alexandria.util.ObjectMapperProvider;
 import org.concordion.api.extension.Extensions;
+import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Extensions(ApiExtension.class)
+@RunWith(ConcordionRunner.class)
 public class ApiFixture extends JerseyTest {
   private static final Logger LOG = LoggerFactory.getLogger(ApiFixture.class);
 
@@ -70,7 +73,7 @@ public class ApiFixture extends JerseyTest {
   }
 
   public void request(String method, String path) {
-    LOG.debug("request: method=[{}], path=[{}]", method, path);
+    LOG.trace("request: method=[{}], path=[{}]", method, path);
 
     response = request.path(path).type(contentType).method(method, ClientResponse.class, body);
 

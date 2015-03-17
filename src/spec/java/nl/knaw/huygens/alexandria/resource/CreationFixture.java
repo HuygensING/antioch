@@ -8,13 +8,10 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
-import org.concordion.integration.junit4.ConcordionRunner;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RunWith(ConcordionRunner.class)
-public class CreationFixture extends ResourcesFixture {
+public class CreationFixture extends ResourceFixture {
   private static final Logger LOG = LoggerFactory.getLogger(CreationFixture.class);
 
   @Override
