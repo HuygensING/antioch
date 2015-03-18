@@ -17,13 +17,15 @@ public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
 
   @Override
   public ObjectMapper getContext(Class<?> type) {
+    LOG.trace("returning Jackson ObjectMapper for {}", type);
+
     // Let's find out if singleton is good enough. If it isn't, just return objectMapper();
     return OBJECT_MAPPER;
   }
 
   private static ObjectMapper objectMapper() {
     ObjectMapper mapper = new ObjectMapper();
-    LOG.debug("Setting up Jackson ObjectMapper: [" + mapper + "]");
+    LOG.debug("setting up Jackson ObjectMapper: [" + mapper + "]");
 
     mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
 

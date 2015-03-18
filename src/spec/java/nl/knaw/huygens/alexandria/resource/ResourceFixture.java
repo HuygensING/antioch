@@ -7,18 +7,26 @@ import nl.knaw.huygens.alexandria.helpers.ApiFixture;
 import nl.knaw.huygens.alexandria.service.ResourceService;
 import org.junit.BeforeClass;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ResourceFixture extends ApiFixture {
-  private static ResourceService RESOURCE_SERVICE_MOCK = mock(ResourceService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ResourceFixture.class);
+
+  private static final ResourceService RESOURCE_SERVICE_MOCK = mock(ResourceService.class);
 
   @BeforeClass
   public static void setup() {
+    LOG.trace("adding class Resources");
     addClass(Resources.class);
+
+    LOG.trace("adding ResourceServiceProvider");
     addProviderForContext(ResourceService.class, RESOURCE_SERVICE_MOCK);
   }
 
   @Override
   public void clear() {
+    LOG.trace("clear");
     super.clear();
     Mockito.reset(RESOURCE_SERVICE_MOCK);
   }

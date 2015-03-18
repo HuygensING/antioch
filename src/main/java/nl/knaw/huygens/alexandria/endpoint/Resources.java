@@ -9,10 +9,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
@@ -23,6 +24,7 @@ import nl.knaw.huygens.alexandria.endpoint.param.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.ResourceService;
+import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,16 +37,13 @@ public class Resources extends JSONEndpoint {
   private static final Logger LOG = LoggerFactory.getLogger(Resources.class);
 
   private final ResourceService resourceService;
-  private final UriInfo uriInfo;
+  private final AlexandriaConfiguration config;
 
-  public Resources(@Context ResourceService resourceService, @Context UriInfo uriInfo) {
-    LOG.trace("Resources created, resourceService=[{}], uriInfo=[{}]", resourceService, uriInfo);
-    this.uriInfo = uriInfo;
+  public Resources(@Context ResourceService resourceService, @Context AlexandriaConfiguration config) {
+    LOG.trace("Resources created, resourceService=[{}], config=[{}]", resourceService, config);
+
+    this.config = config;
     this.resourceService = resourceService;
-
-    LOG.debug("baseUri: [{}]", uriInfo.getBaseUri().toString());
-    LOG.debug("requestUri: [{}]", uriInfo.getRequestUri().toString());
-    LOG.debug("absolutePath: [{}]", uriInfo.getAbsolutePath().toString());
   }
 
   @GET
@@ -104,12 +103,16 @@ public class Resources extends JSONEndpoint {
       ref = resource.getRef();
       createdOn = resource.getCreatedOn().toString(); // lest we get the fields of Instant yielded recursively
       annotations = Sets.newHashSet();
-      resource.getAnnotations().stream().map(a -> annotationURI(a)).forEach(annotations::add);
+      annotationsOf(resource).map(this::annotationURI).forEach(annotations::add);
+    }
+
+    private Stream<AlexandriaAnnotation> annotationsOf(AlexandriaResource resource) {
+      return resource.getAnnotations().stream();
     }
 
     private URI annotationURI(AlexandriaAnnotation a) {
       final String annotationId = a.getId().toString();
-      return uriInfo.getBaseUriBuilder().path(ANNOTATIONS_PATH).path(annotationId).build();
+      return UriBuilder.fromUri(config.getBaseURI()).path(ANNOTATIONS_PATH).path(annotationId).build();
     }
   }
 

@@ -16,6 +16,7 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.LowLevelAppDescriptor;
+import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.util.ObjectMapperProvider;
 import org.concordion.api.extension.Extensions;
 import org.concordion.integration.junit4.ConcordionRunner;
@@ -29,7 +30,17 @@ import org.slf4j.LoggerFactory;
 public class ApiFixture extends JerseyTest {
   private static final Logger LOG = LoggerFactory.getLogger(ApiFixture.class);
 
+  private static final AlexandriaConfiguration CONFIG = testConfiguration();
+
   private static ResourceConfig resourceConfig;
+
+  private static AlexandriaConfiguration testConfiguration() {
+    return new AlexandriaConfiguration() {
+      public URI getBaseURI() {
+        return UriBuilder.fromUri("https://localhost/").port(4242).build();
+      }
+    };
+  }
 
   public static void addClass(Class<?> resourceClass) {
     resourceConfig.getClasses().add(resourceClass);
@@ -45,7 +56,13 @@ public class ApiFixture extends JerseyTest {
 
   @BeforeClass
   public static void resetStaticFields() {
+    LOG.trace("resetting Jersey Config");
     resourceConfig = new DefaultResourceConfig();
+
+    LOG.trace("adding AlexandriaConfigurationProvider");
+    addProviderForContext(AlexandriaConfiguration.class, CONFIG);
+
+    LOG.trace("adding ObjectMapperProvider");
     addClass(ObjectMapperProvider.class);
   }
 
@@ -65,7 +82,7 @@ public class ApiFixture extends JerseyTest {
   }
 
   public void clear() {
-    request = client().resource(getSecureBaseURI());
+    request = client().resource(CONFIG.getBaseURI());
     contentType = MediaType.APPLICATION_JSON_TYPE;
     body = null;
     response = null;
@@ -111,11 +128,7 @@ public class ApiFixture extends JerseyTest {
 
   @Override
   protected URI getBaseURI() {
-    return getSecureBaseURI();
-  }
-
-  private URI getSecureBaseURI() {
-    return UriBuilder.fromUri(super.getBaseURI()).scheme("https").build();
+    return CONFIG.getBaseURI();
   }
 
   private Optional<String> header(String header) {
