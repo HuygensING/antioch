@@ -182,7 +182,7 @@
                                         <include name="**/*.class"/>
                                         <!-- the following fails to copy inner classes (Xyz$1.class) -->
                                         <!--<present targetdir="${spec.testSourceDir}">-->
-                                            <!--<mapper type="glob" from="*.class" to="*.java"/>-->
+                                        <!--<mapper type="glob" from="*.class" to="*.java"/>-->
                                         <!--</present>-->
                                     </fileset>
                                 </move>
@@ -335,6 +335,11 @@
             <version>${jackson.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-joda</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
@@ -356,7 +361,7 @@
         </dependency>
 
 
-		<!-- Tests -->
+        <!-- Tests -->
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
@@ -373,7 +378,7 @@
             <groupId>org.concordion</groupId>
             <artifactId>concordion</artifactId>
             <version>${concordion.version}</version>
-			<scope>test</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

@@ -11,8 +11,10 @@ import javax.ws.rs.core.Response.Status;
 import nl.knaw.huygens.alexandria.endpoint.param.UUIDParam;
 import nl.knaw.huygens.alexandria.service.AnnotationService;
 
-@Path("/annotations")
+@Path(Annotations.ANNOTATIONS_PATH)
 public class Annotations extends JSONEndpoint {
+  public static final String ANNOTATIONS_PATH = "annotations";
+
   private final AnnotationService service;
 
   public Annotations(@Context AnnotationService service) {

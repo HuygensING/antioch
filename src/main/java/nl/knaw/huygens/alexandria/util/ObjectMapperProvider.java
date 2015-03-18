@@ -3,6 +3,8 @@ package nl.knaw.huygens.alexandria.util;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.slf4j.Logger;
@@ -26,9 +28,14 @@ public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
     ObjectMapper mapper = new ObjectMapper();
     LOG.debug("Setting up Jackson ObjectMapper: [" + mapper + "]");
 
+//    mapper.setVisibilityChecker(mapper.getSerializationConfig().getDefaultVisibilityChecker()
+//                                      .withFieldVisibility(JsonAutoDetect.Visibility.ANY));
+    mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+
     // These are 'dev' settings giving us human readable output.
     mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
     mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    mapper.configure(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS, false);
 
     // JodaModule maps DateTime to a flat String (or timestamp, see above) instead of recursively yielding
     // the entire object hierarchy of DateTime which is way too verbose.

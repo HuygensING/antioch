@@ -77,7 +77,7 @@ public class ApiFixture extends JerseyTest {
 
     response = request.path(path).type(contentType).method(method, ClientResponse.class, body);
 
-    entity = response.getEntity(String.class); // .replaceAll(hostInfo(), "{host}") ?
+    entity = response.getEntity(String.class).replaceAll(hostInfo(), "{host}");
   }
 
   public void body(String body) {
@@ -109,7 +109,12 @@ public class ApiFixture extends JerseyTest {
     return format("%s %s", statusInfo.getStatusCode(), statusInfo.getReasonPhrase());
   }
 
-  protected URI getSecureBaseURI() {
+  @Override
+  protected URI getBaseURI() {
+    return getSecureBaseURI();
+  }
+
+  private URI getSecureBaseURI() {
     return UriBuilder.fromUri(super.getBaseURI()).scheme("https").build();
   }
 
@@ -118,7 +123,7 @@ public class ApiFixture extends JerseyTest {
   }
 
   private String hostInfo() {
-    final URI baseURI = getSecureBaseURI();
+    final URI baseURI = getBaseURI();
     return format("%s:%d", baseURI.getHost(), baseURI.getPort());
   }
 
