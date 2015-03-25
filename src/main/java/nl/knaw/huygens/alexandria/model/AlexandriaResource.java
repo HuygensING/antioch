@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
@@ -54,6 +55,10 @@ public class AlexandriaResource {
 
   public Set<AlexandriaAnnotation> getAnnotations() {
     return Collections.unmodifiableSet(annotations);
+  }
+
+  public Stream<AlexandriaAnnotation> streamAnnotations() {
+    return annotations.stream();
   }
 
   public void addAnnotation(AlexandriaAnnotation annotation) {

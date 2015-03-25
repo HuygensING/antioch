@@ -13,7 +13,7 @@ import nl.knaw.huygens.alexandria.util.IdentityCompatibilityArbiter;
 @Consumes(MediaType.APPLICATION_JSON) // rfc4627: JSON text SHALL be encoded in Unicode. The default encoding is UTF-8.
 @Produces(MediaType.APPLICATION_JSON)
 public abstract class JSONEndpoint {
-  protected void requireValidEntity(Object entity) {
+  protected void requireEntity(Object entity) {
     if (entity == null) {
       throw new MissingEntityException();
     }

@@ -1,6 +1,8 @@
 package nl.knaw.huygens.alexandria.annotation;
 
 import static org.concordion.api.MultiValueResult.multiValueResult;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -10,13 +12,13 @@ import java.util.UUID;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import nl.knaw.huygens.alexandria.endpoint.Annotations;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.exception.ResourceExistsException;
 import nl.knaw.huygens.alexandria.helpers.ApiFixture;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.service.AnnotationService;
 import org.concordion.api.MultiValueResult;
 import org.junit.BeforeClass;
@@ -51,17 +53,22 @@ public class AnnotationFixture extends ApiFixture {
 
   public void noSuchAnnotation(String id) {
     UUID uuid = UUID.fromString(id);
-    when(annotationService().getAnnotation(uuid)).thenThrow(new NotFoundException());
+    when(annotationService().readAnnotation(uuid)).thenThrow(new NotFoundException());
   }
 
-  public MultiValueResult testAnno(String key, String value) throws ResourceExistsException {
-    body(key + ":" + value);
-    request("POST", "/annotations");
-    request("GET", "/annotations/1");
-    MultiValueResult response = new MultiValueResult();
-    response.with("key", COMMA_SPLITTER.split(response()).iterator().next());
-    response.with("value", Iterables.getLast(COMMA_SPLITTER.split(response())));
-    return response;
+  public void createAnnotation(String key, String value) throws ResourceExistsException {
+    LOG.trace("createAnnotation([{}],[{}])", key, value);
+
+    final AlexandriaAnnotation annotation = new AlexandriaAnnotation(UUID.randomUUID(), key, value);
+    annotation.addAnnotation(new AlexandriaAnnotation(UUID.randomUUID(), "some", "value"));
+    when(annotationService().createAnnotation(anyString(), anyString())).thenReturn(annotation);
+  }
+
+  public void createAnnotation(String id, String key, String value) throws ResourceExistsException {
+    LOG.trace("createAnnotation([{}],[{}],[{}])", new Object[]{id, key, value});
+
+    when(annotationService().createAnnotation(any(UUID.class), anyString(), anyString()))
+        .thenReturn(new AlexandriaAnnotation(UUID.fromString(id), key, value));
   }
 
   public void setUpAnnotation(String id, String tag) {

@@ -94,7 +94,9 @@ public class ApiFixture extends JerseyTest {
 
     response = request.path(path).type(contentType).method(method, ClientResponse.class, body);
 
-    entity = response.getEntity(String.class).replaceAll(hostInfo(), "{host}");
+    if (response.hasEntity()) {
+      entity = response.getEntity(String.class).replaceAll(hostInfo(), "{host}");
+    }
   }
 
   public void body(String body) {

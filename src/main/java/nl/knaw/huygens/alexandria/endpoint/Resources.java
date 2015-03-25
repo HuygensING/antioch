@@ -39,7 +39,7 @@ public class Resources extends JSONEndpoint {
   private final ResourceService resourceService;
   private final AlexandriaConfiguration config;
 
-  public Resources(@Context ResourceService resourceService, @Context AlexandriaConfiguration config) {
+  public Resources(@Context AlexandriaConfiguration config, @Context ResourceService resourceService) {
     LOG.trace("Resources created, resourceService=[{}], config=[{}]", resourceService, config);
 
     this.config = config;
@@ -55,7 +55,7 @@ public class Resources extends JSONEndpoint {
 
   @POST
   public Response createResourceWithoutGivenID(AlexandriaResource protoType) {
-    requireValidEntity(protoType);
+    requireEntity(protoType);
 
     LOG.debug("createResourceWithoutGivenID: protoType=[{}]", protoType);
     LOG.debug("annotations: [{}]", protoType.getAnnotations());
@@ -68,7 +68,7 @@ public class Resources extends JSONEndpoint {
   @PUT
   @Path("/{uuid}")
   public Response createResourceAtSpecificID(@PathParam("uuid") final UUIDParam paramId, AlexandriaResource protoType) {
-    requireValidEntity(protoType);
+    requireEntity(protoType);
     requireCompatibleIds(paramId, protoType::getId);
 
     LOG.debug("createResourceAtSpecificID: paramId=[{}] vs protoType.id=[{}]", paramId, protoType.getId());

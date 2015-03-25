@@ -22,7 +22,7 @@ public class QueryingFixture extends ResourceFixture {
   }
 
   public void withAnnotation(String id) {
-    resource.addAnnotation(new AlexandriaAnnotation(UUID.fromString(id)));
+    resource.addAnnotation(new AlexandriaAnnotation(UUID.fromString(id), "<type>", "<value>"));
   }
 
   public void noSuchResource(String id) {

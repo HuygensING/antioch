@@ -34,13 +34,13 @@ public class ResourceAnnotations extends JSONEndpoint {
       Solution (for now?) is to use a static wrapper class (q.v.).
      */
 
-    return Response.ok(new AnnotationsWrapper(annotations)).build();
+    return Response.ok(new AnnotationsView(annotations)).build();
   }
 
-  static class AnnotationsWrapper {
+  static class AnnotationsView {
     private final Set<AlexandriaAnnotation> annotations;
 
-    public AnnotationsWrapper(Set<AlexandriaAnnotation> annotations) {
+    public AnnotationsView(Set<AlexandriaAnnotation> annotations) {
       this.annotations = annotations;
     }
 
