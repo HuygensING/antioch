@@ -21,11 +21,14 @@ import nl.knaw.huygens.alexandria.helpers.ApiFixture;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.service.AnnotationService;
 import org.concordion.api.MultiValueResult;
+import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@RunWith(ConcordionRunner.class)
 public class AnnotationFixture extends ApiFixture {
   private static final Logger LOG = LoggerFactory.getLogger(AnnotationFixture.class);
 

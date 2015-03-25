@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Extensions(ApiExtension.class)
-@RunWith(ConcordionRunner.class)
 public class ApiFixture extends JerseyTest {
   private static final Logger LOG = LoggerFactory.getLogger(ApiFixture.class);
 
