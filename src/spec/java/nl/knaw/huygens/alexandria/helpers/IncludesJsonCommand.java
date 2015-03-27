@@ -98,6 +98,10 @@ public class IncludesJsonCommand extends AbstractCommand {
       return false;
     }
 
+    if (expected.size() == 0) {
+      return actual.size() == 0;
+    }
+
     outer:
     for (JsonNode expectedItem : expected) {
       for (JsonNode candidateItem : actual) {

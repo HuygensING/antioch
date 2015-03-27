@@ -69,7 +69,7 @@ public class AnnotationFixture extends ApiFixture {
 
     final AlexandriaAnnotation annotation = new AlexandriaAnnotation(randomUUID(), key, value);
     annotation.setCreatedOn(Instant.now());
-    annotation.addAnnotation(new AlexandriaAnnotation(randomUUID(), "some", "value"));
+//    annotation.addAnnotation(new AlexandriaAnnotation(randomUUID(), "some", "value"));
     when(annotationService().createAnnotation(any(AnnotationCreationRequest.class))).thenReturn(annotation);
   }
 
