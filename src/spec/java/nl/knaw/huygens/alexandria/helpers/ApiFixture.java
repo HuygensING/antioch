@@ -8,7 +8,9 @@ import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.Optional;
 
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;
@@ -19,6 +21,7 @@ import com.sun.jersey.test.framework.LowLevelAppDescriptor;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.util.ObjectMapperProvider;
+import nl.knaw.huygens.alexandria.util.UUIDParser;
 import org.concordion.api.extension.Extensions;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
@@ -74,6 +77,15 @@ public class ApiFixture extends JerseyTest {
   private ClientResponse response;
 
   private String entity;
+
+  public String base() {
+    return baseOf(location());
+  }
+
+  public String uuidQuality() {
+    String idStr = tailOf(location());
+    return UUIDParser.fromString(idStr).get().map(uuid -> "well-formed UUID").orElse("malformed UUID: " + idStr);
+  }
 
   @Override
   protected AppDescriptor configure() {
@@ -145,4 +157,11 @@ public class ApiFixture extends JerseyTest {
     return Optional.ofNullable(response.getLocation()).map(URI::toString);
   }
 
+  private String baseOf(String s) {
+    return s.substring(0, s.lastIndexOf('/') + 1);
+  }
+
+  private String tailOf(String s) {
+    return Iterables.getLast(Splitter.on('/').split(s));
+  }
 }

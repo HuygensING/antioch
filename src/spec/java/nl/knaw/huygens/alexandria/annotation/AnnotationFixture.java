@@ -2,7 +2,6 @@ package nl.knaw.huygens.alexandria.annotation;
 
 import static org.concordion.api.MultiValueResult.multiValueResult;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -59,7 +58,7 @@ public class AnnotationFixture extends ApiFixture {
     when(annotationService().readAnnotation(asUUID(id))).thenThrow(new NotFoundException());
   }
 
-  public void annotationExists(String id) {
+  public void validAnnotation(String id) {
     final AlexandriaAnnotation annotation = new AlexandriaAnnotation(asUUID(id), "type", "value");
     LOG.trace("Mocking annotationService.readAnnotation({}) -> [{}]", id, annotation);
     when(annotationService().readAnnotation(asUUID(id))).thenReturn(annotation);
@@ -72,13 +71,6 @@ public class AnnotationFixture extends ApiFixture {
     annotation.setCreatedOn(Instant.now());
     annotation.addAnnotation(new AlexandriaAnnotation(randomUUID(), "some", "value"));
     when(annotationService().createAnnotation(any(AnnotationCreationRequest.class))).thenReturn(annotation);
-  }
-
-  private void createAnnotation(String id, String key, String value) {
-    LOG.trace("createAnnotation([{}],[{}],[{}])", id, key, value);
-
-    when(annotationService().createAnnotation(any(UUID.class), anyString(), anyString()))
-        .thenReturn(new AlexandriaAnnotation(UUID.fromString(id), key, value));
   }
 
   public void setUpAnnotation(String id, String tag) {

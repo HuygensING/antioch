@@ -1,5 +1,5 @@
 <html xmlns:c="http://www.concordion.org/2007/concordion"
-        >
+      xmlns:json="https://alexandria.huygens.knaw.nl">
 <title>Accessing Annotations</title>
 
 <body>
@@ -33,7 +33,47 @@
                 of type: <code c:set="#type">emotion</code>
                 and value: <code c:set="#value">happy</code>
             </li>
-            <li c:execute="annotationExists(#id)">and that another annotation exists with id:
+            <li>When I <b c:set="#method">POST</b>
+<pre c:execute="body(#TEXT)">{
+    "annotation": {
+        "type": "emotion",
+        "value": "happy",
+        "createdOn" : "2015-03-23T08:28:36.571Z"
+    }
+}</pre>
+                to <code c:set="#endpoint"><b>/annotations</b></code></li>
+
+            <li c:execute="request(#method, #endpoint)">Then:
+                <ol>
+                    <li>the response status should be <b c:assertEquals="status()">201 Created</b>;</li>
+                    <li>the response contains the Location header
+                        <b c:assertEquals="base()">https://{host}/annotations/</b>
+                        followed by a <b c:assertEquals="uuidQuality()">well-formed UUID</b>;
+                    </li>
+                    <li>the response body looks like:
+<pre json:includesJson="responseOrEmpty()">{
+    "annotation": {
+        "type": "emotion",
+        "value": "happy",
+        "annotations": [],
+        "createdOn": "{date.beforeNow}"
+    }
+}</pre>
+                    </li>
+                </ol>
+            </li>
+        </ul>
+    </div>
+
+    <div c:execute="clear()" class="example">
+        <h3>How can I create an annotation which is annotated itself by an existing annotation?</h3>
+
+        <ul>
+            <li c:execute="createAnnotation(#type,#value)">Given an annotation
+                of type: <code c:set="#type">emotion</code>
+                and value: <code c:set="#value">happy</code>
+            </li>
+            <li c:execute="validAnnotation(#id)">and that another valid annotation exists with id:
                 <code c:set="#id">7631e9ef-a41e-40fa-a3dc-ba03267ef34a</code>
             </li>
             <li>When I <b c:set="#method">POST</b>
@@ -55,82 +95,6 @@
         </ul>
     </div>
 
-    <div c:execute="clear()" class="example">
-        <h3>Requirements for adding an annotation to a reference</h3>
-
-        <table>
-            <tr>
-                <th>Id</th>
-                <th>Tag</th>
-                <th>Result</th>
-                <th>Use case</th>
-            </tr>
-            <tr c:execute="#result = addAnnotation(#id,#tag)">
-                <td><span c:set="#id"></span><code>""</code></td>
-                <td c:set="#tag">some annotation</td>
-                <td c:assertEquals="#result">400 Bad Request</td>
-                <td>Add annotation on empty reference id</td>
-            </tr>
-            <tr c:execute="#result = addAnnotation(#id,#tag)">
-                <td c:set="#id">dpo.8111</td>
-                <td><span c:set="#tag"></span><code>""</code></td>
-                <td c:assertEquals="#result">400 Bad Request</td>
-                <td>Add empty annotation on valid reference id</td>
-            </tr>
-            <tr c:execute="#result = addAnnotation(#id,#tag)">
-                <td c:set="#id">dpo.8111</td>
-                <td c:set="#tag">some annotation</td>
-                <td c:assertEquals="#result">201 Created</td>
-                <td>Add valid annotation on valid reference id</td>
-            </tr>
-        </table>
-    </div>
-
-    <div class="example">
-        <h3>Interaction with existing references</h3>
-
-        <p>Given this reference in the database:</p>
-
-        <table c:execute="setUpAnnotation(#id, #tag)">
-            <tr>
-                <th c:set="#id">Id</th>
-                <th c:set="#tag">Tag</th>
-            </tr>
-            <tr>
-                <td>dpo.8111</td>
-                <td>some annotation</td>
-            </tr>
-        </table>
-
-        <p>Then this happens when trying to add the following annotations:</p>
-
-        <table>
-            <tr>
-                <th>Id</th>
-                <th>Tag</th>
-                <th>Result</th>
-                <th>Use case</th>
-            </tr>
-            <tr c:execute="#result = addAnnotation(#id,#tag)">
-                <td c:set="#id">dpo.8111</td>
-                <td c:set="#tag">some annotation</td>
-                <td c:assertEquals="#result">409 Conflict</td>
-                <td>Add existing annotation (again)</td>
-            </tr>
-            <tr c:execute="#result = addAnnotation(#id,#tag)">
-                <td c:set="#id">dpo.8111</td>
-                <td c:set="#tag">another annotation</td>
-                <td c:assertEquals="#result">201 Created</td>
-                <td>Add <i>new</i> annotation to reference with other annotations</td>
-            </tr>
-            <tr c:execute="#result = addAnnotation(#id,#tag)">
-                <td c:set="#id">dpo.3456</td>
-                <td c:set="#tag">some annotation</td>
-                <td c:assertEquals="#result">201 Created</td>
-                <td>Add annotation to reference <i>without</i> annotations</td>
-            </tr>
-        </table>
-    </div>
 </div>
 
 </body>
