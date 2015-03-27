@@ -17,11 +17,10 @@ import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.LowLevelAppDescriptor;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+import nl.knaw.huygens.alexandria.endpoint.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.util.ObjectMapperProvider;
 import org.concordion.api.extension.Extensions;
-import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +59,7 @@ public class ApiFixture extends JerseyTest {
 
     LOG.trace("adding AlexandriaConfigurationProvider");
     addProviderForContext(AlexandriaConfiguration.class, CONFIG);
+    addProviderForContext(AnnotationEntityBuilder.class, AnnotationEntityBuilder.forConfig(CONFIG));
 
     LOG.trace("adding ObjectMapperProvider");
     addClass(ObjectMapperProvider.class);

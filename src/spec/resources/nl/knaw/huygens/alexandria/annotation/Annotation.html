@@ -30,13 +30,18 @@
 
         <ul>
             <li c:execute="createAnnotation(#type,#value)">Given an annotation
-                of type <code c:set="#type">emotion</code>
-                and value <code c:set="#value">happy</code></li>
+                of type: <code c:set="#type">emotion</code>
+                and value: <code c:set="#value">happy</code>
+            </li>
+            <li c:execute="annotationExists(#id)">and that another annotation exists with id:
+                <code c:set="#id">7631e9ef-a41e-40fa-a3dc-ba03267ef34a</code>
+            </li>
             <li>When I <b c:set="#method">POST</b>
 <pre c:execute="body(#TEXT)">{
     "annotation": {
         "type": "emotion",
         "value": "happy",
+        "annotations" : [ "7631e9ef-a41e-40fa-a3dc-ba03267ef34a" ],
         "createdOn" : "2015-03-23T08:28:36.571Z"
     }
 }</pre>

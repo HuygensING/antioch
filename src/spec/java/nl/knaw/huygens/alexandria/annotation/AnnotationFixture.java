@@ -6,17 +6,18 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import nl.knaw.huygens.alexandria.AnnotationCreationRequest;
+import nl.knaw.huygens.alexandria.endpoint.AnnotationRequestValidator;
 import nl.knaw.huygens.alexandria.endpoint.Annotations;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
-import nl.knaw.huygens.alexandria.exception.ResourceExistsException;
 import nl.knaw.huygens.alexandria.helpers.ApiFixture;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.service.AnnotationService;
@@ -34,14 +35,14 @@ public class AnnotationFixture extends ApiFixture {
 
   private static AnnotationService ANNOTATION_SERVICE_MOCK = mock(AnnotationService.class);
 
-  private final Splitter COMMA_SPLITTER = Splitter.on(',');
-
   private final Map<String, List<String>> annotatedReferences = Maps.newHashMap();
 
   @BeforeClass
   public static void setup() {
     addClass(Annotations.class);
     addProviderForContext(AnnotationService.class, ANNOTATION_SERVICE_MOCK);
+    addProviderForContext(AnnotationRequestValidator.class, AnnotationRequestValidator
+        .servedBy(ANNOTATION_SERVICE_MOCK));
   }
 
   @Override
@@ -55,20 +56,26 @@ public class AnnotationFixture extends ApiFixture {
   }
 
   public void noSuchAnnotation(String id) {
-    UUID uuid = UUID.fromString(id);
-    when(annotationService().readAnnotation(uuid)).thenThrow(new NotFoundException());
+    when(annotationService().readAnnotation(asUUID(id))).thenThrow(new NotFoundException());
   }
 
-  public void createAnnotation(String key, String value) throws ResourceExistsException {
+  public void annotationExists(String id) {
+    final AlexandriaAnnotation annotation = new AlexandriaAnnotation(asUUID(id), "type", "value");
+    LOG.trace("Mocking annotationService.readAnnotation({}) -> [{}]", id, annotation);
+    when(annotationService().readAnnotation(asUUID(id))).thenReturn(annotation);
+  }
+
+  public void createAnnotation(String key, String value) {
     LOG.trace("createAnnotation([{}],[{}])", key, value);
 
-    final AlexandriaAnnotation annotation = new AlexandriaAnnotation(UUID.randomUUID(), key, value);
-    annotation.addAnnotation(new AlexandriaAnnotation(UUID.randomUUID(), "some", "value"));
-    when(annotationService().createAnnotation(anyString(), anyString())).thenReturn(annotation);
+    final AlexandriaAnnotation annotation = new AlexandriaAnnotation(randomUUID(), key, value);
+    annotation.setCreatedOn(Instant.now());
+    annotation.addAnnotation(new AlexandriaAnnotation(randomUUID(), "some", "value"));
+    when(annotationService().createAnnotation(any(AnnotationCreationRequest.class))).thenReturn(annotation);
   }
 
-  public void createAnnotation(String id, String key, String value) throws ResourceExistsException {
-    LOG.trace("createAnnotation([{}],[{}],[{}])", new Object[]{id, key, value});
+  private void createAnnotation(String id, String key, String value) {
+    LOG.trace("createAnnotation([{}],[{}],[{}])", id, key, value);
 
     when(annotationService().createAnnotation(any(UUID.class), anyString(), anyString()))
         .thenReturn(new AlexandriaAnnotation(UUID.fromString(id), key, value));
@@ -114,5 +121,13 @@ public class AnnotationFixture extends ApiFixture {
     }
 
     return multiValueResult().with("status", "404 Not Found");
+  }
+
+  private UUID asUUID(String s) {
+    return UUID.fromString(s);
+  }
+
+  private UUID randomUUID() {
+    return UUID.randomUUID();
   }
 }

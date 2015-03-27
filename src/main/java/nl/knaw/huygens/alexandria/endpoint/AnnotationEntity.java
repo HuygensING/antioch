@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
 
 @JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
 @JsonTypeName("annotation")
-public class AnnotationView {
-  private static final Logger LOG = LoggerFactory.getLogger(AnnotationView.class);
+public class AnnotationEntity {
+  private static final Logger LOG = LoggerFactory.getLogger(AnnotationEntity.class);
 
   @JsonIgnore
   private final AlexandriaAnnotation annotation;
@@ -29,15 +29,15 @@ public class AnnotationView {
   @JsonIgnore
   private AlexandriaConfiguration config;
 
-  public static final AnnotationView of(AlexandriaAnnotation someAnnotation) {
-    return new AnnotationView(someAnnotation);
+  public static final AnnotationEntity of(AlexandriaAnnotation someAnnotation) {
+    return new AnnotationEntity(someAnnotation);
   }
 
-  private AnnotationView(AlexandriaAnnotation annotation) {
+  private AnnotationEntity(AlexandriaAnnotation annotation) {
     this.annotation = annotation;
   }
 
-  public final AnnotationView withConfig(AlexandriaConfiguration config) {
+  public final AnnotationEntity withConfig(AlexandriaConfiguration config) {
     this.config = config;
     return this;
   }

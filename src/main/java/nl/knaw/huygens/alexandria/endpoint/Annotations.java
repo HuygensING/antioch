@@ -7,9 +7,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.time.Instant;
+import java.util.UUID;
 
-import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+import nl.knaw.huygens.alexandria.AnnotationCreationParameters;
+import nl.knaw.huygens.alexandria.AnnotationCreationRequest;
 import nl.knaw.huygens.alexandria.endpoint.param.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.service.AnnotationService;
@@ -23,65 +24,43 @@ public class Annotations extends JSONEndpoint {
   private static final Logger LOG = LoggerFactory.getLogger(Annotations.class);
 
   private final AnnotationService service;
-  private final AlexandriaConfiguration config;
+  private final AnnotationEntityBuilder entityBuilder;
+  private final AnnotationRequestValidator validator;
 
-  public Annotations(@Context AlexandriaConfiguration config, @Context AnnotationService service) {
-    LOG.trace("created: config=[{}], service=[{}]", config, service);
-    this.config = config;
+  public Annotations(@Context AnnotationService service, //
+                     @Context AnnotationRequestValidator validator, //
+                     @Context AnnotationEntityBuilder entityBuilder) {
     this.service = service;
+    this.validator = validator;
+    this.entityBuilder = entityBuilder;
   }
 
   @GET
   @Path("/{uuid}")
   public Response readAnnotation(@PathParam("uuid") UUIDParam uuidParam) {
     final AlexandriaAnnotation annotation = service.readAnnotation(uuidParam.getValue());
-    return Response.ok(asEntity(annotation)).build();
+    final AnnotationEntity entity = entityBuilder.build(annotation);
+    return Response.ok(entity).build();
   }
 
   @POST
-  public Response createAnnotation(AnnotationCreationRequest request) {
-    AnnotationRequestValidator.servedBy(service).validate(request);
-
-    final AlexandriaAnnotation annotation = AnnotationCreationHandler.servedBy(service).handle(request);
-
-    return Response.created(locationOf(annotation)).entity(asEntity(annotation)).build();
-  }
-
-  private AnnotationView asEntity(AlexandriaAnnotation annotation) {
-    return AnnotationView.of(annotation).withConfig(config);
+  public Response createAnnotation(final AnnotationCreationParameters suspiciousParams) {
+    LOG.debug("suspiciousParams: [{}]", suspiciousParams.getAnnotations()); // FIXME: WHY IS THIS EMPTY IN THE TEST?
+    // Added 'annotations' in Annotation.html, but now we get 400 Bad Request???
+    final AnnotationCreationRequest validatedRequest = validator.validate(suspiciousParams);
+    LOG.debug("Stream of annotations:");
+    validatedRequest.streamAnnotations().forEach(this::printAnno);
+    final AlexandriaAnnotation annotation = service.createAnnotation(validatedRequest);
+    final AnnotationEntity entity = entityBuilder.build(annotation);
+    return Response.created(locationOf(annotation)).entity(entity).build();
   }
 
   private URI locationOf(AlexandriaAnnotation annotation) {
     return URI.create(annotation.getId().toString());
   }
 
-  static class AnnotationCreationHandler {
-    private final AnnotationService service;
-
-    public AnnotationCreationHandler(AnnotationService service) {
-      this.service = service;
-    }
-
-    public static AnnotationCreationHandler servedBy(AnnotationService service) {
-      return new AnnotationCreationHandler(service);
-    }
-
-    public AlexandriaAnnotation handle(AnnotationCreationRequest request) {
-      final AlexandriaAnnotation annotation;
-      annotation = service.createAnnotation(request.type, request.value);
-
-      LOG.debug("annotation=[{}]", annotation);
-      LOG.debug("annotation.annotations=[{}]", annotation.getAnnotations());
-
-      if (request.createdOn == null) {
-        LOG.debug("No longer pristine, have to generate createdOn");
-        annotation.setCreatedOn(Instant.now());
-      } else {
-        annotation.setCreatedOn(request.createdOn.getValue());
-      }
-
-      return annotation;
-    }
+  private void printAnno(UUID annoId) {
+    LOG.debug("  anno: [{}]", annoId.toString());
   }
 }
 
