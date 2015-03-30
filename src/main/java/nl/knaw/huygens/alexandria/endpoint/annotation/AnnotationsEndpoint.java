@@ -29,7 +29,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   }
 
   @GET
-  @Path("/{uuid}")
+  @Path("{uuid}")
   public Response readAnnotation(@PathParam("uuid") UUIDParam uuidParam) {
     final AlexandriaAnnotation annotation = service.readAnnotation(uuidParam.getValue());
     final AnnotationEntity entity = entityBuilder.build(annotation);

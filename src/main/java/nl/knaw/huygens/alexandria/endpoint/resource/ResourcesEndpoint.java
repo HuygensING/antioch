@@ -45,7 +45,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   }
 
   @GET
-  @Path("/{uuid}")
+  @Path("{uuid}")
   public Response getResourceByID(@PathParam("uuid") final UUIDParam uuid) {
     final AlexandriaResource resource = resourceService.readResource(uuid.getValue());
     return Response.ok(new ResourceAsJSON(resource)).build();
@@ -64,7 +64,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   }
 
   @PUT
-  @Path("/{uuid}")
+  @Path("{uuid}")
   public Response createResourceAtSpecificID(@PathParam("uuid") final UUIDParam paramId, AlexandriaResource protoType) {
     requireEntity(protoType);
     requireCompatibleIds(paramId, protoType::getId);
@@ -76,13 +76,13 @@ public class ResourcesEndpoint extends JSONEndpoint {
     return Response.created(HERE).build();
   }
 
-  @Path("/{uuid}/annotations")
+  @Path("{uuid}/annotations")
   public ResourceAnnotations getAnnotationsForResource(@PathParam("uuid") final UUIDParam uuidParam) {
     return annotationsFor(uuidParam.getValue());
   }
 
   @GET
-  @Path("/{uuid}/ref")
+  @Path("{uuid}/ref")
   public Response getResourceRef(@PathParam("uuid") final UUIDParam uuidParam) {
     final String ref = resourceService.readResource(uuidParam.getValue()).getRef();
     return Response.ok(new RefWrapper(ref)).build();
