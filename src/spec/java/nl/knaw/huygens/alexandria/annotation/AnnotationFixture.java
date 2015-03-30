@@ -35,6 +35,7 @@ public class AnnotationFixture extends ApiFixture {
   private static AnnotationService ANNOTATION_SERVICE_MOCK = mock(AnnotationService.class);
 
   private final Map<String, List<String>> annotatedReferences = Maps.newHashMap();
+  private AlexandriaAnnotation mockAnnotation;
 
   @BeforeClass
   public static void setup() {
@@ -59,7 +60,8 @@ public class AnnotationFixture extends ApiFixture {
   }
 
   public void validAnnotation(String id) {
-    final AlexandriaAnnotation annotation = new AlexandriaAnnotation(asUUID(id), "type", "value");
+    final AlexandriaAnnotation annotation = new AlexandriaAnnotation(asUUID(id), "aType", "aValue");
+    mockAnnotation.addAnnotation(annotation);
     LOG.trace("Mocking annotationService.readAnnotation({}) -> [{}]", id, annotation);
     when(annotationService().readAnnotation(asUUID(id))).thenReturn(annotation);
   }
@@ -67,10 +69,9 @@ public class AnnotationFixture extends ApiFixture {
   public void createAnnotation(String key, String value) {
     LOG.trace("createAnnotation([{}],[{}])", key, value);
 
-    final AlexandriaAnnotation annotation = new AlexandriaAnnotation(randomUUID(), key, value);
-    annotation.setCreatedOn(Instant.now());
-//    annotation.addAnnotation(new AlexandriaAnnotation(randomUUID(), "some", "value"));
-    when(annotationService().createAnnotation(any(AnnotationCreationRequest.class))).thenReturn(annotation);
+    mockAnnotation = new AlexandriaAnnotation(randomUUID(), key, value);
+    mockAnnotation.setCreatedOn(Instant.now());
+    when(annotationService().createAnnotation(any(AnnotationCreationRequest.class))).thenReturn(mockAnnotation);
   }
 
   public void setUpAnnotation(String id, String tag) {

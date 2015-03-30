@@ -81,8 +81,7 @@
     "annotation": {
         "type": "emotion",
         "value": "happy",
-        "annotations" : [ "7631e9ef-a41e-40fa-a3dc-ba03267ef34a" ],
-        "createdOn" : "2015-03-23T08:28:36.571Z"
+        "annotations" : [ "7631e9ef-a41e-40fa-a3dc-ba03267ef34a" ]
     }
 }</pre>
                 to <code c:set="#endpoint"><b>/annotations</b></code></li>
@@ -90,6 +89,17 @@
             <li c:execute="request(#method, #endpoint)">Then:
                 <ol>
                     <li>the response status should be <b c:assertEquals="status()">201 Created</b>;</li>
+                    <li>the response body looks like:
+<pre json:includesJson="responseOrEmpty()">{
+    "annotation": {
+        "type": "emotion",
+        "value": "happy",
+        "annotations": [
+            "https://{host}/annotations/7631e9ef-a41e-40fa-a3dc-ba03267ef34a"
+        ]
+    }
+}</pre>
+                    </li>
                 </ol>
             </li>
         </ul>
