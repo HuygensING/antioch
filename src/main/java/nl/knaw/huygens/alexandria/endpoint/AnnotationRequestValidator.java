@@ -45,11 +45,11 @@ public class AnnotationRequestValidator {
     validateAnnotations(request);
 
     LOG.trace("Done validating");
-    return createParameterView(request);
+    return buildCreationRequest(request);
   }
 
   // TODO: needs to be done by a 'business rule aware' RequestBuilder as it contains the 'createdOn' logic.
-  private AnnotationCreationRequest createParameterView(final AnnotationCreationParameters request) {
+  private AnnotationCreationRequest buildCreationRequest(final AnnotationCreationParameters request) {
     return new AnnotationCreationRequest() {
       @Override
       public String getType() {
@@ -97,38 +97,32 @@ public class AnnotationRequestValidator {
   protected void validateAnnotations(AnnotationCreationParameters request) {
     LOG.trace("Validating annotations");
     request.getAnnotations().ifPresent(annotationParams -> stream(annotationParams) //
-        .map(UUIDParam::getValue).forEach(this::validateAnnotation));
+        .map(UUIDParam::getValue).forEach(this::validateAnnotationId));
   }
 
   protected <T> Stream<T> stream(Collection<T> c) {
     return c.parallelStream(); // override in case you prefer stream() over parallelStream()
   }
 
-  protected void validateAnnotation(UUID uuid) {
+  protected void validateAnnotationId(UUID uuid) {
     LOG.trace("Validating annotation: [{}]", uuid);
     Optional.ofNullable(service.readAnnotation(uuid)).orElseThrow(noSuchAnnotationException(uuid));
   }
 
   protected Supplier<BadRequestException> missingBodyException() {
-    return () -> {
-      LOG.trace(MISSING_ANNOTATION_BODY_MESSAGE);
-      return new BadRequestException(MISSING_ANNOTATION_BODY_MESSAGE);
-    };
+    return () -> badRequestException(MISSING_ANNOTATION_BODY_MESSAGE);
   }
 
   protected Supplier<BadRequestException> missingTypeException() {
-    return () -> {
-      LOG.trace(MISSING_TYPE_MESSAGE);
-      return new BadRequestException(MISSING_TYPE_MESSAGE);
-    };
+    return () -> badRequestException(MISSING_TYPE_MESSAGE);
   }
 
   protected Supplier<BadRequestException> noSuchAnnotationException(UUID uuid) {
-    return () -> {
-      final String message = String.format(NO_SUCH_ANNOTATION_FORMAT, uuid.toString());
-      LOG.trace(message);
-      return new BadRequestException(message);
-    };
+    return () -> badRequestException(String.format(NO_SUCH_ANNOTATION_FORMAT, uuid.toString()));
   }
 
+  protected BadRequestException badRequestException(String message) {
+    LOG.trace(message);
+    return new BadRequestException(message);
+  }
 }
