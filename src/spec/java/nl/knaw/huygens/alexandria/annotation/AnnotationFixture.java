@@ -13,9 +13,9 @@ import java.util.UUID;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import nl.knaw.huygens.alexandria.AnnotationCreationRequest;
-import nl.knaw.huygens.alexandria.endpoint.AnnotationRequestValidator;
-import nl.knaw.huygens.alexandria.endpoint.Annotations;
+import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationRequestBuilder;
+import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
+import nl.knaw.huygens.alexandria.endpoint.annotation.ServiceBasedAnnotationRequestBuilder;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.helpers.ApiFixture;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
@@ -39,10 +39,10 @@ public class AnnotationFixture extends ApiFixture {
 
   @BeforeClass
   public static void setup() {
-    addClass(Annotations.class);
+    addClass(AnnotationsEndpoint.class);
     addProviderForContext(AnnotationService.class, ANNOTATION_SERVICE_MOCK);
-    addProviderForContext(AnnotationRequestValidator.class, AnnotationRequestValidator
-        .servedBy(ANNOTATION_SERVICE_MOCK));
+    addProviderForContext(AnnotationRequestBuilder.class, //
+        ServiceBasedAnnotationRequestBuilder.servedBy(ANNOTATION_SERVICE_MOCK));
   }
 
   @Override
@@ -60,18 +60,21 @@ public class AnnotationFixture extends ApiFixture {
   }
 
   public void validAnnotation(String id) {
-    final AlexandriaAnnotation annotation = new AlexandriaAnnotation(asUUID(id), "aType", "aValue");
+    final UUID uuid = asUUID(id);
+
+    final AlexandriaAnnotation annotation = new AlexandriaAnnotation(uuid, "aType", "aValue");
     mockAnnotation.addAnnotation(annotation);
+
     LOG.trace("Mocking annotationService.readAnnotation({}) -> [{}]", id, annotation);
-    when(annotationService().readAnnotation(asUUID(id))).thenReturn(annotation);
+    when(annotationService().readAnnotation(uuid)).thenReturn(annotation);
   }
 
-  public void createAnnotation(String key, String value) {
-    LOG.trace("createAnnotation([{}],[{}])", key, value);
+  public void createAnnotation(String type, String value) {
+    LOG.trace("createAnnotation([{}],[{}])", type, value);
 
-    mockAnnotation = new AlexandriaAnnotation(randomUUID(), key, value);
+    mockAnnotation = new AlexandriaAnnotation(randomUUID(), type, value);
     mockAnnotation.setCreatedOn(Instant.now());
-    when(annotationService().createAnnotation(any(AnnotationCreationRequest.class))).thenReturn(mockAnnotation);
+    when(annotationService().createAnnotation(any(), any(), any())).thenReturn(mockAnnotation);
   }
 
   public void setUpAnnotation(String id, String tag) {

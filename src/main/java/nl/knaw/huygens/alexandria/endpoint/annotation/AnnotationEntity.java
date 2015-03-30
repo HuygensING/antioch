@@ -1,6 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint;
-
-import static nl.knaw.huygens.alexandria.endpoint.Annotations.ANNOTATIONS_PATH;
+package nl.knaw.huygens.alexandria.endpoint.annotation;
 
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
@@ -14,13 +12,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.collect.Sets;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
 @JsonTypeName("annotation")
-public class AnnotationEntity {
+class AnnotationEntity {
   private static final Logger LOG = LoggerFactory.getLogger(AnnotationEntity.class);
 
   @JsonIgnore
@@ -65,7 +64,7 @@ public class AnnotationEntity {
   private URI annotationURI(AlexandriaAnnotation a) {
     LOG.debug("annotationURI for: [{}], id=[{}]", a, a.getId());
     final String annotationId = a.getId().toString();
-    return UriBuilder.fromUri(config.getBaseURI()).path(ANNOTATIONS_PATH).path(annotationId).build();
+    return UriBuilder.fromUri(config.getBaseURI()).path(EndpointPaths.ANNOTATIONS).path(annotationId).build();
   }
 
   public String getCreatedOn() {

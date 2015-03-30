@@ -1,77 +1,49 @@
-package nl.knaw.huygens.alexandria.endpoint;
+package nl.knaw.huygens.alexandria.endpoint.annotation;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.Instant;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import nl.knaw.huygens.alexandria.AnnotationCreationParameters;
-import nl.knaw.huygens.alexandria.AnnotationCreationRequest;
-import nl.knaw.huygens.alexandria.endpoint.param.InstantParam;
-import nl.knaw.huygens.alexandria.endpoint.param.UUIDParam;
+import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.service.AnnotationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AnnotationRequestValidator {
+public class ServiceBasedAnnotationRequestBuilder implements AnnotationRequestBuilder {
   public static final String MISSING_TYPE_MESSAGE = "Annotation MUST have a type";
   public static final String NO_SUCH_ANNOTATION_FORMAT = "Supposedly existing annotation [%s] not found";
   public static final String MISSING_ANNOTATION_BODY_MESSAGE = "Missing or empty annotation request body";
 
-  private static final Logger LOG = LoggerFactory.getLogger(AnnotationRequestValidator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ServiceBasedAnnotationRequestBuilder.class);
 
-  public static AnnotationRequestValidator servedBy(AnnotationService service) {
-    return new AnnotationRequestValidator(service);
+  public static AnnotationRequestBuilder servedBy(AnnotationService service) {
+    return new ServiceBasedAnnotationRequestBuilder(service);
   }
 
   private final AnnotationService service;
 
-  protected AnnotationRequestValidator(AnnotationService service) {
+  protected ServiceBasedAnnotationRequestBuilder(AnnotationService service) {
     this.service = requireNonNull(service, "AnnotationService must not be null");
   }
 
-  public final AnnotationCreationRequest validate(AnnotationCreationParameters request) {
-    Optional.ofNullable(request).orElseThrow(missingBodyException());
+  @Override
+  public AnnotationRequest build(AnnotationCreationParameters parameters) {
+    Optional.ofNullable(parameters).orElseThrow(missingBodyException());
 
-    validateId(request);
-    validateType(request);
-    validateValue(request);
-    validateCreatedOn(request);
-    validateAnnotations(request);
+    validateId(parameters);
+    validateType(parameters);
+    validateValue(parameters);
+    validateCreatedOn(parameters);
+    validateAnnotations(parameters);
 
     LOG.trace("Done validating");
-    return buildCreationRequest(request);
-  }
 
-  // TODO: needs to be done by a 'business rule aware' RequestBuilder as it contains the 'createdOn' logic.
-  private AnnotationCreationRequest buildCreationRequest(final AnnotationCreationParameters request) {
-    return new AnnotationCreationRequest() {
-      @Override
-      public String getType() {
-        return request.getType().get();
-      }
-
-      @Override
-      public Optional<String> getValue() {
-        return request.getValue();
-      }
-
-      @Override
-      public Stream<UUID> streamAnnotations() {
-        return request.getAnnotations().map(Collection::stream).orElse(Stream.empty()) //
-            .map(UUIDParam::getValue);
-      }
-
-      @Override
-      public Instant getCreatedOn() {
-        return request.getCreatedOn().map(InstantParam::getValue).orElse(Instant.now());
-      }
-    };
+    return new AnnotationCreationRequest(parameters);
   }
 
   protected void validateId(AnnotationCreationParameters request) {
@@ -125,4 +97,5 @@ public class AnnotationRequestValidator {
     LOG.trace(message);
     return new BadRequestException(message);
   }
+
 }

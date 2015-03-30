@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint.param;
+package nl.knaw.huygens.alexandria.endpoint;
 
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 

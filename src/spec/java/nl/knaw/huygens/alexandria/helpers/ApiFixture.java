@@ -19,7 +19,7 @@ import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.LowLevelAppDescriptor;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
-import nl.knaw.huygens.alexandria.endpoint.AnnotationEntityBuilder;
+import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.util.ObjectMapperProvider;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
 import org.concordion.api.extension.Extensions;

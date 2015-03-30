@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria;
+package nl.knaw.huygens.alexandria.endpoint.annotation;
 
 import java.util.Optional;
 import java.util.Set;
@@ -7,12 +7,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import nl.knaw.huygens.alexandria.endpoint.param.InstantParam;
-import nl.knaw.huygens.alexandria.endpoint.param.UUIDParam;
+import nl.knaw.huygens.alexandria.endpoint.InstantParam;
+import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 
 @JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
 @JsonTypeName("annotation")
-public class AnnotationCreationParameters {
+class AnnotationCreationParameters {
   private UUIDParam id;
   private String type;
   private String value;

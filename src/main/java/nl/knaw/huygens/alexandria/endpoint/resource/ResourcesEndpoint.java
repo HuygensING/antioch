@@ -1,6 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint;
-
-import static nl.knaw.huygens.alexandria.endpoint.Annotations.ANNOTATIONS_PATH;
+package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -20,26 +18,26 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.collect.Sets;
-import nl.knaw.huygens.alexandria.endpoint.param.UUIDParam;
+import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
+import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
+import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.ResourceService;
-import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path(Resources.RESOURCES_PATH)
-public class Resources extends JSONEndpoint {
-  public static final String RESOURCES_PATH = "resources";
-
+@Path(EndpointPaths.RESOURCES)
+public class ResourcesEndpoint extends JSONEndpoint {
   private static final URI HERE = URI.create("");
 
-  private static final Logger LOG = LoggerFactory.getLogger(Resources.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ResourcesEndpoint.class);
 
   private final ResourceService resourceService;
   private final AlexandriaConfiguration config;
 
-  public Resources(@Context AlexandriaConfiguration config, @Context ResourceService resourceService) {
+  public ResourcesEndpoint(@Context AlexandriaConfiguration config, @Context ResourceService resourceService) {
     LOG.trace("Resources created, resourceService=[{}], config=[{}]", resourceService, config);
 
     this.config = config;
@@ -80,7 +78,7 @@ public class Resources extends JSONEndpoint {
 
   @Path("/{uuid}/annotations")
   public ResourceAnnotations getAnnotationsForResource(@PathParam("uuid") final UUIDParam uuidParam) {
-    return new ResourceAnnotations(resourceService, uuidParam.getValue());
+    return annotationsFor(uuidParam.getValue());
   }
 
   @GET
@@ -88,6 +86,10 @@ public class Resources extends JSONEndpoint {
   public Response getResourceRef(@PathParam("uuid") final UUIDParam uuidParam) {
     final String ref = resourceService.readResource(uuidParam.getValue()).getRef();
     return Response.ok(new RefWrapper(ref)).build();
+  }
+
+  private ResourceAnnotations annotationsFor(UUID uuid) {
+    return new ResourceAnnotations(resourceService, uuid);
   }
 
   @JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
@@ -112,7 +114,7 @@ public class Resources extends JSONEndpoint {
 
     private URI annotationURI(AlexandriaAnnotation a) {
       final String annotationId = a.getId().toString();
-      return UriBuilder.fromUri(config.getBaseURI()).path(ANNOTATIONS_PATH).path(annotationId).build();
+      return UriBuilder.fromUri(config.getBaseURI()).path(EndpointPaths.ANNOTATIONS).path(annotationId).build();
     }
   }
 

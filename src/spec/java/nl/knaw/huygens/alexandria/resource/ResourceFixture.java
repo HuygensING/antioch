@@ -2,7 +2,7 @@ package nl.knaw.huygens.alexandria.resource;
 
 import static org.mockito.Mockito.mock;
 
-import nl.knaw.huygens.alexandria.endpoint.Resources;
+import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
 import nl.knaw.huygens.alexandria.helpers.ApiFixture;
 import nl.knaw.huygens.alexandria.service.ResourceService;
 import org.concordion.integration.junit4.ConcordionRunner;
@@ -21,7 +21,7 @@ public class ResourceFixture extends ApiFixture {
   @BeforeClass
   public static void setup() {
     LOG.trace("adding class Resources");
-    addClass(Resources.class);
+    addClass(ResourcesEndpoint.class);
 
     LOG.trace("adding ResourceServiceProvider");
     addProviderForContext(ResourceService.class, RESOURCE_SERVICE_MOCK);

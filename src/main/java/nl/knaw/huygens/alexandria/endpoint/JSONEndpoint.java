@@ -6,7 +6,6 @@ import javax.ws.rs.core.MediaType;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import nl.knaw.huygens.alexandria.endpoint.param.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.MissingEntityException;
 import nl.knaw.huygens.alexandria.util.IdentityCompatibilityArbiter;
 

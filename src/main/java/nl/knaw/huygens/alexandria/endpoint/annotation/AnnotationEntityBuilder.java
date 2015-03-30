@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint;
+package nl.knaw.huygens.alexandria.endpoint.annotation;
 
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
