@@ -1,56 +1,41 @@
 package nl.knaw.huygens.alexandria.endpoint.annotation;
 
-import java.time.Instant;
-import java.util.Collection;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Stream;
+import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import nl.knaw.huygens.alexandria.endpoint.InstantParam;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
-import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
-import nl.knaw.huygens.alexandria.service.AnnotationService;
 
-class AnnotationCreationRequest implements AnnotationRequest {
-  private final AnnotationCreationParameters parameters;
+@JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
+@JsonTypeName("annotation")
+class AnnotationCreationRequest {
+  private UUIDParam id;
+  private String type;
+  private String value;
+  private InstantParam createdOn;
+  private Set<UUIDParam> annotations;
 
-  public AnnotationCreationRequest(AnnotationCreationParameters parameters) {
-    this.parameters = parameters;
+  public Optional<UUIDParam> getId() {
+    return Optional.ofNullable(id);
   }
 
-  @Override
-  public AlexandriaAnnotation execute(AnnotationService service) {
-    final UUID uuid = providedUUID().orElse(UUID.randomUUID());
-    final String type = providedType();
-    final Optional<String> value = optionalValue();
-
-    final AlexandriaAnnotation annotation = service.createAnnotation(uuid, type, value);
-
-    annotation.setCreatedOn(providedCreatedOn().orElse(Instant.now()));
-
-    streamAnnotations().map(service::readAnnotation).map(annotation::addAnnotation);
-
-    return annotation;
+  public Optional<String> getType() {
+    return Optional.ofNullable(type);
   }
 
-  private Optional<UUID> providedUUID() {
-    return parameters.getId().map(UUIDParam::getValue);
+  public Optional<String> getValue() {
+    return Optional.ofNullable(value);
   }
 
-  private String providedType() {
-    return parameters.getType().get();
+  public Optional<InstantParam> getCreatedOn() {
+    return Optional.ofNullable(createdOn);
   }
 
-  private Optional<String> optionalValue() {
-    return parameters.getValue();
-  }
-
-  private Stream<UUID> streamAnnotations() {
-    return parameters.getAnnotations().map(Collection::stream).orElse(Stream.empty()) //
-        .map(UUIDParam::getValue);
-  }
-
-  private Optional<Instant> providedCreatedOn() {
-    return parameters.getCreatedOn().map(InstantParam::getValue);
+  public Optional<Set<UUIDParam>> getAnnotations() {
+    return Optional.ofNullable(annotations);
   }
 }

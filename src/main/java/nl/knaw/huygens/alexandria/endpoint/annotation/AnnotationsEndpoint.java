@@ -18,13 +18,13 @@ import nl.knaw.huygens.alexandria.service.AnnotationService;
 public class AnnotationsEndpoint extends JSONEndpoint {
   private final AnnotationService service;
   private final AnnotationEntityBuilder entityBuilder;
-  private final AnnotationRequestBuilder requestBuilder;
+  private final AnnotationCommandBuilder commandBuilder;
 
   public AnnotationsEndpoint(@Context AnnotationService service, //
-                             @Context AnnotationRequestBuilder requestBuilder, //
+                             @Context AnnotationCommandBuilder commandBuilder, //
                              @Context AnnotationEntityBuilder entityBuilder) {
     this.service = service;
-    this.requestBuilder = requestBuilder;
+    this.commandBuilder = commandBuilder;
     this.entityBuilder = entityBuilder;
   }
 
@@ -37,9 +37,9 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   }
 
   @POST
-  public Response createAnnotation(final AnnotationCreationParameters creationParameters) {
-    final AnnotationRequest request = requestBuilder.build(creationParameters);
-    final AlexandriaAnnotation annotation = request.execute(service);
+  public Response createAnnotation(final AnnotationCreationRequest creationRequest) {
+    final AnnotationCommand command = commandBuilder.build(creationRequest);
+    final AlexandriaAnnotation annotation = command.execute(service);
     final AnnotationEntity entity = entityBuilder.build(annotation);
     return Response.created(locationOf(annotation)).entity(entity).build();
   }

@@ -14,25 +14,25 @@ import nl.knaw.huygens.alexandria.service.AnnotationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ServiceBasedAnnotationRequestBuilder implements AnnotationRequestBuilder {
+public class ServiceBackedAnnotationCommandBuilder implements AnnotationCommandBuilder {
   public static final String MISSING_TYPE_MESSAGE = "Annotation MUST have a type";
   public static final String NO_SUCH_ANNOTATION_FORMAT = "Supposedly existing annotation [%s] not found";
   public static final String MISSING_ANNOTATION_BODY_MESSAGE = "Missing or empty annotation request body";
 
-  private static final Logger LOG = LoggerFactory.getLogger(ServiceBasedAnnotationRequestBuilder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ServiceBackedAnnotationCommandBuilder.class);
 
-  public static AnnotationRequestBuilder servedBy(AnnotationService service) {
-    return new ServiceBasedAnnotationRequestBuilder(service);
+  public static AnnotationCommandBuilder servedBy(AnnotationService service) {
+    return new ServiceBackedAnnotationCommandBuilder(service);
   }
 
   private final AnnotationService service;
 
-  protected ServiceBasedAnnotationRequestBuilder(AnnotationService service) {
+  protected ServiceBackedAnnotationCommandBuilder(AnnotationService service) {
     this.service = requireNonNull(service, "AnnotationService must not be null");
   }
 
   @Override
-  public AnnotationRequest build(AnnotationCreationParameters parameters) {
+  public AnnotationCommand build(AnnotationCreationRequest parameters) {
     Optional.ofNullable(parameters).orElseThrow(missingBodyException());
 
     validateId(parameters);
@@ -43,30 +43,30 @@ public class ServiceBasedAnnotationRequestBuilder implements AnnotationRequestBu
 
     LOG.trace("Done validating");
 
-    return new AnnotationCreationRequest(parameters);
+    return new AnnotationCreationCommand(parameters);
   }
 
-  protected void validateId(AnnotationCreationParameters request) {
+  protected void validateId(AnnotationCreationRequest request) {
     LOG.trace("Validating id");
     return; // missing or empty Id means client does not override server generated value.
   }
 
-  protected void validateType(AnnotationCreationParameters request) {
+  protected void validateType(AnnotationCreationRequest request) {
     LOG.trace("Validating type");
     request.getType().filter(s -> !s.isEmpty()).orElseThrow(missingTypeException());
   }
 
-  protected void validateValue(AnnotationCreationParameters request) {
+  protected void validateValue(AnnotationCreationRequest request) {
     LOG.trace("Validating value");
     return; // missing or empty value is ok (means annotation is a Tag)
   }
 
-  protected void validateCreatedOn(AnnotationCreationParameters request) {
+  protected void validateCreatedOn(AnnotationCreationRequest request) {
     LOG.trace("Validating createdOn");
     return; // missing or empty createdOn means client does not override server set value.
   }
 
-  protected void validateAnnotations(AnnotationCreationParameters request) {
+  protected void validateAnnotations(AnnotationCreationRequest request) {
     LOG.trace("Validating annotations");
     request.getAnnotations().ifPresent(annotationParams -> stream(annotationParams) //
         .map(UUIDParam::getValue).forEach(this::validateAnnotationId));
