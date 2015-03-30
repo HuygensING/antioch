@@ -13,9 +13,8 @@ import java.util.UUID;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationCommandBuilder;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
-import nl.knaw.huygens.alexandria.endpoint.annotation.ServiceBackedAnnotationCommandBuilder;
+import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationCreationCommandBuilder;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.helpers.ApiFixture;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
@@ -41,8 +40,8 @@ public class AnnotationFixture extends ApiFixture {
   public static void setup() {
     addClass(AnnotationsEndpoint.class);
     addProviderForContext(AnnotationService.class, ANNOTATION_SERVICE_MOCK);
-    addProviderForContext(AnnotationCommandBuilder.class, //
-        ServiceBackedAnnotationCommandBuilder.servedBy(ANNOTATION_SERVICE_MOCK));
+    addProviderForContext(AnnotationCreationCommandBuilder.class, //
+        AnnotationCreationCommandBuilder.servedBy(ANNOTATION_SERVICE_MOCK));
   }
 
   @Override

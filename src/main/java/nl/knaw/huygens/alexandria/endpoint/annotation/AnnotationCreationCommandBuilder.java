@@ -14,36 +14,35 @@ import nl.knaw.huygens.alexandria.service.AnnotationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ServiceBackedAnnotationCommandBuilder implements AnnotationCommandBuilder {
+public class AnnotationCreationCommandBuilder {
   public static final String MISSING_TYPE_MESSAGE = "Annotation MUST have a type";
   public static final String NO_SUCH_ANNOTATION_FORMAT = "Supposedly existing annotation [%s] not found";
   public static final String MISSING_ANNOTATION_BODY_MESSAGE = "Missing or empty annotation request body";
 
-  private static final Logger LOG = LoggerFactory.getLogger(ServiceBackedAnnotationCommandBuilder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AnnotationCreationCommandBuilder.class);
 
-  public static AnnotationCommandBuilder servedBy(AnnotationService service) {
-    return new ServiceBackedAnnotationCommandBuilder(service);
+  public static AnnotationCreationCommandBuilder servedBy(AnnotationService service) {
+    return new AnnotationCreationCommandBuilder(service);
   }
 
   private final AnnotationService service;
 
-  protected ServiceBackedAnnotationCommandBuilder(AnnotationService service) {
+  protected AnnotationCreationCommandBuilder(AnnotationService service) {
     this.service = requireNonNull(service, "AnnotationService must not be null");
   }
 
-  @Override
-  public AnnotationCommand build(AnnotationCreationRequest parameters) {
-    Optional.ofNullable(parameters).orElseThrow(missingBodyException());
+  public AnnotationCommand build(AnnotationCreationRequest request) {
+    Optional.ofNullable(request).orElseThrow(missingBodyException());
 
-    validateId(parameters);
-    validateType(parameters);
-    validateValue(parameters);
-    validateCreatedOn(parameters);
-    validateAnnotations(parameters);
+    validateId(request);
+    validateType(request);
+    validateValue(request);
+    validateCreatedOn(request);
+    validateAnnotations(request);
 
     LOG.trace("Done validating");
 
-    return new AnnotationCreationCommand(parameters);
+    return new AnnotationCreationCommand(request);
   }
 
   protected void validateId(AnnotationCreationRequest request) {

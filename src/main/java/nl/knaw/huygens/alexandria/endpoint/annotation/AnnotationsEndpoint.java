@@ -18,10 +18,10 @@ import nl.knaw.huygens.alexandria.service.AnnotationService;
 public class AnnotationsEndpoint extends JSONEndpoint {
   private final AnnotationService service;
   private final AnnotationEntityBuilder entityBuilder;
-  private final AnnotationCommandBuilder commandBuilder;
+  private final AnnotationCreationCommandBuilder commandBuilder;
 
   public AnnotationsEndpoint(@Context AnnotationService service, //
-                             @Context AnnotationCommandBuilder commandBuilder, //
+                             @Context AnnotationCreationCommandBuilder commandBuilder, //
                              @Context AnnotationEntityBuilder entityBuilder) {
     this.service = service;
     this.commandBuilder = commandBuilder;
