@@ -11,14 +11,13 @@ import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.service.AnnotationService;
 
-class AnnotationCreationCommand implements AnnotationCommand {
+class AnnotationCreationCommand {
   private final AnnotationCreationRequest request;
 
   public AnnotationCreationCommand(AnnotationCreationRequest request) {
     this.request = request;
   }
 
-  @Override
   public AlexandriaAnnotation execute(AnnotationService service) {
     final UUID uuid = providedUUID().orElse(UUID.randomUUID());
     final AlexandriaAnnotation annotation = service.createAnnotation(uuid, providedType(), optionalValue());

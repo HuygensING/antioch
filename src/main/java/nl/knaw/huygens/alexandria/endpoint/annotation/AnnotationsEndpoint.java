@@ -38,7 +38,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
 
   @POST
   public Response createAnnotation(final AnnotationCreationRequest creationRequest) {
-    final AnnotationCommand command = commandBuilder.build(creationRequest);
+    final AnnotationCreationCommand command = commandBuilder.build(creationRequest);
     final AlexandriaAnnotation annotation = command.execute(service);
     final AnnotationEntity entity = entityBuilder.build(annotation);
     return Response.created(locationOf(annotation)).entity(entity).build();

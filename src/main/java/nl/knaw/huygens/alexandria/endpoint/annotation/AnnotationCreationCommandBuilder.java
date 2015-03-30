@@ -31,7 +31,7 @@ public class AnnotationCreationCommandBuilder {
     this.service = requireNonNull(service, "AnnotationService must not be null");
   }
 
-  public AnnotationCommand build(AnnotationCreationRequest request) {
+  public AnnotationCreationCommand build(AnnotationCreationRequest request) {
     Optional.ofNullable(request).orElseThrow(missingBodyException());
 
     validateId(request);
