@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint.annotation;
+package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
@@ -14,50 +14,47 @@ import com.google.common.collect.Sets;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
-@JsonTypeName("annotation")
-class AnnotationEntity {
-  private static final Logger LOG = LoggerFactory.getLogger(AnnotationEntity.class);
+@JsonTypeName("resource")
+public class ResourceEntity {
+  private static final Logger LOG = LoggerFactory.getLogger(ResourceEntity.class);
 
   @JsonIgnore
-  private final AlexandriaAnnotation annotation;
+  private final AlexandriaResource resource;
 
   @JsonIgnore
   private AlexandriaConfiguration config;
 
-  public static final AnnotationEntity of(AlexandriaAnnotation someAnnotation) {
-    return new AnnotationEntity(someAnnotation);
+  public static final ResourceEntity of(AlexandriaResource someResource) {
+    return new ResourceEntity(someResource);
   }
 
-  private AnnotationEntity(AlexandriaAnnotation annotation) {
-    this.annotation = annotation;
+  private ResourceEntity(AlexandriaResource resource) {
+    this.resource = resource;
   }
 
-  public final AnnotationEntity withConfig(AlexandriaConfiguration config) {
+  public final ResourceEntity withConfig(AlexandriaConfiguration config) {
     this.config = config;
     return this;
   }
 
   public UUID getId() {
-    return annotation.getId();
+    return resource.getId();
   }
 
-  public String getType() {
-    return annotation.getType();
-  }
-
-  public String getValue() {
-    return annotation.getValue();
+  public String getRef() {
+    return resource.getRef();
   }
 
   // TODO: refactor extract common functionality also present in AnnotationEntity.
   public Set<URI> getAnnotations() {
-    LOG.debug("Converting {} annotations: [{}]", annotation.getAnnotations().size(), annotation.getAnnotations());
+    LOG.debug("Converting {} annotations: [{}]", resource.getAnnotations().size(), resource.getAnnotations());
     // TODO: When Jackson can handle Streams, maybe return Stream<AnnotationView>.
-    final Set<URI> uris = Sets.newHashSet(annotation.streamAnnotations().map(a -> annotationURI(a)).iterator());
+    final Set<URI> uris = Sets.newHashSet(resource.streamAnnotations().map(a -> annotationURI(a)).iterator());
     LOG.debug("uris: {}", uris);
     return uris;
   }
@@ -69,7 +66,7 @@ class AnnotationEntity {
   }
 
   public String getCreatedOn() {
-    return annotation.getCreatedOn().toString(); // ISO-8601 representation
+    return resource.getCreatedOn().toString(); // ISO-8601 representation
   }
 
 }

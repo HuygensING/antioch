@@ -9,13 +9,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-
-@JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
-@JsonTypeName("resource")
 public class AlexandriaResource {
   private final UUID id;
 
