@@ -13,6 +13,7 @@ import nl.knaw.huygens.alexandria.service.AnnotationService;
 
 class AnnotationCreationCommand {
   private final AnnotationCreationRequest request;
+  private AlexandriaAnnotation annotation;
 
   public AnnotationCreationCommand(AnnotationCreationRequest request) {
     this.request = request;
@@ -20,13 +21,19 @@ class AnnotationCreationCommand {
 
   public AlexandriaAnnotation execute(AnnotationService service) {
     final UUID uuid = providedUUID().orElse(UUID.randomUUID());
-    final AlexandriaAnnotation annotation = service.createAnnotation(uuid, providedType(), optionalValue());
+    annotation = service.createAnnotation(uuid, providedType(), optionalValue());
 
     annotation.setCreatedOn(providedCreatedOn().orElse(Instant.now()));
 
     streamAnnotations().map(service::readAnnotation).map(annotation::addAnnotation);
 
     return annotation;
+  }
+
+  public boolean requiredIntervention() {
+    boolean generateUUID = !request.getId().isPresent();
+    boolean generateCreatedOn = !request.getCreatedOn().isPresent();
+    return generateUUID || generateCreatedOn;
   }
 
   private Optional<UUID> providedUUID() {

@@ -40,8 +40,13 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   public Response createAnnotation(final AnnotationCreationRequest creationRequest) {
     final AnnotationCreationCommand command = commandBuilder.build(creationRequest);
     final AlexandriaAnnotation annotation = command.execute(service);
-    final AnnotationEntity entity = entityBuilder.build(annotation);
-    return Response.created(locationOf(annotation)).entity(entity).build();
+
+    if (command.requiredIntervention()) {
+      final AnnotationEntity entity = entityBuilder.build(annotation);
+      return Response.created(locationOf(annotation)).entity(entity).build();
+    }
+
+    return Response.noContent().build();
   }
 
   private URI locationOf(AlexandriaAnnotation annotation) {
