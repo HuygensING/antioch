@@ -1,5 +1,8 @@
 package nl.knaw.huygens.alexandria.endpoint.annotation;
 
+import static java.time.Instant.now;
+import static java.util.UUID.randomUUID;
+
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Optional;
@@ -13,17 +16,16 @@ import nl.knaw.huygens.alexandria.service.AnnotationService;
 
 class AnnotationCreationCommand {
   private final AnnotationCreationRequest request;
-  private AlexandriaAnnotation annotation;
 
   public AnnotationCreationCommand(AnnotationCreationRequest request) {
     this.request = request;
   }
 
   public AlexandriaAnnotation execute(AnnotationService service) {
-    final UUID uuid = providedUUID().orElse(UUID.randomUUID());
-    annotation = service.createAnnotation(uuid, providedType(), optionalValue());
+    final UUID uuid = providedUUID().orElse(randomUUID());
+    final AlexandriaAnnotation annotation = service.createAnnotation(uuid, providedType(), optionalValue());
 
-    annotation.setCreatedOn(providedCreatedOn().orElse(Instant.now()));
+    annotation.setCreatedOn(providedCreatedOn().orElse(now()));
 
     streamAnnotations().map(service::readAnnotation).map(annotation::addAnnotation);
 
