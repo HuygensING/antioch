@@ -29,7 +29,6 @@ public class ResourceFixture extends ApiFixture {
 
     addProviderForContext(ResourceCreationCommandBuilder.class, //
             ResourceCreationCommandBuilder.servedBy(RESOURCE_SERVICE_MOCK));
-
   }
 
   @Override
