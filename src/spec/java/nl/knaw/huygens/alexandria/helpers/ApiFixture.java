@@ -62,7 +62,7 @@ public class ApiFixture extends JerseyTest {
     addProviderForContext(AnnotationEntityBuilder.class, AnnotationEntityBuilder.forConfig(CONFIG));
     addProviderForContext(ResourceEntityBuilder.class, ResourceEntityBuilder.forConfig(CONFIG));
 
-            LOG.trace("adding ObjectMapperProvider");
+    LOG.trace("adding ObjectMapperProvider");
     addClass(ObjectMapperProvider.class);
   }
 
