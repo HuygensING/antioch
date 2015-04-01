@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 @JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
 @JsonTypeName("resource")
-public class ResourceEntity {
+class ResourceEntity {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceEntity.class);
 
   @JsonIgnore

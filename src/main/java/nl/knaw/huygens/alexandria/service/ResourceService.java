@@ -9,6 +9,8 @@ import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 public interface ResourceService {
   AlexandriaResource createResource(AlexandriaResource protoType) throws IllegalResourceException;
 
+  AlexandriaResource createResource(UUID uuid) throws IllegalResourceException;
+
   AlexandriaResource readResource(UUID uuid) throws NotFoundException;
 
   AlexandriaResource updateResource(AlexandriaResource protoType) throws IllegalResourceException;

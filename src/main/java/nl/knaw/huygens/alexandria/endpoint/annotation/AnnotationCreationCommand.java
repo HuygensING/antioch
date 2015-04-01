@@ -15,10 +15,10 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.service.AnnotationService;
 
 class AnnotationCreationCommand {
-  private final AnnotationCreationRequest request;
+  private final AnnotationPrototype prototype;
 
-  public AnnotationCreationCommand(AnnotationCreationRequest request) {
-    this.request = request;
+  public AnnotationCreationCommand(AnnotationPrototype prototype) {
+    this.prototype = prototype;
   }
 
   public AlexandriaAnnotation execute(AnnotationService service) {
@@ -27,35 +27,35 @@ class AnnotationCreationCommand {
 
     annotation.setCreatedOn(providedCreatedOn().orElse(now()));
 
-    streamAnnotations().map(service::readAnnotation).map(annotation::addAnnotation);
+    streamAnnotations().map(service::readAnnotation).forEach(annotation::addAnnotation);
 
     return annotation;
   }
 
   public boolean requiredIntervention() {
-    boolean generateUUID = !request.getId().isPresent();
-    boolean generateCreatedOn = !request.getCreatedOn().isPresent();
+    boolean generateUUID = !prototype.getId().isPresent();
+    boolean generateCreatedOn = !prototype.getCreatedOn().isPresent();
     return generateUUID || generateCreatedOn;
   }
 
   private Optional<UUID> providedUUID() {
-    return request.getId().map(UUIDParam::getValue);
+    return prototype.getId().map(UUIDParam::getValue);
   }
 
   private String providedType() {
-    return request.getType().get();
+    return prototype.getType().get();
   }
 
   private Optional<String> optionalValue() {
-    return request.getValue();
+    return prototype.getValue();
   }
 
   private Stream<UUID> streamAnnotations() {
-    return request.getAnnotations().map(Collection::stream).orElse(Stream.empty()) //
+    return prototype.getAnnotations().map(Collection::stream).orElse(Stream.empty()) //
         .map(UUIDParam::getValue);
   }
 
   private Optional<Instant> providedCreatedOn() {
-    return request.getCreatedOn().map(InstantParam::getValue);
+    return prototype.getCreatedOn().map(InstantParam::getValue);
   }
 }

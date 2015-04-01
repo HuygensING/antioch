@@ -2,6 +2,7 @@ package nl.knaw.huygens.alexandria.resource;
 
 import static org.mockito.Mockito.mock;
 
+import nl.knaw.huygens.alexandria.endpoint.resource.ResourceCreationCommandBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
 import nl.knaw.huygens.alexandria.helpers.ApiFixture;
 import nl.knaw.huygens.alexandria.service.ResourceService;
@@ -25,6 +26,10 @@ public class ResourceFixture extends ApiFixture {
 
     LOG.trace("adding ResourceServiceProvider");
     addProviderForContext(ResourceService.class, RESOURCE_SERVICE_MOCK);
+
+    addProviderForContext(ResourceCreationCommandBuilder.class, //
+            ResourceCreationCommandBuilder.servedBy(RESOURCE_SERVICE_MOCK));
+
   }
 
   @Override

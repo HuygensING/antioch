@@ -12,7 +12,7 @@ import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 
 @JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
 @JsonTypeName("annotation")
-class AnnotationCreationRequest {
+class AnnotationPrototype {
   private UUIDParam id;
   private String type;
   private String value;

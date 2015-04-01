@@ -28,46 +28,46 @@ public class AnnotationCreationCommandBuilder {
   private final AnnotationService service;
 
   protected AnnotationCreationCommandBuilder(AnnotationService service) {
-    this.service = requireNonNull(service, "AnnotationService must not be null");
+    this.service = requireNonNull(service, "AnnotationService MUST not be null");
   }
 
-  public AnnotationCreationCommand build(AnnotationCreationRequest request) {
-    Optional.ofNullable(request).orElseThrow(missingBodyException());
+  public AnnotationCreationCommand build(AnnotationPrototype prototype) {
+    Optional.ofNullable(prototype).orElseThrow(missingBodyException());
 
-    validateId(request);
-    validateType(request);
-    validateValue(request);
-    validateCreatedOn(request);
-    validateAnnotations(request);
+    validateId(prototype);
+    validateType(prototype);
+    validateValue(prototype);
+    validateCreatedOn(prototype);
+    validateAnnotations(prototype);
 
     LOG.trace("Done validating");
 
-    return new AnnotationCreationCommand(request);
+    return new AnnotationCreationCommand(prototype);
   }
 
-  protected void validateId(AnnotationCreationRequest request) {
+  protected void validateId(AnnotationPrototype prototype) {
     LOG.trace("Validating id");
     return; // missing or empty Id means client does not override server generated value.
   }
 
-  protected void validateType(AnnotationCreationRequest request) {
+  protected void validateType(AnnotationPrototype prototype) {
     LOG.trace("Validating type");
-    request.getType().filter(s -> !s.isEmpty()).orElseThrow(missingTypeException());
+    prototype.getType().filter(s -> !s.isEmpty()).orElseThrow(missingTypeException());
   }
 
-  protected void validateValue(AnnotationCreationRequest request) {
+  protected void validateValue(AnnotationPrototype prototype) {
     LOG.trace("Validating value");
     return; // missing or empty value is ok (means annotation is a Tag)
   }
 
-  protected void validateCreatedOn(AnnotationCreationRequest request) {
+  protected void validateCreatedOn(AnnotationPrototype prototype) {
     LOG.trace("Validating createdOn");
     return; // missing or empty createdOn means client does not override server set value.
   }
 
-  protected void validateAnnotations(AnnotationCreationRequest request) {
+  protected void validateAnnotations(AnnotationPrototype prototype) {
     LOG.trace("Validating annotations");
-    request.getAnnotations().ifPresent(annotationParams -> stream(annotationParams) //
+    prototype.getAnnotations().ifPresent(annotationParams -> stream(annotationParams) //
         .map(UUIDParam::getValue).forEach(this::validateAnnotationId));
   }
 

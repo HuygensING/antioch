@@ -37,8 +37,8 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   }
 
   @POST
-  public Response createAnnotation(final AnnotationCreationRequest creationRequest) {
-    final AnnotationCreationCommand command = commandBuilder.build(creationRequest);
+  public Response createAnnotation(final AnnotationPrototype prototype) {
+    final AnnotationCreationCommand command = commandBuilder.build(prototype);
     final AlexandriaAnnotation annotation = command.execute(service);
 
     if (command.requiredIntervention()) {

@@ -13,8 +13,8 @@ import java.util.UUID;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationCreationCommandBuilder;
+import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.helpers.ApiFixture;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 public class AnnotationFixture extends ApiFixture {
   private static final Logger LOG = LoggerFactory.getLogger(AnnotationFixture.class);
 
-  private static AnnotationService ANNOTATION_SERVICE_MOCK = mock(AnnotationService.class);
+  private static final AnnotationService ANNOTATION_SERVICE_MOCK = mock(AnnotationService.class);
 
   private final Map<String, List<String>> annotatedReferences = Maps.newHashMap();
   private AlexandriaAnnotation mockAnnotation;
@@ -39,9 +39,11 @@ public class AnnotationFixture extends ApiFixture {
   @BeforeClass
   public static void setup() {
     addClass(AnnotationsEndpoint.class);
+
     addProviderForContext(AnnotationService.class, ANNOTATION_SERVICE_MOCK);
+
     addProviderForContext(AnnotationCreationCommandBuilder.class, //
-        AnnotationCreationCommandBuilder.servedBy(ANNOTATION_SERVICE_MOCK));
+            AnnotationCreationCommandBuilder.servedBy(ANNOTATION_SERVICE_MOCK));
   }
 
   @Override

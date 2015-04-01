@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
 @JsonTypeName("ref")
-public class RefEntity {
+class RefEntity {
   public static RefEntity of(String ref) {
     return new RefEntity(ref);
   }

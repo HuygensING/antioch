@@ -1,7 +1,5 @@
 package nl.knaw.huygens.alexandria.model;
 
-import static nl.knaw.huygens.alexandria.util.OfNullableRenaming.ifProvided;
-
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
@@ -14,7 +12,7 @@ public class AlexandriaResource {
 
   private final Set<AlexandriaAnnotation> annotations = new HashSet<>();
 
-  private final Instant createdOn;
+  private Instant createdOn;
 
   private String ref;
 
@@ -31,19 +29,16 @@ public class AlexandriaResource {
     this.createdOn = createdOn;
   }
 
-  public AlexandriaResource(AlexandriaResource protoType) {
-    id = ifProvided(protoType.id).orElse(UUID.randomUUID());
-    ref = protoType.ref;
-    createdOn = ifProvided(protoType.createdOn).orElse(Instant.now());
-    annotations.addAll(protoType.annotations);
-  }
-
   public UUID getId() {
     return id;
   }
 
   public Instant getCreatedOn() {
     return createdOn;
+  }
+
+  public void setCreatedOn(Instant createdOn) {
+    this.createdOn = createdOn;
   }
 
   public Set<AlexandriaAnnotation> getAnnotations() {
@@ -70,4 +65,5 @@ public class AlexandriaResource {
   public void setRef(String ref) {
     this.ref = ref;
   }
+
 }

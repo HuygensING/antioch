@@ -10,7 +10,6 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.UUID;
 
-import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
@@ -26,16 +25,16 @@ public class ResourcesEndpoint extends JSONEndpoint {
   private static final Logger LOG = LoggerFactory.getLogger(ResourcesEndpoint.class);
 
   private final ResourceService resourceService;
-  private final AlexandriaConfiguration config;
   private final ResourceEntityBuilder entityBuilder;
+  private final ResourceCreationCommandBuilder commandBuilder;
 
-  public ResourcesEndpoint(@Context AlexandriaConfiguration config, //
-                           @Context ResourceService resourceService,
+  public ResourcesEndpoint(@Context ResourceService resourceService,
+                           @Context ResourceCreationCommandBuilder commandBuilder,
                            @Context ResourceEntityBuilder entityBuilder) {
-    LOG.trace("Resources created, resourceService=[{}], config=[{}]", resourceService, config);
+    LOG.trace("Resources created, resourceService=[{}]", resourceService);
 
-    this.config = config;
     this.entityBuilder = entityBuilder;
+    this.commandBuilder = commandBuilder;
     this.resourceService = resourceService;
   }
 
@@ -47,15 +46,18 @@ public class ResourcesEndpoint extends JSONEndpoint {
   }
 
   @POST
-  public Response createResourceWithoutGivenID(AlexandriaResource protoType) {
+  public Response createResourceWithoutGivenID(ResourcePrototype protoType) {
     requireEntity(protoType);
 
-    LOG.debug("createResourceWithoutGivenID: protoType=[{}]", protoType);
-    LOG.debug("annotations: [{}]", protoType.getAnnotations());
+    final ResourceCreationCommand command = commandBuilder.build(protoType);
+    final AlexandriaResource resource = command.execute(resourceService);
 
-    final AlexandriaResource resource = new AlexandriaResource(protoType);
-    final String id = resource.getId().toString();
-    return Response.created(URI.create(id)).entity(entityBuilder.build(resource)).build();
+    if (command.requiredIntervention()) {
+      final ResourceEntity entity = entityBuilder.build(resource);
+      return Response.created(locationOf(resource)).entity(entity).build();
+    }
+
+    return Response.noContent().build();
   }
 
   @PUT
@@ -81,6 +83,10 @@ public class ResourcesEndpoint extends JSONEndpoint {
   public Response getResourceRef(@PathParam("uuid") final UUIDParam uuidParam) {
     AlexandriaResource resource = resourceService.readResource(uuidParam.getValue());
     return Response.ok(RefEntity.of(resource.getRef())).build();
+  }
+
+  private URI locationOf(AlexandriaResource resource) {
+    return URI.create(resource.getId().toString());
   }
 
   private ResourceAnnotations annotationsFor(UUID uuid) {

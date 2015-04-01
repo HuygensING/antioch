@@ -10,7 +10,7 @@ import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
 @JsonTypeName("resource")
-public class ResourceCreationRequest {
+public class ResourcePrototype {
   private UUIDParam id;
   private String ref;
   private InstantParam createdOn;
