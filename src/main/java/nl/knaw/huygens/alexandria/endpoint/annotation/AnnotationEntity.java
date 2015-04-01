@@ -28,7 +28,7 @@ class AnnotationEntity {
   @JsonIgnore
   private AlexandriaConfiguration config;
 
-  public static final AnnotationEntity of(AlexandriaAnnotation someAnnotation) {
+  public static AnnotationEntity of(AlexandriaAnnotation someAnnotation) {
     return new AnnotationEntity(someAnnotation);
   }
 
@@ -57,7 +57,7 @@ class AnnotationEntity {
   public Set<URI> getAnnotations() {
     LOG.debug("Converting {} annotations: [{}]", annotation.getAnnotations().size(), annotation.getAnnotations());
     // TODO: When Jackson can handle Streams, maybe return Stream<AnnotationView>.
-    final Set<URI> uris = Sets.newHashSet(annotation.streamAnnotations().map(a -> annotationURI(a)).iterator());
+    final Set<URI> uris = Sets.newHashSet(annotation.streamAnnotations().map(this::annotationURI).iterator());
     LOG.debug("uris: {}", uris);
     return uris;
   }

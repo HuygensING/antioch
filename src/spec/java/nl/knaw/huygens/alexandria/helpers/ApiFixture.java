@@ -20,6 +20,7 @@ import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.LowLevelAppDescriptor;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
+import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 import nl.knaw.huygens.alexandria.util.ObjectMapperProvider;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
 import org.concordion.api.extension.Extensions;
@@ -36,11 +37,7 @@ public class ApiFixture extends JerseyTest {
   private static ResourceConfig resourceConfig;
 
   private static AlexandriaConfiguration testConfiguration() {
-    return new AlexandriaConfiguration() {
-      public URI getBaseURI() {
-        return UriBuilder.fromUri("https://localhost/").port(4242).build();
-      }
-    };
+    return () -> UriBuilder.fromUri("https://localhost/").port(4242).build();
   }
 
   public static void addClass(Class<?> resourceClass) {
@@ -63,8 +60,9 @@ public class ApiFixture extends JerseyTest {
     LOG.trace("adding AlexandriaConfigurationProvider");
     addProviderForContext(AlexandriaConfiguration.class, CONFIG);
     addProviderForContext(AnnotationEntityBuilder.class, AnnotationEntityBuilder.forConfig(CONFIG));
+    addProviderForContext(ResourceEntityBuilder.class, ResourceEntityBuilder.forConfig(CONFIG));
 
-    LOG.trace("adding ObjectMapperProvider");
+            LOG.trace("adding ObjectMapperProvider");
     addClass(ObjectMapperProvider.class);
   }
 
