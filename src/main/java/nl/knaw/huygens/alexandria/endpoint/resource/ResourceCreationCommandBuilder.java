@@ -10,7 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ResourceCreationCommandBuilder {
-  public static final String MISSING_RESOURCE_BODY_MESSAGE = "Missing or empty resource request body";
+  private static final String MISSING_RESOURCE_BODY_MESSAGE = "Missing or empty resource request body";
+  private static final String MISSING_REF_MESSAGE = "Missing required 'ref' field in resource body";
 
   private static final Logger LOG = LoggerFactory.getLogger(ResourceCreationCommandBuilder.class);
 
@@ -28,8 +29,18 @@ public class ResourceCreationCommandBuilder {
     Optional.ofNullable(prototype).orElseThrow(missingBodyException());
 
     // TODO: validate prototype values
+    validateRef(prototype);
 
     return new ResourceCreationCommand(prototype);
+  }
+
+  private void validateRef(ResourcePrototype prototype) {
+    LOG.trace("validating ref");
+    prototype.getRef().orElseThrow(missingRefException());
+  }
+
+  private Supplier<? extends BadRequestException> missingRefException() {
+    return () -> badRequestException(MISSING_REF_MESSAGE);
   }
 
   protected Supplier<BadRequestException> missingBodyException() {

@@ -1,6 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import static java.time.Instant.now;
+import static java.util.Objects.requireNonNull;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -12,8 +13,12 @@ import nl.knaw.huygens.alexandria.endpoint.InstantParam;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.ResourceService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class ResourceCreationCommand {
+  private static final Logger LOG = LoggerFactory.getLogger(ResourceCreationCommand.class);
+
   private final ResourcePrototype prototype;
 
   ResourceCreationCommand(ResourcePrototype prototype) {
@@ -21,12 +26,14 @@ class ResourceCreationCommand {
   }
 
   public AlexandriaResource execute(ResourceService service) {
+    LOG.trace("executing, service=[{}]", service);
     final AlexandriaResource resource = service.createResource(providedUUID().orElse(UUID.randomUUID()));
 
-    // TODO: figure out how to get a hold of the annotation, or how to use an annotation's UUID to add it
-    // streamAnnotations().map(annotationService::readAnnotation).map(resource::addAnnotation);
-
+    resource.setRef(providedRef());
     resource.setCreatedOn(providedCreatedOn().orElse(now()));
+
+    // TODO: figure out how to get a hold of the annotation(s), or maybe use just an annotation's UUID to add it
+    // streamAnnotations().map(annotationService::readAnnotation).map(resource::addAnnotation);
 
     return resource;
   }
@@ -37,13 +44,17 @@ class ResourceCreationCommand {
     return !protoTypeProvidedId || !protoTypeProvidedCreatedOn;
   }
 
+  private String providedRef() {
+    return requireNonNull(prototype.getRef().get(), "Required 'ref' field was not validated for being non-null");
+  }
+
   private Optional<UUID> providedUUID() {
     return prototype.getId().map(UUIDParam::getValue);
   }
 
   private Stream<UUID> streamAnnotations() {
     return prototype.getAnnotations().map(Collection::stream).orElse(Stream.empty()) //
-            .map(UUIDParam::getValue);
+        .map(UUIDParam::getValue);
   }
 
   private Optional<Instant> providedCreatedOn() {
