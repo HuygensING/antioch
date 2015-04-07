@@ -8,21 +8,19 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import java.net.URI;
+import java.util.Optional;
 
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.ResourceService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Path(EndpointPaths.RESOURCES)
 public class ResourcesEndpoint extends JSONEndpoint {
   private static final URI HERE = URI.create("");
-
-  private static final Logger LOG = LoggerFactory.getLogger(ResourcesEndpoint.class);
 
   private final ResourceService resourceService;
   private final ResourceEntityBuilder entityBuilder;
@@ -30,7 +28,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   public ResourcesEndpoint(@Context ResourceService resourceService, @Context ResourceCreationCommandBuilder
       commandBuilder, @Context ResourceEntityBuilder entityBuilder) {
-    LOG.trace("Resources created, resourceService=[{}]", resourceService);
+    log().trace("Resources created, resourceService=[{}]", resourceService);
 
     this.entityBuilder = entityBuilder;
     this.commandBuilder = commandBuilder;
@@ -46,29 +44,45 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   @POST
   public Response createResourceWithoutGivenID(ResourcePrototype protoType) {
+    log().trace("protoType=[{}]", protoType);
+    requireProtoType(protoType);
+
     final ResourceCreationCommand command = commandBuilder.withoutId(protoType);
     final AlexandriaResource resource = command.execute(resourceService);
 
-    if (command.requiredIntervention()) {
-      final ResourceEntity entity = entityBuilder.build(resource);
-      return Response.created(locationOf(resource)).entity(entity).build();
+    if (command.wasExecutedAsIs()) {
+      return Response.noContent().build();
     }
 
-    return Response.noContent().build();
+    final ResourceEntity entity = entityBuilder.build(resource);
+    return Response.created(locationOf(resource)).entity(entity).build();
   }
 
   @PUT
   @Path("{uuid}")
   public Response createResourceAtSpecificID(@PathParam("uuid") final UUIDParam paramId, ResourcePrototype protoType) {
-    final ResourceCreationCommand command = commandBuilder.ofExistingId(protoType, paramId.getValue());
+    log().trace("paramId=[{}], protoType=[{}]", paramId, protoType);
+    requireProtoType(protoType);
+
+    final ResourceCreationCommand command = commandBuilder.ofSpecificId(protoType, paramId.getValue());
     final AlexandriaResource resource = command.execute(resourceService);
 
-    if (command.requiredIntervention()) {
-      final ResourceEntity entity = entityBuilder.build(resource);
-      return Response.created(HERE).entity(entity).build();
+    final ResponseBuilder builder;
+    if (command.newResourceWasCreated()) {
+      builder = Response.created(HERE).entity(entityBuilder.build(resource));
+    } else {
+      if (command.wasExecutedAsIs()) {
+        builder = Response.noContent();
+      } else {
+        builder = Response.ok(entityBuilder.build(resource));
+      }
     }
 
-    return Response.noContent().build();
+    return builder.build();
+  }
+
+  private void requireProtoType(ResourcePrototype protoType) {
+    Optional.ofNullable(protoType).orElseThrow(missingBodyException());
   }
 
   @Path("{uuid}/annotations")

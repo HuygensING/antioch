@@ -13,8 +13,12 @@ import nl.knaw.huygens.alexandria.endpoint.InstantParam;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.service.AnnotationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class AnnotationCreationCommand {
+  private static final Logger LOG = LoggerFactory.getLogger(AnnotationCreationCommand.class);
+  
   private final AnnotationPrototype prototype;
 
   public AnnotationCreationCommand(AnnotationPrototype prototype) {
@@ -32,10 +36,12 @@ class AnnotationCreationCommand {
     return annotation;
   }
 
-  public boolean requiredIntervention() {
-    boolean generateUUID = !prototype.getId().isPresent();
-    boolean generateCreatedOn = !prototype.getCreatedOn().isPresent();
-    return generateUUID || generateCreatedOn;
+  public boolean wasExecutedAsIs() {
+    boolean protoTypeProvidedUUID = prototype.getId().isPresent();
+    boolean protoTypeProvidedCreatedOn = prototype.getCreatedOn().isPresent();
+    final boolean wasExecutedAsIs = protoTypeProvidedUUID && protoTypeProvidedCreatedOn;
+    LOG.trace("wasExecutedAsIs: {}", wasExecutedAsIs);
+    return wasExecutedAsIs;
   }
 
   private Optional<UUID> providedUUID() {

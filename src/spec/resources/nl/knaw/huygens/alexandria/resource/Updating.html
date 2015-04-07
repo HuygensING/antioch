@@ -19,7 +19,8 @@
 <pre c:execute="body(#TEXT)">{
     "resource": {
         "id": "c6b96360-c0c9-11e4-b947-6bc57448d166",
-        "ref": "http://www.example.com/titles/path/to/UPDATED/title/resource"
+        "ref": "http://www.example.com/titles/path/to/UPDATED/title/resource",
+        "createdOn": "2015-04-07T11:46:16.871Z"
     }
 }</pre>
 
@@ -32,6 +33,29 @@
             <li><b>TODO</b>: a subsequent GET shows an updated "ref" property in the JSON response body.</li>
         </ol>
     </div>
+
+    <div c:execute="clear()" class="example">
+        <h3>What happens when I fail to provide the resource body for the update?</h3>
+
+        <ul>
+            <li>Given a resource located at <code>http://www.example.com/titles/path/to/title/resource</code>,
+                which is to be stored as UUID <code>6e56c868-c0a9-11e4-a762-cb9a664afc01</code>
+            </li>
+
+            <li>When I <b c:set="#method">PUT</b>
+                <pre c:execute="body(#TEXT)"></pre>
+                (nothing) to <code c:set="#endpoint"><b>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</b></code>
+            </li>
+
+            <li c:execute="request(#method, #endpoint)">Then:
+                <ol>
+                    <li>the response status should be <b c:assertEquals="status()">204 No Content</b>;</li>
+                    <li>the response body is <b c:assertEquals="responseOrEmpty()">empty</b>.</li>
+                </ol>
+            </li>
+        </ul>
+    </div>
+
 </div>
 
 </body>

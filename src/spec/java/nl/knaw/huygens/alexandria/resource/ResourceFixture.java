@@ -27,8 +27,7 @@ public class ResourceFixture extends ApiFixture {
     LOG.trace("adding ResourceServiceProvider");
     addProviderForContext(ResourceService.class, RESOURCE_SERVICE_MOCK);
 
-    addProviderForContext(ResourceCreationCommandBuilder.class, //
-            ResourceCreationCommandBuilder.servedBy(RESOURCE_SERVICE_MOCK));
+    addProviderForContext(ResourceCreationCommandBuilder.class, new ResourceCreationCommandBuilder());
   }
 
   @Override

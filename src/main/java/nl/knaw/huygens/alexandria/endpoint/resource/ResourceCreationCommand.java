@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 import nl.knaw.huygens.alexandria.endpoint.InstantParam;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
+import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.ResourceService;
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ class ResourceCreationCommand {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceCreationCommand.class);
 
   private final ResourcePrototype prototype;
+  private boolean resourceCreated;
 
   ResourceCreationCommand(ResourcePrototype prototype) {
     this.prototype = prototype;
@@ -27,7 +29,20 @@ class ResourceCreationCommand {
 
   public AlexandriaResource execute(ResourceService service) {
     LOG.trace("executing, service=[{}]", service);
-    final AlexandriaResource resource = service.createResource(providedUUID().orElse(UUID.randomUUID()));
+
+    AlexandriaResource resource;
+    if (providedUUID().isPresent()) {
+      final UUID uuid = providedUUID().get();
+      try {
+        resource = service.readResource(uuid);
+      } catch (NotFoundException okInThatCaseWeWillCreateIt) {
+        resource = service.createResource(uuid);
+        resourceCreated = true;
+
+      }
+    } else {
+      resource = service.createResource(UUID.randomUUID());
+    }
 
     resource.setRef(providedRef());
     resource.setCreatedOn(providedCreatedOn().orElse(now()));
@@ -38,10 +53,15 @@ class ResourceCreationCommand {
     return resource;
   }
 
-  public boolean requiredIntervention() {
-    final boolean protoTypeProvidedId = prototype.getId().isPresent();
-    final boolean protoTypeProvidedCreatedOn = prototype.getCreatedOn().isPresent();
-    return !protoTypeProvidedId || !protoTypeProvidedCreatedOn;
+  public boolean wasExecutedAsIs() {
+    final boolean wasExecutedAsIs = providedUUID().isPresent() && providedCreatedOn().isPresent();
+    LOG.trace("wasExecutedAsIs: {}", wasExecutedAsIs);
+    return wasExecutedAsIs;
+  }
+
+  public boolean newResourceWasCreated() {
+    LOG.trace("newResourceWasCreated: {}", resourceCreated);
+    return resourceCreated;
   }
 
   private String providedRef() {

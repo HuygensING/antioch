@@ -42,12 +42,12 @@ public class AnnotationsEndpoint extends JSONEndpoint {
     final AnnotationCreationCommand command = commandBuilder.build(prototype);
     final AlexandriaAnnotation annotation = command.execute(service);
 
-    if (command.requiredIntervention()) {
-      final AnnotationEntity entity = entityBuilder.build(annotation);
-      return Response.created(locationOf(annotation)).entity(entity).build();
+    if (command.wasExecutedAsIs()) {
+      return Response.noContent().build();
     }
 
-    return Response.noContent().build();
+    final AnnotationEntity entity = entityBuilder.build(annotation);
+    return Response.created(locationOf(annotation)).entity(entity).build();
   }
 
   @DELETE
