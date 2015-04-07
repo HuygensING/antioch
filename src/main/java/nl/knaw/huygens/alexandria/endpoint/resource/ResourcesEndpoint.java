@@ -8,7 +8,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.util.UUID;
 
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
@@ -28,9 +27,8 @@ public class ResourcesEndpoint extends JSONEndpoint {
   private final ResourceEntityBuilder entityBuilder;
   private final ResourceCreationCommandBuilder commandBuilder;
 
-  public ResourcesEndpoint(@Context ResourceService resourceService,
-                           @Context ResourceCreationCommandBuilder commandBuilder,
-                           @Context ResourceEntityBuilder entityBuilder) {
+  public ResourcesEndpoint(@Context ResourceService resourceService, @Context ResourceCreationCommandBuilder
+      commandBuilder, @Context ResourceEntityBuilder entityBuilder) {
     LOG.trace("Resources created, resourceService=[{}]", resourceService);
 
     this.entityBuilder = entityBuilder;
@@ -47,9 +45,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   @POST
   public Response createResourceWithoutGivenID(ResourcePrototype protoType) {
-    requireEntity(protoType);
-
-    final ResourceCreationCommand command = commandBuilder.build(protoType);
+    final ResourceCreationCommand command = commandBuilder.withoutId(protoType);
     final AlexandriaResource resource = command.execute(resourceService);
 
     if (command.requiredIntervention()) {
@@ -62,20 +58,21 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   @PUT
   @Path("{uuid}")
-  public Response createResourceAtSpecificID(@PathParam("uuid") final UUIDParam paramId, AlexandriaResource protoType) {
-    requireEntity(protoType);
-    requireCompatibleIds(paramId, protoType::getId);
+  public Response createResourceAtSpecificID(@PathParam("uuid") final UUIDParam paramId, ResourcePrototype protoType) {
+    final ResourceCreationCommand command = commandBuilder.ofExistingId(protoType, paramId.getValue());
+    final AlexandriaResource resource = command.execute(resourceService);
 
-    LOG.debug("createResourceAtSpecificID: paramId=[{}] vs protoType.id=[{}]", paramId, protoType.getId());
+    if (command.requiredIntervention()) {
+      final ResourceEntity entity = entityBuilder.build(resource);
+      return Response.created(HERE).entity(entity).build();
+    }
 
-    resourceService.createResource(protoType);
-
-    return Response.created(HERE).build();
+    return Response.noContent().build();
   }
 
   @Path("{uuid}/annotations")
   public ResourceAnnotations getAnnotationsForResource(@PathParam("uuid") final UUIDParam uuidParam) {
-    return annotationsFor(uuidParam.getValue());
+    return new ResourceAnnotations(resourceService, uuidParam.getValue());
   }
 
   @GET
@@ -87,10 +84,6 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   private URI locationOf(AlexandriaResource resource) {
     return URI.create(resource.getId().toString());
-  }
-
-  private ResourceAnnotations annotationsFor(UUID uuid) {
-    return new ResourceAnnotations(resourceService, uuid);
   }
 
 }
