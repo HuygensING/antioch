@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -75,11 +76,17 @@ public class ResourcesEndpoint extends JSONEndpoint {
     return new ResourceAnnotations(resourceService, uuidParam.getValue());
   }
 
+  @DELETE
+  @Path("{uuid}")
+  public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
+    return Response.status(501).build();
+  }
+
   @GET
   @Path("{uuid}/ref")
   public Response getResourceRef(@PathParam("uuid") final UUIDParam uuidParam) {
     AlexandriaResource resource = resourceService.readResource(uuidParam.getValue());
-    return Response.ok(RefEntity.of(resource.getRef())).build();
+    return Response.ok(new RefEntity(resource.getRef())).build();
   }
 
   private URI locationOf(AlexandriaResource resource) {

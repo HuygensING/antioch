@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.endpoint.annotation;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -47,6 +48,12 @@ public class AnnotationsEndpoint extends JSONEndpoint {
     }
 
     return Response.noContent().build();
+  }
+
+  @DELETE
+  @Path("{uuid}")
+  public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
+    return Response.status(501).build();
   }
 
   private URI locationOf(AlexandriaAnnotation annotation) {

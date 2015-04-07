@@ -1,18 +1,15 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = As.EXISTING_PROPERTY)
 @JsonTypeName("ref")
 class RefEntity {
-  public static RefEntity of(String ref) {
-    return new RefEntity(ref);
-  }
-
   private final String ref;
 
-  private RefEntity(String ref) {
+  RefEntity(String ref) {
     this.ref = ref;
   }
 
