@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 @Consumes(MediaType.APPLICATION_JSON) // rfc4627: JSON text SHALL be encoded in Unicode. The default encoding is UTF-8.
 @Produces(MediaType.APPLICATION_JSON)
 public abstract class JSONEndpoint {
-  private static final String MISSING_RESOURCE_BODY_MESSAGE = "Missing or empty resource request body";
+  private static final String MISSING_RESOURCE_BODY_MESSAGE = "Missing or empty request body";
 
   private static final Logger LOG = LoggerFactory.getLogger(JSONEndpoint.class);
 

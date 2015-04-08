@@ -112,6 +112,10 @@ public class ApiFixture extends JerseyTest {
     this.body = body;
   }
 
+  public void emptyBody() {
+    this.body = null;
+  }
+
   public void contentType(String type) {
     this.contentType = MediaType.valueOf(type);
   }

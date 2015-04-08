@@ -13,7 +13,7 @@ public class UpdatingFixture extends ResourceFixture {
   public void request(String method, String path) {
     final AlexandriaResource mockResource = new AlexandriaResource(UUID.randomUUID());
 
-    when(resourceService().readResource(any(UUID.class))).thenThrow(NotFoundException.class);
+    when(resourceService().readResource(any(UUID.class))).thenThrow(new NotFoundException());
     when(resourceService().createResource(any(UUID.class))).thenReturn(mockResource);
 
     super.request(method, path);
