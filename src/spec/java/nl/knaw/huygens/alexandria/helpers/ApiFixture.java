@@ -1,7 +1,10 @@
 package nl.knaw.huygens.alexandria.helpers;
 
 import static java.lang.String.format;
+import static javax.ws.rs.client.Entity.entity;
 
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
@@ -11,19 +14,16 @@ import java.util.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.core.DefaultResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.test.framework.AppDescriptor;
-import com.sun.jersey.test.framework.JerseyTest;
-import com.sun.jersey.test.framework.LowLevelAppDescriptor;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 import nl.knaw.huygens.alexandria.util.ObjectMapperProvider;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
 import org.concordion.api.extension.Extensions;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.client.ClientResponse;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.test.JerseyTest;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,27 +35,39 @@ public class ApiFixture extends JerseyTest {
   private static final AlexandriaConfiguration CONFIG = testConfiguration();
 
   private static ResourceConfig resourceConfig;
+  private WebTarget target;
+  private MediaType contentType;
+  private String body;
+  private ClientResponse response;
+  private String entity;
 
   private static AlexandriaConfiguration testConfiguration() {
     return () -> UriBuilder.fromUri("https://localhost/").port(4242).build();
   }
 
   public static void addClass(Class<?> resourceClass) {
-    resourceConfig.getClasses().add(resourceClass);
-  }
-
-  public static void addSingleton(Object resourceSingleton) {
-    resourceConfig.getSingletons().add(resourceSingleton);
+//    resourceConfig.getClasses().add(resourceClass);
+    resourceConfig.register(new AbstractBinder() {
+      @Override
+      protected void configure() {
+        bind(ObjectMapperProvider.class);
+      }
+    });
   }
 
   public static <T> void addProviderForContext(Class<T> contextClass, T contextObject) {
-    addSingleton(new SingletonContextProvider<>(contextClass, contextObject));
+    resourceConfig.register(new AbstractBinder() {
+      @Override
+      protected void configure() {
+        bind(contextObject).to(contextClass);
+      }
+    });
   }
 
   @BeforeClass
   public static void resetStaticFields() {
     LOG.trace("resetting Jersey Config");
-    resourceConfig = new DefaultResourceConfig();
+    resourceConfig = new ResourceConfig();
 
     LOG.trace("adding AlexandriaConfigurationProvider");
     addProviderForContext(AlexandriaConfiguration.class, CONFIG);
@@ -66,16 +78,6 @@ public class ApiFixture extends JerseyTest {
     addClass(ObjectMapperProvider.class);
   }
 
-  private WebResource request;
-
-  private MediaType contentType;
-
-  private String body;
-
-  private ClientResponse response;
-
-  private String entity;
-
   public String base() {
     return baseOf(location());
   }
@@ -85,13 +87,8 @@ public class ApiFixture extends JerseyTest {
     return UUIDParser.fromString(idStr).get().map(uuid -> "well-formed UUID").orElse("malformed UUID: " + idStr);
   }
 
-  @Override
-  protected AppDescriptor configure() {
-    return new LowLevelAppDescriptor.Builder(resourceConfig).build();
-  }
-
   public void clear() {
-    request = client().resource(CONFIG.getBaseURI());
+    target = client().target(getBaseURI());
     contentType = MediaType.APPLICATION_JSON_TYPE;
     body = null;
     response = null;
@@ -101,10 +98,10 @@ public class ApiFixture extends JerseyTest {
   public void request(String method, String path) {
     LOG.trace("request: method=[{}], path=[{}]", method, path);
 
-    response = request.path(path).type(contentType).method(method, ClientResponse.class, body);
+    response = target.path(path).request().method(method, entity(body, contentType), ClientResponse.class);
 
     if (response.hasEntity()) {
-      entity = response.getEntity(String.class).replaceAll(hostInfo(), "{host}");
+      this.entity = response.readEntity(String.class).replaceAll(hostInfo(), "{host}");
     }
   }
 
@@ -142,6 +139,10 @@ public class ApiFixture extends JerseyTest {
   }
 
   @Override
+  protected Application configure() {
+    return resourceConfig;
+  }
+
   protected URI getBaseURI() {
     return CONFIG.getBaseURI();
   }

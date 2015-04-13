@@ -350,7 +350,7 @@
             <version>${guice.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey</groupId>
+            <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>
             <version>${jersey.version}</version>
         </dependency>
@@ -364,8 +364,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey.jersey-test-framework</groupId>
-            <artifactId>jersey-test-framework-inmemory</artifactId>
+            <groupId>org.glassfish.jersey.test-framework.providers</groupId>
+            <artifactId>jersey-test-framework-provider-inmemory</artifactId>
             <version>${jersey.version}</version>
             <scope>test</scope>
         </dependency>
@@ -408,7 +408,7 @@
         <guice.version>3.0</guice.version>
         <jackson.version>2.5.1</jackson.version>
         <jdk.version>1.8</jdk.version>
-        <jersey.version>1.19</jersey.version>
+        <jersey.version>2.17</jersey.version>
         <junit.version>4.12</junit.version>
         <logback.version>1.1.2</logback.version>
         <mockito.version>1.10.19</mockito.version>
