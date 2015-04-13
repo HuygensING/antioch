@@ -13,7 +13,7 @@ Authorization: auth-token-1234                      # Some token identifying 'ne
     "resource": {
         "id": "some-uuid-1",
         "ref": "http://nederlab.nl/titles/some-uuid-1",
-        "createdBy": "root",                        # root  when unspecified, may be overriden (unchecked)
+        "createdBy": "root",                        # root  when unspecified, may be overridden (unchecked)
         "createdOn": "2015-02-17 07:48:50+01:00"    # now() when unspecified, may be overridden (RFC-3339)
     }
 }
