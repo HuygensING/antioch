@@ -30,7 +30,7 @@ public class ResourceCreationCommandBuilder {
   }
 
   private void validateParamIdAgainstProtoTypeId(ResourcePrototype protoType, UUID uuid) {
-    LOG.debug("createResourceAtSpecificID: paramId=[{}] vs protoType.id=[{}]", uuid, protoType.getId());
+    LOG.debug("validateParamIdAgainstProtoTypeId: paramId=[{}] vs protoType.id=[{}]", uuid, protoType.getId());
     protoType.getId().map(UUIDParam::getValue).ifPresent(mustEqual(uuid));
   }
 

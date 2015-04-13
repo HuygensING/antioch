@@ -38,11 +38,12 @@ class ResourceCreationCommand {
       } catch (NotFoundException okInThatCaseWeWillCreateIt) {
         resource = service.createResource(uuid);
         resourceCreated = true;
-
       }
     } else {
       resource = service.createResource(UUID.randomUUID());
     }
+
+    LOG.trace("resource: [{}]", resource);
 
     resource.setRef(providedRef());
     resource.setCreatedOn(providedCreatedOn().orElse(now()));
