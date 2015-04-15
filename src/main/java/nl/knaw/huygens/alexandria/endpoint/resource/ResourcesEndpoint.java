@@ -1,12 +1,15 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
+import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import java.net.URI;
@@ -26,8 +29,10 @@ public class ResourcesEndpoint extends JSONEndpoint {
   private final ResourceEntityBuilder entityBuilder;
   private final ResourceCreationCommandBuilder commandBuilder;
 
-  public ResourcesEndpoint(@Context ResourceService resourceService, @Context ResourceCreationCommandBuilder
-      commandBuilder, @Context ResourceEntityBuilder entityBuilder) {
+  @Inject
+  public ResourcesEndpoint(ResourceService resourceService, //
+                           ResourceCreationCommandBuilder commandBuilder, //
+                           ResourceEntityBuilder entityBuilder) {
     log().trace("Resources created, resourceService=[{}]", resourceService);
 
     this.entityBuilder = entityBuilder;
@@ -43,6 +48,8 @@ public class ResourcesEndpoint extends JSONEndpoint {
   }
 
   @POST
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   public Response createResourceWithoutGivenID(ResourcePrototype protoType) {
     log().trace("protoType=[{}]", protoType);
     requireProtoType(protoType);
@@ -60,6 +67,8 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   @PUT
   @Path("{uuid}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   public Response createResourceAtSpecificID(@PathParam("uuid") final UUIDParam paramId, ResourcePrototype protoType) {
     log().trace("paramId=[{}], protoType=[{}]", paramId, protoType);
     requireProtoType(protoType);

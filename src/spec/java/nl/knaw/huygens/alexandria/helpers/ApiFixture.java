@@ -1,30 +1,46 @@
 package nl.knaw.huygens.alexandria.helpers;
 
 import static java.lang.String.format;
+import static java.util.logging.Logger.getAnonymousLogger;
 import static javax.ws.rs.client.Entity.entity;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
+import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.servlet.ServletModule;
+import com.squarespace.jersey2.guice.BootstrapUtils;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 import nl.knaw.huygens.alexandria.util.ObjectMapperProvider;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
 import org.concordion.api.extension.Extensions;
+import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.client.ClientResponse;
+import org.glassfish.jersey.CommonProperties;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.filter.LoggingFilter;
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.test.JerseyTest;
-import org.junit.BeforeClass;
+import org.glassfish.jersey.test.TestProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +54,7 @@ public class ApiFixture extends JerseyTest {
   private WebTarget target;
   private MediaType contentType;
   private String body;
-  private ClientResponse response;
+  private Response response;
   private String entity;
 
   private static AlexandriaConfiguration testConfiguration() {
@@ -64,18 +80,28 @@ public class ApiFixture extends JerseyTest {
     });
   }
 
-  @BeforeClass
-  public static void resetStaticFields() {
-    LOG.trace("resetting Jersey Config");
+  public static void setupJerseyAndGuice(Module module) {
+    LOG.trace("Setting up Jersey");
     resourceConfig = new ResourceConfig();
+    LOG.trace("+- resourceConfig=[{}]", resourceConfig);
 
-    LOG.trace("adding AlexandriaConfigurationProvider");
-    addProviderForContext(AlexandriaConfiguration.class, CONFIG);
-    addProviderForContext(AnnotationEntityBuilder.class, AnnotationEntityBuilder.forConfig(CONFIG));
-    addProviderForContext(ResourceEntityBuilder.class, ResourceEntityBuilder.forConfig(CONFIG));
+    resourceConfig.property(ServerProperties.TRACING, "ALL");
+    resourceConfig.register(new LoggingFilter(getAnonymousLogger(), true));
 
-    LOG.trace("adding ObjectMapperProvider");
-    addClass(ObjectMapperProvider.class);
+    resourceConfig.packages("nl.knaw.huygens.alexandria.endpoint.resource");
+    resourceConfig.register(JacksonFeature.class);
+    resourceConfig.register(ObjectMapperProvider.class);
+
+    LOG.trace("Bootstrapping Jersey2-Guice bridge:");
+    ServiceLocator locator = BootstrapUtils.newServiceLocator();
+    LOG.trace("+- locator=[{}]", locator);
+
+    final List<Module> modules = Arrays.asList(new ServletModule(), baseModule(), module);
+    final Injector injector = BootstrapUtils.newInjector(locator, modules);
+    LOG.trace("+- injector=[{}]", injector);
+
+    BootstrapUtils.install(locator);
+    LOG.trace("+- done: locator installed");
   }
 
   public String base() {
@@ -89,7 +115,7 @@ public class ApiFixture extends JerseyTest {
 
   public void clear() {
     target = client().target(getBaseURI());
-    contentType = MediaType.APPLICATION_JSON_TYPE;
+    contentType = APPLICATION_JSON_TYPE;
     body = null;
     response = null;
     entity = null;
@@ -98,7 +124,10 @@ public class ApiFixture extends JerseyTest {
   public void request(String method, String path) {
     LOG.trace("request: method=[{}], path=[{}]", method, path);
 
-    response = target.path(path).request().method(method, entity(body, contentType), ClientResponse.class);
+    final Entity<String> entity = entity(body, contentType);
+    LOG.trace("ContentType=[{}], entity=[{}]", contentType, body);
+    response = target.path(path).request().method(method, entity, Response.class);
+    LOG.trace("response: [{}]", response);
 
     if (response.hasEntity()) {
       this.entity = response.readEntity(String.class).replaceAll(hostInfo(), "{host}");
@@ -140,7 +169,28 @@ public class ApiFixture extends JerseyTest {
 
   @Override
   protected Application configure() {
+    enable(TestProperties.LOG_TRAFFIC);
+    enable(TestProperties.DUMP_ENTITY);
+    enable(CommonProperties.METAINF_SERVICES_LOOKUP_DISABLE);
     return resourceConfig;
+  }
+
+  @Override
+  protected void configureClient(ClientConfig config) {
+    LOG.trace("Configuring test client to use Jackson via our ObjectMapper, config=[{}]", config);
+    config.register(JacksonFeature.class).register(ObjectMapperProvider.class);
+  }
+
+  private static Module baseModule() {
+    return new AbstractModule() {
+      @Override
+      protected void configure() {
+        LOG.trace("setting up Guice bindings");
+        bind(AlexandriaConfiguration.class).toInstance(CONFIG);
+        bind(AnnotationEntityBuilder.class).toInstance(AnnotationEntityBuilder.forConfig(CONFIG));
+        bind(ResourceEntityBuilder.class).toInstance(ResourceEntityBuilder.forConfig(CONFIG));
+      }
+    };
   }
 
   protected URI getBaseURI() {
@@ -148,7 +198,7 @@ public class ApiFixture extends JerseyTest {
   }
 
   private Optional<String> header(String header) {
-    return Optional.ofNullable(response.getHeaders().getFirst(header));
+    return Optional.ofNullable(response.getHeaderString(header));
   }
 
   private String hostInfo() {

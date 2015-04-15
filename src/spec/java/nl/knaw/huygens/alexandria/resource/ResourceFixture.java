@@ -2,8 +2,9 @@ package nl.knaw.huygens.alexandria.resource;
 
 import static org.mockito.Mockito.mock;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceCreationCommandBuilder;
-import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
 import nl.knaw.huygens.alexandria.helpers.ApiFixture;
 import nl.knaw.huygens.alexandria.service.ResourceService;
 import org.concordion.integration.junit4.ConcordionRunner;
@@ -21,13 +22,18 @@ public class ResourceFixture extends ApiFixture {
 
   @BeforeClass
   public static void setup() {
-    LOG.trace("adding class Resources");
-    addClass(ResourcesEndpoint.class);
+    ApiFixture.setupJerseyAndGuice(resourceModule());
+  }
 
-    LOG.trace("adding ResourceServiceProvider");
-    addProviderForContext(ResourceService.class, RESOURCE_SERVICE_MOCK);
-
-    addProviderForContext(ResourceCreationCommandBuilder.class, new ResourceCreationCommandBuilder());
+  private static Module resourceModule() {
+    return new AbstractModule() {
+      @Override
+      protected void configure() {
+        LOG.trace("setting up Guice bindings");
+        bind(ResourceService.class).toInstance(RESOURCE_SERVICE_MOCK);
+        bind(ResourceCreationCommandBuilder.class).toInstance(new ResourceCreationCommandBuilder());
+      }
+    };
   }
 
   @Override

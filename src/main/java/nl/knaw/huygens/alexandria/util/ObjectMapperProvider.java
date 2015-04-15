@@ -13,26 +13,31 @@ import org.slf4j.LoggerFactory;
 @Provider
 public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
   private static final Logger LOG = LoggerFactory.getLogger(ObjectMapperProvider.class);
-  private static final ObjectMapper OBJECT_MAPPER = objectMapper();
+
+  private final ObjectMapper objectMapper;
+
+  public ObjectMapperProvider() {
+    objectMapper = createDefaultMapper();
+  }
 
   @Override
-  public ObjectMapper getContext(Class<?> type) {
+  public ObjectMapper getContext(final Class<?> type) {
     LOG.trace("returning Jackson ObjectMapper for {}", type);
 
     // Let's find out if singleton is good enough. If it isn't, just return objectMapper();
-    return OBJECT_MAPPER;
+    return objectMapper;
   }
 
-  private static ObjectMapper objectMapper() {
-    ObjectMapper mapper = new ObjectMapper();
+  private static ObjectMapper createDefaultMapper() {
+    final ObjectMapper mapper = new ObjectMapper();
     LOG.debug("setting up Jackson ObjectMapper: [" + mapper + "]");
 
     mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
 
     // These are 'dev' settings giving us human readable output.
-    mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-    mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-    mapper.configure(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS, false);
+    mapper.enable(SerializationFeature.INDENT_OUTPUT);
+    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+//    mapper.configure(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS, false);
 
     return mapper;
   }
