@@ -2,10 +2,10 @@ package nl.knaw.huygens.alexandria.helpers;
 
 import static java.lang.String.format;
 import static java.util.logging.Logger.getAnonymousLogger;
-import static javax.ws.rs.client.Entity.entity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
@@ -52,8 +52,8 @@ public class ApiFixture extends JerseyTest {
 
   private static ResourceConfig resourceConfig;
   private WebTarget target;
-  private MediaType contentType;
-  private String body;
+  private Optional<MediaType> contentType;
+  private Optional<String> optionalBody;
   private Response response;
   private String entity;
 
@@ -115,18 +115,19 @@ public class ApiFixture extends JerseyTest {
 
   public void clear() {
     target = client().target(getBaseURI());
-    contentType = APPLICATION_JSON_TYPE;
-    body = null;
+    contentType = Optional.empty();
+    optionalBody = Optional.empty();
     response = null;
     entity = null;
   }
 
   public void request(String method, String path) {
     LOG.trace("request: method=[{}], path=[{}]", method, path);
+    final Builder request = target.path(path).request(APPLICATION_JSON_TYPE);
 
-    final Entity<String> entity = entity(body, contentType);
-    LOG.trace("ContentType=[{}], entity=[{}]", contentType, body);
-    response = target.path(path).request().method(method, entity, Response.class);
+    LOG.trace("ContentType=[{}], optionalBody=[{}]", contentType, optionalBody);
+    response = optionalBody.map(body -> invokeWithEntity(request, method, body))
+                           .orElse(invokeWithoutEntity(request, method));
     LOG.trace("response: [{}]", response);
 
     if (response.hasEntity()) {
@@ -134,16 +135,25 @@ public class ApiFixture extends JerseyTest {
     }
   }
 
+  private Response invokeWithoutEntity(Builder request, String method) {
+    return request.method(method, Response.class);
+  }
+
+  private Response invokeWithEntity(Builder request, String method, String body) {
+    final Entity<String> entity = contentType.map(c -> Entity.entity(body, c)).orElse(Entity.json(body));
+    return request.method(method, entity, Response.class);
+  }
+
   public void body(String body) {
-    this.body = body;
+    this.optionalBody = Optional.of(body);
   }
 
   public void emptyBody() {
-    this.body = null;
+    this.optionalBody = Optional.empty();
   }
 
   public void contentType(String type) {
-    this.contentType = MediaType.valueOf(type);
+    this.contentType = Optional.of(MediaType.valueOf(type));
   }
 
   public String response() {
