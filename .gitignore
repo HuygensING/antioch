@@ -7,3 +7,14 @@ atlassian-ide-plugin.xml
 
 # Maven
 **/target/
+
+# eclipse
+.classpath
+.settings/
+
+# maven modules
+alexandria-acceptance-tests/
+alexandria-main/
+alexandria-server/
+alexandria-site/
+alexandria-webapp/
