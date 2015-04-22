@@ -28,15 +28,12 @@ import com.squarespace.jersey2.guice.BootstrapUtils;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
-import nl.knaw.huygens.alexandria.util.ObjectMapperProvider;
+import nl.knaw.huygens.alexandria.util.HuygensObjectMapperProvider;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
 import org.concordion.api.extension.Extensions;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.CommonProperties;
-import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.filter.LoggingFilter;
-import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.test.JerseyTest;
@@ -66,7 +63,7 @@ public class ApiFixture extends JerseyTest {
     resourceConfig.register(new AbstractBinder() {
       @Override
       protected void configure() {
-        bind(ObjectMapperProvider.class);
+        bind(HuygensObjectMapperProvider.class);
       }
     });
   }
@@ -89,8 +86,7 @@ public class ApiFixture extends JerseyTest {
     resourceConfig.register(new LoggingFilter(getAnonymousLogger(), true));
 
     resourceConfig.packages("nl.knaw.huygens.alexandria.endpoint.resource");
-    resourceConfig.register(JacksonFeature.class);
-    resourceConfig.register(ObjectMapperProvider.class);
+    resourceConfig.register(HuygensObjectMapperProvider.class);
 
     LOG.trace("Bootstrapping Jersey2-Guice bridge:");
     ServiceLocator locator = BootstrapUtils.newServiceLocator();
@@ -181,14 +177,7 @@ public class ApiFixture extends JerseyTest {
   protected Application configure() {
     enable(TestProperties.LOG_TRAFFIC);
     enable(TestProperties.DUMP_ENTITY);
-    enable(CommonProperties.METAINF_SERVICES_LOOKUP_DISABLE);
     return resourceConfig;
-  }
-
-  @Override
-  protected void configureClient(ClientConfig config) {
-    LOG.trace("Configuring test client to use Jackson via our ObjectMapper, config=[{}]", config);
-    config.register(JacksonFeature.class).register(ObjectMapperProvider.class);
   }
 
   private static Module baseModule() {
