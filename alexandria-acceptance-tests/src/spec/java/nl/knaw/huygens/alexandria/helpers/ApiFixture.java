@@ -28,7 +28,7 @@ import com.squarespace.jersey2.guice.BootstrapUtils;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
-import nl.knaw.huygens.alexandria.util.HuygensObjectMapperProvider;
+import nl.knaw.huygens.alexandria.config.JsonConfiguration;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
 import org.concordion.api.extension.Extensions;
 import org.glassfish.hk2.api.ServiceLocator;
@@ -63,7 +63,7 @@ public class ApiFixture extends JerseyTest {
     resourceConfig.register(new AbstractBinder() {
       @Override
       protected void configure() {
-        bind(HuygensObjectMapperProvider.class);
+        bind(JsonConfiguration.class);
       }
     });
   }
@@ -86,7 +86,7 @@ public class ApiFixture extends JerseyTest {
     resourceConfig.register(new LoggingFilter(getAnonymousLogger(), true));
 
     resourceConfig.packages("nl.knaw.huygens.alexandria.endpoint.resource");
-    resourceConfig.register(HuygensObjectMapperProvider.class);
+    resourceConfig.register(JsonConfiguration.class);
 
     LOG.trace("Bootstrapping Jersey2-Guice bridge:");
     ServiceLocator locator = BootstrapUtils.newServiceLocator();

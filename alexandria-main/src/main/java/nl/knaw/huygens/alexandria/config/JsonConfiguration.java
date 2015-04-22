@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.util;
+package nl.knaw.huygens.alexandria.config;
 
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
@@ -11,24 +11,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Provider
-public class HuygensObjectMapperProvider implements ContextResolver<ObjectMapper> {
-  private static final Logger LOG = LoggerFactory.getLogger(HuygensObjectMapperProvider.class);
+public class JsonConfiguration implements ContextResolver<ObjectMapper> {
+  private static final Logger LOG = LoggerFactory.getLogger(JsonConfiguration.class);
 
   private final ObjectMapper defaultObjectMapper;
 
-  public HuygensObjectMapperProvider() {
+  public JsonConfiguration() {
     defaultObjectMapper = createDefaultMapper();
   }
 
   @Override
   public ObjectMapper getContext(final Class<?> type) {
-    LOG.trace("returning Jackson ObjectMapper for {}", type);
+    LOG.trace("Returning Jackson ObjectMapper for type: {}", type);
     return defaultObjectMapper;
   }
 
   private static ObjectMapper createDefaultMapper() {
     final ObjectMapper mapper = new ObjectMapper();
-    LOG.debug("setting up Jackson ObjectMapper: [" + mapper + "]");
+    LOG.debug("Configuring Jackson ObjectMapper: [" + mapper + "]");
 
     mapper.enable(SerializationFeature.INDENT_OUTPUT);
     mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
