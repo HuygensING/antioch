@@ -20,6 +20,7 @@ public abstract class JSONEndpoint {
     return LOG;
   }
 
+  // TODO: we can now get rid of this by using Jersey 2 Bean Validation support! :-)
   protected Supplier<BadRequestException> missingBodyException() {
     return () -> badRequestException(MISSING_RESOURCE_BODY_MESSAGE);
   }

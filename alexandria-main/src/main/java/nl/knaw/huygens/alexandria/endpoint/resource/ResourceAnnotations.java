@@ -1,21 +1,31 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import java.util.Set;
 import java.util.UUID;
 
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
+import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.service.ResourceService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ResourceAnnotations extends JSONEndpoint {
+  private static final Logger LOG = LoggerFactory.getLogger(ResourceAnnotations.class);
+
   private final ResourceService resourceService;
+
   private final UUID uuid;
 
-  public ResourceAnnotations(ResourceService resourceService, UUID uuid) {
+  @Inject
+  public ResourceAnnotations(ResourceService resourceService, @PathParam("uuid") final UUIDParam uuidParam) {
+    LOG.trace("resourceService=[{}], uuidParam=[{}]", resourceService, uuidParam);
     this.resourceService = resourceService;
-    this.uuid = uuid;
+    this.uuid = uuidParam.getValue();
   }
 
   @GET

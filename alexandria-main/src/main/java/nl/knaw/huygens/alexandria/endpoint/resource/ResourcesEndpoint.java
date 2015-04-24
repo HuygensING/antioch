@@ -90,21 +90,13 @@ public class ResourcesEndpoint extends JSONEndpoint {
     return builder.build();
   }
 
-  private void requireProtoType(ResourcePrototype protoType) {
-    Optional.ofNullable(protoType).orElseThrow(missingBodyException());
-  }
-
-  @Path("{uuid}/annotations")
-  public ResourceAnnotations getAnnotationsForResource(@PathParam("uuid") final UUIDParam uuidParam) {
-    return new ResourceAnnotations(resourceService, uuidParam.getValue());
-  }
-
   @DELETE
   @Path("{uuid}")
   public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
     return Response.status(501).build();
   }
 
+  // TODO: replace with sub-resource analogous to {uuid}/annotations (see below)
   @GET
   @Path("{uuid}/ref")
   public Response getResourceRef(@PathParam("uuid") final UUIDParam uuidParam) {
@@ -112,6 +104,19 @@ public class ResourcesEndpoint extends JSONEndpoint {
     return Response.ok(new RefEntity(resource.getRef())).build();
   }
 
+  // Sub-resource delegation
+
+  @Path("{uuid}/annotations")
+  public Class<ResourceAnnotations> getResourceAnnotations() {
+    return ResourceAnnotations.class; // no instantiation of our own; let Jersey handle the lifecycle
+  }
+
+  // TODO: remove by using Jersey's Bean Validation
+  private void requireProtoType(ResourcePrototype protoType) {
+    Optional.ofNullable(protoType).orElseThrow(missingBodyException());
+  }
+
+  // TODO: replace by injected LocationBuilder (to be written) ?
   private URI locationOf(AlexandriaResource resource) {
     return URI.create(resource.getId().toString());
   }
