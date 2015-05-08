@@ -96,8 +96,10 @@ public class ApiFixture extends JerseyTest {
     final Builder request = target.path(path).request(APPLICATION_JSON_TYPE);
 
     LOG.trace("ContentType=[{}], optionalBody=[{}]", contentType, optionalBody);
-    response = optionalBody.map(body -> invokeWithEntity(request, method, body))
-                           .orElse(invokeWithoutEntity(request, method));
+
+    response = optionalBody.isPresent() //
+        ? invokeWithEntity(request, method, optionalBody.get()) //
+        : invokeWithoutEntity(request, method);
     LOG.trace("response: [{}]", response);
 
     if (response.hasEntity()) {
@@ -110,7 +112,7 @@ public class ApiFixture extends JerseyTest {
   }
 
   private Response invokeWithEntity(Builder request, String method, String body) {
-    final Entity<String> entity = contentType.map(c -> Entity.entity(body, c)).orElse(Entity.json(body));
+    final Entity<String> entity = contentType.isPresent() ? Entity.entity(body, contentType.get()) : Entity.json(body);
     return request.method(method, entity, Response.class);
   }
 

@@ -1,5 +1,5 @@
 <html xmlns:c="http://www.concordion.org/2007/concordion"
-        xmlns:json="https://alexandria.huygens.knaw.nl">
+      xmlns:json="https://alexandria.huygens.knaw.nl">
 <title>Creating External Resources</title>
 
 <body>
@@ -35,12 +35,36 @@
         "annotations": [],
         "createdOn": "{date.beforeNow}"
     }
-}</pre></li>
+}</pre>
+                    </li>
                 </ol>
             </li>
         </ul>
     </div>
 
+    <div c:execute="clear()" class="example">
+        <h3>What happens when I POST an empty body when creating a new resource?</h3>
+
+        <ul>
+            <li>When I <b c:set="#method">POST</b>
+                <pre c:execute="body(#TEXT)"><!-- Intentionally left empty --></pre>
+                to <code c:set="#endpoint"><b>/resources</b></code></li>
+
+            <li c:execute="request(#method, #endpoint)">Then:
+                <ol>
+                    <li>the response status should be <b c:assertEquals="status()">400 Bad Request</b>;</li>
+                    <li>the response body contains:
+<pre json:includesJson="responseOrEmpty()">[
+    {
+        "messageTemplate" : "{missing.protoType}",
+        "message" : "Missing required prototype (empty body in POST / PUT)"
+    }
+]</pre>
+                    </li>
+                </ol>
+            </li>
+        </ul>
+    </div>
 
     <div c:execute="clear()" class="example">
         <h3>How can I create an external resource with a specific UUID?</h3>
