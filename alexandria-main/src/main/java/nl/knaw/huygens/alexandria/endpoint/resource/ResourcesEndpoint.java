@@ -1,19 +1,16 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import java.net.URI;
-import java.util.Optional;
 
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
@@ -33,7 +30,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   public ResourcesEndpoint(ResourceService resourceService, //
                            ResourceCreationCommandBuilder commandBuilder, //
                            ResourceEntityBuilder entityBuilder) {
-    log().trace("Resources created, resourceService=[{}]", resourceService);
+    trace("Resources created, resourceService=[{}]", resourceService);
 
     this.entityBuilder = entityBuilder;
     this.commandBuilder = commandBuilder;
@@ -48,11 +45,8 @@ public class ResourcesEndpoint extends JSONEndpoint {
   }
 
   @POST
-  @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.APPLICATION_JSON)
-  public Response createResourceWithoutGivenID(ResourcePrototype protoType) {
-    log().trace("protoType=[{}]", protoType);
-    requireProtoType(protoType);
+  public Response createResourceWithoutGivenID(@NotNull(message = "{missing.protoType}") ResourcePrototype protoType) {
+    trace("protoType=[{}]", protoType);
 
     final ResourceCreationCommand command = commandBuilder.withoutId(protoType);
     final AlexandriaResource resource = command.execute(resourceService);
@@ -67,11 +61,8 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   @PUT
   @Path("{uuid}")
-  @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.APPLICATION_JSON)
-  public Response createResourceAtSpecificID(@PathParam("uuid") final UUIDParam paramId, ResourcePrototype protoType) {
-    log().trace("paramId=[{}], protoType=[{}]", paramId, protoType);
-    requireProtoType(protoType);
+  public Response createResourceAtSpecificID(@PathParam("uuid") final UUIDParam paramId, @NotNull ResourcePrototype protoType) {
+    trace("paramId=[{}], protoType=[{}]", paramId, protoType);
 
     final ResourceCreationCommand command = commandBuilder.ofSpecificId(protoType, paramId.getValue());
     final AlexandriaResource resource = command.execute(resourceService);
@@ -109,11 +100,6 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @Path("{uuid}/annotations")
   public Class<ResourceAnnotations> getResourceAnnotations() {
     return ResourceAnnotations.class; // no instantiation of our own; let Jersey handle the lifecycle
-  }
-
-  // TODO: remove by using Jersey's Bean Validation
-  private void requireProtoType(ResourcePrototype protoType) {
-    Optional.ofNullable(protoType).orElseThrow(missingBodyException());
   }
 
   // TODO: replace by injected LocationBuilder (to be written) ?

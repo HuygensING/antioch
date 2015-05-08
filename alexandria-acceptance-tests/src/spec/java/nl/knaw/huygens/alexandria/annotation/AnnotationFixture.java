@@ -13,6 +13,8 @@ import java.util.UUID;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationCreationCommandBuilder;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
@@ -40,16 +42,25 @@ public class AnnotationFixture extends ApiFixture {
 
   @BeforeClass
   public static void setup() {
-    addClass(AnnotationsEndpoint.class);
+    setupJerseyAndGuice(resourceModule());
+    register(AnnotationsEndpoint.class);
+  }
 
-    addProviderForContext(AnnotationService.class, ANNOTATION_SERVICE_MOCK);
-
-    addProviderForContext(AnnotationCreationCommandBuilder.class, //
-            AnnotationCreationCommandBuilder.servedBy(ANNOTATION_SERVICE_MOCK));
+  private static Module resourceModule() {
+    return new AbstractModule() {
+      @Override
+      protected void configure() {
+        LOG.trace("setting up Guice bindings");
+        bind(AnnotationService.class).toInstance(ANNOTATION_SERVICE_MOCK);
+        bind(AnnotationCreationCommandBuilder.class)
+            .toInstance(AnnotationCreationCommandBuilder.servedBy(ANNOTATION_SERVICE_MOCK));
+      }
+    };
   }
 
   @Override
   public void clear() {
+    LOG.trace("clear");
     super.clear();
     Mockito.reset(ANNOTATION_SERVICE_MOCK);
   }

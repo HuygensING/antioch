@@ -1,7 +1,6 @@
 package nl.knaw.huygens.alexandria.helpers;
 
 import static java.lang.String.format;
-import static java.util.logging.Logger.getAnonymousLogger;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 
 import javax.ws.rs.client.Entity;
@@ -28,14 +27,10 @@ import com.squarespace.jersey2.guice.BootstrapUtils;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
-import nl.knaw.huygens.alexandria.config.JsonConfiguration;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
 import org.concordion.api.extension.Extensions;
 import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.TestProperties;
 import org.slf4j.Logger;
@@ -47,7 +42,7 @@ public class ApiFixture extends JerseyTest {
 
   private static final AlexandriaConfiguration CONFIG = testConfiguration();
 
-  private static ResourceConfig resourceConfig;
+  private static ResourceConfig application;
   private WebTarget target;
   private Optional<MediaType> contentType;
   private Optional<String> optionalBody;
@@ -58,35 +53,14 @@ public class ApiFixture extends JerseyTest {
     return () -> UriBuilder.fromUri("https://localhost/").port(4242).build();
   }
 
-  public static void addClass(Class<?> resourceClass) {
-//    resourceConfig.getClasses().add(resourceClass);
-    resourceConfig.register(new AbstractBinder() {
-      @Override
-      protected void configure() {
-        bind(JsonConfiguration.class);
-      }
-    });
-  }
-
-  public static <T> void addProviderForContext(Class<T> contextClass, T contextObject) {
-    resourceConfig.register(new AbstractBinder() {
-      @Override
-      protected void configure() {
-        bind(contextObject).to(contextClass);
-      }
-    });
+  public static void register(Class<?> componentClass) {
+    application.register(componentClass);
   }
 
   public static void setupJerseyAndGuice(Module module) {
     LOG.trace("Setting up Jersey");
-    resourceConfig = new ResourceConfig();
-    LOG.trace("+- resourceConfig=[{}]", resourceConfig);
-
-    resourceConfig.property(ServerProperties.TRACING, "ALL");
-    resourceConfig.register(new LoggingFilter(getAnonymousLogger(), true));
-
-    resourceConfig.packages("nl.knaw.huygens.alexandria.endpoint.resource");
-    resourceConfig.register(JsonConfiguration.class);
+    application = new AcceptanceTestApplication();
+    LOG.trace("+- application=[{}]", application);
 
     LOG.trace("Bootstrapping Jersey2-Guice bridge:");
     ServiceLocator locator = BootstrapUtils.newServiceLocator();
@@ -177,7 +151,7 @@ public class ApiFixture extends JerseyTest {
   protected Application configure() {
     enable(TestProperties.LOG_TRAFFIC);
     enable(TestProperties.DUMP_ENTITY);
-    return resourceConfig;
+    return application;
   }
 
   private static Module baseModule() {

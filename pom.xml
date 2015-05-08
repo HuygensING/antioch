@@ -1,173 +1,173 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>nl.knaw.huygens.alexandria</groupId>
-	<artifactId>alexandria</artifactId>
-	<packaging>pom</packaging>
-	<version>1.0-SNAPSHOT</version>
-	<name>Alexandria Text Repository</name>
-	<url>http://alexandria.huygens.knaw.nl</url>
-	<inceptionYear>2015</inceptionYear>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>nl.knaw.huygens.alexandria</groupId>
+    <artifactId>alexandria</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>Alexandria Text Repository</name>
+    <url>http://alexandria.huygens.knaw.nl</url>
+    <inceptionYear>2015</inceptionYear>
 
-	<organization>
-		<name>Huygens ING (KNAW)</name>
-		<url>http://www.huygens.knaw.nl</url>
-	</organization>
+    <organization>
+        <name>Huygens ING (KNAW)</name>
+        <url>http://www.huygens.knaw.nl</url>
+    </organization>
 
-	<licenses>
-		<license>
-			<name>GNU General Public License</name>
-			<url>http://www.gnu.org/licenses/gpl.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
+    <licenses>
+        <license>
+            <name>GNU General Public License</name>
+            <url>http://www.gnu.org/licenses/gpl.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
-	<developers>
-		<developer>
-			<id>bramb</id>
-			<name>Bram Buitendijk</name>
-			<email>bram.buitendijk@huygens.knaw.nl</email>
-			<url>https://www.huygens.knaw.nl/buitendijk/</url>
-			<roles>
-				<role>developer</role>
-			</roles>
-		</developer>
-		<developer>
-			<id>dekker</id>
-			<name>Ronald Dekker</name>
-			<email>ronald.dekker@huygens.knaw.nl</email>
-			<url>https://www.huygens.knaw.nl/dekker/</url>
-			<roles>
-				<role>architect</role>
-			</roles>
-		</developer>
-		<developer>
-			<id>jong</id>
-			<name>Hayco de Jong</name>
-			<email>hayco.de.jong@huygens.knaw.nl</email>
-			<url>https://www.huygens.knaw.nl/jong-hayco-de/</url>
-			<roles>
-				<role>architect</role>
-				<role>developer</role>
-			</roles>
-		</developer>
-		<developer>
-			<id>maas</id>
-			<name>Martijn Maas</name>
-			<email>martijn.maas@huygens.knaw.nl</email>
-			<url>https://www.huygens.knaw.nl/maas-martijn/</url>
-			<roles>
-				<role>developer</role>
-			</roles>
-		</developer>
-	</developers>
+    <developers>
+        <developer>
+            <id>bramb</id>
+            <name>Bram Buitendijk</name>
+            <email>bram.buitendijk@huygens.knaw.nl</email>
+            <url>https://www.huygens.knaw.nl/buitendijk/</url>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>dekker</id>
+            <name>Ronald Dekker</name>
+            <email>ronald.dekker@huygens.knaw.nl</email>
+            <url>https://www.huygens.knaw.nl/dekker/</url>
+            <roles>
+                <role>architect</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>jong</id>
+            <name>Hayco de Jong</name>
+            <email>hayco.de.jong@huygens.knaw.nl</email>
+            <url>https://www.huygens.knaw.nl/jong-hayco-de/</url>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>maas</id>
+            <name>Martijn Maas</name>
+            <email>martijn.maas@huygens.knaw.nl</email>
+            <url>https://www.huygens.knaw.nl/maas-martijn/</url>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
 
-	<issueManagement>
-		<system>JIRA</system>
-		<url>http://test173.huygens.knaw.nl/</url>
-	</issueManagement>
+    <issueManagement>
+        <system>JIRA</system>
+        <url>http://test173.huygens.knaw.nl/</url>
+    </issueManagement>
 
-	<ciManagement>
-		<system>jenkins</system>
-		<url>http://ci.huygens.knaw.nl/job/alexandria/</url>
-	</ciManagement>
+    <ciManagement>
+        <system>jenkins</system>
+        <url>http://ci.huygens.knaw.nl/job/alexandria/</url>
+    </ciManagement>
 
-	<distributionManagement>
-		<repository>
-			<id>maven.huygens</id>
-			<name>Huygens Maven Repository</name>
-			<url>${huygens-repo}</url>
-		</repository>
-		<snapshotRepository>
-			<id>maven.huygens.snapshot</id>
-			<name>Huygens Maven Snapshot Repository</name>
-			<url>${huygens-repo}</url>
-			<uniqueVersion>false</uniqueVersion>
-		</snapshotRepository>
-		<site>
-			<id>huygens.site</id>
-			<url>${huygens-site}</url>
-		</site>
-	</distributionManagement>
+    <distributionManagement>
+        <repository>
+            <id>maven.huygens</id>
+            <name>Huygens Maven Repository</name>
+            <url>${huygens-repo}</url>
+        </repository>
+        <snapshotRepository>
+            <id>maven.huygens.snapshot</id>
+            <name>Huygens Maven Snapshot Repository</name>
+            <url>${huygens-repo}</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+        <site>
+            <id>huygens.site</id>
+            <url>${huygens-site}</url>
+        </site>
+    </distributionManagement>
 
-	<repositories>
-		<repository>
-			<id>huygens</id>
-			<url>http://maven.huygens.knaw.nl/repository/</url>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-				<checksumPolicy>warn</checksumPolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-		</repository>
-	</repositories>
+    <repositories>
+        <repository>
+            <id>huygens</id>
+            <url>http://maven.huygens.knaw.nl/repository/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </repository>
+    </repositories>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.2</version>
-				<configuration>
-					<source>${jdk.version}</source>
-					<target>${jdk.version}</target>
-					<testSource>${jdk.version}</testSource>
-					<testTarget>${jdk.version}</testTarget>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.2</version>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                    <testSource>${jdk.version}</testSource>
+                    <testTarget>${jdk.version}</testTarget>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
-	<properties>
-		<!-- Encoding: everything UTF-8 please -->
-		<encoding>UTF-8</encoding>
-		<project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
+    <properties>
+        <!-- Encoding: everything UTF-8 please -->
+        <encoding>UTF-8</encoding>
+        <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
 
-		<!-- Software versions -->
-		<assertj.version>2.0.0</assertj.version>
-		<concordion.version>1.4.7</concordion.version>
-		<guava.version>18.0</guava.version>
-		<guice.version>3.0</guice.version>
-		<jackson.version>2.5.1</jackson.version>
-		<jdk.version>1.8</jdk.version>
-		<jersey.version>2.17</jersey.version>
-		<jersey2-guice.version>0.5</jersey2-guice.version>
-		<junit.version>4.12</junit.version>
-		<logback.version>1.1.2</logback.version>
-		<mockito.version>1.10.19</mockito.version>
-		<plugin.scm-publish.version>1.0</plugin.scm-publish.version>
-		<classloader-leak-prevention.version>1.12.0</classloader-leak-prevention.version>
-		<maven-assembly.version>2.4</maven-assembly.version>
-		<maven-compiler.version>3.1</maven-compiler.version>
-		<maven-war.version>2.1.1</maven-war.version>
-		<servlet-api.version>3.1.0</servlet-api.version>
-		<tomcat-maven.version>1.1</tomcat-maven.version>
+        <!-- Software versions -->
+        <assertj.version>2.0.0</assertj.version>
+        <concordion.version>1.4.7</concordion.version>
+        <guice.version>3.0</guice.version>
+        <jackson.version>2.5.3</jackson.version>
+        <jdk.version>1.8</jdk.version>
+        <jersey.version>2.17</jersey.version>
+        <jersey-bean-validation.version>2.17</jersey-bean-validation.version>
+        <jersey2-guice.version>0.5</jersey2-guice.version>
+        <junit.version>4.12</junit.version>
+        <logback.version>1.1.2</logback.version>
+        <mockito.version>1.10.19</mockito.version>
+        <plugin.scm-publish.version>1.0</plugin.scm-publish.version>
+        <classloader-leak-prevention.version>1.12.0</classloader-leak-prevention.version>
+        <maven-assembly.version>2.4</maven-assembly.version>
+        <maven-compiler.version>3.1</maven-compiler.version>
+        <maven-war.version>2.1.1</maven-war.version>
+        <servlet-api.version>3.1.0</servlet-api.version>
+        <tomcat-maven.version>1.1</tomcat-maven.version>
 
-		<concordion.reportDir>${project.build.directory}/concordion-reports</concordion.reportDir>
-		<integration.testOutputDir>${project.build.directory}/integration-test-classes</integration.testOutputDir>
-		<site.dir>src/site</site.dir>
-		<site.xhtmlDir>${site.dir}/xhtml</site.xhtmlDir>
-		<spec.dir>src/spec</spec.dir>
-		<spec.docDir>${spec.dir}/resources</spec.docDir>
-		<spec.testSourceDir>${spec.dir}/java</spec.testSourceDir>
+        <concordion.reportDir>${project.build.directory}/concordion-reports</concordion.reportDir>
+        <integration.testOutputDir>${project.build.directory}/integration-test-classes</integration.testOutputDir>
+        <site.dir>src/site</site.dir>
+        <site.xhtmlDir>${site.dir}/xhtml</site.xhtmlDir>
+        <spec.dir>src/spec</spec.dir>
+        <spec.docDir>${spec.dir}/resources</spec.docDir>
+        <spec.testSourceDir>${spec.dir}/java</spec.testSourceDir>
 
-		<scm-publish.scmBranch>gh-pages</scm-publish.scmBranch>
-		<scm-publish.pubScmUrl>scm:git:git@github.com:huygensING/alexandria.git</scm-publish.pubScmUrl>
-		<scm-publish.siteDocOuputDirectory>${project.reporting.outputDirectory}</scm-publish.siteDocOuputDirectory>
-		<scmPublish.checkoutDirectory>${project.build.directory}/scmpublish</scmPublish.checkoutDirectory>
-	</properties>
+        <scm-publish.scmBranch>gh-pages</scm-publish.scmBranch>
+        <scm-publish.pubScmUrl>scm:git:git@github.com:huygensING/alexandria.git</scm-publish.pubScmUrl>
+        <scm-publish.siteDocOuputDirectory>${project.reporting.outputDirectory}</scm-publish.siteDocOuputDirectory>
+        <scmPublish.checkoutDirectory>${project.build.directory}/scmpublish</scmPublish.checkoutDirectory>
+    </properties>
 
-	<modules>
-		<module>alexandria-webapp</module>
-		<module>alexandria-server</module>
-		<module>alexandria-acceptance-tests</module>
-		<module>alexandria-main</module>
-		<module>alexandria-site</module>
-	</modules>
+    <modules>
+        <module>alexandria-webapp</module>
+        <module>alexandria-server</module>
+        <module>alexandria-acceptance-tests</module>
+        <module>alexandria-main</module>
+        <module>alexandria-site</module>
+    </modules>
 </project>

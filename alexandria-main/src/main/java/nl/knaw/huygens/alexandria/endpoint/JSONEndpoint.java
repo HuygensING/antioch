@@ -16,8 +16,8 @@ public abstract class JSONEndpoint {
 
   private static final Logger LOG = LoggerFactory.getLogger(JSONEndpoint.class);
 
-  protected Logger log() {
-    return LOG;
+  protected void trace(String format, Object... arguments) {
+    LOG.trace(format, arguments);
   }
 
   // TODO: we can now get rid of this by using Jersey 2 Bean Validation support! :-)

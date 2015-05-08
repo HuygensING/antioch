@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceCreationCommandBuilder;
+import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
 import nl.knaw.huygens.alexandria.helpers.ApiFixture;
 import nl.knaw.huygens.alexandria.service.ResourceService;
 import org.concordion.integration.junit4.ConcordionRunner;
@@ -22,7 +23,8 @@ public class ResourceFixture extends ApiFixture {
 
   @BeforeClass
   public static void setup() {
-    ApiFixture.setupJerseyAndGuice(resourceModule());
+    setupJerseyAndGuice(resourceModule());
+    register(ResourcesEndpoint.class);
   }
 
   private static Module resourceModule() {
