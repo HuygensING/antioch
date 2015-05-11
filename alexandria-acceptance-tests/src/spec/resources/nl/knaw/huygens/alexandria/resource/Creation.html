@@ -43,30 +43,6 @@
     </div>
 
     <div c:execute="clear()" class="example">
-        <h3>What happens when I POST an empty body when creating a new resource?</h3>
-
-        <ul>
-            <li>When I <b c:set="#method">POST</b>
-                <pre c:execute="body(#TEXT)"><!-- Intentionally left empty --></pre>
-                to <code c:set="#endpoint"><b>/resources</b></code></li>
-
-            <li c:execute="request(#method, #endpoint)">Then:
-                <ol>
-                    <li>the response status should be <b c:assertEquals="status()">400 Bad Request</b>;</li>
-                    <li>the response body contains:
-<pre json:includesJson="responseOrEmpty()">[
-    {
-        "messageTemplate" : "{missing.protoType}",
-        "message" : "Missing required prototype (empty body in POST / PUT)"
-    }
-]</pre>
-                    </li>
-                </ol>
-            </li>
-        </ul>
-    </div>
-
-    <div c:execute="clear()" class="example">
         <h3>How can I create an external resource with a specific UUID?</h3>
 
         <ul>
@@ -93,6 +69,94 @@
             </li>
         </ul>
     </div>
+
+    <div c:execute="clear()" class="example">
+        <h3>What happens when I POST an empty body when creating a new resource?</h3>
+
+        <ul>
+            <li>When I <b c:set="#method">POST</b>
+                <pre c:execute="body(#TEXT)"><!-- Intentionally left empty --></pre>
+                to <code c:set="#endpoint"><b>/resources</b></code></li>
+
+            <li c:execute="request(#method, #endpoint)">Then:
+                <ol>
+                    <li>the response status should be <b c:assertEquals="status()">400 Bad Request</b>;</li>
+                    <li>the response body contains (amongst other error details):
+<pre json:includesJson="responseOrEmpty()">[
+    {
+        "message" : "may not be null",
+        "messageTemplate" : "{javax.validation.constraints.NotNull.message}",
+        "path" : "ResourcesEndpoint.createResourceWithoutGivenID.arg0"
+    }
+]</pre>
+                    </li>
+                </ol>
+            </li>
+        </ul>
+    </div>
+
+    <div c:execute="clear()" class="example">
+        <h3>What happens when I POST a body without a <code>ref</code> when creating a new resource?</h3>
+
+        <ul>
+            <li>When I <b c:set="#method">POST</b>
+<pre c:execute="body(#TEXT)">{
+    "resource": {
+        "annotations": [],
+        "createdOn": "2015-04-07T09:10:55.877Z"
+    }
+}</pre>
+                to <code c:set="#endpoint"><b>/resources</b></code></li>
+
+            <li c:execute="request(#method, #endpoint)">Then:
+                <ol>
+                    <li>the response status should be <b c:assertEquals="status()">400 Bad Request</b>;</li>
+                    <li>the response body contains (amongst other error details):
+<pre json:includesJson="responseOrEmpty()">[
+    {
+        "message" : "Missing required 'ref' field"
+    }
+]</pre>
+                    </li>
+                </ol>
+            </li>
+        </ul>
+    </div>
+
+    <div c:execute="clear()" class="example">
+        <h3>When creating a new resource via PUT, the id in the entity body MUST match the one used in the URL</h3>
+
+        <ul>
+            <li>Given some resource located which is to be stored as UUID
+                <code>6e56c868-c0a9-11e4-a762-cb9a664afc01</code>
+            </li>
+
+            <li>When I <b c:set="#method">PUT</b> (note the mismatch for parameter <code>id</code>)
+<pre c:execute="body(#TEXT)">{
+    "resource": {
+        "id": "3c86e050-f7d8-11e4-9c82-df9a2acb2bd1",
+        "ref": "http://www.example.com/titles/path/to/title/resource",
+        "createdOn": "2015-04-07T09:10:55.877Z"
+    }
+}</pre>
+                to <code c:set="#endpoint"><b>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</b></code>
+            </li>
+
+            <li c:execute="request(#method, #endpoint)">Then:
+                <ol>
+                    <li>the response status should be <b c:assertEquals="status()">400 Bad Request</b>;</li>
+                    <li>the response body contains (amongst other error details):
+                        <pre json:includesJson="responseOrEmpty()">[
+    {
+        "message" : "Entity 'id' must match the one used in the URL"
+    }
+]</pre>
+                    </li>
+                </ol>
+            </li>
+        </ul>
+    </div>
+
 </div>
 </body>
 </html>

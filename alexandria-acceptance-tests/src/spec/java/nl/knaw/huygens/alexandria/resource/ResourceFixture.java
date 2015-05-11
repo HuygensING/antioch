@@ -4,7 +4,7 @@ import static org.mockito.Mockito.mock;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
-import nl.knaw.huygens.alexandria.endpoint.resource.ResourceCreationCommandBuilder;
+import nl.knaw.huygens.alexandria.endpoint.resource.ResourceCreationRequestBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
 import nl.knaw.huygens.alexandria.helpers.ApiFixture;
 import nl.knaw.huygens.alexandria.service.ResourceService;
@@ -33,7 +33,7 @@ public class ResourceFixture extends ApiFixture {
       protected void configure() {
         LOG.trace("setting up Guice bindings");
         bind(ResourceService.class).toInstance(RESOURCE_SERVICE_MOCK);
-        bind(ResourceCreationCommandBuilder.class).toInstance(new ResourceCreationCommandBuilder());
+        bind(ResourceCreationRequestBuilder.class).toInstance(new ResourceCreationRequestBuilder());
       }
     };
   }

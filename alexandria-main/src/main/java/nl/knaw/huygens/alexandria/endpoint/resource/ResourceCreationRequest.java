@@ -17,13 +17,13 @@ import nl.knaw.huygens.alexandria.service.ResourceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class ResourceCreationCommand {
-  private static final Logger LOG = LoggerFactory.getLogger(ResourceCreationCommand.class);
+class ResourceCreationRequest {
+  private static final Logger LOG = LoggerFactory.getLogger(ResourceCreationRequest.class);
 
   private final ResourcePrototype prototype;
   private boolean resourceCreated;
 
-  ResourceCreationCommand(ResourcePrototype prototype) {
+  ResourceCreationRequest(ResourcePrototype prototype) {
     this.prototype = prototype;
   }
 
@@ -66,11 +66,11 @@ class ResourceCreationCommand {
   }
 
   private String providedRef() {
-    return requireNonNull(prototype.getRef().get(), "Required 'ref' field was not validated for being non-null");
+    return requireNonNull(prototype.getRef(), "Required 'ref' field was not validated for being non-null");
   }
 
   private Optional<UUID> providedUUID() {
-    return prototype.getId().map(UUIDParam::getValue);
+    return Optional.ofNullable(prototype.getId()).map(UUIDParam::getValue);
   }
 
   private Stream<UUID> streamAnnotations() {
