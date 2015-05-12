@@ -6,6 +6,8 @@ import javax.ws.rs.ext.ContextResolver;
 
 import org.glassfish.jersey.server.validation.ValidationConfig;
 import org.glassfish.jersey.server.validation.internal.InjectingConstraintValidatorFactory;
+import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +26,8 @@ public class ValidationConfigurationContextResolver implements ContextResolver<V
   public ValidationConfig getContext(Class<?> type) {
     LOG.trace("getting context for: [{}]", type);
     return new ValidationConfig() //
+        .messageInterpolator(new ResourceBundleMessageInterpolator(//
+            new PlatformResourceBundleLocator("ValidationMessages")))
         .constraintValidatorFactory(resourceContext.getResource(InjectingConstraintValidatorFactory.class));
   }
 
