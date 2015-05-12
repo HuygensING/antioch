@@ -10,7 +10,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import java.net.URI;
 
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
@@ -72,18 +71,15 @@ public class ResourcesEndpoint extends JSONEndpoint {
     final ResourceCreationRequest request = requestBuilder.build(protoType);
     final AlexandriaResource resource = request.execute(resourceService);
 
-    final ResponseBuilder builder;
     if (request.newResourceWasCreated()) {
-      builder = Response.created(HERE).entity(entityBuilder.build(resource));
-    } else {
-      if (request.wasExecutedAsIs()) {
-        builder = Response.noContent();
-      } else {
-        builder = Response.ok(entityBuilder.build(resource));
-      }
+      return Response.created(HERE).entity(entityBuilder.build(resource)).build();
     }
 
-    return builder.build();
+    if (request.wasExecutedAsIs()) {
+      return Response.noContent().build();
+    }
+
+    return Response.ok(entityBuilder.build(resource)).build();
   }
 
   @DELETE
@@ -108,6 +104,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   }
 
   // TODO: replace by injected LocationBuilder (to be written) ?
+
   private URI locationOf(AlexandriaResource resource) {
     return URI.create(resource.getId().toString());
   }
