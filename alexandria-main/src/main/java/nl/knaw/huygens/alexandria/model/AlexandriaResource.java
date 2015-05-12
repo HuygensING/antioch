@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-public class AlexandriaResource {
+public class AlexandriaResource implements Accountable {
   private final UUID id;
 
   private final Set<AlexandriaAnnotation> annotations = new HashSet<>();
@@ -16,13 +16,7 @@ public class AlexandriaResource {
 
   private String ref;
 
-  public AlexandriaResource() {
-    this(UUID.randomUUID());
-  }
-
-  public AlexandriaResource(UUID id) {
-    this(id, Instant.now());
-  }
+  private AlexandriaProvenance provenance;
 
   public AlexandriaResource(UUID id, Instant createdOn) {
     this.id = id;
@@ -53,17 +47,21 @@ public class AlexandriaResource {
     annotations.add(annotation);
   }
 
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + "[id=" + getId() + ",createdOn=" + createdOn + "]";
-  }
-
   public String getRef() {
     return ref;
   }
 
   public void setRef(String ref) {
     this.ref = ref;
+  }
+
+  public void setProvenance(AlexandriaProvenance provenance) {
+    this.provenance = provenance;
+  }
+
+  @Override
+  public AlexandriaProvenance getProvenance() {
+    return provenance;
   }
 
 }

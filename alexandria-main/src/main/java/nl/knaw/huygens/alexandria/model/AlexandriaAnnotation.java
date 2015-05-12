@@ -14,7 +14,7 @@ import com.google.common.collect.Sets;
 
 @JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
 @JsonTypeName("annotation")
-public class AlexandriaAnnotation {
+public class AlexandriaAnnotation implements Accountable {
   private final UUID id;
 
   private final String type;
@@ -24,6 +24,8 @@ public class AlexandriaAnnotation {
   private final Set<AlexandriaAnnotation> annotations;
 
   private Instant createdOn;
+
+  private AlexandriaProvenance provenance;
 
   public AlexandriaAnnotation(UUID id, String type, String value) {
     this.id = id;
@@ -52,12 +54,9 @@ public class AlexandriaAnnotation {
     return annotations.stream();
   }
 
+  // TODO: migrate to service layer
   public boolean addAnnotation(AlexandriaAnnotation annotation) {
     return annotations.add(annotation);
-  }
-
-  public boolean removeAnnotation(AlexandriaAnnotation annotation) {
-    return annotations.remove(annotation);
   }
 
   public Instant getCreatedOn() {
@@ -66,5 +65,14 @@ public class AlexandriaAnnotation {
 
   public void setCreatedOn(Instant createdOn) {
     this.createdOn = createdOn;
+  }
+
+  @Override
+  public AlexandriaProvenance getProvenance() {
+    return provenance;
+  }
+
+  public void setProvenance(AlexandriaProvenance provenance) {
+    this.provenance = provenance;
   }
 }

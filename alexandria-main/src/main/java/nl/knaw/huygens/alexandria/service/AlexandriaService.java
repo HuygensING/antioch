@@ -18,7 +18,10 @@ public interface AlexandriaService {
 
   void deleteResource(UUID uuid) throws NotFoundException;
 
+  // TODO: we change our mind: 'value' should always be provided, and 'type' should be optional.
   AlexandriaAnnotation createAnnotation(UUID uuid, String type, Optional<String> value) throws ResourceExistsException;
 
   AlexandriaAnnotation readAnnotation(UUID uuid) throws NotFoundException;
+
+  // TODO: add methods for linking an annotation to a resource and for one annotation to another annotation.
 }

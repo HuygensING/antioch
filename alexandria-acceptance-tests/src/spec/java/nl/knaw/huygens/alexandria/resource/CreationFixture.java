@@ -3,6 +3,7 @@ package nl.knaw.huygens.alexandria.resource;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
@@ -15,7 +16,7 @@ public class CreationFixture extends ResourceFixture {
   public void request(String method, String path) {
     when(resourceService().readResource(any(UUID.class))).thenThrow(new NotFoundException());
 
-    final AlexandriaResource mockResource = new AlexandriaResource(UUID.randomUUID());
+    final AlexandriaResource mockResource = new AlexandriaResource(UUID.randomUUID(), Instant.now());
     when(resourceService().createResource(any(UUID.class))).thenReturn(mockResource);
 
     super.request(method, path);

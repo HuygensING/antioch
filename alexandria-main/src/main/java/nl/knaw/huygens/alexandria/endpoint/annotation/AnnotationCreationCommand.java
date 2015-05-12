@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 class AnnotationCreationCommand {
   private static final Logger LOG = LoggerFactory.getLogger(AnnotationCreationCommand.class);
-  
+
   private final AnnotationPrototype prototype;
 
   public AnnotationCreationCommand(AnnotationPrototype prototype) {
@@ -27,10 +27,14 @@ class AnnotationCreationCommand {
 
   public AlexandriaAnnotation execute(AlexandriaService service) {
     final UUID uuid = providedUUID().orElse(randomUUID());
+
+    // TODO: we change our mind: 'value' should always be provided, and 'type' should now be optional.
     final AlexandriaAnnotation annotation = service.createAnnotation(uuid, providedType(), optionalValue());
 
+    // TODO: upgrade to proper provenance instance
     annotation.setCreatedOn(providedCreatedOn().orElse(now()));
 
+    // TODO: rewire via the service layer
     streamAnnotations().map(service::readAnnotation).forEach(annotation::addAnnotation);
 
     return annotation;
@@ -57,8 +61,7 @@ class AnnotationCreationCommand {
   }
 
   private Stream<UUID> streamAnnotations() {
-    return prototype.getAnnotations().map(Collection::stream).orElse(Stream.empty()) //
-        .map(UUIDParam::getValue);
+    return prototype.getAnnotations().map(Collection::stream).orElse(Stream.empty()).map(UUIDParam::getValue);
   }
 
   private Optional<Instant> providedCreatedOn() {

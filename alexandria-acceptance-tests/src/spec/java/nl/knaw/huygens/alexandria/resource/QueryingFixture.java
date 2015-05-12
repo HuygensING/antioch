@@ -2,6 +2,7 @@ package nl.knaw.huygens.alexandria.resource;
 
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
@@ -13,7 +14,7 @@ public class QueryingFixture extends ResourceFixture {
 
   public void existingResource(String id) {
     UUID uuid = UUID.fromString(id);
-    resource = new AlexandriaResource(uuid);
+    resource = new AlexandriaResource(uuid, Instant.now());
     when(resourceService().readResource(uuid)).thenReturn(resource);
   }
 
