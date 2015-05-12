@@ -56,8 +56,9 @@ public class AnnotationsEndpoint extends JSONEndpoint {
     return Response.status(501).build();
   }
 
+  // TODO: replace by injected LocationBuilder (to be written) ?
   private URI locationOf(AlexandriaAnnotation annotation) {
-    return URI.create(annotation.getId().toString());
+    return URI.create(String.format("%s/%s", EndpointPaths.ANNOTATIONS + "/", annotation.getId()));
   }
 
 }

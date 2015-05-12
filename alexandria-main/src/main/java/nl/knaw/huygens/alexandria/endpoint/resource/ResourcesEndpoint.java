@@ -49,7 +49,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   }
 
   @POST
-  public Response createResourceWithoutGivenID(@NotNull @Valid @WithoutId ResourcePrototype protoType) {
+  public Response createResource(@NotNull @Valid @WithoutId ResourcePrototype protoType) {
     LOG.trace("protoType=[{}]", protoType);
 
     final ResourceCreationRequest request = requestBuilder.build(protoType);
@@ -65,7 +65,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   @PUT
   @Path("{uuid}")
-  public Response createResourceAtSpecificID(@NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
+  public Response setResourceAtSpecificID(@NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
     LOG.trace("protoType=[{}]", protoType);
 
     final ResourceCreationRequest request = requestBuilder.build(protoType);
@@ -104,9 +104,8 @@ public class ResourcesEndpoint extends JSONEndpoint {
   }
 
   // TODO: replace by injected LocationBuilder (to be written) ?
-
   private URI locationOf(AlexandriaResource resource) {
-    return URI.create(resource.getId().toString());
+    return URI.create(String.format("%s/%s", EndpointPaths.RESOURCES + "/", resource.getId()));
   }
 
 }

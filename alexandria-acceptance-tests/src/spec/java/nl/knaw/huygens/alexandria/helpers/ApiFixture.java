@@ -84,7 +84,7 @@ public class ApiFixture extends JerseyTest {
   }
 
   public void clear() {
-    target = client().target(getBaseURI());
+    target = client().target(getBaseUri());
     contentType = Optional.empty();
     optionalBody = Optional.empty();
     response = null;
@@ -168,7 +168,9 @@ public class ApiFixture extends JerseyTest {
     };
   }
 
-  protected URI getBaseURI() {
+  @Override
+  protected URI getBaseUri() {
+//  protected URI getBaseURI() {
     return CONFIG.getBaseURI();
   }
 
@@ -177,7 +179,7 @@ public class ApiFixture extends JerseyTest {
   }
 
   private String hostInfo() {
-    final URI baseURI = getBaseURI();
+    final URI baseURI = getBaseUri();
     return format("%s:%d", baseURI.getHost(), baseURI.getPort());
   }
 
