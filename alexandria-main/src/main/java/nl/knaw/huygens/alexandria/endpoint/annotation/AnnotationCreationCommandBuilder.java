@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
-import nl.knaw.huygens.alexandria.service.AnnotationService;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,14 +21,14 @@ public class AnnotationCreationCommandBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(AnnotationCreationCommandBuilder.class);
 
-  public static AnnotationCreationCommandBuilder servedBy(AnnotationService service) {
+  public static AnnotationCreationCommandBuilder servedBy(AlexandriaService service) {
     return new AnnotationCreationCommandBuilder(service);
   }
 
-  private final AnnotationService service;
+  private final AlexandriaService service;
 
-  protected AnnotationCreationCommandBuilder(AnnotationService service) {
-    this.service = requireNonNull(service, "AnnotationService MUST not be null");
+  protected AnnotationCreationCommandBuilder(AlexandriaService service) {
+    this.service = requireNonNull(service, "AlexandriaService MUST not be null");
   }
 
   public AnnotationCreationCommand build(AnnotationPrototype prototype) {

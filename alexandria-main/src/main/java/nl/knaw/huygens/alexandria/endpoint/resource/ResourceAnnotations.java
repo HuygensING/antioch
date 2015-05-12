@@ -10,27 +10,27 @@ import java.util.UUID;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
-import nl.knaw.huygens.alexandria.service.ResourceService;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ResourceAnnotations extends JSONEndpoint {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceAnnotations.class);
 
-  private final ResourceService resourceService;
+  private final AlexandriaService alexandriaService;
 
   private final UUID uuid;
 
   @Inject
-  public ResourceAnnotations(ResourceService resourceService, @PathParam("uuid") final UUIDParam uuidParam) {
-    LOG.trace("resourceService=[{}], uuidParam=[{}]", resourceService, uuidParam);
-    this.resourceService = resourceService;
+  public ResourceAnnotations(AlexandriaService alexandriaService, @PathParam("uuid") final UUIDParam uuidParam) {
+    LOG.trace("resourceService=[{}], uuidParam=[{}]", alexandriaService, uuidParam);
+    this.alexandriaService = alexandriaService;
     this.uuid = uuidParam.getValue();
   }
 
   @GET
   public Response get() {
-    final Set<AlexandriaAnnotation> annotations = resourceService.readResource(uuid).getAnnotations();
+    final Set<AlexandriaAnnotation> annotations = alexandriaService.readResource(uuid).getAnnotations();
 
     /*
       return Response.ok(annotations).build() unfortunately yields:

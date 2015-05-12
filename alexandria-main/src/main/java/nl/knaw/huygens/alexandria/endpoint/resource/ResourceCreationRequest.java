@@ -13,7 +13,7 @@ import nl.knaw.huygens.alexandria.endpoint.InstantParam;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.service.ResourceService;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +27,7 @@ class ResourceCreationRequest {
     this.prototype = prototype;
   }
 
-  public AlexandriaResource execute(ResourceService service) {
+  public AlexandriaResource execute(AlexandriaService service) {
     LOG.trace("executing, service=[{}]", service);
 
     AlexandriaResource resource;

@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import nl.knaw.huygens.alexandria.endpoint.InstantParam;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
-import nl.knaw.huygens.alexandria.service.AnnotationService;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +25,7 @@ class AnnotationCreationCommand {
     this.prototype = prototype;
   }
 
-  public AlexandriaAnnotation execute(AnnotationService service) {
+  public AlexandriaAnnotation execute(AlexandriaService service) {
     final UUID uuid = providedUUID().orElse(randomUUID());
     final AlexandriaAnnotation annotation = service.createAnnotation(uuid, providedType(), optionalValue());
 

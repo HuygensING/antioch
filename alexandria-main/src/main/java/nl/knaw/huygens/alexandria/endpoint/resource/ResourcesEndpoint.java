@@ -16,7 +16,7 @@ import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.service.ResourceService;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,25 +26,25 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   private static final URI HERE = URI.create("");
 
-  private final ResourceService resourceService;
+  private final AlexandriaService alexandriaService;
   private final ResourceEntityBuilder entityBuilder;
   private final ResourceCreationRequestBuilder requestBuilder;
 
   @Inject
-  public ResourcesEndpoint(ResourceService resourceService, //
+  public ResourcesEndpoint(AlexandriaService service, //
                            ResourceCreationRequestBuilder requestBuilder, //
                            ResourceEntityBuilder entityBuilder) {
-    LOG.trace("Resources created, resourceService=[{}]", resourceService);
+    LOG.trace("Resources created, alexandriaService=[{}]", service);
 
+    this.alexandriaService = service;
     this.entityBuilder = entityBuilder;
     this.requestBuilder = requestBuilder;
-    this.resourceService = resourceService;
   }
 
   @GET
   @Path("{uuid}")
   public Response getResourceByID(@PathParam("uuid") final UUIDParam uuid) {
-    final AlexandriaResource resource = resourceService.readResource(uuid.getValue());
+    final AlexandriaResource resource = alexandriaService.readResource(uuid.getValue());
     return Response.ok(entityBuilder.build(resource)).build();
   }
 
@@ -53,7 +53,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
     LOG.trace("protoType=[{}]", protoType);
 
     final ResourceCreationRequest request = requestBuilder.build(protoType);
-    final AlexandriaResource resource = request.execute(resourceService);
+    final AlexandriaResource resource = request.execute(alexandriaService);
 
     if (request.wasExecutedAsIs()) {
       return Response.noContent().build();
@@ -69,7 +69,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
     LOG.trace("protoType=[{}]", protoType);
 
     final ResourceCreationRequest request = requestBuilder.build(protoType);
-    final AlexandriaResource resource = request.execute(resourceService);
+    final AlexandriaResource resource = request.execute(alexandriaService);
 
     if (request.newResourceWasCreated()) {
       return Response.created(HERE).entity(entityBuilder.build(resource)).build();
@@ -92,7 +92,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @GET
   @Path("{uuid}/ref")
   public Response getResourceRef(@PathParam("uuid") final UUIDParam uuidParam) {
-    AlexandriaResource resource = resourceService.readResource(uuidParam.getValue());
+    AlexandriaResource resource = alexandriaService.readResource(uuidParam.getValue());
     return Response.ok(new RefEntity(resource.getRef())).build();
   }
 

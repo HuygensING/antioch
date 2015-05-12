@@ -7,7 +7,7 @@ import com.google.inject.Module;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceCreationRequestBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
 import nl.knaw.huygens.alexandria.helpers.ApiFixture;
-import nl.knaw.huygens.alexandria.service.ResourceService;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public class ResourceFixture extends ApiFixture {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceFixture.class);
 
-  private static final ResourceService RESOURCE_SERVICE_MOCK = mock(ResourceService.class);
+  private static final AlexandriaService RESOURCE_SERVICE_MOCK = mock(AlexandriaService.class);
 
   @BeforeClass
   public static void setup() {
@@ -32,7 +32,7 @@ public class ResourceFixture extends ApiFixture {
       @Override
       protected void configure() {
         LOG.trace("setting up Guice bindings");
-        bind(ResourceService.class).toInstance(RESOURCE_SERVICE_MOCK);
+        bind(AlexandriaService.class).toInstance(RESOURCE_SERVICE_MOCK);
         bind(ResourceCreationRequestBuilder.class).toInstance(new ResourceCreationRequestBuilder());
       }
     };
@@ -45,7 +45,7 @@ public class ResourceFixture extends ApiFixture {
     Mockito.reset(RESOURCE_SERVICE_MOCK);
   }
 
-  protected ResourceService resourceService() {
+  protected AlexandriaService resourceService() {
     return RESOURCE_SERVICE_MOCK;
   }
 }

@@ -20,7 +20,7 @@ import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.helpers.ApiFixture;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
-import nl.knaw.huygens.alexandria.service.AnnotationService;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import org.concordion.api.MultiValueResult;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.BeforeClass;
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 public class AnnotationFixture extends ApiFixture {
   private static final Logger LOG = LoggerFactory.getLogger(AnnotationFixture.class);
 
-  private static final AnnotationService ANNOTATION_SERVICE_MOCK = mock(AnnotationService.class);
+  private static final AlexandriaService SERVICE_MOCK = mock(AlexandriaService.class);
 
   private final Map<String, List<String>> annotatedReferences = Maps.newHashMap();
   private AlexandriaAnnotation mockAnnotation;
@@ -49,9 +49,9 @@ public class AnnotationFixture extends ApiFixture {
       @Override
       protected void configure() {
         LOG.trace("setting up Guice bindings");
-        bind(AnnotationService.class).toInstance(ANNOTATION_SERVICE_MOCK);
+        bind(AlexandriaService.class).toInstance(SERVICE_MOCK);
         bind(AnnotationCreationCommandBuilder.class)
-            .toInstance(AnnotationCreationCommandBuilder.servedBy(ANNOTATION_SERVICE_MOCK));
+            .toInstance(AnnotationCreationCommandBuilder.servedBy(SERVICE_MOCK));
       }
     };
   }
@@ -60,11 +60,11 @@ public class AnnotationFixture extends ApiFixture {
   public void clear() {
     LOG.trace("clear");
     super.clear();
-    Mockito.reset(ANNOTATION_SERVICE_MOCK);
+    Mockito.reset(SERVICE_MOCK);
   }
 
-  protected AnnotationService annotationService() {
-    return ANNOTATION_SERVICE_MOCK;
+  protected AlexandriaService annotationService() {
+    return SERVICE_MOCK;
   }
 
   public void noSuchAnnotation(String id) {

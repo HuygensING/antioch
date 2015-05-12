@@ -13,15 +13,15 @@ import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
-import nl.knaw.huygens.alexandria.service.AnnotationService;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 @Path(EndpointPaths.ANNOTATIONS)
 public class AnnotationsEndpoint extends JSONEndpoint {
-  private final AnnotationService service;
+  private final AlexandriaService service;
   private final AnnotationEntityBuilder entityBuilder;
   private final AnnotationCreationCommandBuilder commandBuilder;
 
-  public AnnotationsEndpoint(@Context AnnotationService service, //
+  public AnnotationsEndpoint(@Context AlexandriaService service, //
                              @Context AnnotationCreationCommandBuilder commandBuilder, //
                              @Context AnnotationEntityBuilder entityBuilder) {
     this.service = service;
