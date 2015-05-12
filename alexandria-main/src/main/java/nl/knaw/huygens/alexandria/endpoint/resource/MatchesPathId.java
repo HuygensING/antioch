@@ -4,6 +4,7 @@ import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.PathParam;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -26,7 +27,7 @@ public @interface MatchesPathId {
   class Validator implements ConstraintValidator<MatchesPathId, ResourcePrototype> {
     final UUID paramId;
 
-    public Validator(@PathParam("uuid") UUIDParam uuidParam) {
+    public Validator(@NotNull @PathParam("uuid") UUIDParam uuidParam) {
       this.paramId = uuidParam.getValue();
     }
 
@@ -42,7 +43,7 @@ public @interface MatchesPathId {
       }
 
       final UUID protoId = prototype.getId().getValue();
-      return protoId != null && protoId.equals(paramId);
+      return protoId.equals(paramId);
     }
   }
 }
