@@ -34,7 +34,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   public ResourcesEndpoint(ResourceService resourceService, //
                            ResourceCreationRequestBuilder requestBuilder, //
                            ResourceEntityBuilder entityBuilder) {
-    LOG.trace("Resources created, resourceService=[{}]", new Object[]{resourceService});
+    LOG.trace("Resources created, resourceService=[{}]", resourceService);
 
     this.entityBuilder = entityBuilder;
     this.requestBuilder = requestBuilder;
