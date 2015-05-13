@@ -1,84 +1,71 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
-import static java.time.Instant.now;
 import static java.util.Objects.requireNonNull;
 
 import java.time.Instant;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import nl.knaw.huygens.alexandria.endpoint.InstantParam;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
-import nl.knaw.huygens.alexandria.exception.NotFoundException;
-import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 class ResourceCreationRequest {
-  private static final Logger LOG = LoggerFactory.getLogger(ResourceCreationRequest.class);
+	private static final String DEFAULT_WHY = "why";
 
-  private final ResourcePrototype prototype;
-  private boolean resourceCreated;
+	private static final String DEFAULT_WHO = "nederlab";
 
-  ResourceCreationRequest(ResourcePrototype prototype) {
-    this.prototype = prototype;
-  }
+	private static final Logger LOG = LoggerFactory.getLogger(ResourceCreationRequest.class);
 
-  public AlexandriaResource execute(AlexandriaService service) {
-    LOG.trace("executing, service=[{}]", service);
+	private final ResourcePrototype prototype;
+	private boolean resourceCreated;
 
-    AlexandriaResource resource;
-    if (providedUUID().isPresent()) {
-      final UUID uuid = providedUUID().get();
-      try {
-        resource = service.readResource(uuid);
-      } catch (NotFoundException okInThatCaseWeWillCreateIt) {
-        resource = service.createResource(uuid);
-        resourceCreated = true;
-      }
-    } else {
-      resource = service.createResource(UUID.randomUUID());
-    }
+	private UUID uuid;
 
-    LOG.trace("resource: [{}]", resource);
+	ResourceCreationRequest(ResourcePrototype prototype) {
+		this.prototype = prototype;
+	}
 
-    resource.setRef(providedRef());
-    resource.setCreatedOn(providedCreatedOn().orElse(now()));
+	public void execute(AlexandriaService service) {
+		LOG.trace("executing, service=[{}]", service);
 
-    // TODO: figure out how to get a hold of the annotation(s), or maybe use just an annotation's UUID to add it
-    // streamAnnotations().map(annotationService::readAnnotation).map(resource::addAnnotation);
+		uuid = providedUUID().orElse(UUID.randomUUID());
 
-    return resource;
-  }
+		String ref = providedRef();
+		TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(DEFAULT_WHO, providedCreatedOn().orElse(Instant.now()), DEFAULT_WHY);
+		resourceCreated = service.createOrUpdateResource(uuid, ref, provenance);
 
-  public boolean wasExecutedAsIs() {
-    final boolean wasExecutedAsIs = providedUUID().isPresent() && providedCreatedOn().isPresent();
-    LOG.trace("wasExecutedAsIs: {}", wasExecutedAsIs);
-    return wasExecutedAsIs;
-  }
+		// LOG.trace("resource: [{}]", resource);
+	}
 
-  public boolean newResourceWasCreated() {
-    LOG.trace("newResourceWasCreated: {}", resourceCreated);
-    return resourceCreated;
-  }
+	public boolean wasExecutedAsIs() {
+		final boolean wasExecutedAsIs = providedUUID().isPresent() && providedCreatedOn().isPresent();
+		LOG.trace("wasExecutedAsIs: {}", wasExecutedAsIs);
+		return wasExecutedAsIs;
+	}
 
-  private String providedRef() {
-    return requireNonNull(prototype.getRef(), "Required 'ref' field was not validated for being non-null");
-  }
+	public boolean newResourceWasCreated() {
+		LOG.trace("newResourceWasCreated: {}", resourceCreated);
+		return resourceCreated;
+	}
 
-  private Optional<UUID> providedUUID() {
-    return Optional.ofNullable(prototype.getId()).map(UUIDParam::getValue);
-  }
+	public UUID getUUID() {
+		return uuid;
+	}
 
-  private Stream<UUID> streamAnnotations() {
-    return prototype.getAnnotations().map(Collection::stream).orElse(Stream.empty()) //
-        .map(UUIDParam::getValue);
-  }
+	private String providedRef() {
+		return requireNonNull(prototype.getRef(), "Required 'ref' field was not validated for being non-null");
+	}
 
-  private Optional<Instant> providedCreatedOn() {
-    return prototype.getCreatedOn().map(InstantParam::getValue);
-  }
+	private Optional<UUID> providedUUID() {
+		return Optional.ofNullable(prototype.getId()).map(UUIDParam::getValue);
+	}
+
+	private Optional<Instant> providedCreatedOn() {
+		return prototype.getCreatedOn().map(InstantParam::getValue);
+	}
 }

@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.endpoint.annotation;
 
+import javax.inject.Inject;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -7,6 +8,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+
 import java.net.URI;
 
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
@@ -19,11 +21,12 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 public class AnnotationsEndpoint extends JSONEndpoint {
   private final AlexandriaService service;
   private final AnnotationEntityBuilder entityBuilder;
-  private final AnnotationCreationCommandBuilder commandBuilder;
+  private final AnnotationCreationRequestBuilder commandBuilder;
 
-  public AnnotationsEndpoint(@Context AlexandriaService service, //
-                             @Context AnnotationCreationCommandBuilder commandBuilder, //
-                             @Context AnnotationEntityBuilder entityBuilder) {
+  @Inject
+  public AnnotationsEndpoint(AlexandriaService service, //
+                             AnnotationCreationRequestBuilder commandBuilder, //
+                             AnnotationEntityBuilder entityBuilder) {
     this.service = service;
     this.commandBuilder = commandBuilder;
     this.entityBuilder = entityBuilder;
@@ -39,7 +42,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
 
   @POST
   public Response createAnnotation(final AnnotationPrototype prototype) {
-    final AnnotationCreationCommand command = commandBuilder.build(prototype);
+    final AnnotationCreationRequest command = commandBuilder.build(prototype);
     final AlexandriaAnnotation annotation = command.execute(service);
 
     if (command.wasExecutedAsIs()) {

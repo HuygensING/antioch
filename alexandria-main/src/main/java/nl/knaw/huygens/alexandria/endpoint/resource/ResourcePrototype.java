@@ -1,13 +1,14 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
-import javax.validation.constraints.NotNull;
 import java.util.Optional;
-import java.util.Set;
+
+import javax.validation.constraints.NotNull;
+
+import nl.knaw.huygens.alexandria.endpoint.InstantParam;
+import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import nl.knaw.huygens.alexandria.endpoint.InstantParam;
-import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
 @JsonTypeName("resource")
@@ -19,7 +20,7 @@ public class ResourcePrototype {
 
   private InstantParam createdOn;
 
-  private Set<UUIDParam> annotations;
+//  private Set<UUIDParam> annotations;
 
   public UUIDParam getId() {
     return id;
@@ -33,7 +34,7 @@ public class ResourcePrototype {
     return Optional.ofNullable(createdOn);
   }
 
-  public Optional<Set<UUIDParam>> getAnnotations() {
-    return Optional.ofNullable(annotations);
-  }
+//  public Optional<Set<UUIDParam>> getAnnotations() {
+//    return Optional.ofNullable(annotations);
+//  }
 }

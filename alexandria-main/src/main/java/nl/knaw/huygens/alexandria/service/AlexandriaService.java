@@ -3,25 +3,26 @@ package nl.knaw.huygens.alexandria.service;
 import java.util.Optional;
 import java.util.UUID;
 
-import nl.knaw.huygens.alexandria.exception.IllegalResourceException;
-import nl.knaw.huygens.alexandria.exception.NotFoundException;
-import nl.knaw.huygens.alexandria.exception.ResourceExistsException;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
 public interface AlexandriaService {
-  AlexandriaResource createResource(UUID uuid) throws IllegalResourceException;
+	boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance);
 
-  AlexandriaResource readResource(UUID uuid) throws NotFoundException;
+	AlexandriaResource readResource(UUID uuid);
 
-  AlexandriaResource updateResource(AlexandriaResource resource) throws IllegalResourceException;
+	AlexandriaAnnotationBody createAnnotationBody(UUID uuid, Optional<String> type, String value, TentativeAlexandriaProvenance provenance);
 
-  void deleteResource(UUID uuid) throws NotFoundException;
+	AlexandriaAnnotationBody findAnnotationBodyWithTypeAndValue(Optional<String> type, String value);
 
-  // TODO: we change our mind: 'value' should always be provided, and 'type' should be optional.
-  AlexandriaAnnotation createAnnotation(UUID uuid, String type, Optional<String> value) throws ResourceExistsException;
+	AlexandriaAnnotationBody readAnnotationBody(UUID uuid);
 
-  AlexandriaAnnotation readAnnotation(UUID uuid) throws NotFoundException;
+	AlexandriaAnnotation annotate(AlexandriaResource resource, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance);
 
-  // TODO: add methods for linking an annotation to a resource and for one annotation to another annotation.
+	AlexandriaAnnotation annotate(AlexandriaAnnotation annotation, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance);
+
+	AlexandriaAnnotation readAnnotation(UUID uuid);
+
 }
