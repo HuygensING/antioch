@@ -1,11 +1,9 @@
 package nl.knaw.huygens.alexandria.annotation;
 
 import static org.concordion.api.MultiValueResult.multiValueResult;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -15,7 +13,6 @@ import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.helpers.ApiFixture;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
-import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 import org.concordion.api.MultiValueResult;
@@ -73,23 +70,23 @@ public class AnnotationFixture extends ApiFixture {
 		when(annotationService().readAnnotation(asUUID(id))).thenThrow(new NotFoundException());
 	}
 
-	public void validAnnotation(String id) {
-		final UUID uuid = asUUID(id);
-
-		final AlexandriaAnnotationBody annotation = new AlexandriaAnnotationBody(uuid, "aType", "aValue");
-		mockAnnotation.addAnnotation(annotation);
-
-		LOG.trace("Mocking annotationService.readAnnotation({}) -> [{}]", id, annotation);
-		when(annotationService().readAnnotation(uuid)).thenReturn(annotation);
-	}
-
-	public void createAnnotation(String type, String value) {
-		LOG.trace("createAnnotation([{}],[{}])", type, value);
-
-		mockAnnotation = new AlexandriaAnnotation(randomUUID(), type, value);
-		mockAnnotation.setCreatedOn(Instant.now());
-		when(annotationService().createAnnotation(any(), any(), any())).thenReturn(mockAnnotation);
-	}
+	// public void validAnnotation(String id) {
+	// final UUID uuid = asUUID(id);
+	//
+	// final AlexandriaAnnotation annotation = new AlexandriaAnnotationBody(uuid, "aType", "aValue");
+	// mockAnnotation.addAnnotation(annotation);
+	//
+	// LOG.trace("Mocking annotationService.readAnnotation({}) -> [{}]", id, annotation);
+	// when(annotationService().readAnnotation(uuid)).thenReturn(annotation);
+	// }
+	//
+	// public void createAnnotation(String type, String value) {
+	// LOG.trace("createAnnotation([{}],[{}])", type, value);
+	//
+	// mockAnnotation = new AlexandriaAnnotation(randomUUID(), type, value);
+	// mockAnnotation.setCreatedOn(Instant.now());
+	// when(annotationService().createAnnotation(any(), any(), any())).thenReturn(mockAnnotation);
+	// }
 
 	public void setUpAnnotation(String id, String tag) {
 		List<String> tags = annotatedReferences.get(id);
