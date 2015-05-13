@@ -1,16 +1,21 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Response;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
+
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
+import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationCreationRequestBuilder;
+import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,10 +26,15 @@ public class ResourceAnnotations extends JSONEndpoint {
 
   private final UUID uuid;
 
+	private final AnnotationCreationRequestBuilder requestBuilder;
+
   @Inject
-  public ResourceAnnotations(AlexandriaService alexandriaService, @PathParam("uuid") final UUIDParam uuidParam) {
-    LOG.trace("resourceService=[{}], uuidParam=[{}]", alexandriaService, uuidParam);
+  public ResourceAnnotations(AlexandriaService alexandriaService, //
+  		AnnotationCreationRequestBuilder requestBuilder, //
+  		@PathParam("uuid") final UUIDParam uuidParam) {
+		LOG.trace("resourceService=[{}], uuidParam=[{}]", alexandriaService, uuidParam);
     this.alexandriaService = alexandriaService;
+    this.requestBuilder = requestBuilder;
     this.uuid = uuidParam.getValue();
   }
 
@@ -46,6 +56,11 @@ public class ResourceAnnotations extends JSONEndpoint {
      */
 
     return Response.ok(new AnnotationsView(annotations)).build();
+  }
+  
+  @POST
+  public Response addAnnotation(AnnotationPrototype prototype) {
+  	return Response.ok().build();
   }
 
   static class AnnotationsView {
