@@ -1,15 +1,9 @@
 package nl.knaw.huygens.alexandria.model;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Stream;
 
-public class AlexandriaResource implements Accountable {
+public class AlexandriaResource extends AnnotatableObject {
 	private final UUID id;
-
-	private final Set<AlexandriaAnnotation> annotations = new HashSet<>();
 
 	private String ref;
 
@@ -22,18 +16,6 @@ public class AlexandriaResource implements Accountable {
 
 	public UUID getId() {
 		return id;
-	}
-
-	public Set<AlexandriaAnnotation> getAnnotations() {
-		return Collections.unmodifiableSet(annotations);
-	}
-
-	public Stream<AlexandriaAnnotation> streamAnnotations() {
-		return annotations.stream();
-	}
-
-	public void addAnnotation(AlexandriaAnnotation annotation) {
-		annotations.add(annotation);
 	}
 
 	public String getRef() {

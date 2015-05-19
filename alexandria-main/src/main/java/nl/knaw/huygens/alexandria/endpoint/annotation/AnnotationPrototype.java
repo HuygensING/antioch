@@ -2,6 +2,8 @@ package nl.knaw.huygens.alexandria.endpoint.annotation;
 
 import java.util.Optional;
 
+import javax.validation.constraints.NotNull;
+
 import nl.knaw.huygens.alexandria.endpoint.InstantParam;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 
@@ -13,21 +15,13 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
 @JsonTypeName("annotation")
 public class AnnotationPrototype {
-	private String type;
-	private String value;
 	private InstantParam createdOn;
+	@NotNull
+	@ExistingAnnotationBody
 	private UUIDParam annotationBodyId;
 
-	public Optional<UUIDParam> getAnnotationBodyId() {
-		return Optional.ofNullable(annotationBodyId);
-	}
-
-	public Optional<String> getType() {
-		return Optional.ofNullable(type);
-	}
-
-	public Optional<String> getValue() {
-		return Optional.ofNullable(value);
+	public UUIDParam getAnnotationBodyId() {
+		return annotationBodyId;
 	}
 
 	public Optional<InstantParam> getCreatedOn() {

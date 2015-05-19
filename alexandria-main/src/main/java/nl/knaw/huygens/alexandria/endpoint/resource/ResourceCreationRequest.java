@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import nl.knaw.huygens.alexandria.endpoint.InstantParam;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
+import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
@@ -15,10 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 class ResourceCreationRequest {
-	private static final String DEFAULT_WHY = "why";
-
-	private static final String DEFAULT_WHO = "nederlab";
-
 	private static final Logger LOG = LoggerFactory.getLogger(ResourceCreationRequest.class);
 
 	private final ResourcePrototype prototype;
@@ -36,7 +33,8 @@ class ResourceCreationRequest {
 		uuid = providedUUID().orElse(UUID.randomUUID());
 
 		String ref = providedRef();
-		TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(DEFAULT_WHO, providedCreatedOn().orElse(Instant.now()), DEFAULT_WHY);
+		TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(AlexandriaProvenance.DEFAULT_WHO, //
+				providedCreatedOn().orElse(Instant.now()), AlexandriaProvenance.DEFAULT_WHY);
 		resourceCreated = service.createOrUpdateResource(uuid, ref, provenance);
 
 		// LOG.trace("resource: [{}]", resource);

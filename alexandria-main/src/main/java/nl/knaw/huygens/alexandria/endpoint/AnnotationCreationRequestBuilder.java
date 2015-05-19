@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint.annotation;
+package nl.knaw.huygens.alexandria.endpoint;
 
 import static java.util.Objects.requireNonNull;
 
@@ -8,7 +8,10 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 import org.slf4j.Logger;
@@ -27,22 +30,37 @@ public class AnnotationCreationRequestBuilder {
 
 	private final AlexandriaService service;
 
+	private Optional<AlexandriaResource> resource;
+	private Optional<AlexandriaAnnotation> annotation;
+
 	protected AnnotationCreationRequestBuilder(AlexandriaService service) {
 		this.service = requireNonNull(service, "AlexandriaService MUST not be null");
 	}
 
-	public AnnotationCreationRequest build(AnnotationPrototype prototype) {
-		Optional.ofNullable(prototype).orElseThrow(missingBodyException());
+	public AnnotationCreationRequestBuilder ofResource(UUID uuid) {
+		resource = Optional.of(service.readResource(uuid));
+		return this;
+	}
 
-		validateId(prototype);
-		validateType(prototype);
-		validateValue(prototype);
-		validateCreatedOn(prototype);
+	public AnnotationCreationRequestBuilder ofAnnotation(UUID uuid) {
+		annotation = Optional.of(service.readAnnotation(uuid));
+		return this;
+	}
+
+	public AnnotationCreationRequest build(AnnotationPrototype prototype) {
+		// Optional.ofNullable(prototype).orElseThrow(missingBodyException());
+
+		// validateId(prototype);
+		// validateType(prototype);
+		// validateValue(prototype);
+		// validateCreatedOn(prototype);
 		// validateAnnotations(prototype);
 
-		LOG.trace("Done validating");
+		if (resource.isPresent()) {
+			return new AnnotationCreationRequest(resource.get(), prototype);
+		}
 
-		return new AnnotationCreationRequest(prototype);
+		return new AnnotationCreationRequest(annotation.get(), prototype);
 	}
 
 	protected void validateId(AnnotationPrototype prototype) {
@@ -53,7 +71,7 @@ public class AnnotationCreationRequestBuilder {
 
 	protected void validateType(AnnotationPrototype prototype) {
 		LOG.trace("Validating type");
-		prototype.getType().filter(s -> !s.isEmpty()).orElseThrow(missingTypeException());
+		// prototype.getType().filter(s -> !s.isEmpty()).orElseThrow(missingTypeException());
 	}
 
 	protected void validateValue(AnnotationPrototype prototype) {

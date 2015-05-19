@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint.resource;
+package nl.knaw.huygens.alexandria.endpoint.annotation;
 
 import java.net.URI;
 import java.util.Set;
@@ -20,15 +20,14 @@ import nl.knaw.huygens.alexandria.endpoint.AnnotationEntity;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
-import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ResourceAnnotations extends JSONEndpoint {
-	private static final Logger LOG = LoggerFactory.getLogger(ResourceAnnotations.class);
+public class AnnotationAnnotations extends JSONEndpoint {
+	private static final Logger LOG = LoggerFactory.getLogger(AnnotationAnnotations.class);
 
 	private final AlexandriaService service;
 
@@ -39,7 +38,7 @@ public class ResourceAnnotations extends JSONEndpoint {
 	private final AlexandriaConfiguration configuration;
 
 	@Inject
-	public ResourceAnnotations(AlexandriaService service, //
+	public AnnotationAnnotations(AlexandriaService service, //
 			AnnotationCreationRequestBuilder requestBuilder, //
 			AlexandriaConfiguration configuration, //
 			@PathParam("uuid") final UUIDParam uuidParam) {
@@ -59,14 +58,14 @@ public class ResourceAnnotations extends JSONEndpoint {
 
 	@POST
 	public Response addAnnotation(@NotNull @Valid AnnotationPrototype prototype) {
-		AnnotationCreationRequest request = requestBuilder.ofResource(uuid).build(prototype);
+		AnnotationCreationRequest request = requestBuilder.ofAnnotation(uuid).build(prototype);
 		request.execute(service);
 		return Response.created(locationOf(uuid)).build();
 	}
 
 	// TODO: replace by injected LocationBuilder (to be written) ?
 	private URI locationOf(UUID uuid) {
-		return URI.create(String.format("%s/%s/%s", configuration.getBaseURI(), EndpointPaths.RESOURCES, uuid));
+		return URI.create(String.format("%s/%s/%s", configuration.getBaseURI(), EndpointPaths.ANNOTATIONS, uuid));
 	}
 
 }

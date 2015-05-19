@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationCreationRequestBuilder;
+import nl.knaw.huygens.alexandria.endpoint.AnnotationCreationRequestBuilder;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.helpers.ApiFixture;
