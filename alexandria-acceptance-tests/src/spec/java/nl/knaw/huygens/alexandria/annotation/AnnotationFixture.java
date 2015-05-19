@@ -8,13 +8,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import nl.knaw.huygens.alexandria.endpoint.AnnotationCreationRequestBuilder;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.helpers.ApiFixture;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-
 import org.concordion.api.MultiValueResult;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.BeforeClass;
@@ -22,12 +25,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.inject.AbstractModule;
-import com.google.inject.Module;
 
 @RunWith(ConcordionRunner.class)
 public class AnnotationFixture extends ApiFixture {
@@ -50,7 +47,6 @@ public class AnnotationFixture extends ApiFixture {
 			protected void configure() {
 				LOG.trace("setting up Guice bindings");
 				bind(AlexandriaService.class).toInstance(SERVICE_MOCK);
-				bind(AnnotationCreationRequestBuilder.class).toInstance(AnnotationCreationRequestBuilder.servedBy(SERVICE_MOCK));
 			}
 		};
 	}

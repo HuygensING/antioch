@@ -2,6 +2,7 @@ package nl.knaw.huygens.alexandria.endpoint;
 
 import static java.util.Objects.requireNonNull;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,16 +25,17 @@ public class AnnotationCreationRequestBuilder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AnnotationCreationRequestBuilder.class);
 
-	public static AnnotationCreationRequestBuilder servedBy(AlexandriaService service) {
-		return new AnnotationCreationRequestBuilder(service);
-	}
+//	public static AnnotationCreationRequestBuilder servedBy(AlexandriaService service) {
+//		return new AnnotationCreationRequestBuilder(service);
+//	}
 
 	private final AlexandriaService service;
 
 	private Optional<AlexandriaResource> resource;
 	private Optional<AlexandriaAnnotation> annotation;
 
-	protected AnnotationCreationRequestBuilder(AlexandriaService service) {
+	@Inject
+	public AnnotationCreationRequestBuilder(AlexandriaService service) {
 		this.service = requireNonNull(service, "AlexandriaService MUST not be null");
 	}
 
