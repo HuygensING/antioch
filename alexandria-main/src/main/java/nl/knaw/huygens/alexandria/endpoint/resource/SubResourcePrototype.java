@@ -2,8 +2,6 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import java.util.Optional;
 
-import javax.validation.constraints.NotNull;
-
 import nl.knaw.huygens.alexandria.endpoint.InstantParam;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 
@@ -12,20 +10,13 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
 @JsonTypeName("resource")
-public class ResourcePrototype {
+public class SubResourcePrototype {
 	private UUIDParam id;
-
-	@NotNull(message = "{nl.knaw.huygens.alexandria.endpoint.resource.ResourceProtoType.ref.NotNull.message}")
-	private String ref;
 
 	private InstantParam createdOn;
 
 	public UUIDParam getId() {
 		return id;
-	}
-
-	public String getRef() {
-		return ref;
 	}
 
 	public Optional<InstantParam> getCreatedOn() {
