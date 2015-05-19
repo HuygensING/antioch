@@ -105,6 +105,11 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
 	// Sub-resource delegation
 
+	@Path("{uuid}/subresources")
+	public Class<SubResources> getSubResources() {
+		return SubResources.class; // no instantiation of our own; let Jersey handle the lifecycle
+	}
+
 	@Path("{uuid}/annotations")
 	public Class<ResourceAnnotations> getAnnotations() {
 		return ResourceAnnotations.class; // no instantiation of our own; let Jersey handle the lifecycle

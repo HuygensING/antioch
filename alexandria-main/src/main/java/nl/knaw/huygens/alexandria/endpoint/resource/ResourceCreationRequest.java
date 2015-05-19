@@ -27,6 +27,15 @@ class ResourceCreationRequest {
 		this.prototype = prototype;
 	}
 
+	/*
+	 * Yuck!
+	 * TODO: introduce CreationRequest interface with execute() (and maybe later wasExecutedAsIs et al.)
+	 * two classes: ResourceCreationRequest implements CreationRequest and SubResourceCreationRequest implements etc.
+	 * ResourceCreationRequestBuilder has two methods: one for each class and instantiates the right XXRequest implementation
+	 */
+//	ResourceCreationRequest(UUID parentId, SubResourcePrototype prototype2) {
+//	}
+
 	public void execute(AlexandriaService service) {
 		LOG.trace("executing, service=[{}]", service);
 
