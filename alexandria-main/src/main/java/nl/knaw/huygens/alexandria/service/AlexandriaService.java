@@ -13,7 +13,7 @@ public interface AlexandriaService {
 
 	AlexandriaResource readResource(UUID uuid);
 
-	AlexandriaAnnotationBody createAnnotationBody(UUID uuid, Optional<String> type, String value, TentativeAlexandriaProvenance provenance);
+	boolean createAnnotationBody(UUID uuid, Optional<String> type, String value, TentativeAlexandriaProvenance provenance);
 
 	AlexandriaAnnotationBody findAnnotationBodyWithTypeAndValue(Optional<String> type, String value);
 

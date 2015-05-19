@@ -1,6 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint.annotation;
 
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+import nl.knaw.huygens.alexandria.endpoint.AnnotationEntity;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 
 public class AnnotationEntityBuilder {

@@ -23,12 +23,6 @@ public class TinkerpopService implements AlexandriaService {
 	}
 
 	@Override
-	public AlexandriaAnnotationBody createAnnotationBody(UUID uuid, Optional<String> type, String value, TentativeAlexandriaProvenance provenance) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public AlexandriaAnnotationBody readAnnotationBody(UUID uuid) {
 		// TODO Auto-generated method stub
 		return null;
@@ -56,6 +50,12 @@ public class TinkerpopService implements AlexandriaService {
 	public AlexandriaAnnotationBody findAnnotationBodyWithTypeAndValue(Optional<String> type, String value) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public boolean createAnnotationBody(UUID uuid, Optional<String> type, String value, TentativeAlexandriaProvenance provenance) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

@@ -3,14 +3,11 @@ package nl.knaw.huygens.alexandria.endpoint.annotation;
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
-import java.net.URI;
-
+import nl.knaw.huygens.alexandria.endpoint.AnnotationEntity;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
@@ -19,52 +16,34 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 @Path(EndpointPaths.ANNOTATIONS)
 public class AnnotationsEndpoint extends JSONEndpoint {
-  private final AlexandriaService service;
-  private final AnnotationEntityBuilder entityBuilder;
-  private final AnnotationCreationRequestBuilder commandBuilder;
+	private final AlexandriaService service;
+	private final AnnotationEntityBuilder entityBuilder;
 
-  @Inject
-  public AnnotationsEndpoint(AlexandriaService service, //
-                             AnnotationCreationRequestBuilder commandBuilder, //
-                             AnnotationEntityBuilder entityBuilder) {
-    this.service = service;
-    this.commandBuilder = commandBuilder;
-    this.entityBuilder = entityBuilder;
-  }
+	@Inject
+	public AnnotationsEndpoint(AlexandriaService service, //
+			AnnotationEntityBuilder entityBuilder) {
+		this.service = service;
+		this.entityBuilder = entityBuilder;
+	}
 
-  @GET
-  @Path("{uuid}")
-  public Response readAnnotation(@PathParam("uuid") UUIDParam uuidParam) {
-    final AlexandriaAnnotation annotation = service.readAnnotation(uuidParam.getValue());
-    final AnnotationEntity entity = entityBuilder.build(annotation);
-    return Response.ok(entity).build();
-  }
+	@GET
+	@Path("{uuid}")
+	public Response readAnnotation(@PathParam("uuid") UUIDParam uuidParam) {
+		final AlexandriaAnnotation annotation = service.readAnnotation(uuidParam.getValue());
+		final AnnotationEntity entity = entityBuilder.build(annotation);
+		return Response.ok(entity).build();
+	}
 
-  @POST
-  public Response createAnnotation(final AnnotationPrototype prototype) {
-    final AnnotationCreationRequest command = commandBuilder.build(prototype);
-    final AlexandriaAnnotation annotation = command.execute(service);
+	@DELETE
+	@Path("{uuid}")
+	public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
+		return Response.status(501).build();
+	}
 
-    if (command.wasExecutedAsIs()) {
-      return Response.noContent().build();
-    }
+	// Sub-resource delegation
 
-    final AnnotationEntity entity = entityBuilder.build(annotation);
-    return Response.created(locationOf(annotation)).entity(entity).build();
-  }
-
-  @DELETE
-  @Path("{uuid}")
-  public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
-    return Response.status(501).build();
-  }
-
-  // TODO: replace by injected LocationBuilder (to be written) ?
-  private URI locationOf(AlexandriaAnnotation annotation) {
-    return URI.create(String.format("%s/%s", EndpointPaths.ANNOTATIONS + "/", annotation.getId()));
-  }
-
+	@Path("{uuid}/annotations")
+	public Class<AnnotationAnnotations> getAnnotations() {
+		return AnnotationAnnotations.class; // no instantiation of our own; let Jersey handle the lifecycle
+	}
 }
-
-
-

@@ -2,12 +2,12 @@ package nl.knaw.huygens.alexandria.model;
 
 import java.util.UUID;
 
-public class AlexandriaAnnotation implements Accountable {
+public class AlexandriaAnnotation extends AnnotatableObject {
 	private final UUID id;
 
 	private final AlexandriaAnnotationBody body;
 
-	private final AlexandriaProvenance provenance;	
+	private final AlexandriaProvenance provenance;
 
 	public AlexandriaAnnotation(UUID id, AlexandriaAnnotationBody body, TentativeAlexandriaProvenance provenance) {
 		this.id = id;
@@ -27,5 +27,4 @@ public class AlexandriaAnnotation implements Accountable {
 	public AlexandriaProvenance getProvenance() {
 		return provenance;
 	}
-
 }

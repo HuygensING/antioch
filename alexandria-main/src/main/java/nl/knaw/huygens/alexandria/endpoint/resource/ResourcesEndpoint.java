@@ -51,14 +51,12 @@ public class ResourcesEndpoint extends JSONEndpoint {
 	@GET
 	@Path("{uuid}")
 	public Response getResourceByID(@PathParam("uuid") final UUIDParam uuid) {
-		final AlexandriaResource resource = alexandriaService.readResource(uuid
-				.getValue());
+		final AlexandriaResource resource = alexandriaService.readResource(uuid.getValue());
 		return Response.ok(entityBuilder.build(resource)).build();
 	}
 
 	@POST
-	public Response createResource(
-			@NotNull @Valid @WithoutId ResourcePrototype protoType) {
+	public Response createResource(@NotNull @Valid @WithoutId ResourcePrototype protoType) {
 		LOG.trace("protoType=[{}]", protoType);
 
 		final ResourceCreationRequest request = requestBuilder.build(protoType);
@@ -74,8 +72,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
 	@PUT
 	@Path("{uuid}")
-	public Response setResourceAtSpecificID(
-			@NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
+	public Response setResourceAtSpecificID(@NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
 		LOG.trace("protoType=[{}]", protoType);
 
 		final ResourceCreationRequest request = requestBuilder.build(protoType);
@@ -102,23 +99,20 @@ public class ResourcesEndpoint extends JSONEndpoint {
 	@GET
 	@Path("{uuid}/ref")
 	public Response getResourceRef(@PathParam("uuid") final UUIDParam uuidParam) {
-		AlexandriaResource resource = alexandriaService.readResource(uuidParam
-				.getValue());
+		AlexandriaResource resource = alexandriaService.readResource(uuidParam.getValue());
 		return Response.ok(new RefEntity(resource.getRef())).build();
 	}
 
 	// Sub-resource delegation
 
 	@Path("{uuid}/annotations")
-	public Class<ResourceAnnotations> getResourceAnnotations() {
-		return ResourceAnnotations.class; // no instantiation of our own; let Jersey
-																			// handle the lifecycle
+	public Class<ResourceAnnotations> getAnnotations() {
+		return ResourceAnnotations.class; // no instantiation of our own; let Jersey handle the lifecycle
 	}
 
 	// TODO: replace by injected LocationBuilder (to be written) ?
 	private URI locationOf(UUID uuid) {
-		return URI.create(String.format("%s/%s/%s", configuration.getBaseURI(),
-				EndpointPaths.RESOURCES, uuid));
+		return URI.create(String.format("%s/%s/%s", configuration.getBaseURI(), EndpointPaths.RESOURCES, uuid));
 	}
 
 }

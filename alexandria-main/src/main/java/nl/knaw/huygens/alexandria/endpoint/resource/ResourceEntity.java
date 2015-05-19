@@ -59,7 +59,7 @@ class ResourceEntity {
 		LOG.debug("Converting {} annotations: [{}]", resource.getAnnotations().size(), resource.getAnnotations());
 		// TODO: When Jackson can handle Streams, maybe return
 		// Stream<AnnotationView>.
-		final Set<URI> uris = Sets.newHashSet(resource.streamAnnotations().map(this::annotationURI).iterator());
+		final Set<URI> uris = Sets.newHashSet(resource.getAnnotations().stream().map(this::annotationURI).iterator());
 		LOG.debug("uris: {}", uris);
 		return uris;
 	}
