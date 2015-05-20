@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Optional;
 
 import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -54,7 +53,7 @@ public class ApiFixture extends JerseyTest {
   private Optional<MediaType> optionalContentType;
   private Optional<String> optionalBody;
   private Response response;
-  private String entity;
+  private Optional<String> entity;
 
   @BeforeClass
   public static void setup() {
@@ -104,30 +103,31 @@ public class ApiFixture extends JerseyTest {
     optionalContentType = Optional.empty();
     optionalBody = Optional.empty();
     response = null;
-    entity = null;
+    entity = Optional.empty();
     LOG.trace("+- done (request details cleared)");
   }
 
   public void request(String method, String path) {
     LOG.trace("request: method=[{}], path=[{}]", method, path);
-    final Builder request = target.path(path).request(APPLICATION_JSON_TYPE);
+    final Builder invoker = target.path(path).request(APPLICATION_JSON_TYPE);
 
-    response = invoke(request, method);
-    LOG.trace("response: [{}]", response);
-
-    if (response.hasEntity()) {
-      entity = response.readEntity(String.class).replaceAll(hostInfo(), "{host}");
-      LOG.trace("read response entity: [{}]", entity);
-    }
-  }
-
-  private Response invoke(Builder request, String method) {
     if (optionalBody.isPresent()) {
       final MediaType mediaType = optionalContentType.orElse(APPLICATION_JSON_TYPE);
-      return request.method(method, Entity.entity(optionalBody.get(), mediaType), Response.class);
+      response = invoker.method(method, Entity.entity(optionalBody.get(), mediaType), Response.class);
+    } else {
+      response = invoker.method(method, Response.class);
+    }
+    LOG.trace("response: [{}]", response);
+
+    if (response == null) {
+      throw new IllegalStateException("Invoker yielded null Response");
     }
 
-    return request.method(method, Response.class);
+    if (response.hasEntity()) {
+      final String rawEntity = response.readEntity(String.class);
+      entity = Optional.of(normalizeHostInfo(rawEntity));
+      LOG.trace("read response entity: [{}]", entity);
+    }
   }
 
   public void body(String body) {
@@ -143,19 +143,11 @@ public class ApiFixture extends JerseyTest {
   }
 
   public String response() {
-    return entity;
-  }
-
-  public String responseOrEmpty() {
-    return Optional.ofNullable(Strings.emptyToNull(response())).orElse("empty");
-  }
-
-  public String headerContent(String name) {
-    return header(name).map(content -> format("%s:%s", name, content)).orElse("(no name)");
+    return entity.orElse("empty");
   }
 
   public String location() {
-    return responseLocation().map(l -> l.replaceAll(hostInfo(), "{host}")).orElse("no-location");
+    return responseLocation().map(this::normalizeHostInfo).orElse("no-location");
   }
 
   public String status() {
@@ -194,6 +186,10 @@ public class ApiFixture extends JerseyTest {
 
   private Optional<String> header(String header) {
     return Optional.ofNullable(response.getHeaderString(header));
+  }
+
+  private String normalizeHostInfo(String s) {
+    return s.replaceAll(hostInfo(), "{host}");
   }
 
   private String hostInfo() {
