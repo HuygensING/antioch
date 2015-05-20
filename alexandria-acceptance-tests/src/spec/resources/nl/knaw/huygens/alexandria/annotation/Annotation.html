@@ -20,7 +20,7 @@
             <li c:execute="request(#method, #endpoint)">Then:</li>
             <ol>
                 <li>the response status should be <b c:assertEquals="status()">404 Not Found</b>;</li>
-                <li>the response body is <b c:assertEquals="responseOrEmpty()">empty</b>.</li>
+                <li>the response body is <b c:assertEquals="response()">empty</b>.</li>
             </ol>
         </ul>
     </div>
@@ -51,7 +51,7 @@
                         followed by a <b c:assertEquals="uuidQuality()">well-formed UUID</b>;
                     </li>
                     <li>the response body looks like:
-<pre json:includesJson="responseOrEmpty()">{
+<pre json:includesJson="response()">{
     "annotation": {
         "type": "emotion",
         "value": "happy",
@@ -90,7 +90,7 @@
                 <ol>
                     <li>the response status should be <b c:assertEquals="status()">201 Created</b>;</li>
                     <li>the response body looks like:
-<pre json:includesJson="responseOrEmpty()">{
+<pre json:includesJson="response()">{
     "annotation": {
         "type": "emotion",
         "value": "happy",

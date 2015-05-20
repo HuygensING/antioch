@@ -21,7 +21,7 @@
             <li c:execute="request(#method, #endpoint)">Then:</li>
             <ol>
                 <li>the response status should be <b c:assertEquals="status()">404 Not Found</b>;</li>
-                <li>the response body is <b c:assertEquals="responseOrEmpty()">empty</b>.</li>
+                <li>the response body is <b c:assertEquals="response()">empty</b>.</li>
             </ol>
         </ul>
     </div>

@@ -29,7 +29,7 @@
                         followed by a <b c:assertEquals="uuidQuality()">well-formed UUID</b>;
                     </li>
                     <li>the response body looks like:
-<pre json:includesJson="responseOrEmpty()">{
+<pre json:includesJson="response()">{
     "resource": {
         "ref": "http://www.example.com/titles/path/to/title/resource",
         "annotations": [],
@@ -64,7 +64,7 @@
             <li c:execute="request(#method, #endpoint)">Then:
                 <ol>
                     <li>the response status should be <b c:assertEquals="status()">204 No Content</b>;</li>
-                    <li>the response body is <b c:assertEquals="responseOrEmpty()">empty</b>.</li>
+                    <li>the response body is <b c:assertEquals="response()">empty</b>.</li>
                 </ol>
             </li>
         </ul>
@@ -82,7 +82,7 @@
                 <ol>
                     <li>the response status should be <b c:assertEquals="status()">400 Bad Request</b>;</li>
                     <li>the response body contains (amongst other error details):
-<pre json:includesJson="responseOrEmpty()">[
+<pre json:includesJson="response()">[
     {
         "message" : "may not be null",
         "messageTemplate" : "{javax.validation.constraints.NotNull.message}",
@@ -112,7 +112,7 @@
                 <ol>
                     <li>the response status should be <b c:assertEquals="status()">400 Bad Request</b>;</li>
                     <li>the response body contains (amongst other error details):
-<pre json:includesJson="responseOrEmpty()">[
+<pre json:includesJson="response()">[
     {
         "message" : "Missing required 'ref' field"
     }
@@ -146,7 +146,7 @@
                 <ol>
                     <li>the response status should be <b c:assertEquals="status()">400 Bad Request</b>;</li>
                     <li>the response body contains (amongst other error details):
-                        <pre json:includesJson="responseOrEmpty()">[
+                        <pre json:includesJson="response()">[
     {
         "message" : "Entity 'id' must match the one used in the URL"
     }
