@@ -51,7 +51,7 @@ public class ApiFixture extends JerseyTest {
   private static ResourceConfig application;
 
   private WebTarget target;
-  private Optional<MediaType> contentType;
+  private Optional<MediaType> optionalContentType;
   private Optional<String> optionalBody;
   private Response response;
   private String entity;
@@ -101,7 +101,7 @@ public class ApiFixture extends JerseyTest {
     target = client().target(getBaseUri());
     LOG.trace("+- refreshed WebTarget: [{}]", target);
 
-    contentType = Optional.empty();
+    optionalContentType = Optional.empty();
     optionalBody = Optional.empty();
     response = null;
     entity = null;
@@ -112,36 +112,34 @@ public class ApiFixture extends JerseyTest {
     LOG.trace("request: method=[{}], path=[{}]", method, path);
     final Builder request = target.path(path).request(APPLICATION_JSON_TYPE);
 
-    response = optionalBody.isPresent() //
-        ? invokeWithEntity(request, method, optionalBody.get()) //
-        : invokeWithoutEntity(request, method);
+    response = invoke(request, method);
     LOG.trace("response: [{}]", response);
 
     if (response.hasEntity()) {
-      this.entity = response.readEntity(String.class).replaceAll(hostInfo(), "{host}");
+      entity = response.readEntity(String.class).replaceAll(hostInfo(), "{host}");
       LOG.trace("read response entity: [{}]", entity);
     }
   }
 
-  private Response invokeWithoutEntity(Builder request, String method) {
+  private Response invoke(Builder request, String method) {
+    if (optionalBody.isPresent()) {
+      final MediaType mediaType = optionalContentType.orElse(APPLICATION_JSON_TYPE);
+      return request.method(method, Entity.entity(optionalBody.get(), mediaType), Response.class);
+    }
+
     return request.method(method, Response.class);
   }
 
-  private Response invokeWithEntity(Builder request, String method, String body) {
-    final Entity<String> entity = contentType.isPresent() ? Entity.entity(body, contentType.get()) : Entity.json(body);
-    return request.method(method, entity, Response.class);
-  }
-
   public void body(String body) {
-    this.optionalBody = Optional.of(body);
+    optionalBody = Optional.of(body);
   }
 
   public void emptyBody() {
-    this.optionalBody = Optional.empty();
+    body("");
   }
 
   public void contentType(String type) {
-    this.contentType = Optional.of(MediaType.valueOf(type));
+    optionalContentType = Optional.of(MediaType.valueOf(type));
   }
 
   public String response() {
