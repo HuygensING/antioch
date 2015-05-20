@@ -1,7 +1,6 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
-import java.net.URI;
-import java.util.UUID;
+import static nl.knaw.huygens.alexandria.endpoint.EndpointPaths.RESOURCES;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -13,18 +12,19 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
+import java.util.UUID;
 
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
-import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path(EndpointPaths.RESOURCES)
+@Path(RESOURCES)
 public class ResourcesEndpoint extends JSONEndpoint {
 	private static final Logger LOG = LoggerFactory.getLogger(JSONEndpoint.class);
 
@@ -117,7 +117,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
 	// TODO: replace by injected LocationBuilder (to be written) ?
 	private URI locationOf(UUID uuid) {
-		return URI.create(String.format("%s/%s/%s", configuration.getBaseURI(), EndpointPaths.RESOURCES, uuid));
+		return UriBuilder.fromUri(configuration.getBaseURI()).path(RESOURCES).path("{uuid}").build(uuid);
 	}
 
 }
