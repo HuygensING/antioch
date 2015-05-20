@@ -15,12 +15,12 @@ import org.concordion.api.ExpectedToFail;
 public class CreationFixture extends ResourceFixture {
 	@Override
 	public void request(String method, String path) {
-		when(resourceService().readResource(any(UUID.class))).thenThrow(new NotFoundException());
+		when(service().readResource(any(UUID.class))).thenThrow(new NotFoundException());
 
 		TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("", Instant.now(), "");
 		// final AlexandriaResource mockResource = new
 		// AlexandriaResource(UUID.randomUUID(), provenance);
-		when(resourceService().createOrUpdateResource(any(UUID.class), any(String.class), provenance)).thenReturn(true);
+		when(service().createOrUpdateResource(any(UUID.class), any(String.class), provenance)).thenReturn(true);
 
 		super.request(method, path);
 	}

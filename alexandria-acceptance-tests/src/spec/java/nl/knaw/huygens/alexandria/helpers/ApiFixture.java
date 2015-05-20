@@ -2,6 +2,7 @@ package nl.knaw.huygens.alexandria.helpers;
 
 import static java.lang.String.format;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
+import static org.mockito.Mockito.mock;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
@@ -27,12 +28,15 @@ import com.squarespace.jersey2.guice.BootstrapUtils;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
 import org.concordion.api.extension.Extensions;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.TestProperties;
+import org.junit.BeforeClass;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,36 +46,41 @@ public class ApiFixture extends JerseyTest {
 
   private static final AlexandriaConfiguration CONFIG = testConfiguration();
 
+  private static final AlexandriaService SERVICE_MOCK = mock(AlexandriaService.class);
+
   private static ResourceConfig application;
+
   private WebTarget target;
   private Optional<MediaType> contentType;
   private Optional<String> optionalBody;
   private Response response;
   private String entity;
 
-  private static AlexandriaConfiguration testConfiguration() {
-    return () -> UriBuilder.fromUri("https://localhost/").port(4242).build();
-  }
+  @BeforeClass
+  public static void setup() {
+    LOG.debug("Setting up Jersey");
 
-  public static void register(Class<?> componentClass) {
-    application.register(componentClass);
-  }
-
-  public static void setupJerseyAndGuice(Module module) {
-    LOG.trace("Setting up Jersey");
     application = new AcceptanceTestApplication();
     LOG.trace("+- application=[{}]", application);
 
-    LOG.trace("Bootstrapping Jersey2-Guice bridge:");
+    LOG.debug("Bootstrapping Jersey2-Guice bridge");
     ServiceLocator locator = BootstrapUtils.newServiceLocator();
     LOG.trace("+- locator=[{}]", locator);
 
-    final List<Module> modules = Arrays.asList(new ServletModule(), baseModule(), module);
+    final List<Module> modules = Arrays.asList(new ServletModule(), baseModule());
     final Injector injector = BootstrapUtils.newInjector(locator, modules);
     LOG.trace("+- injector=[{}]", injector);
 
     BootstrapUtils.install(locator);
     LOG.trace("+- done: locator installed");
+  }
+
+  protected static void register(Class<?> componentClass) {
+    application.register(componentClass);
+  }
+
+  private static AlexandriaConfiguration testConfiguration() {
+    return () -> UriBuilder.fromUri("https://localhost/").port(4242).build();
   }
 
   public String base() {
@@ -84,18 +93,24 @@ public class ApiFixture extends JerseyTest {
   }
 
   public void clear() {
+    LOG.debug("Clearing ApiFixture");
+
+    LOG.trace("+- resetting (mocked) AlexandriaService layer");
+    Mockito.reset(SERVICE_MOCK);
+
     target = client().target(getBaseUri());
+    LOG.trace("+- refreshed WebTarget: [{}]", target);
+
     contentType = Optional.empty();
     optionalBody = Optional.empty();
     response = null;
     entity = null;
+    LOG.trace("+- done (request details cleared)");
   }
 
   public void request(String method, String path) {
     LOG.trace("request: method=[{}], path=[{}]", method, path);
     final Builder request = target.path(path).request(APPLICATION_JSON_TYPE);
-
-    LOG.trace("ContentType=[{}], optionalBody=[{}]", contentType, optionalBody);
 
     response = optionalBody.isPresent() //
         ? invokeWithEntity(request, method, optionalBody.get()) //
@@ -104,6 +119,7 @@ public class ApiFixture extends JerseyTest {
 
     if (response.hasEntity()) {
       this.entity = response.readEntity(String.class).replaceAll(hostInfo(), "{host}");
+      LOG.trace("read response entity: [{}]", entity);
     }
   }
 
@@ -156,22 +172,26 @@ public class ApiFixture extends JerseyTest {
     return application;
   }
 
+  @Override
+  protected URI getBaseUri() {
+    return CONFIG.getBaseURI();
+  }
+
+  protected AlexandriaService service() {
+    return SERVICE_MOCK;
+  }
+
   private static Module baseModule() {
     return new AbstractModule() {
       @Override
       protected void configure() {
         LOG.trace("setting up Guice bindings");
+        bind(AlexandriaService.class).toInstance(SERVICE_MOCK);
         bind(AlexandriaConfiguration.class).toInstance(CONFIG);
         bind(AnnotationEntityBuilder.class).toInstance(AnnotationEntityBuilder.forConfig(CONFIG));
         bind(ResourceEntityBuilder.class).toInstance(ResourceEntityBuilder.forConfig(CONFIG));
       }
     };
-  }
-
-  @Override
-  protected URI getBaseUri() {
-//  protected URI getBaseURI() {
-    return CONFIG.getBaseURI();
   }
 
   private Optional<String> header(String header) {
