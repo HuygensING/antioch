@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.inject.AbstractModule;
@@ -80,7 +81,17 @@ public class ApiFixture extends JerseyTest {
   }
 
   private static AlexandriaConfiguration testConfiguration() {
-    return () -> UriBuilder.fromUri("https://localhost/").port(4242).build();
+    return new AlexandriaConfiguration() {
+      @Override
+      public URI getBaseURI() {
+        return UriBuilder.fromUri("https://localhost/").port(4242).build();
+      }
+
+      @Override
+      public String toString() {
+        return Objects.toStringHelper(this).add("baseURI", getBaseURI()).toString();
+      }
+    };
   }
 
   public String base() {
