@@ -18,7 +18,7 @@ public class QueryingFixture extends ResourceFixture {
 		UUID uuid = UUID.fromString(id);
 		TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
 		resource = new AlexandriaResource(uuid, provenance);
-		when(resourceService().readResource(uuid)).thenReturn(resource);
+		when(service().readResource(uuid)).thenReturn(resource);
 	}
 
 	public void withReference(String reference) {
@@ -33,6 +33,6 @@ public class QueryingFixture extends ResourceFixture {
 
 	public void noSuchResource(String id) {
 		UUID uuid = UUID.fromString(id);
-		when(resourceService().readResource(uuid)).thenThrow(new NotFoundException());
+		when(service().readResource(uuid)).thenThrow(new NotFoundException());
 	}
 }
