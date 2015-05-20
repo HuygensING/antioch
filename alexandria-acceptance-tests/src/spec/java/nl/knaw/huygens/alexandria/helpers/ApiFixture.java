@@ -22,6 +22,7 @@ import com.google.common.collect.Iterables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.Scopes;
 import com.google.inject.servlet.ServletModule;
 import com.squarespace.jersey2.guice.BootstrapUtils;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
@@ -178,8 +179,8 @@ public class ApiFixture extends JerseyTest {
         LOG.trace("setting up Guice bindings");
         bind(AlexandriaService.class).toInstance(SERVICE_MOCK);
         bind(AlexandriaConfiguration.class).toInstance(CONFIG);
-        bind(AnnotationEntityBuilder.class).toInstance(AnnotationEntityBuilder.forConfig(CONFIG));
-        bind(ResourceEntityBuilder.class).toInstance(ResourceEntityBuilder.forConfig(CONFIG));
+        bind(AnnotationEntityBuilder.class).in(Scopes.SINGLETON);
+        bind(ResourceEntityBuilder.class).in(Scopes.SINGLETON);
       }
     };
   }
