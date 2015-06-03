@@ -4,6 +4,11 @@ import static java.lang.String.format;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static org.mockito.Mockito.mock;
 
+import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
@@ -12,10 +17,21 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+
+import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
+import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.util.UUIDParser;
+
+import org.concordion.api.extension.Extensions;
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.test.JerseyTest;
+import org.glassfish.jersey.test.TestProperties;
+import org.junit.BeforeClass;
+import org.mockito.Mockito;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
@@ -26,24 +42,9 @@ import com.google.inject.Module;
 import com.google.inject.Scopes;
 import com.google.inject.servlet.ServletModule;
 import com.squarespace.jersey2.guice.BootstrapUtils;
-import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
-import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
-import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
-import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.alexandria.util.UUIDParser;
-import org.concordion.api.extension.Extensions;
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.test.JerseyTest;
-import org.glassfish.jersey.test.TestProperties;
-import org.junit.BeforeClass;
-import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Extensions(ApiExtension.class)
 public class ApiFixture extends JerseyTest {
-  private static final Logger LOG = LoggerFactory.getLogger(ApiFixture.class);
 
   private static final AlexandriaConfiguration CONFIG = testConfiguration();
 
@@ -59,21 +60,21 @@ public class ApiFixture extends JerseyTest {
 
   @BeforeClass
   public static void setup() {
-    LOG.debug("Setting up Jersey");
+    Log.debug("Setting up Jersey");
 
     application = new AcceptanceTestApplication();
-    LOG.trace("+- application=[{}]", application);
+    Log.trace("+- application=[{}]", application);
 
-    LOG.debug("Bootstrapping Jersey2-Guice bridge");
+    Log.debug("Bootstrapping Jersey2-Guice bridge");
     ServiceLocator locator = BootstrapUtils.newServiceLocator();
-    LOG.trace("+- locator=[{}]", locator);
+    Log.trace("+- locator=[{}]", locator);
 
     final List<Module> modules = Arrays.asList(new ServletModule(), baseModule());
     final Injector injector = BootstrapUtils.newInjector(locator, modules);
-    LOG.trace("+- injector=[{}]", injector);
+    Log.trace("+- injector=[{}]", injector);
 
     BootstrapUtils.install(locator);
-    LOG.trace("+- done: locator installed");
+    Log.trace("+- done: locator installed");
   }
 
   protected static void register(Class<?> componentClass) {
@@ -104,23 +105,23 @@ public class ApiFixture extends JerseyTest {
   }
 
   public void clear() {
-    LOG.debug("Clearing ApiFixture");
+    Log.debug("Clearing ApiFixture");
 
-    LOG.trace("+- resetting (mocked) AlexandriaService layer");
+    Log.trace("+- resetting (mocked) AlexandriaService layer");
     Mockito.reset(SERVICE_MOCK);
 
     target = client().target(getBaseUri());
-    LOG.trace("+- refreshed WebTarget: [{}]", target);
+    Log.trace("+- refreshed WebTarget: [{}]", target);
 
     optionalContentType = Optional.empty();
     optionalBody = Optional.empty();
     response = null;
     entity = Optional.empty();
-    LOG.trace("+- done (request details cleared)");
+    Log.trace("+- done (request details cleared)");
   }
 
   public void request(String method, String path) {
-    LOG.trace("request: method=[{}], path=[{}]", method, path);
+    Log.trace("request: method=[{}], path=[{}]", method, path);
     final Builder invoker = target.path(path).request(APPLICATION_JSON_TYPE);
 
     if (optionalBody.isPresent()) {
@@ -129,7 +130,7 @@ public class ApiFixture extends JerseyTest {
     } else {
       response = invoker.method(method, Response.class);
     }
-    LOG.trace("response: [{}]", response);
+    Log.trace("response: [{}]", response);
 
     if (response == null) {
       throw new IllegalStateException("Invoker yielded null Response");
@@ -138,7 +139,7 @@ public class ApiFixture extends JerseyTest {
     if (response.hasEntity()) {
       final String rawEntity = response.readEntity(String.class);
       entity = Optional.of(normalizeHostInfo(rawEntity));
-      LOG.trace("read response entity: [{}]", entity);
+      Log.trace("read response entity: [{}]", entity);
     }
   }
 
@@ -187,7 +188,7 @@ public class ApiFixture extends JerseyTest {
     return new AbstractModule() {
       @Override
       protected void configure() {
-        LOG.trace("setting up Guice bindings");
+        Log.trace("setting up Guice bindings");
         bind(AlexandriaService.class).toInstance(SERVICE_MOCK);
         bind(AlexandriaConfiguration.class).toInstance(CONFIG);
         bind(AnnotationEntityBuilder.class).in(Scopes.SINGLETON);

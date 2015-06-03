@@ -7,28 +7,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.helpers.ApiFixture;
+
 import org.concordion.api.MultiValueResult;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 @RunWith(ConcordionRunner.class)
 public class AnnotationFixture extends ApiFixture {
-  private static final Logger LOG = LoggerFactory.getLogger(AnnotationFixture.class);
 
   private final Map<String, List<String>> annotatedReferences = Maps.newHashMap();
 
   @BeforeClass
   public static void registerEndpoint() {
-    LOG.trace("Registering AnnotationsEndpoint");
+    Log.trace("Registering AnnotationsEndpoint");
     register(AnnotationsEndpoint.class);
   }
 
@@ -42,12 +42,12 @@ public class AnnotationFixture extends ApiFixture {
   // final AlexandriaAnnotation annotation = new AlexandriaAnnotationBody(uuid, "aType", "aValue");
   // mockAnnotation.addAnnotation(annotation);
   //
-  // LOG.trace("Mocking annotationService.readAnnotation({}) -> [{}]", id, annotation);
+  // Log.trace("Mocking annotationService.readAnnotation({}) -> [{}]", id, annotation);
   // when(annotationService().readAnnotation(uuid)).thenReturn(annotation);
   // }
   //
   // public void createAnnotation(String type, String value) {
-  // LOG.trace("createAnnotation([{}],[{}])", type, value);
+  // Log.trace("createAnnotation([{}],[{}])", type, value);
   //
   // mockAnnotation = new AlexandriaAnnotation(randomUUID(), type, value);
   // mockAnnotation.setCreatedOn(Instant.now());
