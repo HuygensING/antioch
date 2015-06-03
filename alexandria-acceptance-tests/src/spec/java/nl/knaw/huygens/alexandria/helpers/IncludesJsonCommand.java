@@ -7,8 +7,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import nl.knaw.huygens.Log;
+
 import org.concordion.api.AbstractCommand;
 import org.concordion.api.CommandCall;
 import org.concordion.api.Element;
@@ -19,11 +19,11 @@ import org.concordion.api.listener.AssertEqualsListener;
 import org.concordion.api.listener.AssertFailureEvent;
 import org.concordion.api.listener.AssertSuccessEvent;
 import org.concordion.internal.util.Announcer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class IncludesJsonCommand extends AbstractCommand {
-  private static final Logger LOG = LoggerFactory.getLogger(IncludesJsonCommand.class);
 
   private Announcer<AssertEqualsListener> listeners = Announcer.to(AssertEqualsListener.class);
 
@@ -31,10 +31,10 @@ public class IncludesJsonCommand extends AbstractCommand {
   public void verify(CommandCall commandCall, Evaluator evaluator, ResultRecorder resultRecorder) {
     final Element element = commandCall.getElement();
     final String expected = element.getText();
-//    LOG.trace("IncludesJsonCommand: expected=[{}]", expected);
+    // Log.trace("IncludesJsonCommand: expected=[{}]", expected);
 
     final String actual = (String) evaluator.evaluate(commandCall.getExpression());
-//    LOG.trace("IncludesJsonCommand: actual=[{}]", actual);
+    // Log.trace("IncludesJsonCommand: actual=[{}]", actual);
 
     if (includesJson(actual, expected)) {
       resultRecorder.record(Result.SUCCESS);
@@ -66,8 +66,8 @@ public class IncludesJsonCommand extends AbstractCommand {
   }
 
   private boolean includesJson(JsonNode actual, JsonNode expected) {
-    LOG.trace("includesJson.actual  =[{}]", actual);
-    LOG.trace("includesJson.expected=[{}]", expected);
+    Log.trace("includesJson.actual  =[{}]", actual);
+    Log.trace("includesJson.expected=[{}]", expected);
     if (expected.isArray()) {
       return includesJsonArray(actual, expected);
     }
@@ -79,12 +79,12 @@ public class IncludesJsonCommand extends AbstractCommand {
     if (expected.isTextual()) {
       // TODO: rather than if-else store these in a mapping from "{format}" to a JsonChecker (to be written) per format
       if ("{date.beforeNow}".equals(expected.asText())) {
-        LOG.trace("Parsing [{}] as Instant", actual.asText());
+        Log.trace("Parsing [{}] as Instant", actual.asText());
         try {
           final Instant when = Instant.parse(actual.asText());
           return when.isBefore(Instant.now());
         } catch (DateTimeParseException e) {
-          LOG.trace("DateTimeParseException: [{}]", e.getMessage());
+          Log.trace("DateTimeParseException: [{}]", e.getMessage());
           return false;
         }
       }
@@ -102,8 +102,7 @@ public class IncludesJsonCommand extends AbstractCommand {
       return actual.size() == 0;
     }
 
-    outer:
-    for (JsonNode expectedItem : expected) {
+    outer: for (JsonNode expectedItem : expected) {
       for (JsonNode candidateItem : actual) {
         if (includesJson(candidateItem, expectedItem)) {
           continue outer;
