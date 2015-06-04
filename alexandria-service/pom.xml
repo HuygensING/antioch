@@ -13,7 +13,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>alexandria-main</artifactId>
       <version>${project.version}</version>
-      <scope>test</scope>
     </dependency>
 
     <!-- tinkerpop -->
@@ -44,7 +43,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
+
     <!-- Tests -->
     <dependency>
       <groupId>org.assertj</groupId>

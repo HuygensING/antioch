@@ -167,11 +167,11 @@
   </properties>
 
   <modules>
-    <module>alexandria-acceptance-tests</module>
     <module>alexandria-main</module>
+    <module>alexandria-acceptance-tests</module>
+    <module>alexandria-service</module>
     <module>alexandria-server</module>
     <module>alexandria-webapp</module>
     <module>alexandria-site</module>
-    <module>alexandria-service</module>
   </modules>
 </project>
