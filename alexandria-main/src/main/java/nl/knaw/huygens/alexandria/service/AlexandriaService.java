@@ -10,22 +10,29 @@ import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
 public interface AlexandriaService {
-	boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance);
+  /**
+   *
+   * @param uuid
+   * @param ref
+   * @param provenance
+   * @return true if the resource was created, false if it was updated
+   */
+  boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance);
 
-	AlexandriaResource readResource(UUID uuid);
+  AlexandriaResource readResource(UUID uuid);
 
-	boolean createAnnotationBody(UUID uuid, Optional<String> type, String value, TentativeAlexandriaProvenance provenance);
+  boolean createAnnotationBody(UUID uuid, Optional<String> type, String value, TentativeAlexandriaProvenance provenance);
 
-	AlexandriaAnnotationBody findAnnotationBodyWithTypeAndValue(Optional<String> type, String value);
+  AlexandriaAnnotationBody findAnnotationBodyWithTypeAndValue(Optional<String> type, String value);
 
-	AlexandriaAnnotationBody readAnnotationBody(UUID uuid);
+  AlexandriaAnnotationBody readAnnotationBody(UUID uuid);
 
-	AlexandriaAnnotation annotate(AlexandriaResource resource, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance);
+  AlexandriaAnnotation annotate(AlexandriaResource resource, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance);
 
-	AlexandriaAnnotation annotate(AlexandriaAnnotation annotation, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance);
+  AlexandriaAnnotation annotate(AlexandriaAnnotation annotation, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance);
 
-	AlexandriaAnnotation readAnnotation(UUID uuid);
+  AlexandriaAnnotation readAnnotation(UUID uuid);
 
-	Set<AlexandriaResource> readSubResources(UUID uuid);
+  Set<AlexandriaResource> readSubResources(UUID uuid);
 
 }
