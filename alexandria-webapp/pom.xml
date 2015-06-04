@@ -11,11 +11,11 @@
 	<packaging>war</packaging>
 
 	<dependencies>
-		<dependency>
-			<groupId>nl.knaw.huygens.alexandria</groupId>
-			<artifactId>alexandria-main</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>alexandria-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
 		<dependency>
 			<groupId>se.jiderhamn</groupId>
