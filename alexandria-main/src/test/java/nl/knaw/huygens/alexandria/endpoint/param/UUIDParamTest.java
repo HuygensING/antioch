@@ -1,9 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint.param;
 
 import static org.junit.Assert.assertEquals;
-
 import java.util.UUID;
-
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import org.junit.Test;
