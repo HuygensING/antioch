@@ -9,6 +9,15 @@
   <url>http://alexandria.huygens.knaw.nl</url>
   <inceptionYear>2015</inceptionYear>
 
+  <modules>
+    <module>alexandria-main</module>
+    <module>alexandria-acceptance-tests</module>
+    <module>alexandria-service</module>
+    <module>alexandria-server</module>
+    <module>alexandria-webapp</module>
+    <module>alexandria-site</module>
+  </modules>
+
   <organization>
     <name>Huygens ING (KNAW)</name>
     <url>http://www.huygens.knaw.nl</url>
@@ -131,16 +140,17 @@
 
     <!-- Software versions -->
     <assertj.version>3.0.0</assertj.version>
-    <concordion.version>1.4.7</concordion.version>
+    <concordion.version>1.5.0</concordion.version>
     <guice.version>3.0</guice.version>
-    <jackson.version>2.5.3</jackson.version>
+    <jackson.version>2.6.0-rc1</jackson.version>
     <jdk.version>1.8</jdk.version>
     <jersey.version>2.17</jersey.version>
     <jersey-bean-validation.version>2.17</jersey-bean-validation.version>
-    <jersey2-guice.version>0.5</jersey2-guice.version>
+    <jersey2-guice.version>0.10</jersey2-guice.version>
     <junit.version>4.12</junit.version>
     <log.version>1.0.0</log.version>
-    <mockito.version>1.10.19</mockito.version>
+    <logback.version>1.1.2</logback.version>
+    <mockito.version>2.0.13-beta</mockito.version>
     <plugin.scm-publish.version>1.0</plugin.scm-publish.version>
     <classloader-leak-prevention.version>1.13.0</classloader-leak-prevention.version>
     <maven-assembly.version>2.4</maven-assembly.version>
@@ -164,12 +174,8 @@
     <scmPublish.checkoutDirectory>${project.build.directory}/scmpublish</scmPublish.checkoutDirectory>
   </properties>
 
-  <modules>
-    <module>alexandria-main</module>
-    <module>alexandria-acceptance-tests</module>
-    <module>alexandria-service</module>
-    <module>alexandria-server</module>
-    <module>alexandria-webapp</module>
-    <module>alexandria-site</module>
-  </modules>
+  <prerequisites>
+    <maven>3.0</maven>
+  </prerequisites>
+
 </project>
