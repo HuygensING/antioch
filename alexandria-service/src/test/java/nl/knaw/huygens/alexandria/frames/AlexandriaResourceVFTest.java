@@ -7,10 +7,9 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
-import org.junit.Test;
 
 public class AlexandriaResourceVFTest {
-  @Test
+  // @Test
   public void testGetAfterOfIsIdentity() {
 
     UUID id = UUID.randomUUID();
