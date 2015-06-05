@@ -130,7 +130,7 @@
     <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
 
     <!-- Software versions -->
-    <assertj.version>2.0.0</assertj.version>
+    <assertj.version>3.0.0</assertj.version>
     <concordion.version>1.4.7</concordion.version>
     <guice.version>3.0</guice.version>
     <jackson.version>2.5.3</jackson.version>
@@ -143,15 +143,14 @@
     <logback.version>1.1.2</logback.version>
     <mockito.version>1.10.19</mockito.version>
     <plugin.scm-publish.version>1.0</plugin.scm-publish.version>
-    <classloader-leak-prevention.version>1.12.0</classloader-leak-prevention.version>
+    <classloader-leak-prevention.version>1.13.0</classloader-leak-prevention.version>
     <maven-assembly.version>2.4</maven-assembly.version>
     <maven-compiler.version>3.1</maven-compiler.version>
     <maven-war.version>2.1.1</maven-war.version>
     <servlet-api.version>3.1.0</servlet-api.version>
     <tomcat-maven.version>1.1</tomcat-maven.version>
-    <tinkerpop.version>3.0.0.M8-incubating</tinkerpop.version>
+    <tinkerpop.version>3.0.0.M9-incubating</tinkerpop.version>
     <neo4j-gremlin.version>3.0.0.M7</neo4j-gremlin.version>
-
     <concordion.reportDir>${project.build.directory}/concordion-reports</concordion.reportDir>
     <integration.testOutputDir>${project.build.directory}/integration-test-classes</integration.testOutputDir>
     <site.dir>src/site</site.dir>
