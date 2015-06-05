@@ -6,14 +6,23 @@ import java.util.Set;
 
 public abstract class AnnotatableObject implements Accountable {
 
-	private final Set<AlexandriaAnnotation> annotations = new HashSet<>();
+  private AlexandriaState state = AlexandriaState.Default;
+  private final Set<AlexandriaAnnotation> annotations = new HashSet<>();
 
-	public Set<AlexandriaAnnotation> getAnnotations() {
-		return Collections.unmodifiableSet(annotations);
-	}
+  public Set<AlexandriaAnnotation> getAnnotations() {
+    return Collections.unmodifiableSet(annotations);
+  }
 
-	public void addAnnotation(AlexandriaAnnotation annotation) {
-		annotations.add(annotation);
-	}
+  public void addAnnotation(AlexandriaAnnotation annotation) {
+    annotations.add(annotation);
+  }
+
+  public AlexandriaState getState() {
+    return state;
+  }
+
+  public void setState(AlexandriaState state) {
+    this.state = state;
+  }
 
 }
