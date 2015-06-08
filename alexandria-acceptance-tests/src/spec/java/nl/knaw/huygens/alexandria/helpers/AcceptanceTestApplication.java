@@ -1,7 +1,7 @@
 package nl.knaw.huygens.alexandria.helpers;
 
 import static java.util.logging.Logger.getAnonymousLogger;
-
+import nl.knaw.huygens.alexandria.config.JsonConfiguration;
 import nl.knaw.huygens.alexandria.config.ValidationConfigurationContextResolver;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.server.ResourceConfig;
