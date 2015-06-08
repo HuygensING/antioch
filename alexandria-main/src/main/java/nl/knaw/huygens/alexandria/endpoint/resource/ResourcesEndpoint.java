@@ -1,7 +1,6 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import static nl.knaw.huygens.alexandria.endpoint.EndpointPaths.RESOURCES;
-
 import java.net.URI;
 
 import javax.inject.Inject;
@@ -14,13 +13,14 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 @Path(RESOURCES)
@@ -31,16 +31,13 @@ public class ResourcesEndpoint extends JSONEndpoint {
   private final AlexandriaService alexandriaService;
   private final ResourceEntityBuilder entityBuilder;
   private final ResourceCreationRequestBuilder requestBuilder;
-  private final AlexandriaConfiguration configuration;
   private final LocationBuilder locationBuilder;
 
   @Inject
   public ResourcesEndpoint(AlexandriaService service, //
-      AlexandriaConfiguration configuration,//
       ResourceCreationRequestBuilder requestBuilder, //
       LocationBuilder locationBuilder, //
       ResourceEntityBuilder entityBuilder) {
-    this.configuration = configuration;
     this.locationBuilder = locationBuilder;
     Log.trace("Resources created, alexandriaService=[{}]", service);
 
@@ -60,6 +57,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   public Response createResource(@NotNull @Valid @WithoutId ResourcePrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
 
+    protoType.setState(AlexandriaState.Temporary);
     final ResourceCreationRequest request = requestBuilder.build(protoType);
     AlexandriaResource resource = request.execute(alexandriaService);
 
@@ -76,6 +74,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   public Response setResourceAtSpecificID(@NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
 
+    protoType.setState(AlexandriaState.Default);
     final ResourceCreationRequest request = requestBuilder.build(protoType);
     request.execute(alexandriaService);
 
