@@ -160,6 +160,8 @@
     <tomcat-maven.version>1.1</tomcat-maven.version>
     <tinkerpop.version>3.0.0.M9-incubating</tinkerpop.version>
     <neo4j-gremlin.version>3.0.0.M7</neo4j-gremlin.version>
+    <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
+    
     <concordion.reportDir>${project.build.directory}/concordion-reports</concordion.reportDir>
     <integration.testOutputDir>${project.build.directory}/integration-test-classes</integration.testOutputDir>
     <site.dir>src/site</site.dir>
