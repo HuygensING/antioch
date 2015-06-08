@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.helpers;
+package nl.knaw.huygens.alexandria.config;
 
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
