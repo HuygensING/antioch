@@ -3,9 +3,9 @@ package nl.knaw.huygens.alexandria.service;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
+import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
@@ -34,5 +34,7 @@ public interface AlexandriaService {
   AlexandriaAnnotation readAnnotation(UUID uuid);
 
   Set<AlexandriaResource> readSubResources(UUID uuid);
+
+  AlexandriaProvenance readProvenance(UUID value);
 
 }
