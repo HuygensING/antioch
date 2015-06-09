@@ -3,9 +3,9 @@ package nl.knaw.huygens.alexandria.service;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
+import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
@@ -61,6 +61,12 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
 
   @Override
   public Set<AlexandriaResource> readSubResources(UUID uuid) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public AlexandriaProvenance readProvenance(UUID value) {
     // TODO Auto-generated method stub
     return null;
   }
