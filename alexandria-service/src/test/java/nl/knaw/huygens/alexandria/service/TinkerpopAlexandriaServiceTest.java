@@ -10,8 +10,6 @@ import nl.knaw.huygens.alexandria.storage.Storage;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.Test;
-import com.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
-import com.tinkerpop.gremlin.structure.Vertex;
 
 public class TinkerpopAlexandriaServiceTest {
   private static final Storage mockStorage = mock(Storage.class);
@@ -28,14 +26,4 @@ public class TinkerpopAlexandriaServiceTest {
     assertThat(created).isTrue();
   }
 
-  // @Test
-  public void neo4jtest() throws Exception {
-    Neo4jGraph g = Neo4jGraph.open("C:/Users/BramB/My Documents/Neo4j/alexandria.graphdb");
-    // Log.info("graph features: {}", g.features());
-    Vertex v = g.addVertex(Labels.Resource.toString());
-    v.properties("name", "NAME", "id", "NAM001");
-    v.property("name").property("when", "now");
-    g.io().writeGraphSON("target/graph.json");
-    g.close();
-  }
 }
