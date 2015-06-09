@@ -1,10 +1,8 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import static nl.knaw.huygens.alexandria.endpoint.EndpointPaths.RESOURCES;
-
 import java.net.URI;
 import java.util.UUID;
-
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -16,7 +14,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
@@ -91,7 +88,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @DELETE
   @Path("{uuid}")
   public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
-    return Response.status(501).build();
+    return methodNotImplemented();
   }
 
   // TODO: replace with sub-resource analogous to {uuid}/annotations (see below)
