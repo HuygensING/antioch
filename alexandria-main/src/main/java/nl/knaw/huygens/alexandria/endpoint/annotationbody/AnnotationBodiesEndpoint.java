@@ -56,7 +56,7 @@ public class AnnotationBodiesEndpoint extends JSONEndpoint {
 	@DELETE
 	@Path("{uuid}")
 	public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
-		return Response.status(501).build();
+		return methodNotImplemented();
 	}
 
 	private URI locationOf(UUID uuid) {
