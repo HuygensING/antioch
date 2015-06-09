@@ -10,6 +10,7 @@ import org.glassfish.jersey.server.ServerProperties;
 public class AlexandriaResourceConfig extends ResourceConfig {
   public AlexandriaResourceConfig() {
     packages("nl.knaw.huygens.alexandria.endpoint");
+
     // Bean Validation error messages in the response entity.
     property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true);
 
@@ -24,7 +25,6 @@ public class AlexandriaResourceConfig extends ResourceConfig {
 
     // JSON configuration
     register(JsonConfiguration.class);
-
   }
 
 }
