@@ -1,18 +1,17 @@
 package nl.knaw.huygens.alexandria.endpoint.provenance;
 
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.time.Instant;
+
+import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
-import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
-import nl.knaw.huygens.alexandria.model.Accountable;
-import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 
 @JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
 @JsonTypeName("provenance")
@@ -24,7 +23,7 @@ public class ProvenanceEntity {
   private AlexandriaConfiguration config;
 
   @JsonIgnore
-  private EndpointPathResolver resolver;
+  private LocationBuilder locationBuilder;
 
   private ProvenanceEntity(AlexandriaProvenance provenance) {
     this.provenance = provenance;
@@ -39,8 +38,8 @@ public class ProvenanceEntity {
     return this;
   }
 
-  public ProvenanceEntity withResolver(EndpointPathResolver resolver) {
-    this.resolver = resolver;
+  public ProvenanceEntity withLocationBuilder(LocationBuilder locationBuilder) {
+    this.locationBuilder = locationBuilder;
     return this;
   }
 
@@ -49,7 +48,7 @@ public class ProvenanceEntity {
   }
 
   public URI getWhat() {
-    return accountableURI(provenance.getWhat());
+    return locationBuilder.locationOf(provenance.getWhat());
   }
 
   public Instant getWhen() {
@@ -60,8 +59,4 @@ public class ProvenanceEntity {
     return provenance.getWhy();
   }
 
-  private URI accountableURI(Accountable what) {
-    final String endpoint = resolver.pathOf(what);
-    return UriBuilder.fromUri(config.getBaseURI()).path(endpoint).path("{uuid}").build(what.getId());
-  }
 }

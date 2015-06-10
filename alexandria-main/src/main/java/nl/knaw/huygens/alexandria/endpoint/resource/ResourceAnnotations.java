@@ -1,8 +1,5 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
-import static nl.knaw.huygens.alexandria.endpoint.EndpointPaths.RESOURCES;
-
-import java.net.URI;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -14,15 +11,15 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.AnnotationCreationRequest;
 import nl.knaw.huygens.alexandria.endpoint.AnnotationCreationRequestBuilder;
-import nl.knaw.huygens.alexandria.endpoint.AnnotationEntity;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
+import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
+import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntity;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -37,11 +34,15 @@ public class ResourceAnnotations extends JSONEndpoint {
 
   private final AlexandriaConfiguration configuration;
 
+  private final LocationBuilder locationBuilder;
+
   @Inject
   public ResourceAnnotations(AlexandriaService service, //
       AnnotationCreationRequestBuilder requestBuilder, //
       AlexandriaConfiguration configuration, //
+      LocationBuilder locationBuilder, //
       @PathParam("uuid") final UUIDParam uuidParam) {
+    this.locationBuilder = locationBuilder;
     Log.trace("resourceService=[{}], uuidParam=[{}]", service, uuidParam);
     this.service = service;
     this.requestBuilder = requestBuilder;
@@ -59,13 +60,8 @@ public class ResourceAnnotations extends JSONEndpoint {
   @POST
   public Response addAnnotation(@NotNull @Valid AnnotationPrototype prototype) {
     AnnotationCreationRequest request = requestBuilder.ofResource(uuid).build(prototype);
-    request.execute(service);
-    return Response.created(locationOf(uuid)).build();
-  }
-
-  // TODO: replace by injected LocationBuilder (to be written) ?
-  private URI locationOf(UUID uuid) {
-    return UriBuilder.fromUri(configuration.getBaseURI()).path(RESOURCES).path("{uuid}").build(uuid);
+    AlexandriaAnnotation annotation = request.execute(service);
+    return Response.created(locationBuilder.locationOf(annotation)).build();
   }
 
 }

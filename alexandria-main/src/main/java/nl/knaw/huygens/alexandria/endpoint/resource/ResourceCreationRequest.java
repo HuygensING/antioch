@@ -10,6 +10,7 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.InstantParam;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
@@ -33,7 +34,7 @@ class ResourceCreationRequest {
   // ResourceCreationRequest(UUID parentId, SubResourcePrototype prototype2) {
   // }
 
-  public void execute(AlexandriaService service) {
+  public AlexandriaResource execute(AlexandriaService service) {
     Log.trace("executing, service=[{}]", service);
 
     uuid = providedUUID().orElse(UUID.randomUUID());
@@ -42,8 +43,9 @@ class ResourceCreationRequest {
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(AlexandriaProvenance.DEFAULT_WHO, //
         providedCreatedOn().orElse(Instant.now()), AlexandriaProvenance.DEFAULT_WHY);
     resourceCreated = service.createOrUpdateResource(uuid, ref, provenance);
-
     // Log.trace("resource: [{}]", resource);
+
+    return service.readResource(uuid);
   }
 
   public boolean wasExecutedAsIs() {

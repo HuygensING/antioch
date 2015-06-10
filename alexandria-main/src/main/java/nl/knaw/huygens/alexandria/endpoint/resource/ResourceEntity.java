@@ -1,28 +1,22 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
-import static nl.knaw.huygens.alexandria.endpoint.EndpointPaths.ANNOTATIONS;
-
-import java.net.URI;
-import java.util.Set;
 import java.util.UUID;
 
-import javax.ws.rs.core.UriBuilder;
-
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
-import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.endpoint.AnnotatableObjectEntity;
+import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.AnnotatableObject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.common.collect.Sets;
 
 @JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
 @JsonTypeName("resource")
-class ResourceEntity {
+class ResourceEntity extends AnnotatableObjectEntity {
 
   @JsonIgnore
   private final AlexandriaResource resource;
@@ -38,8 +32,8 @@ class ResourceEntity {
     this.resource = resource;
   }
 
-  public final ResourceEntity withConfig(AlexandriaConfiguration config) {
-    this.config = config;
+  public final ResourceEntity withLocationBuilder(LocationBuilder locationBuilder) {
+    this.locationBuilder = locationBuilder;
     return this;
   }
 
@@ -51,22 +45,13 @@ class ResourceEntity {
     return resource.getRef();
   }
 
-  // TODO: refactor extract common functionality also present in AnnotationEntity.
-  public Set<URI> getAnnotations() {
-    Log.debug("Converting {} annotations: [{}]", resource.getAnnotations().size(), resource.getAnnotations());
-    // TODO: When Jackson can handle Streams, maybe return Stream<AnnotationView>.
-    final Set<URI> uris = Sets.newHashSet(resource.getAnnotations().stream().map(this::annotationURI).iterator());
-    Log.debug("uris: {}", uris);
-    return uris;
-  }
-
-  private URI annotationURI(AlexandriaAnnotation a) {
-    Log.debug("annotationURI for: [{}], id=[{}]", a, a.getId());
-    return UriBuilder.fromUri(config.getBaseURI()).path(ANNOTATIONS).path("{uuid}").build(a.getId());
-  }
-
   public String getCreatedOn() {
     return resource.getProvenance().getWhen().toString(); // ISO-8601 representation
+  }
+
+  @Override
+  protected AnnotatableObject getAnnotatable() {
+    return resource;
   }
 
 }
