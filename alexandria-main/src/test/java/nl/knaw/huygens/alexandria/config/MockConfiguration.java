@@ -8,7 +8,7 @@ public class MockConfiguration implements AlexandriaConfiguration {
 
   @Override
   public URI getBaseURI() {
-    return URI.create("http://alexandria.org/");
+    return URI.create("http://alexandria.eg/");
   }
 
 }
