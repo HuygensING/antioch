@@ -9,4 +9,5 @@ public final class EndpointPaths {
   private EndpointPaths() {
     throw new AssertionError("Paths shall not be instantiated");
   }
+
 }

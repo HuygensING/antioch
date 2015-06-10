@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
@@ -31,7 +32,7 @@ public class ProvenanceEntityBuilderTest {
     AlexandriaProvenance provenance = resource.getProvenance();
     AlexandriaConfiguration config = mock(AlexandriaConfiguration.class);
     when(config.getBaseURI()).thenReturn(URI.create(baseURI));
-    ProvenanceEntityBuilder builder = new ProvenanceEntityBuilder(config);
+    ProvenanceEntityBuilder builder = new ProvenanceEntityBuilder(config, new EndpointPathResolver());
     ProvenanceEntity entity = builder.build(provenance);
 
     String expectedLocation = baseURI + "/" + EndpointPaths.RESOURCES + "/" + id;
