@@ -14,8 +14,8 @@ public class ProvenanceEntityBuilder {
   @Inject
   public ProvenanceEntityBuilder(AlexandriaConfiguration config, EndpointPathResolver resolver) {
     Log.trace("ProvenanceEntityBuilder created: config=[{}], resolver=[{}]", config, resolver);
-    this.resolver = resolver;
     this.config = config;
+    this.resolver = resolver;
   }
 
   public ProvenanceEntity build(AlexandriaProvenance provenance) {
