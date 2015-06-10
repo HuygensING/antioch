@@ -1,8 +1,9 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import static nl.knaw.huygens.alexandria.endpoint.EndpointPaths.RESOURCES;
+
 import java.net.URI;
-import java.util.UUID;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -13,10 +14,11 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
+import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -30,13 +32,16 @@ public class ResourcesEndpoint extends JSONEndpoint {
   private final ResourceEntityBuilder entityBuilder;
   private final ResourceCreationRequestBuilder requestBuilder;
   private final AlexandriaConfiguration configuration;
+  private final LocationBuilder locationBuilder;
 
   @Inject
   public ResourcesEndpoint(AlexandriaService service, //
       AlexandriaConfiguration configuration,//
       ResourceCreationRequestBuilder requestBuilder, //
+      LocationBuilder locationBuilder, //
       ResourceEntityBuilder entityBuilder) {
     this.configuration = configuration;
+    this.locationBuilder = locationBuilder;
     Log.trace("Resources created, alexandriaService=[{}]", service);
 
     this.alexandriaService = service;
@@ -56,14 +61,14 @@ public class ResourcesEndpoint extends JSONEndpoint {
     Log.trace("protoType=[{}]", protoType);
 
     final ResourceCreationRequest request = requestBuilder.build(protoType);
-    request.execute(alexandriaService);
+    AlexandriaResource resource = request.execute(alexandriaService);
 
     if (request.wasExecutedAsIs()) {
       return Response.noContent().build();
     }
 
     // final ResourceEntity entity = entityBuilder.build(resource);
-    return Response.created(locationOf(request.getUUID())).build();
+    return Response.created(locationBuilder.locationOf(resource)).build();
   }
 
   @PUT
@@ -109,11 +114,6 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @Path("{uuid}/annotations")
   public Class<ResourceAnnotations> getAnnotations() {
     return ResourceAnnotations.class; // no instantiation of our own; let Jersey handle the lifecycle
-  }
-
-  // TODO: replace by injected LocationBuilder (to be written) ?
-  private URI locationOf(UUID uuid) {
-    return UriBuilder.fromUri(configuration.getBaseURI()).path(RESOURCES).path("{uuid}").build(uuid);
   }
 
 }
