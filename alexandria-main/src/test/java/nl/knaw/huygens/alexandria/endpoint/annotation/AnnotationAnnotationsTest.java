@@ -17,32 +17,36 @@ import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
-import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 import org.junit.Test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 
 public class AnnotationAnnotationsTest {
   @Test
-  public void testAnnotationURIsAreCorrect() {
-    UUID uuid = UUID.randomUUID();
+  public void testAnnotationURIsAreCorrect() throws JsonProcessingException {
+    UUID uuid0 = UUID.randomUUID();
+    AlexandriaAnnotation annotation0 = mock(AlexandriaAnnotation.class);
+    when(annotation0.getId()).thenReturn(uuid0);
 
-    AlexandriaAnnotation annotation = mock(AlexandriaAnnotation.class);
-    when(annotation.getId()).thenReturn(uuid);
+    UUID uuid1 = UUID.randomUUID();
+    AlexandriaAnnotation annotation1 = mock(AlexandriaAnnotation.class);
+    when(annotation1.getId()).thenReturn(uuid1);
 
-    AlexandriaResource resource = mock(AlexandriaResource.class);
-    when(resource.getAnnotations()).thenReturn(ImmutableSet.of(annotation));
+    // annotation1 is an annotation on annotation0
+    when(annotation0.getAnnotations()).thenReturn(ImmutableSet.of(annotation1));
 
     AlexandriaService service = mock(AlexandriaService.class);
-    when(service.readResource(uuid)).thenReturn(resource);
+    when(service.readAnnotation(uuid0)).thenReturn(annotation0);
+    when(service.readAnnotation(uuid1)).thenReturn(annotation1);
 
     AnnotationCreationRequestBuilder requestBuilder = mock(AnnotationCreationRequestBuilder.class);
     AlexandriaConfiguration configuration = new MockConfiguration();
     LocationBuilder locationBuilder = new LocationBuilder(configuration, new EndpointPathResolver());
-    String uuidString = uuid.toString();
-    UUIDParam uuidParam = new UUIDParam(uuidString);
+    UUIDParam uuidParam = new UUIDParam(uuid0.toString());
     AnnotationAnnotations aa = new AnnotationAnnotations(service, requestBuilder, locationBuilder, uuidParam);
 
     Response response = aa.get();
@@ -50,6 +54,9 @@ public class AnnotationAnnotationsTest {
 
     Set<AnnotationEntity> entity = (Set<AnnotationEntity>) response.getEntity();
     Log.info("entity={}", entity);
+    ObjectMapper om = new ObjectMapper();
+    Log.info("json={}", om.writeValueAsString(entity));
     assertThat(entity).hasSize(1);
+    assertThat(entity.iterator().next().getId()).isEqualTo(uuid1);
   }
 }
