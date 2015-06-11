@@ -7,8 +7,8 @@ import java.util.UUID;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.storage.Storage;
-import org.apache.tinkerpop.gremlin.structure.Graph;
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import com.tinkerpop.gremlin.structure.Graph;
+import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.Test;
 
 public class TinkerpopAlexandriaServiceTest {
