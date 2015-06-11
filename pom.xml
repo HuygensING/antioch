@@ -162,7 +162,7 @@
     <tinkerpop.version>3.0.0.M7</tinkerpop.version>
     <neo4j-gremlin.version>3.0.0.M7</neo4j-gremlin.version>
     <!-- <tinkerpop.groupId>org.apache.tinkerpop</tinkerpop.groupId> <tinkerpop.version>3.0.0.M9-incubating</tinkerpop.version> -->
-    <peapod.version>0.1.1-SNAPSHOT</peapod.version>
+    <peapod.version>0.1.0</peapod.version>
     <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
 
     <concordion.reportDir>${project.build.directory}/concordion-reports</concordion.reportDir>

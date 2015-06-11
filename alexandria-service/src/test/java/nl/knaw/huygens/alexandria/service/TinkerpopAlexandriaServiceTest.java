@@ -2,14 +2,18 @@ package nl.knaw.huygens.alexandria.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+
 import java.time.Instant;
 import java.util.UUID;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.storage.Storage;
+
+import org.junit.Test;
+
 import com.tinkerpop.gremlin.structure.Graph;
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
-import org.junit.Test;
 
 public class TinkerpopAlexandriaServiceTest {
   private static final Storage mockStorage = mock(Storage.class);

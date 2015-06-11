@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.frames;
+package nl.knaw.huygens.alexandria.storage.frames;
 
 import java.time.Instant;
 
