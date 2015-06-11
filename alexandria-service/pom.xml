@@ -32,6 +32,8 @@
       <artifactId>tinkergraph-gremlin</artifactId>
       <version>${tinkerpop.version}</version>
     </dependency>
+
+    <!-- tinkerpop3 ogm -->
     <dependency>
       <groupId>org.bayofmany.peapod</groupId>
       <artifactId>peapod</artifactId>
