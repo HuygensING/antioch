@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.service;
 
-public enum Labels {
-  Resource, Annotation, AnnotationBody, Provenance
+public class Labels {
+  public static final String RESOURCE = "Resource";
+  public static final String ANNOTATION = "Annotation";
+  public static final String ANNOTATIONBODY = "AnnotationBody";
 }
