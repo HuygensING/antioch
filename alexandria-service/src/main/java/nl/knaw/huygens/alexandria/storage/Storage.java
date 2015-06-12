@@ -1,5 +1,8 @@
 package nl.knaw.huygens.alexandria.storage;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
 import java.util.UUID;
 
 import jline.internal.Log;
@@ -31,11 +34,15 @@ public class Storage {
 
   public AlexandriaResource read(Class clazz, UUID uuid) {
     if (clazz.equals(AlexandriaResource.class)) {
-      startTransaction();
-      AlexandriaResourceVF arvf = fg.V(AlexandriaResourceVF.class).has("id", uuid.toString()).toList().get(0);
-      commitTransaction();
+      List<AlexandriaResourceVF> results = fg.V(AlexandriaResourceVF.class).has("id", uuid.toString()).toList();
+      if (results.isEmpty()) {
+        return null;
+      }
+      AlexandriaResourceVF arvf = results.get(0);
       TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(arvf.getProvenanceWho(), arvf.getProvenanceWhen(), arvf.getProvenanceWhy());
       AlexandriaResource resource = new AlexandriaResource(uuid, provenance);
+      resource.setRef(arvf.getRef());
+      resource.setState(arvf.getState());
       return resource;
     }
     return null;
@@ -55,7 +62,12 @@ public class Storage {
     arvf.setProvenanceWho(provenance.getWho());
     arvf.setProvenanceWhy(provenance.getWhy());
     arvf.setRef(resource.getRef());
+    arvf.setState(resource.getState());
     commitTransaction();
+  }
+
+  public void dump(OutputStream os) throws IOException {
+    g.io().graphSONWriter().create().writeGraph(os, g);
   }
 
   // private methods
