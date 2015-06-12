@@ -1,7 +1,6 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import static nl.knaw.huygens.alexandria.endpoint.EndpointPaths.RESOURCES;
-import java.net.URI;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -18,14 +17,13 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
+import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 @Path(RESOURCES)
 public class ResourcesEndpoint extends JSONEndpoint {
-
-  private static final URI HERE = URI.create("");
 
   private final AlexandriaService alexandriaService;
   private final ResourceEntityBuilder entityBuilder;
@@ -49,7 +47,11 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @Path("{uuid}")
   public Response getResourceByID(@PathParam("uuid") final UUIDParam uuid) {
     final AlexandriaResource resource = alexandriaService.readResource(uuid.getValue());
-    return Response.ok(entityBuilder.build(resource)).build();
+    if (resource == null) {
+      throw new NotFoundException();
+    } else {
+      return Response.ok(entityBuilder.build(resource)).build();
+    }
   }
 
   @POST
@@ -75,10 +77,10 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
     protoType.setState(AlexandriaState.Default);
     final ResourceCreationRequest request = requestBuilder.build(protoType);
-    request.execute(alexandriaService);
+    AlexandriaResource resource = request.execute(alexandriaService);
 
     if (request.newResourceWasCreated()) {
-      return Response.created(HERE).build();
+      return Response.created(locationBuilder.locationOf(resource)).build();
     }
 
     if (request.wasExecutedAsIs()) {
