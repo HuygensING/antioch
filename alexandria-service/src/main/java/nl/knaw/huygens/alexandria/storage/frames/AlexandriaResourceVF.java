@@ -2,6 +2,7 @@ package nl.knaw.huygens.alexandria.storage.frames;
 
 import java.time.Instant;
 
+import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.service.Labels;
 import peapod.annotations.Vertex;
 
@@ -26,5 +27,9 @@ public abstract class AlexandriaResourceVF {
   public abstract String getProvenanceWhy();
 
   public abstract void setProvenanceWhy(String why);
+
+  public abstract AlexandriaState getState();
+
+  public abstract void setState(AlexandriaState state);
 
 }
