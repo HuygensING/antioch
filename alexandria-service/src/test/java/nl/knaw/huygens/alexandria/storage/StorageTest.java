@@ -35,6 +35,7 @@ public class StorageTest {
     String why = "why";
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(who, when, why);
     AlexandriaResource resource = new AlexandriaResource(id, provenance);
+    resource.setRef("reference");
     logGraphAsJson();
     Log.info("resource={}", resource);
     storage.createOrUpdate(resource);

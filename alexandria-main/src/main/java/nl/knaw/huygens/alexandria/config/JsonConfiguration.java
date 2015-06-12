@@ -31,7 +31,7 @@ public class JsonConfiguration implements ContextResolver<ObjectMapper> {
 
     mapper.enable(SerializationFeature.INDENT_OUTPUT);
     mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    mapper.disable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
+    // mapper.disable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
 
     mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
 
