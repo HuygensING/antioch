@@ -3,7 +3,9 @@ package nl.knaw.huygens.alexandria.service;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+
 import javax.inject.Inject;
+
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
@@ -25,7 +27,7 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
     boolean newlyCreated;
 
     if (storage.exists(AlexandriaResource.class, uuid)) {
-      resource = storage.read(AlexandriaResource.class, uuid);
+      resource = readResource(uuid);
       newlyCreated = false;
 
     } else {
@@ -33,15 +35,14 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
       newlyCreated = true;
     }
     resource.setRef(ref);
-    storage.createOrUpdate(resource);
+    storage.createOrUpdateResource(resource);
 
     return newlyCreated;
   }
 
   @Override
   public AlexandriaResource readResource(UUID uuid) {
-    AlexandriaResource resource = storage.read(AlexandriaResource.class, uuid);
-    return resource;
+    return storage.readResource(uuid);
   }
 
   @Override
@@ -64,20 +65,27 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
 
   @Override
   public AlexandriaAnnotation annotate(AlexandriaResource resource, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
-    // TODO Auto-generated method stub
-    return null;
+    AlexandriaAnnotation newAnnotation = createAnnotation(annotationbody, provenance);
+    storage.annotateResourceWithAnnotation(resource, newAnnotation);
+    return newAnnotation;
+  }
+
+  private AlexandriaAnnotation createAnnotation(AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
+    UUID id = UUID.randomUUID();
+    AlexandriaAnnotation newAnnotation = new AlexandriaAnnotation(id, annotationbody, provenance);
+    return newAnnotation;
   }
 
   @Override
   public AlexandriaAnnotation annotate(AlexandriaAnnotation annotation, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
-    // TODO Auto-generated method stub
-    return null;
+    AlexandriaAnnotation newAnnotation = createAnnotation(annotationbody, provenance);
+    storage.annotateAnnotationWithAnnotation(annotation, newAnnotation);
+    return newAnnotation;
   }
 
   @Override
   public AlexandriaAnnotation readAnnotation(UUID uuid) {
-    // TODO Auto-generated method stub
-    return null;
+    return storage.readAnnotation(uuid);
   }
 
   @Override

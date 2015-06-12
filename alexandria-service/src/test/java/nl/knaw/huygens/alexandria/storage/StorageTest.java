@@ -38,10 +38,10 @@ public class StorageTest {
     resource.setRef("reference");
     logGraphAsJson();
     Log.info("resource={}", resource);
-    storage.createOrUpdate(resource);
+    storage.createOrUpdateResource(resource);
     logGraphAsJson();
     Log.info("after createOrUpdate");
-    AlexandriaResource read = storage.read(AlexandriaResource.class, id);
+    AlexandriaResource read = storage.readResource(id);
     Log.info("after read");
 
     logGraphAsJson();

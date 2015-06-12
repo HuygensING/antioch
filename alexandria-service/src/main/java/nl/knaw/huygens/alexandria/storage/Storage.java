@@ -6,9 +6,14 @@ import java.util.List;
 import java.util.UUID;
 
 import jline.internal.Log;
+import nl.knaw.huygens.alexandria.model.Accountable;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
+import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
+import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import peapod.FramedGraph;
 
@@ -29,43 +34,88 @@ public class Storage {
   }
 
   public boolean exists(Class clazz, UUID uuid) {
-    return false;
+    List<AlexandriaVF> results = fg.V(clazz).has("id", uuid.toString()).toList();
+    return !results.isEmpty();
   }
 
-  public AlexandriaResource read(Class clazz, UUID uuid) {
-    if (clazz.equals(AlexandriaResource.class)) {
-      List<ResourceVF> results = fg.V(ResourceVF.class).has("id", uuid.toString()).toList();
-      if (results.isEmpty()) {
-        return null;
-      }
-      ResourceVF arvf = results.get(0);
-      TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(arvf.getProvenanceWho(), arvf.getProvenanceWhen(), arvf.getProvenanceWhy());
-      AlexandriaResource resource = new AlexandriaResource(uuid, provenance);
-      resource.setRef(arvf.getRef());
-      resource.setState(arvf.getState());
-      return resource;
+  public AlexandriaResource readResource(UUID uuid) {
+    ResourceVF rvf = readResourceVF(uuid);
+    if (rvf == null) {
+      return null;
     }
-    return null;
+    TentativeAlexandriaProvenance provenance = createTentativeProvenance(rvf);
+    AlexandriaResource resource = new AlexandriaResource(uuid, provenance);
+    resource.setRef(rvf.getRef());
+    resource.setState(rvf.getState());
+    return resource;
   }
 
-  public void createOrUpdate(AlexandriaResource resource) {
+  public AlexandriaAnnotation readAnnotation(UUID uuid) {
+    AnnotationVF avf = readAnnotationVF(uuid);
+    if (avf == null) {
+      return null;
+    }
+    TentativeAlexandriaProvenance provenance = createTentativeProvenance(avf);
+    AlexandriaAnnotationBody body = new AlexandriaAnnotationBody(uuid, avf.getType(), avf.getValue(), provenance);
+    AlexandriaAnnotation annotation = new AlexandriaAnnotation(uuid, body, provenance);
+    return annotation;
+  }
+
+  public void createOrUpdateResource(AlexandriaResource resource) {
     startTransaction();
 
-    ResourceVF arvf = null;
+    ResourceVF rvf = null;
     if (exists(resource.getClass(), resource.getId())) {
-      arvf = fg.v(resource.getId());
+      rvf = fg.v(resource.getId());
     } else {
-      arvf = fg.addVertex(ResourceVF.class, resource.getId());
+      rvf = fg.addVertex(ResourceVF.class, resource.getId());
     }
 
-    arvf.setId(resource.getId().toString());
-    arvf.setRef(resource.getRef());
-    arvf.setState(resource.getState());
+    rvf.setRef(resource.getRef());
+    rvf.setState(resource.getState());
 
-    AlexandriaProvenance provenance = resource.getProvenance();
-    arvf.setProvenanceWhen(provenance.getWhen());
-    arvf.setProvenanceWho(provenance.getWho());
-    arvf.setProvenanceWhy(provenance.getWhy());
+    setAlexandriaVFProperties(resource, rvf);
+
+    commitTransaction();
+  }
+
+  public void createOrUpdateAnnotation(AlexandriaAnnotation annotation) {
+    startTransaction();
+
+    AnnotationVF avf = null;
+    if (exists(annotation.getClass(), annotation.getId())) {
+      avf = fg.v(annotation.getId());
+    } else {
+      avf = fg.addVertex(AnnotationVF.class, annotation.getId());
+    }
+
+    avf.setType(annotation.getBody().getType());
+    avf.setValue(annotation.getBody().getValue());
+    avf.setState(annotation.getState());
+
+    setAlexandriaVFProperties(annotation, avf);
+
+    commitTransaction();
+  }
+
+  public void annotateResourceWithAnnotation(AlexandriaResource resource, AlexandriaAnnotation newAnnotation) {
+    startTransaction();
+
+    AnnotationVF avf = createAnnotationVF(newAnnotation);
+
+    ResourceVF resourceToAnnotate = readResourceVF(resource.getId());
+    avf.setAnnotatedResource(resourceToAnnotate);
+
+    commitTransaction();
+  }
+
+  public void annotateAnnotationWithAnnotation(AlexandriaAnnotation annotation, AlexandriaAnnotation newAnnotation) {
+    startTransaction();
+
+    AnnotationVF avf = createAnnotationVF(newAnnotation);
+
+    AnnotationVF annotationToAnnotate = readAnnotationVF(annotation.getId());
+    avf.setAnnotatedAnnotation(annotationToAnnotate);
 
     commitTransaction();
   }
@@ -95,5 +145,46 @@ public class Storage {
     } else {
       Log.error("rollback called, but transactions are not supported by graph {}", g);
     }
+  }
+
+  private ResourceVF readResourceVF(UUID uuid) {
+    List<ResourceVF> results = fg.V(ResourceVF.class).has("id", uuid.toString()).toList();
+    ResourceVF rvf = null;
+    if (!results.isEmpty()) {
+      rvf = results.get(0);
+    }
+    return rvf;
+  }
+
+  private AnnotationVF readAnnotationVF(UUID uuid) {
+    List<AnnotationVF> results = fg.V(AnnotationVF.class).has("id", uuid.toString()).toList();
+    AnnotationVF vf = null;
+    if (!results.isEmpty()) {
+      vf = results.get(0);
+    }
+    return vf;
+  }
+
+  private TentativeAlexandriaProvenance createTentativeProvenance(AlexandriaVF avf) {
+    return new TentativeAlexandriaProvenance(avf.getProvenanceWho(), avf.getProvenanceWhen(), avf.getProvenanceWhy());
+  }
+
+  private AnnotationVF createAnnotationVF(AlexandriaAnnotation newAnnotation) {
+    AnnotationVF avf = fg.addVertex(AnnotationVF.class, newAnnotation.getId());
+    setAlexandriaVFProperties(newAnnotation, avf);
+
+    avf.setType(newAnnotation.getBody().getType());
+    avf.setValue(newAnnotation.getBody().getValue());
+    avf.setState(newAnnotation.getState());
+    return avf;
+  }
+
+  private void setAlexandriaVFProperties(Accountable resource, AlexandriaVF vf) {
+    vf.setId(resource.getId().toString());
+
+    AlexandriaProvenance provenance = resource.getProvenance();
+    vf.setProvenanceWhen(provenance.getWhen());
+    vf.setProvenanceWho(provenance.getWho());
+    vf.setProvenanceWhy(provenance.getWhy());
   }
 }
