@@ -7,10 +7,12 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AnnotatableObject;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Sets;
 
 public abstract class AnnotatableObjectEntity {
 
+  @JsonIgnore
   protected LocationBuilder locationBuilder;
 
   abstract protected AnnotatableObject getAnnotatable();
