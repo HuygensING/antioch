@@ -7,14 +7,15 @@ import nl.knaw.huygens.alexandria.service.Labels;
 import peapod.annotations.Vertex;
 
 @Vertex(Labels.RESOURCE)
-public abstract class AlexandriaResourceVF {
-  public abstract String getRef();
-
-  public abstract void setRef(String ref);
+public abstract class AlexandriaVF {
 
   public abstract String getId();
 
   public abstract void setId(String id);
+
+  public abstract AlexandriaState getState();
+
+  public abstract void setState(AlexandriaState state);
 
   public abstract String getProvenanceWho();
 
@@ -27,9 +28,5 @@ public abstract class AlexandriaResourceVF {
   public abstract String getProvenanceWhy();
 
   public abstract void setProvenanceWhy(String why);
-
-  public abstract AlexandriaState getState();
-
-  public abstract void setState(AlexandriaState state);
 
 }

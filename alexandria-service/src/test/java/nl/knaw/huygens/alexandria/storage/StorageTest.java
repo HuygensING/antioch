@@ -12,7 +12,7 @@ import java.util.UUID;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
-import nl.knaw.huygens.alexandria.storage.frames.AlexandriaResourceVF;
+import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 
 import org.junit.Test;
 import org.reflections.Reflections;
@@ -61,9 +61,9 @@ public class StorageTest {
 
   @Test
   public void test() {
-    String string = AlexandriaResourceVF.class.getPackage().getName() + ".";
-    Log.info("XXstring={}", string);
+    String string = ResourceVF.class.getPackage().getName() + ".";
+    Log.info("string={}", string);
     Set<Class<?>> framerClasses = new Reflections(string).getTypesAnnotatedWith(Framer.class);
-    Log.info("XXclasses={}", framerClasses);
+    Log.info("classes={}", framerClasses);
   }
 }

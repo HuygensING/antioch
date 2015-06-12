@@ -9,7 +9,7 @@ import jline.internal.Log;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
-import nl.knaw.huygens.alexandria.storage.frames.AlexandriaResourceVF;
+import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import peapod.FramedGraph;
 
 import com.tinkerpop.gremlin.structure.Graph;
@@ -25,7 +25,7 @@ public class Storage {
   public Storage(Graph graph) {
     g = graph;
     transactionsSupported = g.features().graph().supportsTransactions();
-    fg = new FramedGraph(g, AlexandriaResourceVF.class.getPackage());
+    fg = new FramedGraph(g, ResourceVF.class.getPackage());
   }
 
   public boolean exists(Class clazz, UUID uuid) {
@@ -34,11 +34,11 @@ public class Storage {
 
   public AlexandriaResource read(Class clazz, UUID uuid) {
     if (clazz.equals(AlexandriaResource.class)) {
-      List<AlexandriaResourceVF> results = fg.V(AlexandriaResourceVF.class).has("id", uuid.toString()).toList();
+      List<ResourceVF> results = fg.V(ResourceVF.class).has("id", uuid.toString()).toList();
       if (results.isEmpty()) {
         return null;
       }
-      AlexandriaResourceVF arvf = results.get(0);
+      ResourceVF arvf = results.get(0);
       TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(arvf.getProvenanceWho(), arvf.getProvenanceWhen(), arvf.getProvenanceWhy());
       AlexandriaResource resource = new AlexandriaResource(uuid, provenance);
       resource.setRef(arvf.getRef());
@@ -50,19 +50,23 @@ public class Storage {
 
   public void createOrUpdate(AlexandriaResource resource) {
     startTransaction();
-    AlexandriaResourceVF arvf = null;
+
+    ResourceVF arvf = null;
     if (exists(resource.getClass(), resource.getId())) {
       arvf = fg.v(resource.getId());
     } else {
-      arvf = fg.addVertex(AlexandriaResourceVF.class, resource.getId());
+      arvf = fg.addVertex(ResourceVF.class, resource.getId());
     }
+
     arvf.setId(resource.getId().toString());
+    arvf.setRef(resource.getRef());
+    arvf.setState(resource.getState());
+
     AlexandriaProvenance provenance = resource.getProvenance();
     arvf.setProvenanceWhen(provenance.getWhen());
     arvf.setProvenanceWho(provenance.getWho());
     arvf.setProvenanceWhy(provenance.getWhy());
-    arvf.setRef(resource.getRef());
-    arvf.setState(resource.getState());
+
     commitTransaction();
   }
 
