@@ -107,18 +107,25 @@ public class ResourcesEndpoint extends JSONEndpoint {
   // Sub-resource delegation
 
   @Path("{uuid}/subresources")
-  public Class<SubResourcesEndpoint> getSubResources() {
+  public Class<SubResourcesEndpoint> getSubResourcesEndpoint() {
     return SubResourcesEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }
 
   @Path("{uuid}/annotations")
-  public Class<ResourceAnnotationsEndpoint> getAnnotations() {
+  public Class<ResourceAnnotationsEndpoint> getAnnotationsEndpoint() {
     return ResourceAnnotationsEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }
 
+  // @Path("{uuid}/provenance")
+  // public Class<ResourceProvenanceEndpoint> getProvenanceEndpoint() {
+  // return ResourceProvenanceEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
+  // }
+
   @Path("{uuid}/provenance")
-  public Class<ResourceProvenanceEndpoint> getProvenance() {
-    return ResourceProvenanceEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
+  public ResourceProvenanceEndpoint getProvenanceEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
+    // If we let Jersey handle the lifecycle, this endpoint doesn't show up in the standard application.wadl
+    // TODO: make the combination subresource as class/application.wadl work
+    return new ResourceProvenanceEndpoint(alexandriaService, uuidParam, locationBuilder);
   }
 
 }
