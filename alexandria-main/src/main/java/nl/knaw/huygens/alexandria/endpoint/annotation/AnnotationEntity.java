@@ -5,7 +5,7 @@ import java.util.UUID;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.AnnotatableObjectEntity;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
-import nl.knaw.huygens.alexandria.model.AnnotatableObject;
+import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -41,7 +41,7 @@ public class AnnotationEntity extends AnnotatableObjectEntity {
   }
 
   @Override
-  protected AnnotatableObject getAnnotatable() {
+  protected AbstractAnnotatable getAnnotatable() {
     return annotation;
   }
 

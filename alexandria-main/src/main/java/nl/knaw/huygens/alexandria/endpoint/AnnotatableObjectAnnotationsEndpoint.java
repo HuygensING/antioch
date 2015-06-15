@@ -16,7 +16,7 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntity;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
-import nl.knaw.huygens.alexandria.model.AnnotatableObject;
+import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint {
@@ -38,7 +38,7 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
     this.locationBuilder = locationBuilder;
   }
 
-  protected abstract AnnotatableObject getAnnotableObject();
+  protected abstract AbstractAnnotatable getAnnotableObject();
 
   protected abstract AnnotationCreationRequestBuilder getAnnotationCreationRequestBuilder();
 

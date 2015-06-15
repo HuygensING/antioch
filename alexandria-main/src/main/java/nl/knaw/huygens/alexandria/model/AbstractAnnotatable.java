@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class AnnotatableObject implements Accountable {
+public abstract class AbstractAnnotatable implements Accountable {
 
   private AlexandriaState state = AlexandriaState.Default;
   private final Set<AlexandriaAnnotation> annotations = new HashSet<>();

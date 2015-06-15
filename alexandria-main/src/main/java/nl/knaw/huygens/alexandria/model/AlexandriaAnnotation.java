@@ -2,7 +2,7 @@ package nl.knaw.huygens.alexandria.model;
 
 import java.util.UUID;
 
-public class AlexandriaAnnotation extends AnnotatableObject {
+public class AlexandriaAnnotation extends AbstractAnnotatable {
 	private final UUID id;
 
 	private final AlexandriaAnnotationBody body;

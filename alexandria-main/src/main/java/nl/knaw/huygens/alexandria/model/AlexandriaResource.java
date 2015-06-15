@@ -2,7 +2,7 @@ package nl.knaw.huygens.alexandria.model;
 
 import java.util.UUID;
 
-public class AlexandriaResource extends AnnotatableObject {
+public class AlexandriaResource extends AbstractAnnotatable {
   private final UUID id;
 
   private String ref;

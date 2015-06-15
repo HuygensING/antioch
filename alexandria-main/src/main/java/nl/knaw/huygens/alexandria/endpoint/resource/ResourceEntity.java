@@ -6,7 +6,7 @@ import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.AnnotatableObjectEntity;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.AnnotatableObject;
+import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -50,7 +50,7 @@ class ResourceEntity extends AnnotatableObjectEntity {
   }
 
   @Override
-  protected AnnotatableObject getAnnotatable() {
+  protected AbstractAnnotatable getAnnotatable() {
     return resource;
   }
 

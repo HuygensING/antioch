@@ -5,7 +5,7 @@ import java.util.Set;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
-import nl.knaw.huygens.alexandria.model.AnnotatableObject;
+import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Sets;
@@ -15,7 +15,7 @@ public abstract class AnnotatableObjectEntity {
   @JsonIgnore
   protected LocationBuilder locationBuilder;
 
-  abstract protected AnnotatableObject getAnnotatable();
+  abstract protected AbstractAnnotatable getAnnotatable();
 
   public Set<URI> getAnnotations() {
     Log.debug("Converting {} annotations: [{}]", getAnnotatable().getAnnotations().size(), getAnnotatable().getAnnotations());
