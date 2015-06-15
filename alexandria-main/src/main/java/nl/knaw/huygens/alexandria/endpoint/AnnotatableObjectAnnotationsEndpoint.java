@@ -4,7 +4,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
@@ -15,8 +14,8 @@ import javax.ws.rs.core.Response;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntity;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
-import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint {
@@ -26,8 +25,7 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   protected final AnnotationCreationRequestBuilder requestBuilder;
   protected final UUID uuid;
 
-  @Inject
-  public AnnotatableObjectAnnotationsEndpoint(AlexandriaService service, //
+  protected AnnotatableObjectAnnotationsEndpoint(AlexandriaService service, //
       AnnotationCreationRequestBuilder requestBuilder, //
       LocationBuilder locationBuilder, //
       @PathParam("uuid") final UUIDParam uuidParam) {
