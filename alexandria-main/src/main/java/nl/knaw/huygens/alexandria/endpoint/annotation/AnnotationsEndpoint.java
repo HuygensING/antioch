@@ -42,7 +42,12 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   // Sub-resource delegation
 
   @Path("{uuid}/annotations")
-  public Class<AnnotationAnnotations> getAnnotations() {
-    return AnnotationAnnotations.class; // no instantiation of our own; let Jersey handle the lifecycle
+  public Class<AnnotationAnnotationsEndpoint> getAnnotations() {
+    return AnnotationAnnotationsEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
+  }
+
+  @Path("{uuid}/provenance")
+  public Class<AnnotationProvenanceEndpoint> getProvenance() {
+    return AnnotationProvenanceEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }
 }

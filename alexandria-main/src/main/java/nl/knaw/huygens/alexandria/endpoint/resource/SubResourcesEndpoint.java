@@ -19,7 +19,7 @@ import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
-public class SubResources extends JSONEndpoint {
+public class SubResourcesEndpoint extends JSONEndpoint {
 
   private final AlexandriaService service;
   private final UUID parentUuid;
@@ -27,7 +27,7 @@ public class SubResources extends JSONEndpoint {
   private final LocationBuilder locationBuilder;
 
   @Inject
-  public SubResources(AlexandriaService service, //
+  public SubResourcesEndpoint(AlexandriaService service, //
       ResourceCreationRequestBuilder requestBuilder, //
       LocationBuilder locationBuilder, //
       @PathParam("uuid") final UUIDParam uuidParam) {

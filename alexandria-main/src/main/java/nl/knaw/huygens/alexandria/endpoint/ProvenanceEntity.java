@@ -1,10 +1,7 @@
-package nl.knaw.huygens.alexandria.endpoint.provenance;
+package nl.knaw.huygens.alexandria.endpoint;
 
 import java.net.URI;
-import java.time.Instant;
 
-import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
-import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -20,9 +17,6 @@ public class ProvenanceEntity {
   private final AlexandriaProvenance provenance;
 
   @JsonIgnore
-  private AlexandriaConfiguration config;
-
-  @JsonIgnore
   private LocationBuilder locationBuilder;
 
   private ProvenanceEntity(AlexandriaProvenance provenance) {
@@ -31,11 +25,6 @@ public class ProvenanceEntity {
 
   public static ProvenanceEntity of(AlexandriaProvenance provenance) {
     return new ProvenanceEntity(provenance);
-  }
-
-  public final ProvenanceEntity withConfig(AlexandriaConfiguration config) {
-    this.config = config;
-    return this;
   }
 
   public ProvenanceEntity withLocationBuilder(LocationBuilder locationBuilder) {
@@ -51,8 +40,8 @@ public class ProvenanceEntity {
     return locationBuilder.locationOf(provenance.getWhat());
   }
 
-  public Instant getWhen() {
-    return provenance.getWhen();
+  public String getWhen() {
+    return provenance.getWhen().toString();
   }
 
   public String getWhy() {

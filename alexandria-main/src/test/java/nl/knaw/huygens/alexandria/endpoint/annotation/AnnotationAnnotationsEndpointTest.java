@@ -25,7 +25,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 
-public class AnnotationAnnotationsTest {
+public class AnnotationAnnotationsEndpointTest {
   @Test
   public void testAnnotationURIsAreCorrect() throws JsonProcessingException {
     UUID uuid0 = UUID.randomUUID();
@@ -47,7 +47,7 @@ public class AnnotationAnnotationsTest {
     AlexandriaConfiguration configuration = new MockConfiguration();
     LocationBuilder locationBuilder = new LocationBuilder(configuration, new EndpointPathResolver());
     UUIDParam uuidParam = new UUIDParam(uuid0.toString());
-    AnnotationAnnotations aa = new AnnotationAnnotations(service, requestBuilder, locationBuilder, uuidParam);
+    AnnotationAnnotationsEndpoint aa = new AnnotationAnnotationsEndpoint(service, requestBuilder, locationBuilder, uuidParam);
 
     Response response = aa.get();
     Log.info("response={}", response);

@@ -4,22 +4,25 @@ import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
 import java.util.Arrays;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaServletModule;
 import nl.knaw.huygens.alexandria.config.TinkerpopAlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.jersey.AlexandriaResourceConfig;
+
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+
 import com.squarespace.jersey2.guice.BootstrapUtils;
 
 public class Server {
+  private static final long ONE_HOUR = Duration.ofHours(1).toMillis();
+
   public static void main(String[] args) throws IOException {
     new Server().run();
   }
-
-  private static final long ONE_HOUR = Duration.ofHours(1).toMillis();
 
   private void run() throws IOException {
     URI uri = getBaseURI();

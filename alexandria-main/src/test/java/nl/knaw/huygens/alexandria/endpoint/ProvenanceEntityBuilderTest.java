@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint.provenance;
+package nl.knaw.huygens.alexandria.endpoint;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -10,9 +10,6 @@ import java.util.UUID;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
-import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
-import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
-import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
@@ -34,7 +31,7 @@ public class ProvenanceEntityBuilderTest {
     AlexandriaConfiguration config = mock(AlexandriaConfiguration.class);
     when(config.getBaseURI()).thenReturn(URI.create(baseURI));
     LocationBuilder locationBuilder = new LocationBuilder(config, new EndpointPathResolver());
-    ProvenanceEntityBuilder builder = new ProvenanceEntityBuilder(config, locationBuilder);
+    ProvenanceEntityBuilder builder = new ProvenanceEntityBuilder(locationBuilder);
     ProvenanceEntity entity = builder.build(provenance);
 
     String expectedLocation = baseURI + "/" + EndpointPaths.RESOURCES + "/" + id;

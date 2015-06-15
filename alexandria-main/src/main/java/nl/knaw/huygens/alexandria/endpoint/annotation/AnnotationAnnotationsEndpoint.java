@@ -4,18 +4,18 @@ import javax.inject.Inject;
 import javax.ws.rs.PathParam;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.endpoint.AnnotatableObjectAnnotations;
+import nl.knaw.huygens.alexandria.endpoint.AnnotatableObjectAnnotationsEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.AnnotationCreationRequestBuilder;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AnnotatableObject;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
-public class AnnotationAnnotations extends AnnotatableObjectAnnotations {
+public class AnnotationAnnotationsEndpoint extends AnnotatableObjectAnnotationsEndpoint {
 
   // TODO: how to remove this duplicated inject/constructor?
   @Inject
-  public AnnotationAnnotations(AlexandriaService service, //
+  public AnnotationAnnotationsEndpoint(AlexandriaService service, //
       AnnotationCreationRequestBuilder requestBuilder, //
       LocationBuilder locationBuilder, //
       @PathParam("uuid") final UUIDParam uuidParam) {

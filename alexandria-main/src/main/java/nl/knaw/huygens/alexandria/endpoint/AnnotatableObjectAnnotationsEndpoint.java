@@ -19,7 +19,7 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AnnotatableObject;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
-public abstract class AnnotatableObjectAnnotations extends JSONEndpoint {
+public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint {
 
   protected final AlexandriaService service;
   protected final LocationBuilder locationBuilder;
@@ -27,7 +27,7 @@ public abstract class AnnotatableObjectAnnotations extends JSONEndpoint {
   protected final UUID uuid;
 
   @Inject
-  public AnnotatableObjectAnnotations(AlexandriaService service, //
+  public AnnotatableObjectAnnotationsEndpoint(AlexandriaService service, //
       AnnotationCreationRequestBuilder requestBuilder, //
       LocationBuilder locationBuilder, //
       @PathParam("uuid") final UUIDParam uuidParam) {
