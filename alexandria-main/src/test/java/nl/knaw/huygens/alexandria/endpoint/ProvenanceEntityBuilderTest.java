@@ -39,7 +39,7 @@ public class ProvenanceEntityBuilderTest {
     Log.info("entity={}", entity);
     Log.info("what={}", what);
     assertThat(what.toString()).isEqualTo(expectedLocation);
-    assertThat(entity.getWhen()).isEqualTo(when);
+    assertThat(entity.getWhen()).isEqualTo(when.toString());
     assertThat(entity.getWhy()).isEqualTo(why);
   }
 
