@@ -33,7 +33,7 @@
     <dependency>
       <groupId>org.glassfish.jersey.ext</groupId>
       <artifactId>jersey-bean-validation</artifactId>
-      <version>${jersey-bean-validation.version}</version>
+      <version>${jersey.version}</version>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
