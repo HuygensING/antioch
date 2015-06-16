@@ -5,7 +5,7 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.UUID;
 
-import jline.internal.Log;
+import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
@@ -15,10 +15,12 @@ import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
-import peapod.FramedGraph;
 
-import com.tinkerpop.gremlin.structure.Graph;
-import com.tinkerpop.gremlin.structure.Transaction;
+import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.structure.Transaction;
+import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
+
+import peapod.FramedGraph;
 
 public class Storage {
   private static Graph g;
@@ -34,8 +36,9 @@ public class Storage {
   }
 
   public boolean exists(Class clazz, UUID uuid) {
-    List<AlexandriaVF> results = fg.V(clazz).has("id", uuid.toString()).toList();
-    return !results.isEmpty();
+    // List<AlexandriaVF> results = fg.V(clazz).has("id", uuid.toString()).toList();
+    Object v = fg.v(uuid, clazz);
+    return v != null;
   }
 
   public AlexandriaResource readResource(UUID uuid) {
@@ -121,7 +124,7 @@ public class Storage {
   }
 
   public void dump(OutputStream os) throws IOException {
-    g.io().graphSONWriter().create().writeGraph(os, g);
+    g.io(new GraphSONIo.Builder()).writer().create().writeGraph(os, g);
   }
 
   // private methods

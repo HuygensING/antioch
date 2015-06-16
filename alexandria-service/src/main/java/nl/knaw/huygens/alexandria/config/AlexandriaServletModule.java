@@ -9,7 +9,7 @@ import nl.knaw.huygens.alexandria.storage.Storage;
 
 import com.google.inject.Scopes;
 import com.google.inject.servlet.ServletModule;
-import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
 public class AlexandriaServletModule extends ServletModule {
   @Override

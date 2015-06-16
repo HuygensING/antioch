@@ -1,7 +1,6 @@
 package nl.knaw.huygens.alexandria.endpoint.annotation;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.ws.rs.PathParam;
 
 import nl.knaw.huygens.Log;
@@ -12,7 +11,6 @@ import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
-@Singleton
 public class AnnotationAnnotationsEndpoint extends AnnotatableObjectAnnotationsEndpoint {
 
   // TODO: how to remove this duplicated inject/constructor?

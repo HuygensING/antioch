@@ -12,8 +12,8 @@ import nl.knaw.huygens.alexandria.storage.Storage;
 
 import org.junit.Test;
 
-import com.tinkerpop.gremlin.structure.Graph;
-import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
 public class TinkerpopAlexandriaServiceTest {
   private static final Storage mockStorage = mock(Storage.class);

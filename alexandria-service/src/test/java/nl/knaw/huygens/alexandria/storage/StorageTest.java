@@ -6,21 +6,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Set;
 import java.util.UUID;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
-import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 
+import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.Test;
-import org.reflections.Reflections;
-
-import peapod.internal.runtime.Framer;
-
-import com.tinkerpop.gremlin.structure.Graph;
-import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
 public class StorageTest {
 
@@ -52,18 +47,17 @@ public class StorageTest {
 
   private void logGraphAsJson() {
     try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-      g.io().graphSONWriter().create().writeGraph(os, g);
+      g.io(new GraphSONIo.Builder()).writer().create().writeGraph(os, g);
       Log.info("graph as json={}", new String(os.toByteArray(), StandardCharsets.UTF_8));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
-
-  @Test
-  public void test() {
-    String string = ResourceVF.class.getPackage().getName() + ".";
-    Log.info("string={}", string);
-    Set<Class<?>> framerClasses = new Reflections(string).getTypesAnnotatedWith(Framer.class);
-    Log.info("classes={}", framerClasses);
-  }
+  // @Test
+  // public void test() {
+  // String string = ResourceVF.class.getPackage().getName() + ".";
+  // Log.info("string={}", string);
+  // Set<Class<?>> framerClasses = new Reflections(string).getTypesAnnotatedWith(Framer.class);
+  // Log.info("classes={}", framerClasses);
+  // }
 }

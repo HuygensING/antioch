@@ -2,9 +2,7 @@ package nl.knaw.huygens.alexandria.endpoint;
 
 import java.util.UUID;
 
-import javax.inject.Inject;
 import javax.ws.rs.GET;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import nl.knaw.huygens.Log;
@@ -17,9 +15,8 @@ public abstract class AccountableProvenanceEndpoint extends JSONEndpoint {
   protected final UUID uuid;
   private final LocationBuilder locationBuilder;
 
-  @Inject
-  public AccountableProvenanceEndpoint(AlexandriaService service, //
-      @PathParam("uuid") final UUIDParam uuidParam, LocationBuilder locationBuilder) {
+  protected AccountableProvenanceEndpoint(AlexandriaService service, //
+      final UUIDParam uuidParam, LocationBuilder locationBuilder) {
     this.locationBuilder = locationBuilder;
     Log.trace("resourceService=[{}], uuidParam=[{}]", service, uuidParam);
     this.service = service;

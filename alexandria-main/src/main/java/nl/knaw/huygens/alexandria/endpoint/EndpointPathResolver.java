@@ -2,13 +2,17 @@ package nl.knaw.huygens.alexandria.endpoint;
 
 import java.util.Map;
 
-import com.google.common.collect.Maps;
+import javax.inject.Singleton;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 
+import com.google.common.collect.Maps;
+
+@Singleton
 public class EndpointPathResolver {
   private Map<Class<? extends Accountable>, String> accountableEndpoints;
 
