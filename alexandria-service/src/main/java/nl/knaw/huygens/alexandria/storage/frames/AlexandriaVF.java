@@ -3,10 +3,7 @@ package nl.knaw.huygens.alexandria.storage.frames;
 import java.time.Instant;
 
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.service.Labels;
-import peapod.annotations.Vertex;
 
-@Vertex(Labels.RESOURCE)
 public abstract class AlexandriaVF {
 
   public abstract String getId();
