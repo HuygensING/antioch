@@ -2,14 +2,12 @@ package nl.knaw.huygens.alexandria.endpoint;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
-import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -32,7 +30,7 @@ public class AnnotationCreationRequest {
   }
 
   public AlexandriaAnnotation execute(AlexandriaService service) {
-    final TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(AlexandriaProvenance.DEFAULT_WHO, providedCreatedOn().orElse(Instant.now()), AlexandriaProvenance.DEFAULT_WHY);
+    final TentativeAlexandriaProvenance provenance = providedProvenance().get();
 
     AlexandriaAnnotationBody body = null;
     UUID bodyId = providedId().getValue();
@@ -49,7 +47,7 @@ public class AnnotationCreationRequest {
     return requireNonNull(prototype.getAnnotationBodyId(), "Required 'value' field was not validated for being non-null");
   }
 
-  private Optional<Instant> providedCreatedOn() {
-    return prototype.getCreatedOn().map(InstantParam::getValue);
+  private Optional<TentativeAlexandriaProvenance> providedProvenance() {
+    return prototype.getProvenance().map(ProvenancePrototype::getValue);
   }
 }

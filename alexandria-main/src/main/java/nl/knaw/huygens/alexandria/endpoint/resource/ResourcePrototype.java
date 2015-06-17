@@ -1,10 +1,13 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import java.util.Optional;
+
 import javax.validation.constraints.NotNull;
-import nl.knaw.huygens.alexandria.endpoint.InstantParam;
+
+import nl.knaw.huygens.alexandria.endpoint.ProvenancePrototype;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -17,7 +20,7 @@ public class ResourcePrototype {
   @NotNull(message = "{nl.knaw.huygens.alexandria.endpoint.resource.ResourceProtoType.ref.NotNull.message}")
   private String ref;
 
-  private InstantParam createdOn;
+  private ProvenancePrototype provenance;
   private AlexandriaState state;
 
   public UUIDParam getId() {
@@ -32,13 +35,12 @@ public class ResourcePrototype {
     return state;
   }
 
-  public Optional<InstantParam> getCreatedOn() {
-    return Optional.ofNullable(createdOn);
+  public Optional<ProvenancePrototype> getProvenance() {
+    return Optional.ofNullable(provenance);
   }
 
   @JsonIgnore
   public void setState(AlexandriaState state) {
     this.state = state;
   }
-
 }

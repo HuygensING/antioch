@@ -2,9 +2,11 @@ package nl.knaw.huygens.alexandria.endpoint;
 
 import java.net.URI;
 
+import nl.knaw.huygens.alexandria.endpoint.resource.PropertyPrefix;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
@@ -36,6 +38,7 @@ public class ProvenanceEntity {
     return provenance.getWho();
   }
 
+  @JsonProperty(PropertyPrefix.LINK + "what")
   public URI getWhat() {
     return locationBuilder.locationOf(provenance.getWhat());
   }

@@ -4,10 +4,12 @@ import java.net.URI;
 import java.util.Set;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.endpoint.resource.PropertyPrefix;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Sets;
 
 public abstract class AnnotatableObjectEntity {
@@ -17,6 +19,7 @@ public abstract class AnnotatableObjectEntity {
 
   abstract protected AbstractAnnotatable getAnnotatable();
 
+  @JsonProperty(PropertyPrefix.LINK + "annotations")
   public Set<URI> getAnnotations() {
     Log.debug("Converting {} annotations: [{}]", getAnnotatable().getAnnotations().size(), getAnnotatable().getAnnotations());
     // TODO: When Jackson can handle Streams, maybe return Stream<AnnotationView>.

@@ -1,14 +1,16 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
+import java.net.URI;
 import java.util.UUID;
 
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.AnnotatableObjectEntity;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
-import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
@@ -45,8 +47,9 @@ class ResourceEntity extends AnnotatableObjectEntity {
     return resource.getRef();
   }
 
-  public String getCreatedOn() {
-    return resource.getProvenance().getWhen().toString(); // ISO-8601 representation
+  @JsonProperty(PropertyPrefix.LINK + "provenance")
+  public URI getProvenance() {
+    return URI.create(locationBuilder.locationOf(resource) + "/provenance");
   }
 
   @Override

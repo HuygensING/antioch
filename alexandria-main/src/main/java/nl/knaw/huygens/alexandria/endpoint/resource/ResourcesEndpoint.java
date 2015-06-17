@@ -3,6 +3,7 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
 import static nl.knaw.huygens.alexandria.endpoint.EndpointPaths.RESOURCES;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.DELETE;
@@ -22,6 +23,7 @@ import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
+@Singleton
 @Path(RESOURCES)
 public class ResourcesEndpoint extends JSONEndpoint {
 

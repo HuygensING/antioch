@@ -3,7 +3,7 @@ package nl.knaw.huygens.alexandria.model;
 import java.time.Instant;
 
 public class AlexandriaProvenance {
-  public static final String DEFAULT_WHY = "why";
+  public static final String DEFAULT_WHY = "";
   public static final String DEFAULT_WHO = "nederlab";
 
   private final String who;
