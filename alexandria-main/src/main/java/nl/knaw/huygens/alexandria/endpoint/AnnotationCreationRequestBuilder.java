@@ -78,9 +78,9 @@ public class AnnotationCreationRequestBuilder {
     return; // missing or empty value is ok (means annotation is a Tag)
   }
 
-  protected void validateCreatedOn(AnnotationPrototype prototype) {
-    Log.trace("Validating createdOn");
-    return; // missing or empty createdOn means client does not override server
+  protected void validateProvenance(AnnotationPrototype prototype) {
+    Log.trace("Validating provenance");
+    return; // missing or empty provenance means client does not override server
             // set value.
   }
 
