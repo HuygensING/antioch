@@ -1,11 +1,5 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -13,6 +7,11 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriInfo;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.List;
 
 import nl.knaw.huygens.Log;
 
@@ -27,11 +26,11 @@ public @interface MatchesPathId {
   Class<? extends Payload>[] payload() default {};
 
   class Validator implements ConstraintValidator<MatchesPathId, ResourcePrototype> {
-    final UriInfo urinfo;
+    final UriInfo uriInfo;
 
     @Inject
-    public Validator(UriInfo urinfo) {
-      this.urinfo = urinfo;
+    public Validator(UriInfo uriInfo) {
+      this.uriInfo = uriInfo;
     }
 
     @Override
@@ -41,7 +40,7 @@ public @interface MatchesPathId {
       }
 
       final String protoId = prototype.getId().getValue().toString();
-      List<PathSegment> pathSegments = urinfo.getPathSegments();
+      List<PathSegment> pathSegments = uriInfo.getPathSegments();
       String uuid = pathSegments.get(pathSegments.size() - 1).getPath();
       return protoId.equals(uuid);
     }
