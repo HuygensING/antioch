@@ -4,17 +4,17 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.UUID;
+import java.util.List;
 
+import javax.inject.Inject;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.UriInfo;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 
 @Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
@@ -26,18 +26,12 @@ public @interface MatchesPathId {
 
   Class<? extends Payload>[] payload() default {};
 
-  // TODO fix this validator, it now only works once, then the paramId is set, the next @MatchesPathId doesn't make a new Validator, so paramId is not updated
   class Validator implements ConstraintValidator<MatchesPathId, ResourcePrototype> {
-    final UUID paramId;
+    final UriInfo urinfo;
 
-    public Validator(@NotNull @PathParam("uuid") UUIDParam uuidParam) {
-      this.paramId = uuidParam.getValue();
-    }
-
-    @Override
-    public void initialize(MatchesPathId constraintAnnotation) {
-      // nothing needed.
-      Log.trace("MatchesPathId.initialize");
+    @Inject
+    public Validator(UriInfo urinfo) {
+      this.urinfo = urinfo;
     }
 
     @Override
@@ -46,8 +40,15 @@ public @interface MatchesPathId {
         return true;
       }
 
-      final UUID protoId = prototype.getId().getValue();
-      return protoId.equals(paramId);
+      final String protoId = prototype.getId().getValue().toString();
+      List<PathSegment> pathSegments = urinfo.getPathSegments();
+      String uuid = pathSegments.get(pathSegments.size() - 1).getPath();
+      return protoId.equals(uuid);
+    }
+
+    @Override
+    public void initialize(MatchesPathId constraintAnnotation) {
+      Log.info("initialize: annotation={}", constraintAnnotation);
     }
   }
 
