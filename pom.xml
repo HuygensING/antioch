@@ -29,12 +29,14 @@
     <!-- Software versions -->
     <assertj.version>3.0.0</assertj.version>
     <concordion.version>1.5.0</concordion.version>
+    <concordion-rest-extension.version>0.5.0</concordion-rest-extension.version>
     <guice.version>3.0</guice.version>
     <jackson.version>2.6.0-rc2</jackson.version>
     <jdk.version>1.8</jdk.version>
     <jersey.version>2.18</jersey.version>
     <jersey2-guice.version>0.10</jersey2-guice.version>
     <junit.version>4.12</junit.version>
+    <junitparams.version>1.0.4</junitparams.version>
     <log.version>1.0.0</log.version>
     <logback.version>1.1.2</logback.version>
     <mockito.version>2.0.20-beta</mockito.version>
