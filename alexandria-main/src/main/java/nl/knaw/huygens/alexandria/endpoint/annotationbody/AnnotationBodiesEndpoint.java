@@ -1,7 +1,6 @@
 package nl.knaw.huygens.alexandria.endpoint.annotationbody;
 
 import java.net.URI;
-import java.util.Optional;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -38,14 +37,9 @@ public class AnnotationBodiesEndpoint extends JSONEndpoint {
   @GET
   @Path("{uuid}")
   public Response readAnnotationBody(@PathParam("uuid") UUIDParam uuidParam) {
-    Optional<AlexandriaAnnotationBody> optional = service.readAnnotationBody(uuidParam.getValue());
-    if (optional.isPresent()) {
-      final AlexandriaAnnotationBody annotationBody = optional.get();
-      final AnnotationBodyEntity entity = entityBuilder.build(annotationBody);
-      return Response.ok(entity).build();
-    } else {
-      throw new NotFoundException("No AnnotationBody with id " + uuidParam);
-    }
+    final AlexandriaAnnotationBody annotationBody = service.readAnnotationBody(uuidParam.getValue())//
+        .orElseThrow(() -> new NotFoundException("No annotationbody found with id " + uuidParam));
+    return Response.ok(entityBuilder.build(annotationBody)).build();
   }
 
   @POST

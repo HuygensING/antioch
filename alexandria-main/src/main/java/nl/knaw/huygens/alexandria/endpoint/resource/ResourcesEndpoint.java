@@ -4,8 +4,6 @@ import static nl.knaw.huygens.alexandria.endpoint.EndpointPaths.RESOURCES;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-import java.util.Optional;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.Valid;
@@ -54,13 +52,10 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @Path("{uuid}")
   @ApiOperation(value = "Get the resource with the given uuid", response = ResourceEntity.class)
   public Response getResourceByID(@PathParam("uuid") final UUIDParam uuid) {
-    Optional<AlexandriaResource> optional = alexandriaService.readResource(uuid.getValue());
-    if (optional.isPresent()) {
-      return Response.ok(entityBuilder.build(optional.get())).build();
+    AlexandriaResource resource = alexandriaService.readResource(uuid.getValue())//
+        .orElseThrow(() -> new NotFoundException("No resource found with id " + uuid));
+    return Response.ok(entityBuilder.build(resource)).build();
 
-    } else {
-      throw new NotFoundException("No resource found with id " + uuid);
-    }
   }
 
   @POST

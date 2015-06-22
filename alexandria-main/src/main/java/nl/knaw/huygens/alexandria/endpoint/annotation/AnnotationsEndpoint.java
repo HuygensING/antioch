@@ -2,8 +2,6 @@ package nl.knaw.huygens.alexandria.endpoint.annotation;
 
 import io.swagger.annotations.Api;
 
-import java.util.Optional;
-
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -34,15 +32,9 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   @GET
   @Path("{uuid}")
   public Response readAnnotation(@PathParam("uuid") UUIDParam uuidParam) {
-    Optional<AlexandriaAnnotation> optionalAnnotation = service.readAnnotation(uuidParam.getValue());
-    if (optionalAnnotation.isPresent()) {
-      final AlexandriaAnnotation annotation = optionalAnnotation.get();
-      final AnnotationEntity entity = entityBuilder.build(annotation);
-      return Response.ok(entity).build();
-
-    } else {
-      throw new NotFoundException("No annotation found with id " + uuidParam);
-    }
+    final AlexandriaAnnotation annotation = service.readAnnotation(uuidParam.getValue())//
+        .orElseThrow(() -> new NotFoundException("No annotation found with id " + uuidParam));
+    return Response.ok(entityBuilder.build(annotation)).build();
   }
 
   @DELETE
