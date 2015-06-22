@@ -4,4 +4,6 @@ import java.net.URI;
 
 public interface AlexandriaConfiguration {
   URI getBaseURI();
+
+  String getStorageDirectory();
 }

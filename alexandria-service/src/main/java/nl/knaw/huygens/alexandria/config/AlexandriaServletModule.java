@@ -6,10 +6,10 @@ import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerpopAlexandriaService;
 import nl.knaw.huygens.alexandria.storage.Storage;
+import nl.knaw.huygens.alexandria.storage.TinkerGraphStorage;
 
 import com.google.inject.Scopes;
 import com.google.inject.servlet.ServletModule;
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
 public class AlexandriaServletModule extends ServletModule {
   @Override
@@ -20,7 +20,8 @@ public class AlexandriaServletModule extends ServletModule {
     bind(AlexandriaConfiguration.class).to(TinkerpopAlexandriaConfiguration.class);
     bind(AnnotationEntityBuilder.class).in(Scopes.SINGLETON);
     bind(ResourceEntityBuilder.class).in(Scopes.SINGLETON);
-    bind(Storage.class).toInstance(new Storage(TinkerGraph.open()));
+    bind(Storage.class).to(TinkerGraphStorage.class);
+    // bind(Storage.class).to(Neo4JStorage.class);
 
     super.configureServlets();
   }

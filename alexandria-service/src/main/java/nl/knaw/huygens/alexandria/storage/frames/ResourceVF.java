@@ -1,6 +1,6 @@
 package nl.knaw.huygens.alexandria.storage.frames;
 
-import nl.knaw.huygens.alexandria.service.Labels;
+import nl.knaw.huygens.alexandria.storage.Labels;
 import peapod.annotations.Vertex;
 
 @Vertex(Labels.RESOURCE)

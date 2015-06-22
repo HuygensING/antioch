@@ -1,5 +1,9 @@
 package nl.knaw.huygens.alexandria.endpoint.annotation;
 
+import io.swagger.annotations.Api;
+
+import java.util.Optional;
+
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -10,10 +14,12 @@ import javax.ws.rs.core.Response;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
+import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 @Path(EndpointPaths.ANNOTATIONS)
+@Api("annotations")
 public class AnnotationsEndpoint extends JSONEndpoint {
   private final AlexandriaService service;
   private final AnnotationEntityBuilder entityBuilder;
@@ -28,9 +34,15 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   @GET
   @Path("{uuid}")
   public Response readAnnotation(@PathParam("uuid") UUIDParam uuidParam) {
-    final AlexandriaAnnotation annotation = service.readAnnotation(uuidParam.getValue());
-    final AnnotationEntity entity = entityBuilder.build(annotation);
-    return Response.ok(entity).build();
+    Optional<AlexandriaAnnotation> optionalAnnotation = service.readAnnotation(uuidParam.getValue());
+    if (optionalAnnotation.isPresent()) {
+      final AlexandriaAnnotation annotation = optionalAnnotation.get();
+      final AnnotationEntity entity = entityBuilder.build(annotation);
+      return Response.ok(entity).build();
+
+    } else {
+      throw new NotFoundException("No annotation found with id " + uuidParam);
+    }
   }
 
   @DELETE

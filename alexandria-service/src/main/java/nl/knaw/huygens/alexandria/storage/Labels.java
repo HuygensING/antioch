@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.service;
+package nl.knaw.huygens.alexandria.storage;
 
 public class Labels {
   public static final String RESOURCE = "Resource";

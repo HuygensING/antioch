@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
+import io.swagger.annotations.ApiModel;
+
 import java.net.URI;
 import java.util.UUID;
 
@@ -18,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
 @JsonTypeName("resource")
+@ApiModel("resource")
 class ResourceEntity extends AnnotatableObjectEntity {
 
   @JsonIgnore

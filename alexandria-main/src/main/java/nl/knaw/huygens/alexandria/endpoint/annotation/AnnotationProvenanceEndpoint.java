@@ -9,7 +9,6 @@ import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
-
 public class AnnotationProvenanceEndpoint extends AccountableProvenanceEndpoint {
   @Inject
   public AnnotationProvenanceEndpoint(AlexandriaService service, //
@@ -19,7 +18,7 @@ public class AnnotationProvenanceEndpoint extends AccountableProvenanceEndpoint 
 
   @Override
   protected Accountable getAccountable() {
-    return service.readAnnotation(uuid);
+    return service.readAnnotation(uuid).get();
   };
 
 }

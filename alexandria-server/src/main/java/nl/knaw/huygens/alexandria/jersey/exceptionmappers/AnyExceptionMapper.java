@@ -10,10 +10,10 @@ import nl.knaw.huygens.Log;
 
 @Singleton
 @Provider
-public class RuntimeExceptionMapper implements ExceptionMapper<RuntimeException> {
+public class AnyExceptionMapper implements ExceptionMapper<Exception> {
 
   @Override
-  public Response toResponse(RuntimeException e) {
+  public Response toResponse(Exception e) {
     Log.error("error:{}", e);
     return Response//
         .status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).type("text/plain").build();

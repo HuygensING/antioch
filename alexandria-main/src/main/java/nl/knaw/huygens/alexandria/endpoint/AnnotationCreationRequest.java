@@ -1,7 +1,5 @@
 package nl.knaw.huygens.alexandria.endpoint;
 
-import static java.util.Objects.requireNonNull;
-
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,9 +30,10 @@ public class AnnotationCreationRequest {
   public AlexandriaAnnotation execute(AlexandriaService service) {
     final TentativeAlexandriaProvenance provenance = providedProvenance().get();
 
-    AlexandriaAnnotationBody body = null;
-    UUID bodyId = providedId().getValue();
-    body = service.readAnnotationBody(bodyId); // must exist, checked by @ExistingAnnotationBody. TODO: transactionize?
+    UUID annotationBodyUuid = UUID.randomUUID();
+    Optional<AlexandriaAnnotationBody> result = service.findAnnotationBodyWithTypeAndValue(providedType(), providedValue());
+    AlexandriaAnnotationBody body = result.isPresent() ? result.get() //
+        : service.createAnnotationBody(annotationBodyUuid, providedType(), providedValue(), provenance);
 
     if (resource.isPresent()) {
       return service.annotate(resource.get(), body, provenance);
@@ -43,8 +42,16 @@ public class AnnotationCreationRequest {
     return service.annotate(annotation.get(), body, provenance);
   }
 
-  private UUIDParam providedId() {
-    return requireNonNull(prototype.getAnnotationBodyId(), "Required 'value' field was not validated for being non-null");
+  // private UUIDParam providedId() {
+  // return requireNonNull(prototype.getAnnotationBodyId(), "Required 'value' field was not validated for being non-null");
+  // }
+
+  private Optional<String> providedType() {
+    return prototype.getType();
+  }
+
+  private String providedValue() {
+    return prototype.getValue();
   }
 
   private Optional<TentativeAlexandriaProvenance> providedProvenance() {

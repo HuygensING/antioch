@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint;
 
+import io.swagger.annotations.ApiOperation;
+
 import java.util.UUID;
 
 import javax.ws.rs.GET;
@@ -26,6 +28,7 @@ public abstract class AccountableProvenanceEndpoint extends JSONEndpoint {
   protected abstract Accountable getAccountable();
 
   @GET
+  @ApiOperation(value = "get the provenance", response = ProvenanceEntity.class)
   public Response get() {
     AlexandriaProvenance provenance = getAccountable().getProvenance();
     ProvenanceEntity entity = ProvenanceEntity.of(provenance).withLocationBuilder(locationBuilder);

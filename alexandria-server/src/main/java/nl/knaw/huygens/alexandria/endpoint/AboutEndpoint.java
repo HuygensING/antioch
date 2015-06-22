@@ -1,5 +1,8 @@
 package nl.knaw.huygens.alexandria.endpoint;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -15,6 +18,7 @@ import com.google.common.collect.Maps;
 
 @Singleton
 @Path("about")
+@Api("about")
 public class AboutEndpoint extends JSONEndpoint {
   Date starttime = new Date();
 
@@ -24,6 +28,7 @@ public class AboutEndpoint extends JSONEndpoint {
    * @return about-data map
    */
   @GET
+  @ApiOperation("get information about the server (version,builddate,started)")
   public Response getMetadata() {
     Map<String, String> data = Maps.newLinkedHashMap();
     data.put("version", getProperty("version"));

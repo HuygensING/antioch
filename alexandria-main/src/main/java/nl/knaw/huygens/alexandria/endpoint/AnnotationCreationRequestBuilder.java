@@ -37,12 +37,12 @@ public class AnnotationCreationRequestBuilder {
   }
 
   public AnnotationCreationRequestBuilder ofResource(UUID uuid) {
-    resource = Optional.of(service.readResource(uuid));
+    resource = service.readResource(uuid);
     return this;
   }
 
   public AnnotationCreationRequestBuilder ofAnnotation(UUID uuid) {
-    annotation = Optional.of(service.readAnnotation(uuid));
+    annotation = service.readAnnotation(uuid);
     return this;
   }
 

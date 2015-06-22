@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint;
 
+import io.swagger.annotations.ApiOperation;
+
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -8,7 +10,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import nl.knaw.huygens.Log;
@@ -28,7 +29,7 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   protected AnnotatableObjectAnnotationsEndpoint(AlexandriaService service, //
       AnnotationCreationRequestBuilder requestBuilder, //
       LocationBuilder locationBuilder, //
-      @PathParam("uuid") final UUIDParam uuidParam) {
+      final UUIDParam uuidParam) {
     Log.trace("resourceService=[{}], uuidParam=[{}]", service, uuidParam);
     this.service = service;
     this.requestBuilder = requestBuilder;
@@ -41,6 +42,7 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   protected abstract AnnotationCreationRequestBuilder getAnnotationCreationRequestBuilder();
 
   @GET
+  @ApiOperation(value = "get the annotations")
   public Response get() {
     final Set<AlexandriaAnnotation> annotations = getAnnotableObject().getAnnotations();
     final Set<AnnotationEntity> outgoingAnnos = annotations.stream().map(AnnotationEntity::of).collect(Collectors.toSet());
@@ -48,6 +50,7 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   }
 
   @POST
+  @ApiOperation("add annotation")
   public Response addAnnotation(@NotNull @Valid AnnotationPrototype prototype) {
     AnnotationCreationRequest request = getAnnotationCreationRequestBuilder().build(prototype);
     AlexandriaAnnotation annotation = request.execute(service);

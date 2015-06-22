@@ -8,4 +8,8 @@ public class NotFoundException extends WebApplicationException {
   public NotFoundException() {
     super(Response.status(Status.NOT_FOUND).build());
   }
+
+  public NotFoundException(String message) {
+    super(Response.status(Status.NOT_FOUND).entity(message).build());
+  }
 }

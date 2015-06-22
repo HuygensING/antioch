@@ -44,7 +44,7 @@ class ResourceCreationRequest {
     resourceCreated = service.createOrUpdateResource(uuid, ref, provenance);
     // Log.trace("resource: [{}]", resource);
 
-    return service.readResource(uuid);
+    return service.readResource(uuid).get();
   }
 
   private TentativeAlexandriaProvenance defaultProvenance() {

@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
+import io.swagger.annotations.Api;
+
 import javax.inject.Inject;
 import javax.ws.rs.PathParam;
 
@@ -10,6 +12,7 @@ import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
+@Api("annotations")
 public class ResourceAnnotationsEndpoint extends AnnotatableObjectAnnotationsEndpoint {
 
   // TODO: how to remove this duplicated inject/constructor?
@@ -23,7 +26,7 @@ public class ResourceAnnotationsEndpoint extends AnnotatableObjectAnnotationsEnd
 
   @Override
   protected AbstractAnnotatable getAnnotableObject() {
-    return service.readResource(uuid);
+    return service.readResource(uuid).get();
   };
 
   @Override

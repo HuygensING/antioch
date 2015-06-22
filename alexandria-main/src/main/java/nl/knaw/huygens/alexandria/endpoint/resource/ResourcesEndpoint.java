@@ -1,6 +1,10 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import static nl.knaw.huygens.alexandria.endpoint.EndpointPaths.RESOURCES;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -25,6 +29,7 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 @Singleton
 @Path(RESOURCES)
+@Api(RESOURCES)
 public class ResourcesEndpoint extends JSONEndpoint {
 
   private final AlexandriaService alexandriaService;
@@ -47,12 +52,14 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   @GET
   @Path("{uuid}")
+  @ApiOperation(value = "Get the resource with the given uuid", response = ResourceEntity.class)
   public Response getResourceByID(@PathParam("uuid") final UUIDParam uuid) {
-    final AlexandriaResource resource = alexandriaService.readResource(uuid.getValue());
-    if (resource == null) {
-      throw new NotFoundException();
+    Optional<AlexandriaResource> optional = alexandriaService.readResource(uuid.getValue());
+    if (optional.isPresent()) {
+      return Response.ok(entityBuilder.build(optional.get())).build();
+
     } else {
-      return Response.ok(entityBuilder.build(resource)).build();
+      throw new NotFoundException("No resource found with id " + uuid);
     }
   }
 
@@ -102,7 +109,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @GET
   @Path("{uuid}/ref")
   public Response getResourceRef(@PathParam("uuid") final UUIDParam uuidParam) {
-    AlexandriaResource resource = alexandriaService.readResource(uuidParam.getValue());
+    AlexandriaResource resource = alexandriaService.readResource(uuidParam.getValue()).get();
     return Response.ok(new RefEntity(resource.getRef())).build();
   }
 

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -40,8 +41,10 @@ public class AnnotationAnnotationsEndpointTest {
     when(annotation0.getAnnotations()).thenReturn(ImmutableSet.of(annotation1));
 
     AlexandriaService service = mock(AlexandriaService.class);
-    when(service.readAnnotation(uuid0)).thenReturn(annotation0);
-    when(service.readAnnotation(uuid1)).thenReturn(annotation1);
+    Optional<AlexandriaAnnotation> optional0 = Optional.of(annotation0);
+    Optional<AlexandriaAnnotation> optional1 = Optional.of(annotation1);
+    when(service.readAnnotation(uuid0)).thenReturn(optional0);
+    when(service.readAnnotation(uuid1)).thenReturn(optional1);
 
     AnnotationCreationRequestBuilder requestBuilder = mock(AnnotationCreationRequestBuilder.class);
     AlexandriaConfiguration configuration = new MockConfiguration();

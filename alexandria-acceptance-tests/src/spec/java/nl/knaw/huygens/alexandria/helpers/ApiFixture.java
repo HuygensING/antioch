@@ -4,6 +4,13 @@ import static java.lang.String.format;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static org.mockito.Mockito.mock;
 
+import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Supplier;
+
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
@@ -12,12 +19,22 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Supplier;
+
+import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
+import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
+import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.util.UUIDParser;
+
+import org.concordion.api.extension.Extensions;
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.test.JerseyTest;
+import org.glassfish.jersey.test.TestProperties;
+import org.junit.BeforeClass;
+import org.mockito.Mockito;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
@@ -28,20 +45,6 @@ import com.google.inject.Module;
 import com.google.inject.Scopes;
 import com.google.inject.servlet.ServletModule;
 import com.squarespace.jersey2.guice.BootstrapUtils;
-import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
-import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
-import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
-import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
-import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.alexandria.util.UUIDParser;
-import org.concordion.api.extension.Extensions;
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.test.JerseyTest;
-import org.glassfish.jersey.test.TestProperties;
-import org.junit.BeforeClass;
-import org.mockito.Mockito;
 
 @Extensions(ApiExtension.class)
 public class ApiFixture extends JerseyTest {
@@ -91,6 +94,11 @@ public class ApiFixture extends JerseyTest {
       @Override
       public String toString() {
         return Objects.toStringHelper(this).add("baseURI", getBaseURI()).toString();
+      }
+
+      @Override
+      public String getStorageDirectory() {
+        return "/tmp";
       }
     };
   }
