@@ -56,7 +56,7 @@
     <swagger-maven-plugin.version>3.1.0</swagger-maven-plugin.version>
     <swagger.version>1.5.0</swagger.version>
     <build-helper-maven-plugin.version>1.9.1</build-helper-maven-plugin.version>
-    
+
     <concordion.reportDir>${project.build.directory}/concordion-reports</concordion.reportDir>
     <integration.testOutputDir>${project.build.directory}/integration-test-classes</integration.testOutputDir>
     <site.dir>src/site</site.dir>
@@ -69,7 +69,7 @@
     <scm-publish.pubScmUrl>scm:git:git@github.com:huygensING/alexandria.git</scm-publish.pubScmUrl>
     <scm-publish.siteDocOuputDirectory>${project.reporting.outputDirectory}</scm-publish.siteDocOuputDirectory>
     <scmPublish.checkoutDirectory>${project.build.directory}/scmpublish</scmPublish.checkoutDirectory>
-    
+
     <project.license.name>GNU General Public License</project.license.name>
     <project.license.url>http://www.gnu.org/licenses/gpl.txt</project.license.url>
   </properties>
