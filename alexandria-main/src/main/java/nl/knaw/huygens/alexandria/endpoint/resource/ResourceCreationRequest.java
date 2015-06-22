@@ -2,14 +2,12 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.ProvenancePrototype;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
-import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -40,19 +38,15 @@ class ResourceCreationRequest {
     uuid = providedUUID().orElse(UUID.randomUUID());
 
     String ref = providedRef();
-    TentativeAlexandriaProvenance provenance = providedProvenance().orElse(defaultProvenance());
+    TentativeAlexandriaProvenance provenance = providedProvenance().orElse(TentativeAlexandriaProvenance.createDefault());
     resourceCreated = service.createOrUpdateResource(uuid, ref, provenance);
     // Log.trace("resource: [{}]", resource);
 
     return service.readResource(uuid).get();
   }
 
-  private TentativeAlexandriaProvenance defaultProvenance() {
-    return new TentativeAlexandriaProvenance(AlexandriaProvenance.DEFAULT_WHO, Instant.now(), AlexandriaProvenance.DEFAULT_WHY);
-  }
-
   public boolean wasExecutedAsIs() {
-    final boolean wasExecutedAsIs = providedUUID().isPresent() && providedProvenance().isPresent();
+    final boolean wasExecutedAsIs = providedUUID().isPresent();// && providedProvenance().isPresent();
     Log.trace("wasExecutedAsIs: {}", wasExecutedAsIs);
     return wasExecutedAsIs;
   }

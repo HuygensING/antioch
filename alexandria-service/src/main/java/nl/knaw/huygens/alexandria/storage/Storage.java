@@ -65,6 +65,11 @@ public class Storage {
     AlexandriaResource resource = new AlexandriaResource(uuid, provenance);
     resource.setRef(rvf.getRef());
     resource.setState(AlexandriaState.valueOf(rvf.getState()));
+    List<AnnotationVF> annotatedBy = rvf.getAnnotatedBy();
+    for (AnnotationVF annotationVF : annotatedBy) {
+      AlexandriaAnnotation annotation = deframeAnnotation(annotationVF);
+      resource.addAnnotation(annotation);
+    }
     return resource;
   }
 
@@ -73,12 +78,7 @@ public class Storage {
     if (avf == null) {
       return null;
     }
-    TentativeAlexandriaProvenance provenance = deframeProvenance(avf);
-    AnnotationBodyVF bodyVF = avf.getBody();
-    TentativeAlexandriaProvenance bodyProvenance = deframeProvenance(bodyVF);
-    AlexandriaAnnotationBody body = new AlexandriaAnnotationBody(getUUID(bodyVF), bodyVF.getType(), bodyVF.getValue(), bodyProvenance);
-    AlexandriaAnnotation annotation = new AlexandriaAnnotation(uuid, body, provenance);
-    return annotation;
+    return deframeAnnotation(avf);
   }
 
   public void createOrUpdateResource(AlexandriaResource resource) {
@@ -224,17 +224,40 @@ public class Storage {
     return vf;
   }
 
-  private TentativeAlexandriaProvenance deframeProvenance(AlexandriaVF avf) {
-    String provenanceWhen = avf.getProvenanceWhen();
-    return new TentativeAlexandriaProvenance(avf.getProvenanceWho(), Instant.parse(provenanceWhen), avf.getProvenanceWhy());
-  }
-
   private AnnotationVF createAnnotationVF(AlexandriaAnnotation newAnnotation) {
     AnnotationVF avf = fg.addVertex(AnnotationVF.class);
     setAlexandriaVFProperties(newAnnotation, avf);
 
     avf.setState(newAnnotation.getState().toString());
+
+    String bodyId = newAnnotation.getBody().getId().toString();
+    List<AnnotationBodyVF> results = fg.V(AnnotationBodyVF.class).has(IDENTIFIER_PROPERTY, bodyId).toList();
+    AnnotationBodyVF bodyVF = results.get(0);
+
+    avf.setBody(bodyVF);
     return avf;
+  }
+
+  private AlexandriaAnnotation deframeAnnotation(AnnotationVF annotationVF) {
+    TentativeAlexandriaProvenance provenance = deframeProvenance(annotationVF);
+    UUID uuid = getUUID(annotationVF);
+    AlexandriaAnnotationBody body = deframeAnnotationBody(annotationVF.getBody());
+    return new AlexandriaAnnotation(uuid, body, provenance);
+  }
+
+  private AlexandriaAnnotationBody deframeAnnotationBody(AnnotationBodyVF annotationBodyVF) {
+    TentativeAlexandriaProvenance provenance = deframeProvenance(annotationBodyVF);
+    UUID uuid = getUUID(annotationBodyVF);
+    return new AlexandriaAnnotationBody(uuid, annotationBodyVF.getType(), annotationBodyVF.getValue(), provenance);
+  }
+
+  private TentativeAlexandriaProvenance deframeProvenance(AlexandriaVF avf) {
+    String provenanceWhen = avf.getProvenanceWhen();
+    return new TentativeAlexandriaProvenance(avf.getProvenanceWho(), Instant.parse(provenanceWhen), avf.getProvenanceWhy());
+  }
+
+  private UUID getUUID(AlexandriaVF vf) {
+    return UUID.fromString(vf.getUuid());
   }
 
   private void setAlexandriaVFProperties(Accountable resource, AlexandriaVF vf) {
@@ -245,15 +268,4 @@ public class Storage {
     vf.setProvenanceWho(provenance.getWho());
     vf.setProvenanceWhy(provenance.getWhy());
   }
-
-  private AlexandriaAnnotationBody deframeAnnotationBody(AnnotationBodyVF annotationBodyVF) {
-    TentativeAlexandriaProvenance provenance = deframeProvenance(annotationBodyVF);
-    UUID uuid = getUUID(annotationBodyVF);
-    return new AlexandriaAnnotationBody(uuid, annotationBodyVF.getType(), annotationBodyVF.getValue(), provenance);
-  }
-
-  private UUID getUUID(AnnotationBodyVF annotationBodyVF) {
-    return UUID.fromString(annotationBodyVF.getUuid());
-  }
-
 }

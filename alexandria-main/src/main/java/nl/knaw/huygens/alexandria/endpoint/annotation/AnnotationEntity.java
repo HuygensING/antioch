@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.AnnotatableObjectEntity;
-import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -38,6 +38,14 @@ public class AnnotationEntity extends AnnotatableObjectEntity {
 
   public UUID getId() {
     return annotation.getId();
+  }
+
+  public String getType() {
+    return annotation.getBody().getType();
+  }
+
+  public String getValue() {
+    return annotation.getBody().getValue();
   }
 
   @Override

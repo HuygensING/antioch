@@ -6,7 +6,7 @@ import peapod.annotations.Vertex;
 
 @Vertex(Labels.ANNOTATION)
 public abstract class AnnotationVF extends AlexandriaVF {
-  private static final String ANNOTATES = "annotates";
+  static final String ANNOTATES = "annotates";
   private static final String HAS_BODY = "has_body";
 
   @Edge(ANNOTATES)

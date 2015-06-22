@@ -28,7 +28,7 @@ public class AnnotationCreationRequest {
   }
 
   public AlexandriaAnnotation execute(AlexandriaService service) {
-    final TentativeAlexandriaProvenance provenance = providedProvenance().get();
+    final TentativeAlexandriaProvenance provenance = providedProvenance().orElse(TentativeAlexandriaProvenance.createDefault());
 
     UUID annotationBodyUuid = UUID.randomUUID();
     Optional<AlexandriaAnnotationBody> result = service.findAnnotationBodyWithTypeAndValue(providedType(), providedValue());

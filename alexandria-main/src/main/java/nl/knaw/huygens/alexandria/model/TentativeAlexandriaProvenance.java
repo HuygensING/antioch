@@ -7,6 +7,10 @@ public class TentativeAlexandriaProvenance {
   private final Instant when;
   private final String why;
 
+  public static TentativeAlexandriaProvenance createDefault() {
+    return new TentativeAlexandriaProvenance(AlexandriaProvenance.DEFAULT_WHO, Instant.now(), AlexandriaProvenance.DEFAULT_WHY);
+  }
+
   public TentativeAlexandriaProvenance(String who, Instant when, String why) {
     this.who = who;
     this.when = when;
@@ -24,8 +28,9 @@ public class TentativeAlexandriaProvenance {
   public String getWhy() {
     return why;
   }
-  
+
   public AlexandriaProvenance bind(Accountable what) {
-  	return new AlexandriaProvenance(what, who, when, why);
-	}
+    return new AlexandriaProvenance(what, who, when, why);
+  }
+
 }

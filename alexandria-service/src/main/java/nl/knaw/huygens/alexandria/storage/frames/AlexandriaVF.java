@@ -1,5 +1,10 @@
 package nl.knaw.huygens.alexandria.storage.frames;
 
+import java.util.List;
+
+import peapod.annotations.Edge;
+import peapod.annotations.In;
+
 public abstract class AlexandriaVF {
 
   public abstract String getUuid();
@@ -22,4 +27,7 @@ public abstract class AlexandriaVF {
 
   public abstract void setProvenanceWhy(String why);
 
+  @In
+  @Edge(AnnotationVF.ANNOTATES)
+  public abstract List<AnnotationVF> getAnnotatedBy();
 }
