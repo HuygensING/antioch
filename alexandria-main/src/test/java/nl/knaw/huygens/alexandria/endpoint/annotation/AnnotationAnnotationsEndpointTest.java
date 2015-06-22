@@ -55,6 +55,7 @@ public class AnnotationAnnotationsEndpointTest {
     Response response = aa.get();
     Log.info("response={}", response);
 
+    @SuppressWarnings("unchecked")
     Set<AnnotationEntity> entity = (Set<AnnotationEntity>) response.getEntity();
     Log.info("entity={}", entity);
     ObjectMapper om = new ObjectMapper();
