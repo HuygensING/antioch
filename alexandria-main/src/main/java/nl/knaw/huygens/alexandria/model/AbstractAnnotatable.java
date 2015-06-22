@@ -15,6 +15,7 @@ public abstract class AbstractAnnotatable implements Accountable {
 
   public void addAnnotation(AlexandriaAnnotation annotation) {
     annotations.add(annotation);
+    annotation.setAnnotatable(this);
   }
 
   public AlexandriaState getState() {

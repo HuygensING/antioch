@@ -26,7 +26,8 @@ public class ResourceAnnotationsEndpoint extends AnnotatableObjectAnnotationsEnd
 
   @Override
   protected AbstractAnnotatable getAnnotableObject() {
-    return service.readResource(uuid).get();
+    return service.readResource(uuid)//
+        .orElseThrow(ResourcesEndpoint.resourceNotFoundForId(uuid));
   };
 
   @Override

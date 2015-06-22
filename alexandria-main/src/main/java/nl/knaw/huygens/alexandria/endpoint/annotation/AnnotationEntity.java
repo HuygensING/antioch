@@ -2,12 +2,14 @@ package nl.knaw.huygens.alexandria.endpoint.annotation;
 
 import java.util.UUID;
 
-import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.AnnotatableObjectEntity;
+import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+import nl.knaw.huygens.alexandria.endpoint.resource.PropertyPrefix;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
@@ -20,9 +22,6 @@ public class AnnotationEntity extends AnnotatableObjectEntity {
   @JsonIgnore
   private final AlexandriaAnnotation annotation;
 
-  @JsonIgnore
-  private AlexandriaConfiguration config;
-
   public static AnnotationEntity of(AlexandriaAnnotation someAnnotation) {
     return new AnnotationEntity(someAnnotation);
   }
@@ -31,13 +30,18 @@ public class AnnotationEntity extends AnnotatableObjectEntity {
     this.annotation = annotation;
   }
 
-  public final AnnotationEntity withConfig(AlexandriaConfiguration config) {
-    this.config = config;
+  public final AnnotationEntity withLocationBuilder(LocationBuilder locationBuilder) {
+    this.locationBuilder = locationBuilder;
     return this;
   }
 
   public UUID getId() {
     return annotation.getId();
+  }
+
+  @JsonProperty(PropertyPrefix.LINK)
+  public String getAnnotates() {
+    return locationBuilder.locationOf(annotation.getAnnotatable()).toString();
   }
 
   public String getType() {

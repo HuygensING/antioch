@@ -53,11 +53,4 @@ public class StorageTest {
       throw new RuntimeException(e);
     }
   }
-  // @Test
-  // public void test() {
-  // String string = ResourceVF.class.getPackage().getName() + ".";
-  // Log.info("string={}", string);
-  // Set<Class<?>> framerClasses = new Reflections(string).getTypesAnnotatedWith(Framer.class);
-  // Log.info("classes={}", framerClasses);
-  // }
 }

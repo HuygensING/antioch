@@ -113,8 +113,6 @@ public class Storage {
       avf.setUuid(uuid.toString());
     }
 
-    // avf.setType(annotation.getBody().getType());
-    // avf.setValue(annotation.getBody().getValue());
     avf.setState(annotation.getState().toString());
 
     setAlexandriaVFProperties(annotation, avf);
@@ -145,7 +143,10 @@ public class Storage {
   }
 
   public Optional<AlexandriaAnnotationBody> findAnnotationBodyWithTypeAndValue(Optional<String> type, String value) {
-    List<AnnotationBodyVF> results = fg.V(AnnotationBodyVF.class).has("type", type.orElse("")).has("value", value).toList();
+    List<AnnotationBodyVF> results = fg.V(AnnotationBodyVF.class)//
+        .has("type", type.orElse(""))//
+        .has("value", value)//
+        .toList();
     if (results.isEmpty()) {
       return Optional.empty();
     }

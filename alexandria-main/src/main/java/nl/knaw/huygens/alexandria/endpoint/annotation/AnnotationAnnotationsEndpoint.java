@@ -25,7 +25,8 @@ public class AnnotationAnnotationsEndpoint extends AnnotatableObjectAnnotationsE
 
   @Override
   protected AbstractAnnotatable getAnnotableObject() {
-    return service.readAnnotation(uuid).get();
+    return service.readAnnotation(uuid)//
+        .orElseThrow(AnnotationsEndpoint.annotationNotFoundForId(uuid));
   };
 
   @Override

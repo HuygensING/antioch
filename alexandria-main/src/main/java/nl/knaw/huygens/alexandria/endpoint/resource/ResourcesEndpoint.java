@@ -4,6 +4,8 @@ import static nl.knaw.huygens.alexandria.endpoint.EndpointPaths.RESOURCES;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
+import java.util.function.Supplier;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.Valid;
@@ -53,7 +55,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @ApiOperation(value = "Get the resource with the given uuid", response = ResourceEntity.class)
   public Response getResourceByID(@PathParam("uuid") final UUIDParam uuid) {
     AlexandriaResource resource = alexandriaService.readResource(uuid.getValue())//
-        .orElseThrow(() -> new NotFoundException("No resource found with id " + uuid));
+        .orElseThrow(resourceNotFoundForId(uuid));
     return Response.ok(entityBuilder.build(resource)).build();
 
   }
@@ -104,7 +106,8 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @GET
   @Path("{uuid}/ref")
   public Response getResourceRef(@PathParam("uuid") final UUIDParam uuidParam) {
-    AlexandriaResource resource = alexandriaService.readResource(uuidParam.getValue()).get();
+    AlexandriaResource resource = alexandriaService.readResource(uuidParam.getValue())//
+        .orElseThrow(resourceNotFoundForId(uuidParam));
     return Response.ok(new RefEntity(resource.getRef())).build();
   }
 
@@ -129,7 +132,12 @@ public class ResourcesEndpoint extends JSONEndpoint {
   public ResourceProvenanceEndpoint getProvenanceEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
     // If we let Jersey handle the lifecycle, this endpoint doesn't show up in the standard application.wadl
     // TODO: make the combination subresource as class/application.wadl work
+    // swagger seems to have the same problem
     return new ResourceProvenanceEndpoint(alexandriaService, uuidParam, locationBuilder);
   }
+
+  public static Supplier<NotFoundException> resourceNotFoundForId(Object id) {
+    return () -> new NotFoundException("No resource found with id " + id);
+  };
 
 }

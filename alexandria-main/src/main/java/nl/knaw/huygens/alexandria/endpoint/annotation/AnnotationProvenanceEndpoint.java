@@ -18,7 +18,8 @@ public class AnnotationProvenanceEndpoint extends AccountableProvenanceEndpoint 
 
   @Override
   protected Accountable getAccountable() {
-    return service.readAnnotation(uuid).get();
-  };
+    return service.readAnnotation(uuid)//
+        .orElseThrow(AnnotationsEndpoint.annotationNotFoundForId(uuid));
+  }
 
 }

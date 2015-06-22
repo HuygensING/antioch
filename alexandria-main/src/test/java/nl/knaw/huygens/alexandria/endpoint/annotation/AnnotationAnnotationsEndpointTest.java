@@ -24,7 +24,6 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 
 public class AnnotationAnnotationsEndpointTest {
@@ -70,8 +69,8 @@ public class AnnotationAnnotationsEndpointTest {
     @SuppressWarnings("unchecked")
     Set<AnnotationEntity> entity = (Set<AnnotationEntity>) response.getEntity();
     Log.info("entity={}", entity);
-    ObjectMapper om = new ObjectMapper();
-    Log.info("json={}", om.writeValueAsString(entity));
+    // ObjectMapper om = new ObjectMapper();
+    // Log.info("json={}", om.writeValueAsString(entity));
     assertThat(entity).hasSize(1);
     assertThat(entity.iterator().next().getId()).isEqualTo(uuid1);
   }
