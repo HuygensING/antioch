@@ -14,8 +14,8 @@ public class AnnotationCreationRequest {
 
   private final AnnotationPrototype prototype;
 
-  private Optional<AlexandriaResource> resource;
-  private Optional<AlexandriaAnnotation> annotation;
+  private Optional<AlexandriaResource> resource = Optional.empty();
+  private Optional<AlexandriaAnnotation> annotation = Optional.empty();
 
   public AnnotationCreationRequest(AlexandriaResource resource, AnnotationPrototype prototype) {
     this.prototype = prototype;

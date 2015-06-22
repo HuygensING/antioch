@@ -28,8 +28,8 @@ public class AnnotationCreationRequestBuilder {
 
   private final AlexandriaService service;
 
-  private Optional<AlexandriaResource> resource;
-  private Optional<AlexandriaAnnotation> annotation;
+  private Optional<AlexandriaResource> resource = Optional.empty();
+  private Optional<AlexandriaAnnotation> annotation = Optional.empty();
 
   @Inject
   public AnnotationCreationRequestBuilder(AlexandriaService service) {
