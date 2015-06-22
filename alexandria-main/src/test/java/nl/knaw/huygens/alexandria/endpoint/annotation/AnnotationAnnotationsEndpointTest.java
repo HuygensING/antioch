@@ -18,6 +18,7 @@ import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 import org.junit.Test;
@@ -29,13 +30,24 @@ import com.google.common.collect.ImmutableSet;
 public class AnnotationAnnotationsEndpointTest {
   @Test
   public void testAnnotationURIsAreCorrect() throws JsonProcessingException {
+
+    AlexandriaAnnotationBody body0 = mock(AlexandriaAnnotationBody.class);
+    when(body0.getType()).thenReturn("");
+    when(body0.getValue()).thenReturn("Bookmark");
+
     UUID uuid0 = UUID.randomUUID();
     AlexandriaAnnotation annotation0 = mock(AlexandriaAnnotation.class);
     when(annotation0.getId()).thenReturn(uuid0);
+    when(annotation0.getBody()).thenReturn(body0);
+
+    AlexandriaAnnotationBody body1 = mock(AlexandriaAnnotationBody.class);
+    when(body1.getType()).thenReturn("Comment");
+    when(body1.getValue()).thenReturn("Improbable");
 
     UUID uuid1 = UUID.randomUUID();
     AlexandriaAnnotation annotation1 = mock(AlexandriaAnnotation.class);
     when(annotation1.getId()).thenReturn(uuid1);
+    when(annotation1.getBody()).thenReturn(body1);
 
     // annotation1 is an annotation on annotation0
     when(annotation0.getAnnotations()).thenReturn(ImmutableSet.of(annotation1));
