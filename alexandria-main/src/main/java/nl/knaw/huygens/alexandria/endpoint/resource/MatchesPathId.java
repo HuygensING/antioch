@@ -12,10 +12,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.List;
+import java.util.UUID;
 
 import nl.knaw.huygens.Log;
 
-@Target({ ElementType.FIELD, ElementType.PARAMETER })
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = MatchesPathId.Validator.class)
 public @interface MatchesPathId {
@@ -34,21 +35,47 @@ public @interface MatchesPathId {
     }
 
     @Override
+    public void initialize(MatchesPathId constraintAnnotation) {
+      Log.info("initialize: annotation={}", constraintAnnotation);
+    }
+
+    @Override
     public boolean isValid(ResourcePrototype prototype, ConstraintValidatorContext context) {
       if (prototype == null) {
         return true;
       }
 
-      final String protoId = prototype.getId().getValue().toString();
-      List<PathSegment> pathSegments = uriInfo.getPathSegments();
-      String uuid = pathSegments.get(pathSegments.size() - 1).getPath();
-      return protoId.equals(uuid);
+      final PathSegment uriId = uriId();
+      final UUID prototypeId = prototypeId(prototype);
+
+      return value(uriId).equals(value(prototypeId));
     }
 
-    @Override
-    public void initialize(MatchesPathId constraintAnnotation) {
-      Log.info("initialize: annotation={}", constraintAnnotation);
+    private String value(PathSegment segment) {
+      return segment.getPath();
     }
+
+    private String value(UUID uuid) {
+      return String.valueOf(uuid);
+    }
+
+    private PathSegment uriId() {
+      return uuidSegment(uriSegments());
+    }
+
+    private PathSegment uuidSegment(List<PathSegment> pathSegments) {
+      final int uuidSegmentIndex = uriSegments().size() - 1;
+      return pathSegments.get(uuidSegmentIndex);
+    }
+
+    private List<PathSegment> uriSegments() {
+      return uriInfo.getPathSegments();
+    }
+
+    private UUID prototypeId(ResourcePrototype prototype) {
+      return prototype.getId().getValue();
+    }
+
   }
 
 }
