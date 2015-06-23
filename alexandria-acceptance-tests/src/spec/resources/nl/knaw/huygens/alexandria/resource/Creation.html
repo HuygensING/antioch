@@ -1,14 +1,37 @@
 <html xmlns:c="http://www.concordion.org/2007/concordion"
-      xmlns:json="https://alexandria.huygens.knaw.nl">
+      xmlns:r="http://pragmatists.github.io/concordion-rest-extension"
+      xmlns:json="https://alexandria.huygens.knaw.nl"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://pragmatists.github.io/concordion-rest-extension http://pragmatists.github.io/concordion-rest-extension/xsd/concordion-rest.xsd">
 <title>Creating External Resources</title>
 
-<body>
+<body class="container">
 
-<h1>Creating external resources</h1>
+<h2 class="page-header">Creating external resources</h2>
 
 <div class="examples">
     <div c:execute="clear()" class="example">
         <h3>How can I create an external resource without specifying an ID?</h3>
+        <!--
+        <r:request>
+            When I
+            <r:post>/resources</r:post>
+            with the following body
+            (using
+            <r:setHeader name="Content-type">application/json</r:setHeader>
+            )
+            <r:jsonBody> {
+                "resource": {
+                "ref": "http://www.example.com/titles/path/to/title/resource"
+                }
+            }
+            </r:jsonBody>
+            Then I should receive
+            <r:status>HTTP/1.1 201 Created</r:status>
+            with response header
+            <r:header name="Location">/resources/1234-ab</r:header>
+        </r:request>
+        -->
 
         <ul>
             <li>Given some resource located at <code>http://www.example.com/titles/path/to/title/resource</code></li>
@@ -82,13 +105,12 @@
                 <ol>
                     <li>the response status should be <b c:assertEquals="status()">400 Bad Request</b>;</li>
                     <li>the response body contains (amongst other error details):
-<pre json:includesJson="response()">[
-    {
-        "message" : "may not be null",
-        "messageTemplate" : "{javax.validation.constraints.NotNull.message}",
-        "path" : "ResourcesEndpoint.createResource.arg0"
-    }
-]</pre>
+                        <json:includesJson>[ {
+                            "message" : "may not be null",
+                            "messageTemplate" : "{javax.validation.constraints.NotNull.message}",
+                            "path" : "ResourcesEndpoint.createResource.arg0"
+                            }
+                        ]</json:includesJson>
                     </li>
                 </ol>
             </li>

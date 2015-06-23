@@ -4,13 +4,6 @@ import static java.lang.String.format;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static org.mockito.Mockito.mock;
 
-import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Supplier;
-
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
@@ -19,22 +12,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
-
-import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
-import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
-import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
-import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
-import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.alexandria.util.UUIDParser;
-
-import org.concordion.api.extension.Extensions;
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.test.JerseyTest;
-import org.glassfish.jersey.test.TestProperties;
-import org.junit.BeforeClass;
-import org.mockito.Mockito;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Supplier;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
@@ -45,9 +28,23 @@ import com.google.inject.Module;
 import com.google.inject.Scopes;
 import com.google.inject.servlet.ServletModule;
 import com.squarespace.jersey2.guice.BootstrapUtils;
+import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
+import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
+import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.util.UUIDParser;
+import org.concordion.api.extension.Extensions;
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.test.JerseyTest;
+import org.glassfish.jersey.test.TestProperties;
+import org.junit.BeforeClass;
+import org.mockito.Mockito;
 
-@Extensions(ApiExtension.class)
-public class ApiFixture extends JerseyTest {
+@Extensions(RestExtension.class)
+public class RestFixture extends JerseyTest {
 
   private static final AlexandriaConfiguration CONFIG = testConfiguration();
 
@@ -92,13 +89,27 @@ public class ApiFixture extends JerseyTest {
       }
 
       @Override
-      public String toString() {
-        return Objects.toStringHelper(this).add("baseURI", getBaseURI()).toString();
+      public String getStorageDirectory() {
+        return "/tmp";
       }
 
       @Override
-      public String getStorageDirectory() {
-        return "/tmp";
+      public String toString() {
+        return Objects.toStringHelper(this).add("baseURI", getBaseURI()).toString();
+      }
+    };
+  }
+
+  private static Module baseModule() {
+    return new AbstractModule() {
+      @Override
+      protected void configure() {
+        Log.trace("setting up Guice bindings");
+        bind(AlexandriaService.class).toInstance(SERVICE_MOCK);
+        bind(AlexandriaConfiguration.class).toInstance(CONFIG);
+        bind(AnnotationEntityBuilder.class).in(Scopes.SINGLETON);
+        bind(EndpointPathResolver.class).in(Scopes.SINGLETON);
+        bind(ResourceEntityBuilder.class).in(Scopes.SINGLETON);
       }
     };
   }
@@ -110,14 +121,6 @@ public class ApiFixture extends JerseyTest {
   public String uuidQuality() {
     final String idStr = tailOf(location());
     return parse(idStr).map(uuid -> "well-formed UUID").orElseGet(malformedDescription(idStr));
-  }
-
-  private Optional<UUID> parse(String idStr) {
-    return UUIDParser.fromString(idStr).get();
-  }
-
-  private Supplier<String> malformedDescription(String idStr) {
-    return () -> "malformed UUID: " + idStr;
   }
 
   public void clear() {
@@ -200,18 +203,12 @@ public class ApiFixture extends JerseyTest {
     return SERVICE_MOCK;
   }
 
-  private static Module baseModule() {
-    return new AbstractModule() {
-      @Override
-      protected void configure() {
-        Log.trace("setting up Guice bindings");
-        bind(AlexandriaService.class).toInstance(SERVICE_MOCK);
-        bind(AlexandriaConfiguration.class).toInstance(CONFIG);
-        bind(AnnotationEntityBuilder.class).in(Scopes.SINGLETON);
-        bind(EndpointPathResolver.class).in(Scopes.SINGLETON);
-        bind(ResourceEntityBuilder.class).in(Scopes.SINGLETON);
-      }
-    };
+  private Optional<UUID> parse(String idStr) {
+    return UUIDParser.fromString(idStr).get();
+  }
+
+  private Supplier<String> malformedDescription(String idStr) {
+    return () -> "malformed UUID: " + idStr;
   }
 
   private Optional<String> header(String header) {

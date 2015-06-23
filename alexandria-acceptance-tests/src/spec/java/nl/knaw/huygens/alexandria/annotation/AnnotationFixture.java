@@ -10,7 +10,7 @@ import java.util.UUID;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
-import nl.knaw.huygens.alexandria.helpers.ApiFixture;
+import nl.knaw.huygens.alexandria.helpers.RestFixture;
 
 import org.concordion.api.MultiValueResult;
 import org.concordion.integration.junit4.ConcordionRunner;
@@ -22,7 +22,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @RunWith(ConcordionRunner.class)
-public class AnnotationFixture extends ApiFixture {
+public class AnnotationFixture extends RestFixture {
 
   private final Map<String, List<String>> annotatedReferences = Maps.newHashMap();
 
