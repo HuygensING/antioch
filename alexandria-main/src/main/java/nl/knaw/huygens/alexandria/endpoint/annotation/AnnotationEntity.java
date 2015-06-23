@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
 @JsonTypeName("annotation")
 @ApiModel("annotation")
-class AnnotationEntity extends AnnotatableObjectEntity {
+public class AnnotationEntity extends AnnotatableObjectEntity {
 
   @JsonIgnore
   private final AlexandriaAnnotation annotation;
