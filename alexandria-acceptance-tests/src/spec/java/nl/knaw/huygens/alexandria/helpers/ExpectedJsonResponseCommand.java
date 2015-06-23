@@ -19,8 +19,8 @@ import org.concordion.api.Evaluator;
 import org.concordion.api.ResultRecorder;
 import org.concordion.internal.listener.AssertResultRenderer;
 
-public class IncludesJsonCommand extends HuygensCommand {
-  public IncludesJsonCommand() {
+public class ExpectedJsonResponseCommand extends HuygensCommand {
+  public ExpectedJsonResponseCommand() {
     addListener(new AssertResultRenderer());
   }
 

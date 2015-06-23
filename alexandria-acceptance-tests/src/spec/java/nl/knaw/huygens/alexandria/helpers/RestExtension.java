@@ -36,13 +36,13 @@ public class RestExtension implements ConcordionExtension {
   }
 
   private void registerCommands(ConcordionExtender concordionExtender) {
-    concordionExtender.withCommand(REST_EXTENSION_NS, "includesJson", new IncludesJsonCommand());
+    concordionExtender.withCommand(REST_EXTENSION_NS, "jsonResponse", new ExpectedJsonResponseCommand());
   }
 
   private void registerCommandDecorator(ConcordionExtender concordionExtender) {
     concordionExtender.withDocumentParsingListener(new DocumentParsingListener() {
       private Map<String, String> tags = new HashMap<String, String>() {{
-        put("includesJson", "pre");
+        put("jsonResponse", "pre");
       }};
 
       @Override
