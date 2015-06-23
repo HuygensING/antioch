@@ -13,7 +13,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.core.Response;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntity;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;

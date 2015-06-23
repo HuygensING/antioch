@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint.annotation;
 
+import io.swagger.annotations.ApiModel;
+
 import java.util.UUID;
 
 import nl.knaw.huygens.alexandria.endpoint.AnnotatableObjectEntity;
@@ -17,7 +19,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
 @JsonTypeName("annotation")
-public class AnnotationEntity extends AnnotatableObjectEntity {
+@ApiModel("annotation")
+class AnnotationEntity extends AnnotatableObjectEntity {
 
   @JsonIgnore
   private final AlexandriaAnnotation annotation;

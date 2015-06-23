@@ -33,4 +33,9 @@ public abstract class AnnotatableObjectEntity {
     return locationBuilder.locationOf(annotation);
   }
 
+  @JsonProperty(PropertyPrefix.LINK + "provenance")
+  public URI getProvenance() {
+    return URI.create(locationBuilder.locationOf(getAnnotatable()) + "/provenance");
+  }
+
 }
