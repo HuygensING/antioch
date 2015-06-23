@@ -1,5 +1,8 @@
 <html xmlns:c="http://www.concordion.org/2007/concordion"
-      xmlns:json="https://alexandria.huygens.knaw.nl">
+      xmlns:r="https://alexandria.huygens.knaw.nl"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="https://alexandria.huygens.knaw.nl http://pragmatists.github.io/concordion-rest-extension/xsd/concordion-rest.xsd">
+
 <title>Creating External Resources</title>
 
 <body class="container">
@@ -30,6 +33,17 @@
         </r:request>
         -->
 
+        <r:request>
+            When I
+            <r:post>/resources</r:post>
+            the following body:
+<pre c:execute="body(#TEXT)">{
+    "resource": {
+        "ref": "http://www.example.com/titles/path/to/title/resource"
+    }
+}</pre>
+        </r:request>
+
         <ul>
             <li>Given some resource located at <code>http://www.example.com/titles/path/to/title/resource</code></li>
 
@@ -49,14 +63,14 @@
                         followed by a <b c:assertEquals="uuidQuality()">well-formed UUID</b>;
                     </li>
                     <li>the response body looks like:
-                        <json:jsonResponse> {
+                        <r:jsonResponse> {
                             "resource": {
                             "ref": "http://www.example.com/titles/path/to/title/resource",
                             "annotations": [],
                             "createdOn": "{date.beforeNow}"
                             }
                             }
-                        </json:jsonResponse>
+                        </r:jsonResponse>
                     </li>
                 </ol>
             </li>
@@ -103,13 +117,13 @@
                 <ol>
                     <li>the response status should be <b c:assertEquals="status()">400 Bad Request</b>;</li>
                     <li>the response body contains (amongst other error details):
-                        <json:jsonResponse>[ {
+                        <r:jsonResponse>[ {
                             "message" : "may not be null",
                             "messageTemplate" : "{javax.validation.constraints.NotNull.message}",
                             "path" : "ResourcesEndpoint.createResource.arg0"
                             }
                             ]
-                        </json:jsonResponse>
+                        </r:jsonResponse>
                     </li>
                 </ol>
             </li>
@@ -133,13 +147,13 @@
                 <ol>
                     <li>the response status should be <b c:assertEquals="status()">400 Bad Request</b>;</li>
                     <li>the response body contains (amongst other error details):
-                        <json:jsonResponse>
+                        <r:jsonResponse>
                             [
                             {
                             "message" : "Missing required 'ref' field"
                             }
                             ]
-                        </json:jsonResponse>
+                        </r:jsonResponse>
                     </li>
                 </ol>
             </li>
@@ -169,12 +183,12 @@
                 <ol>
                     <li>the response status should be <b c:assertEquals="status()">400 Bad Request</b>;</li>
                     <li>the response body contains (amongst other error details):
-                        <json:jsonResponse>[
+                        <r:jsonResponse>[
                             {
                             "message" : "Entity 'id' must match the one used in the URL"
                             }
                             ]
-                        </json:jsonResponse>
+                        </r:jsonResponse>
                     </li>
                 </ol>
             </li>

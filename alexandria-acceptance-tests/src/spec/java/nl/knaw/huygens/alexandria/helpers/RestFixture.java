@@ -57,6 +57,8 @@ public class RestFixture extends JerseyTest {
   private Optional<String> optionalBody;
   private Response response;
   private Optional<String> entity;
+  private String method;
+  private String url;
 
   @BeforeClass
   public static void setup() {
@@ -137,6 +139,24 @@ public class RestFixture extends JerseyTest {
     response = null;
     entity = Optional.empty();
     Log.trace("+- done (request details cleared)");
+  }
+
+  public RestFixture method(String method) {
+    Log.trace("method set to: [{}]", method);
+    this.method = method;
+    return this;
+  }
+
+  public RestFixture url(String url) {
+    Log.trace("url set to: [{}]", url);
+    this.url = url;
+    return this;
+  }
+
+  public RestFixture execute() {
+    Log.trace("executing");
+    request(method, url);
+    return this;
   }
 
   public void request(String method, String path) {

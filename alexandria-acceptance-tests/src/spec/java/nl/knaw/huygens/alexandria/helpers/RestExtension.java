@@ -36,12 +36,22 @@ public class RestExtension implements ConcordionExtension {
   }
 
   private void registerCommands(ConcordionExtender concordionExtender) {
+    concordionExtender.withCommand(REST_EXTENSION_NS, "request", new RequestCommand());
+    concordionExtender.withCommand(REST_EXTENSION_NS, "get", new HttpMethodCommand("GET"));
+    concordionExtender.withCommand(REST_EXTENSION_NS, "post", new HttpMethodCommand("POST"));
+    concordionExtender.withCommand(REST_EXTENSION_NS, "put", new HttpMethodCommand("PUT"));
+    concordionExtender.withCommand(REST_EXTENSION_NS, "delete", new HttpMethodCommand("DELETE"));
     concordionExtender.withCommand(REST_EXTENSION_NS, "jsonResponse", new ExpectedJsonResponseCommand());
   }
 
   private void registerCommandDecorator(ConcordionExtender concordionExtender) {
     concordionExtender.withDocumentParsingListener(new DocumentParsingListener() {
       private Map<String, String> tags = new HashMap<String, String>() {{
+        put("request", "div");
+        put("get", "code");
+        put("post", "code");
+        put("put", "code");
+        put("delete", "code");
         put("jsonResponse", "pre");
       }};
 
