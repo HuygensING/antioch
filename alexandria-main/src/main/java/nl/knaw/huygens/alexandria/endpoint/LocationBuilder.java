@@ -20,10 +20,8 @@ public class LocationBuilder {
   }
 
   public URI locationOf(Accountable accountable) {
-    String path = resolver.pathOf(accountable);
-    if (path == null) {
-      throw new RuntimeException("unknown Accountable " + accountable.getClass());
-    }
+    String path = resolver.pathOf(accountable)//
+        .orElseThrow(() -> new RuntimeException("unknown Accountable " + accountable.getClass()));
     return UriBuilder.fromUri(config.getBaseURI())//
         .path(path).path("{uuid}").build(accountable.getId());
   }

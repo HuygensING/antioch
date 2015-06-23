@@ -1,6 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint;
 
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Singleton;
 
@@ -24,8 +25,8 @@ public class EndpointPathResolver {
     accountableEndpoints.put(AlexandriaResource.class, EndpointPaths.RESOURCES);
   }
 
-  public String pathOf(Accountable accountable) {
-    return accountableEndpoints.get(accountable.getClass());
+  public Optional<String> pathOf(Accountable accountable) {
+    return Optional.ofNullable(accountableEndpoints.get(accountable.getClass()));
   }
 
 }
