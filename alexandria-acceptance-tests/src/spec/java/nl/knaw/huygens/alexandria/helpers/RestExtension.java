@@ -41,6 +41,7 @@ public class RestExtension implements ConcordionExtension {
     concordionExtender.withCommand(REST_EXTENSION_NS, "post", new HttpMethodCommand("POST"));
     concordionExtender.withCommand(REST_EXTENSION_NS, "put", new HttpMethodCommand("PUT"));
     concordionExtender.withCommand(REST_EXTENSION_NS, "delete", new HttpMethodCommand("DELETE"));
+    concordionExtender.withCommand(REST_EXTENSION_NS, "jsonBody", new JsonBodyCommand());
     concordionExtender.withCommand(REST_EXTENSION_NS, "jsonResponse", new ExpectedJsonResponseCommand());
   }
 
@@ -52,6 +53,7 @@ public class RestExtension implements ConcordionExtension {
         put("post", "code");
         put("put", "code");
         put("delete", "code");
+        put("jsonBody", "pre");
         put("jsonResponse", "pre");
       }};
 

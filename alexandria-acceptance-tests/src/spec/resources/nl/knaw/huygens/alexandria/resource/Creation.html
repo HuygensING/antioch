@@ -12,37 +12,28 @@
 <div class="examples">
     <div c:execute="clear()" class="example">
         <h3>How can I create an external resource without specifying an ID?</h3>
-        <!--
-        <r:request>
-            When I
-            <r:post>/resources</r:post>
-            with the following body
-            (using
-            <r:setHeader name="Content-type">application/json</r:setHeader>
-            )
-            <r:jsonBody> {
-                "resource": {
-                "ref": "http://www.example.com/titles/path/to/title/resource"
-                }
-            }
-            </r:jsonBody>
-            Then I should receive
-            <r:status>HTTP/1.1 201 Created</r:status>
-            with response header
-            <r:header name="Location">/resources/1234-ab</r:header>
-        </r:request>
-        -->
 
         <r:request>
             When I
             <r:post>/resources</r:post>
             the following body:
-<pre c:execute="body(#TEXT)">{
-    "resource": {
-        "ref": "http://www.example.com/titles/path/to/title/resource"
-    }
-}</pre>
+            <r:jsonBody>
+                {
+                    "resource": {
+                    "ref": "http://www.example.com/titles/path/to/title/resource"
+                    }
+                }
+            </r:jsonBody>
         </r:request>
+        then the response should contain
+        <r:jsonResponse> {
+            "resource": {
+                "ref": "http://www.example.com/titles/path/to/title/resource",
+                "annotations": [],
+                "createdOn": "{date.beforeNow}"
+                }
+            }
+        </r:jsonResponse>
 
         <ul>
             <li>Given some resource located at <code>http://www.example.com/titles/path/to/title/resource</code></li>
