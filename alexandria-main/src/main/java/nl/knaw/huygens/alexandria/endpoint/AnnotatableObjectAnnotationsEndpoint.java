@@ -42,7 +42,7 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   protected abstract AnnotationCreationRequestBuilder getAnnotationCreationRequestBuilder();
 
   @GET
-  @ApiOperation("get the annotations")
+  @ApiOperation(value = "get the annotations", response = AnnotationEntity.class)
   public Response get() {
     final Set<AlexandriaAnnotation> annotations = getAnnotableObject().getAnnotations();
     final Set<AnnotationEntity> outgoingAnnos = annotations.stream().map(AnnotationEntity::of).collect(Collectors.toSet());

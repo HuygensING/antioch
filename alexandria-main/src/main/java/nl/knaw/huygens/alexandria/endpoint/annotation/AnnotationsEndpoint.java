@@ -1,6 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint.annotation;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 import java.util.function.Supplier;
 
@@ -33,6 +34,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
 
   @GET
   @Path("{uuid}")
+  @ApiOperation(value = "get the annotation", response = AnnotationEntity.class)
   public Response readAnnotation(@PathParam("uuid") UUIDParam uuidParam) {
     final AlexandriaAnnotation annotation = service.readAnnotation(uuidParam.getValue())//
         .orElseThrow(annotationNotFoundForId(uuidParam));

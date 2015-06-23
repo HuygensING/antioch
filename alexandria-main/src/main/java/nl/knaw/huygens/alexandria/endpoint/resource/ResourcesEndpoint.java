@@ -105,6 +105,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   // TODO: replace with sub-resource analogous to {uuid}/annotations (see below)
   @GET
   @Path("{uuid}/ref")
+  @ApiOperation(value = "Get just the ref of the resource with the given uuid", response = RefEntity.class)
   public Response getResourceRef(@PathParam("uuid") final UUIDParam uuidParam) {
     AlexandriaResource resource = alexandriaService.readResource(uuidParam.getValue())//
         .orElseThrow(resourceNotFoundForId(uuidParam));
