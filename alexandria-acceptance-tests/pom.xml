@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>nl.knaw.huygens.alexandria</groupId>
@@ -71,7 +71,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.8</version>
+        <version>${build-helper-maven-plugin.version}</version>
         <executions>
           <execution>
             <id>add-integration-test-sources</id>
@@ -116,10 +116,10 @@
             </goals>
             <configuration>
               <target>
-                <mkdir dir="${integration.testOutputDir}"/>
+                <mkdir dir="${integration.testOutputDir}" />
                 <move todir="${integration.testOutputDir}">
                   <fileset dir="${project.build.testOutputDirectory}">
-                    <include name="**/*.class"/>
+                    <include name="**/*.class" />
                     <!-- the following fails to copy inner classes (Xyz$1.class) -->
                     <!--<present targetdir="${spec.testSourceDir}"> -->
                     <!--<mapper type="glob" from="*.class" to="*.java"/> -->
@@ -150,7 +150,7 @@
             <id>run-integration-tests</id>
             <goals>
               <goal>integration-test</goal>
-              <!--<goal>verify</goal>-->
+              <!--<goal>verify</goal> -->
             </goals>
           </execution>
         </executions>

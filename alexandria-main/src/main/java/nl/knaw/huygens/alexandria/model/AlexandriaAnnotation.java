@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.model;
 
+import java.net.URI;
 import java.util.UUID;
 
 public class AlexandriaAnnotation extends AbstractAnnotatable {
@@ -9,7 +10,9 @@ public class AlexandriaAnnotation extends AbstractAnnotatable {
 
   private final AlexandriaProvenance provenance;
 
-  private AbstractAnnotatable annotatable;
+  private URI annotatableURI;
+
+  private AccountablePointer annotatedPointer;
 
   public AlexandriaAnnotation(UUID id, AlexandriaAnnotationBody body, TentativeAlexandriaProvenance provenance) {
     this.id = id;
@@ -31,12 +34,16 @@ public class AlexandriaAnnotation extends AbstractAnnotatable {
     return provenance;
   }
 
-  public void setAnnotatable(AbstractAnnotatable annotatable) {
-    this.annotatable = annotatable;
+  public URI getAnnotatableURI() {
+    return annotatableURI;
   }
 
-  public AbstractAnnotatable getAnnotatable() {
-    return annotatable;
+  public void setAnnotatablePointer(AccountablePointer pointer) {
+    this.annotatedPointer = pointer;
+  }
+
+  public AccountablePointer getAnnotatablePointer() {
+    return annotatedPointer;
   }
 
 }

@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public abstract class AbstractAnnotatable implements Accountable {
-
   private AlexandriaState state = AlexandriaState.Default;
   private final Set<AlexandriaAnnotation> annotations = new HashSet<>();
 
@@ -15,7 +14,7 @@ public abstract class AbstractAnnotatable implements Accountable {
 
   public void addAnnotation(AlexandriaAnnotation annotation) {
     annotations.add(annotation);
-    annotation.setAnnotatable(this);
+    annotation.setAnnotatablePointer(new AccountablePointer(this.getClass(), this.getId().toString()));
   }
 
   public AlexandriaState getState() {

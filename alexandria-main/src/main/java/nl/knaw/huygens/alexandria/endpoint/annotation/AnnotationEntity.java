@@ -39,9 +39,9 @@ public class AnnotationEntity extends AnnotatableObjectEntity {
     return annotation.getId();
   }
 
-  @JsonProperty(PropertyPrefix.LINK)
+  @JsonProperty(PropertyPrefix.LINK + "annotates")
   public String getAnnotates() {
-    return locationBuilder.locationOf(annotation.getAnnotatable()).toString();
+    return locationBuilder.locationOf(annotation.getAnnotatablePointer()).toString();
   }
 
   public String getType() {

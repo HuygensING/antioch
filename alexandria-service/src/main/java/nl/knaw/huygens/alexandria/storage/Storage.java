@@ -7,8 +7,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.inject.Inject;
+
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.Accountable;
+import nl.knaw.huygens.alexandria.model.AccountablePointer;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
@@ -39,6 +43,9 @@ public class Storage {
 
   private Transaction tx;
 
+  @Inject
+  LocationBuilder locationBuilder;
+
   public Storage(Graph graph) {
     g = graph;
     GraphFeatures features = g.features().graph();
@@ -57,28 +64,19 @@ public class Storage {
   }
 
   public AlexandriaResource readResource(UUID uuid) {
-    ResourceVF rvf = readResourceVF(uuid);
-    if (rvf == null) {
+    Optional<ResourceVF> orvf = readResourceVF(uuid);
+    if (!orvf.isPresent()) {
       return null;
     }
-    TentativeAlexandriaProvenance provenance = deframeProvenance(rvf);
-    AlexandriaResource resource = new AlexandriaResource(uuid, provenance);
-    resource.setRef(rvf.getRef());
-    resource.setState(AlexandriaState.valueOf(rvf.getState()));
-    List<AnnotationVF> annotatedBy = rvf.getAnnotatedBy();
-    for (AnnotationVF annotationVF : annotatedBy) {
-      AlexandriaAnnotation annotation = deframeAnnotation(annotationVF);
-      resource.addAnnotation(annotation);
-    }
-    return resource;
+    return deframeResource(orvf.get());
   }
 
   public AlexandriaAnnotation readAnnotation(UUID uuid) {
-    AnnotationVF avf = readAnnotationVF(uuid);
-    if (avf == null) {
+    Optional<AnnotationVF> avf = readAnnotationVF(uuid);
+    if (!avf.isPresent()) {
       return null;
     }
-    return deframeAnnotation(avf);
+    return deframeAnnotation(avf.get());
   }
 
   public void createOrUpdateResource(AlexandriaResource resource) {
@@ -87,7 +85,7 @@ public class Storage {
     ResourceVF rvf = null;
     UUID uuid = resource.getId();
     if (exists(ResourceVF.class, uuid)) {
-      rvf = readResourceVF(uuid);
+      rvf = readResourceVF(uuid).get();
     } else {
       rvf = fg.addVertex(ResourceVF.class);
       rvf.setUuid(uuid.toString());
@@ -107,7 +105,7 @@ public class Storage {
     AnnotationVF avf = null;
     UUID uuid = annotation.getId();
     if (exists(AnnotationVF.class, uuid)) {
-      avf = readAnnotationVF(uuid);
+      avf = readAnnotationVF(uuid).get();
     } else {
       avf = fg.addVertex(AnnotationVF.class, uuid);
       avf.setUuid(uuid.toString());
@@ -125,7 +123,7 @@ public class Storage {
 
     AnnotationVF avf = createAnnotationVF(newAnnotation);
 
-    ResourceVF resourceToAnnotate = readResourceVF(resource.getId());
+    ResourceVF resourceToAnnotate = readResourceVF(resource.getId()).get();
     avf.setAnnotatedResource(resourceToAnnotate);
 
     commitTransaction();
@@ -136,7 +134,7 @@ public class Storage {
 
     AnnotationVF avf = createAnnotationVF(newAnnotation);
 
-    AnnotationVF annotationToAnnotate = readAnnotationVF(annotation.getId());
+    AnnotationVF annotationToAnnotate = readAnnotationVF(annotation.getId()).get();
     avf.setAnnotatedAnnotation(annotationToAnnotate);
 
     commitTransaction();
@@ -207,22 +205,20 @@ public class Storage {
     }
   }
 
-  private ResourceVF readResourceVF(UUID uuid) {
+  private Optional<ResourceVF> readResourceVF(UUID uuid) {
     List<ResourceVF> results = fg.V(ResourceVF.class).has(IDENTIFIER_PROPERTY, uuid.toString()).toList();
-    ResourceVF rvf = null;
-    if (!results.isEmpty()) {
-      rvf = results.get(0);
+    if (results.isEmpty()) {
+      return Optional.empty();
     }
-    return rvf;
+    return Optional.ofNullable(results.get(0));
   }
 
-  private AnnotationVF readAnnotationVF(UUID uuid) {
+  private Optional<AnnotationVF> readAnnotationVF(UUID uuid) {
     List<AnnotationVF> results = fg.V(AnnotationVF.class).has(IDENTIFIER_PROPERTY, uuid.toString()).toList();
-    AnnotationVF vf = null;
-    if (!results.isEmpty()) {
-      vf = results.get(0);
+    if (results.isEmpty()) {
+      return Optional.empty();
     }
-    return vf;
+    return Optional.ofNullable(results.get(0));
   }
 
   private AnnotationVF createAnnotationVF(AlexandriaAnnotation newAnnotation) {
@@ -239,11 +235,36 @@ public class Storage {
     return avf;
   }
 
+  private AlexandriaResource deframeResource(ResourceVF rvf) {
+    TentativeAlexandriaProvenance provenance = deframeProvenance(rvf);
+    UUID uuid = getUUID(rvf);
+    AlexandriaResource resource = new AlexandriaResource(uuid, provenance);
+    resource.setRef(rvf.getRef());
+    resource.setState(AlexandriaState.valueOf(rvf.getState()));
+    for (AnnotationVF annotationVF : rvf.getAnnotatedBy()) {
+      AlexandriaAnnotation annotation = deframeAnnotation(annotationVF);
+      resource.addAnnotation(annotation);
+    }
+    return resource;
+  }
+
   private AlexandriaAnnotation deframeAnnotation(AnnotationVF annotationVF) {
     TentativeAlexandriaProvenance provenance = deframeProvenance(annotationVF);
     UUID uuid = getUUID(annotationVF);
     AlexandriaAnnotationBody body = deframeAnnotationBody(annotationVF.getBody());
-    return new AlexandriaAnnotation(uuid, body, provenance);
+    AlexandriaAnnotation annotation = new AlexandriaAnnotation(uuid, body, provenance);
+    AnnotationVF annotatedAnnotation = annotationVF.getAnnotatedAnnotation();
+    if (annotatedAnnotation != null) {
+      annotation.setAnnotatablePointer(new AccountablePointer(AlexandriaAnnotation.class, annotatedAnnotation.getUuid()));
+    } else {
+      ResourceVF annotatedResource = annotationVF.getAnnotatedResource();
+      annotation.setAnnotatablePointer(new AccountablePointer(AlexandriaResource.class, annotatedResource.getUuid()));
+    }
+    for (AnnotationVF avf : annotationVF.getAnnotatedBy()) {
+      AlexandriaAnnotation annotationAnnotation = deframeAnnotation(avf);
+      annotation.addAnnotation(annotationAnnotation);
+    }
+    return annotation;
   }
 
   private AlexandriaAnnotationBody deframeAnnotationBody(AnnotationBodyVF annotationBodyVF) {

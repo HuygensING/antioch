@@ -26,7 +26,11 @@ public class EndpointPathResolver {
   }
 
   public Optional<String> pathOf(Accountable accountable) {
-    return Optional.ofNullable(accountableEndpoints.get(accountable.getClass()));
+    return pathOf(accountable.getClass());
+  }
+
+  public Optional<String> pathOf(Class<? extends Accountable> accountableClass) {
+    return Optional.ofNullable(accountableEndpoints.get(accountableClass));
   }
 
 }

@@ -12,4 +12,5 @@ public abstract class AnnotationBodyVF extends AlexandriaVF {
   public abstract void setValue(String value);
 
   public abstract String getValue();
+
 }
