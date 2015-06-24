@@ -1,5 +1,5 @@
 <html xmlns:c="http://www.concordion.org/2007/concordion"
-      xmlns:r="https://alexandria.huygens.knaw.nl"
+      xmlns:h="https://alexandria.huygens.knaw.nl"
       xmlns:xsi="http://www.w3.org/1999/xhtml"
       xsi:schemaLocation="https://alexandria.huygens.knaw.nl http://pragmatists.github.io/concordion-rest-extension/xsd/concordion-rest.xsd">
 
@@ -7,63 +7,34 @@
 
 <body class="container">
 
-<h2 class="page-header">Creating external resources</h2>
+<h2>Creating external resources</h2>
 
 <div class="examples">
     <div c:execute="clear()" class="example">
         <h3>How can I create an external resource without specifying an ID?</h3>
 
-        <r:request>
-            When I <r:post>/resources</r:post> the following body:
-            <r:jsonBody>
+        <h:request>
+            When I <h:post>/resources</h:post> the following body:
+            <h:jsonBody>
                 {
                     "resource": {
                     "ref": "http://www.example.com/titles/path/to/title/resource"
                     }
                 }
-            </r:jsonBody>
-        </r:request>
-        then I should receive <r:status>201 Created</r:status> with the following body:
-        <r:jsonResponse> {
+            </h:jsonBody>
+        </h:request>
+        then I should receive <h:status>201 Created</h:status> with a Location header
+        <h:location type="base">https://{host}/resources/</h:location> followed by a
+        <h:location type="uuid">well-formed UUID</h:location>
+        and body:
+        <h:jsonResponse> {
             "resource": {
                 "ref": "http://www.example.com/titles/path/to/title/resource",
                 "annotations": [],
                 "createdOn": "{date.beforeNow}"
                 }
             }
-        </r:jsonResponse>
-
-        <ul>
-            <li>Given some resource located at <code>http://www.example.com/titles/path/to/title/resource</code></li>
-
-            <li>When I <b c:set="#method">POST</b>
-<pre c:execute="body(#TEXT)">{
-    "resource": {
-        "ref": "http://www.example.com/titles/path/to/title/resource"
-    }
-}</pre>
-                to <code c:set="#endpoint"><b>/resources</b></code></li>
-
-            <li c:execute="request(#method, #endpoint)">Then:
-                <ol>
-                    <li>the response status should be <b c:assertEquals="status()">201 Created</b>;</li>
-                    <li>the response contains the Location header
-                        <b c:assertEquals="base()">https://{host}/resources/</b>
-                        followed by a <b c:assertEquals="uuidQuality()">well-formed UUID</b>;
-                    </li>
-                    <li>the response body looks like:
-                        <r:jsonResponse> {
-                            "resource": {
-                            "ref": "http://www.example.com/titles/path/to/title/resource",
-                            "annotations": [],
-                            "createdOn": "{date.beforeNow}"
-                            }
-                            }
-                        </r:jsonResponse>
-                    </li>
-                </ol>
-            </li>
-        </ul>
+        </h:jsonResponse>
     </div>
 
     <div c:execute="clear()" class="example">
@@ -106,13 +77,13 @@
                 <ol>
                     <li>the response status should be <b c:assertEquals="status()">400 Bad Request</b>;</li>
                     <li>the response body contains (amongst other error details):
-                        <r:jsonResponse>[ {
+                        <h:jsonResponse>[ {
                             "message" : "may not be null",
                             "messageTemplate" : "{javax.validation.constraints.NotNull.message}",
                             "path" : "ResourcesEndpoint.createResource.arg0"
                             }
                             ]
-                        </r:jsonResponse>
+                        </h:jsonResponse>
                     </li>
                 </ol>
             </li>
@@ -136,13 +107,13 @@
                 <ol>
                     <li>the response status should be <b c:assertEquals="status()">400 Bad Request</b>;</li>
                     <li>the response body contains (amongst other error details):
-                        <r:jsonResponse>
+                        <h:jsonResponse>
                             [
                             {
                             "message" : "Missing required 'ref' field"
                             }
                             ]
-                        </r:jsonResponse>
+                        </h:jsonResponse>
                     </li>
                 </ol>
             </li>
@@ -172,12 +143,12 @@
                 <ol>
                     <li>the response status should be <b c:assertEquals="status()">400 Bad Request</b>;</li>
                     <li>the response body contains (amongst other error details):
-                        <r:jsonResponse>[
+                        <h:jsonResponse>[
                             {
                             "message" : "Entity 'id' must match the one used in the URL"
                             }
                             ]
-                        </r:jsonResponse>
+                        </h:jsonResponse>
                     </li>
                 </ol>
             </li>

@@ -15,11 +15,7 @@ code.success {
 	color: #363;
 }
 
-span.success {
-	padding: 2px 4px;
-}
-
-code.failure .actual{
+code.failure .actual {
 	color: #bb5050;
 }
 
@@ -33,7 +29,8 @@ code.get:before,
 code.post:before,
 code.put:before,
 code.delete:before,
-code.patch:before {
+code.patch:before,
+code.location:before {
 	font-weight: bold;
 	margin-right: 0.5em;
 }
@@ -56,6 +53,10 @@ code.patch:before {
 
 code.set-header:before, code.header:before {
 	content: attr(name) ': ';
+}
+
+span.success {
+	padding: 2px 4px;
 }
 
 pre {
@@ -106,7 +107,7 @@ pre {
     padding-right: 16px;
 }
 
-.header {
+.page-header {
     position: absolute;
     top: 0;
     left: 0;
@@ -122,13 +123,13 @@ pre {
     color: #FFFFFF;
 }
 
-.header h1 {
+.page-header h1 {
     font-size: 20px;
     margin: 0;
     padding: 0;
 }
 
-.header p {
+.page-header p {
     font-size: 12px;
     margin: 0;
 }

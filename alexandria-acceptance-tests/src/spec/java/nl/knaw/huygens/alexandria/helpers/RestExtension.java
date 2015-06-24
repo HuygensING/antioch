@@ -43,6 +43,8 @@ public class RestExtension implements ConcordionExtension {
     concordionExtender.withCommand(REST_EXTENSION_NS, "delete", new HttpMethodCommand("DELETE"));
     concordionExtender.withCommand(REST_EXTENSION_NS, "jsonBody", new JsonBodyCommand());
     concordionExtender.withCommand(REST_EXTENSION_NS, "status", new ExpectedStatusCommand());
+    concordionExtender.withCommand(REST_EXTENSION_NS, "header", new ExpectedHeaderCommand());
+    concordionExtender.withCommand(REST_EXTENSION_NS, "location", new ExpectedLocationCommand());
     concordionExtender.withCommand(REST_EXTENSION_NS, "jsonResponse", new ExpectedJsonResponseCommand());
   }
 
@@ -56,6 +58,8 @@ public class RestExtension implements ConcordionExtension {
         put("delete", "code");
         put("jsonBody", "pre");
         put("status", "code");
+        put("header", "code");
+        put("location", "code");
         put("jsonResponse", "pre");
       }};
 
@@ -73,7 +77,7 @@ public class RestExtension implements ConcordionExtension {
         Log.trace("checking element: [{}]", element.getLocalName());
         if (REST_EXTENSION_NS.equals(element.getNamespaceURI())) {
           Attribute attr = new Attribute(element.getLocalName(), "");
-          attr.setNamespace("r", REST_EXTENSION_NS);
+          attr.setNamespace("h", REST_EXTENSION_NS);
           element.addAttribute(attr);
           element.setNamespacePrefix("");
           element.setNamespaceURI(null);
@@ -110,7 +114,7 @@ public class RestExtension implements ConcordionExtension {
       @Override
       public void beforeParsing(Document document) {
         Element header = new Element("div");
-        header.addAttribute(new Attribute("class", "header"));
+        header.addAttribute(new Attribute("class", "page-header"));
         header.appendChild(title("Alexandria Text Annotation Repository"));
         header.appendChild(subtitle("REST API Specification"));
         Element body = (Element) document.query("//body").get(0);

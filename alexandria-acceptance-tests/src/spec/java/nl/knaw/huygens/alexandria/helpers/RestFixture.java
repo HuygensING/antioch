@@ -116,14 +116,14 @@ public class RestFixture extends JerseyTest {
     };
   }
 
-  public String base() {
-    return baseOf(location());
-  }
-
-  public String uuidQuality() {
-    final String idStr = tailOf(location());
-    return parse(idStr).map(uuid -> "well-formed UUID").orElseGet(malformedDescription(idStr));
-  }
+//  public String base() {
+//    return baseOf(location());
+//  }
+//
+//  public String uuidQuality() {
+//    final String idStr = tailOf(location());
+//    return parse(idStr).map(uuid -> "well-formed UUID").orElseGet(malformedDescription(idStr));
+//  }
 
   public void clear() {
     Log.debug("Clearing ApiFixture");
@@ -198,8 +198,12 @@ public class RestFixture extends JerseyTest {
     return entity.orElse("empty");
   }
 
-  public String location() {
-    return responseLocation().map(this::normalizeHostInfo).orElse("no-location");
+  public Optional<String> location() {
+    return Optional.ofNullable(response.getLocation()).map(URI::toString).map(this::normalizeHostInfo);
+  }
+
+  public Optional<String> header(String header) {
+    return Optional.ofNullable(response.getHeaderString(header));
   }
 
   public String status() {
@@ -231,10 +235,6 @@ public class RestFixture extends JerseyTest {
     return () -> "malformed UUID: " + idStr;
   }
 
-  private Optional<String> header(String header) {
-    return Optional.ofNullable(response.getHeaderString(header));
-  }
-
   private String normalizeHostInfo(String s) {
     return s.replaceAll(hostInfo(), "{host}");
   }
@@ -242,10 +242,6 @@ public class RestFixture extends JerseyTest {
   private String hostInfo() {
     final URI baseURI = getBaseUri();
     return format("%s:%d", baseURI.getHost(), baseURI.getPort());
-  }
-
-  private Optional<String> responseLocation() {
-    return Optional.ofNullable(response.getLocation()).map(URI::toString);
   }
 
   private String baseOf(String s) {
