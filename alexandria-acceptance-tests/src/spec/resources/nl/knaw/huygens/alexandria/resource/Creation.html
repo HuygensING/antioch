@@ -1,7 +1,8 @@
 <html xmlns:c="http://www.concordion.org/2007/concordion"
-      xmlns:h="https://alexandria.huygens.knaw.nl"
+      xmlns:h="http://alexandria.huygens.knaw.nl/concordion-extension"
       xmlns:xsi="http://www.w3.org/1999/xhtml"
-      xsi:schemaLocation="https://alexandria.huygens.knaw.nl http://pragmatists.github.io/concordion-rest-extension/xsd/concordion-rest.xsd">
+      xsi:schemaLocation="http://alexandria.huygens.knaw.nl/concordion-extension
+                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
 
 <title>Creating External Resources</title>
 
@@ -10,31 +11,36 @@
 <h2>Creating external resources</h2>
 
 <div class="examples">
-    <div c:execute="clear()" class="example">
+    <div class="example">
         <h3>How can I create an external resource without specifying an ID?</h3>
 
         <h:request>
-            When I <h:post>/resources</h:post> the following body:
-            <h:jsonBody>
-                {
-                    "resource": {
-                    "ref": "http://www.example.com/titles/path/to/title/resource"
-                    }
+            When I <h:post>/resources</h:post>
+            the following body: <h:jsonBody> {
+                "resource": {
+                "ref": "http://www.example.com/titles/path/to/title/resource"
                 }
-            </h:jsonBody>
+            } </h:jsonBody>
+            then I should receive:
+            <ol>
+                <li>status <h:status>201 Created</h:status></li>
+                <li>Location header:
+                    <ol>
+                        <li>starting with <h:location type="base">https://{host}/resources/</h:location></li>
+                        <li>followed by a <h:location type="uuid">well-formed UUID</h:location></li>
+                    </ol>
+                </li>
+                <li>body containing:
+                    <h:jsonResponse>{
+                        "resource": {
+                            "ref": "http://www.example.com/titles/path/to/title/resource",
+                            "annotations": [],
+                            "createdOn": "{date.beforeNow}"
+                        }
+                    }</h:jsonResponse>
+                </li>
+            </ol>
         </h:request>
-        then I should receive <h:status>201 Created</h:status> with a Location header
-        <h:location type="base">https://{host}/resources/</h:location> followed by a
-        <h:location type="uuid">well-formed UUID</h:location>
-        and body:
-        <h:jsonResponse> {
-            "resource": {
-                "ref": "http://www.example.com/titles/path/to/title/resource",
-                "annotations": [],
-                "createdOn": "{date.beforeNow}"
-                }
-            }
-        </h:jsonResponse>
     </div>
 
     <div c:execute="clear()" class="example">

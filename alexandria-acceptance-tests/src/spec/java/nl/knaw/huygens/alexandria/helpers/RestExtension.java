@@ -15,7 +15,7 @@ import org.concordion.api.listener.DocumentParsingListener;
 import org.concordion.internal.ConcordionBuilder;
 
 public class RestExtension implements ConcordionExtension {
-  public static final String REST_EXTENSION_NS = "https://alexandria.huygens.knaw.nl";
+  public static final String REST_EXTENSION_NS = "http://alexandria.huygens.knaw.nl/concordion-extension";
 
   @Override
   public void addTo(ConcordionExtender concordionExtender) {
