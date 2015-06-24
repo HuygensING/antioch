@@ -6,7 +6,6 @@ import org.concordion.api.Evaluator;
 import org.concordion.api.ResultRecorder;
 
 public class RequestCommand extends HuygensCommand {
-
   @Override
   public void execute(CommandCall commandCall, Evaluator evaluator, ResultRecorder resultRecorder) {
     final RestFixture fixture = getFixture(evaluator);
