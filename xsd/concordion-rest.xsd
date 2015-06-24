@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://alexandria.huygens.knaw.nl/concordion-extension"
+	elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:rest="http://pragmatists.github.io/concordion-rest-extension">
+
+	<element name="request" type="rest:requestType"></element>
+
+	<complexType name="requestType" mixed="true">
+		<choice minOccurs="0" maxOccurs="unbounded">
+			<group ref="rest:setUp"></group>
+			<group ref="rest:verify"></group>
+			<sequence>
+				<any processContents="skip" minOccurs="0" />
+			</sequence>
+		</choice>
+
+	</complexType>
+
+	<group name="setUp">
+		<choice>
+			<group ref="rest:httpMethods"></group>
+			<element name="jsonBody" type="string" minOccurs="0" maxOccurs="unbounded"/>
+			<element name="setHeader" type="rest:headerType" minOccurs="0" maxOccurs="unbounded"/>
+		</choice>
+	</group>
+
+	<group name="httpMethods">
+		<choice>
+			<element name="get" type="string"></element>
+			<element name="post" type="string"></element>
+			<element name="put" type="string"></element>
+			<element name="delete" type="string"></element>
+			<element name="patch" type="string"></element>
+		</choice>
+	</group>
+	
+	<group name="verify">
+		<choice>
+			<element name="status" type="string" minOccurs="0" maxOccurs="unbounded"/>
+			<element name="success" type="string" minOccurs="0" maxOccurs="unbounded"/>
+			<element name="header" type="rest:headerType" minOccurs="0" maxOccurs="unbounded"/>
+			<element name="attachment" type="string" minOccurs="0" maxOccurs="unbounded"/>
+			<element name="jsonResponse" type="rest:jsonResponseType" minOccurs="0" maxOccurs="unbounded"/>
+		</choice>
+	</group>
+
+	<complexType name="jsonResponseType">
+		<simpleContent>
+			<extension base="string">
+				<attribute name="mode" use="optional">
+					<simpleType>
+						<restriction base="string">
+							<enumeration value="includes"></enumeration>
+							<enumeration value="equals"></enumeration>
+						</restriction>
+					</simpleType>
+				</attribute>
+			</extension>
+		</simpleContent>
+	</complexType>
+
+	<complexType name="headerType">
+		<simpleContent>
+			<extension base="string">
+				<attribute name="name" use="required" type="string" />
+			</extension>
+		</simpleContent>
+	</complexType>
+
+</schema>
