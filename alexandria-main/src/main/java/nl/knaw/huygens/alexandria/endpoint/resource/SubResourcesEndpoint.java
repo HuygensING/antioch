@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
+import io.swagger.annotations.ApiOperation;
+
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -39,6 +41,7 @@ public class SubResourcesEndpoint extends JSONEndpoint {
   }
 
   @GET
+  @ApiOperation(value = "get subresources", response = ResourceEntity.class)
   public Response get() {
     final Set<AlexandriaResource> subresources = service.readSubResources(parentUuid);
     final Set<ResourceEntity> outgoing = subresources.stream().map(ResourceEntity::of).collect(Collectors.toSet());
@@ -46,6 +49,7 @@ public class SubResourcesEndpoint extends JSONEndpoint {
   }
 
   @POST
+  @ApiOperation("add subresource")
   public Response addSubResource(@NotNull @Valid SubResourcePrototype prototype) {
     ResourceCreationRequest request = requestBuilder.build(parentUuid, prototype);
     AlexandriaResource resource = request.execute(service);
