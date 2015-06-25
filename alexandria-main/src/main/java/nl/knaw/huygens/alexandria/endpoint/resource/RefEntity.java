@@ -1,6 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import io.swagger.annotations.ApiModel;
+import nl.knaw.huygens.alexandria.endpoint.Entity;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
@@ -9,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = As.EXISTING_PROPERTY)
 @JsonTypeName("ref")
 @ApiModel("ref")
-class RefEntity {
+class RefEntity implements Entity {
   private final String ref;
 
   RefEntity(String ref) {

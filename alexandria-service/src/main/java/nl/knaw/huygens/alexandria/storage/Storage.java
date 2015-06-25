@@ -18,11 +18,13 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.model.AlexandriaSubResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
+import nl.knaw.huygens.alexandria.storage.frames.SubResourceVF;
 
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Graph.Features.GraphFeatures;
@@ -63,20 +65,28 @@ public class Storage {
     return fgt.tryNext().isPresent();
   }
 
-  public AlexandriaResource readResource(UUID uuid) {
+  public Optional<AlexandriaResource> readResource(UUID uuid) {
     Optional<ResourceVF> orvf = readResourceVF(uuid);
-    if (!orvf.isPresent()) {
-      return null;
+    if (orvf.isPresent()) {
+      return Optional.of(deframeResource(orvf.get()));
     }
-    return deframeResource(orvf.get());
+    return Optional.empty();
   }
 
-  public AlexandriaAnnotation readAnnotation(UUID uuid) {
-    Optional<AnnotationVF> avf = readAnnotationVF(uuid);
-    if (!avf.isPresent()) {
-      return null;
+  public Optional<AlexandriaSubResource> readSubResource(UUID uuid) {
+    Optional<SubResourceVF> osrvf = readSubResourceVF(uuid);
+    if (osrvf.isPresent()) {
+      return Optional.of(deframeSubResource(osrvf.get()));
     }
-    return deframeAnnotation(avf.get());
+    return Optional.empty();
+  }
+
+  public Optional<AlexandriaAnnotation> readAnnotation(UUID uuid) {
+    Optional<AnnotationVF> avf = readAnnotationVF(uuid);
+    if (avf.isPresent()) {
+      return Optional.of(deframeAnnotation(avf.get()));
+    }
+    return Optional.empty();
   }
 
   public void createOrUpdateResource(AlexandriaResource resource) {
@@ -213,6 +223,14 @@ public class Storage {
     return Optional.ofNullable(results.get(0));
   }
 
+  private Optional<SubResourceVF> readSubResourceVF(UUID uuid) {
+    List<SubResourceVF> results = fg.V(SubResourceVF.class).has(IDENTIFIER_PROPERTY, uuid.toString()).toList();
+    if (results.isEmpty()) {
+      return Optional.empty();
+    }
+    return Optional.ofNullable(results.get(0));
+  }
+
   private Optional<AnnotationVF> readAnnotationVF(UUID uuid) {
     List<AnnotationVF> results = fg.V(AnnotationVF.class).has(IDENTIFIER_PROPERTY, uuid.toString()).toList();
     if (results.isEmpty()) {
@@ -248,11 +266,27 @@ public class Storage {
     return resource;
   }
 
+  private AlexandriaSubResource deframeSubResource(SubResourceVF srvf) {
+    TentativeAlexandriaProvenance provenance = deframeProvenance(srvf);
+    UUID uuid = getUUID(srvf);
+    AlexandriaSubResource subResource = new AlexandriaSubResource(uuid, provenance);
+    subResource.setSub(srvf.getSub());
+    subResource.setState(AlexandriaState.valueOf(srvf.getState()));
+    for (AnnotationVF annotationVF : srvf.getAnnotatedBy()) {
+      AlexandriaAnnotation annotation = deframeAnnotation(annotationVF);
+      subResource.addAnnotation(annotation);
+    }
+    ResourceVF parentResource = srvf.getParentResource();
+    subResource.setParentResourcePointer(new AccountablePointer<AlexandriaResource>(AlexandriaResource.class, parentResource.getUuid()));
+    return subResource;
+  }
+
   private AlexandriaAnnotation deframeAnnotation(AnnotationVF annotationVF) {
     TentativeAlexandriaProvenance provenance = deframeProvenance(annotationVF);
     UUID uuid = getUUID(annotationVF);
     AlexandriaAnnotationBody body = deframeAnnotationBody(annotationVF.getBody());
     AlexandriaAnnotation annotation = new AlexandriaAnnotation(uuid, body, provenance);
+    annotation.setState(AlexandriaState.valueOf(annotationVF.getState()));
     AnnotationVF annotatedAnnotation = annotationVF.getAnnotatedAnnotation();
     if (annotatedAnnotation != null) {
       annotation.setAnnotatablePointer(new AccountablePointer<AlexandriaAnnotation>(AlexandriaAnnotation.class, annotatedAnnotation.getUuid()));

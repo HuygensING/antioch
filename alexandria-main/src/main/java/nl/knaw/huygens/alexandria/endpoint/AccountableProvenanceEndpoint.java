@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiOperation;
 
 import java.util.UUID;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.Response;
 
@@ -21,15 +20,14 @@ public abstract class AccountableProvenanceEndpoint extends JSONEndpoint {
   protected AccountableProvenanceEndpoint(AlexandriaService service, //
       final UUIDParam uuidParam, LocationBuilder locationBuilder) {
     this.locationBuilder = locationBuilder;
-    Log.trace("resourceService=[{}], uuidParam=[{}]", service, uuidParam);
     this.service = service;
     this.uuid = uuidParam.getValue();
+    Log.trace("resourceService=[{}], uuidParam=[{}]", service, uuidParam);
   }
 
   protected abstract Accountable getAccountable();
 
   @GET
-  
   @ApiOperation(value = "get the provenance", response = ProvenanceEntity.class)
   public Response get() {
     AlexandriaProvenance provenance = getAccountable().getProvenance();

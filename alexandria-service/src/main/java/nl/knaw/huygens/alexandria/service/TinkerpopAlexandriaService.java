@@ -45,7 +45,7 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
 
   @Override
   public Optional<AlexandriaResource> readResource(UUID uuid) {
-    return Optional.ofNullable(storage.readResource(uuid));
+    return storage.readResource(uuid);
   }
 
   @Override
@@ -87,7 +87,7 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
 
   @Override
   public Optional<AlexandriaAnnotation> readAnnotation(UUID uuid) {
-    return Optional.ofNullable(storage.readAnnotation(uuid));
+    return storage.readAnnotation(uuid);
   }
 
   @Override
@@ -97,19 +97,16 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
 
   @Override
   public AlexandriaSubResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance) {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public Optional<AlexandriaSubResource> readSubResource(UUID uuid) {
-    // TODO Auto-generated method stub
-    return null;
+    return storage.readSubResource(uuid);
   }
 
   @Override
   public AlexandriaAnnotation annotate(AlexandriaSubResource subresource, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
-    // TODO Auto-generated method stub
     return null;
   }
 

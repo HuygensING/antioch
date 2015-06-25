@@ -1,6 +1,6 @@
 package nl.knaw.huygens.alexandria.storage;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.StrictAssertions.assertThat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,7 +36,7 @@ public class StorageTest {
     storage.createOrUpdateResource(resource);
     logGraphAsJson();
     Log.info("after createOrUpdate");
-    AlexandriaResource read = storage.readResource(id);
+    AlexandriaResource read = storage.readResource(id).get();
     Log.info("after read");
 
     logGraphAsJson();

@@ -2,6 +2,7 @@ package nl.knaw.huygens.alexandria.endpoint;
 
 import java.net.URI;
 import java.util.Set;
+import java.util.UUID;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.resource.PropertyPrefix;
@@ -12,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Sets;
 
-public abstract class AnnotatableObjectEntity {
+public abstract class AbstractAnnotatableEntity extends JsonWrapperObject implements Entity {
 
   @JsonIgnore
   protected LocationBuilder locationBuilder;
@@ -36,6 +37,10 @@ public abstract class AnnotatableObjectEntity {
   @JsonProperty(PropertyPrefix.LINK + "provenance")
   public URI getProvenance() {
     return URI.create(locationBuilder.locationOf(getAnnotatable()) + "/provenance");
+  }
+
+  public UUID getId() {
+    return getAnnotatable().getId();
   }
 
 }

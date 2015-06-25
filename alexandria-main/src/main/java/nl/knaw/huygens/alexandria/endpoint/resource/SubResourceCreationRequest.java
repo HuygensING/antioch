@@ -33,8 +33,7 @@ class SubResourceCreationRequest implements CreationRequest<AlexandriaSubResourc
 
     String sub = providedSub();
     TentativeAlexandriaProvenance provenance = providedProvenance().orElse(TentativeAlexandriaProvenance.createDefault());
-    subResource = service.createOrUpdateResource(uuid, sub, provenance);
-    // Log.trace("resource: [{}]", resource);
+    service.createSubResource(uuid, parentId, sub, provenance);
 
     return service.readSubResource(uuid).get();
   }

@@ -10,15 +10,11 @@ import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
 @JsonTypeName("provenance")
 @ApiModel("provenance")
-public class ProvenanceEntity {
+public class ProvenanceEntity extends JsonWrapperObject implements Entity {
   @JsonIgnore
   private final AlexandriaProvenance provenance;
 

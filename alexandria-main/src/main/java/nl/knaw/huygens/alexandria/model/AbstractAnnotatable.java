@@ -6,12 +6,12 @@ import java.util.Set;
 import java.util.UUID;
 
 public abstract class AbstractAnnotatable extends AbstractAccountable {
+  private AlexandriaState state = AlexandriaState.Default;
+  private final Set<AlexandriaAnnotation> annotations = new HashSet<>();
+
   protected AbstractAnnotatable(UUID id, TentativeAlexandriaProvenance provenance) {
     super(id, provenance);
   }
-
-  private AlexandriaState state = AlexandriaState.Default;
-  private final Set<AlexandriaAnnotation> annotations = new HashSet<>();
 
   public Set<AlexandriaAnnotation> getAnnotations() {
     return Collections.unmodifiableSet(annotations);
