@@ -27,7 +27,7 @@
     <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 
     <!-- Software versions -->
-    <assertj.version>3.0.0</assertj.version>
+    <assertj.version>3.1.0</assertj.version>
     <concordion.version>1.5.0</concordion.version>
     <concordion-rest-extension.version>0.5.0</concordion-rest-extension.version>
     <guice.version>3.0</guice.version>
@@ -39,7 +39,7 @@
     <junitparams.version>1.0.4</junitparams.version>
     <log.version>1.0.0</log.version>
     <logback.version>1.1.2</logback.version>
-    <mockito.version>2.0.20-beta</mockito.version>
+    <mockito.version>2.0.21-beta</mockito.version>
     <plugin.scm-publish.version>1.1</plugin.scm-publish.version>
     <classloader-leak-prevention.version>1.13.0</classloader-leak-prevention.version>
     <maven-assembly.version>2.4</maven-assembly.version>
@@ -51,7 +51,7 @@
     <tinkerpop.version>3.0.0.M9-incubating</tinkerpop.version>
     <neo4j-gremlin.version>3.0.0.M7</neo4j-gremlin.version>
     <!-- <tinkerpop.groupId>org.apache.tinkerpop</tinkerpop.groupId> <tinkerpop.version>3.0.0.M9-incubating</tinkerpop.version> -->
-    <peapod.version>0.2.0-SNAPSHOT</peapod.version>
+    <peapod.version>0.2.0</peapod.version>
     <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
     <swagger-maven-plugin.version>3.1.0</swagger-maven-plugin.version>
     <swagger.version>1.5.0</swagger.version>
