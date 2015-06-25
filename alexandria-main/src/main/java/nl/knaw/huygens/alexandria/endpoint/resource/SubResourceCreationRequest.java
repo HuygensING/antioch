@@ -9,42 +9,34 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.CreationRequest;
 import nl.knaw.huygens.alexandria.endpoint.ProvenancePrototype;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
-import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.AlexandriaSubResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
-class ResourceCreationRequest implements CreationRequest<AlexandriaResource> {
+class SubResourceCreationRequest implements CreationRequest<AlexandriaSubResource> {
 
-  private final ResourcePrototype prototype;
-  private boolean resourceCreated;
-
+  private boolean subResource;
+  private UUID parentId;
+  private SubResourcePrototype prototype;
   private UUID uuid;
 
-  ResourceCreationRequest(ResourcePrototype prototype) {
+  public SubResourceCreationRequest(UUID parentId, SubResourcePrototype prototype) {
+    this.parentId = parentId;
     this.prototype = prototype;
   }
 
-  /*
-   * Yuck!
-   * TODO: introduce CreationRequest interface with execute() (and maybe later wasExecutedAsIs et al.)
-   * two classes: ResourceCreationRequest implements CreationRequest and SubResourceCreationRequest implements etc.
-   * ResourceCreationRequestBuilder has two methods: one for each class and instantiates the right XXRequest implementation
-   */
-  // ResourceCreationRequest(UUID parentId, SubResourcePrototype prototype2) {
-  // }
-
   @Override
-  public AlexandriaResource execute(AlexandriaService service) {
+  public AlexandriaSubResource execute(AlexandriaService service) {
     Log.trace("executing, service=[{}]", service);
 
     uuid = providedUUID().orElse(UUID.randomUUID());
 
-    String ref = providedRef();
+    String sub = providedSub();
     TentativeAlexandriaProvenance provenance = providedProvenance().orElse(TentativeAlexandriaProvenance.createDefault());
-    resourceCreated = service.createOrUpdateResource(uuid, ref, provenance);
+    subResource = service.createOrUpdateResource(uuid, sub, provenance);
     // Log.trace("resource: [{}]", resource);
 
-    return service.readResource(uuid).get();
+    return service.readSubResource(uuid).get();
   }
 
   public boolean wasExecutedAsIs() {
@@ -54,16 +46,16 @@ class ResourceCreationRequest implements CreationRequest<AlexandriaResource> {
   }
 
   public boolean newResourceWasCreated() {
-    Log.trace("newResourceWasCreated: {}", resourceCreated);
-    return resourceCreated;
+    Log.trace("newResourceWasCreated: {}", subResource);
+    return subResource;
   }
 
   public UUID getUUID() {
     return uuid;
   }
 
-  private String providedRef() {
-    return requireNonNull(prototype.getRef(), "Required 'ref' field was not validated for being non-null");
+  private String providedSub() {
+    return requireNonNull(prototype.getSub(), "Required 'sub' field was not validated for being non-null");
   }
 
   private Optional<UUID> providedUUID() {

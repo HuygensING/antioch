@@ -3,20 +3,11 @@ package nl.knaw.huygens.alexandria.model;
 import java.util.UUID;
 
 public class AlexandriaResource extends AbstractAnnotatable {
-  private final UUID id;
 
   private String ref;
 
-  private final AlexandriaProvenance provenance;
-
   public AlexandriaResource(UUID id, TentativeAlexandriaProvenance provenance) {
-    this.id = id;
-    this.provenance = provenance.bind(this);
-  }
-
-  @Override
-  public UUID getId() {
-    return id;
+    super(id, provenance);
   }
 
   public String getRef() {
@@ -25,11 +16,6 @@ public class AlexandriaResource extends AbstractAnnotatable {
 
   public void setRef(String ref) {
     this.ref = ref;
-  }
-
-  @Override
-  public AlexandriaProvenance getProvenance() {
-    return provenance;
   }
 
 }

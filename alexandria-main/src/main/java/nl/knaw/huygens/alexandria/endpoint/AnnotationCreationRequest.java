@@ -10,7 +10,7 @@ import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
-public class AnnotationCreationRequest {
+public class AnnotationCreationRequest implements CreationRequest<AlexandriaAnnotation> {
 
   private final AnnotationPrototype prototype;
 
@@ -27,6 +27,7 @@ public class AnnotationCreationRequest {
     this.annotation = Optional.of(annotation);
   }
 
+  @Override
   public AlexandriaAnnotation execute(AlexandriaService service) {
     final TentativeAlexandriaProvenance provenance = providedProvenance().orElse(TentativeAlexandriaProvenance.createDefault());
 
@@ -57,4 +58,5 @@ public class AnnotationCreationRequest {
   private Optional<TentativeAlexandriaProvenance> providedProvenance() {
     return prototype.getProvenance().map(ProvenancePrototype::getValue);
   }
+
 }

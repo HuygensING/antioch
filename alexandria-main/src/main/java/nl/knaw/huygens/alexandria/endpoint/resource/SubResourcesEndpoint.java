@@ -19,6 +19,7 @@ import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.AlexandriaSubResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class SubResourcesEndpoint extends JSONEndpoint {
@@ -51,8 +52,8 @@ public class SubResourcesEndpoint extends JSONEndpoint {
   @POST
   @ApiOperation("add subresource")
   public Response addSubResource(@NotNull @Valid SubResourcePrototype prototype) {
-    ResourceCreationRequest request = requestBuilder.build(parentUuid, prototype);
-    AlexandriaResource resource = request.execute(service);
+    SubResourceCreationRequest request = requestBuilder.build(parentUuid, prototype);
+    AlexandriaSubResource resource = request.execute(service);
     return Response.created(locationBuilder.locationOf(resource)).build();
   }
 

@@ -10,9 +10,7 @@ public class ResourceCreationRequestBuilder {
     return new ResourceCreationRequest(protoType);
   }
 
-  public ResourceCreationRequest build(UUID parentId, SubResourcePrototype prototype) {
-    // TODO: see comments in ResourceCreationRequest
-    // return new ResourceCreationRequest(parentId,prototype);
-    return null;
+  public SubResourceCreationRequest build(UUID parentId, SubResourcePrototype prototype) {
+    return new SubResourceCreationRequest(parentId, prototype);
   }
 }

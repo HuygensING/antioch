@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.AlexandriaSubResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
@@ -92,6 +93,24 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
   @Override
   public Set<AlexandriaResource> readSubResources(UUID uuid) {
     return Sets.newHashSet();
+  }
+
+  @Override
+  public AlexandriaSubResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Optional<AlexandriaSubResource> readSubResource(UUID uuid) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public AlexandriaAnnotation annotate(AlexandriaSubResource subresource, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

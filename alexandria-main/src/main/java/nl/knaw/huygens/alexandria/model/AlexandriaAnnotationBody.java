@@ -2,37 +2,22 @@ package nl.knaw.huygens.alexandria.model;
 
 import java.util.UUID;
 
-public class AlexandriaAnnotationBody implements Accountable {
-	private final UUID id;
+public class AlexandriaAnnotationBody extends AbstractAccountable {
+  private final String type;
+  private final String value;
 
-	private final String type;
+  public AlexandriaAnnotationBody(UUID id, String type, String value, TentativeAlexandriaProvenance provenance) {
+    super(id, provenance);
+    this.type = type;
+    this.value = value;
+  }
 
-	private final String value;
+  public String getType() {
+    return type;
+  }
 
-	private final AlexandriaProvenance provenance;
-
-	public AlexandriaAnnotationBody(UUID id, String type, String value, TentativeAlexandriaProvenance provenance) {
-		this.id = id;
-		this.type = type;
-		this.value = value;
-		this.provenance = provenance.bind(this);
-	}
-
-	public UUID getId() {
-		return id;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	@Override
-	public AlexandriaProvenance getProvenance() {
-		return provenance;
-	}
+  public String getValue() {
+    return value;
+  }
 
 }

@@ -12,11 +12,15 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("resource")
 public class SubResourcePrototype {
   private UUIDParam id;
-
+  private String sub;
   private ProvenancePrototype provenance;
 
   public UUIDParam getId() {
     return id;
+  }
+
+  public String getSub() {
+    return sub;
   }
 
   public Optional<ProvenancePrototype> getProvenance() {
