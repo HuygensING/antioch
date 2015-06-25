@@ -35,6 +35,7 @@
     <concordion-rest-extension.version>0.5.0</concordion-rest-extension.version>
     <concordion.version>1.4.7</concordion.version> <!-- 1.5.0 broken (aggregate tests use homebrew runner) try again >= 1.5.1 -->
     <guice.version>3.0</guice.version>
+    <guice-bridge.version>2.4.0-b26</guice-bridge.version>
     <jackson.version>2.6.0-rc3</jackson.version>
     <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
     <jdk.version>1.8</jdk.version>
