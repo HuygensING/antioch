@@ -35,7 +35,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
 
   @GET
   @Path("{uuid}")
-  @Consumes()
+  
   @ApiOperation(value = "get the annotation", response = AnnotationEntity.class)
   public Response readAnnotation(@PathParam("uuid") UUIDParam uuidParam) {
     final AlexandriaAnnotation annotation = service.readAnnotation(uuidParam.getValue())//
@@ -45,7 +45,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
 
   @DELETE
   @Path("{uuid}")
-  @Consumes()
+  
   public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
     return methodNotImplemented();
   }

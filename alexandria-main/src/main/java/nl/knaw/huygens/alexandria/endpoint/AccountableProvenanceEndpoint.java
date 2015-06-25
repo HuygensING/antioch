@@ -29,7 +29,7 @@ public abstract class AccountableProvenanceEndpoint extends JSONEndpoint {
   protected abstract Accountable getAccountable();
 
   @GET
-  @Consumes()
+  
   @ApiOperation(value = "get the provenance", response = ProvenanceEntity.class)
   public Response get() {
     AlexandriaProvenance provenance = getAccountable().getProvenance();

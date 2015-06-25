@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import nl.knaw.huygens.Log;
@@ -43,7 +44,6 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   protected abstract AnnotationCreationRequestBuilder getAnnotationCreationRequestBuilder();
 
   @GET
-  @Consumes()
   @ApiOperation(value = "get the annotations", response = AnnotationEntity.class)
   public Response get() {
     final Set<AlexandriaAnnotation> annotations = getAnnotableObject().getAnnotations();
@@ -52,6 +52,7 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   }
 
   @POST
+  @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation("add annotation")
   public Response addAnnotation(@NotNull @Valid AnnotationPrototype prototype) {
     AnnotationCreationRequest request = getAnnotationCreationRequestBuilder().build(prototype);

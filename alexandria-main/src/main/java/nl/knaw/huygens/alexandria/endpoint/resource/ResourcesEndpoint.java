@@ -17,6 +17,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import nl.knaw.huygens.Log;
@@ -44,25 +45,24 @@ public class ResourcesEndpoint extends JSONEndpoint {
       LocationBuilder locationBuilder, //
       ResourceEntityBuilder entityBuilder) {
     this.locationBuilder = locationBuilder;
-    Log.trace("Resources created, alexandriaService=[{}]", service);
-
     this.alexandriaService = service;
     this.entityBuilder = entityBuilder;
     this.requestBuilder = requestBuilder;
+    Log.trace("Resources created, alexandriaService=[{}]", service);
   }
 
   @GET
   @Path("{uuid}")
-  @Consumes()
   @ApiOperation(value = "Get the resource with the given uuid", response = ResourceEntity.class)
   public Response getResourceByID(@PathParam("uuid") final UUIDParam uuid) {
     AlexandriaResource resource = alexandriaService.readResource(uuid.getValue())//
         .orElseThrow(resourceNotFoundForId(uuid));
     return Response.ok(entityBuilder.build(resource)).build();
-
   }
 
   @POST
+  @Consumes(MediaType.APPLICATION_JSON)
+  @ApiOperation("create new Resource")
   public Response createResource(@NotNull @Valid @WithoutId ResourcePrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
 
@@ -80,6 +80,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   @PUT
   @Path("{uuid}")
+  @Consumes(MediaType.APPLICATION_JSON)
   public Response setResourceAtSpecificID(@NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
 
@@ -100,7 +101,6 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   @DELETE
   @Path("{uuid}")
-  @Consumes()
   public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
     return methodNotImplemented();
   }
@@ -108,7 +108,6 @@ public class ResourcesEndpoint extends JSONEndpoint {
   // TODO: replace with sub-resource analogous to {uuid}/annotations (see below)
   @GET
   @Path("{uuid}/ref")
-  @Consumes()
   @ApiOperation(value = "Get just the ref of the resource with the given uuid", response = RefEntity.class)
   public Response getResourceRef(@PathParam("uuid") final UUIDParam uuidParam) {
     AlexandriaResource resource = alexandriaService.readResource(uuidParam.getValue())//

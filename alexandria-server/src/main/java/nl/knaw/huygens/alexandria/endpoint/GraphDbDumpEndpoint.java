@@ -17,7 +17,7 @@ public class GraphDbDumpEndpoint extends JSONEndpoint {
   Storage storage;
 
   @GET
-  @Consumes()
+  
   public Response dumpGraphDb() {
     StreamingOutput stream = os -> {
       storage.dump(os);

@@ -13,6 +13,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import nl.knaw.huygens.Log;
@@ -43,7 +44,6 @@ public class SubResourcesEndpoint extends JSONEndpoint {
   }
 
   @GET
-  @Consumes()
   @ApiOperation(value = "get subresources", response = ResourceEntity.class)
   public Response get() {
     final Set<AlexandriaResource> subresources = service.readSubResources(parentUuid);
@@ -52,6 +52,7 @@ public class SubResourcesEndpoint extends JSONEndpoint {
   }
 
   @POST
+  @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation("add subresource")
   public Response addSubResource(@NotNull @Valid SubResourcePrototype prototype) {
     SubResourceCreationRequest request = requestBuilder.build(parentUuid, prototype);

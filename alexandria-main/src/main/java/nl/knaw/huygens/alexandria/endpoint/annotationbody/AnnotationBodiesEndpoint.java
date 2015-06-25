@@ -13,6 +13,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -41,7 +42,6 @@ public class AnnotationBodiesEndpoint extends JSONEndpoint {
 
   @GET
   @Path("{uuid}")
-  @Consumes()
   @ApiOperation(value = "get the annotation body", response = AnnotationBodyEntity.class)
   public Response readAnnotationBody(@PathParam("uuid") UUIDParam uuidParam) {
     final AlexandriaAnnotationBody annotationBody = service.readAnnotationBody(uuidParam.getValue())//
@@ -50,6 +50,8 @@ public class AnnotationBodiesEndpoint extends JSONEndpoint {
   }
 
   @POST
+  @Consumes(MediaType.APPLICATION_JSON)
+  @ApiOperation("create a new annotation body")
   public Response createAnnotationBody(final AnnotationBodyPrototype prototype) {
     final AnnotationBodyCreationRequest request = requestBuilder.build(prototype);
     request.execute(service);
@@ -63,7 +65,6 @@ public class AnnotationBodiesEndpoint extends JSONEndpoint {
 
   @DELETE
   @Path("{uuid}")
-  @Consumes()
   public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
     return methodNotImplemented();
   }
