@@ -52,12 +52,17 @@ public class Server {
   }
 
   protected HttpServer startServer(URI uri) throws IOException {
-    ServiceLocator locator = BootstrapUtils.newServiceLocator();
-    BootstrapUtils.newInjector(locator, Arrays.asList(new AlexandriaServletModule()));
-    BootstrapUtils.install(locator);
+    ServiceLocator locator = createServiceLocator();
     ResourceConfig config = new AlexandriaApplication();
     Log.info("Starting grizzly at {} ...", uri);
     return GrizzlyHttpServerFactory.createHttpServer(uri, config, locator);
+  }
+
+  private ServiceLocator createServiceLocator() {
+    ServiceLocator locator = BootstrapUtils.newServiceLocator();
+    BootstrapUtils.newInjector(locator, Arrays.asList(new AlexandriaServletModule()));
+    BootstrapUtils.install(locator);
+    return locator;
   }
 
 }
