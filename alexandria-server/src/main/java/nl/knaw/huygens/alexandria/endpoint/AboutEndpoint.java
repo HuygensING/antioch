@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.PropertyResourceBundle;
 
 import javax.inject.Singleton;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -28,6 +29,7 @@ public class AboutEndpoint extends JSONEndpoint {
    * @return about-data map
    */
   @GET
+  @Consumes()
   @ApiOperation("get information about the server (version,builddate,started)")
   public Response getMetadata() {
     Map<String, String> data = Maps.newLinkedHashMap();

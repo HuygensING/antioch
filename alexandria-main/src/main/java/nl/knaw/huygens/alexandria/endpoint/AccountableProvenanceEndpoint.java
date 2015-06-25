@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 
 import java.util.UUID;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.Response;
 
@@ -28,6 +29,7 @@ public abstract class AccountableProvenanceEndpoint extends JSONEndpoint {
   protected abstract Accountable getAccountable();
 
   @GET
+  @Consumes()
   @ApiOperation(value = "get the provenance", response = ProvenanceEntity.class)
   public Response get() {
     AlexandriaProvenance provenance = getAccountable().getProvenance();

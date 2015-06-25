@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PathParam;
@@ -42,6 +43,7 @@ public class SubResourcesEndpoint extends JSONEndpoint {
   }
 
   @GET
+  @Consumes()
   @ApiOperation(value = "get subresources", response = ResourceEntity.class)
   public Response get() {
     final Set<AlexandriaResource> subresources = service.readSubResources(parentUuid);

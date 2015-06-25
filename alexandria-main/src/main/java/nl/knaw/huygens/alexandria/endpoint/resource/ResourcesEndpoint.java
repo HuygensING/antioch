@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -52,6 +53,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   @GET
   @Path("{uuid}")
+  @Consumes()
   @ApiOperation(value = "Get the resource with the given uuid", response = ResourceEntity.class)
   public Response getResourceByID(@PathParam("uuid") final UUIDParam uuid) {
     AlexandriaResource resource = alexandriaService.readResource(uuid.getValue())//
@@ -98,6 +100,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   @DELETE
   @Path("{uuid}")
+  @Consumes()
   public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
     return methodNotImplemented();
   }
@@ -105,6 +108,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   // TODO: replace with sub-resource analogous to {uuid}/annotations (see below)
   @GET
   @Path("{uuid}/ref")
+  @Consumes()
   @ApiOperation(value = "Get just the ref of the resource with the given uuid", response = RefEntity.class)
   public Response getResourceRef(@PathParam("uuid") final UUIDParam uuidParam) {
     AlexandriaResource resource = alexandriaService.readResource(uuidParam.getValue())//

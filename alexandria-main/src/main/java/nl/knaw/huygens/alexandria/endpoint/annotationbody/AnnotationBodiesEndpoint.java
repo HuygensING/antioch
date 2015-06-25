@@ -7,6 +7,7 @@ import java.net.URI;
 import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -40,6 +41,7 @@ public class AnnotationBodiesEndpoint extends JSONEndpoint {
 
   @GET
   @Path("{uuid}")
+  @Consumes()
   @ApiOperation(value = "get the annotation body", response = AnnotationBodyEntity.class)
   public Response readAnnotationBody(@PathParam("uuid") UUIDParam uuidParam) {
     final AlexandriaAnnotationBody annotationBody = service.readAnnotationBody(uuidParam.getValue())//
@@ -61,6 +63,7 @@ public class AnnotationBodiesEndpoint extends JSONEndpoint {
 
   @DELETE
   @Path("{uuid}")
+  @Consumes()
   public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
     return methodNotImplemented();
   }
