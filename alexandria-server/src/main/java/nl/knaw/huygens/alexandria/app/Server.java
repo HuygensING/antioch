@@ -8,7 +8,7 @@ import java.util.Arrays;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaServletModule;
 import nl.knaw.huygens.alexandria.config.TinkerpopAlexandriaConfiguration;
-import nl.knaw.huygens.alexandria.jersey.AlexandriaResourceConfig;
+import nl.knaw.huygens.alexandria.jersey.AlexandriaApplication;
 
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.hk2.api.ServiceLocator;
@@ -55,7 +55,7 @@ public class Server {
     ServiceLocator locator = BootstrapUtils.newServiceLocator();
     BootstrapUtils.newInjector(locator, Arrays.asList(new AlexandriaServletModule()));
     BootstrapUtils.install(locator);
-    ResourceConfig config = new AlexandriaResourceConfig();
+    ResourceConfig config = new AlexandriaApplication();
     Log.info("Starting grizzly at {} ...", uri);
     return GrizzlyHttpServerFactory.createHttpServer(uri, config, locator);
   }

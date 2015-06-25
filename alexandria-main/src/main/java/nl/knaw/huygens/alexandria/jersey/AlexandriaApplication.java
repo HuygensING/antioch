@@ -8,8 +8,8 @@ import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 
-public class AlexandriaResourceConfig extends ResourceConfig {
-  public AlexandriaResourceConfig() {
+public class AlexandriaApplication extends ResourceConfig {
+  public AlexandriaApplication() {
     packages("nl.knaw.huygens.alexandria.endpoint", "nl.knaw.huygens.alexandria.jersey");
 
     // Bean Validation error messages in the response entity.
