@@ -19,7 +19,9 @@ public abstract class AbstractAnnotatable extends AbstractAccountable {
 
   public void addAnnotation(AlexandriaAnnotation annotation) {
     annotations.add(annotation);
-    annotation.setAnnotatablePointer(new AccountablePointer(this.getClass(), this.getId().toString()));
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    AccountablePointer<? extends Accountable> pointer = new AccountablePointer(this.getClass(), this.getId().toString());
+    annotation.setAnnotatablePointer(pointer);
   }
 
   public AlexandriaState getState() {

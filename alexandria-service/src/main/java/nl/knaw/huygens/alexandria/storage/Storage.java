@@ -255,10 +255,10 @@ public class Storage {
     AlexandriaAnnotation annotation = new AlexandriaAnnotation(uuid, body, provenance);
     AnnotationVF annotatedAnnotation = annotationVF.getAnnotatedAnnotation();
     if (annotatedAnnotation != null) {
-      annotation.setAnnotatablePointer(new AccountablePointer(AlexandriaAnnotation.class, annotatedAnnotation.getUuid()));
+      annotation.setAnnotatablePointer(new AccountablePointer<AlexandriaAnnotation>(AlexandriaAnnotation.class, annotatedAnnotation.getUuid()));
     } else {
       ResourceVF annotatedResource = annotationVF.getAnnotatedResource();
-      annotation.setAnnotatablePointer(new AccountablePointer(AlexandriaResource.class, annotatedResource.getUuid()));
+      annotation.setAnnotatablePointer(new AccountablePointer<AlexandriaResource>(AlexandriaResource.class, annotatedResource.getUuid()));
     }
     for (AnnotationVF avf : annotationVF.getAnnotatedBy()) {
       AlexandriaAnnotation annotationAnnotation = deframeAnnotation(avf);

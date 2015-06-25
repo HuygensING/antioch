@@ -34,7 +34,7 @@ public class LocationBuilder {
         .path(path).path("{uuid}").build(uuid);
   }
 
-  public URI locationOf(AccountablePointer annotatablePointer) {
+  public URI locationOf(AccountablePointer<? extends Accountable> annotatablePointer) {
     return locationOf(annotatablePointer.getAccountableClass(), annotatablePointer.getIdentifier());
   }
 }
