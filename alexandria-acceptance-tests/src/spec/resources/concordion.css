@@ -1,5 +1,77 @@
 /* Huygens ING extension to Concordion CSS (gleaned from https://github.com/Pragmatists/OpenTrapp) */
 
+.json, .xml {
+	padding: 0;
+}
+
+code {
+	background-color: #f5f5f5;
+	color: #333;
+	padding-top: 4px;
+}
+
+code.success {
+	background-color: #afa;
+	color: #363;
+}
+
+code.failure .actual {
+	color: #bb5050;
+}
+
+code.failure {
+  	padding: 2px 4px;
+  	padding-top: 4px;
+  	color: #bb5050;
+}
+
+code.get:before,
+code.post:before,
+code.put:before,
+code.delete:before,
+code.patch:before,
+code.location:before {
+	font-weight: bold;
+	margin-right: 0.5em;
+}
+
+code.get:before {
+	content: 'GET';
+}
+code.post:before {
+	content: 'POST';
+}
+code.put:before {
+	content: 'PUT';
+}
+code.delete:before {
+	content: 'DELETE';
+}
+code.patch:before {
+	content: 'PATCH';
+}
+
+code.set-header:before, code.header:before {
+	content: attr(name) ': ';
+}
+
+span.success {
+	padding: 2px 4px;
+}
+
+pre {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.table th {
+	background-color: transparent;
+}
+
+.table th, .table td {
+  border: inherit;
+}
+
 .examples {
     overflow: hidden;
 }
@@ -35,7 +107,7 @@
     padding-right: 16px;
 }
 
-.header {
+.page-header {
     position: absolute;
     top: 0;
     left: 0;
@@ -51,13 +123,13 @@
     color: #FFFFFF;
 }
 
-.header h1 {
+.page-header h1 {
     font-size: 20px;
     margin: 0;
     padding: 0;
 }
 
-.header p {
+.page-header p {
     font-size: 12px;
     margin: 0;
 }

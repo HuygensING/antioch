@@ -7,62 +7,42 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.common.base.Strings;
 import nl.knaw.huygens.Log;
-
-import org.concordion.api.AbstractCommand;
 import org.concordion.api.CommandCall;
 import org.concordion.api.Element;
 import org.concordion.api.Evaluator;
-import org.concordion.api.Result;
 import org.concordion.api.ResultRecorder;
-import org.concordion.api.listener.AssertEqualsListener;
-import org.concordion.api.listener.AssertFailureEvent;
-import org.concordion.api.listener.AssertSuccessEvent;
-import org.concordion.internal.util.Announcer;
+import org.concordion.internal.listener.AssertResultRenderer;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-public class IncludesJsonCommand extends AbstractCommand {
-
-  private Announcer<AssertEqualsListener> listeners = Announcer.to(AssertEqualsListener.class);
+public class ExpectedJsonResponseCommand extends HuygensCommand {
+  public ExpectedJsonResponseCommand() {
+    addListener(new AssertResultRenderer());
+  }
 
   @Override
   public void verify(CommandCall commandCall, Evaluator evaluator, ResultRecorder resultRecorder) {
     final Element element = commandCall.getElement();
-    final String expected = element.getText();
-    // Log.trace("IncludesJsonCommand: expected=[{}]", expected);
+    final JsonNode expectedJson = asJson(element.getText());
+    final String expected = pretty(expectedJson);
+    element.moveChildrenTo(new Element("tmp"));
+    element.appendText(expected);
 
-    final String actual = (String) evaluator.evaluate(commandCall.getExpression());
-    // Log.trace("IncludesJsonCommand: actual=[{}]", actual);
-
-    if (includesJson(actual, expected)) {
-      resultRecorder.record(Result.SUCCESS);
-      announceSuccess(element);
+    final String actual = getFixture(evaluator).response();
+    if (Strings.isNullOrEmpty(actual)) {
+      fail(resultRecorder, element, "(not set)", expected);
     } else {
-      resultRecorder.record(Result.FAILURE);
-      announceFailure(element, expected, actual);
+      final JsonNode actualJson = asJson(actual);
+      if (includesJson(actualJson, expectedJson)) {
+        succeed(resultRecorder, element);
+      } else {
+        fail(resultRecorder, element, pretty(actualJson), expected);
+      }
     }
-  }
-
-  public void addAssertEqualsListener(AssertEqualsListener listener) {
-    listeners.addListener(listener);
-  }
-
-  public void removeAssertEqualsListener(AssertEqualsListener listener) {
-    listeners.removeListener(listener);
-  }
-
-  private void announceSuccess(Element element) {
-    listeners.announce().successReported(new AssertSuccessEvent(element));
-  }
-
-  private void announceFailure(Element element, String expected, Object actual) {
-    listeners.announce().failureReported(new AssertFailureEvent(element, expected, actual));
-  }
-
-  private boolean includesJson(String actual, String expected) {
-    return includesJson(asJson(actual), asJson(expected));
   }
 
   private boolean includesJson(JsonNode actual, JsonNode expected) {
@@ -78,15 +58,16 @@ public class IncludesJsonCommand extends AbstractCommand {
 
     if (expected.isTextual()) {
       // TODO: rather than if-else store these in a mapping from "{format}" to a JsonChecker (to be written) per format
-      if ("{date.beforeNow}".equals(expected.asText())) {
-        Log.trace("Parsing [{}] as Instant", actual.asText());
-        try {
-          final Instant when = Instant.parse(actual.asText());
-          return when.isBefore(Instant.now());
-        } catch (DateTimeParseException e) {
-          Log.trace("DateTimeParseException: [{}]", e.getMessage());
-          return false;
-        }
+      switch (expected.asText()) {
+        case "{date.beforeNow}":
+          Log.trace("Parsing [{}] as Instant", actual.asText());
+          try {
+            final Instant when = Instant.parse(actual.asText());
+            return when.isBefore(Instant.now());
+          } catch (DateTimeParseException e) {
+            Log.trace("DateTimeParseException: [{}]", e.getMessage());
+            return false;
+          }
       }
     }
 
@@ -102,7 +83,8 @@ public class IncludesJsonCommand extends AbstractCommand {
       return actual.size() == 0;
     }
 
-    outer: for (JsonNode expectedItem : expected) {
+    outer:
+    for (JsonNode expectedItem : expected) {
       for (JsonNode candidateItem : actual) {
         if (includesJson(candidateItem, expectedItem)) {
           continue outer;
@@ -143,6 +125,14 @@ public class IncludesJsonCommand extends AbstractCommand {
       return new ObjectMapper().readTree(json);
     } catch (IOException e) {
       throw new RuntimeException("Failed to parse json: " + json, e);
+    }
+  }
+
+  private String pretty(JsonNode node) {
+    try {
+      return new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(node);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Failed to process json: " + node.asText(), e);
     }
   }
 
