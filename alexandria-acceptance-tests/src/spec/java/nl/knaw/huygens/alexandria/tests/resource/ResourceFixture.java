@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.resource;
+package nl.knaw.huygens.alexandria.tests.resource;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;

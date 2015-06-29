@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria;
+package nl.knaw.huygens.alexandria.tests;
 
 import nl.knaw.huygens.alexandria.helpers.RestExtension;
 import org.concordion.api.extension.Extensions;

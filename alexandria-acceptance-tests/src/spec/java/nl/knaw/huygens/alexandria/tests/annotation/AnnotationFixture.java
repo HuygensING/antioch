@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.annotation;
+package nl.knaw.huygens.alexandria.tests.annotation;
 
 import static org.concordion.api.MultiValueResult.multiValueResult;
 import static org.mockito.Mockito.when;
