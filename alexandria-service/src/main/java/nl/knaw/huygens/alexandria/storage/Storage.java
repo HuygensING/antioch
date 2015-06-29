@@ -1,16 +1,25 @@
 package nl.knaw.huygens.alexandria.storage;
 
+import static java.util.stream.Collectors.toSet;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.inject.Inject;
 
+import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.structure.Graph.Features.GraphFeatures;
+import org.apache.tinkerpop.gremlin.structure.Transaction;
+import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AccountablePointer;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
@@ -25,12 +34,6 @@ import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import nl.knaw.huygens.alexandria.storage.frames.SubResourceVF;
-
-import org.apache.tinkerpop.gremlin.structure.Graph;
-import org.apache.tinkerpop.gremlin.structure.Graph.Features.GraphFeatures;
-import org.apache.tinkerpop.gremlin.structure.Transaction;
-import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
-
 import peapod.FramedGraph;
 import peapod.FramedGraphTraversal;
 import peapod.annotations.Vertex;
@@ -107,6 +110,29 @@ public class Storage {
     setAlexandriaVFProperties(resource, rvf);
 
     commitTransaction();
+  }
+
+  public void createSubResource(AlexandriaSubResource subresource) {
+    startTransaction();
+
+    SubResourceVF rvf = null;
+    UUID uuid = subresource.getId();
+    if (exists(SubResourceVF.class, uuid)) {
+      rvf = readSubResourceVF(uuid).get();
+    } else {
+      rvf = fg.addVertex(SubResourceVF.class);
+      rvf.setUuid(uuid.toString());
+    }
+
+    rvf.setSub(subresource.getSub());
+    rvf.setState(subresource.getState().toString());
+    Optional<ResourceVF> parentVF = readResourceVF(UUID.fromString(subresource.getParentResourcePointer().getIdentifier()));
+    rvf.setParentResource(parentVF.get());
+
+    setAlexandriaVFProperties(subresource, rvf);
+
+    commitTransaction();
+
   }
 
   public void createOrUpdateAnnotation(AlexandriaAnnotation annotation) {
@@ -324,4 +350,12 @@ public class Storage {
     vf.setProvenanceWho(provenance.getWho());
     vf.setProvenanceWhy(provenance.getWhy());
   }
+
+  public Set<AlexandriaSubResource> readSubResources(UUID uuid) {
+    ResourceVF resourcevf = readResourceVF(uuid).orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
+    return resourcevf.getSubResources().stream()//
+        .map(vf -> deframeSubResource(vf))//
+        .collect(toSet());
+  }
+
 }
