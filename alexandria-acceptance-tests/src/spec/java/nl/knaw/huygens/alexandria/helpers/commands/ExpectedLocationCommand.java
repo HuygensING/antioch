@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.helpers;
+package nl.knaw.huygens.alexandria.helpers.commands;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -6,6 +6,8 @@ import java.util.function.Supplier;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+import nl.knaw.huygens.alexandria.helpers.HuygensConcordionCommand;
+import nl.knaw.huygens.alexandria.helpers.RestFixture;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
 import org.concordion.api.CommandCall;
 import org.concordion.api.Element;
@@ -13,6 +15,7 @@ import org.concordion.api.Evaluator;
 import org.concordion.api.ResultRecorder;
 import org.concordion.internal.listener.AssertResultRenderer;
 
+@HuygensConcordionCommand(command = "location")
 public class ExpectedLocationCommand extends HuygensCommand {
 
   public ExpectedLocationCommand() {

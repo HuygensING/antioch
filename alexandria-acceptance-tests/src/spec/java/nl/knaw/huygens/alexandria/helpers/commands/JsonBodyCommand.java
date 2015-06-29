@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.helpers;
+package nl.knaw.huygens.alexandria.helpers.commands;
 
 import java.io.IOException;
 
@@ -6,12 +6,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import nl.knaw.huygens.alexandria.helpers.HuygensConcordionCommand;
 import org.concordion.api.CommandCall;
 import org.concordion.api.Element;
 import org.concordion.api.Evaluator;
 import org.concordion.api.ResultRecorder;
 import org.concordion.internal.listener.AssertResultRenderer;
 
+@HuygensConcordionCommand(command = "jsonBody", htmlTag = "pre")
 public class JsonBodyCommand extends HuygensCommand {
   public JsonBodyCommand() {
     addListener(new AssertResultRenderer());

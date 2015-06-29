@@ -4,15 +4,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.commands.FixtureEvaluator;
+import nl.knaw.huygens.alexandria.commands.HuygensConcordionCommand;
 import nu.xom.Attribute;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
+import org.concordion.api.Command;
 import org.concordion.api.Resource;
 import org.concordion.api.extension.ConcordionExtender;
 import org.concordion.api.extension.ConcordionExtension;
 import org.concordion.api.listener.DocumentParsingListener;
 import org.concordion.internal.ConcordionBuilder;
+import org.reflections.Reflections;
 
 public class RestExtension implements ConcordionExtension {
   public static final String REST_EXTENSION_NS = "http://alexandria.huygens.knaw.nl/concordion-extension";
@@ -36,16 +40,32 @@ public class RestExtension implements ConcordionExtension {
   }
 
   private void registerCommands(ConcordionExtender concordionExtender) {
-    concordionExtender.withCommand(REST_EXTENSION_NS, "request", new RequestCommand());
-    concordionExtender.withCommand(REST_EXTENSION_NS, "get", new HttpMethodCommand("GET"));
-    concordionExtender.withCommand(REST_EXTENSION_NS, "post", new HttpMethodCommand("POST"));
-    concordionExtender.withCommand(REST_EXTENSION_NS, "put", new HttpMethodCommand("PUT"));
-    concordionExtender.withCommand(REST_EXTENSION_NS, "delete", new HttpMethodCommand("DELETE"));
-    concordionExtender.withCommand(REST_EXTENSION_NS, "jsonBody", new JsonBodyCommand());
-    concordionExtender.withCommand(REST_EXTENSION_NS, "status", new ExpectedStatusCommand());
-    concordionExtender.withCommand(REST_EXTENSION_NS, "header", new ExpectedHeaderCommand());
-    concordionExtender.withCommand(REST_EXTENSION_NS, "location", new ExpectedLocationCommand());
-    concordionExtender.withCommand(REST_EXTENSION_NS, "jsonResponse", new ExpectedJsonResponseCommand());
+    final Reflections reflections = new Reflections("nl.knaw.huygens.alexandria");
+    reflections.getTypesAnnotatedWith(HuygensConcordionCommand.class).stream().forEach(cmd -> {
+      final HuygensConcordionCommand annotation = cmd.getAnnotation(HuygensConcordionCommand.class);
+      concordionExtender
+          .withCommand(REST_EXTENSION_NS, annotation.command(), instantiate((Class<? extends Command>) cmd));
+    });
+//    concordionExtender.withCommand(REST_EXTENSION_NS, "request", new RequestCommand());
+//    concordionExtender.withCommand(REST_EXTENSION_NS, "get", new HttpMethodCommand("GET"));
+//    concordionExtender.withCommand(REST_EXTENSION_NS, "post", new HttpMethodCommand("POST"));
+//    concordionExtender.withCommand(REST_EXTENSION_NS, "put", new HttpMethodCommand("PUT"));
+//    concordionExtender.withCommand(REST_EXTENSION_NS, "delete", new HttpMethodCommand("DELETE"));
+//    concordionExtender.withCommand(REST_EXTENSION_NS, "jsonBody", new JsonBodyCommand());
+//    concordionExtender.withCommand(REST_EXTENSION_NS, "status", new ExpectedStatusCommand());
+//    concordionExtender.withCommand(REST_EXTENSION_NS, "header", new ExpectedHeaderCommand());
+//    concordionExtender.withCommand(REST_EXTENSION_NS, "location", new ExpectedLocationCommand());
+//    concordionExtender.withCommand(REST_EXTENSION_NS, "jsonResponse", new ExpectedJsonResponseCommand());
+  }
+
+  private Command instantiate(Class<? extends Command> cmd) {
+    Log.trace("Instantiating: [{}]", cmd);
+    try {
+      return cmd.newInstance();
+    } catch (InstantiationException | IllegalAccessException e) {
+      Log.warn("Cannot instantiate command [{}]: {}", cmd.getName(), e);
+      throw new RuntimeException(e);
+    }
   }
 
   private void registerCommandDecorator(ConcordionExtender concordionExtender) {

@@ -1,5 +1,7 @@
-package nl.knaw.huygens.alexandria.helpers;
+package nl.knaw.huygens.alexandria.helpers.commands;
 
+import nl.knaw.huygens.alexandria.helpers.FixtureEvaluator;
+import nl.knaw.huygens.alexandria.helpers.RestFixture;
 import org.concordion.api.AbstractCommand;
 import org.concordion.api.Element;
 import org.concordion.api.Evaluator;

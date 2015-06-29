@@ -1,30 +1,31 @@
-package nl.knaw.huygens.alexandria.helpers;
+package nl.knaw.huygens.alexandria.helpers.commands;
 
+import nl.knaw.huygens.alexandria.helpers.HuygensConcordionCommand;
 import org.concordion.api.CommandCall;
 import org.concordion.api.Element;
 import org.concordion.api.Evaluator;
 import org.concordion.api.ResultRecorder;
 import org.concordion.internal.listener.AssertResultRenderer;
 
-public class ExpectedHeaderCommand extends HuygensCommand {
+@HuygensConcordionCommand(command = "status")
+public class ExpectedStatusCommand extends HuygensCommand {
 
-  public ExpectedHeaderCommand() {
+  public ExpectedStatusCommand() {
     addListener(new AssertResultRenderer());
   }
 
   @Override
   public void verify(CommandCall commandCall, Evaluator evaluator, ResultRecorder resultRecorder) {
     final Element element = commandCall.getElement();
-    element.addStyleClass("header");
 
-    final String expectedHeader = element.getText();
-    final String actualHeader = getFixture(evaluator).header(element.getAttributeValue("name")).orElse("(not set)");
+    final String expectedStatus = element.getText();
+    final String actualStatus = getFixture(evaluator).status();
 
-    if (actualHeader.equals(expectedHeader)) {
+    if (expectedStatus.equals(actualStatus)) {
       succeed(resultRecorder, element);
     }
     else {
-      fail(resultRecorder, element, actualHeader, expectedHeader);
+      fail(resultRecorder, element, actualStatus, expectedStatus);
     }
   }
 }

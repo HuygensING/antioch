@@ -1,10 +1,13 @@
-package nl.knaw.huygens.alexandria.helpers;
+package nl.knaw.huygens.alexandria.helpers.commands;
 
+import nl.knaw.huygens.alexandria.helpers.HuygensConcordionCommand;
+import nl.knaw.huygens.alexandria.helpers.RestFixture;
 import org.concordion.api.CommandCall;
 import org.concordion.api.CommandCallList;
 import org.concordion.api.Evaluator;
 import org.concordion.api.ResultRecorder;
 
+@HuygensConcordionCommand(command = "request", htmlTag = "div")
 public class RequestCommand extends HuygensCommand {
   @Override
   public void execute(CommandCall commandCall, Evaluator evaluator, ResultRecorder resultRecorder) {
