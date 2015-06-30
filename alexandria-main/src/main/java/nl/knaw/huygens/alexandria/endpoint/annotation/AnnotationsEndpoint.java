@@ -1,18 +1,16 @@
 package nl.knaw.huygens.alexandria.endpoint.annotation;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
@@ -27,7 +25,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   private final AnnotationEntityBuilder entityBuilder;
 
   @Inject
-  public AnnotationsEndpoint(AlexandriaService service, //
+  public AnnotationsEndpoint(AlexandriaService service,      //
       AnnotationEntityBuilder entityBuilder) {
     this.service = service;
     this.entityBuilder = entityBuilder;
@@ -35,7 +33,6 @@ public class AnnotationsEndpoint extends JSONEndpoint {
 
   @GET
   @Path("{uuid}")
-  
   @ApiOperation(value = "get the annotation", response = AnnotationEntity.class)
   public Response readAnnotation(@PathParam("uuid") UUIDParam uuidParam) {
     final AlexandriaAnnotation annotation = service.readAnnotation(uuidParam.getValue())//
@@ -45,8 +42,8 @@ public class AnnotationsEndpoint extends JSONEndpoint {
 
   @DELETE
   @Path("{uuid}")
-  
   public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
+    // set state to expired
     return methodNotImplemented();
   }
 
