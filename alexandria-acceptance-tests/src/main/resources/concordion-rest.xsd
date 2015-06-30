@@ -26,20 +26,21 @@
 
   <group name="httpMethods">
     <choice>
+      <element name="delete" type="string"></element>
       <element name="get" type="string"></element>
+      <element name="patch" type="string"></element>
       <element name="post" type="string"></element>
       <element name="put" type="string"></element>
-      <element name="delete" type="string"></element>
-      <element name="patch" type="string"></element>
     </choice>
   </group>
 
   <group name="verify">
     <choice>
-      <element name="status" type="string" minOccurs="0" maxOccurs="unbounded"/>
-      <element name="location" type="rest:locationType" minOccurs="0" maxOccurs="unbounded"/>
       <element name="header" type="rest:headerType" minOccurs="0" maxOccurs="unbounded"/>
+      <element name="location" type="rest:locationType" minOccurs="0" maxOccurs="unbounded"/>
       <element name="jsonResponse" type="string" minOccurs="0" maxOccurs="unbounded"/>
+      <element name="responseBody" type="string" minOccurs="0" maxOccurs="unbounded"/>
+      <element name="status" type="string" minOccurs="0" maxOccurs="unbounded"/>
     </choice>
   </group>
 

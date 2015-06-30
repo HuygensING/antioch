@@ -55,6 +55,10 @@ code.set-header:before, code.header:before {
 	content: attr(name) ': ';
 }
 
+code.empty:before {
+    content: '<empty>'
+}
+
 span.success {
 	padding: 2px 4px;
 }

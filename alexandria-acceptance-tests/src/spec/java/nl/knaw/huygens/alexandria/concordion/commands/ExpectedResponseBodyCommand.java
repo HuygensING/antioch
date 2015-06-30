@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.concordion.commands;
 
+import java.util.Optional;
+
 import nl.knaw.huygens.alexandria.concordion.HuygensCommand;
 import org.concordion.api.CommandCall;
 import org.concordion.api.Element;
@@ -7,7 +9,7 @@ import org.concordion.api.Evaluator;
 import org.concordion.api.ResultRecorder;
 import org.concordion.internal.listener.AssertResultRenderer;
 
-@HuygensCommand(name = "status")
+@HuygensCommand(name = "responseBody")
 public class ExpectedResponseBodyCommand extends nl.knaw.huygens.alexandria.concordion.commands.HuygensCommand {
 
   public ExpectedResponseBodyCommand() {
@@ -18,14 +20,22 @@ public class ExpectedResponseBodyCommand extends nl.knaw.huygens.alexandria.conc
   public void verify(CommandCall commandCall, Evaluator evaluator, ResultRecorder resultRecorder) {
     final Element element = commandCall.getElement();
 
-    final String expectedStatus = element.getText();
-    final String actualStatus = getFixture(evaluator).status();
+    final String expectedBody = element.getText();
+    final Optional<String> actualBody = getFixture(evaluator).response();
 
-    if (expectedStatus.equals(actualStatus)) {
-      succeed(resultRecorder, element);
-    }
-    else {
-      fail(resultRecorder, element, actualStatus, expectedStatus);
+    if (expectedBody.isEmpty()) {
+      element.addStyleClass("empty");
+      if (actualBody.isPresent()) {
+        fail(resultRecorder, element, actualBody.get(), "(not set)");
+      } else {
+        succeed(resultRecorder, element);
+      }
+    } else {
+      if (actualBody.isPresent()) {
+        succeed(resultRecorder, element);
+      } else {
+        fail(resultRecorder, element, "(not set)", expectedBody);
+      }
     }
   }
 }
