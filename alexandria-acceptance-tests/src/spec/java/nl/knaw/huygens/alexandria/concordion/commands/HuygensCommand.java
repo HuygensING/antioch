@@ -1,5 +1,7 @@
-package nl.knaw.huygens.alexandria.helpers;
+package nl.knaw.huygens.alexandria.concordion.commands;
 
+import nl.knaw.huygens.alexandria.concordion.FixtureEvaluator;
+import nl.knaw.huygens.alexandria.concordion.RestFixture;
 import org.concordion.api.AbstractCommand;
 import org.concordion.api.Element;
 import org.concordion.api.Evaluator;
@@ -10,7 +12,7 @@ import org.concordion.api.listener.AssertFailureEvent;
 import org.concordion.api.listener.AssertSuccessEvent;
 import org.concordion.internal.util.Announcer;
 
-public class HuygensCommand extends AbstractCommand {
+public abstract class HuygensCommand extends AbstractCommand {
   private final Announcer<AssertEqualsListener> listeners = Announcer.to(AssertEqualsListener.class);
 
   protected void addListener(AssertEqualsListener listener) {

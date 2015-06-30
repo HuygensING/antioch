@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.helpers;
+package nl.knaw.huygens.alexandria.concordion;
 
 import static java.util.logging.Logger.getAnonymousLogger;
 import nl.knaw.huygens.alexandria.config.JsonConfiguration;

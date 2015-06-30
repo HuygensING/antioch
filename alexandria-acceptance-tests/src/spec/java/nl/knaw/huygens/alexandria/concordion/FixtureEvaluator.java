@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.helpers;
+package nl.knaw.huygens.alexandria.concordion;
 
 import org.concordion.internal.SimpleEvaluator;
 

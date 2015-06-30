@@ -1,11 +1,11 @@
-package nl.knaw.huygens.alexandria.helpers;
+package nl.knaw.huygens.alexandria.concordion.commands;
 
 import org.concordion.api.CommandCall;
 import org.concordion.api.Element;
 import org.concordion.api.Evaluator;
 import org.concordion.api.ResultRecorder;
 
-public class HttpMethodCommand extends HuygensCommand {
+abstract public class HttpMethodCommand extends HuygensCommand {
   private final String method;
 
   public HttpMethodCommand(String method) {

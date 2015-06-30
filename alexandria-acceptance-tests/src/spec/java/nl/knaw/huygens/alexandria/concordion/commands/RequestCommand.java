@@ -1,11 +1,14 @@
-package nl.knaw.huygens.alexandria.helpers;
+package nl.knaw.huygens.alexandria.concordion.commands;
 
+import nl.knaw.huygens.alexandria.concordion.HuygensCommand;
+import nl.knaw.huygens.alexandria.concordion.RestFixture;
 import org.concordion.api.CommandCall;
 import org.concordion.api.CommandCallList;
 import org.concordion.api.Evaluator;
 import org.concordion.api.ResultRecorder;
 
-public class RequestCommand extends HuygensCommand {
+@HuygensCommand(name = "request", htmlTag = "div")
+public class RequestCommand extends nl.knaw.huygens.alexandria.concordion.commands.HuygensCommand {
   @Override
   public void execute(CommandCall commandCall, Evaluator evaluator, ResultRecorder resultRecorder) {
     final RestFixture fixture = getFixture(evaluator);
