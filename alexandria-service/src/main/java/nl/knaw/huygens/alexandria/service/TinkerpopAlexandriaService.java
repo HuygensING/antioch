@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
+import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AccountablePointer;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
@@ -106,6 +107,21 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
   @Override
   public Optional<AlexandriaResource> readSubResource(UUID uuid) {
     return storage.readSubResource(uuid);
+  }
+
+  @Override
+  public Optional<? extends Accountable> dereference(AccountablePointer<? extends Accountable> pointer) {
+    Class<? extends Accountable> aClass = pointer.getAccountableClass();
+    UUID uuid = UUID.fromString(pointer.getIdentifier());
+    if (AlexandriaResource.class.equals(aClass)) {
+      return readResource(uuid);
+
+    } else if (AlexandriaAnnotation.class.equals(aClass)) {
+      return readAnnotation(uuid);
+
+    } else {
+      throw new RuntimeException("unexpected accountableClass: " + aClass.getName());
+    }
   }
 
 }

@@ -1,18 +1,25 @@
 package nl.knaw.huygens.alexandria.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.StrictAssertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
-
-import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
-import nl.knaw.huygens.alexandria.storage.Storage;
 
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.Test;
+
+import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.model.Accountable;
+import nl.knaw.huygens.alexandria.model.AccountablePointer;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
+import nl.knaw.huygens.alexandria.storage.Storage;
 
 public class TinkerpopAlexandriaServiceTest {
   private static final Storage mockStorage = mock(Storage.class);
@@ -29,4 +36,40 @@ public class TinkerpopAlexandriaServiceTest {
     assertThat(created).isTrue();
   }
 
+  @Test
+  public void testDereferenceWithExistingAnnotation() {
+    UUID id = UUID.randomUUID();
+    AlexandriaAnnotationBody body = mock(AlexandriaAnnotationBody.class);
+    TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
+    when(mockStorage.readAnnotation(id)).thenReturn(Optional.of(new AlexandriaAnnotation(id, body, provenance)));
+    AccountablePointer<AlexandriaAnnotation> ap = new AccountablePointer<AlexandriaAnnotation>(AlexandriaAnnotation.class, id.toString());
+
+    Optional<? extends Accountable> optional = service.dereference(ap);
+    assertThat(optional.isPresent());
+    AlexandriaAnnotation annotation = (AlexandriaAnnotation) optional.get();
+    assertThat(annotation.getId()).isEqualTo(id);
+  }
+
+  @Test
+  public void testDereferenceWithNonExistingAnnotation() {
+    UUID id = UUID.randomUUID();
+    when(mockStorage.readAnnotation(id)).thenReturn(Optional.empty());
+    AccountablePointer<AlexandriaAnnotation> ap = new AccountablePointer<AlexandriaAnnotation>(AlexandriaAnnotation.class, id.toString());
+
+    Optional<? extends Accountable> optional = service.dereference(ap);
+    assertThat(optional.isPresent()).isFalse();
+  }
+
+  @Test
+  public void testDereferenceWithExistingResource() {
+    UUID id = UUID.randomUUID();
+    TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
+    when(mockStorage.readResource(id)).thenReturn(Optional.of(new AlexandriaResource(id, provenance)));
+    AccountablePointer<AlexandriaResource> ap = new AccountablePointer<AlexandriaResource>(AlexandriaResource.class, id.toString());
+
+    Optional<? extends Accountable> optional = service.dereference(ap);
+    assertThat(optional.isPresent());
+    AlexandriaResource annotation = (AlexandriaResource) optional.get();
+    assertThat(annotation.getId()).isEqualTo(id);
+  }
 }
