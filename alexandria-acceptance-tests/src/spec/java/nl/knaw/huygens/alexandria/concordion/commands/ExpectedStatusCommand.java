@@ -1,14 +1,14 @@
-package nl.knaw.huygens.alexandria.helpers.commands;
+package nl.knaw.huygens.alexandria.concordion.commands;
 
-import nl.knaw.huygens.alexandria.helpers.HuygensConcordionCommand;
+import nl.knaw.huygens.alexandria.concordion.HuygensCommand;
 import org.concordion.api.CommandCall;
 import org.concordion.api.Element;
 import org.concordion.api.Evaluator;
 import org.concordion.api.ResultRecorder;
 import org.concordion.internal.listener.AssertResultRenderer;
 
-@HuygensConcordionCommand(command = "status")
-public class ExpectedStatusCommand extends HuygensCommand {
+@HuygensCommand(name = "status")
+public class ExpectedStatusCommand extends nl.knaw.huygens.alexandria.concordion.commands.HuygensCommand {
 
   public ExpectedStatusCommand() {
     addListener(new AssertResultRenderer());

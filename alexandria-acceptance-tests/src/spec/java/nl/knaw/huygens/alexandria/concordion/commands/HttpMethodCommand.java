@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.helpers.commands;
+package nl.knaw.huygens.alexandria.concordion.commands;
 
 import org.concordion.api.CommandCall;
 import org.concordion.api.Element;

@@ -1,11 +1,12 @@
-package nl.knaw.huygens.alexandria.helpers;
+package nl.knaw.huygens.alexandria.concordion;
 
-import java.util.HashMap;
+import java.lang.annotation.Annotation;
 import java.util.Map;
+import java.util.Set;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.commands.FixtureEvaluator;
-import nl.knaw.huygens.alexandria.commands.HuygensConcordionCommand;
 import nu.xom.Attribute;
 import nu.xom.Document;
 import nu.xom.Element;
@@ -21,10 +22,17 @@ import org.reflections.Reflections;
 public class RestExtension implements ConcordionExtension {
   public static final String REST_EXTENSION_NS = "http://alexandria.huygens.knaw.nl/concordion-extension";
 
+  private final Set<Class<? extends Command>> commands = Sets.newHashSet();
+  private final Map<String, String> htmlCommandTags = Maps.newHashMap();
+
+  public RestExtension() {
+    addAnnotatedCommands(new Reflections("nl.knaw.huygens.alexandria"));
+  }
+
   @Override
   public void addTo(ConcordionExtender concordionExtender) {
     registerCommands(concordionExtender);
-    registerCommandDecorator(concordionExtender);
+    registerCommandToHtmlTranslator(concordionExtender);
     registerLinkedCSS(concordionExtender);
     addHeader(concordionExtender);
 
@@ -39,27 +47,46 @@ public class RestExtension implements ConcordionExtension {
         .withEvaluatorFactory(fixture -> new FixtureEvaluator((RestFixture) fixture));
   }
 
+  private void addAnnotatedCommands(Reflections scanner) {
+    scanForAnnotatedClasses(scanner, HuygensCommand.class).forEach(this::addCommand);
+  }
+
+  private Set<Class<?>> scanForAnnotatedClasses(Reflections scanner, Class<? extends Annotation> annotationClass) {
+    final Set<Class<?>> annotatedClasses = scanner.getTypesAnnotatedWith(annotationClass);
+
+    if (Log.isDebugEnabled()) {
+      final int annotatedClassesCount = annotatedClasses.size();
+      final String annotationName = annotationClass.getSimpleName();
+      final String classOrClasses = annotatedClassesCount == 1 ? "class" : "classes";
+      Log.debug("Found {} @{} annotated {}", annotatedClassesCount, annotationName, classOrClasses);
+    }
+
+    return annotatedClasses;
+  }
+
+  @SuppressWarnings("unchecked")
+  private void addCommand(Class<?> candidate) {
+    if (Command.class.isAssignableFrom(candidate)) {
+      Log.trace("Adding command: {}", candidate);
+      commands.add((Class<? extends Command>) candidate);
+    } else {
+      Log.warn("Ignoring @{} class {} as it does not implement {}", //
+          HuygensCommand.class.getSimpleName(), candidate.getName(), Command.class.getName());
+    }
+  }
+
   private void registerCommands(ConcordionExtender concordionExtender) {
-    final Reflections reflections = new Reflections("nl.knaw.huygens.alexandria");
-    reflections.getTypesAnnotatedWith(HuygensConcordionCommand.class).stream().forEach(cmd -> {
-      final HuygensConcordionCommand annotation = cmd.getAnnotation(HuygensConcordionCommand.class);
-      concordionExtender
-          .withCommand(REST_EXTENSION_NS, annotation.command(), instantiate((Class<? extends Command>) cmd));
+    commands.stream().forEach(cmd -> {
+      final HuygensCommand annotation = cmd.getAnnotation(HuygensCommand.class);
+      final String name = annotation.name();
+      final String tag = annotation.htmlTag();
+      Log.trace("Command <{}> is translated to HTML tag <{}> and handled by {}", name, tag, cmd.getSimpleName());
+      htmlCommandTags.put(name, tag);
+      concordionExtender.withCommand(REST_EXTENSION_NS, name, instantiate(cmd));
     });
-//    concordionExtender.withCommand(REST_EXTENSION_NS, "request", new RequestCommand());
-//    concordionExtender.withCommand(REST_EXTENSION_NS, "get", new HttpMethodCommand("GET"));
-//    concordionExtender.withCommand(REST_EXTENSION_NS, "post", new HttpMethodCommand("POST"));
-//    concordionExtender.withCommand(REST_EXTENSION_NS, "put", new HttpMethodCommand("PUT"));
-//    concordionExtender.withCommand(REST_EXTENSION_NS, "delete", new HttpMethodCommand("DELETE"));
-//    concordionExtender.withCommand(REST_EXTENSION_NS, "jsonBody", new JsonBodyCommand());
-//    concordionExtender.withCommand(REST_EXTENSION_NS, "status", new ExpectedStatusCommand());
-//    concordionExtender.withCommand(REST_EXTENSION_NS, "header", new ExpectedHeaderCommand());
-//    concordionExtender.withCommand(REST_EXTENSION_NS, "location", new ExpectedLocationCommand());
-//    concordionExtender.withCommand(REST_EXTENSION_NS, "jsonResponse", new ExpectedJsonResponseCommand());
   }
 
   private Command instantiate(Class<? extends Command> cmd) {
-    Log.trace("Instantiating: [{}]", cmd);
     try {
       return cmd.newInstance();
     } catch (InstantiationException | IllegalAccessException e) {
@@ -68,33 +95,19 @@ public class RestExtension implements ConcordionExtension {
     }
   }
 
-  private void registerCommandDecorator(ConcordionExtender concordionExtender) {
+  private void registerCommandToHtmlTranslator(ConcordionExtender concordionExtender) {
     concordionExtender.withDocumentParsingListener(new DocumentParsingListener() {
-      private Map<String, String> tags = new HashMap<String, String>() {{
-        put("request", "div");
-        put("get", "code");
-        put("post", "code");
-        put("put", "code");
-        put("delete", "code");
-        put("jsonBody", "pre");
-        put("status", "code");
-        put("header", "code");
-        put("location", "code");
-        put("jsonResponse", "pre");
-      }};
-
       @Override
       public void beforeParsing(Document document) {
-        visit(document.getRootElement());
+        translate(document.getRootElement());
       }
 
-      private void visit(Element element) {
+      private void translate(Element element) {
         final Elements children = element.getChildElements();
         for (int i = 0; i < children.size(); i++) {
-          visit(children.get(i));
+          translate(children.get(i));
         }
 
-        Log.trace("checking element: [{}]", element.getLocalName());
         if (REST_EXTENSION_NS.equals(element.getNamespaceURI())) {
           Attribute attr = new Attribute(element.getLocalName(), "");
           attr.setNamespace("h", REST_EXTENSION_NS);
@@ -106,9 +119,7 @@ public class RestExtension implements ConcordionExtension {
       }
 
       private String translate(String localName) {
-        final String translated = tags.getOrDefault(localName, localName);
-        Log.trace("translating: [{}] -> [{}]", localName, translated);
-        return translated;
+        return htmlCommandTags.getOrDefault(localName, localName);
       }
     });
   }

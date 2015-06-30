@@ -1,6 +1,5 @@
-package nl.knaw.huygens.alexandria.helpers;
+package nl.knaw.huygens.alexandria.concordion;
 
-import nl.knaw.huygens.alexandria.helpers.RestFixture;
 import org.concordion.internal.SimpleEvaluator;
 
 public class FixtureEvaluator extends SimpleEvaluator {
