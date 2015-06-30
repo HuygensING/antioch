@@ -16,7 +16,7 @@
 
         <h:request>
             When I <h:post>/resources</h:post>
-            the following body: <h:jsonBody> {
+            the following body: <h:jsonBody>{
                 "resource": {
                 "ref": "http://www.example.com/titles/path/to/title/resource"
                 }
@@ -28,8 +28,20 @@
         </h:request>
     </div>
 
-    <div c:execute="clear()" class="example">
+    <div class="example">
         <h3>How can I create an external resource with a specific UUID?</h3>
+
+        <h:request>
+            When I <h:post>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:post>
+            the following body: <h:jsonBody> {
+                "resource": {
+                    "id": "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+                    "ref": "http://www.example.com/titles/path/to/title/resource",
+                    "createdOn": "2015-04-07T09:10:55.877Z"
+                }
+            } </h:jsonBody>
+            then I should receive <h:status>204 No Content</h:status> and the response body is <h:responseBody/>.
+        </h:request>
 
         <ul>
             <li>Given a resource located at <code>http://www.example.com/titles/path/to/title/resource</code>,
