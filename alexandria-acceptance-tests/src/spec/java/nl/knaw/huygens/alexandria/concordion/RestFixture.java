@@ -34,6 +34,8 @@ import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.service.TinkerpopAlexandriaService;
+import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
 import org.concordion.api.extension.Extensions;
 import org.glassfish.hk2.api.ServiceLocator;
@@ -48,7 +50,10 @@ public class RestFixture extends JerseyTest {
 
   private static final AlexandriaConfiguration CONFIG = testConfiguration();
 
-  private static final AlexandriaService SERVICE_MOCK = mock(AlexandriaService.class);
+  private static final Storage STORAGE_MOCK = mock(Storage.class);
+
+  //private static final AlexandriaService SERVICE_MOCK = mock(AlexandriaService.class);
+  private static final AlexandriaService service = new TinkerpopAlexandriaService(STORAGE_MOCK);
 
   private static ResourceConfig application;
 
@@ -77,6 +82,7 @@ public class RestFixture extends JerseyTest {
 
     BootstrapUtils.install(locator);
     Log.trace("+- done: locator installed");
+
   }
 
   protected static void register(Class<?> componentClass) {
@@ -107,7 +113,7 @@ public class RestFixture extends JerseyTest {
       @Override
       protected void configure() {
         Log.trace("setting up Guice bindings");
-        bind(AlexandriaService.class).toInstance(SERVICE_MOCK);
+        bind(AlexandriaService.class).toInstance(service);
         bind(AlexandriaConfiguration.class).toInstance(CONFIG);
         bind(AnnotationEntityBuilder.class).in(Scopes.SINGLETON);
         bind(EndpointPathResolver.class).in(Scopes.SINGLETON);
@@ -128,8 +134,8 @@ public class RestFixture extends JerseyTest {
   public void clear() {
     Log.debug("Clearing ApiFixture");
 
-    Log.trace("+- resetting (mocked) AlexandriaService layer");
-    Mockito.reset(SERVICE_MOCK);
+    Log.trace("+- resetting (mocked) Storage layer");
+    Mockito.reset(STORAGE_MOCK);
 
     target = client().target(getBaseUri());
     Log.trace("+- refreshed WebTarget: [{}]", target);
@@ -194,8 +200,8 @@ public class RestFixture extends JerseyTest {
     optionalContentType = Optional.of(MediaType.valueOf(type));
   }
 
-  public String response() {
-    return entity.orElse("empty");
+  public Optional<String> response() {
+    return entity; //.orElse("empty");
   }
 
   public Optional<String> location() {
@@ -224,7 +230,11 @@ public class RestFixture extends JerseyTest {
   }
 
   protected AlexandriaService service() {
-    return SERVICE_MOCK;
+    return service;
+  }
+
+  protected Storage storage() {
+    return STORAGE_MOCK;
   }
 
   private Optional<UUID> parse(String idStr) {

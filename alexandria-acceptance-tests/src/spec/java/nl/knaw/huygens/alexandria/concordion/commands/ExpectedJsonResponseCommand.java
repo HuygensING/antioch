@@ -6,12 +6,12 @@ import java.time.format.DateTimeParseException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.common.base.Strings;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.concordion.HuygensCommand;
 import org.concordion.api.CommandCall;
@@ -34,16 +34,16 @@ public class ExpectedJsonResponseCommand extends nl.knaw.huygens.alexandria.conc
     element.moveChildrenTo(new Element("tmp"));
     element.appendText(expected);
 
-    final String actual = getFixture(evaluator).response();
-    if (Strings.isNullOrEmpty(actual)) {
-      fail(resultRecorder, element, "(not set)", expected);
-    } else {
-      final JsonNode actualJson = asJson(actual);
+    final Optional<String> actual = getFixture(evaluator).response();
+    if (actual.isPresent()) {
+      final JsonNode actualJson = asJson(actual.get());
       if (includesJson(actualJson, expectedJson)) {
         succeed(resultRecorder, element);
       } else {
         fail(resultRecorder, element, pretty(actualJson), expected);
       }
+    } else {
+      fail(resultRecorder, element, "(not set)", expected);
     }
   }
 

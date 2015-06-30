@@ -21,25 +21,10 @@
                 "ref": "http://www.example.com/titles/path/to/title/resource"
                 }
             } </h:jsonBody>
-            then I should receive:
-            <ol>
-                <li>status <h:status>201 Created</h:status></li>
-                <li>Location header:
-                    <ol>
-                        <li>starting with <h:location type="base">https://{host}/resources/</h:location></li>
-                        <li>followed by a <h:location type="uuid">well-formed UUID</h:location></li>
-                    </ol>
-                </li>
-                <li>body containing:
-                    <h:jsonResponse>{
-                        "resource": {
-                            "ref": "http://www.example.com/titles/path/to/title/resource",
-                            "annotations": [],
-                            "createdOn": "{date.beforeNow}"
-                        }
-                    }</h:jsonResponse>
-                </li>
-            </ol>
+            then I should receive <h:status>201 Created</h:status> and the response contains
+            a Location header starting with <h:location type="base">https://{host}/resources/</h:location>,
+            followed by a <h:location type="uuid">well-formed UUID</h:location>.
+            The response body is <h:responseBody/>.
         </h:request>
     </div>
 
