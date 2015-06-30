@@ -8,9 +8,9 @@ import peapod.annotations.In;
 import peapod.annotations.Out;
 import peapod.annotations.Vertex;
 
-@Vertex(Labels.RESOURCE)
+@Vertex(Labels.SUBRESOURCE)
 public abstract class SubResourceVF extends AlexandriaVF {
-  private static final String PART_OF = "part_of";
+  static final String PART_OF = "part_of";
 
   public abstract String getSub();
 
@@ -20,8 +20,12 @@ public abstract class SubResourceVF extends AlexandriaVF {
   @Edge(PART_OF)
   public abstract ResourceVF getParentResource();
 
+  @Out
+  @Edge(PART_OF)
+  public abstract void setParentResource(ResourceVF resourceVF);
+
   @In
-  @Edge(AnnotationVF.ANNOTATES_RESOURCE)
+  @Edge(AnnotationVF.ANNOTATES_SUBRESOURCE)
   public abstract List<AnnotationVF> getAnnotatedBy();
 
 }

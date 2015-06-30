@@ -17,4 +17,8 @@ public abstract class ResourceVF extends AlexandriaVF {
   @Edge(AnnotationVF.ANNOTATES_RESOURCE)
   public abstract List<AnnotationVF> getAnnotatedBy();
 
+  @In
+  @Edge(SubResourceVF.PART_OF)
+  public abstract List<SubResourceVF> getSubResources();
+
 }

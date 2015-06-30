@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
+import nl.knaw.huygens.alexandria.model.AccountablePointer;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
@@ -13,8 +14,6 @@ import nl.knaw.huygens.alexandria.model.AlexandriaSubResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
-
-import com.google.common.collect.Sets;
 
 public class TinkerpopAlexandriaService implements AlexandriaService {
   private Storage storage;
@@ -91,13 +90,17 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
   }
 
   @Override
-  public Set<AlexandriaResource> readSubResources(UUID uuid) {
-    return Sets.newHashSet();
+  public Set<AlexandriaSubResource> readSubResources(UUID uuid) {
+    return storage.readSubResources(uuid);
   }
 
   @Override
   public AlexandriaSubResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance) {
-    return null;
+    AlexandriaSubResource subresource = new AlexandriaSubResource(uuid, provenance);
+    subresource.setSub(sub);
+    subresource.setParentResourcePointer(new AccountablePointer<AlexandriaResource>(AlexandriaResource.class, parentUuid.toString()));
+    storage.createSubResource(subresource);
+    return subresource;
   }
 
   @Override
