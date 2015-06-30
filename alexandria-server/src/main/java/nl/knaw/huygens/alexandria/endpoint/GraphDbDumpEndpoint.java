@@ -2,7 +2,6 @@ package nl.knaw.huygens.alexandria.endpoint;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -17,7 +16,6 @@ public class GraphDbDumpEndpoint extends JSONEndpoint {
   Storage storage;
 
   @GET
-  
   public Response dumpGraphDb() {
     StreamingOutput stream = os -> {
       storage.dump(os);

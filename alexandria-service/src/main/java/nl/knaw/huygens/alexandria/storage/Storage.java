@@ -79,7 +79,7 @@ public class Storage {
   public Optional<AlexandriaResource> readSubResource(UUID uuid) {
     Optional<ResourceVF> osrvf = readResourceVF(uuid);
     if (osrvf.isPresent()) {
-      return Optional.of(deframeSubResource(osrvf.get()));
+      return Optional.of(deframeResource(osrvf.get()));
     }
     return Optional.empty();
   }
@@ -285,20 +285,9 @@ public class Storage {
     if (parentResource != null) {
       resource.setParentResourcePointer(new AccountablePointer<AlexandriaResource>(AlexandriaResource.class, parentResource.getUuid()));
     }
+    rvf.getSubResources().stream()//
+        .forEach(vf -> resource.addSubResourcePointer(new AccountablePointer<AlexandriaResource>(AlexandriaResource.class, vf.getUuid())));
     return resource;
-  }
-
-  private AlexandriaResource deframeSubResource(ResourceVF srvf) {
-    TentativeAlexandriaProvenance provenance = deframeProvenance(srvf);
-    UUID uuid = getUUID(srvf);
-    AlexandriaResource subResource = new AlexandriaResource(uuid, provenance);
-    subResource.setCargo(srvf.getCargo());
-    subResource.setState(AlexandriaState.valueOf(srvf.getState()));
-    for (AnnotationVF annotationVF : srvf.getAnnotatedBy()) {
-      AlexandriaAnnotation annotation = deframeAnnotation(annotationVF);
-      subResource.addAnnotation(annotation);
-    }
-    return subResource;
   }
 
   private AlexandriaAnnotation deframeAnnotation(AnnotationVF annotationVF) {
@@ -348,7 +337,7 @@ public class Storage {
   public Set<AlexandriaResource> readSubResources(UUID uuid) {
     ResourceVF resourcevf = readResourceVF(uuid).orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
     return resourcevf.getSubResources().stream()//
-        .map(vf -> deframeSubResource(vf))//
+        .map(vf -> deframeResource(vf))//
         .collect(toSet());
   }
 
