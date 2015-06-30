@@ -33,8 +33,7 @@ public class AnnotationCreationRequest implements CreationRequest<AlexandriaAnno
 
     UUID annotationBodyUuid = UUID.randomUUID();
     Optional<AlexandriaAnnotationBody> result = service.findAnnotationBodyWithTypeAndValue(providedType(), providedValue());
-    AlexandriaAnnotationBody body = result.isPresent() ? result.get() //
-        : service.createAnnotationBody(annotationBodyUuid, providedType(), providedValue(), provenance);
+    AlexandriaAnnotationBody body = result.orElseGet(() -> service.createAnnotationBody(annotationBodyUuid, providedType(), providedValue(), provenance));
 
     if (resource.isPresent()) {
       return service.annotate(resource.get(), body, provenance);

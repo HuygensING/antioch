@@ -1,7 +1,5 @@
 package nl.knaw.huygens.alexandria.endpoint;
 
-import io.swagger.annotations.ApiOperation;
-
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -14,11 +12,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntity;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint {
@@ -28,9 +28,9 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   protected final AnnotationCreationRequestBuilder requestBuilder;
   protected final UUID uuid;
 
-  protected AnnotatableObjectAnnotationsEndpoint(AlexandriaService service, //
-      AnnotationCreationRequestBuilder requestBuilder, //
-      LocationBuilder locationBuilder, //
+  protected AnnotatableObjectAnnotationsEndpoint(AlexandriaService service,    //
+      AnnotationCreationRequestBuilder requestBuilder,    //
+      LocationBuilder locationBuilder,    //
       final UUIDParam uuidParam) {
     Log.trace("resourceService=[{}], uuidParam=[{}]", service, uuidParam);
     this.service = service;
@@ -55,6 +55,7 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation("add annotation")
   public Response addAnnotation(@NotNull @Valid AnnotationPrototype prototype) {
+    prototype.setState(AlexandriaState.Temporary);
     AnnotationCreationRequest request = getAnnotationCreationRequestBuilder().build(prototype);
     AlexandriaAnnotation annotation = request.execute(service);
     return Response.created(locationBuilder.locationOf(annotation)).build();

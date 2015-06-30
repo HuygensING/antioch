@@ -1,8 +1,6 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import static nl.knaw.huygens.alexandria.endpoint.EndpointPaths.RESOURCES;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 
 import java.util.function.Supplier;
 
@@ -20,6 +18,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -40,9 +40,9 @@ public class ResourcesEndpoint extends JSONEndpoint {
   private final LocationBuilder locationBuilder;
 
   @Inject
-  public ResourcesEndpoint(AlexandriaService service, //
-      ResourceCreationRequestBuilder requestBuilder, //
-      LocationBuilder locationBuilder, //
+  public ResourcesEndpoint(AlexandriaService service,  //
+      ResourceCreationRequestBuilder requestBuilder,  //
+      LocationBuilder locationBuilder,  //
       ResourceEntityBuilder entityBuilder) {
     this.locationBuilder = locationBuilder;
     this.alexandriaService = service;
@@ -126,11 +126,6 @@ public class ResourcesEndpoint extends JSONEndpoint {
   public Class<ResourceAnnotationsEndpoint> getAnnotationsEndpoint() {
     return ResourceAnnotationsEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }
-
-  // @Path("{uuid}/provenance")
-  // public Class<ResourceProvenanceEndpoint> getProvenanceEndpoint() {
-  // return ResourceProvenanceEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
-  // }
 
   @Path("{uuid}/provenance")
   public ResourceProvenanceEndpoint getProvenanceEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
