@@ -26,14 +26,14 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.model.AlexandriaSubResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
-import nl.knaw.huygens.alexandria.storage.frames.SubResourceVF;
+import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import peapod.FramedGraph;
 import peapod.FramedGraphTraversal;
 import peapod.annotations.Vertex;
@@ -76,8 +76,8 @@ public class Storage {
     return Optional.empty();
   }
 
-  public Optional<AlexandriaSubResource> readSubResource(UUID uuid) {
-    Optional<SubResourceVF> osrvf = readSubResourceVF(uuid);
+  public Optional<AlexandriaResource> readSubResource(UUID uuid) {
+    Optional<ResourceVF> osrvf = readResourceVF(uuid);
     if (osrvf.isPresent()) {
       return Optional.of(deframeSubResource(osrvf.get()));
     }
@@ -104,7 +104,7 @@ public class Storage {
       rvf.setUuid(uuid.toString());
     }
 
-    rvf.setRef(resource.getRef());
+    rvf.setCargo(resource.getCargo());
     rvf.setState(resource.getState().toString());
 
     setAlexandriaVFProperties(resource, rvf);
@@ -112,21 +112,21 @@ public class Storage {
     commitTransaction();
   }
 
-  public void createSubResource(AlexandriaSubResource subresource) {
+  public void createSubResource(AlexandriaResource subresource) {
     startTransaction();
 
-    SubResourceVF rvf = null;
+    ResourceVF rvf = null;
     UUID uuid = subresource.getId();
-    if (exists(SubResourceVF.class, uuid)) {
-      rvf = readSubResourceVF(uuid).get();
+    if (exists(ResourceVF.class, uuid)) {
+      rvf = readResourceVF(uuid).get();
     } else {
-      rvf = fg.addVertex(SubResourceVF.class);
+      rvf = fg.addVertex(ResourceVF.class);
       rvf.setUuid(uuid.toString());
     }
 
-    rvf.setSub(subresource.getSub());
+    rvf.setCargo(subresource.getCargo());
     rvf.setState(subresource.getState().toString());
-    Optional<ResourceVF> parentVF = readResourceVF(UUID.fromString(subresource.getParentResourcePointer().getIdentifier()));
+    Optional<ResourceVF> parentVF = readResourceVF(UUID.fromString(subresource.getParentResourcePointer().get().getIdentifier()));
     rvf.setParentResource(parentVF.get());
 
     setAlexandriaVFProperties(subresource, rvf);
@@ -249,14 +249,6 @@ public class Storage {
     return Optional.ofNullable(results.get(0));
   }
 
-  private Optional<SubResourceVF> readSubResourceVF(UUID uuid) {
-    List<SubResourceVF> results = fg.V(SubResourceVF.class).has(IDENTIFIER_PROPERTY, uuid.toString()).toList();
-    if (results.isEmpty()) {
-      return Optional.empty();
-    }
-    return Optional.ofNullable(results.get(0));
-  }
-
   private Optional<AnnotationVF> readAnnotationVF(UUID uuid) {
     List<AnnotationVF> results = fg.V(AnnotationVF.class).has(IDENTIFIER_PROPERTY, uuid.toString()).toList();
     if (results.isEmpty()) {
@@ -283,27 +275,29 @@ public class Storage {
     TentativeAlexandriaProvenance provenance = deframeProvenance(rvf);
     UUID uuid = getUUID(rvf);
     AlexandriaResource resource = new AlexandriaResource(uuid, provenance);
-    resource.setRef(rvf.getRef());
+    resource.setCargo(rvf.getCargo());
     resource.setState(AlexandriaState.valueOf(rvf.getState()));
     for (AnnotationVF annotationVF : rvf.getAnnotatedBy()) {
       AlexandriaAnnotation annotation = deframeAnnotation(annotationVF);
       resource.addAnnotation(annotation);
     }
+    ResourceVF parentResource = rvf.getParentResource();
+    if (parentResource != null) {
+      resource.setParentResourcePointer(new AccountablePointer<AlexandriaResource>(AlexandriaResource.class, parentResource.getUuid()));
+    }
     return resource;
   }
 
-  private AlexandriaSubResource deframeSubResource(SubResourceVF srvf) {
+  private AlexandriaResource deframeSubResource(ResourceVF srvf) {
     TentativeAlexandriaProvenance provenance = deframeProvenance(srvf);
     UUID uuid = getUUID(srvf);
-    AlexandriaSubResource subResource = new AlexandriaSubResource(uuid, provenance);
-    subResource.setSub(srvf.getSub());
+    AlexandriaResource subResource = new AlexandriaResource(uuid, provenance);
+    subResource.setCargo(srvf.getCargo());
     subResource.setState(AlexandriaState.valueOf(srvf.getState()));
     for (AnnotationVF annotationVF : srvf.getAnnotatedBy()) {
       AlexandriaAnnotation annotation = deframeAnnotation(annotationVF);
       subResource.addAnnotation(annotation);
     }
-    ResourceVF parentResource = srvf.getParentResource();
-    subResource.setParentResourcePointer(new AccountablePointer<AlexandriaResource>(AlexandriaResource.class, parentResource.getUuid()));
     return subResource;
   }
 
@@ -351,7 +345,7 @@ public class Storage {
     vf.setProvenanceWhy(provenance.getWhy());
   }
 
-  public Set<AlexandriaSubResource> readSubResources(UUID uuid) {
+  public Set<AlexandriaResource> readSubResources(UUID uuid) {
     ResourceVF resourcevf = readResourceVF(uuid).orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
     return resourcevf.getSubResources().stream()//
         .map(vf -> deframeSubResource(vf))//

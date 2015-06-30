@@ -24,7 +24,7 @@ public class QueryingFixture extends ResourceFixture {
   }
 
   public void withReference(String reference) {
-    resource.setRef(reference);
+    resource.setCargo(reference);
   }
 
   public void withAnnotation(String id) {

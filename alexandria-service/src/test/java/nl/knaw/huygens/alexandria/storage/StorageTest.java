@@ -8,14 +8,14 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.UUID;
 
-import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
-
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.Test;
+
+import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
 public class StorageTest {
 
@@ -30,7 +30,7 @@ public class StorageTest {
     String why = "why";
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(who, when, why);
     AlexandriaResource resource = new AlexandriaResource(id, provenance);
-    resource.setRef("reference");
+    resource.setCargo("reference");
     logGraphAsJson();
     Log.info("resource={}", resource);
     storage.createOrUpdateResource(resource);
@@ -41,7 +41,7 @@ public class StorageTest {
 
     logGraphAsJson();
     Log.info("read={}", read);
-    assertThat(read).isEqualToComparingOnlyGivenFields(resource, "ref", "id", "state");
+    assertThat(read).isEqualToComparingOnlyGivenFields(resource, "cargo", "id", "state");
     assertThat(read.getProvenance()).isEqualToComparingOnlyGivenFields(resource.getProvenance(), "who", "why", "when");
   }
 

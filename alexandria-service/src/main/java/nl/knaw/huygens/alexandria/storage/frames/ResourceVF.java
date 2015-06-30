@@ -5,20 +5,31 @@ import java.util.List;
 import nl.knaw.huygens.alexandria.storage.Labels;
 import peapod.annotations.Edge;
 import peapod.annotations.In;
+import peapod.annotations.Out;
 import peapod.annotations.Vertex;
 
 @Vertex(Labels.RESOURCE)
 public abstract class ResourceVF extends AlexandriaVF {
-  public abstract String getRef();
+  static final String PART_OF = "part_of";
 
-  public abstract void setRef(String ref);
+  public abstract String getCargo();
+
+  public abstract void setCargo(String cargo);
 
   @In
   @Edge(AnnotationVF.ANNOTATES_RESOURCE)
   public abstract List<AnnotationVF> getAnnotatedBy();
 
   @In
-  @Edge(SubResourceVF.PART_OF)
-  public abstract List<SubResourceVF> getSubResources();
+  @Edge(PART_OF)
+  public abstract List<ResourceVF> getSubResources();
+
+  @Out
+  @Edge(PART_OF)
+  public abstract ResourceVF getParentResource();
+
+  @Out
+  @Edge(PART_OF)
+  public abstract void setParentResource(ResourceVF resourceVF);
 
 }

@@ -10,7 +10,7 @@ import nl.knaw.huygens.alexandria.model.AccountablePointer;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.AlexandriaSubResource;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
@@ -36,7 +36,7 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
       resource = new AlexandriaResource(uuid, provenance);
       newlyCreated = true;
     }
-    resource.setRef(ref);
+    resource.setCargo(ref);
     storage.createOrUpdateResource(resource);
 
     return newlyCreated;
@@ -90,27 +90,22 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
   }
 
   @Override
-  public Set<AlexandriaSubResource> readSubResources(UUID uuid) {
+  public Set<AlexandriaResource> readSubResources(UUID uuid) {
     return storage.readSubResources(uuid);
   }
 
   @Override
-  public AlexandriaSubResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance) {
-    AlexandriaSubResource subresource = new AlexandriaSubResource(uuid, provenance);
-    subresource.setSub(sub);
+  public AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance) {
+    AlexandriaResource subresource = new AlexandriaResource(uuid, provenance);
+    subresource.setCargo(sub);
     subresource.setParentResourcePointer(new AccountablePointer<AlexandriaResource>(AlexandriaResource.class, parentUuid.toString()));
     storage.createSubResource(subresource);
     return subresource;
   }
 
   @Override
-  public Optional<AlexandriaSubResource> readSubResource(UUID uuid) {
+  public Optional<AlexandriaResource> readSubResource(UUID uuid) {
     return storage.readSubResource(uuid);
-  }
-
-  @Override
-  public AlexandriaAnnotation annotate(AlexandriaSubResource subresource, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
-    return null;
   }
 
 }

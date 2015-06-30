@@ -9,11 +9,11 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.CreationRequest;
 import nl.knaw.huygens.alexandria.endpoint.ProvenancePrototype;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
-import nl.knaw.huygens.alexandria.model.AlexandriaSubResource;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
-class SubResourceCreationRequest implements CreationRequest<AlexandriaSubResource> {
+class SubResourceCreationRequest implements CreationRequest<AlexandriaResource> {
 
   private boolean subResource;
   private UUID parentId;
@@ -26,7 +26,7 @@ class SubResourceCreationRequest implements CreationRequest<AlexandriaSubResourc
   }
 
   @Override
-  public AlexandriaSubResource execute(AlexandriaService service) {
+  public AlexandriaResource execute(AlexandriaService service) {
     Log.trace("executing, service=[{}]", service);
 
     uuid = providedUUID().orElse(UUID.randomUUID());

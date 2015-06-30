@@ -7,7 +7,6 @@ import java.util.UUID;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.AlexandriaSubResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
 public interface AlexandriaService {
@@ -21,13 +20,13 @@ public interface AlexandriaService {
    */
   boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance);
 
-  AlexandriaSubResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance);
+  AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance);
 
   Optional<AlexandriaResource> readResource(UUID uuid);
 
-  Optional<AlexandriaSubResource> readSubResource(UUID uuid);
+  Optional<AlexandriaResource> readSubResource(UUID uuid);
 
-  Set<AlexandriaSubResource> readSubResources(UUID uuid);
+  Set<AlexandriaResource> readSubResources(UUID uuid);
 
   AlexandriaAnnotationBody createAnnotationBody(UUID uuid, Optional<String> type, String value, TentativeAlexandriaProvenance provenance);
 
@@ -36,8 +35,6 @@ public interface AlexandriaService {
   Optional<AlexandriaAnnotationBody> readAnnotationBody(UUID uuid);
 
   AlexandriaAnnotation annotate(AlexandriaResource resource, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance);
-
-  AlexandriaAnnotation annotate(AlexandriaSubResource subresource, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance);
 
   AlexandriaAnnotation annotate(AlexandriaAnnotation annotation, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance);
 

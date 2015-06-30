@@ -112,7 +112,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   public Response getResourceRef(@PathParam("uuid") final UUIDParam uuidParam) {
     AlexandriaResource resource = alexandriaService.readResource(uuidParam.getValue())//
         .orElseThrow(resourceNotFoundForId(uuidParam));
-    return Response.ok(new RefEntity(resource.getRef())).build();
+    return Response.ok(new RefEntity(resource.getCargo())).build();
   }
 
   // Sub-resource delegation

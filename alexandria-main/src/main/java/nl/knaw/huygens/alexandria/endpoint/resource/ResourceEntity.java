@@ -30,7 +30,7 @@ public class ResourceEntity extends AbstractAnnotatableEntity {
   }
 
   public String getRef() {
-    return resource.getRef();
+    return resource.getCargo();
   }
 
   @Override
