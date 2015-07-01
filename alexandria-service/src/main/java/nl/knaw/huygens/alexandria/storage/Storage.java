@@ -25,29 +25,39 @@ import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.structure.Graph.Features;
 import org.apache.tinkerpop.gremlin.structure.Graph.Features.GraphFeatures;
 import org.apache.tinkerpop.gremlin.structure.Transaction;
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import peapod.FramedGraph;
 import peapod.FramedGraphTraversal;
 import peapod.annotations.Vertex;
 
 public class Storage {
   private static final String IDENTIFIER_PROPERTY = "uuid";
-  protected static final String DUMPFILE = "dump.json";
-  private static Graph g;
-  private static FramedGraph fg;
-  private static boolean transactionsSupported;
-  protected static boolean persistenceSupported;
+  private static final String DUMPFILE = "dump.json";
+
+  private final Graph graph;
+  private final FramedGraph framedGraph;
 
   private Transaction tx;
 
+  public Storage() {
+    this(TinkerGraph.open());
+  }
+
   public Storage(Graph graph) {
-    g = graph;
-    GraphFeatures features = g.features().graph();
-    transactionsSupported = features.supportsTransactions();
-    persistenceSupported = features.supportsPersistence();
-    fg = new FramedGraph(g, ResourceVF.class.getPackage());
+    this.graph = graph;
+    this.framedGraph = new FramedGraph(graph, ResourceVF.class.getPackage());
+  }
+
+  public boolean supportsTransactions() {
+    return graphFeatures().supportsTransactions();
+  }
+
+  public boolean supportsPersistence() {
+    return graphFeatures().supportsPersistence();
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -55,7 +65,7 @@ public class Storage {
     if (clazz.getAnnotationsByType(Vertex.class).length == 0) {
       throw new RuntimeException("Class " + clazz + " has no peapod @Vertex annotation, are you sure it is the correct class?");
     }
-    FramedGraphTraversal fgt = fg.V(clazz).has(IDENTIFIER_PROPERTY, uuid.toString());
+    FramedGraphTraversal fgt = framedGraph.V(clazz).has(IDENTIFIER_PROPERTY, uuid.toString());
     return fgt.tryNext().isPresent();
   }
 
@@ -79,7 +89,7 @@ public class Storage {
     if (exists(ResourceVF.class, uuid)) {
       rvf = readResourceVF(uuid).get();
     } else {
-      rvf = fg.addVertex(ResourceVF.class);
+      rvf = framedGraph.addVertex(ResourceVF.class);
       rvf.setUuid(uuid.toString());
     }
 
@@ -99,7 +109,7 @@ public class Storage {
     if (exists(ResourceVF.class, uuid)) {
       rvf = readResourceVF(uuid).get();
     } else {
-      rvf = fg.addVertex(ResourceVF.class);
+      rvf = framedGraph.addVertex(ResourceVF.class);
       rvf.setUuid(uuid.toString());
     }
 
@@ -123,7 +133,7 @@ public class Storage {
     if (exists(AnnotationVF.class, uuid)) {
       avf = readAnnotationVF(uuid).get();
     } else {
-      avf = fg.addVertex(AnnotationVF.class, uuid);
+      avf = framedGraph.addVertex(AnnotationVF.class, uuid);
       avf.setUuid(uuid.toString());
     }
 
@@ -157,7 +167,7 @@ public class Storage {
   }
 
   public Optional<AlexandriaAnnotationBody> findAnnotationBodyWithTypeAndValue(Optional<String> type, String value) {
-    List<AnnotationBodyVF> results = fg.V(AnnotationBodyVF.class)//
+    List<AnnotationBodyVF> results = framedGraph.V(AnnotationBodyVF.class)//
         .has("type", type.orElse(""))//
         .has("value", value)//
         .toList();
@@ -168,19 +178,19 @@ public class Storage {
   }
 
   public void writeAnnotationBody(AlexandriaAnnotationBody body) {
-    AnnotationBodyVF abvf = fg.addVertex(AnnotationBodyVF.class);
+    AnnotationBodyVF abvf = framedGraph.addVertex(AnnotationBodyVF.class);
     setAlexandriaVFProperties(body, abvf);
     abvf.setType(body.getType());
     abvf.setValue(body.getValue());
   }
 
   public void dump(OutputStream os) throws IOException {
-    g.io(new GraphSONIo.Builder()).writer().create().writeGraph(os, g);
+    graph.io(new GraphSONIo.Builder()).writer().create().writeGraph(os, graph);
   }
 
   public void loadFromDisk(String file) {
     try {
-      g.io(new GraphSONIo.Builder()).readGraph(file);
+      graph.io(new GraphSONIo.Builder()).readGraph(file);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -188,7 +198,7 @@ public class Storage {
 
   public void saveToDisk(String file) {
     try {
-      g.io(new GraphSONIo.Builder()).writeGraph(file);
+      graph.io(new GraphSONIo.Builder()).writeGraph(file);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -196,37 +206,45 @@ public class Storage {
 
   // private methods
 
+  private GraphFeatures graphFeatures() {
+    return features().graph();
+  }
+
+  private Features features() {
+    return graph.features();
+  }
+
   private void startTransaction() {
-    if (transactionsSupported) {
-      tx = fg.tx();
+    if (supportsTransactions()) {
+      tx = framedGraph.tx();
     }
   }
 
   private void commitTransaction() {
-    if (transactionsSupported) {
+    if (supportsTransactions()) {
       tx.commit();
       tx.close();
     }
-    if (!persistenceSupported) {
+    if (!supportsPersistence()) {
       saveToDisk(DUMPFILE);
     }
   }
 
   private void rollbackTransaction() {
-    if (transactionsSupported) {
+    if (supportsTransactions()) {
       tx.rollback();
       tx.close();
     } else {
-      Log.error("rollback called, but transactions are not supported by graph {}", g);
+      Log.error("rollback called, but transactions are not supported by graph {}", graph);
     }
   }
 
   private Optional<ResourceVF> readResourceVF(UUID uuid) {
-    return firstOrEmpty(fg.V(ResourceVF.class).has(IDENTIFIER_PROPERTY, uuid.toString()).toList());
+    return firstOrEmpty(framedGraph.V(ResourceVF.class).has(IDENTIFIER_PROPERTY, uuid.toString()).toList());
   }
 
   private Optional<AnnotationVF> readAnnotationVF(UUID uuid) {
-    return firstOrEmpty(fg.V(AnnotationVF.class).has(IDENTIFIER_PROPERTY, uuid.toString()).toList());
+    return firstOrEmpty(framedGraph.V(AnnotationVF.class).has(IDENTIFIER_PROPERTY, uuid.toString()).toList());
   }
 
   private <T> Optional<T> firstOrEmpty(List<T> results) {
@@ -234,13 +252,13 @@ public class Storage {
   }
 
   private AnnotationVF createAnnotationVF(AlexandriaAnnotation newAnnotation) {
-    AnnotationVF avf = fg.addVertex(AnnotationVF.class);
+    AnnotationVF avf = framedGraph.addVertex(AnnotationVF.class);
     setAlexandriaVFProperties(newAnnotation, avf);
 
     avf.setState(newAnnotation.getState().toString());
 
     String bodyId = newAnnotation.getBody().getId().toString();
-    List<AnnotationBodyVF> results = fg.V(AnnotationBodyVF.class).has(IDENTIFIER_PROPERTY, bodyId).toList();
+    List<AnnotationBodyVF> results = framedGraph.V(AnnotationBodyVF.class).has(IDENTIFIER_PROPERTY, bodyId).toList();
     AnnotationBodyVF bodyVF = results.get(0);
 
     avf.setBody(bodyVF);
