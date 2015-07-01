@@ -64,7 +64,7 @@ public abstract class EndpointTest extends JerseyTest {
     return Entity.json(string.replace("'", "\""));
   }
 
-  private static AlexandriaConfiguration testConfiguration() {
+  protected static AlexandriaConfiguration testConfiguration() {
     return new AlexandriaConfiguration() {
       @Override
       public URI getBaseURI() {

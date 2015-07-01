@@ -1,13 +1,9 @@
-package nl.knaw.huygens.alexandria.endpoint.resource;
+package nl.knaw.huygens.alexandria.storage;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.Optional;
-import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -20,16 +16,17 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
-import nl.knaw.huygens.alexandria.endpoint.MockedServiceEndpointTest;
-import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.endpoint.resource.ResourceCreationRequestBuilder;
+import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
+import nl.knaw.huygens.alexandria.endpoint.resource.ResourcePrototype;
+import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
-public class ResourcesEndpointTest extends MockedServiceEndpointTest {
+public class ResourcesEndpointTest extends TinkergraphServiceEndpointTest {
   private static final String ROOTPATH = EndpointPaths.RESOURCES;
   ObjectMapper om = new ObjectMapper();
 
@@ -40,7 +37,6 @@ public class ResourcesEndpointTest extends MockedServiceEndpointTest {
 
   @Test
   public void testGettingANonExistingResourceGivesANotFoundError() {
-    when(SERVICE_MOCK.readResource(any(UUID.class))).thenReturn(Optional.empty());
     Response response = target(ROOTPATH).path("c28626d4-493a-4204-83d9-e9ae17e15654").request().get();
     Log.debug("response={}", response);
     assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
@@ -49,12 +45,9 @@ public class ResourcesEndpointTest extends MockedServiceEndpointTest {
   @Test
   public void testPost() {
     TentativeAlexandriaProvenance provenance = mock(TentativeAlexandriaProvenance.class);
-    UUID id = UUID.randomUUID();
-    AlexandriaResource resource = new AlexandriaResource(id, provenance);
-    when(SERVICE_MOCK.readResource(any(UUID.class))).thenReturn(Optional.of(resource));
     Response response = target(ROOTPATH).request().post(jsonEntity("{'resource':{'ref':'REF'}}"));
     Log.debug("response={}", response);
-    assertThat(response.getLocation().toString()).contains("/resources/" + id);
+    assertThat(response.getLocation().toString()).contains("/resources/");
     assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
   }
 
@@ -68,7 +61,7 @@ public class ResourcesEndpointTest extends MockedServiceEndpointTest {
   public void testTwoPutsWillNotProduceAnError() throws JsonParseException, JsonMappingException, IOException {
     AlexandriaService service = mock(AlexandriaService.class);
     ResourceCreationRequestBuilder requestBuilder = new ResourceCreationRequestBuilder();
-    LocationBuilder locationBuilder = new LocationBuilder(new MockConfiguration(), new EndpointPathResolver());
+    LocationBuilder locationBuilder = new LocationBuilder(testConfiguration(), new EndpointPathResolver());
     ResourceEntityBuilder entityBuilder = new ResourceEntityBuilder(locationBuilder);
     ResourcesEndpoint re = new ResourcesEndpoint(service, requestBuilder, locationBuilder, entityBuilder);
 
