@@ -1,12 +1,8 @@
-// Copied from Pragmatists' Concordion-extender. See https://github.com/Pragmatists/concordion-rest-extension
-
 window.addEventListener('load', ready, false);
 
 function ready(){
-	
-	enableCodeMirror('.json:not(.rest-failure)', {name: 'javascript', json: true});
+	enableCodeMirror('.json.rest-success', {name: 'javascript', json: true});
 	enableCodeMirrorMerge('.json.rest-failure', {name: 'javascript', json: true});
-
 }
 
 function unescape(input){
@@ -21,8 +17,8 @@ function enableCodeMirror(selector, mode){
 		jsons = document.querySelectorAll(selector);
 
 	for(i=0; i<jsons.length; i++){
-
 		value = unescape(jsons[i].innerHTML);
+		console.log("unescaped: " + value);
 		jsons[i].innerHTML = "";
 
 		editor = CodeMirror(jsons[i], {
@@ -34,8 +30,7 @@ function enableCodeMirror(selector, mode){
 	}	
 }
 
-function enableCodeMirrorMerge(selector, mode){
-
+function enableCodeMirrorMerge(selector, mode) {
 	var jsons = document.querySelectorAll(selector);
 	var i;
 	
@@ -44,8 +39,7 @@ function enableCodeMirrorMerge(selector, mode){
 	}	
 };
 
-function mergeView(target, mode){
-
+function mergeView(target, mode) {
 	var editor,
 		expectedValue, actualValue, 
 		expected = target.querySelector('.expected'),

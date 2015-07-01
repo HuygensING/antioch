@@ -3,9 +3,11 @@ package nl.knaw.huygens.alexandria.concordion;
 import org.concordion.api.Element;
 import org.concordion.api.listener.AssertEqualsListener;
 import org.concordion.api.listener.AssertFailureEvent;
+import org.concordion.api.listener.AssertFalseListener;
 import org.concordion.api.listener.AssertSuccessEvent;
+import org.concordion.api.listener.AssertTrueListener;
 
-public class RestResultRenderer implements AssertEqualsListener {
+public class RestResultRenderer implements AssertEqualsListener, AssertTrueListener, AssertFalseListener {
   @Override
   public void successReported(AssertSuccessEvent event) {
     event.getElement().addStyleClass("rest-success").appendNonBreakingSpaceIfBlank();
@@ -32,6 +34,9 @@ public class RestResultRenderer implements AssertEqualsListener {
   }
 
   private String convertToString(Object object) {
-    return object == null ? "(null)" : String.valueOf(object);
+    if (object == null) {
+      return "(null)";
+    }
+    return "" + object;
   }
 }

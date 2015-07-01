@@ -73,12 +73,21 @@
         </div>
     </div>
 
-    <div c:execute="clear()" class="example">
-        <h3>What happens when I POST an empty body when creating a new resource?</h3>
+    <div id="post-empty" class="panel panel-default" c:execute="clearStorage()">
+        <div class="panel-heading"><b>What happens when I POST an empty body when creating a new resource?</b></div>
+        <div class="panel-body">
+            <h:request>
+                When I <h:post>/resources</h:post> the following body:
+                <pre class="json" c:execute="body(#TEXT)"> </pre>
+                then I should receive <h:status>400 Bad Request</h:status> and the response body contains:
+                <h:jsonResponse>[{"message":"may not be null"}]</h:jsonResponse>
+            </h:request>
+        </div>
 
+        <!--
         <ul>
             <li>When I <b c:set="#method">POST</b>
-                <pre c:execute="body(#TEXT)"><!-- Intentionally left empty --></pre>
+                <pre c:execute="body(#TEXT)"></pre>
                 to <code c:set="#endpoint"><b>/resources</b></code></li>
 
             <li c:execute="request(#method, #endpoint)">Then:
@@ -96,6 +105,7 @@
                 </ol>
             </li>
         </ul>
+        -->
     </div>
 
     <div c:execute="clear()" class="example">
