@@ -36,7 +36,7 @@
     <jackson.version>2.6.0-rc3</jackson.version>
     <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
     <jdk.version>1.8</jdk.version>
-    <jersey.version>2.18</jersey.version>
+    <jersey.version>2.19</jersey.version>
     <jersey2-guice.version>0.10</jersey2-guice.version>
     <junit.version>4.12</junit.version>
     <junitparams.version>1.0.4</junitparams.version>
@@ -46,7 +46,7 @@
     <maven-compiler.version>3.1</maven-compiler.version>
     <maven-surefire.version>2.18.1</maven-surefire.version>
     <maven-war.version>2.3</maven-war.version>
-    <mockito.version>2.0.24-beta</mockito.version>
+    <mockito.version>2.0.26-beta</mockito.version>
     <neo4j-gremlin.version>3.0.0.M7</neo4j-gremlin.version>
     <peapod.version>0.2.0</peapod.version>
     <plugin.scm-publish.version>1.1</plugin.scm-publish.version>
