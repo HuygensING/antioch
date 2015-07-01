@@ -7,6 +7,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.exception.ErrorEntityBuilder;
 
 @Singleton
 @Provider
@@ -16,7 +17,7 @@ public class AnyExceptionMapper implements ExceptionMapper<Exception> {
   public Response toResponse(Exception e) {
     Log.error("error:{}", e);
     return Response//
-        .status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).type("text/plain").build();
+        .status(Status.INTERNAL_SERVER_ERROR).entity(ErrorEntityBuilder.build(e)).build();
   }
 
 }
