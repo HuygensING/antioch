@@ -2,7 +2,6 @@ package nl.knaw.huygens.alexandria.concordion;
 
 import static java.lang.String.format;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
-import static org.mockito.Mockito.mock;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
@@ -43,16 +42,13 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.TestProperties;
 import org.junit.BeforeClass;
-import org.mockito.Mockito;
 
 @Extensions(RestExtension.class)
 public class RestFixture extends JerseyTest {
 
   private static final AlexandriaConfiguration CONFIG = testConfiguration();
 
-  private static final Storage STORAGE_MOCK = mock(Storage.class);
-
-  private static final AlexandriaService service = new TinkerpopAlexandriaService(STORAGE_MOCK);
+  private static TinkerpopAlexandriaService service = new TinkerpopAlexandriaService(new Storage());
 
   private static ResourceConfig application;
 
@@ -124,9 +120,6 @@ public class RestFixture extends JerseyTest {
   public void clear() {
     Log.debug("Clearing ApiFixture");
 
-    Log.trace("+- resetting (mocked) Storage layer");
-    Mockito.reset(STORAGE_MOCK);
-
     target = client().target(getBaseUri());
     Log.trace("+- refreshed WebTarget: [{}]", target);
 
@@ -135,6 +128,11 @@ public class RestFixture extends JerseyTest {
     response = null;
     entity = Optional.empty();
     Log.trace("+- done (request details cleared)");
+  }
+
+  public void clearStorage() {
+    Log.debug("Clearing Storage");
+    service.setStorage(new Storage());
   }
 
   public RestFixture method(String method) {
@@ -221,10 +219,6 @@ public class RestFixture extends JerseyTest {
 
   protected AlexandriaService service() {
     return service;
-  }
-
-  protected Storage storage() {
-    return STORAGE_MOCK;
   }
 
   private Optional<UUID> parse(String idStr) {

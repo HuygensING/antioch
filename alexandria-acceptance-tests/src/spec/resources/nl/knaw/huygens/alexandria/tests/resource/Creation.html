@@ -24,11 +24,12 @@
             then I should receive <h:status>201 Created</h:status> and the response contains
             a Location header starting with <h:location type="base">https://{host}/resources/</h:location>,
             followed by a <h:location type="uuid">well-formed UUID</h:location>.
+            The location is: <h:location type="full"/>.
             The response body is <h:responseBody/>.
         </h:request>
     </div>
 
-    <div class="example">
+    <div class="example" c:execute="clearStorage()">
         <h3>How can I create an external resource with a specific UUID?</h3>
 
         <h:request>
@@ -44,7 +45,26 @@
                     }
                 }
             } </h:jsonBody>
-            then I should receive <h:status>204 No Content</h:status> and the response body is <h:responseBody/>.
+            then I should receive <h:status>201 Created</h:status> and the response body is <h:responseBody/>.
+        </h:request>
+        <h:request>
+            Then <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:get>
+            should return <h:status>200 OK</h:status> with a response body containing
+            <h:jsonResponse>{ "resource": {
+                "id" : "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+                "ref": "http://www.example.com/titles/path/to/title/resource",
+                "^provenance": "https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/provenance"
+            } }</h:jsonResponse>
+        </h:request>
+        <h:request>
+            And <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/provenance</h:get>
+            should return <h:status>200 OK</h:status> with a response body containing
+            <h:jsonResponse>{ "provenance": {
+                "who": "nederlab",
+                "why": "some reason",
+                "when": "{date.beforeNow}",
+                "^what": "https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01"
+            } } </h:jsonResponse>
         </h:request>
     </div>
 

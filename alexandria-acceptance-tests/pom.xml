@@ -15,18 +15,30 @@
       <version>${project.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.reflections</groupId>
-      <artifactId>reflections</artifactId>
-      <version>${reflections.version}</version>
-    </dependency>
-
     <!-- Tests -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>alexandria-test</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.reflections</groupId>
+      <artifactId>reflections</artifactId>
+      <version>${reflections.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>${tinkerpop.groupId}</groupId>
+      <artifactId>gremlin-core</artifactId>
+      <version>${tinkerpop.version}</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>slf4j-log4j12</artifactId>
+          <groupId>org.slf4j</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
