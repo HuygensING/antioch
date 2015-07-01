@@ -4,7 +4,9 @@ import static org.assertj.core.api.StrictAssertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
+import java.util.UUID;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -23,7 +25,6 @@ import nl.knaw.huygens.alexandria.endpoint.resource.ResourceCreationRequestBuild
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourcePrototype;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
-import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class ResourcesEndpointTest extends TinkergraphServiceEndpointTest {
@@ -44,7 +45,6 @@ public class ResourcesEndpointTest extends TinkergraphServiceEndpointTest {
 
   @Test
   public void testPost() {
-    TentativeAlexandriaProvenance provenance = mock(TentativeAlexandriaProvenance.class);
     Response response = target(ROOTPATH).request().post(jsonEntity("{'resource':{'ref':'REF'}}"));
     Log.debug("response={}", response);
     assertThat(response.getLocation().toString()).contains("/resources/");
@@ -52,9 +52,19 @@ public class ResourcesEndpointTest extends TinkergraphServiceEndpointTest {
   }
 
   @Test
-  public void testPostResource() {
-    // Object entity;
-    // target(EndpointPaths.RESOURCES).request().post(Entity.json(entity));
+  public void testPutAndAnnotate() {
+    UUID uuid = UUID.randomUUID();
+    Entity<String> resourcePrototype = jsonEntity("{'resource':{'id':'" + uuid.toString() + "','ref':'Jan Klaassen'}}");
+    Response response = target(ROOTPATH).path(uuid.toString()).request().put(resourcePrototype);
+    Log.debug("response={}", response);
+    assertThat(response.getLocation().toString()).contains("/resources/");
+    assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
+
+    Entity<String> annotationPrototype = jsonEntity("{'annotation':{'type':'Tag','value':'Bookmark'}}");
+    Response annotateResponse = target(ROOTPATH).path(uuid.toString()).path("annotations").request().post(annotationPrototype);
+    Log.debug("response={}", annotateResponse);
+    assertThat(annotateResponse.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
+    Log.debug("response.location={}", annotateResponse.getLocation());
   }
 
   // @Test
