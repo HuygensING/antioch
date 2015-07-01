@@ -1,8 +1,10 @@
 package nl.knaw.huygens.alexandria.endpoint;
 
+import static java.util.stream.Collectors.toSet;
+
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -11,6 +13,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import com.google.common.collect.ImmutableMap;
 
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.Log;
@@ -28,9 +32,9 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   protected final AnnotationCreationRequestBuilder requestBuilder;
   protected final UUID uuid;
 
-  protected AnnotatableObjectAnnotationsEndpoint(AlexandriaService service,    //
-      AnnotationCreationRequestBuilder requestBuilder,    //
-      LocationBuilder locationBuilder,    //
+  protected AnnotatableObjectAnnotationsEndpoint(AlexandriaService service,                //
+      AnnotationCreationRequestBuilder requestBuilder,                //
+      LocationBuilder locationBuilder,                //
       final UUIDParam uuidParam) {
     Log.trace("resourceService=[{}], uuidParam=[{}]", service, uuidParam);
     this.service = service;
@@ -47,8 +51,9 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   @ApiOperation(value = "get the annotations", response = AnnotationEntity.class)
   public Response get() {
     final Set<AlexandriaAnnotation> annotations = getAnnotableObject().getAnnotations();
-    final Set<AnnotationEntity> outgoingAnnos = annotations.stream().map(AnnotationEntity::of).collect(Collectors.toSet());
-    return Response.ok(outgoingAnnos).build();
+    Map<String, Set<AnnotationEntity>> entity = ImmutableMap.of("annotations", annotations.stream()//
+        .map((AlexandriaAnnotation a) -> AnnotationEntity.of(a).withLocationBuilder(locationBuilder)).collect(toSet()));
+    return Response.ok(entity).build();
   }
 
   @POST
