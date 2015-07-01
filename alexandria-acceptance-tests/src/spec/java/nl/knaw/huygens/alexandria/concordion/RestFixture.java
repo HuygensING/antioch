@@ -52,7 +52,6 @@ public class RestFixture extends JerseyTest {
 
   private static final Storage STORAGE_MOCK = mock(Storage.class);
 
-  //private static final AlexandriaService SERVICE_MOCK = mock(AlexandriaService.class);
   private static final AlexandriaService service = new TinkerpopAlexandriaService(STORAGE_MOCK);
 
   private static ResourceConfig application;
@@ -121,15 +120,6 @@ public class RestFixture extends JerseyTest {
       }
     };
   }
-
-//  public String base() {
-//    return baseOf(location());
-//  }
-//
-//  public String uuidQuality() {
-//    final String idStr = tailOf(location());
-//    return parse(idStr).map(uuid -> "well-formed UUID").orElseGet(malformedDescription(idStr));
-//  }
 
   public void clear() {
     Log.debug("Clearing ApiFixture");
