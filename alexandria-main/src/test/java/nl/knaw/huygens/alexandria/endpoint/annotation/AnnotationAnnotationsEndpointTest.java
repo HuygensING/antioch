@@ -4,11 +4,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.ws.rs.core.Response;
+
+import org.junit.Test;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.collect.ImmutableSet;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
@@ -20,11 +26,6 @@ import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-
-import org.junit.Test;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.collect.ImmutableSet;
 
 public class AnnotationAnnotationsEndpointTest {
   @Test
@@ -67,11 +68,13 @@ public class AnnotationAnnotationsEndpointTest {
     Log.info("response={}", response);
 
     @SuppressWarnings("unchecked")
-    Set<AnnotationEntity> entity = (Set<AnnotationEntity>) response.getEntity();
+    Map<String, Object> entity = (Map<String, Object>) response.getEntity();
     Log.info("entity={}", entity);
     // ObjectMapper om = new ObjectMapper();
     // Log.info("json={}", om.writeValueAsString(entity));
-    assertThat(entity).hasSize(1);
-    assertThat(entity.iterator().next().getId()).isEqualTo(uuid1);
+    assertThat(entity).containsKeys("annotations");
+    Set<AnnotationEntity> list = (Set<AnnotationEntity>) entity.get("annotations");
+    assertThat(list).hasSize(1);
+    assertThat(list.iterator().next().getId()).isEqualTo(uuid1);
   }
 }
