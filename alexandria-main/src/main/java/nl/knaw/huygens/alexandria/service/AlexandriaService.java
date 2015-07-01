@@ -26,8 +26,6 @@ public interface AlexandriaService {
 
   Optional<AlexandriaResource> readResource(UUID uuid);
 
-  Optional<AlexandriaResource> readSubResource(UUID uuid);
-
   Set<AlexandriaResource> readSubResources(UUID uuid);
 
   AlexandriaAnnotationBody createAnnotationBody(UUID uuid, Optional<String> type, String value, TentativeAlexandriaProvenance provenance);

@@ -104,11 +104,6 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
   }
 
   @Override
-  public Optional<AlexandriaResource> readSubResource(UUID uuid) {
-    return storage.readSubResource(uuid);
-  }
-
-  @Override
   public Optional<? extends Accountable> dereference(AccountablePointer<? extends Accountable> pointer) {
     Class<? extends Accountable> aClass = pointer.getAccountableClass();
     UUID uuid = UUID.fromString(pointer.getIdentifier());

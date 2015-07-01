@@ -10,6 +10,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.structure.Graph.Features.GraphFeatures;
+import org.apache.tinkerpop.gremlin.structure.Transaction;
+import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.Accountable;
@@ -24,10 +29,6 @@ import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
-import org.apache.tinkerpop.gremlin.structure.Graph;
-import org.apache.tinkerpop.gremlin.structure.Graph.Features.GraphFeatures;
-import org.apache.tinkerpop.gremlin.structure.Transaction;
-import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
 import peapod.FramedGraph;
 import peapod.FramedGraphTraversal;
 import peapod.annotations.Vertex;
@@ -60,10 +61,6 @@ public class Storage {
   }
 
   public Optional<AlexandriaResource> readResource(UUID uuid) {
-    return readResourceVF(uuid).map(this::deframeResource);
-  }
-
-  public Optional<AlexandriaResource> readSubResource(UUID uuid) {
     return readResourceVF(uuid).map(this::deframeResource);
   }
 
