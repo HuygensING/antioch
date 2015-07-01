@@ -15,7 +15,7 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 class SubResourceCreationRequest implements CreationRequest<AlexandriaResource> {
 
-  private boolean subResource;
+  private boolean subResourceWasCreated;
   private UUID parentId;
   private SubResourcePrototype prototype;
   private UUID uuid;
@@ -45,8 +45,8 @@ class SubResourceCreationRequest implements CreationRequest<AlexandriaResource> 
   }
 
   public boolean newResourceWasCreated() {
-    Log.trace("newResourceWasCreated: {}", subResource);
-    return subResource;
+    Log.trace("newResourceWasCreated: {}", subResourceWasCreated);
+    return subResourceWasCreated;
   }
 
   public UUID getUUID() {
