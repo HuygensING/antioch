@@ -2,7 +2,6 @@ package nl.knaw.huygens.alexandria.storage;
 
 import static java.util.stream.Collectors.toSet;
 
-import javax.inject.Inject;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.Instant;
@@ -12,7 +11,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AccountablePointer;
@@ -107,8 +105,8 @@ public class Storage {
 
     rvf.setCargo(subResource.getCargo());
     rvf.setState(subResource.getState().toString());
-    Optional<ResourceVF> parentVF = readResourceVF(UUID.fromString(subResource.getParentResourcePointer().get()
-                                                                              .getIdentifier()));
+    final UUID parentId = UUID.fromString(subResource.getParentResourcePointer().get().getIdentifier());
+    Optional<ResourceVF> parentVF = readResourceVF(parentId);
     rvf.setParentResource(parentVF.get());
 
     setAlexandriaVFProperties(subResource, rvf);
