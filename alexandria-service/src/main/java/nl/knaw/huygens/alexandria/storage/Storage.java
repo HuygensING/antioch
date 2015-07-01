@@ -44,9 +44,6 @@ public class Storage {
 
   private Transaction tx;
 
-  @Inject
-  LocationBuilder locationBuilder;
-
   public Storage(Graph graph) {
     g = graph;
     GraphFeatures features = g.features().graph();
