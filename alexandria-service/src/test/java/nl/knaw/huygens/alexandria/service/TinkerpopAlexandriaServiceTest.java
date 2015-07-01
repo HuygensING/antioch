@@ -22,8 +22,8 @@ import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.storage.Storage;
 
 public class TinkerpopAlexandriaServiceTest {
-  private static final Storage mockStorage = mock(Storage.class);
-  TinkerpopAlexandriaService service = new TinkerpopAlexandriaService(mockStorage);
+  private final Storage mockStorage = mock(Storage.class);
+  private final TinkerpopAlexandriaService service = new TinkerpopAlexandriaService(mockStorage);
 
   @Test
   public void test() {
@@ -42,7 +42,7 @@ public class TinkerpopAlexandriaServiceTest {
     AlexandriaAnnotationBody body = mock(AlexandriaAnnotationBody.class);
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
     when(mockStorage.readAnnotation(id)).thenReturn(Optional.of(new AlexandriaAnnotation(id, body, provenance)));
-    AccountablePointer<AlexandriaAnnotation> ap = new AccountablePointer<AlexandriaAnnotation>(AlexandriaAnnotation.class, id.toString());
+    AccountablePointer<AlexandriaAnnotation> ap = new AccountablePointer<>(AlexandriaAnnotation.class, id.toString());
 
     Optional<? extends Accountable> optional = service.dereference(ap);
     assertThat(optional.isPresent());
@@ -54,7 +54,7 @@ public class TinkerpopAlexandriaServiceTest {
   public void testDereferenceWithNonExistingAnnotation() {
     UUID id = UUID.randomUUID();
     when(mockStorage.readAnnotation(id)).thenReturn(Optional.empty());
-    AccountablePointer<AlexandriaAnnotation> ap = new AccountablePointer<AlexandriaAnnotation>(AlexandriaAnnotation.class, id.toString());
+    AccountablePointer<AlexandriaAnnotation> ap = new AccountablePointer<>(AlexandriaAnnotation.class, id.toString());
 
     Optional<? extends Accountable> optional = service.dereference(ap);
     assertThat(optional.isPresent()).isFalse();
@@ -65,7 +65,7 @@ public class TinkerpopAlexandriaServiceTest {
     UUID id = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
     when(mockStorage.readResource(id)).thenReturn(Optional.of(new AlexandriaResource(id, provenance)));
-    AccountablePointer<AlexandriaResource> ap = new AccountablePointer<AlexandriaResource>(AlexandriaResource.class, id.toString());
+    AccountablePointer<AlexandriaResource> ap = new AccountablePointer<>(AlexandriaResource.class, id.toString());
 
     Optional<? extends Accountable> optional = service.dereference(ap);
     assertThat(optional.isPresent());

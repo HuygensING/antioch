@@ -16,10 +16,15 @@ import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 
 public class TinkerpopAlexandriaService implements AlexandriaService {
+  // not final and no constructor injection because acceptance tests need to (re-)set the storage in between tests.
   private Storage storage;
 
-  @Inject
   public TinkerpopAlexandriaService(Storage storage) {
+    this.storage = storage;
+  }
+
+  @Inject
+  public void setStorage(Storage storage) {
     this.storage = storage;
   }
 
@@ -71,12 +76,6 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
     return newAnnotation;
   }
 
-  private AlexandriaAnnotation createAnnotation(AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
-    UUID id = UUID.randomUUID();
-    AlexandriaAnnotation newAnnotation = new AlexandriaAnnotation(id, annotationbody, provenance);
-    return newAnnotation;
-  }
-
   @Override
   public AlexandriaAnnotation annotate(AlexandriaAnnotation annotation, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
     AlexandriaAnnotation newAnnotation = createAnnotation(annotationbody, provenance);
@@ -116,6 +115,11 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
     } else {
       throw new RuntimeException("unexpected accountableClass: " + aClass.getName());
     }
+  }
+
+  private AlexandriaAnnotation createAnnotation(AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
+    UUID id = UUID.randomUUID();
+    return new AlexandriaAnnotation(id, annotationbody, provenance);
   }
 
 }
