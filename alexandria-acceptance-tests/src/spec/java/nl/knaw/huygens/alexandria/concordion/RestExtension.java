@@ -33,6 +33,8 @@ public class RestExtension implements ConcordionExtension {
   public void addTo(ConcordionExtender concordionExtender) {
     registerCommands(concordionExtender);
     registerCommandToHtmlTranslator(concordionExtender);
+    registerCodeMirror(concordionExtender);
+    registerBootstrap(concordionExtender);
     registerLinkedCSS(concordionExtender);
     addHeader(concordionExtender);
 
@@ -45,6 +47,26 @@ public class RestExtension implements ConcordionExtension {
      */
     ((ConcordionBuilder) concordionExtender)
         .withEvaluatorFactory(fixture -> new FixtureEvaluator((RestFixture) fixture));
+  }
+
+  private void registerCodeMirror(ConcordionExtender concordionExtender) {
+    concordionExtender.withLinkedCSS("/codemirror/codemirror.css", new Resource("/codemirror/codemirror.css"));
+    concordionExtender.withLinkedCSS("/codemirror/merge.css", new Resource("/codemirror/merge.css"));
+    concordionExtender
+        .withLinkedCSS("/codemirror/enable-codemirror.css", new Resource("/codemirror/enable-codemirror" + ".css"));
+
+    concordionExtender.withLinkedJavaScript("/codemirror/codemirror.js", new Resource("/codemirror/codemirror.js"));
+    concordionExtender.withLinkedJavaScript("/codemirror/javascript.js", new Resource("/codemirror/javascript.js"));
+    concordionExtender
+        .withLinkedJavaScript("/codemirror/diff_match_patch.js", new Resource("/codemirror/diff_match_patch.js"));
+    concordionExtender.withLinkedJavaScript("/codemirror/merge.js", new Resource("/codemirror/merge.js"));
+    concordionExtender
+        .withLinkedJavaScript("/codemirror/enable-codemirror.js", new Resource("/codemirror/enable-codemirror.js"));
+  }
+
+  private void registerBootstrap(ConcordionExtender concordionExtender) {
+    concordionExtender.withLinkedCSS("/bootstrap/bootstrap.css", new Resource("/bootstrap/bootstrap.css"));
+    concordionExtender.withLinkedCSS("/bootstrap/enable-bootstrap.css", new Resource("/bootstrap/enable-bootstrap.css"));
   }
 
   private void addAnnotatedCommands(Reflections scanner) {
@@ -125,7 +147,7 @@ public class RestExtension implements ConcordionExtension {
   }
 
   private void registerLinkedCSS(ConcordionExtender concordionExtender) {
-    concordionExtender.withLinkedCSS("/concordion.css", new Resource("/concordion.css"));
+//    concordionExtender.withLinkedCSS("/concordion.css", new Resource("/concordion.css"));
   }
 
   private void addHeader(ConcordionExtender concordionExtender) {
