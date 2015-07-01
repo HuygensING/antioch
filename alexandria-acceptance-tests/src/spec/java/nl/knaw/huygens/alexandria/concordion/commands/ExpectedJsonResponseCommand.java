@@ -14,21 +14,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.concordion.HuygensCommand;
+import nl.knaw.huygens.alexandria.concordion.RestResultRenderer;
 import org.concordion.api.CommandCall;
 import org.concordion.api.Element;
 import org.concordion.api.Evaluator;
 import org.concordion.api.ResultRecorder;
-import org.concordion.internal.listener.AssertResultRenderer;
 
 @HuygensCommand(name = "jsonResponse", htmlTag = "pre")
 public class ExpectedJsonResponseCommand extends nl.knaw.huygens.alexandria.concordion.commands.HuygensCommand {
   public ExpectedJsonResponseCommand() {
-    addListener(new AssertResultRenderer());
+    addListener(new RestResultRenderer());
   }
 
   @Override
   public void verify(CommandCall commandCall, Evaluator evaluator, ResultRecorder resultRecorder) {
     final Element element = commandCall.getElement();
+    element.addStyleClass("json");
+
     final JsonNode expectedJson = asJson(element.getText());
     final String expected = pretty(expectedJson);
     element.moveChildrenTo(new Element("tmp"));
