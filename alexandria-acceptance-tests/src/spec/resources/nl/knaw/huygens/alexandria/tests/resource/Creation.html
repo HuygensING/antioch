@@ -8,66 +8,69 @@
 
 <body class="container">
 
-<h2>Creating external resources</h2>
+    <h2 class="page-header">Creating external resources</h2>
 
-<div class="examples">
-    <div class="example">
-        <h3>How can I create an external resource without specifying an ID?</h3>
+    <h3>Examples:</h3>
 
-        <h:request>
-            When I <h:post>/resources</h:post>
-            the following body: <h:jsonBody>{
-                "resource": {
-                "ref": "http://www.example.com/titles/path/to/title/resource"
-                }
-            } </h:jsonBody>
-            then I should receive <h:status>201 Created</h:status> and the response contains
-            a Location header starting with <h:location type="base">https://{host}/resources/</h:location>,
-            followed by a <h:location type="uuid">well-formed UUID</h:location>.
-            The location is: <h:location type="full"/>.
-            The response body is <h:responseBody/>.
-        </h:request>
+    <div id="create-post" class="panel panel-default">
+        <div class="panel-heading"><b>How can I create an external resource without specifying an ID?</b></div>
+        <div class="panel-body">
+            <h:request>
+                When I <h:post>/resources</h:post>
+                the following body: <h:jsonBody>{
+                    "resource": {
+                    "ref": "http://www.example.com/titles/path/to/title/resource"
+                    }
+                } </h:jsonBody>
+                then I should receive <h:status>201 Created</h:status> and the response contains
+                a Location header starting with <h:location type="base">https://{host}/resources/</h:location>,
+                followed by a <h:location type="uuid">well-formed UUID</h:location>.
+                The location is: <h:location type="full"/>.
+                The response body is <h:responseBody/>.
+            </h:request>
+            </div>
     </div>
 
-    <div class="example" c:execute="clearStorage()">
-        <h3>How can I create an external resource with a specific UUID?</h3>
-
-        <h:request>
-            When I <h:put>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:put>
-            the following body: <h:jsonBody> {
-                "resource": {
-                    "id": "6e56c868-c0a9-11e4-a762-cb9a664afc01",
-                    "ref": "http://www.example.com/titles/path/to/title/resource",
-                    "provenance": {
-                        "who": "nederlab",
-                        "why": "some reason",
-                        "when": "2015-04-07T09:10:55.877Z"
+    <div id="create-put" class="panel panel-default" c:execute="clearStorage()">
+        <div class="panel-heading"><b>How can I create an external resource with a specific UUID?</b></div>
+        <div class="panel-body">
+            <h:request>
+                When I <h:put>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:put>
+                the following body: <h:jsonBody> {
+                    "resource": {
+                        "id": "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+                        "ref": "http://www.example.com/titles/path/to/title/resource",
+                        "provenance": {
+                            "who": "nederlab",
+                            "why": "some reason",
+                            "when": "2015-04-07T09:10:55.877Z"
+                        }
                     }
-                }
-            } </h:jsonBody>
-            then I should receive <h:status>201 Created</h:status> and the response body is <h:responseBody/>.
-        </h:request>
+                } </h:jsonBody>
+                then I should receive <h:status>201 Created</h:status> and the response body is <h:responseBody/>.
+            </h:request>
 
-        <h:request>
-            Then <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:get>
-            should return <h:status>200 OK</h:status> with a response body containing
-            <h:jsonResponse>{ "resource": {
-                "id" : "6e56c868-c0a9-11e4-a762-cb9a664afc01",
-                "ref": "http://www.example.com/titles/path/to/title/resource",
-                "^provenance": "https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/provenance"
-            } }</h:jsonResponse>
-        </h:request>
+            <h:request>
+                Then <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:get>
+                should return <h:status>200 OK</h:status> with a response body containing
+                <h:jsonResponse>{ "resource": {
+                    "id" : "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+                    "ref": "http://www.example.com/titles/path/to/title/resource",
+                    "^provenance": "https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/provenance"
+                } }</h:jsonResponse>
+            </h:request>
 
-        <h:request>
-            And <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/provenance</h:get>
-            should return <h:status>200 OK</h:status> with a response body containing
-            <h:jsonResponse>{ "provenance": {
-                "who": "nederlab",
-                "why": "some reason",
-                "when": "{date.beforeNow}",
-                "^what": "https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01"
-            } } </h:jsonResponse>
-        </h:request>
+            <h:request>
+                And <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/provenance</h:get>
+                should return <h:status>200 OK</h:status> with a response body containing
+                <h:jsonResponse>{ "provenance": {
+                    "who": "nederlab",
+                    "why": "some reason",
+                    "when": "{date.beforeNow}",
+                    "^what": "https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01"
+                } } </h:jsonResponse>
+            </h:request>
+        </div>
     </div>
 
     <div c:execute="clear()" class="example">
@@ -160,6 +163,5 @@
         </ul>
     </div>
 
-</div>
 </body>
 </html>
