@@ -96,11 +96,11 @@ public class Storage {
     commitTransaction();
   }
 
-  public void createSubResource(AlexandriaResource subresource) {
+  public void createSubResource(AlexandriaResource subResource) {
     startTransaction();
 
     final ResourceVF rvf;
-    final UUID uuid = subresource.getId();
+    final UUID uuid = subResource.getId();
     if (exists(ResourceVF.class, uuid)) {
       rvf = readResourceVF(uuid).get();
     } else {
@@ -108,12 +108,13 @@ public class Storage {
       rvf.setUuid(uuid.toString());
     }
 
-    rvf.setCargo(subresource.getCargo());
-    rvf.setState(subresource.getState().toString());
-    Optional<ResourceVF> parentVF = readResourceVF(UUID.fromString(subresource.getParentResourcePointer().get().getIdentifier()));
+    rvf.setCargo(subResource.getCargo());
+    rvf.setState(subResource.getState().toString());
+    Optional<ResourceVF> parentVF = readResourceVF(UUID.fromString(subResource.getParentResourcePointer().get()
+                                                                              .getIdentifier()));
     rvf.setParentResource(parentVF.get());
 
-    setAlexandriaVFProperties(subresource, rvf);
+    setAlexandriaVFProperties(subResource, rvf);
 
     commitTransaction();
 
