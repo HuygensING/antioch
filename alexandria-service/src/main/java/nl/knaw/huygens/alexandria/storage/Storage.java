@@ -14,6 +14,7 @@ import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Graph.Features;
 import org.apache.tinkerpop.gremlin.structure.Graph.Features.GraphFeatures;
 import org.apache.tinkerpop.gremlin.structure.Transaction;
+import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
@@ -37,7 +38,7 @@ import peapod.annotations.Vertex;
 
 public class Storage {
   private static final String IDENTIFIER_PROPERTY = "uuid";
-  private static final String DUMPFILE = "dump.json";
+  protected static final String DUMPFILE = "dump.xml";
 
   private final Graph graph;
   private final FramedGraph framedGraph;
@@ -181,13 +182,17 @@ public class Storage {
     abvf.setValue(body.getValue());
   }
 
-  public void dump(OutputStream os) throws IOException {
+  public void dumpToGraphSON(OutputStream os) throws IOException {
     graph.io(new GraphSONIo.Builder()).writer().create().writeGraph(os, graph);
+  }
+
+  public void dumpToGraphML(OutputStream os) throws IOException {
+    graph.io(new GraphMLIo.Builder()).writer().create().writeGraph(os, graph);
   }
 
   public void loadFromDisk(String file) {
     try {
-      graph.io(new GraphSONIo.Builder()).readGraph(file);
+      graph.io(new GraphMLIo.Builder()).readGraph(file);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -195,7 +200,7 @@ public class Storage {
 
   public void saveToDisk(String file) {
     try {
-      graph.io(new GraphSONIo.Builder()).writeGraph(file);
+      graph.io(new GraphMLIo.Builder()).writeGraph(file);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
