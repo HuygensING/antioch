@@ -41,7 +41,7 @@ class ResourceCreationRequest implements CreationRequest<AlexandriaResource> {
 
     String ref = providedRef();
     TentativeAlexandriaProvenance provenance = providedProvenance().orElse(TentativeAlexandriaProvenance.createDefault());
-    resourceCreated = service.createOrUpdateResource(uuid, ref, provenance);
+    resourceCreated = service.createOrUpdateResource(uuid, ref, provenance, prototype.getState());
     // Log.trace("resource: [{}]", resource);
 
     return service.readResource(uuid).get();

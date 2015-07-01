@@ -9,6 +9,7 @@ import nl.knaw.huygens.alexandria.model.AccountablePointer;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
 public interface AlexandriaService {
@@ -18,9 +19,10 @@ public interface AlexandriaService {
    * @param uuid
    * @param ref
    * @param provenance
+   * @param alexandriaState
    * @return true if the resource was created, false if it was updated
    */
-  boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance);
+  boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance, AlexandriaState alexandriaState);
 
   AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance);
 

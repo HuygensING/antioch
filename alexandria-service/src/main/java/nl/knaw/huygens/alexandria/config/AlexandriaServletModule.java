@@ -8,15 +8,15 @@ import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerpopAlexandriaService;
+import nl.knaw.huygens.alexandria.storage.PersistentTinkerGraphStorage;
 import nl.knaw.huygens.alexandria.storage.Storage;
-import nl.knaw.huygens.alexandria.storage.TinkerGraphStorage;
 
 public class AlexandriaServletModule extends ServletModule {
   @Override
   protected void configureServlets() {
     // guice binds here
     Log.trace("setting up Guice bindings");
-    Storage storage = new TinkerGraphStorage();
+    Storage storage = new PersistentTinkerGraphStorage();
     AlexandriaService service = new TinkerpopAlexandriaService(storage);
     bind(AlexandriaService.class).toInstance(service);
     bind(AlexandriaConfiguration.class).to(TinkerpopAlexandriaConfiguration.class);

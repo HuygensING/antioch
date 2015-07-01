@@ -25,6 +25,8 @@ import nl.knaw.huygens.alexandria.endpoint.resource.ResourceCreationRequestBuild
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourcePrototype;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class ResourcesEndpointTest extends TinkergraphServiceEndpointTest {
@@ -44,11 +46,27 @@ public class ResourcesEndpointTest extends TinkergraphServiceEndpointTest {
   }
 
   @Test
-  public void testPost() {
+  public void testPostSetsStateToTemporaryAndPutSetsStateToDefault() {
     Response response = target(ROOTPATH).request().post(jsonEntity("{'resource':{'ref':'REF'}}"));
     Log.debug("response={}", response);
     assertThat(response.getLocation().toString()).contains("/resources/");
     assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
+
+    UUID id = extractId(response);
+    Log.debug("uuid={}", id);
+    AlexandriaResource resource = getStorage().readResource(id).get();
+    assertThat(resource.getState()).isEqualTo(AlexandriaState.Temporary);
+
+    response = target(ROOTPATH).path(id.toString()).request().put(jsonEntity("{'resource':{'id':'" + id + "','ref':'REF'}}"));
+    assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
+
+    resource = getStorage().readResource(id).get();
+    assertThat(resource.getState()).isEqualTo(AlexandriaState.Default);
+  }
+
+  private UUID extractId(Response response) {
+    String[] parts = response.getLocation().getPath().split("/");
+    return UUID.fromString(parts[parts.length - 1]);
   }
 
   @Test

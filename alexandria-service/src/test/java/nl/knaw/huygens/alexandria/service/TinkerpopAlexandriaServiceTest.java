@@ -18,6 +18,7 @@ import nl.knaw.huygens.alexandria.model.AccountablePointer;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.storage.Storage;
 
@@ -32,7 +33,8 @@ public class TinkerpopAlexandriaServiceTest {
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.ofEpochSecond(1000000), "why");
     UUID uuid = new UUID(1l, 1l);
     String ref = "ref";
-    boolean created = service.createOrUpdateResource(uuid, ref, provenance);
+    AlexandriaState state = AlexandriaState.Default;
+    boolean created = service.createOrUpdateResource(uuid, ref, provenance, state);
     assertThat(created).isTrue();
   }
 

@@ -9,13 +9,17 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerpopAlexandriaService;
 
 public class TinkergraphServiceEndpointTest extends EndpointTest {
-  private static Storage storage = new TinkerGraphStorage();
-  protected static final AlexandriaService tinkerGraphService = new TinkerpopAlexandriaService(storage);
+  static Storage storage = new TinkerGraphStorage();
+  static final AlexandriaService tinkerGraphService = new TinkerpopAlexandriaService(storage);
 
   @BeforeClass
   public static void setup() {
-    Module baseModule = new TestModule(tinkerGraphService);
+    Module baseModule = new TestModule(tinkerGraphService, storage);
     setupWithModule(baseModule);
+  }
+
+  public Storage getStorage() {
+    return storage;
   }
 
 }

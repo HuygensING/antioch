@@ -11,6 +11,7 @@ import nl.knaw.huygens.alexandria.model.AccountablePointer;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
@@ -29,7 +30,7 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
   }
 
   @Override
-  public boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance) {
+  public boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
     AlexandriaResource resource;
     boolean newlyCreated;
 
@@ -42,6 +43,7 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
       newlyCreated = true;
     }
     resource.setCargo(ref);
+    resource.setState(state);
     storage.createOrUpdateResource(resource);
 
     return newlyCreated;
