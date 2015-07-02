@@ -1,19 +1,19 @@
 package nl.knaw.huygens.alexandria.endpoint;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.resource.PropertyPrefix;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
-import nl.knaw.huygens.alexandria.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.model.AlexandriaState;
 
 public abstract class AbstractAnnotatableEntity extends JsonWrapperObject implements Entity {
 
@@ -45,7 +45,10 @@ public abstract class AbstractAnnotatableEntity extends JsonWrapperObject implem
     return getAnnotatable().getId();
   }
 
-  public AlexandriaState getState() {
-    return getAnnotatable().getState();
+  public Map<String, Object> getState() {
+    return ImmutableMap.of(//
+        "value", getAnnotatable().getState(), //
+        "since", getAnnotatable().getStateSince().toString()//
+    );
   }
 }
