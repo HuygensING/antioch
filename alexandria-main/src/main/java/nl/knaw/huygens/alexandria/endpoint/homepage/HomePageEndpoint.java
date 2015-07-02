@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint;
+package nl.knaw.huygens.alexandria.endpoint.homepage;
 
 import java.io.IOException;
 import java.io.InputStream;

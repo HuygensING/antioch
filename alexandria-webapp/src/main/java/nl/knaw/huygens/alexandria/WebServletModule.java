@@ -2,14 +2,14 @@ package nl.knaw.huygens.alexandria;
 
 import javax.ws.rs.container.ResourceContext;
 
-import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.config.AlexandriaServletModule;
-import nl.knaw.huygens.alexandria.jersey.AlexandriaApplication;
-
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.server.internal.JerseyResourceContext;
 
 import com.squarespace.jersey2.guice.BootstrapUtils;
+
+import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.config.AlexandriaServletModule;
+import nl.knaw.huygens.alexandria.jersey.AlexandriaApplication;
 
 public class WebServletModule extends AlexandriaServletModule {
 

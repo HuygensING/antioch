@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint;
+package nl.knaw.huygens.alexandria.endpoint.about;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.StrictAssertions.assertThat;
@@ -13,6 +13,7 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.endpoint.about.AboutEndpoint;
 
 public class AboutEndpointTest extends JerseyTest {
   @Override

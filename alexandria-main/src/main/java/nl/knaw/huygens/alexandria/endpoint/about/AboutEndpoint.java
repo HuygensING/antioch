@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint;
+package nl.knaw.huygens.alexandria.endpoint.about;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -16,6 +16,7 @@ import com.google.common.collect.Maps;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 
 @Singleton
 @Path("about")
