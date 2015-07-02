@@ -39,4 +39,10 @@ public abstract class AbstractAccountable implements Accountable {
     this.stateSince = Instant.now();
   }
 
+  // Only to be used when deframing from graphdb
+  public void setStateSince(Instant instant) {
+    this.stateSince = instant;
+
+  }
+
 }

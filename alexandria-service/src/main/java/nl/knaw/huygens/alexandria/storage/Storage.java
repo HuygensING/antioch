@@ -97,7 +97,7 @@ public class Storage {
 
     rvf.setCargo(resource.getCargo());
 
-    setAlexandriaVFProperties(resource, rvf);
+    setAlexandriaVFProperties(rvf, resource);
 
     commitTransaction();
   }
@@ -115,12 +115,11 @@ public class Storage {
     }
 
     rvf.setCargo(subResource.getCargo());
-    rvf.setState(subResource.getState().toString());
     final UUID parentId = UUID.fromString(subResource.getParentResourcePointer().get().getIdentifier());
     Optional<ResourceVF> parentVF = readResourceVF(parentId);
     rvf.setParentResource(parentVF.get());
 
-    setAlexandriaVFProperties(subResource, rvf);
+    setAlexandriaVFProperties(rvf, subResource);
 
     commitTransaction();
 
@@ -138,9 +137,7 @@ public class Storage {
       avf.setUuid(uuid.toString());
     }
 
-    avf.setState(annotation.getState().toString());
-
-    setAlexandriaVFProperties(annotation, avf);
+    setAlexandriaVFProperties(avf, annotation);
 
     commitTransaction();
   }
@@ -180,7 +177,7 @@ public class Storage {
 
   public void writeAnnotationBody(AlexandriaAnnotationBody body) {
     AnnotationBodyVF abvf = framedGraph.addVertex(AnnotationBodyVF.class);
-    setAlexandriaVFProperties(body, abvf);
+    setAlexandriaVFProperties(abvf, body);
     abvf.setType(body.getType());
     abvf.setValue(body.getValue());
   }
@@ -274,9 +271,7 @@ public class Storage {
 
   private AnnotationVF createAnnotationVF(AlexandriaAnnotation newAnnotation) {
     AnnotationVF avf = framedGraph.addVertex(AnnotationVF.class);
-    setAlexandriaVFProperties(newAnnotation, avf);
-
-    avf.setState(newAnnotation.getState().toString());
+    setAlexandriaVFProperties(avf, newAnnotation);
 
     String bodyId = newAnnotation.getBody().getId().toString();
     List<AnnotationBodyVF> results = framedGraph.V(AnnotationBodyVF.class).has(IDENTIFIER_PROPERTY, bodyId).toList();
@@ -292,6 +287,7 @@ public class Storage {
     AlexandriaResource resource = new AlexandriaResource(uuid, provenance);
     resource.setCargo(rvf.getCargo());
     resource.setState(AlexandriaState.valueOf(rvf.getState()));
+    resource.setStateSince(Instant.ofEpochSecond(rvf.getStateSince()));
     for (AnnotationVF annotationVF : rvf.getAnnotatedBy()) {
       AlexandriaAnnotation annotation = deframeAnnotation(annotationVF);
       resource.addAnnotation(annotation);
@@ -311,6 +307,7 @@ public class Storage {
     AlexandriaAnnotationBody body = deframeAnnotationBody(annotationVF.getBody());
     AlexandriaAnnotation annotation = new AlexandriaAnnotation(uuid, body, provenance);
     annotation.setState(AlexandriaState.valueOf(annotationVF.getState()));
+    annotation.setStateSince(Instant.ofEpochSecond(annotationVF.getStateSince()));
     AnnotationVF annotatedAnnotation = annotationVF.getAnnotatedAnnotation();
     if (annotatedAnnotation == null) {
       ResourceVF annotatedResource = annotationVF.getAnnotatedResource();
@@ -340,7 +337,7 @@ public class Storage {
     return UUID.fromString(vf.getUuid());
   }
 
-  private void setAlexandriaVFProperties(Accountable accountable, AlexandriaVF vf) {
+  private void setAlexandriaVFProperties(AlexandriaVF vf, Accountable accountable) {
     vf.setUuid(accountable.getId().toString());
 
     vf.setState(accountable.getState().toString());
