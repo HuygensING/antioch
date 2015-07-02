@@ -3,10 +3,13 @@ package nl.knaw.huygens.alexandria.endpoint.annotation;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.Api;
@@ -16,6 +19,7 @@ import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 @Path(EndpointPaths.ANNOTATIONS)
@@ -25,7 +29,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   private final AnnotationEntityBuilder entityBuilder;
 
   @Inject
-  public AnnotationsEndpoint(AlexandriaService service,      //
+  public AnnotationsEndpoint(AlexandriaService service,                     //
       AnnotationEntityBuilder entityBuilder) {
     this.service = service;
     this.entityBuilder = entityBuilder;
@@ -40,10 +44,32 @@ public class AnnotationsEndpoint extends JSONEndpoint {
     return Response.ok(entityBuilder.build(annotation)).build();
   }
 
+  @PUT
+  @Path("{uuid}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @ApiOperation(value = "update/confirm the annotation")
+  public Response updateAnnotation(@PathParam("uuid") UUIDParam uuidParam, AnnotationPrototype protoType) {
+    protoType.setState(AlexandriaState.Default);
+
+    // service.createOrUpdateAnnotation(uuidParam.getValue(), protoType.getProvenance());
+    // AnnotationCreationRequest request = getAnnotationCreationRequestBuilder().build(prototype);
+    // AlexandriaAnnotation annotation = request.execute(service);
+    //
+    // if (request.newResourceWasCreated()) {
+    // return Response.created(locationBuilder.locationOf(resource)).build();
+    // }
+    //
+    // if (request.wasExecutedAsIs()) {
+    // return Response.noContent().build();
+    // }
+
+    return Response.noContent().build();
+  }
+
   @DELETE
   @Path("{uuid}")
   public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
-    // set state to expired
+    // set state to expired (or delete when state=default?)
     return methodNotImplemented();
   }
 

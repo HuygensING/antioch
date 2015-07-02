@@ -40,9 +40,9 @@ public class ResourcesEndpoint extends JSONEndpoint {
   private final LocationBuilder locationBuilder;
 
   @Inject
-  public ResourcesEndpoint(AlexandriaService service,  //
-      ResourceCreationRequestBuilder requestBuilder,  //
-      LocationBuilder locationBuilder,  //
+  public ResourcesEndpoint(AlexandriaService service,    //
+      ResourceCreationRequestBuilder requestBuilder,    //
+      LocationBuilder locationBuilder,    //
       ResourceEntityBuilder entityBuilder) {
     this.locationBuilder = locationBuilder;
     this.alexandriaService = service;
@@ -81,6 +81,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @PUT
   @Path("{uuid}")
   @Consumes(MediaType.APPLICATION_JSON)
+  @ApiOperation(value = "update/confirm/create the resource with the given uuid")
   public Response setResourceAtSpecificID(@NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
 

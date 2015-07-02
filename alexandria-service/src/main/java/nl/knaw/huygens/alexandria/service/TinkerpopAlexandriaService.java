@@ -55,7 +55,7 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
   }
 
   @Override
-  public AlexandriaAnnotationBody createAnnotationBody(UUID uuid, Optional<String> type, String value, TentativeAlexandriaProvenance provenance) {
+  public AlexandriaAnnotationBody createAnnotationBody(UUID uuid, Optional<String> type, String value, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
     AlexandriaAnnotationBody body = new AlexandriaAnnotationBody(uuid, type.orElse(""), value, provenance);
     storage.writeAnnotationBody(body);
     return body;
@@ -96,7 +96,7 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
   }
 
   @Override
-  public AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance) {
+  public AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
     AlexandriaResource subresource = new AlexandriaResource(uuid, provenance);
     subresource.setCargo(sub);
     subresource.setParentResourcePointer(new AccountablePointer<AlexandriaResource>(AlexandriaResource.class, parentUuid.toString()));

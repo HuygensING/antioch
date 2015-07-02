@@ -24,13 +24,15 @@ public interface AlexandriaService {
    */
   boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance, AlexandriaState alexandriaState);
 
-  AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance);
+  // boolean createOrUpdateAnnotation(UUID uuid, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance, AlexandriaState alexandriaState);
+
+  AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance, AlexandriaState alexandriaState);
 
   Optional<AlexandriaResource> readResource(UUID uuid);
 
   Set<AlexandriaResource> readSubResources(UUID uuid);
 
-  AlexandriaAnnotationBody createAnnotationBody(UUID uuid, Optional<String> type, String value, TentativeAlexandriaProvenance provenance);
+  AlexandriaAnnotationBody createAnnotationBody(UUID uuid, Optional<String> type, String value, TentativeAlexandriaProvenance provenance, AlexandriaState alexandriaState);
 
   Optional<AlexandriaAnnotationBody> findAnnotationBodyWithTypeAndValue(Optional<String> type, String value);
 

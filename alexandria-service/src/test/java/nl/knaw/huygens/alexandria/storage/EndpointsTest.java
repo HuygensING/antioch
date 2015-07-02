@@ -21,21 +21,26 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
+import nl.knaw.huygens.alexandria.endpoint.resource.ResourceAnnotationsEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceCreationRequestBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourcePrototype;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
-public class ResourcesEndpointTest extends TinkergraphServiceEndpointTest {
+public class EndpointsTest extends TinkergraphServiceEndpointTest {
   private static final String ROOTPATH = EndpointPaths.RESOURCES;
   ObjectMapper om = new ObjectMapper();
 
   @BeforeClass
   public static void registerEndpoint() {
     register(ResourcesEndpoint.class);
+    register(AnnotationsEndpoint.class);
+    register(ResourceAnnotationsEndpoint.class);
   }
 
   @Test
@@ -46,7 +51,7 @@ public class ResourcesEndpointTest extends TinkergraphServiceEndpointTest {
   }
 
   @Test
-  public void testPostSetsStateToTemporaryAndPutSetsStateToDefault() {
+  public void testPostResourceSetsStateToTemporaryAndPutSetsStateToDefault() {
     Response response = target(ROOTPATH).request().post(jsonEntity("{'resource':{'ref':'REF'}}"));
     Log.debug("response={}", response);
     assertThat(response.getLocation().toString()).contains("/resources/");
@@ -62,6 +67,39 @@ public class ResourcesEndpointTest extends TinkergraphServiceEndpointTest {
 
     resource = getStorage().readResource(id).get();
     assertThat(resource.getState()).isEqualTo(AlexandriaState.Default);
+  }
+
+  @Test
+  public void testPostResourceAnnotationSetsStateToTemporaryAndPutAnnotationSetsStateToDefault() {
+    Response response = target(ROOTPATH).request().post(jsonEntity("{'resource':{'ref':'REF'}}"));
+    Log.debug("response={}", response);
+    assertThat(response.getLocation().toString()).contains("/resources/");
+    assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
+
+    UUID id = extractId(response);
+    Log.debug("resource uuid={}", id);
+    AlexandriaResource resource = getStorage().readResource(id).get();
+    assertThat(resource.getState()).isEqualTo(AlexandriaState.Temporary);
+
+    response = target(ROOTPATH).path(id.toString()).request().put(jsonEntity("{'resource':{'id':'" + id + "','ref':'REF'}}"));
+    assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
+
+    resource = getStorage().readResource(id).get();
+    assertThat(resource.getState()).isEqualTo(AlexandriaState.Default);
+
+    response = target(ROOTPATH).path(id.toString()).path("annotations").request().post(jsonEntity("{'annotation':{'value':'bladiebla'}}"));
+    assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
+
+    UUID annotationId = extractId(response);
+    Log.debug("annotation uuid={}", annotationId);
+    AlexandriaAnnotation annotation = getStorage().readAnnotation(annotationId).get();
+    assertThat(annotation.getState()).isEqualTo(AlexandriaState.Temporary);
+
+    response = target("annotations").path(annotationId.toString()).request().put(jsonEntity("{'annotation':{'id':'" + id + "','value':'bladiebla'}}"));
+    assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
+
+    annotation = getStorage().readAnnotation(annotationId).get();
+    assertThat(annotation.getState()).isEqualTo(AlexandriaState.Default);
   }
 
   private UUID extractId(Response response) {

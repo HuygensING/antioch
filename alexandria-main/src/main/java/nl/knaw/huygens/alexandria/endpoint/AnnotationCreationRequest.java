@@ -7,6 +7,7 @@ import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
@@ -33,7 +34,11 @@ public class AnnotationCreationRequest implements CreationRequest<AlexandriaAnno
 
     UUID annotationBodyUuid = UUID.randomUUID();
     Optional<AlexandriaAnnotationBody> result = service.findAnnotationBodyWithTypeAndValue(providedType(), providedValue());
-    AlexandriaAnnotationBody body = result.orElseGet(() -> service.createAnnotationBody(annotationBodyUuid, providedType(), providedValue(), provenance));
+    AlexandriaState state = prototype.getState();
+    AlexandriaAnnotationBody body = result//
+        .orElseGet(() -> {
+          return service.createAnnotationBody(annotationBodyUuid, providedType(), providedValue(), provenance, state);
+        });
 
     if (resource.isPresent()) {
       return service.annotate(resource.get(), body, provenance);

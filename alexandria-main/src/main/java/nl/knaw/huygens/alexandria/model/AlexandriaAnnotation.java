@@ -10,6 +10,7 @@ public class AlexandriaAnnotation extends AbstractAnnotatable {
   public AlexandriaAnnotation(UUID id, AlexandriaAnnotationBody body, TentativeAlexandriaProvenance provenance) {
     super(id, provenance);
     this.body = body;
+    this.setState(AlexandriaState.Temporary);
   }
 
   public AlexandriaAnnotationBody getBody() {
