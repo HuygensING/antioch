@@ -54,7 +54,7 @@ public class SubResourcesEndpoint extends JSONEndpoint {
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation("add subresource")
   public Response addSubResource(@NotNull @Valid SubResourcePrototype prototype) {
-    prototype.setState(AlexandriaState.Temporary);
+    prototype.setState(AlexandriaState.TENTATIVE);
     SubResourceCreationRequest request = requestBuilder.build(parentUuid, prototype);
     AlexandriaResource resource = request.execute(service);
     return Response.created(locationBuilder.locationOf(resource)).build();

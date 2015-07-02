@@ -10,6 +10,10 @@ public abstract class AlexandriaVF {
 
   public abstract void setState(String state);
 
+  public abstract Long getStateSince();
+
+  public abstract void setStateSince(Long epochSecond);
+
   public abstract String getProvenanceWho();
 
   public abstract void setProvenanceWho(String who);

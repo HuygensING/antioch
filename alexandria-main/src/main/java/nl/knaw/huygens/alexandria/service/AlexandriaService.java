@@ -46,4 +46,9 @@ public interface AlexandriaService {
 
   Optional<? extends Accountable> dereference(AccountablePointer<? extends Accountable> pointer);
 
+  /**
+   * remove all unconfirmed objects that have timed out
+   */
+  void removeExpiredTentatives();
+
 }

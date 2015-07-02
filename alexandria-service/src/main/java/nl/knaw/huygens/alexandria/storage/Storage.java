@@ -1,10 +1,13 @@
 package nl.knaw.huygens.alexandria.storage;
 
 import static java.util.stream.Collectors.toSet;
+import static org.apache.tinkerpop.gremlin.process.traversal.P.lt;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.TemporalAmount;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -39,6 +42,7 @@ import peapod.annotations.Vertex;
 public class Storage {
   private static final String IDENTIFIER_PROPERTY = "uuid";
   protected static final String DUMPFILE = "dump.xml";
+  private static final TemporalAmount TIMEOUT = Duration.ofDays(1);
 
   private final Graph graph;
   private final FramedGraph framedGraph;
@@ -92,7 +96,6 @@ public class Storage {
     }
 
     rvf.setCargo(resource.getCargo());
-    rvf.setState(resource.getState().toString());
 
     setAlexandriaVFProperties(resource, rvf);
 
@@ -182,6 +185,13 @@ public class Storage {
     abvf.setValue(body.getValue());
   }
 
+  public Set<AlexandriaResource> readSubResources(UUID uuid) {
+    ResourceVF resourcevf = readResourceVF(uuid).orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
+    return resourcevf.getSubResources().stream()//
+        .map(this::deframeResource)//
+        .collect(toSet());
+  }
+
   public void dumpToGraphSON(OutputStream os) throws IOException {
     graph.io(new GraphSONIo.Builder()).writer().create().writeGraph(os, graph);
   }
@@ -204,6 +214,15 @@ public class Storage {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public void removeExpiredTentatives() {
+    // Tentative vertices should not have any outgoing or incoming edges!!
+    Long threshold = Instant.now().minus(TIMEOUT).getEpochSecond();
+    graph.traversal().V()//
+        .has("state", AlexandriaState.TENTATIVE.name())//
+        .has("stateSince", lt(threshold))//
+        .remove();
   }
 
   // private methods
@@ -321,20 +340,16 @@ public class Storage {
     return UUID.fromString(vf.getUuid());
   }
 
-  private void setAlexandriaVFProperties(Accountable resource, AlexandriaVF vf) {
-    vf.setUuid(resource.getId().toString());
+  private void setAlexandriaVFProperties(Accountable accountable, AlexandriaVF vf) {
+    vf.setUuid(accountable.getId().toString());
 
-    AlexandriaProvenance provenance = resource.getProvenance();
+    vf.setState(accountable.getState().toString());
+    vf.setStateSince(accountable.getStateSince().getEpochSecond());
+
+    AlexandriaProvenance provenance = accountable.getProvenance();
     vf.setProvenanceWhen(provenance.getWhen().toString());
     vf.setProvenanceWho(provenance.getWho());
     vf.setProvenanceWhy(provenance.getWhy());
-  }
-
-  public Set<AlexandriaResource> readSubResources(UUID uuid) {
-    ResourceVF resourcevf = readResourceVF(uuid).orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
-    return resourcevf.getSubResources().stream()//
-        .map(this::deframeResource)//
-        .collect(toSet());
   }
 
 }

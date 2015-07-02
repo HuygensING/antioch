@@ -51,7 +51,7 @@ public class EndpointsTest extends TinkergraphServiceEndpointTest {
   }
 
   @Test
-  public void testPostResourceSetsStateToTemporaryAndPutSetsStateToDefault() {
+  public void testPostResourceSetsStateToTentativeAndPutSetsStateToConfirmed() {
     Response response = target(ROOTPATH).request().post(jsonEntity("{'resource':{'ref':'REF'}}"));
     Log.debug("response={}", response);
     assertThat(response.getLocation().toString()).contains("/resources/");
@@ -60,17 +60,17 @@ public class EndpointsTest extends TinkergraphServiceEndpointTest {
     UUID id = extractId(response);
     Log.debug("uuid={}", id);
     AlexandriaResource resource = getStorage().readResource(id).get();
-    assertThat(resource.getState()).isEqualTo(AlexandriaState.Temporary);
+    assertThat(resource.getState()).isEqualTo(AlexandriaState.TENTATIVE);
 
     response = target(ROOTPATH).path(id.toString()).request().put(jsonEntity("{'resource':{'id':'" + id + "','ref':'REF'}}"));
     assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
 
     resource = getStorage().readResource(id).get();
-    assertThat(resource.getState()).isEqualTo(AlexandriaState.Default);
+    assertThat(resource.getState()).isEqualTo(AlexandriaState.CONFIRMED);
   }
 
   @Test
-  public void testPostResourceAnnotationSetsStateToTemporaryAndPutAnnotationSetsStateToDefault() {
+  public void testPostResourceAnnotationSetsStateToTentativeAndPutAnnotationSetsStateToConfirmed() {
     Response response = target(ROOTPATH).request().post(jsonEntity("{'resource':{'ref':'REF'}}"));
     Log.debug("response={}", response);
     assertThat(response.getLocation().toString()).contains("/resources/");
@@ -79,13 +79,13 @@ public class EndpointsTest extends TinkergraphServiceEndpointTest {
     UUID id = extractId(response);
     Log.debug("resource uuid={}", id);
     AlexandriaResource resource = getStorage().readResource(id).get();
-    assertThat(resource.getState()).isEqualTo(AlexandriaState.Temporary);
+    assertThat(resource.getState()).isEqualTo(AlexandriaState.TENTATIVE);
 
     response = target(ROOTPATH).path(id.toString()).request().put(jsonEntity("{'resource':{'id':'" + id + "','ref':'REF'}}"));
     assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
 
     resource = getStorage().readResource(id).get();
-    assertThat(resource.getState()).isEqualTo(AlexandriaState.Default);
+    assertThat(resource.getState()).isEqualTo(AlexandriaState.CONFIRMED);
 
     response = target(ROOTPATH).path(id.toString()).path("annotations").request().post(jsonEntity("{'annotation':{'value':'bladiebla'}}"));
     assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
@@ -93,7 +93,7 @@ public class EndpointsTest extends TinkergraphServiceEndpointTest {
     UUID annotationId = extractId(response);
     Log.debug("annotation uuid={}", annotationId);
     AlexandriaAnnotation annotation = getStorage().readAnnotation(annotationId).get();
-    assertThat(annotation.getState()).isEqualTo(AlexandriaState.Temporary);
+    assertThat(annotation.getState()).isEqualTo(AlexandriaState.TENTATIVE);
 
     response = target("annotations").path(annotationId.toString()).request().put(jsonEntity("{'annotation':{'id':'" + id + "','value':'bladiebla'}}"));
     assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());

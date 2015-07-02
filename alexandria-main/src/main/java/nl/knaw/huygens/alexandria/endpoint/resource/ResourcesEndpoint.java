@@ -66,7 +66,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   public Response createResource(@NotNull @Valid @WithoutId ResourcePrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
 
-    protoType.setState(AlexandriaState.Temporary);
+    protoType.setState(AlexandriaState.TENTATIVE);
     final ResourceCreationRequest request = requestBuilder.build(protoType);
     AlexandriaResource resource = request.execute(alexandriaService);
 
@@ -85,7 +85,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   public Response setResourceAtSpecificID(@NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
 
-    protoType.setState(AlexandriaState.Default);
+    protoType.setState(AlexandriaState.CONFIRMED);
     final ResourceCreationRequest request = requestBuilder.build(protoType);
     AlexandriaResource resource = request.execute(alexandriaService);
 

@@ -6,7 +6,8 @@ import java.util.Set;
 import java.util.UUID;
 
 public abstract class AbstractAnnotatable extends AbstractAccountable {
-  private AlexandriaState state = AlexandriaState.Default;
+
+  // TODO: use AccountablePointers ?
   private final Set<AlexandriaAnnotation> annotations = new HashSet<>();
 
   protected AbstractAnnotatable(UUID id, TentativeAlexandriaProvenance provenance) {
@@ -22,14 +23,6 @@ public abstract class AbstractAnnotatable extends AbstractAccountable {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     AccountablePointer<? extends Accountable> pointer = new AccountablePointer(this.getClass(), this.getId().toString());
     annotation.setAnnotatablePointer(pointer);
-  }
-
-  public AlexandriaState getState() {
-    return state;
-  }
-
-  public void setState(AlexandriaState state) {
-    this.state = state;
   }
 
 }

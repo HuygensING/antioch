@@ -49,7 +49,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation(value = "update/confirm the annotation")
   public Response updateAnnotation(@PathParam("uuid") UUIDParam uuidParam, AnnotationPrototype protoType) {
-    protoType.setState(AlexandriaState.Default);
+    protoType.setState(AlexandriaState.CONFIRMED);
 
     // service.createOrUpdateAnnotation(uuidParam.getValue(), protoType.getProvenance());
     // AnnotationCreationRequest request = getAnnotationCreationRequestBuilder().build(prototype);

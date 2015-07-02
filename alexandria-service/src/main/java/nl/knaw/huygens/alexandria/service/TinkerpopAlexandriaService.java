@@ -119,6 +119,11 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
     }
   }
 
+  @Override
+  public void removeExpiredTentatives() {
+    storage.removeExpiredTentatives();
+  }
+
   private AlexandriaAnnotation createAnnotation(AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
     UUID id = UUID.randomUUID();
     return new AlexandriaAnnotation(id, annotationbody, provenance);

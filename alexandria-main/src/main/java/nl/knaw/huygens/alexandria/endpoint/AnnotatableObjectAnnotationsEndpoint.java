@@ -61,7 +61,7 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation("add annotation")
   public Response addAnnotation(@NotNull @Valid AnnotationPrototype prototype) {
-    prototype.setState(AlexandriaState.Temporary);
+    prototype.setState(AlexandriaState.TENTATIVE);
     AnnotationCreationRequest request = getAnnotationCreationRequestBuilder().build(prototype);
     AlexandriaAnnotation annotation = request.execute(service);
     return Response.created(locationBuilder.locationOf(annotation)).build();
