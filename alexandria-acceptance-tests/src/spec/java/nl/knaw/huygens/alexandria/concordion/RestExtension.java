@@ -35,7 +35,6 @@ public class RestExtension implements ConcordionExtension {
     registerCommandToHtmlTranslator(concordionExtender);
     registerCodeMirror(concordionExtender);
     registerBootstrap(concordionExtender);
-    registerLinkedCSS(concordionExtender);
     addHeader(concordionExtender);
 
     /* HACK to make the fixture (the instance of the JerseyTest) available in our Concordion Commands.
@@ -49,24 +48,33 @@ public class RestExtension implements ConcordionExtension {
         .withEvaluatorFactory(fixture -> new FixtureEvaluator((RestFixture) fixture));
   }
 
-  private void registerCodeMirror(ConcordionExtender concordionExtender) {
-    concordionExtender.withLinkedCSS("/codemirror/codemirror.css", new Resource("/codemirror/codemirror.css"));
-    concordionExtender.withLinkedCSS("/codemirror/merge.css", new Resource("/codemirror/merge.css"));
-    concordionExtender
-        .withLinkedCSS("/codemirror/enable-codemirror.css", new Resource("/codemirror/enable-codemirror" + ".css"));
+  private void registerCodeMirror(ConcordionExtender extender) {
+    linkCSS(extender, "/codemirror/codemirror.css");
+    linkCSS(extender, "/codemirror/enable-codemirror.css");
+    linkCSS(extender, "/codemirror/merge.css");
 
-    concordionExtender.withLinkedJavaScript("/codemirror/codemirror.js", new Resource("/codemirror/codemirror.js"));
-    concordionExtender.withLinkedJavaScript("/codemirror/javascript.js", new Resource("/codemirror/javascript.js"));
-    concordionExtender
-        .withLinkedJavaScript("/codemirror/diff_match_patch.js", new Resource("/codemirror/diff_match_patch.js"));
-    concordionExtender.withLinkedJavaScript("/codemirror/merge.js", new Resource("/codemirror/merge.js"));
-    concordionExtender
-        .withLinkedJavaScript("/codemirror/enable-codemirror.js", new Resource("/codemirror/enable-codemirror.js"));
+    linkJavaScript(extender, "/codemirror/codemirror.js");
+    linkJavaScript(extender, "/codemirror/javascript.js");
+    linkJavaScript(extender, "/codemirror/diff_match_patch.js");
+    linkJavaScript(extender, "/codemirror/merge.js");
+    linkJavaScript(extender, "/codemirror/enable-codemirror.js");
   }
 
-  private void registerBootstrap(ConcordionExtender concordionExtender) {
-    concordionExtender.withLinkedCSS("/bootstrap/bootstrap.css", new Resource("/bootstrap/bootstrap.css"));
-    concordionExtender.withLinkedCSS("/bootstrap/enable-bootstrap.css", new Resource("/bootstrap/enable-bootstrap.css"));
+  private void registerBootstrap(ConcordionExtender extender) {
+    linkCSS(extender, "/bootstrap/bootstrap.css");
+    linkCSS(extender, "/bootstrap/enable-bootstrap.css");
+  }
+
+  private void linkCSS(ConcordionExtender extender, String location) {
+    extender.withLinkedCSS(location, resource(location));
+  }
+
+  private void linkJavaScript(ConcordionExtender extender, String location) {
+    extender.withLinkedJavaScript(location, resource(location));
+  }
+
+  private Resource resource(String location) {
+    return new Resource(location);
   }
 
   private void addAnnotatedCommands(Reflections scanner) {
@@ -144,10 +152,6 @@ public class RestExtension implements ConcordionExtension {
         return htmlCommandTags.getOrDefault(localName, localName);
       }
     });
-  }
-
-  private void registerLinkedCSS(ConcordionExtender concordionExtender) {
-//    concordionExtender.withLinkedCSS("/concordion.css", new Resource("/concordion.css"));
   }
 
   private void addHeader(ConcordionExtender concordionExtender) {
