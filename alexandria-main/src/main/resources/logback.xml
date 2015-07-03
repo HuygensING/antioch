@@ -6,6 +6,7 @@
     </appender>
 
     <logger name="nl.knaw.huygens.alexandria" level="trace"/>
+    <logger name="io.swagger" level="info"/>
 
     <root level="debug">
         <appender-ref ref="STDOUT"/>
