@@ -17,6 +17,7 @@ import org.concordion.api.extension.ConcordionExtender;
 import org.concordion.api.extension.ConcordionExtension;
 import org.concordion.api.listener.DocumentParsingListener;
 import org.concordion.internal.ConcordionBuilder;
+import org.concordion.internal.SimpleEvaluator;
 import org.reflections.Reflections;
 
 public class RestExtension implements ConcordionExtension {
@@ -44,8 +45,13 @@ public class RestExtension implements ConcordionExtension {
      * the fixture instance is passed through createEvaluator, we can intercept it and store it in an Evaluator
      * of our own where we can make the fixture available at a later time.
      */
-    ((ConcordionBuilder) concordionExtender)
-        .withEvaluatorFactory(fixture -> new FixtureEvaluator((RestFixture) fixture));
+    final ConcordionBuilder concordionBuilder = (ConcordionBuilder) concordionExtender;
+    concordionBuilder.withEvaluatorFactory(fixture -> {
+      if (fixture instanceof RestFixture) {
+        return new FixtureEvaluator((RestFixture) fixture);
+      }
+      return new SimpleEvaluator(fixture);
+    });
   }
 
   private void registerCodeMirror(ConcordionExtender extender) {

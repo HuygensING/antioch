@@ -32,7 +32,7 @@
     <build-helper-maven-plugin.version>1.9.1</build-helper-maven-plugin.version>
     <classloader-leak-prevention.version>1.13.0</classloader-leak-prevention.version>
     <concordion-rest-extension.version>0.5.0</concordion-rest-extension.version>
-    <concordion.version>1.5.0</concordion.version>
+    <concordion.version>1.4.7</concordion.version> <!-- 1.5.0 broken (aggregate tests use homebrew runner) try again >= 1.5.1 -->
     <guice.version>3.0</guice.version>
     <jackson.version>2.6.0-rc3</jackson.version>
     <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>

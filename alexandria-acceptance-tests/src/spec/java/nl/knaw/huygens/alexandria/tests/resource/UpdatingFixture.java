@@ -5,14 +5,16 @@ import static org.mockito.Mockito.when;
 
 import java.util.UUID;
 
-import org.concordion.api.ExpectedToFail;
-
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
+import org.concordion.api.ExpectedToFail;
+import org.concordion.integration.junit4.ConcordionRunner;
+import org.junit.runner.RunWith;
 
 @ExpectedToFail
-public class UpdatingFixture extends ResourceFixture {
+@RunWith(ConcordionRunner.class)
+public class UpdatingFixture extends ResourcesBase {
   @Override
   public void request(String method, String path) {
     when(service().readResource(any(UUID.class))).thenThrow(new NotFoundException());

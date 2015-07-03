@@ -201,7 +201,7 @@
         <version>1.0.2</version>
         <configuration>
           <concordionDir>${concordion.reportDir}</concordionDir>
-          <concordionIndexFile>nl/knaw/huygens/alexandria/Alexandria.html</concordionIndexFile>
+          <concordionIndexFile>nl/knaw/huygens/alexandria/tests/Alexandria.html</concordionIndexFile>
         </configuration>
       </plugin>
     </plugins>
