@@ -1,8 +1,5 @@
 package nl.knaw.huygens.alexandria.endpoint;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -15,6 +12,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 import com.google.common.collect.Maps;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 @Singleton
 @Path("about")
@@ -33,7 +33,7 @@ public class AboutEndpoint extends JSONEndpoint {
     Map<String, String> data = Maps.newLinkedHashMap();
     data.put("version", getProperty("version"));
     data.put("builddate", getProperty("builddate"));
-    data.put("started", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.starttime));
+    data.put("started", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(this.starttime));
     return Response.ok(data).build();
   }
 
