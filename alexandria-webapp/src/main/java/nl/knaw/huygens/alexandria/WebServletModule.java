@@ -18,7 +18,7 @@ public class WebServletModule extends AlexandriaServletModule {
     }
     bind(ServletContainer.class).toInstance(new ServletContainer(rc));
     // bind(ResourceContext.class).to(JerseyResourceContext.class);
-    serve("/*").with(ServletContainer.class);
+    serve("/api/*").with(MyServlet.class);
   }
 
 }
