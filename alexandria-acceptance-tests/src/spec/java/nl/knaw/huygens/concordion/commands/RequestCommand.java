@@ -8,7 +8,7 @@ import org.concordion.api.Evaluator;
 import org.concordion.api.ResultRecorder;
 
 @HuygensCommand(name = "request", htmlTag = "div")
-public class RequestCommand extends nl.knaw.huygens.concordion.commands.HuygensCommand {
+public class RequestCommand extends AbstractHuygensCommand {
   @Override
   public void execute(CommandCall commandCall, Evaluator evaluator, ResultRecorder resultRecorder) {
     final RestFixture fixture = getFixture(evaluator);

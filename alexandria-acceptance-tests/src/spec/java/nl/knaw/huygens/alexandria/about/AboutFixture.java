@@ -2,6 +2,7 @@ package nl.knaw.huygens.alexandria.about;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.AboutEndpoint;
+import nl.knaw.huygens.alexandria.endpoint.HomePageEndpoint;
 import nl.knaw.huygens.concordion.RestFixture;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.BeforeClass;
@@ -13,6 +14,7 @@ public class AboutFixture extends RestFixture {
   public static void registerEndpoint() {
     Log.trace("Registering {}", AboutEndpoint.class.getSimpleName());
     register(AboutEndpoint.class);
+    register(HomePageEndpoint.class);
   }
 
 }

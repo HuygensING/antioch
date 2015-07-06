@@ -8,7 +8,7 @@ import org.concordion.api.ResultRecorder;
 import org.concordion.internal.listener.AssertResultRenderer;
 
 @HuygensCommand(name = "status")
-public class ExpectedStatusCommand extends nl.knaw.huygens.concordion.commands.HuygensCommand {
+public class ExpectedStatusCommand extends AbstractHuygensCommand {
 
   public ExpectedStatusCommand() {
     addListener(new AssertResultRenderer());

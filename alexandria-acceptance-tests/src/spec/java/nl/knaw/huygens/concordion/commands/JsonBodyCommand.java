@@ -14,7 +14,7 @@ import org.concordion.api.ResultRecorder;
 import org.concordion.internal.listener.AssertResultRenderer;
 
 @HuygensCommand(name = "jsonBody", htmlTag = "pre")
-public class JsonBodyCommand extends nl.knaw.huygens.concordion.commands.HuygensCommand {
+public class JsonBodyCommand extends AbstractHuygensCommand {
   public JsonBodyCommand() {
     addListener(new AssertResultRenderer());
   }

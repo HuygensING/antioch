@@ -12,7 +12,7 @@ import org.concordion.api.listener.AssertFailureEvent;
 import org.concordion.api.listener.AssertSuccessEvent;
 import org.concordion.internal.util.Announcer;
 
-public abstract class HuygensCommand extends AbstractCommand {
+public abstract class AbstractHuygensCommand extends AbstractCommand {
   private final Announcer<AssertEqualsListener> listeners = Announcer.to(AssertEqualsListener.class);
 
   protected void addListener(AssertEqualsListener listener) {

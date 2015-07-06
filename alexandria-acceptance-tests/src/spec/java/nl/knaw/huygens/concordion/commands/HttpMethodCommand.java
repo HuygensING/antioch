@@ -5,7 +5,7 @@ import org.concordion.api.Element;
 import org.concordion.api.Evaluator;
 import org.concordion.api.ResultRecorder;
 
-abstract public class HttpMethodCommand extends HuygensCommand {
+abstract public class HttpMethodCommand extends AbstractHuygensCommand {
   private final String method;
 
   public HttpMethodCommand(String method) {

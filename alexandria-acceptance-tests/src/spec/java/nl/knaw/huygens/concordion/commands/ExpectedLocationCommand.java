@@ -16,7 +16,7 @@ import org.concordion.api.ResultRecorder;
 import org.concordion.internal.listener.AssertResultRenderer;
 
 @HuygensCommand(name = "location")
-public class ExpectedLocationCommand extends nl.knaw.huygens.concordion.commands.HuygensCommand {
+public class ExpectedLocationCommand extends AbstractHuygensCommand {
 
   public ExpectedLocationCommand() {
     addListener(new AssertResultRenderer());

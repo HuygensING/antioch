@@ -10,7 +10,7 @@ import org.concordion.api.ResultRecorder;
 import org.concordion.internal.listener.AssertResultRenderer;
 
 @HuygensCommand(name = "responseBody")
-public class ExpectedResponseBodyCommand extends nl.knaw.huygens.concordion.commands.HuygensCommand {
+public class ExpectedResponseBodyCommand extends AbstractHuygensCommand {
 
   public ExpectedResponseBodyCommand() {
     addListener(new AssertResultRenderer());

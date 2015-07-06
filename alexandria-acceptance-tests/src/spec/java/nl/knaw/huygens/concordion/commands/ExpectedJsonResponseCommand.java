@@ -21,7 +21,7 @@ import org.concordion.api.Evaluator;
 import org.concordion.api.ResultRecorder;
 
 @HuygensCommand(name = "jsonResponse", htmlTag = "pre")
-public class ExpectedJsonResponseCommand extends nl.knaw.huygens.concordion.commands.HuygensCommand {
+public class ExpectedJsonResponseCommand extends AbstractHuygensCommand {
   public ExpectedJsonResponseCommand() {
     addListener(new RestResultRenderer());
   }

@@ -13,7 +13,9 @@ import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -59,6 +61,7 @@ public class RestFixture extends JerseyTest {
   private Optional<String> entity;
   private String method;
   private String url;
+  private Map<String, String> headers = new HashMap<>();
 
   @BeforeClass
   public static void setup() {
@@ -127,6 +130,7 @@ public class RestFixture extends JerseyTest {
     optionalBody = Optional.empty();
     response = null;
     entity = Optional.empty();
+    headers.clear();
     Log.trace("+- done (request details cleared)");
   }
 
@@ -155,7 +159,12 @@ public class RestFixture extends JerseyTest {
 
   public void request(String method, String path) {
     Log.trace("request: method=[{}], path=[{}]", method, path);
-    final Builder invoker = target.path(path).request(APPLICATION_JSON_TYPE);
+    Builder invoker = target.path(path).request(APPLICATION_JSON_TYPE);
+
+    for (Map.Entry<String, String> entry : headers.entrySet()) {
+      Log.trace("header: {}: {}", entry.getKey(), entry.getValue());
+      invoker = invoker.header(entry.getKey(), entry.getValue());
+    }
 
     if (optionalBody.isPresent()) {
       final MediaType mediaType = optionalContentType.orElse(APPLICATION_JSON_TYPE);
@@ -182,6 +191,10 @@ public class RestFixture extends JerseyTest {
 
   public void emptyBody() {
     body("");
+  }
+
+  public void setHeader(String name, String value) {
+    headers.put(name, value);
   }
 
   public void contentType(String type) {
