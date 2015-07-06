@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
+import java.util.TimeZone;
 
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
@@ -33,7 +34,9 @@ public class AboutEndpoint extends JSONEndpoint {
     Map<String, String> data = Maps.newLinkedHashMap();
     data.put("version", getProperty("version"));
     data.put("builddate", getProperty("builddate"));
-    data.put("started", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(this.starttime));
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT-1.00"));
+    data.put("started", simpleDateFormat.format(this.starttime));
     return Response.ok(data).build();
   }
 
