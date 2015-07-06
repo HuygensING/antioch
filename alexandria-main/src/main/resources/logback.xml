@@ -5,7 +5,7 @@
         </encoder>
     </appender>
 
-    <logger name="nl.knaw.huygens.alexandria" level="trace"/>
+    <logger name="nl.knaw.huygens" level="trace"/>
     <logger name="io.swagger" level="info"/>
 
     <root level="debug">
