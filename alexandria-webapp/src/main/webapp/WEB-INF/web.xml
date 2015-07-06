@@ -6,6 +6,7 @@
   <description>Alexandria Text Annotation Repository (REST)</description>
   <display-name>Alexandria Text Annotation Repository (REST)</display-name>
 
+<!-- 
   <servlet>
     <servlet-name>alexandria</servlet-name>
     <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
@@ -15,11 +16,11 @@
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
-
   <servlet-mapping>
     <servlet-name>alexandria</servlet-name>
     <url-pattern>/*</url-pattern>
   </servlet-mapping>
+ -->
   
   <filter>
     <filter-name>guiceFilter</filter-name>

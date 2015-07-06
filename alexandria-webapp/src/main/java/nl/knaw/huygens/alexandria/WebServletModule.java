@@ -1,11 +1,6 @@
 package nl.knaw.huygens.alexandria;
 
-import javax.ws.rs.container.ResourceContext;
-
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.jersey.server.internal.JerseyResourceContext;
-
-import com.squarespace.jersey2.guice.BootstrapUtils;
+import org.glassfish.jersey.servlet.ServletContainer;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaServletModule;
@@ -21,16 +16,9 @@ public class WebServletModule extends AlexandriaServletModule {
       Log.info("resourceClass={}", resource);
       bind(resource).asEagerSingleton();
     }
-
-    bind(ServiceLocator.class).toInstance(createServiceLocator());
-    bind(ResourceContext.class).to(JerseyResourceContext.class);
-  }
-
-  private ServiceLocator createServiceLocator() {
-    ServiceLocator locator = BootstrapUtils.newServiceLocator();
-    // BootstrapUtils.newInjector(locator, Arrays.asList(new AlexandriaServletModule()));
-    BootstrapUtils.install(locator);
-    return locator;
+    bind(ServletContainer.class).toInstance(new ServletContainer(rc));
+    // bind(ResourceContext.class).to(JerseyResourceContext.class);
+    serve("/*").with(ServletContainer.class);
   }
 
 }

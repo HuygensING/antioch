@@ -1,25 +1,16 @@
 package nl.knaw.huygens.alexandria;
 
+import java.util.List;
+
 import javax.servlet.ServletContextEvent;
+
+import com.google.common.collect.ImmutableList;
+import com.google.inject.Module;
+import com.squarespace.jersey2.guice.JerseyGuiceServletContextListener;
 
 import nl.knaw.huygens.Log;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.servlet.GuiceServletContextListener;
-
-public class ContextListener extends GuiceServletContextListener {
-  public static Injector injector;
-
-  public ContextListener() {
-    injector = Guice.createInjector(new WebServletModule());
-  }
-
-  @Override
-  protected Injector getInjector() {
-    Log.info("ContextListener.getInjector()");
-    return injector;
-  }
+public class ContextListener extends JerseyGuiceServletContextListener {
 
   @Override
   public void contextInitialized(ServletContextEvent servletContextEvent) {
@@ -31,5 +22,11 @@ public class ContextListener extends GuiceServletContextListener {
   public void contextDestroyed(ServletContextEvent servletContextEvent) {
     Log.info("ContextListener.contextDestroyed()");
     super.contextDestroyed(servletContextEvent);
+  }
+
+  @Override
+  protected List<? extends Module> modules() {
+    Log.info("modules() called");
+    return ImmutableList.of(new WebServletModule());
   }
 }

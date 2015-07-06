@@ -17,11 +17,8 @@
       <version>${project.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.glassfish.hk2</groupId>
-      <artifactId>guice-bridge</artifactId>
-      <version>${guice-bridge.version}</version>
-    </dependency>
+    <!-- <dependency> <groupId>org.glassfish.hk2</groupId> <artifactId>guice-bridge</artifactId> 
+      <version>${guice-bridge.version}</version> </dependency> -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
