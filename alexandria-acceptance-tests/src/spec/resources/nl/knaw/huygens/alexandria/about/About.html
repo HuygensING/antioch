@@ -1,0 +1,27 @@
+<html xmlns:h="http://alexandria.huygens.knaw.nl/concordion-extension"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://alexandria.huygens.knaw.nl/concordion-extension
+                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+
+<title>About the server</title>
+
+<body class="container">
+
+<h2 class="page-header">About the server</h2>
+
+<div id="about" class="panel panel-default">
+    <div class="panel-heading"><b>How can I get information about the Alexandria server?</b></div>
+    <div class="panel-body">
+        <h:request>
+            When I <h:get>/about</h:get> then I should receive <h:status>200 OK</h:status>
+            and the body contains <h:jsonResponse>{
+            "version": "1.0-SNAPSHOT",
+            "builddate": "{date.beforeNow}",
+            "started": "{date.beforeNow}"
+        }</h:jsonResponse>
+        </h:request>
+    </div>
+</div>
+</body>
+
+</html>
