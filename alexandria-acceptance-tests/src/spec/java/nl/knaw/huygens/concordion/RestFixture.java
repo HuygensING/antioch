@@ -118,7 +118,7 @@ public class RestFixture extends JerseyTest {
   }
 
   public void clear() {
-    Log.debug("Clearing ApiFixture");
+    Log.debug("Clearing {}", getClass().getSimpleName());
 
     target = client().target(getBaseUri());
     Log.trace("+- refreshed WebTarget: [{}]", target);
