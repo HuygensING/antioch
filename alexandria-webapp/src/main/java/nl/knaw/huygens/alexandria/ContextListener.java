@@ -3,6 +3,7 @@ package nl.knaw.huygens.alexandria;
 import java.util.List;
 
 import javax.servlet.ServletContextEvent;
+import javax.servlet.annotation.WebListener;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Module;
@@ -10,6 +11,7 @@ import com.squarespace.jersey2.guice.JerseyGuiceServletContextListener;
 
 import nl.knaw.huygens.Log;
 
+@WebListener
 public class ContextListener extends JerseyGuiceServletContextListener {
 
   @Override

@@ -6,22 +6,11 @@
   <description>Alexandria Text Annotation Repository (REST)</description>
   <display-name>Alexandria Text Annotation Repository (REST)</display-name>
 
-<!-- 
-  <servlet>
-    <servlet-name>alexandria</servlet-name>
-    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
-    <init-param>
-      <param-name>javax.ws.rs.Application</param-name>
-      <param-value>nl.knaw.huygens.alexandria.jersey.AlexandriaApplication</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>alexandria</servlet-name>
-    <url-pattern>/*</url-pattern>
-  </servlet-mapping>
- -->
-  
+  <!-- <servlet> <servlet-name>alexandria</servlet-name> <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class> 
+    <init-param> <param-name>javax.ws.rs.Application</param-name> <param-value>nl.knaw.huygens.alexandria.jersey.AlexandriaApplication</param-value> 
+    </init-param> <load-on-startup>1</load-on-startup> </servlet> <servlet-mapping> 
+    <servlet-name>alexandria</servlet-name> <url-pattern>/*</url-pattern> </servlet-mapping> -->
+
   <filter>
     <filter-name>guiceFilter</filter-name>
     <filter-class>com.google.inject.servlet.GuiceFilter</filter-class>
@@ -31,10 +20,6 @@
     <filter-name>guiceFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-
-  <listener>
-    <listener-class>nl.knaw.huygens.alexandria.ContextListener</listener-class>
-  </listener>
 
   <listener>
     <listener-class>se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor</listener-class>
