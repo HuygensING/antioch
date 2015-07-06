@@ -33,7 +33,8 @@ public class AboutEndpoint extends JSONEndpoint {
     Map<String, String> data = Maps.newLinkedHashMap();
     data.put("version", getProperty("version"));
     data.put("builddate", getProperty("builddate"));
-    data.put("started", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(this.starttime));
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+    data.put("started", simpleDateFormat.format(this.starttime));
     return Response.ok(data).build();
   }
 
