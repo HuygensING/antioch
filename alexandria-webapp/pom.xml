@@ -25,6 +25,11 @@
       <version>${servlet-api.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-servlet</artifactId>
+      <version>${jersey.version}</version>
+    </dependency>
+    <dependency>
       <groupId>se.jiderhamn</groupId>
       <artifactId>classloader-leak-prevention</artifactId>
       <scope>runtime</scope>
