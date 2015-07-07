@@ -52,6 +52,8 @@
           <scmBranch>${scm-publish.scmBranch}</scmBranch>
         </configuration>
       </plugin>
+
     </plugins>
   </build>
+
 </project>
