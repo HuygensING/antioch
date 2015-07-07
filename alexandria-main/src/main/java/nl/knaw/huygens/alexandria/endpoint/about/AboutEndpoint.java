@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -15,13 +16,18 @@ import com.google.common.collect.Maps;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 @Singleton
 @Path("about")
 @Api("about")
 public class AboutEndpoint extends JSONEndpoint {
   Date starttime = new Date();
+
+  @Inject
+  AlexandriaService s;
 
   /**
    * Show information about the back-end
@@ -31,6 +37,7 @@ public class AboutEndpoint extends JSONEndpoint {
   @GET
   @ApiOperation("get information about the server (version,builddate,started)")
   public Response getMetadata() {
+    Log.info("service={}", s);
     Map<String, String> data = Maps.newLinkedHashMap();
     data.put("version", getProperty("version"));
     data.put("builddate", getProperty("builddate"));
