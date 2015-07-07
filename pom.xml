@@ -39,7 +39,7 @@
     <jackson.version>2.6.0-rc3</jackson.version>
     <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
     <jdk.version>1.8</jdk.version>
-    <jersey.version>2.19</jersey.version>
+    <jersey.version>2.17</jersey.version><!--  can't update this version until jersey2-guice does -->
     <jersey2-guice.version>0.10</jersey2-guice.version>
     <junit.version>4.12</junit.version>
     <junitparams.version>1.0.4</junitparams.version>
