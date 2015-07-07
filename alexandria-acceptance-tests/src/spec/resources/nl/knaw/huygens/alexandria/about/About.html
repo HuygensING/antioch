@@ -9,7 +9,7 @@
 
 <h2 class="page-header">About the server</h2>
 
-<div id="about" class="panel">
+<div id="about" class="panel panel-default">
     <div class="panel-heading"><b>How can I get information about the Alexandria server?</b></div>
     <div class="panel-body">
         <h:request>
@@ -26,22 +26,23 @@
 <h2 class="page-header">Server homepage (apidocs, wadl)</h2>
 
 <div id="homepage" class="panel panel-default">
-    <div class="body">
+    <div class="panel-heading">What resources does the server provide besides REST resources?</div>
+    <div class="panel-body">
         <h:request>
-            <p>When I <h:get>/</h:get>
+            When I <h:get>/</h:get>
                 using <h:setHeader name="Accept">text/html</h:setHeader>
-                then I should receive <h:status>200 OK</h:status></p>
+            then I should receive <h:status>200 OK</h:status>
         </h:request>
 
         <h:request>
-            <p>When I <h:get>/application.wadl</h:get>
+            When I <h:get>/application.wadl</h:get>
                 using <h:setHeader name="Accept">application/xml</h:setHeader>
-                then I should receive <h:status>200 OK</h:status>
-            </p>
+            then I should receive <h:status>200 OK</h:status>
         </h:request>
 
         <h:request>
-            <p>When I <h:get>/favicon.ico</h:get> then I should receive <h:status>204 No Content</h:status></p>
+            Alexandria has an empty favicon:
+            <h:get>/favicon.ico</h:get> yields <h:status>204 No Content</h:status>
         </h:request>
     </div>
 </div>
