@@ -40,9 +40,8 @@
         <version>${plugin.scm-publish.version}</version>
         <inherited>true</inherited>
         <configuration>
-          <checkoutDirectory>${scmPublish.checkoutDirectory}</checkoutDirectory>
-          <checkinComment>Publishing Site Docs for
-            ${project.artifactId}:${project.version}
+          <checkoutDirectory>${scm-publish.checkoutDirectory}</checkoutDirectory>
+          <checkinComment>Publishing Site Docs for ${project.artifactId}:${project.version}
           </checkinComment>
           <!-- Plugins defaults to "target/staging" and since the distributionManagement 
             section is a pain in the ass for site docs, this is easier -->
