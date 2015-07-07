@@ -186,6 +186,13 @@
   </repositories>
 
   <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh</artifactId>
+        <version>2.7</version>
+      </extension>
+    </extensions>
     <sourceDirectory>src/main/java</sourceDirectory>
     <resources>
       <resource>
