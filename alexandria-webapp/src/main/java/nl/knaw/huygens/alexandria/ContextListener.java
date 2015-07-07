@@ -18,7 +18,6 @@ public class ContextListener extends JerseyGuiceServletContextListener {
   @Override
   public void contextInitialized(ServletContextEvent servletContextEvent) {
     Log.info("ContextListener.contextInitialized()");
-    Log.info("injector={}", injector);
     super.contextInitialized(servletContextEvent);
   }
 
