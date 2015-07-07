@@ -1,12 +1,13 @@
 package nl.knaw.huygens.alexandria.about;
 
-import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.endpoint.AboutEndpoint;
-import nl.knaw.huygens.alexandria.endpoint.HomePageEndpoint;
-import nl.knaw.huygens.concordion.RestFixture;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
+
+import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.endpoint.about.AboutEndpoint;
+import nl.knaw.huygens.alexandria.endpoint.homepage.HomePageEndpoint;
+import nl.knaw.huygens.concordion.RestFixture;
 
 @RunWith(ConcordionRunner.class)
 public class AboutFixture extends RestFixture {
