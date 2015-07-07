@@ -9,7 +9,7 @@
 
 <h2 class="page-header">About the server</h2>
 
-<div id="about" class="panel panel-default">
+<div id="about" class="panel">
     <div class="panel-heading"><b>How can I get information about the Alexandria server?</b></div>
     <div class="panel-body">
         <h:request>
@@ -20,11 +20,24 @@
             "started": "{date.beforeNow}"
         }</h:jsonResponse>
         </h:request>
+    </div>
+</div>
 
+<h2 class="page-header">Server homepage (apidocs, wadl)</h2>
+
+<div id="homepage" class="panel panel-default">
+    <div class="body">
         <h:request>
             <p>When I <h:get>/</h:get>
                 using <h:setHeader name="Accept">text/html</h:setHeader>
                 then I should receive <h:status>200 OK</h:status></p>
+        </h:request>
+
+        <h:request>
+            <p>When I <h:get>/application.wadl</h:get>
+                using <h:setHeader name="Accept">application/xml</h:setHeader>
+                then I should receive <h:status>200 OK</h:status>
+            </p>
         </h:request>
 
         <h:request>
