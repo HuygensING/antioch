@@ -14,7 +14,6 @@ import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,7 +26,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
-import com.google.inject.servlet.ServletModule;
 import com.squarespace.jersey2.guice.BootstrapUtils;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
@@ -52,6 +50,8 @@ public class RestFixture extends JerseyTest {
 
   private static TinkerpopAlexandriaService service = new TinkerpopAlexandriaService(new Storage());
 
+  private static boolean jersey2GuiceBridgeInitialised;
+
   private static ResourceConfig application;
 
   private WebTarget target;
@@ -61,7 +61,7 @@ public class RestFixture extends JerseyTest {
   private Optional<String> entity;
   private String method;
   private String url;
-  private Map<String, String> headers = new HashMap<>();
+  private final Map<String, String> headers = new HashMap<>();
 
   @BeforeClass
   public static void setup() {
@@ -70,17 +70,10 @@ public class RestFixture extends JerseyTest {
     application = new AcceptanceTestApplication();
     Log.trace("+- application=[{}]", application);
 
-    Log.debug("Bootstrapping Jersey2-Guice bridge");
-    ServiceLocator locator = BootstrapUtils.newServiceLocator();
-    Log.trace("+- locator=[{}]", locator);
-
-    final List<Module> modules = Arrays.asList(new ServletModule(), baseModule());
-    final Injector injector = BootstrapUtils.newInjector(locator, modules);
-    Log.trace("+- injector=[{}]", injector);
-
-    BootstrapUtils.install(locator);
-    Log.trace("+- done: locator installed");
-
+    if (!jersey2GuiceBridgeInitialised) {
+      initialiseJersey2GuiceBridge();
+      jersey2GuiceBridgeInitialised = true;
+    }
   }
 
   protected static void register(Class<?> componentClass) {
@@ -104,6 +97,19 @@ public class RestFixture extends JerseyTest {
         return Objects.toStringHelper(this).add("baseURI", getBaseURI()).toString();
       }
     };
+  }
+
+  private static void initialiseJersey2GuiceBridge() {
+    Log.debug("Bootstrapping Jersey2-Guice bridge");
+
+    final ServiceLocator locator = BootstrapUtils.newServiceLocator();
+    Log.trace("+- locator=[{}]", locator);
+
+    final Injector injector = BootstrapUtils.newInjector(locator, Arrays.asList(baseModule()));
+    Log.trace("+- injector=[{}]", injector);
+
+    BootstrapUtils.install(locator);
+    Log.trace("+- done: locator installed");
   }
 
   private static Module baseModule() {
