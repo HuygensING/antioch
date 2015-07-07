@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint;
+package nl.knaw.huygens.alexandria.endpoint.homepage;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +24,7 @@ public class HomePageEndpoint {
   public Response getHomePage() throws IOException {
     InputStream resourceAsStream = Thread.currentThread()//
         .getContextClassLoader().getResourceAsStream("index.html");
-    return Response.ok(resourceAsStream).build();
+    return Response.ok(resourceAsStream).header("Pragma", "public").header("Cache-Control", "public").build();
 
   }
 
@@ -33,5 +33,4 @@ public class HomePageEndpoint {
   public Response getFavIcon() {
     return Response.noContent().build();
   }
-
 }

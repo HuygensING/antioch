@@ -1,0 +1,14 @@
+<configuration>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d [%thread] %-5level %logger{48} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <logger name="nl.knaw.huygens.alexandria" level="trace" />
+  <logger name="io.swagger" level="debug" />
+
+  <root level="info">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>
