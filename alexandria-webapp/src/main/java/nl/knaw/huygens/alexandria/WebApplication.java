@@ -23,7 +23,6 @@ public class WebApplication extends AlexandriaApplication {
     List<Module> modules = Arrays.asList(new AlexandriaServletModule());
     Injector injector = BootstrapUtils.newInjector(locator, modules);
     Log.debug("injector={}", injector);
-    Log.debug("locator={}", locator);
     BootstrapUtils.install(locator);
   }
 }
