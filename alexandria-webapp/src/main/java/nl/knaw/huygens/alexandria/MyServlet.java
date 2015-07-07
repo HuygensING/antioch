@@ -16,8 +16,12 @@ import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 public class MyServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
 
-  @Inject
   AlexandriaConfiguration config;
+
+  @Inject
+  public MyServlet(AlexandriaConfiguration config) {
+    this.config = config;
+  }
 
   @Override
   protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
