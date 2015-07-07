@@ -5,20 +5,18 @@ import static org.assertj.core.api.StrictAssertions.assertThat;
 
 import java.util.Map;
 
-import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.test.JerseyTest;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.endpoint.about.AboutEndpoint;
+import nl.knaw.huygens.alexandria.endpoint.MockedServiceEndpointTest;
 
-public class AboutEndpointTest extends JerseyTest {
-  @Override
-  protected Application configure() {
-    return new ResourceConfig(AboutEndpoint.class);
+public class AboutEndpointTest extends MockedServiceEndpointTest {
+  @BeforeClass
+  public static void registerEndpoint() {
+    register(AboutEndpoint.class);
   }
 
   @Test
