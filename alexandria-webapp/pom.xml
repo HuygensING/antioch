@@ -63,7 +63,7 @@
         <groupId>org.apache.tomcat.maven</groupId>
         <artifactId>tomcat7-maven-plugin</artifactId>
         <configuration>
-          <update>true</update>
+          <update>false</update>
           <server>${tomcat.server}</server>
           <url>${tomcat.manager.url}</url>
           <path>${tomcat.path}</path>
