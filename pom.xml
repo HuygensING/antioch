@@ -24,7 +24,7 @@
     <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
     <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
 
-	<!-- Timestamp settings for use in properties file -->
+    <!-- Timestamp settings for use in properties file -->
     <timestamp>${maven.build.timestamp}</timestamp>
     <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
 
@@ -39,7 +39,7 @@
     <jackson.version>2.6.0-rc3</jackson.version>
     <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
     <jdk.version>1.8</jdk.version>
-    <jersey.version>2.17</jersey.version><!--  can't update this version until jersey2-guice does -->
+    <jersey.version>2.17</jersey.version><!-- can't update this version until jersey2-guice does -->
     <jersey2-guice.version>0.10</jersey2-guice.version>
     <junit.version>4.12</junit.version>
     <junitparams.version>1.0.4</junitparams.version>
@@ -61,7 +61,7 @@
     <tinkerpop.version>3.0.0.M9-incubating</tinkerpop.version>
     <tomcat7-maven.version>2.2</tomcat7-maven.version>
 
-	<!-- Concordion settings (move to acceptance-test module?) -->
+    <!-- Concordion settings (move to acceptance-test module?) -->
     <concordion.reportDir>${project.build.directory}/concordion-reports</concordion.reportDir>
     <integration.testOutputDir>${project.build.directory}/integration-test-classes</integration.testOutputDir>
     <site.dir>src/site</site.dir>
@@ -70,13 +70,13 @@
     <spec.docDir>${spec.dir}/resources</spec.docDir>
     <spec.testSourceDir>${spec.dir}/java</spec.testSourceDir>
 
-	<!-- Settings for maven-site-plugin -->
-	<port>9000</port>
+    <!-- Settings for maven-site-plugin -->
+    <port>9000</port>
 
-	<!-- Settings for maven-scm-publish-plugin used to publish site to GitHub -->
-	<scmpublish.checkinComment>Publishing Site Docs for ${project.artifactId}:${project.version}</scmpublish.checkinComment>
-	<scmpublish.pubScmUrl>scm:git:git@github.com:huygensING/alexandria.git </scmpublish.pubScmUrl>
-	<scmpublish.scm.branch>gh-pages</scmpublish.scm.branch>
+    <!-- Settings for maven-scm-publish-plugin used to publish site to GitHub -->
+    <scmpublish.checkinComment>Publishing Site Docs for ${project.artifactId}:${project.version}</scmpublish.checkinComment>
+    <scmpublish.pubScmUrl>scm:git:git@github.com:huygensING/alexandria.git </scmpublish.pubScmUrl>
+    <scmpublish.scm.branch>gh-pages</scmpublish.scm.branch>
 
     <project.license.name>GNU General Public License</project.license.name>
     <project.license.url>http://www.gnu.org/licenses/gpl.txt</project.license.url>
@@ -159,8 +159,8 @@
     </snapshotRepository>
     <site>
       <id>huygens.site</id>
-	  <!-- This is used by maven-scm-publish-plugin -->
-	  <url>scm:git:git@github.com:huygensING/alexandria.git</url>
+      <!-- This is used by maven-scm-publish-plugin -->
+      <url>scm:git:git@github.com:huygensING/alexandria.git</url>
     </site>
   </distributionManagement>
 
@@ -228,34 +228,35 @@
         </configuration>
       </plugin>
 
-	  <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-site-plugin</artifactId>
-		<version>3.4</version>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.4</version>
 
-		<dependencies>
-		  <dependency>
-			<groupId>lt.velykis.maven.skins</groupId>
-			<artifactId>reflow-velocity-tools</artifactId>
-			<version>1.1.1</version>
-		  </dependency>
+        <dependencies>
+          <dependency>
+            <groupId>lt.velykis.maven.skins</groupId>
+            <artifactId>reflow-velocity-tools</artifactId>
+            <version>1.1.1</version>
+          </dependency>
 
-		  <!-- Reflow skin requires Velocity >= 1.7 -->
-		  <dependency>
-			<groupId>org.apache.velocity</groupId>
-			<artifactId>velocity</artifactId>
-			<version>1.7</version>
-		  </dependency>
-		</dependencies>
-	  </plugin>
+          <!-- Reflow skin requires Velocity >= 1.7 -->
+          <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+            <version>1.7</version>
+          </dependency>
+        </dependencies>
+      </plugin>
 
-	  <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-scm-publish-plugin</artifactId>
-		<version>${plugin.scm-publish.version}</version>
-		<!-- this plugin configuration should apply to POMs which inherit from this one-->
-		<inherited>true</inherited>
-	  </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-scm-publish-plugin</artifactId>
+        <version>${plugin.scm-publish.version}</version>
+        <!-- this plugin configuration should apply to POMs which inherit 
+          from this one -->
+        <inherited>true</inherited>
+      </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -306,7 +307,7 @@
               <report>project-team</report>
               <report>cim</report>
               <report>issue-tracking</report>
-			  <!--<report>dependencies</report>-->
+              <!--<report>dependencies</report> -->
             </reports>
           </reportSet>
         </reportSets>
