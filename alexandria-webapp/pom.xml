@@ -76,8 +76,8 @@
     <profile>
       <id>test</id>
       <properties>
-        <tomcat.server>tomcat.hi17</tomcat.server>
-        <tomcat.manager.url>${tc17-manager}</tomcat.manager.url>
+        <tomcat.server>tomcat.hi23</tomcat.server>
+        <tomcat.manager.url>${tc23-manager}</tomcat.manager.url>
         <tomcat.path>/test-alexandria</tomcat.path>
       </properties>
     </profile>
