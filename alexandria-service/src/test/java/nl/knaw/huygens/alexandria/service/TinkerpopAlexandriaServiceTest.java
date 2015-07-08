@@ -24,7 +24,7 @@ import nl.knaw.huygens.alexandria.storage.Storage;
 
 public class TinkerpopAlexandriaServiceTest {
   private final Storage mockStorage = mock(Storage.class);
-  private final TinkerpopAlexandriaService service = new TinkerpopAlexandriaService(mockStorage);
+  private final TinkerpopAlexandriaService service = (TinkerpopAlexandriaService) new TinkerpopAlexandriaService().withStorage(mockStorage);
 
   @Test
   public void test() {

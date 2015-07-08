@@ -68,7 +68,7 @@
       <id>test</id>
       <properties>
         <tomcat.server>tomcat.hi17</tomcat.server>
-        <tomcat.manager.url>http://demo17.huygens.knaw.nl/manager/html</tomcat.manager.url>
+        <tomcat.manager.url>${tc17-manager}</tomcat.manager.url>
         <tomcat.path>/test-alexandria</tomcat.path>
       </properties>
     </profile>

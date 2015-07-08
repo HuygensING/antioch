@@ -10,7 +10,7 @@ import nl.knaw.huygens.alexandria.service.TinkerpopAlexandriaService;
 
 public class TinkergraphServiceEndpointTest extends EndpointTest {
   static Storage storage = new TinkerGraphStorage();
-  static final AlexandriaService tinkerGraphService = new TinkerpopAlexandriaService(storage);
+  static final AlexandriaService tinkerGraphService = new TinkerpopAlexandriaService().withStorage(storage);
 
   @BeforeClass
   public static void setup() {

@@ -41,13 +41,13 @@ import peapod.annotations.Vertex;
 
 public class Storage {
   private static final String IDENTIFIER_PROPERTY = "uuid";
-  protected static final String DUMPFILE = "dump.xml";
   private static final TemporalAmount TIMEOUT = Duration.ofDays(1);
 
   private final Graph graph;
   private final FramedGraph framedGraph;
 
   private Transaction tx;
+  private String dumpfile;
 
   public Storage() {
     this(TinkerGraph.open());
@@ -206,10 +206,12 @@ public class Storage {
   }
 
   public void saveToDisk(String file) {
-    try {
-      graph.io(new GraphMLIo.Builder()).writeGraph(file);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    if (file != null) {
+      try {
+        graph.io(new GraphMLIo.Builder()).writeGraph(file);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
   }
 
@@ -244,7 +246,7 @@ public class Storage {
       tx.close();
     }
     if (!supportsPersistence()) {
-      saveToDisk(DUMPFILE);
+      saveToDisk(getDumpFile());
     }
   }
 
@@ -347,6 +349,14 @@ public class Storage {
     vf.setProvenanceWhen(provenance.getWhen().toString());
     vf.setProvenanceWho(provenance.getWho());
     vf.setProvenanceWhy(provenance.getWhy());
+  }
+
+  public String getDumpFile() {
+    return dumpfile;
+  }
+
+  public void setDumpFile(String dumpfile) {
+    this.dumpfile = dumpfile;
   }
 
 }

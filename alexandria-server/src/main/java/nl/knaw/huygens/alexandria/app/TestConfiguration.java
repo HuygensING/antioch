@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria;
+package nl.knaw.huygens.alexandria.app;
 
 import java.net.URI;
 
@@ -10,13 +10,12 @@ public class TestConfiguration implements AlexandriaConfiguration {
 
   @Override
   public URI getBaseURI() {
-    // TODO: hide url
-    return UriBuilder.fromUri("http://demo17.huygens.knaw.nl/test-alexandria/").build();
+    return UriBuilder.fromUri("http://localhost").port(2015).build();
   }
 
   @Override
   public String getStorageDirectory() {
-    return "/data/alexandria/";
+    return "d:/tmp/alexandria";
   }
 
 }

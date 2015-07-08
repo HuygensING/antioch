@@ -5,20 +5,22 @@ import java.net.URI;
 import java.time.Duration;
 import java.util.Arrays;
 
-import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.config.AlexandriaServletModule;
-import nl.knaw.huygens.alexandria.config.TinkerpopAlexandriaConfiguration;
-import nl.knaw.huygens.alexandria.jersey.AlexandriaApplication;
-
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
+import com.google.inject.AbstractModule;
 import com.squarespace.jersey2.guice.BootstrapUtils;
+
+import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+import nl.knaw.huygens.alexandria.config.AlexandriaServletModule;
+import nl.knaw.huygens.alexandria.jersey.AlexandriaApplication;
 
 public class Server {
   private static final long ONE_HOUR = Duration.ofHours(1).toMillis();
+  private AlexandriaConfiguration config = new TestConfiguration();
 
   public static void main(String[] args) throws IOException {
     new Server().run();
@@ -48,7 +50,7 @@ public class Server {
   }
 
   private URI getBaseURI() {
-    return new TinkerpopAlexandriaConfiguration().getBaseURI();
+    return config.getBaseURI();
   }
 
   protected HttpServer startServer(URI uri) throws IOException {
@@ -60,7 +62,13 @@ public class Server {
 
   private ServiceLocator createServiceLocator() {
     ServiceLocator locator = BootstrapUtils.newServiceLocator();
-    BootstrapUtils.newInjector(locator, Arrays.asList(new AlexandriaServletModule()));
+    AbstractModule configModule = new AbstractModule() {
+      @Override
+      protected void configure() {
+        bind(AlexandriaConfiguration.class).toInstance(config);
+      }
+    };
+    BootstrapUtils.newInjector(locator, Arrays.asList(new AlexandriaServletModule(), configModule));
     BootstrapUtils.install(locator);
     return locator;
   }

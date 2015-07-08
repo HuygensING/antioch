@@ -16,13 +16,10 @@ public class AlexandriaServletModule extends ServletModule {
   protected void configureServlets() {
     // guice binds here
     Log.trace("configureServlets(): setting up Guice bindings");
-    Storage storage = new PersistentTinkerGraphStorage();
-    AlexandriaService service = new TinkerpopAlexandriaService(storage);
-    bind(AlexandriaService.class).toInstance(service);
-    bind(AlexandriaConfiguration.class).to(TinkerpopAlexandriaConfiguration.class);
+    bind(AlexandriaService.class).to(TinkerpopAlexandriaService.class);
     bind(AnnotationEntityBuilder.class).in(Scopes.SINGLETON);
     bind(ResourceEntityBuilder.class).in(Scopes.SINGLETON);
-    bind(Storage.class).toInstance(storage);
+    bind(Storage.class).to(PersistentTinkerGraphStorage.class);
     super.configureServlets();
   }
 }
