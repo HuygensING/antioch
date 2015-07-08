@@ -23,18 +23,14 @@
 <a class="jxr_linenumber" name="L15" href="#L15">15</a>    @Override
 <a class="jxr_linenumber" name="L16" href="#L16">16</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">void</strong> configureServlets() {
 <a class="jxr_linenumber" name="L17" href="#L17">17</a>      <em class="jxr_comment">// guice binds here</em>
-<a class="jxr_linenumber" name="L18" href="#L18">18</a>      Log.trace(<span class="jxr_string">"setting up Guice bindings"</span>);
-<a class="jxr_linenumber" name="L19" href="#L19">19</a>      <a href="../../../../../nl/knaw/huygens/alexandria/storage/Storage.html">Storage</a> storage = <strong class="jxr_keyword">new</strong> <a href="../../../../../nl/knaw/huygens/alexandria/storage/PersistentTinkerGraphStorage.html">PersistentTinkerGraphStorage</a>();
-<a class="jxr_linenumber" name="L20" href="#L20">20</a>      <a href="../../../../../nl/knaw/huygens/alexandria/service/AlexandriaService.html">AlexandriaService</a> service = <strong class="jxr_keyword">new</strong> <a href="../../../../../nl/knaw/huygens/alexandria/service/TinkerpopAlexandriaService.html">TinkerpopAlexandriaService</a>(storage);
-<a class="jxr_linenumber" name="L21" href="#L21">21</a>      bind(AlexandriaService.<strong class="jxr_keyword">class</strong>).toInstance(service);
-<a class="jxr_linenumber" name="L22" href="#L22">22</a>      bind(AlexandriaConfiguration.<strong class="jxr_keyword">class</strong>).to(TinkerpopAlexandriaConfiguration.<strong class="jxr_keyword">class</strong>);
-<a class="jxr_linenumber" name="L23" href="#L23">23</a>      bind(AnnotationEntityBuilder.<strong class="jxr_keyword">class</strong>).in(Scopes.SINGLETON);
-<a class="jxr_linenumber" name="L24" href="#L24">24</a>      bind(ResourceEntityBuilder.<strong class="jxr_keyword">class</strong>).in(Scopes.SINGLETON);
-<a class="jxr_linenumber" name="L25" href="#L25">25</a>      bind(Storage.<strong class="jxr_keyword">class</strong>).toInstance(storage);
-<a class="jxr_linenumber" name="L26" href="#L26">26</a>  
-<a class="jxr_linenumber" name="L27" href="#L27">27</a>      <strong class="jxr_keyword">super</strong>.configureServlets();
-<a class="jxr_linenumber" name="L28" href="#L28">28</a>    }
-<a class="jxr_linenumber" name="L29" href="#L29">29</a>  }
+<a class="jxr_linenumber" name="L18" href="#L18">18</a>      Log.trace(<span class="jxr_string">"configureServlets(): setting up Guice bindings"</span>);
+<a class="jxr_linenumber" name="L19" href="#L19">19</a>      bind(AlexandriaService.<strong class="jxr_keyword">class</strong>).to(TinkerpopAlexandriaService.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L20" href="#L20">20</a>      bind(AnnotationEntityBuilder.<strong class="jxr_keyword">class</strong>).in(Scopes.SINGLETON);
+<a class="jxr_linenumber" name="L21" href="#L21">21</a>      bind(ResourceEntityBuilder.<strong class="jxr_keyword">class</strong>).in(Scopes.SINGLETON);
+<a class="jxr_linenumber" name="L22" href="#L22">22</a>      bind(Storage.<strong class="jxr_keyword">class</strong>).to(PersistentTinkerGraphStorage.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L23" href="#L23">23</a>      <strong class="jxr_keyword">super</strong>.configureServlets();
+<a class="jxr_linenumber" name="L24" href="#L24">24</a>    }
+<a class="jxr_linenumber" name="L25" href="#L25">25</a>  }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2015 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>

@@ -2,8 +2,10 @@ nl.knaw.huygens.alexandria
 nl.knaw.huygens.alexandria.app
 nl.knaw.huygens.alexandria.config
 nl.knaw.huygens.alexandria.endpoint
+nl.knaw.huygens.alexandria.endpoint.about
 nl.knaw.huygens.alexandria.endpoint.annotation
 nl.knaw.huygens.alexandria.endpoint.annotationbody
+nl.knaw.huygens.alexandria.endpoint.homepage
 nl.knaw.huygens.alexandria.endpoint.resource
 nl.knaw.huygens.alexandria.exception
 nl.knaw.huygens.alexandria.jersey
