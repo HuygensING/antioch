@@ -7,16 +7,20 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 
 @Singleton
 public class PersistentTinkerGraphStorage extends TinkerGraphStorage {
+  private static final String DUMPFILE = "alexandria.graphml";
 
   @Inject
-  public PersistentTinkerGraphStorage() {
+  public PersistentTinkerGraphStorage(AlexandriaConfiguration config) {
     super();
-    if (!supportsPersistence() && Files.exists(Paths.get(DUMPFILE))) {
-      Log.info("reading stored db from {}", DUMPFILE);
-      loadFromDisk(DUMPFILE);
+    String dumpfile = config.getStorageDirectory() + "/" + DUMPFILE;
+    setDumpFile(dumpfile);
+    if (!supportsPersistence() && Files.exists(Paths.get(dumpfile))) {
+      Log.info("reading stored db from {}", dumpfile);
+      loadFromDisk(dumpfile);
     }
   }
 }
