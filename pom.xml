@@ -39,7 +39,8 @@
     <jackson.version>2.6.0-rc3</jackson.version>
     <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
     <jdk.version>1.8</jdk.version>
-    <jersey.version>2.17</jersey.version><!-- can't update this version until jersey2-guice does -->
+    <jersey.version>2.17</jersey.version><!-- can't update this version until 
+      jersey2-guice does -->
     <jersey2-guice.version>0.10</jersey2-guice.version>
     <junit.version>4.12</junit.version>
     <junitparams.version>1.0.4</junitparams.version>
@@ -74,7 +75,8 @@
     <port>9000</port>
 
     <!-- Settings for maven-scm-publish-plugin used to publish site to GitHub -->
-    <scmpublish.checkinComment>Publishing Site Docs for ${project.artifactId}:${project.version}</scmpublish.checkinComment>
+    <scmpublish.checkinComment>Publishing Site Docs for
+      ${project.artifactId}:${project.version}</scmpublish.checkinComment>
     <scmpublish.pubScmUrl>scm:git:git@github.com:huygensING/alexandria.git </scmpublish.pubScmUrl>
     <scmpublish.scm.branch>gh-pages</scmpublish.scm.branch>
 
@@ -282,7 +284,54 @@
         </dependencies>
       </plugin>
 
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.9.1</version>
+        <executions>
+          <execution>
+            <id>timestamp-property</id>
+            <goals>
+              <goal>timestamp-property</goal>
+            </goals>
+            <configuration>
+              <name>current.time</name>
+              <pattern>${maven.build.timestamp.format}</pattern>
+              <timeZone>AMS</timeZone>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
+    <pluginManagement>
+      <plugins>
+        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <versionRange>[1.9.1,)</versionRange>
+                    <goals>
+                      <goal>timestamp-property</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore></ignore>
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
   <prerequisites>
