@@ -58,7 +58,7 @@
     <swagger.version>1.5.0</swagger.version>
     <tinkerpop.groupId>org.apache.tinkerpop</tinkerpop.groupId>
     <tinkerpop.version>3.0.0.M9-incubating</tinkerpop.version>
-    <tomcat-maven.version>1.1</tomcat-maven.version>
+    <tomcat7-maven.version>2.2</tomcat7-maven.version>
 
     <concordion.reportDir>${project.build.directory}/concordion-reports</concordion.reportDir>
     <integration.testOutputDir>${project.build.directory}/integration-test-classes</integration.testOutputDir>
