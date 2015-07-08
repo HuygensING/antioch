@@ -48,6 +48,8 @@ public class Storage {
 
   private Transaction tx;
   private String dumpfile;
+  private boolean supportsTransactions;
+  private boolean supportsPersistence;
 
   public Storage() {
     this(TinkerGraph.open());
@@ -56,14 +58,17 @@ public class Storage {
   public Storage(Graph graph) {
     this.graph = graph;
     this.framedGraph = new FramedGraph(graph, ResourceVF.class.getPackage());
+    GraphFeatures graphFeatures = graph.features().graph();
+    this.supportsPersistence = graphFeatures.supportsPersistence();
+    this.supportsTransactions = graphFeatures.supportsTransactions();
   }
 
   public boolean supportsTransactions() {
-    return graphFeatures().supportsTransactions();
+    return supportsTransactions;
   }
 
   public boolean supportsPersistence() {
-    return graphFeatures().supportsPersistence();
+    return supportsPersistence;
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
