@@ -85,6 +85,9 @@
   <profiles>
     <profile>
       <id>test</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <properties>
         <tomcat.server>tomcat.hi23</tomcat.server>
         <tomcat.manager.url>${tc23-manager}</tomcat.manager.url>
@@ -95,8 +98,8 @@
     <profile>
       <id>prod</id>
       <properties>
-        <tomcat.server></tomcat.server>
-        <tomcat.manager.url></tomcat.manager.url>
+        <tomcat.server>tomcat.hi23</tomcat.server>
+        <tomcat.manager.url>${tc23-manager}</tomcat.manager.url>
         <tomcat.path>/alexandria</tomcat.path>
       </properties>
     </profile>
