@@ -25,7 +25,6 @@
     <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
 
     <!-- Timestamp settings for use in properties file -->
-    <timestamp>${maven.build.timestamp}</timestamp>
     <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
 
     <!-- Software versions -->
@@ -295,7 +294,7 @@
               <goal>timestamp-property</goal>
             </goals>
             <configuration>
-              <name>current.time</name>
+              <name>timestamp</name>
               <pattern>${maven.build.timestamp.format}</pattern>
               <timeZone>AMS</timeZone>
             </configuration>
