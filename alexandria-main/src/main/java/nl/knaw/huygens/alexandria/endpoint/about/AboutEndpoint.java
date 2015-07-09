@@ -45,6 +45,7 @@ public class AboutEndpoint extends JSONEndpoint {
   public Response getMetadata() {
     Map<String, String> data = Maps.newLinkedHashMap();
     data.put("version", getProperty("version"));
+    data.put("commit id", getProperty("commit_id"));
     data.put("builddate", getProperty("builddate"));
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     simpleDateFormat.setTimeZone(TimeZone.getTimeZone("AMS"));
