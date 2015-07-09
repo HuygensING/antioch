@@ -53,29 +53,30 @@
 <a class="jxr_linenumber" name="L45" href="#L45">45</a>    <strong class="jxr_keyword">public</strong> Response getMetadata() {
 <a class="jxr_linenumber" name="L46" href="#L46">46</a>      Map&lt;String, String&gt; data = Maps.newLinkedHashMap();
 <a class="jxr_linenumber" name="L47" href="#L47">47</a>      data.put(<span class="jxr_string">"version"</span>, getProperty(<span class="jxr_string">"version"</span>));
-<a class="jxr_linenumber" name="L48" href="#L48">48</a>      data.put(<span class="jxr_string">"builddate"</span>, getProperty(<span class="jxr_string">"builddate"</span>));
-<a class="jxr_linenumber" name="L49" href="#L49">49</a>      SimpleDateFormat simpleDateFormat = <strong class="jxr_keyword">new</strong> SimpleDateFormat(<span class="jxr_string">"yyyy-MM-dd'T'HH:mm:ss'Z'"</span>);
-<a class="jxr_linenumber" name="L50" href="#L50">50</a>      simpleDateFormat.setTimeZone(TimeZone.getTimeZone(<span class="jxr_string">"AMS"</span>));
-<a class="jxr_linenumber" name="L51" href="#L51">51</a>      data.put(<span class="jxr_string">"started"</span>, simpleDateFormat.format(<strong class="jxr_keyword">this</strong>.starttime));
-<a class="jxr_linenumber" name="L52" href="#L52">52</a>      <strong class="jxr_keyword">return</strong> Response.ok(data).build();
-<a class="jxr_linenumber" name="L53" href="#L53">53</a>    }
-<a class="jxr_linenumber" name="L54" href="#L54">54</a>  
-<a class="jxr_linenumber" name="L55" href="#L55">55</a>    <em class="jxr_comment">// private methods</em>
-<a class="jxr_linenumber" name="L56" href="#L56">56</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> PropertyResourceBundle propertyResourceBundle;
-<a class="jxr_linenumber" name="L57" href="#L57">57</a>  
-<a class="jxr_linenumber" name="L58" href="#L58">58</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">synchronized</strong> String getProperty(String key) {
-<a class="jxr_linenumber" name="L59" href="#L59">59</a>      <strong class="jxr_keyword">if</strong> (propertyResourceBundle == <strong class="jxr_keyword">null</strong>) {
-<a class="jxr_linenumber" name="L60" href="#L60">60</a>        <strong class="jxr_keyword">try</strong> {
-<a class="jxr_linenumber" name="L61" href="#L61">61</a>          propertyResourceBundle = <strong class="jxr_keyword">new</strong> PropertyResourceBundle(<em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L62" href="#L62">62</a>              Thread.currentThread().getContextClassLoader().getResourceAsStream(<span class="jxr_string">"about.properties"</span>));
-<a class="jxr_linenumber" name="L63" href="#L63">63</a>        } <strong class="jxr_keyword">catch</strong> (IOException e) {
-<a class="jxr_linenumber" name="L64" href="#L64">64</a>          e.printStackTrace();
-<a class="jxr_linenumber" name="L65" href="#L65">65</a>        }
-<a class="jxr_linenumber" name="L66" href="#L66">66</a>      }
-<a class="jxr_linenumber" name="L67" href="#L67">67</a>      <strong class="jxr_keyword">return</strong> propertyResourceBundle.getString(key);
-<a class="jxr_linenumber" name="L68" href="#L68">68</a>    }
-<a class="jxr_linenumber" name="L69" href="#L69">69</a>  
-<a class="jxr_linenumber" name="L70" href="#L70">70</a>  }
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>      data.put(<span class="jxr_string">"commit id"</span>, getProperty(<span class="jxr_string">"commit_id"</span>));
+<a class="jxr_linenumber" name="L49" href="#L49">49</a>      data.put(<span class="jxr_string">"builddate"</span>, getProperty(<span class="jxr_string">"builddate"</span>));
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>      SimpleDateFormat simpleDateFormat = <strong class="jxr_keyword">new</strong> SimpleDateFormat(<span class="jxr_string">"yyyy-MM-dd'T'HH:mm:ss'Z'"</span>);
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>      simpleDateFormat.setTimeZone(TimeZone.getTimeZone(<span class="jxr_string">"AMS"</span>));
+<a class="jxr_linenumber" name="L52" href="#L52">52</a>      data.put(<span class="jxr_string">"started"</span>, simpleDateFormat.format(<strong class="jxr_keyword">this</strong>.starttime));
+<a class="jxr_linenumber" name="L53" href="#L53">53</a>      <strong class="jxr_keyword">return</strong> Response.ok(data).build();
+<a class="jxr_linenumber" name="L54" href="#L54">54</a>    }
+<a class="jxr_linenumber" name="L55" href="#L55">55</a>  
+<a class="jxr_linenumber" name="L56" href="#L56">56</a>    <em class="jxr_comment">// private methods</em>
+<a class="jxr_linenumber" name="L57" href="#L57">57</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> PropertyResourceBundle propertyResourceBundle;
+<a class="jxr_linenumber" name="L58" href="#L58">58</a>  
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">synchronized</strong> String getProperty(String key) {
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>      <strong class="jxr_keyword">if</strong> (propertyResourceBundle == <strong class="jxr_keyword">null</strong>) {
+<a class="jxr_linenumber" name="L61" href="#L61">61</a>        <strong class="jxr_keyword">try</strong> {
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>          propertyResourceBundle = <strong class="jxr_keyword">new</strong> PropertyResourceBundle(<em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>              Thread.currentThread().getContextClassLoader().getResourceAsStream(<span class="jxr_string">"about.properties"</span>));
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>        } <strong class="jxr_keyword">catch</strong> (IOException e) {
+<a class="jxr_linenumber" name="L65" href="#L65">65</a>          e.printStackTrace();
+<a class="jxr_linenumber" name="L66" href="#L66">66</a>        }
+<a class="jxr_linenumber" name="L67" href="#L67">67</a>      }
+<a class="jxr_linenumber" name="L68" href="#L68">68</a>      <strong class="jxr_keyword">return</strong> propertyResourceBundle.getString(key);
+<a class="jxr_linenumber" name="L69" href="#L69">69</a>    }
+<a class="jxr_linenumber" name="L70" href="#L70">70</a>  
+<a class="jxr_linenumber" name="L71" href="#L71">71</a>  }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2015 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
