@@ -296,6 +296,7 @@
             <configuration>
               <name>timestamp</name>
               <pattern>${maven.build.timestamp.format}</pattern>
+              <locale>nl,nl</locale>
               <timeZone>AMS</timeZone>
             </configuration>
           </execution>
