@@ -4,7 +4,7 @@ function divider {
   echo
 }
 
-base=http://alexandria.huygens.knaw.nl/alexandria
+base=http://tc23.huygens.knaw.nl/alexandria
 mvn package tomcat7:redeploy -P prod -pl alexandria-webapp -am
 divider
 sleep 20 # wait for the server to boot
