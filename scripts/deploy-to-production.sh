@@ -10,3 +10,4 @@ divider
 sleep 20 # wait for the server to boot
 curlCmd="curl -sSf $base/about"
 echo $curlCmd
+eval($curlCmd)
