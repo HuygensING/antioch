@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function usage {
-  echo "Usage: deploy-to.sh {test|production}"
+  echo "Usage: deploy-to.sh {test|prod} {base-url}"
 }
 
 function divider {
@@ -11,19 +11,8 @@ function divider {
 }
 
 function deploy {
-  if [ "test" == "$1" ]; then
-    base=http://tc23.huygens.knaw.nl/test-alexandria
-    profile=test
-	  
-	elif [ "production" == "$1" ]; then
-    base=http://tc23.huygens.knaw.nl/alexandria
-    profile=prod
-	
-	else
-	  usage
-	  exit
-	fi
-
+  profile=$1
+  base=$2
 	mvn package tomcat7:redeploy -P $profile -pl alexandria-webapp -am &&
 	(
 		divider
@@ -36,4 +25,11 @@ function deploy {
 	divider
 }
 
-deploy $1
+profile=$1
+base=$2
+if [[ -n "$profile" && -n "$base" ]]; then
+  deploy $profile $base
+else
+  usage
+fi
+  
