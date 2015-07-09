@@ -15,63 +15,67 @@
 <a class="jxr_linenumber" name="L7" href="#L7">7</a>   <strong class="jxr_keyword">import</strong> java.util.PropertyResourceBundle;
 <a class="jxr_linenumber" name="L8" href="#L8">8</a>   <strong class="jxr_keyword">import</strong> java.util.TimeZone;
 <a class="jxr_linenumber" name="L9" href="#L9">9</a>   
-<a class="jxr_linenumber" name="L10" href="#L10">10</a>  <strong class="jxr_keyword">import</strong> javax.inject.Inject;
-<a class="jxr_linenumber" name="L11" href="#L11">11</a>  <strong class="jxr_keyword">import</strong> javax.inject.Singleton;
-<a class="jxr_linenumber" name="L12" href="#L12">12</a>  <strong class="jxr_keyword">import</strong> javax.ws.rs.GET;
-<a class="jxr_linenumber" name="L13" href="#L13">13</a>  <strong class="jxr_keyword">import</strong> javax.ws.rs.Path;
-<a class="jxr_linenumber" name="L14" href="#L14">14</a>  <strong class="jxr_keyword">import</strong> javax.ws.rs.core.Response;
-<a class="jxr_linenumber" name="L15" href="#L15">15</a>  
-<a class="jxr_linenumber" name="L16" href="#L16">16</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Maps;
-<a class="jxr_linenumber" name="L17" href="#L17">17</a>  
-<a class="jxr_linenumber" name="L18" href="#L18">18</a>  <strong class="jxr_keyword">import</strong> io.swagger.annotations.Api;
-<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <strong class="jxr_keyword">import</strong> io.swagger.annotations.ApiOperation;
-<a class="jxr_linenumber" name="L20" href="#L20">20</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.Log;
-<a class="jxr_linenumber" name="L21" href="#L21">21</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
-<a class="jxr_linenumber" name="L22" href="#L22">22</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.service.AlexandriaService;
-<a class="jxr_linenumber" name="L23" href="#L23">23</a>  
-<a class="jxr_linenumber" name="L24" href="#L24">24</a>  @Singleton
-<a class="jxr_linenumber" name="L25" href="#L25">25</a>  @Path(<span class="jxr_string">"about"</span>)
-<a class="jxr_linenumber" name="L26" href="#L26">26</a>  @Api(<span class="jxr_string">"about"</span>)
-<a class="jxr_linenumber" name="L27" href="#L27">27</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/about/AboutEndpoint.html">AboutEndpoint</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/JSONEndpoint.html">JSONEndpoint</a> {
-<a class="jxr_linenumber" name="L28" href="#L28">28</a>    Date starttime = <strong class="jxr_keyword">new</strong> Date();
-<a class="jxr_linenumber" name="L29" href="#L29">29</a>  
-<a class="jxr_linenumber" name="L30" href="#L30">30</a>    @Inject
-<a class="jxr_linenumber" name="L31" href="#L31">31</a>    <a href="../../../../../../nl/knaw/huygens/alexandria/service/AlexandriaService.html">AlexandriaService</a> s;
+<a class="jxr_linenumber" name="L10" href="#L10">10</a>  <strong class="jxr_keyword">import</strong> javax.inject.Singleton;
+<a class="jxr_linenumber" name="L11" href="#L11">11</a>  <strong class="jxr_keyword">import</strong> javax.ws.rs.GET;
+<a class="jxr_linenumber" name="L12" href="#L12">12</a>  <strong class="jxr_keyword">import</strong> javax.ws.rs.Path;
+<a class="jxr_linenumber" name="L13" href="#L13">13</a>  <strong class="jxr_keyword">import</strong> javax.ws.rs.core.Response;
+<a class="jxr_linenumber" name="L14" href="#L14">14</a>  
+<a class="jxr_linenumber" name="L15" href="#L15">15</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Maps;
+<a class="jxr_linenumber" name="L16" href="#L16">16</a>  
+<a class="jxr_linenumber" name="L17" href="#L17">17</a>  <strong class="jxr_keyword">import</strong> io.swagger.annotations.Api;
+<a class="jxr_linenumber" name="L18" href="#L18">18</a>  <strong class="jxr_keyword">import</strong> io.swagger.annotations.ApiOperation;
+<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
+<a class="jxr_linenumber" name="L20" href="#L20">20</a>  
+<a class="jxr_linenumber" name="L21" href="#L21">21</a>  @Singleton
+<a class="jxr_linenumber" name="L22" href="#L22">22</a>  @Path(<span class="jxr_string">"about"</span>)
+<a class="jxr_linenumber" name="L23" href="#L23">23</a>  @Api(<span class="jxr_string">"about"</span>)
+<a class="jxr_linenumber" name="L24" href="#L24">24</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/about/AboutEndpoint.html">AboutEndpoint</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/JSONEndpoint.html">JSONEndpoint</a> {
+<a class="jxr_linenumber" name="L25" href="#L25">25</a>    <strong class="jxr_keyword">static</strong> Date starttime;
+<a class="jxr_linenumber" name="L26" href="#L26">26</a>  
+<a class="jxr_linenumber" name="L27" href="#L27">27</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/about/AboutEndpoint.html">AboutEndpoint</a>() {
+<a class="jxr_linenumber" name="L28" href="#L28">28</a>      <strong class="jxr_keyword">if</strong> (starttime == <strong class="jxr_keyword">null</strong>) {
+<a class="jxr_linenumber" name="L29" href="#L29">29</a>        init();
+<a class="jxr_linenumber" name="L30" href="#L30">30</a>      }
+<a class="jxr_linenumber" name="L31" href="#L31">31</a>    }
 <a class="jxr_linenumber" name="L32" href="#L32">32</a>  
-<a class="jxr_linenumber" name="L33" href="#L33">33</a>    <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <em class="jxr_javadoccomment">   * Show information about the back-end</em>
-<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <em class="jxr_javadoccomment">   *</em>
-<a class="jxr_linenumber" name="L36" href="#L36">36</a>  <em class="jxr_javadoccomment">   * @return about-data map</em>
-<a class="jxr_linenumber" name="L37" href="#L37">37</a>  <em class="jxr_javadoccomment">   */</em>
-<a class="jxr_linenumber" name="L38" href="#L38">38</a>    @GET
-<a class="jxr_linenumber" name="L39" href="#L39">39</a>    @ApiOperation(<span class="jxr_string">"get information about the server (version,builddate,started)"</span>)
-<a class="jxr_linenumber" name="L40" href="#L40">40</a>    <strong class="jxr_keyword">public</strong> Response getMetadata() {
-<a class="jxr_linenumber" name="L41" href="#L41">41</a>      Log.info(<span class="jxr_string">"service={}"</span>, s);
-<a class="jxr_linenumber" name="L42" href="#L42">42</a>      Map&lt;String, String&gt; data = Maps.newLinkedHashMap();
-<a class="jxr_linenumber" name="L43" href="#L43">43</a>      data.put(<span class="jxr_string">"version"</span>, getProperty(<span class="jxr_string">"version"</span>));
-<a class="jxr_linenumber" name="L44" href="#L44">44</a>      data.put(<span class="jxr_string">"builddate"</span>, getProperty(<span class="jxr_string">"builddate"</span>));
-<a class="jxr_linenumber" name="L45" href="#L45">45</a>      SimpleDateFormat simpleDateFormat = <strong class="jxr_keyword">new</strong> SimpleDateFormat(<span class="jxr_string">"yyyy-MM-dd'T'HH:mm:ss'Z'"</span>);
-<a class="jxr_linenumber" name="L46" href="#L46">46</a>      simpleDateFormat.setTimeZone(TimeZone.getTimeZone(<span class="jxr_string">"AMS"</span>));
-<a class="jxr_linenumber" name="L47" href="#L47">47</a>      data.put(<span class="jxr_string">"started"</span>, simpleDateFormat.format(<strong class="jxr_keyword">this</strong>.starttime));
-<a class="jxr_linenumber" name="L48" href="#L48">48</a>      <strong class="jxr_keyword">return</strong> Response.ok(data).build();
-<a class="jxr_linenumber" name="L49" href="#L49">49</a>    }
-<a class="jxr_linenumber" name="L50" href="#L50">50</a>  
-<a class="jxr_linenumber" name="L51" href="#L51">51</a>    <em class="jxr_comment">// private methods</em>
-<a class="jxr_linenumber" name="L52" href="#L52">52</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> PropertyResourceBundle propertyResourceBundle;
-<a class="jxr_linenumber" name="L53" href="#L53">53</a>  
-<a class="jxr_linenumber" name="L54" href="#L54">54</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">synchronized</strong> String getProperty(String key) {
-<a class="jxr_linenumber" name="L55" href="#L55">55</a>      <strong class="jxr_keyword">if</strong> (propertyResourceBundle == <strong class="jxr_keyword">null</strong>) {
-<a class="jxr_linenumber" name="L56" href="#L56">56</a>        <strong class="jxr_keyword">try</strong> {
-<a class="jxr_linenumber" name="L57" href="#L57">57</a>          propertyResourceBundle = <strong class="jxr_keyword">new</strong> PropertyResourceBundle(<em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L58" href="#L58">58</a>              Thread.currentThread().getContextClassLoader().getResourceAsStream(<span class="jxr_string">"about.properties"</span>));
-<a class="jxr_linenumber" name="L59" href="#L59">59</a>        } <strong class="jxr_keyword">catch</strong> (IOException e) {
-<a class="jxr_linenumber" name="L60" href="#L60">60</a>          e.printStackTrace();
-<a class="jxr_linenumber" name="L61" href="#L61">61</a>        }
-<a class="jxr_linenumber" name="L62" href="#L62">62</a>      }
-<a class="jxr_linenumber" name="L63" href="#L63">63</a>      <strong class="jxr_keyword">return</strong> propertyResourceBundle.getString(key);
-<a class="jxr_linenumber" name="L64" href="#L64">64</a>    }
-<a class="jxr_linenumber" name="L65" href="#L65">65</a>  
-<a class="jxr_linenumber" name="L66" href="#L66">66</a>  }
+<a class="jxr_linenumber" name="L33" href="#L33">33</a>    <em class="jxr_comment">// needs to be called at the start of the server</em>
+<a class="jxr_linenumber" name="L34" href="#L34">34</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">void</strong> init() {
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>      starttime = <strong class="jxr_keyword">new</strong> Date();
+<a class="jxr_linenumber" name="L36" href="#L36">36</a>    }
+<a class="jxr_linenumber" name="L37" href="#L37">37</a>  
+<a class="jxr_linenumber" name="L38" href="#L38">38</a>    <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L39" href="#L39">39</a>  <em class="jxr_javadoccomment">   * Show information about the back-end</em>
+<a class="jxr_linenumber" name="L40" href="#L40">40</a>  <em class="jxr_javadoccomment">   *</em>
+<a class="jxr_linenumber" name="L41" href="#L41">41</a>  <em class="jxr_javadoccomment">   * @return about-data map</em>
+<a class="jxr_linenumber" name="L42" href="#L42">42</a>  <em class="jxr_javadoccomment">   */</em>
+<a class="jxr_linenumber" name="L43" href="#L43">43</a>    @GET
+<a class="jxr_linenumber" name="L44" href="#L44">44</a>    @ApiOperation(<span class="jxr_string">"get information about the server (version,builddate,started)"</span>)
+<a class="jxr_linenumber" name="L45" href="#L45">45</a>    <strong class="jxr_keyword">public</strong> Response getMetadata() {
+<a class="jxr_linenumber" name="L46" href="#L46">46</a>      Map&lt;String, String&gt; data = Maps.newLinkedHashMap();
+<a class="jxr_linenumber" name="L47" href="#L47">47</a>      data.put(<span class="jxr_string">"version"</span>, getProperty(<span class="jxr_string">"version"</span>));
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>      data.put(<span class="jxr_string">"builddate"</span>, getProperty(<span class="jxr_string">"builddate"</span>));
+<a class="jxr_linenumber" name="L49" href="#L49">49</a>      SimpleDateFormat simpleDateFormat = <strong class="jxr_keyword">new</strong> SimpleDateFormat(<span class="jxr_string">"yyyy-MM-dd'T'HH:mm:ss'Z'"</span>);
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>      simpleDateFormat.setTimeZone(TimeZone.getTimeZone(<span class="jxr_string">"AMS"</span>));
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>      data.put(<span class="jxr_string">"started"</span>, simpleDateFormat.format(<strong class="jxr_keyword">this</strong>.starttime));
+<a class="jxr_linenumber" name="L52" href="#L52">52</a>      <strong class="jxr_keyword">return</strong> Response.ok(data).build();
+<a class="jxr_linenumber" name="L53" href="#L53">53</a>    }
+<a class="jxr_linenumber" name="L54" href="#L54">54</a>  
+<a class="jxr_linenumber" name="L55" href="#L55">55</a>    <em class="jxr_comment">// private methods</em>
+<a class="jxr_linenumber" name="L56" href="#L56">56</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> PropertyResourceBundle propertyResourceBundle;
+<a class="jxr_linenumber" name="L57" href="#L57">57</a>  
+<a class="jxr_linenumber" name="L58" href="#L58">58</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">synchronized</strong> String getProperty(String key) {
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>      <strong class="jxr_keyword">if</strong> (propertyResourceBundle == <strong class="jxr_keyword">null</strong>) {
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>        <strong class="jxr_keyword">try</strong> {
+<a class="jxr_linenumber" name="L61" href="#L61">61</a>          propertyResourceBundle = <strong class="jxr_keyword">new</strong> PropertyResourceBundle(<em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>              Thread.currentThread().getContextClassLoader().getResourceAsStream(<span class="jxr_string">"about.properties"</span>));
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>        } <strong class="jxr_keyword">catch</strong> (IOException e) {
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>          e.printStackTrace();
+<a class="jxr_linenumber" name="L65" href="#L65">65</a>        }
+<a class="jxr_linenumber" name="L66" href="#L66">66</a>      }
+<a class="jxr_linenumber" name="L67" href="#L67">67</a>      <strong class="jxr_keyword">return</strong> propertyResourceBundle.getString(key);
+<a class="jxr_linenumber" name="L68" href="#L68">68</a>    }
+<a class="jxr_linenumber" name="L69" href="#L69">69</a>  
+<a class="jxr_linenumber" name="L70" href="#L70">70</a>  }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2015 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
