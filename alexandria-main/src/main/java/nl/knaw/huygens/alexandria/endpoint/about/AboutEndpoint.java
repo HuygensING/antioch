@@ -1,5 +1,9 @@
 package nl.knaw.huygens.alexandria.endpoint.about;
 
+import javax.inject.Singleton;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -7,13 +11,7 @@ import java.util.Map;
 import java.util.PropertyResourceBundle;
 import java.util.TimeZone;
 
-import javax.inject.Singleton;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
-
 import com.google.common.collect.Maps;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
@@ -49,7 +47,7 @@ public class AboutEndpoint extends JSONEndpoint {
     data.put("builddate", getProperty("builddate"));
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     simpleDateFormat.setTimeZone(TimeZone.getTimeZone("AMS"));
-    data.put("started", simpleDateFormat.format(this.starttime));
+    data.put("started", simpleDateFormat.format(starttime));
     return Response.ok(data).build();
   }
 
