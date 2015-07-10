@@ -54,10 +54,10 @@ public class AboutEndpoint extends JSONEndpoint {
   @ApiOperation("get information about the server (version,buildDate,commitId,startedAt)")
   public Response getMetadata() {
     final Map<String, String> data = Maps.newLinkedHashMap();
-    data.put("version", getProperty("version"));
-    data.put("commitId", getProperty("commit_id"));
     data.put("buildDate", getProperty("buildDate"));
+    data.put("commitId", getProperty("commitId"));
     data.put("startedAt", startedAt.toString());
+    data.put("version", getProperty("version"));
     return Response.ok(data).build();
   }
 
