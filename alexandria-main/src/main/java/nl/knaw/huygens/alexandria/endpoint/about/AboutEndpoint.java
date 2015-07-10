@@ -8,12 +8,14 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.PropertyResourceBundle;
 import java.util.TimeZone;
 
 import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 
 @Singleton
@@ -63,7 +65,12 @@ public class AboutEndpoint extends JSONEndpoint {
         e.printStackTrace();
       }
     }
-    return propertyResourceBundle.getString(key);
+    try {
+      return propertyResourceBundle.getString(key);
+    } catch (MissingResourceException e) {
+      Log.warn("Missing expected resource: [{}] -- winging it", key);
+      return "missing";
+    }
   }
 
 }
