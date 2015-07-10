@@ -5,12 +5,10 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.PropertyResourceBundle;
-import java.util.TimeZone;
 
 import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
@@ -22,38 +20,8 @@ import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 @Path("about")
 @Api("about")
 public class AboutEndpoint extends JSONEndpoint {
-  static Date starttime;
+  private static final Instant startedAt = Instant.now();
 
-  public AboutEndpoint() {
-    if (starttime == null) {
-      init();
-    }
-  }
-
-  // needs to be called at the start of the server
-  public static void init() {
-    starttime = new Date();
-  }
-
-  /**
-   * Show information about the back-end
-   *
-   * @return about-data map
-   */
-  @GET
-  @ApiOperation("get information about the server (version,builddate,started)")
-  public Response getMetadata() {
-    Map<String, String> data = Maps.newLinkedHashMap();
-    data.put("version", getProperty("version"));
-    data.put("commit id", getProperty("commit_id"));
-    data.put("builddate", getProperty("builddate"));
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-    simpleDateFormat.setTimeZone(TimeZone.getTimeZone("AMS"));
-    data.put("started", simpleDateFormat.format(starttime));
-    return Response.ok(data).build();
-  }
-
-  // private methods
   private static PropertyResourceBundle propertyResourceBundle;
 
   private static synchronized String getProperty(String key) {
@@ -65,12 +33,32 @@ public class AboutEndpoint extends JSONEndpoint {
         e.printStackTrace();
       }
     }
+
     try {
       return propertyResourceBundle.getString(key);
     } catch (MissingResourceException e) {
       Log.warn("Missing expected resource: [{}] -- winging it", key);
       return "missing";
+    } catch (ClassCastException e) {
+      Log.warn("Property value for key [{}] cannot be transformed to String -- winging it", key);
+      return "malformed";
     }
+  }
+
+  /**
+   * Show information about the back-end
+   *
+   * @return about-data map
+   */
+  @GET
+  @ApiOperation("get information about the server (version,buildDate,commitId,startedAt)")
+  public Response getMetadata() {
+    final Map<String, String> data = Maps.newLinkedHashMap();
+    data.put("version", getProperty("version"));
+    data.put("commitId", getProperty("commit_id"));
+    data.put("buildDate", getProperty("buildDate"));
+    data.put("startedAt", startedAt.toString());
+    return Response.ok(data).build();
   }
 
 }
