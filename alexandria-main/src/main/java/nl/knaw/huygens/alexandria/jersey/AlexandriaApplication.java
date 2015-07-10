@@ -2,13 +2,11 @@ package nl.knaw.huygens.alexandria.jersey;
 
 import static java.util.logging.Logger.getAnonymousLogger;
 
+import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.config.JsonConfiguration;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
-
-import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.config.JsonConfiguration;
-import nl.knaw.huygens.alexandria.endpoint.about.AboutEndpoint;
 
 public class AlexandriaApplication extends ResourceConfig {
   public AlexandriaApplication() {
@@ -29,9 +27,6 @@ public class AlexandriaApplication extends ResourceConfig {
 
     // // X-Jersey-Tracing-nnn diagnostic response headers
     // property(ServerProperties.TRACING, "ALL");
-
-    // initialize to set the startdate
-    AboutEndpoint.init();
   }
 
 }
