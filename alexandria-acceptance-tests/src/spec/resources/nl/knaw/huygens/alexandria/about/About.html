@@ -15,9 +15,10 @@
         <h:request>
             When I <h:get>/about</h:get> then I should receive <h:status>200 OK</h:status>
             and the body contains <h:jsonResponse>{
-            "version": "1.0-SNAPSHOT",
             "buildDate": "{date.beforeNow}",
-            "startedAt": "{date.beforeNow}"
+            "commitId": "{git.validCommitId}",
+            "startedAt": "{date.beforeNow}",
+            "version": "1.0-SNAPSHOT"
         }</h:jsonResponse>
         </h:request>
     </div>

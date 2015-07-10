@@ -72,6 +72,8 @@ public class ExpectedJsonResponseCommand extends AbstractHuygensCommand {
             Log.trace("DateTimeParseException: [{}]", e.getMessage());
             return false;
           }
+        case "{git.validCommitId}":
+          return actual.asText().matches("[0-9a-z]{40}");
       }
     }
 
