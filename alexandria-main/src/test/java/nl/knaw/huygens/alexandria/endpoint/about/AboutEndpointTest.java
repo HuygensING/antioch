@@ -21,7 +21,8 @@ public class AboutEndpointTest extends MockedServiceEndpointTest {
     Response response = target("about").request().get();
     Log.info("response={}", response);
     assertThat(response.getStatus()).isEqualTo(200);
-    assertThat(responseEntityAsMap(response)).containsKeys("version", "buildDate", "commitId", "startedAt");
+    assertThat(responseEntityAsMap(response))
+        .containsKeys("version", "buildDate", "commitId", "startedAt", "scmBranch");
   }
 
   @SuppressWarnings("unchecked")
