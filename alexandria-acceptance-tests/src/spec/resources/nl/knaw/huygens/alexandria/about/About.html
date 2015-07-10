@@ -15,7 +15,7 @@
         <h:request>
             When I <h:get>/about</h:get> then I should receive <h:status>200 OK</h:status>
             and the body contains <h:jsonResponse>{
-            "buildDate": "{date.beforeNow}",
+            "buildDate": "{date.anyValid}",
             "commitId": "{git.validCommitId}",
             "scmBranch": "develop",
             "startedAt": "{date.beforeNow}",
