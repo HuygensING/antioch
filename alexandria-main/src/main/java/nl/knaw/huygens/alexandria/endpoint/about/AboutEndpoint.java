@@ -56,6 +56,7 @@ public class AboutEndpoint extends JSONEndpoint {
     final Map<String, String> data = Maps.newLinkedHashMap();
     data.put("buildDate", getProperty("buildDate"));
     data.put("commitId", getProperty("commitId"));
+    data.put("scmBranch", getProperty("scmBranch"));
     data.put("startedAt", startedAt.toString());
     data.put("version", getProperty("version"));
     return Response.ok(data).build();
