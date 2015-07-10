@@ -73,6 +73,7 @@ public class ExpectedJsonResponseCommand extends AbstractHuygensCommand {
             return false;
           }
         case "{git.validCommitId}":
+          // e.g., "33b3dda729f8465c31a3993fb52dc3a33c93242b"
           return actual.asText().matches("[0-9a-z]{40}");
       }
     }
