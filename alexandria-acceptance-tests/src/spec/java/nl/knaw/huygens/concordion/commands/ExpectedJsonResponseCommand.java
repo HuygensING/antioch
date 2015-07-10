@@ -63,6 +63,16 @@ public class ExpectedJsonResponseCommand extends AbstractHuygensCommand {
     if (expected.isTextual()) {
       // TODO: rather than if-else store these in a mapping from "{format}" to a JsonChecker (to be written) per format
       switch (expected.asText()) {
+        case "{date.anyValid}":
+          try {
+            Log.trace("Parsing [{}] as Instant", actual.asText());
+            Instant.parse(actual.asText());
+            return true;
+          } catch (DateTimeParseException e) {
+            Log.trace("DateTimeParseException: [{}]", e.getMessage());
+            return false;
+          }
+
         case "{date.beforeNow}":
           Log.trace("Parsing [{}] as Instant", actual.asText());
           try {
@@ -72,6 +82,7 @@ public class ExpectedJsonResponseCommand extends AbstractHuygensCommand {
             Log.trace("DateTimeParseException: [{}]", e.getMessage());
             return false;
           }
+
         case "{git.validCommitId}":
           // e.g., "33b3dda729f8465c31a3993fb52dc3a33c93242b"
           return actual.asText().matches("[0-9a-z]{40}");
