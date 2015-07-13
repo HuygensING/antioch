@@ -29,65 +29,48 @@
         </div>
     </div>
 
+    <div id="get-all-resource-data" class="panel panel-default" c:execute="clearStorage()">
+        <div class="panel-heading"><b>How can I get all data for a given resource?</b></div>
+        <div class="panel-body">
+            <h:request>
+                Given I have <h:success>successfully</h:success>
+                <h:put>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:put> the following body:
+                <h:jsonBody>{
+                    "resource": {
+                        "id": "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+                        "ref": "http://www.example.com/titles/path/to/title/resource"
+                    }
+                }</h:jsonBody>
+            </h:request>
+
+            <h:request>
+                When I <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:get>
+                I should receive <h:status>200 OK</h:status> with a response body containing
+                <h:jsonResponse>{
+                    "resource": {
+                        "id" : "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+                        "ref": "http://www.example.com/titles/path/to/title/resource",
+                        "^provenance": "https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/provenance"
+                    }
+                }</h:jsonResponse>
+            </h:request>
+
+            <h:request>
+                And <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/provenance</h:get>
+                should return <h:status>200 OK</h:status> with a response body containing
+                <h:jsonResponse>{
+                    "provenance": {
+                        "who": "nederlab",
+                        "why": "",
+                        "when": "{date.beforeNow}",
+                        "^what": "https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01"
+                    }
+                } </h:jsonResponse>
+            </h:request>
+        </div>
+    </div>
+
     <!--
-    <div class="examples">
-    <div c:execute="clear()" class="example">
-        <h3>What happens when I try to GET a non-existent resource?</h3>
-
-        <ul>
-            <li>Given that no resource exists with ID
-                <span c:execute="noSuchResource(#id)"><code
-                        c:set="#id">3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</code></span></li>
-
-            <li>When I <b c:set="#method">GET</b> <code><b
-                    c:set="#endpoint">/resources/3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</b></code></li>
-
-            <li c:execute="request(#method, #endpoint)">Then:</li>
-            <ol>
-                <li>the response status should be <b c:assertEquals="status()">404 Not Found</b>;</li>
-                <li>the response body is <b c:assertEquals="response()">empty</b>.</li>
-            </ol>
-        </ul>
-    </div>
-
-    <div c:execute="clear()" class="example">
-        <h3>How can I GET (all) the data of an existing resource?</h3>
-
-        <ul>
-            <li c:execute="existingResource(#id)">Given an existing resource
-                <ul>
-                    <li>identified by <code c:set="#id">c6b96360-c0c9-11e4-b947-6bc57448d166</code>;</li>
-                    <li c:execute="withReference(#ref)">referring to
-                        <code c:set="#ref">http://www.example.com/titles/path/to/title/resource</code>;
-                    </li>
-                    <li c:execute="withAnnotation(#annoId)">with an annotation identified by
-                        <code c:set="#annoId">92af4396-cc77-11e4-9b9b-1f1561a91434</code>.
-                    </li>
-                </ul>
-            </li>
-            <li>When I <b c:set="#method">GET</b> <code><b
-                    c:set="#endpoint">/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</b></code></li>
-
-            <li c:execute="request(#method, #endpoint)">Then:
-                <ol>
-                    <li>the response status should be <b c:assertEquals="status()">200 OK</b>;</li>
-                    <li>And the response body looks like:
-<pre json:includesJson="response()">{
-    "resource": {
-        "id": "c6b96360-c0c9-11e4-b947-6bc57448d166",
-        "ref": "http://www.example.com/titles/path/to/title/resource",
-        "annotations": [
-            "https://{host}/annotations/92af4396-cc77-11e4-9b9b-1f1561a91434"
-        ],
-        "createdOn": "{date.beforeNow}"
-    }
-}</pre>
-                    </li>
-                </ol>
-            </li>
-        </ul>
-    </div>
-
     <div c:execute="clear()" class="example">
         <h3>How can I GET the <code>ref</code> of an existing resource?</h3>
 

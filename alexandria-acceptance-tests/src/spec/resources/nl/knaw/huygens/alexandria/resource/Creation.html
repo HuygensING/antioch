@@ -64,27 +64,6 @@
                 } </h:jsonBody>
                 then I should receive <h:status>201 Created</h:status> and the response body is <h:responseBody/>.
             </h:request>
-
-            <h:request>
-                Then <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:get>
-                should return <h:status>200 OK</h:status> with a response body containing
-                <h:jsonResponse>{ "resource": {
-                    "id" : "6e56c868-c0a9-11e4-a762-cb9a664afc01",
-                    "ref": "http://www.example.com/titles/path/to/title/resource",
-                    "^provenance": "https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/provenance"
-                } }</h:jsonResponse>
-            </h:request>
-
-            <h:request>
-                And <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/provenance</h:get>
-                should return <h:status>200 OK</h:status> with a response body containing
-                <h:jsonResponse>{ "provenance": {
-                    "who": "nederlab",
-                    "why": "some reason",
-                    "when": "{date.beforeNow}",
-                    "^what": "https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01"
-                } } </h:jsonResponse>
-            </h:request>
         </div>
     </div>
 
