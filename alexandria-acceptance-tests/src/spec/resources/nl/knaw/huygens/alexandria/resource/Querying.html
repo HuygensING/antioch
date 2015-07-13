@@ -1,12 +1,36 @@
 <html xmlns:c="http://www.concordion.org/2007/concordion"
-      xmlns:json="https://alexandria.huygens.knaw.nl">
+      xmlns:h="http://alexandria.huygens.knaw.nl/concordion-extension"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://alexandria.huygens.knaw.nl/concordion-extension
+                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+
 <title>Querying External Resources</title>
 
-<body>
+<body class="container">
 
-<h1>Querying external resources</h1>
+    <h2 class="page-header">Querying external resources</h2>
 
-<div class="examples">
+    <h3>Examples:</h3>
+
+    <div id="get-non-existent" class="panel panel-default" c:execute="clearStorage()">
+        <div class="panel-heading"><b>What happens when I GET a non-existent resource?</b></div>
+        <div class="panel-body">
+            Given that no resource exists with ID <code>3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</code>
+            <h:request>
+                When I <h:get>/resources/3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</h:get>
+                then I should receive <h:status>404 Not Found</h:status>
+                and the response body should contain:
+                <h:jsonResponse>{
+                    "error": {
+                        "message": "No resource found with id 3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44"
+                    }
+                }</h:jsonResponse>
+            </h:request>
+        </div>
+    </div>
+
+    <!--
+    <div class="examples">
     <div c:execute="clear()" class="example">
         <h3>What happens when I try to GET a non-existent resource?</h3>
 
@@ -133,5 +157,6 @@
         </ul>
     </div>
 </div>
+-->
 </body>
 </html>
