@@ -10,6 +10,23 @@
 
     <h2 class="page-header">Creating external resources</h2>
 
+    <div class="alert alert-success" role="alert">
+        This section explains how to register external resources to Alexandria via POST or PUT
+    </div>
+
+    <div>
+        The following use-cases are documented here:
+        <ul>
+            <li><a href="#create-post">Creating a resource via POST</a></li>
+            <li><a href="#create-put">Creating a resource via PUT</a></li>
+            <li><a href="#post-empty">POSTing empty body</a></li>
+            <li><a href="#post-missing-ref">POSTing a body with no 'ref' field</a></li>
+            <li><a href="#put-entity-id-must-match-url">Entity id must match id in URL</a></li>
+        </ul>
+    </div>
+
+    <h3>Examples:</h3>
+
     <div id="create-post" class="panel panel-default">
         <div class="panel-heading"><b>How can I create an external resource without specifying an ID?</b></div>
         <div class="panel-body">
