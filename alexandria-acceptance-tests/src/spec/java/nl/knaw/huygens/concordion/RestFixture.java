@@ -1,15 +1,10 @@
 package nl.knaw.huygens.concordion;
 
 import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
-
-import java.net.URI;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Supplier;
+import static javax.ws.rs.core.Response.Status.Family.REDIRECTION;
+import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
@@ -17,15 +12,17 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status.Family;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
-
-import org.concordion.api.extension.Extensions;
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.test.JerseyTest;
-import org.glassfish.jersey.test.TestProperties;
-import org.junit.BeforeClass;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Supplier;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
@@ -35,7 +32,6 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
 import com.squarespace.jersey2.guice.BootstrapUtils;
-
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
@@ -45,6 +41,12 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerpopAlexandriaService;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
+import org.concordion.api.extension.Extensions;
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.test.JerseyTest;
+import org.glassfish.jersey.test.TestProperties;
+import org.junit.BeforeClass;
 
 @Extensions(RestExtension.class)
 public class RestFixture extends JerseyTest {
@@ -57,14 +59,21 @@ public class RestFixture extends JerseyTest {
 
   private static ResourceConfig application;
 
-  private WebTarget target;
-  private Optional<MediaType> optionalContentType;
-  private Optional<String> optionalBody;
-  private Response response;
-  private Optional<String> entity;
-  private String method;
-  private String url;
   private final Map<String, String> headers = new HashMap<>();
+
+  private WebTarget target;
+
+  private Optional<MediaType> optionalContentType;
+
+  private Optional<String> optionalBody;
+
+  private Response response;
+
+  private Optional<String> entity;
+
+  private String method;
+
+  private String url;
 
   @BeforeClass
   public static void setup() {
@@ -108,7 +117,7 @@ public class RestFixture extends JerseyTest {
     final ServiceLocator locator = BootstrapUtils.newServiceLocator();
     Log.trace("+- locator=[{}]", locator);
 
-    final Injector injector = BootstrapUtils.newInjector(locator, Arrays.asList(baseModule()));
+    final Injector injector = BootstrapUtils.newInjector(locator, singletonList(baseModule()));
     Log.trace("+- injector=[{}]", injector);
 
     BootstrapUtils.install(locator);
@@ -223,8 +232,18 @@ public class RestFixture extends JerseyTest {
   }
 
   public String status() {
-    final StatusType statusInfo = response.getStatusInfo();
+    final StatusType statusInfo = statusInfo();
     return format("%s %s", statusInfo.getStatusCode(), statusInfo.getReasonPhrase());
+  }
+
+  public boolean wasSuccessful() {
+    final StatusType statusInfo = statusInfo();
+    final Family family = statusInfo.getFamily();
+    return family == SUCCESSFUL || family == REDIRECTION;
+  }
+
+  private StatusType statusInfo() {
+    return response.getStatusInfo();
   }
 
   @Override
