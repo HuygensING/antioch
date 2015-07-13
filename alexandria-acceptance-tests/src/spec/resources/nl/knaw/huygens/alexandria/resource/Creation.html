@@ -10,8 +10,6 @@
 
     <h2 class="page-header">Creating external resources</h2>
 
-    <h3>Examples:</h3>
-
     <div id="create-post" class="panel panel-default">
         <div class="panel-heading"><b>How can I create an external resource without specifying an ID?</b></div>
         <div class="panel-body">
@@ -83,29 +81,6 @@
                 <h:jsonResponse>[{"message":"may not be null"}]</h:jsonResponse>
             </h:request>
         </div>
-
-        <!--
-        <ul>
-            <li>When I <b c:set="#method">POST</b>
-                <pre c:execute="body(#TEXT)"></pre>
-                to <code c:set="#endpoint"><b>/resources</b></code></li>
-
-            <li c:execute="request(#method, #endpoint)">Then:
-                <ol>
-                    <li>the response status should be <b c:assertEquals="status()">400 Bad Request</b>;</li>
-                    <li>the response body contains (amongst other error details):
-                        <h:jsonResponse>[ {
-                            "message" : "may not be null",
-                            "messageTemplate" : "{javax.validation.constraints.NotNull.message}",
-                            "path" : "ResourcesEndpoint.createResource.arg0"
-                            }
-                            ]
-                        </h:jsonResponse>
-                    </li>
-                </ol>
-            </li>
-        </ul>
-        -->
     </div>
 
     <div id="post-missing-ref" class="panel panel-default" c:execute="clearStorage()">
@@ -150,43 +125,6 @@
             </h:request>
         </div>
     </div>
-
-    <!--
-    <div c:execute="clear()" class="example">
-        <h3>When creating a new resource via PUT, the id in the entity body MUST match the one used in the URL</h3>
-
-        <ul>
-            <li>Given some resource located which is to be stored as UUID
-                <code>6e56c868-c0a9-11e4-a762-cb9a664afc01</code>
-            </li>
-
-            <li>When I <b c:set="#method">PUT</b> (note the mismatch for parameter <code>id</code>)
-<pre c:execute="body(#TEXT)">{
-    "resource": {
-        "id": "3c86e050-f7d8-11e4-9c82-df9a2acb2bd1",
-        "ref": "http://www.example.com/titles/path/to/title/resource",
-        "createdOn": "2015-04-07T09:10:55.877Z"
-    }
-}</pre>
-                to <code c:set="#endpoint"><b>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</b></code>
-            </li>
-
-            <li c:execute="request(#method, #endpoint)">Then:
-                <ol>
-                    <li>the response status should be <b c:assertEquals="status()">400 Bad Request</b>;</li>
-                    <li>the response body contains (amongst other error details):
-                        <h:jsonResponse>[
-                            {
-                            "message" : "Entity 'id' must match the one used in the URL"
-                            }
-                            ]
-                        </h:jsonResponse>
-                    </li>
-                </ol>
-            </li>
-        </ul>
-    </div>
-    -->
 
 </body>
 </html>
