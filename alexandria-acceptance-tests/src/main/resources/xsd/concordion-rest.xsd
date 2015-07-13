@@ -3,12 +3,12 @@
         elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema"
         xmlns:rest="http://alexandria.huygens.knaw.nl/concordion-extension">
 
-  <element name="request" type="rest:requestType"></element>
+  <element name="request" type="rest:requestType"/>
 
   <complexType name="requestType" mixed="true">
     <choice minOccurs="0" maxOccurs="unbounded">
-      <group ref="rest:setUp"></group>
-      <group ref="rest:verify"></group>
+      <group ref="rest:setUp"/>
+      <group ref="rest:verify"/>
       <sequence>
         <any processContents="skip" minOccurs="0"/>
       </sequence>
@@ -18,7 +18,7 @@
 
   <group name="setUp">
     <choice>
-      <group ref="rest:httpMethods"></group>
+      <group ref="rest:httpMethods"/>
       <element name="jsonBody" type="string" minOccurs="0" maxOccurs="unbounded"/>
       <element name="setHeader" type="rest:headerType" minOccurs="0" maxOccurs="unbounded"/>
     </choice>
@@ -26,11 +26,11 @@
 
   <group name="httpMethods">
     <choice>
-      <element name="delete" type="string"></element>
-      <element name="get" type="string"></element>
-      <element name="patch" type="string"></element>
-      <element name="post" type="string"></element>
-      <element name="put" type="string"></element>
+      <element name="delete" type="string"/>
+      <element name="get" type="string"/>
+      <element name="patch" type="string"/>
+      <element name="post" type="string"/>
+      <element name="put" type="string"/>
     </choice>
   </group>
 
