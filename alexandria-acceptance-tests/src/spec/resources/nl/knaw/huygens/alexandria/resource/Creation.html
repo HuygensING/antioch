@@ -131,6 +131,27 @@
         </div>
     </div>
 
+    <div id="put-entity-id-must-match-url" class="panel panel-default" c:execute="clearStorage()">
+        <div class="panel-heading">
+            <b>When creating a new resource via PUT, the id in the entity body MUST match the one used in the URL</b>
+        </div>
+        <div class="panel-body">
+            <h:request>
+                When I <h:put>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:put>
+                the following body (note the mismatch for parameter <code>id</code>):
+                <h:jsonBody>{
+                    "resource": {
+                        "id": "3c86e050-f7d8-11e4-9c82-df9a2acb2bd1",
+                        "ref": "http://www.example.com/titles/path/to/title/resource"
+                    }
+                }</h:jsonBody>
+                Then I should receive <h:status>400 Bad Request</h:status> and the response body contains:
+                <h:jsonResponse>[{"message" : "Entity 'id' must match the one used in the URL"}]</h:jsonResponse>
+            </h:request>
+        </div>
+    </div>
+
+    <!--
     <div c:execute="clear()" class="example">
         <h3>When creating a new resource via PUT, the id in the entity body MUST match the one used in the URL</h3>
 
@@ -165,6 +186,7 @@
             </li>
         </ul>
     </div>
+    -->
 
 </body>
 </html>
