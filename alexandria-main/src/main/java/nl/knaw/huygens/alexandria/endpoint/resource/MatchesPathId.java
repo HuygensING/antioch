@@ -12,9 +12,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.List;
-import java.util.UUID;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
@@ -42,21 +42,21 @@ public @interface MatchesPathId {
     @Override
     public boolean isValid(ResourcePrototype prototype, ConstraintValidatorContext context) {
       if (prototype == null) {
-        return true;
+        return true; // Non-null validation, if desired, should be enforced via @NotNull
       }
 
-      final PathSegment uriId = uriId();
-      final UUID prototypeId = prototypeId(prototype);
+      final UUIDParam prototypeId = prototype.getId();
 
-      return value(uriId).equals(value(prototypeId));
+      // Either no id was passed in prototype, or it MUST equal the id in URI
+      return prototypeId == null || value(uriId()).equals(value(prototypeId));
     }
 
     private String value(PathSegment segment) {
       return segment.getPath();
     }
 
-    private String value(UUID uuid) {
-      return String.valueOf(uuid);
+    private String value(UUIDParam uuid) {
+      return String.valueOf(uuid.getValue());
     }
 
     private PathSegment uriId() {
@@ -71,11 +71,6 @@ public @interface MatchesPathId {
     private List<PathSegment> uriSegments() {
       return uriInfo.getPathSegments();
     }
-
-    private UUID prototypeId(ResourcePrototype prototype) {
-      return prototype.getId().getValue();
-    }
-
   }
 
 }
