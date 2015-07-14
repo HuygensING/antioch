@@ -13,14 +13,14 @@ function divider {
 function deploy {
   profile=$1
   base=$2
-	mvn package tomcat7:redeploy -P $profile -pl alexandria-webapp -am &&
+	mvn package tomcat7:redeploy -P ${profile} -pl alexandria-webapp -am &&
 	(
 		divider
 		sleep 20 # wait for the server to boot
 
 		curlCmd="curl -sSf $base/about"
-		echo $curlCmd
-		eval $curlCmd
+		echo ${curlCmd}
+		eval ${curlCmd}
 	)
 	divider
 }
@@ -28,7 +28,7 @@ function deploy {
 profile=$1
 base=$2
 if [[ -n "$profile" && -n "$base" ]]; then
-  deploy $profile $base
+  deploy ${profile} ${base}
 else
   usage
 fi
