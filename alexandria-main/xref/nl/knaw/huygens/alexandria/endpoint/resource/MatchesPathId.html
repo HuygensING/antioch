@@ -20,9 +20,9 @@
 <a class="jxr_linenumber" name="L12" href="#L12">12</a>  <strong class="jxr_keyword">import</strong> java.lang.annotation.RetentionPolicy;
 <a class="jxr_linenumber" name="L13" href="#L13">13</a>  <strong class="jxr_keyword">import</strong> java.lang.annotation.Target;
 <a class="jxr_linenumber" name="L14" href="#L14">14</a>  <strong class="jxr_keyword">import</strong> java.util.List;
-<a class="jxr_linenumber" name="L15" href="#L15">15</a>  <strong class="jxr_keyword">import</strong> java.util.UUID;
-<a class="jxr_linenumber" name="L16" href="#L16">16</a>  
-<a class="jxr_linenumber" name="L17" href="#L17">17</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.Log;
+<a class="jxr_linenumber" name="L15" href="#L15">15</a>  
+<a class="jxr_linenumber" name="L16" href="#L16">16</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.Log;
+<a class="jxr_linenumber" name="L17" href="#L17">17</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 <a class="jxr_linenumber" name="L18" href="#L18">18</a>  
 <a class="jxr_linenumber" name="L19" href="#L19">19</a>  @Target({ElementType.FIELD, ElementType.PARAMETER})
 <a class="jxr_linenumber" name="L20" href="#L20">20</a>  @Retention(RetentionPolicy.RUNTIME)
@@ -50,21 +50,21 @@
 <a class="jxr_linenumber" name="L42" href="#L42">42</a>      @Override
 <a class="jxr_linenumber" name="L43" href="#L43">43</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> isValid(<a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/resource/ResourcePrototype.html">ResourcePrototype</a> prototype, ConstraintValidatorContext context) {
 <a class="jxr_linenumber" name="L44" href="#L44">44</a>        <strong class="jxr_keyword">if</strong> (prototype == <strong class="jxr_keyword">null</strong>) {
-<a class="jxr_linenumber" name="L45" href="#L45">45</a>          <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">true</strong>;
+<a class="jxr_linenumber" name="L45" href="#L45">45</a>          <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">true</strong>; <em class="jxr_comment">// Non-null validation, if desired, should be enforced via @NotNull</em>
 <a class="jxr_linenumber" name="L46" href="#L46">46</a>        }
 <a class="jxr_linenumber" name="L47" href="#L47">47</a>  
-<a class="jxr_linenumber" name="L48" href="#L48">48</a>        <strong class="jxr_keyword">final</strong> PathSegment uriId = uriId();
-<a class="jxr_linenumber" name="L49" href="#L49">49</a>        <strong class="jxr_keyword">final</strong> UUID prototypeId = prototypeId(prototype);
-<a class="jxr_linenumber" name="L50" href="#L50">50</a>  
-<a class="jxr_linenumber" name="L51" href="#L51">51</a>        <strong class="jxr_keyword">return</strong> value(uriId).equals(value(prototypeId));
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>        <strong class="jxr_keyword">final</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/UUIDParam.html">UUIDParam</a> prototypeId = prototype.getId();
+<a class="jxr_linenumber" name="L49" href="#L49">49</a>  
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>        <em class="jxr_comment">// Either no id was passed in prototype, or it MUST equal the id in URI</em>
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>        <strong class="jxr_keyword">return</strong> prototypeId == <strong class="jxr_keyword">null</strong> || value(uriId()).equals(value(prototypeId));
 <a class="jxr_linenumber" name="L52" href="#L52">52</a>      }
 <a class="jxr_linenumber" name="L53" href="#L53">53</a>  
 <a class="jxr_linenumber" name="L54" href="#L54">54</a>      <strong class="jxr_keyword">private</strong> String value(PathSegment segment) {
 <a class="jxr_linenumber" name="L55" href="#L55">55</a>        <strong class="jxr_keyword">return</strong> segment.getPath();
 <a class="jxr_linenumber" name="L56" href="#L56">56</a>      }
 <a class="jxr_linenumber" name="L57" href="#L57">57</a>  
-<a class="jxr_linenumber" name="L58" href="#L58">58</a>      <strong class="jxr_keyword">private</strong> String value(UUID uuid) {
-<a class="jxr_linenumber" name="L59" href="#L59">59</a>        <strong class="jxr_keyword">return</strong> String.valueOf(uuid);
+<a class="jxr_linenumber" name="L58" href="#L58">58</a>      <strong class="jxr_keyword">private</strong> String value(<a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/UUIDParam.html">UUIDParam</a> uuid) {
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>        <strong class="jxr_keyword">return</strong> String.valueOf(uuid.getValue());
 <a class="jxr_linenumber" name="L60" href="#L60">60</a>      }
 <a class="jxr_linenumber" name="L61" href="#L61">61</a>  
 <a class="jxr_linenumber" name="L62" href="#L62">62</a>      <strong class="jxr_keyword">private</strong> PathSegment uriId() {
@@ -79,14 +79,9 @@
 <a class="jxr_linenumber" name="L71" href="#L71">71</a>      <strong class="jxr_keyword">private</strong> List&lt;PathSegment&gt; uriSegments() {
 <a class="jxr_linenumber" name="L72" href="#L72">72</a>        <strong class="jxr_keyword">return</strong> uriInfo.getPathSegments();
 <a class="jxr_linenumber" name="L73" href="#L73">73</a>      }
-<a class="jxr_linenumber" name="L74" href="#L74">74</a>  
-<a class="jxr_linenumber" name="L75" href="#L75">75</a>      <strong class="jxr_keyword">private</strong> UUID prototypeId(<a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/resource/ResourcePrototype.html">ResourcePrototype</a> prototype) {
-<a class="jxr_linenumber" name="L76" href="#L76">76</a>        <strong class="jxr_keyword">return</strong> prototype.getId().getValue();
-<a class="jxr_linenumber" name="L77" href="#L77">77</a>      }
-<a class="jxr_linenumber" name="L78" href="#L78">78</a>  
-<a class="jxr_linenumber" name="L79" href="#L79">79</a>    }
-<a class="jxr_linenumber" name="L80" href="#L80">80</a>  
-<a class="jxr_linenumber" name="L81" href="#L81">81</a>  }
+<a class="jxr_linenumber" name="L74" href="#L74">74</a>    }
+<a class="jxr_linenumber" name="L75" href="#L75">75</a>  
+<a class="jxr_linenumber" name="L76" href="#L76">76</a>  }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2015 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
