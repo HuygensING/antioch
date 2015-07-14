@@ -1,13 +1,55 @@
-<html xmlns:c="http://www.concordion.org/2007/concordion">
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://alexandria.huygens.knaw.nl/concordion-extension"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://alexandria.huygens.knaw.nl/concordion-extension
+                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+
 <title>Updating External Resources</title>
 
-<body>
+<body class="container">
 
-<h1>Updating external resources</h1>
+    <h2 class="page-header">Updating external resources</h2>
 
-<!--http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html-->
-<!--http://en.wikipedia.org/wiki/List_of_HTTP_status_codes#2xx_Success-->
+    <h3>Examples:</h3>
 
+    <div id="put-updates-resource" class="panel panel-default" c:execute="clearStorage()">
+        <div class="panel-heading"><b>How can I update an external resource?</b></div>
+        <div class="panel-body">
+            <h:request>
+                Given that I have <h:success>successfully</h:success>
+                <h:put>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</h:put> the body:
+                <h:jsonBody>{
+                    "resource": {
+                        "id": "c6b96360-c0c9-11e4-b947-6bc57448d166",
+                        "ref": "http://www.example.com/titles/path/to/title/resource"
+                    }
+                }
+                </h:jsonBody>
+            </h:request>
+
+            <h:request>
+                When I <h:put>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</h:put> the body:
+                <h:jsonBody>{
+                    "resource": {
+                        "ref": "http://www.example.com/titles/path/to/UPDATED/title/resource"
+                    }
+                }</h:jsonBody>
+                Then I should receive <h:status>204 No Content</h:status>
+                and the response body is <h:responseBody/>.
+            </h:request>
+
+            <h:request>
+                And <h:get>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</h:get> gives body:
+                <h:jsonResponse>{
+                    "resource": {
+                        "ref": "http://www.example.com/titles/path/to/UPDATED/title/resource"
+                    }
+                }</h:jsonResponse>
+            </h:request>
+        </div>
+    </div>
+
+<!--
 <div class="examples">
     <div c:execute="clear()" class="example">
 
@@ -57,6 +99,7 @@
     </div>
 
 </div>
+-->
 
 </body>
 </html>
