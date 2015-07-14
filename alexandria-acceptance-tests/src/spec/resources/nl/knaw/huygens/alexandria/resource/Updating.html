@@ -82,32 +82,5 @@
         </h:request>
     </div>
 
-<!--
-<div class="examples">
-    <div c:execute="clear()" class="example">
-        <h3>What happens when I send an empty PUT request to an existing resource?</h3>
-        <h5>Or in other words: will an empty PUT delete an existing resource?</h5>
-
-        <ul>
-            <li>Given a resource identified by <code>6e56c868-c0a9-11e4-a762-cb9a664afc01</code></li>
-
-            <li>When I <b c:set="#method">PUT</b>
-                <pre c:execute="emptyBody()">&#160;</pre>
-                to <code c:set="#endpoint"><b>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</b></code>
-            </li>
-
-            <li c:execute="request(#method, #endpoint)">Then:
-                <ol>
-                    <li>the response status should be <b c:assertEquals="status()">400 Bad Request</b>;</li>
-                    <li>the response body is <b c:assertEquals="response()">Missing or empty request body</b>.
-                    </li>
-                </ol>
-            </li>
-        </ul>
-    </div>
-
-</div>
--->
-
 </body>
 </html>
