@@ -41,7 +41,7 @@ public class ResourceEntity extends AbstractAnnotatableEntity {
 
   @JsonProperty(PropertyPrefix.LINK + "subresources")
   public Set<URI> getSubResources() {
-    return resource.getSubResourcePointers().stream().map(p -> locationBuilder.locationOf(p)).collect(toSet());
+    return resource.getSubResourcePointers().stream().map(locationBuilder::locationOf).collect(toSet());
   }
 
   @Override
