@@ -32,15 +32,15 @@
 <a class="jxr_linenumber" name="L24" href="#L24">24</a>    }
 <a class="jxr_linenumber" name="L25" href="#L25">25</a>  
 <a class="jxr_linenumber" name="L26" href="#L26">26</a>    @Override
-<a class="jxr_linenumber" name="L27" href="#L27">27</a>    <strong class="jxr_keyword">protected</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/model/AbstractAnnotatable.html">AbstractAnnotatable</a> getAnnotableObject() {
+<a class="jxr_linenumber" name="L27" href="#L27">27</a>    <strong class="jxr_keyword">protected</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/model/AbstractAnnotatable.html">AbstractAnnotatable</a> getAnnotatableObject() {
 <a class="jxr_linenumber" name="L28" href="#L28">28</a>      <strong class="jxr_keyword">return</strong> service.readAnnotation(uuid)<em class="jxr_comment">//</em>
 <a class="jxr_linenumber" name="L29" href="#L29">29</a>          .orElseThrow(AnnotationsEndpoint.annotationNotFoundForId(uuid));
-<a class="jxr_linenumber" name="L30" href="#L30">30</a>    };
+<a class="jxr_linenumber" name="L30" href="#L30">30</a>    }
 <a class="jxr_linenumber" name="L31" href="#L31">31</a>  
 <a class="jxr_linenumber" name="L32" href="#L32">32</a>    @Override
 <a class="jxr_linenumber" name="L33" href="#L33">33</a>    <strong class="jxr_keyword">protected</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/AnnotationCreationRequestBuilder.html">AnnotationCreationRequestBuilder</a> getAnnotationCreationRequestBuilder() {
 <a class="jxr_linenumber" name="L34" href="#L34">34</a>      <strong class="jxr_keyword">return</strong> requestBuilder.ofAnnotation(uuid);
-<a class="jxr_linenumber" name="L35" href="#L35">35</a>    };
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>    }
 <a class="jxr_linenumber" name="L36" href="#L36">36</a>  
 <a class="jxr_linenumber" name="L37" href="#L37">37</a>  }
 </pre>
