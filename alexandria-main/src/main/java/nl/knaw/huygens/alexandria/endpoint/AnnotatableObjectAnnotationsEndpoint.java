@@ -43,14 +43,14 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
     this.locationBuilder = locationBuilder;
   }
 
-  protected abstract AbstractAnnotatable getAnnotableObject();
+  protected abstract AbstractAnnotatable getAnnotatableObject();
 
   protected abstract AnnotationCreationRequestBuilder getAnnotationCreationRequestBuilder();
 
   @GET
   @ApiOperation(value = "get the annotations", response = AnnotationEntity.class)
   public Response get() {
-    final Set<AnnotationEntity> annotationEntities = getAnnotableObject().getAnnotations().stream()//
+    final Set<AnnotationEntity> annotationEntities = getAnnotatableObject().getAnnotations().stream()//
         .map((AlexandriaAnnotation a) -> AnnotationEntity.of(a).withLocationBuilder(locationBuilder))//
         .collect(toSet());
     Map<String, Set<AnnotationEntity>> entity = ImmutableMap.of("annotations", annotationEntities);

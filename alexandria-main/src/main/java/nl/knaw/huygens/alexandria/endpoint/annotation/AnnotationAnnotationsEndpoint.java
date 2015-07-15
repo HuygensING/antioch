@@ -24,14 +24,14 @@ public class AnnotationAnnotationsEndpoint extends AnnotatableObjectAnnotationsE
   }
 
   @Override
-  protected AbstractAnnotatable getAnnotableObject() {
+  protected AbstractAnnotatable getAnnotatableObject() {
     return service.readAnnotation(uuid)//
         .orElseThrow(AnnotationsEndpoint.annotationNotFoundForId(uuid));
-  };
+  }
 
   @Override
   protected AnnotationCreationRequestBuilder getAnnotationCreationRequestBuilder() {
     return requestBuilder.ofAnnotation(uuid);
-  };
+  }
 
 }

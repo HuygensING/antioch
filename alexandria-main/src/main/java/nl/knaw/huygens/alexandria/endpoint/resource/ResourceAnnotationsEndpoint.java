@@ -1,10 +1,9 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
-import io.swagger.annotations.Api;
-
 import javax.inject.Inject;
 import javax.ws.rs.PathParam;
 
+import io.swagger.annotations.Api;
 import nl.knaw.huygens.alexandria.endpoint.AnnotatableObjectAnnotationsEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.AnnotationCreationRequestBuilder;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -25,14 +24,14 @@ public class ResourceAnnotationsEndpoint extends AnnotatableObjectAnnotationsEnd
   }
 
   @Override
-  protected AbstractAnnotatable getAnnotableObject() {
+  protected AbstractAnnotatable getAnnotatableObject() {
     return service.readResource(uuid)//
         .orElseThrow(ResourcesEndpoint.resourceNotFoundForId(uuid));
-  };
+  }
 
   @Override
   protected AnnotationCreationRequestBuilder getAnnotationCreationRequestBuilder() {
     return requestBuilder.ofResource(uuid);
-  };
+  }
 
 }
