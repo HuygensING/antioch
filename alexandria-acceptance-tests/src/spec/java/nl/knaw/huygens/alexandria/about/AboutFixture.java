@@ -7,10 +7,10 @@ import org.junit.runner.RunWith;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.about.AboutEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.homepage.HomePageEndpoint;
-import nl.knaw.huygens.concordion.AlexandriaFixture;
+import nl.knaw.huygens.concordion.AlexandriaAcceptanceTest;
 
 @RunWith(ConcordionRunner.class)
-public class AboutFixture extends AlexandriaFixture {
+public class AboutFixture extends AlexandriaAcceptanceTest {
   @BeforeClass
   public static void registerEndpoint() {
     Log.trace("Registering {}", AboutEndpoint.class.getSimpleName());

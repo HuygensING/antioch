@@ -27,7 +27,7 @@ import nl.knaw.huygens.alexandria.util.UUIDParser;
 import nl.knaw.huygens.cat.RestFixture;
 import org.junit.BeforeClass;
 
-public class AlexandriaFixture extends RestFixture {
+public class AlexandriaAcceptanceTest extends RestFixture {
   private static final AlexandriaConfiguration CONFIG = testConfiguration();
 
   private static TinkerpopAlexandriaService service = new TinkerpopAlexandriaService().withStorage(new Storage());
