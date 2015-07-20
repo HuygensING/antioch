@@ -1,4 +1,4 @@
-package nl.knaw.huygens.concordion;
+package nl.knaw.huygens.alexandria.concordion;
 
 import static java.lang.String.format;
 
@@ -33,8 +33,8 @@ public class AlexandriaAcceptanceTest extends RestFixture {
   private static TinkerpopAlexandriaService service = new TinkerpopAlexandriaService().withStorage(new Storage());
 
   @BeforeClass
-  public static void setupAlexandriaFixture() {
-    Log.debug("Setting up AlexandriaFixture");
+  public static void setupAlexandriaAcceptanceTest() {
+    Log.debug("Setting up AlexandriaAcceptanceTest");
     setupRestFixture(alexandriaModule());
     register(JsonConfiguration.class);
   }

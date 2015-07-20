@@ -1,4 +1,4 @@
-package nl.knaw.huygens.concordion;
+package nl.knaw.huygens.alexandria.concordion;
 
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
