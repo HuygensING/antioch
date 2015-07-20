@@ -22,37 +22,18 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @RunWith(ConcordionRunner.class)
-public class AnnotationFixture extends AlexandriaAcceptanceTest {
+public class AnnotationFixture extends AnnotationsBase {
 
   private final Map<String, List<String>> annotatedReferences = Maps.newHashMap();
 
   @BeforeClass
   public static void registerEndpoint() {
-    Log.trace("Registering AnnotationsEndpoint");
     register(AnnotationsEndpoint.class);
   }
 
   public void noSuchAnnotation(String id) {
     when(service().readAnnotation(asUUID(id))).thenThrow(new NotFoundException());
   }
-
-  // public void validAnnotation(String id) {
-  // final UUID uuid = asUUID(id);
-  //
-  // final AlexandriaAnnotation annotation = new AlexandriaAnnotationBody(uuid, "aType", "aValue");
-  // mockAnnotation.addAnnotation(annotation);
-  //
-  // Log.trace("Mocking annotationService.readAnnotation({}) -> [{}]", id, annotation);
-  // when(annotationService().readAnnotation(uuid)).thenReturn(annotation);
-  // }
-  //
-  // public void createAnnotation(String type, String value) {
-  // Log.trace("createAnnotation([{}],[{}])", type, value);
-  //
-  // mockAnnotation = new AlexandriaAnnotation(randomUUID(), type, value);
-  // mockAnnotation.setCreatedOn(Instant.now());
-  // when(annotationService().createAnnotation(any(), any(), any())).thenReturn(mockAnnotation);
-  // }
 
   public void setUpAnnotation(String id, String tag) {
     List<String> tags = annotatedReferences.get(id);

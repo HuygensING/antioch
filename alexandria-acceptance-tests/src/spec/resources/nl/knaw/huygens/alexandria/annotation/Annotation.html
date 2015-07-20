@@ -1,30 +1,35 @@
 <html xmlns:c="http://www.concordion.org/2007/concordion"
-      xmlns:json="https://alexandria.huygens.knaw.nl">
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+
 <title>Accessing Annotations</title>
 
-<body>
+<body class="container">
 
-<h1>Accessing annotations</h1>
+    <h2 class="page-header">Accessing annotations</h2>
 
-<div class="examples">
-    <div c:execute="clear()" class="example">
-        <h3>What happens when I try to GET a non-existent annotation?</h3>
+    <h3>Examples</h3>
 
-        <ul>
-            <li>Given that no annotation exists with ID <span c:execute="noSuchAnnotation(#id)">
-                    <code c:set="#id">3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</code></span></li>
-
-            <li>When I <b c:set="#method">GET</b>
-                <code><b c:set="#endpoint">/annotations/3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</b></code></li>
-
-            <li c:execute="request(#method, #endpoint)">Then:</li>
-            <ol>
-                <li>the response status should be <b c:assertEquals="status()">404 Not Found</b>;</li>
-                <li>the response body is <b c:assertEquals="response()">empty</b>.</li>
-            </ol>
-        </ul>
+    <div id="get-non-existent" class="panel panel-default">
+        <div class="panel-heading">What happens when I GET a non-existent annotation?</div>
+        <div class="panel-body">
+            Given that no annotation exists with ID <code>1dccfd5a-2ec1-11e5-ae97-0360c65ad001</code>
+            <h:request>
+                When I <h:get>/annotations/1dccfd5a-2ec1-11e5-ae97-0360c65ad001</h:get>
+                then I should receive <h:status>404 Not Found</h:status>
+                and the response body should contain:
+                <h:jsonResponse>{
+                    "error": {
+                        "message": "No annotation found with id 1dccfd5a-2ec1-11e5-ae97-0360c65ad001"
+                    }
+                }</h:jsonResponse>
+            </h:request>
+        </div>
     </div>
 
+<!--
     <div c:execute="clear()" class="example">
         <h3>How do I create an annotation?</h3>
 
@@ -105,7 +110,8 @@
         </ul>
     </div>
 
-</div>
+    </div>
+-->
 
 </body>
 </html>
