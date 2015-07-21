@@ -7,19 +7,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import nl.knaw.huygens.Log;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
+import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
-import nl.knaw.huygens.alexandria.concordion.AlexandriaAcceptanceTest;
-
 import org.concordion.api.MultiValueResult;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
-
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 @RunWith(ConcordionRunner.class)
 public class AnnotationFixture extends AnnotationsBase {
@@ -29,6 +26,9 @@ public class AnnotationFixture extends AnnotationsBase {
   @BeforeClass
   public static void registerEndpoint() {
     register(AnnotationsEndpoint.class);
+//    register(AnnotationAnnotationsEndpoint.class);
+//    register(AnnotatableObjectAnnotationsEndpoint.class);
+    register(ResourcesEndpoint.class);
   }
 
   public void noSuchAnnotation(String id) {
