@@ -1,42 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><html xmlns:concordion="http://www.concordion.org/2007/concordion"><head><script type="text/javascript">/* Stack Trace Toggling */
-
-function getElementById(id) {
-  var element;
-
-  if (document.getElementById) { // standard
-    return document.getElementById(id);
-  } else if (document.all) { // old IE versions
-    return document.all[id];
-  } else if (document.layers) { // nn4
-    return document.layers[id];
-  }
-  alert("Sorry, but your web browser is not supported by Concordion.");
-}
-
-function isVisible(element) {
-  return element.style.display;
-}
-
-function makeVisible(element) {
-  element.style.display = "block";
-}
-
-function makeInvisible(element) {
-  element.style.display = "";
-}
-
-function toggleStackTrace(stackTraceNumber) {
-  var stackTrace = getElementById("stackTrace" + stackTraceNumber);
-  var stackTraceButton = getElementById("stackTraceButton" + stackTraceNumber);
-  if (isVisible(stackTrace)) {
-    makeInvisible(stackTrace);
-    stackTraceButton.value = "View Stack";
-  } else {
-    makeVisible(stackTrace);
-    stackTraceButton.value = "Hide Stack";
-  }
-}
-</script><style>* {
+<?xml version="1.0" encoding="UTF-8"?><html xmlns:concordion="http://www.concordion.org/2007/concordion"><head><style>* {
   font-family: Arial;
 }
 body {
@@ -212,8 +174,8 @@ ins {
 <ul>
     <li><a concordion:run="concordion" href="Creation.html" class="success">How do I create an external resource?</a></li>
     <li><a concordion:run="concordion" href="Querying.html" class="success">How do I retrieve an external resource?</a></li>
-    <li><a concordion:run="concordion" href="Updating.html"><span class="failure"><del class="expected">How do I update an external resource?</del></span></a><div><span class="exceptionMessage">Specification is expected to fail but has neither failures nor exceptions.</span><input class="stackTraceButton" id="stackTraceButton1" type="button" onclick="javascript:toggleStackTrace('1')" value="View Stack" /><div class="stackTrace" id="stackTrace1"><p>While evaluating expression: <code>concordion</code></p><div class="stackTraceExceptionMessage">java.lang.AssertionError: Specification is expected to fail but has neither failures nor exceptions.</div><div class="stackTraceEntry">at org.concordion.internal.FixtureState$2.assertIsSatisfied (FixtureState.java:46)</div><div class="stackTraceEntry">at org.concordion.internal.SummarizingResultRecorder.assertIsSatisfied (SummarizingResultRecorder.java:28)</div><div class="stackTraceEntry">at org.concordion.internal.FixtureRunner.run (FixtureRunner.java:32)</div><div class="stackTraceEntry">at org.concordion.integration.junit4.ConcordionRunner$1.evaluate (ConcordionRunner.java:118)</div><div class="stackTraceEntry">at org.junit.internal.runners.statements.RunBefores.evaluate (RunBefores.java:26)</div><div class="stackTraceEntry">at org.junit.internal.runners.statements.RunAfters.evaluate (RunAfters.java:27)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner.runLeaf (ParentRunner.java:325)</div><div class="stackTraceEntry">at org.junit.runners.BlockJUnit4ClassRunner.runChild (BlockJUnit4ClassRunner.java:78)</div><div class="stackTraceEntry">at org.concordion.integration.junit4.ConcordionRunner.runChild (ConcordionRunner.java:109)</div><div class="stackTraceEntry">at org.concordion.integration.junit4.ConcordionRunner.runChild (ConcordionRunner.java:20)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner$3.run (ParentRunner.java:290)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner$1.schedule (ParentRunner.java:71)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner.runChildren (ParentRunner.java:288)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner.access$000 (ParentRunner.java:58)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner$2.evaluate (ParentRunner.java:268)</div><div class="stackTraceEntry">at org.junit.internal.runners.statements.RunBefores.evaluate (RunBefores.java:26)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner.run (ParentRunner.java:363)</div><div class="stackTraceEntry">at org.junit.runners.Suite.runChild (Suite.java:128)</div><div class="stackTraceEntry">at org.junit.runners.Suite.runChild (Suite.java:27)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner$3.run (ParentRunner.java:290)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner$1.schedule (ParentRunner.java:71)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner.runChildren (ParentRunner.java:288)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner.access$000 (ParentRunner.java:58)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner$2.evaluate (ParentRunner.java:268)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner.run (ParentRunner.java:363)</div><div class="stackTraceEntry">at org.junit.runner.JUnitCore.run (JUnitCore.java:137)</div><div class="stackTraceEntry">at org.junit.runner.JUnitCore.run (JUnitCore.java:115)</div><div class="stackTraceEntry">at org.junit.runner.JUnitCore.run (JUnitCore.java:105)</div><div class="stackTraceEntry">at org.junit.runner.JUnitCore.runClasses (JUnitCore.java:62)</div><div class="stackTraceEntry">at org.junit.runner.JUnitCore.runClasses (JUnitCore.java:49)</div><div class="stackTraceEntry">at org.concordion.internal.runner.DefaultConcordionRunner.runJUnitClass (DefaultConcordionRunner.java:57)</div><div class="stackTraceEntry">at org.concordion.internal.runner.DefaultConcordionRunner.runTestClass (DefaultConcordionRunner.java:52)</div><div class="stackTraceEntry">at org.concordion.internal.runner.DefaultConcordionRunner.execute (DefaultConcordionRunner.java:22)</div><div class="stackTraceEntry">at org.concordion.internal.command.RunCommand.execute (RunCommand.java:93)</div><div class="stackTraceEntry">at org.concordion.api.AbstractCommandDecorator$2.run (AbstractCommandDecorator.java:23)</div><div class="stackTraceEntry">at org.concordion.internal.command.LocalTextDecorator.process (LocalTextDecorator.java:26)</div><div class="stackTraceEntry">at org.concordion.api.AbstractCommandDecorator.execute (AbstractCommandDecorator.java:21)</div><div class="stackTraceEntry">at org.concordion.api.AbstractCommandDecorator$2.run (AbstractCommandDecorator.java:23)</div><div class="stackTraceEntry">at org.concordion.internal.command.ThrowableCatchingDecorator.process (ThrowableCatchingDecorator.java:42)</div><div class="stackTraceEntry">at org.concordion.api.AbstractCommandDecorator.execute (AbstractCommandDecorator.java:21)</div><div class="stackTraceEntry">at org.concordion.api.CommandCall.execute (CommandCall.java:29)</div><div class="stackTraceEntry">at org.concordion.api.CommandCallList.processSequentially (CommandCallList.java:30)</div><div class="stackTraceEntry">at org.concordion.internal.command.SpecificationCommand.execute (SpecificationCommand.java:25)</div><div class="stackTraceEntry">at org.concordion.api.CommandCall.execute (CommandCall.java:29)</div><div class="stackTraceEntry">at org.concordion.internal.XMLSpecification.process (XMLSpecification.java:17)</div><div class="stackTraceEntry">at org.concordion.Concordion.process (Concordion.java:32)</div><div class="stackTraceEntry">at org.concordion.Concordion.process (Concordion.java:26)</div><div class="stackTraceEntry">at org.concordion.internal.FixtureRunner.run (FixtureRunner.java:21)</div><div class="stackTraceEntry">at org.concordion.integration.junit4.ConcordionRunner$1.evaluate (ConcordionRunner.java:118)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner.runLeaf (ParentRunner.java:325)</div><div class="stackTraceEntry">at org.junit.runners.BlockJUnit4ClassRunner.runChild (BlockJUnit4ClassRunner.java:78)</div><div class="stackTraceEntry">at org.concordion.integration.junit4.ConcordionRunner.runChild (ConcordionRunner.java:109)</div><div class="stackTraceEntry">at org.concordion.integration.junit4.ConcordionRunner.runChild (ConcordionRunner.java:20)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner$3.run (ParentRunner.java:290)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner$1.schedule (ParentRunner.java:71)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner.runChildren (ParentRunner.java:288)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner.access$000 (ParentRunner.java:58)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner$2.evaluate (ParentRunner.java:268)</div><div class="stackTraceEntry">at org.junit.runners.ParentRunner.run (ParentRunner.java:363)</div><div class="stackTraceEntry">at org.apache.maven.surefire.junit4.JUnit4Provider.execute (JUnit4Provider.java:283)</div><div class="stackTraceEntry">at org.apache.maven.surefire.junit4.JUnit4Provider.executeWithRerun (JUnit4Provider.java:173)</div><div class="stackTraceEntry">at org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet (JUnit4Provider.java:153)</div><div class="stackTraceEntry">at org.apache.maven.surefire.junit4.JUnit4Provider.invoke (JUnit4Provider.java:128)</div><div class="stackTraceEntry">at org.apache.maven.surefire.booter.ForkedBooter.invokeProviderInSameClassLoader (ForkedBooter.java:203)</div><div class="stackTraceEntry">at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess (ForkedBooter.java:155)</div><div class="stackTraceEntry">at org.apache.maven.surefire.booter.ForkedBooter.main (ForkedBooter.java:103)</div></div></div></li>
+    <li><a concordion:run="concordion" href="Updating.html" class="success">How do I update an external resource?</a></li>
 </ul>
 
-<div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 4361 ms on 21-Jul-2015 at 13:51:48 CEST</div></div></body>
+<div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 4415 ms on 21-Jul-2015 at 14:26:29 CEST</div></div></body>
 </html>
