@@ -25,6 +25,7 @@ import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.MockedServiceEndpointTest;
+import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -73,11 +74,13 @@ public class ResourcesEndpointTest extends MockedServiceEndpointTest {
     ResourcesEndpoint re = new ResourcesEndpoint(service, requestBuilder, locationBuilder, entityBuilder);
 
     ResourcePrototype prototype1 = deserialize("{'resource':{'id':'c28626d4-493a-4204-83d9-e9ae17e15654','ref':'Referentie1'}}");
-    Response response1 = re.setResourceAtSpecificID(prototype1);
+    UUIDParam uuidparam1=new UUIDParam("c28626d4-493a-4204-83d9-e9ae17e15654");
+    Response response1 = re.setResourceAtSpecificID(uuidparam1,prototype1);
     assertThat(response1.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
 
     ResourcePrototype prototype2 = deserialize("{'resource':{'id':'d1753214-493a-4204-83d9-e9ae17e15654','ref':'Referentie2'}}");
-    Response response2 = re.setResourceAtSpecificID(prototype2);
+    UUIDParam uuidparam2=new UUIDParam("d1753214-493a-4204-83d9-e9ae17e15654");
+    Response response2 = re.setResourceAtSpecificID(uuidparam2,prototype2);
     assertThat(response2.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
   }
 

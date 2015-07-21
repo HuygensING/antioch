@@ -15,7 +15,7 @@ public class TestConfiguration implements AlexandriaConfiguration {
 
   @Override
   public String getStorageDirectory() {
-    return "d:/tmp/alexandria";
+    return "c:/tmp/alexandria";
   }
 
 }

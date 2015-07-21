@@ -40,9 +40,9 @@ public class ResourcesEndpoint extends JSONEndpoint {
   private final LocationBuilder locationBuilder;
 
   @Inject
-  public ResourcesEndpoint(AlexandriaService service,    //
-      ResourceCreationRequestBuilder requestBuilder,    //
-      LocationBuilder locationBuilder,    //
+  public ResourcesEndpoint(AlexandriaService service, //
+      ResourceCreationRequestBuilder requestBuilder, //
+      LocationBuilder locationBuilder, //
       ResourceEntityBuilder entityBuilder) {
     this.locationBuilder = locationBuilder;
     this.alexandriaService = service;
@@ -82,10 +82,12 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @Path("{uuid}")
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation(value = "update/confirm/create the resource with the given uuid")
-  public Response setResourceAtSpecificID(@NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
+  public Response setResourceAtSpecificID(@PathParam("uuid") final UUIDParam uuid,
+      @NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
 
     protoType.setState(AlexandriaState.CONFIRMED);
+    protoType.setId(uuid); // in case the prototype has no id, get it from the Path
     final ResourceCreationRequest request = requestBuilder.build(protoType);
     AlexandriaResource resource = request.execute(alexandriaService);
 

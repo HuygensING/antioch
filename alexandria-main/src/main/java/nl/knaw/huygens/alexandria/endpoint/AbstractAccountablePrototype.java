@@ -2,9 +2,9 @@ package nl.knaw.huygens.alexandria.endpoint;
 
 import java.util.Optional;
 
-import nl.knaw.huygens.alexandria.model.AlexandriaState;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import nl.knaw.huygens.alexandria.model.AlexandriaState;
 
 public abstract class AbstractAccountablePrototype extends JsonWrapperObject implements Prototype {
   private UUIDParam id;
@@ -13,6 +13,10 @@ public abstract class AbstractAccountablePrototype extends JsonWrapperObject imp
 
   public UUIDParam getId() {
     return id;
+  }
+
+  public void setId(UUIDParam uuid) {
+    id = uuid;
   }
 
   public AlexandriaState getState() {
