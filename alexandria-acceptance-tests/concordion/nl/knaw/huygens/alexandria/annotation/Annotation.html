@@ -167,68 +167,68 @@ ins {
 
 <link type="text/css" rel="stylesheet" href="../../../../../codemirror/codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/enable-codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/merge.css" /><script type="text/javascript" src="../../../../../codemirror/codemirror.js"></script><script type="text/javascript" src="../../../../../codemirror/javascript.js"></script><script type="text/javascript" src="../../../../../codemirror/diff_match_patch.js"></script><script type="text/javascript" src="../../../../../codemirror/merge.js"></script><script type="text/javascript" src="../../../../../codemirror/enable-codemirror.js"></script><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/bootstrap.css" /><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/enable-bootstrap.css" /></head><body class="container"><span class="breadcrumbs"><a href="../Alexandria.html">Alexandria</a> &gt;</span>
 
-    <h2 class="page-header">Accessing annotations</h2>
+<h2 class="page-header">Accessing annotations</h2>
 
-    <h3>Examples</h3>
+<h3>Examples</h3>
 
-    <div id="get-non-existent" class="panel panel-default">
-        <div class="panel-heading">What happens when I GET a non-existent annotation?</div>
-        <div class="panel-body">
-            Given that no annotation exists with ID <code>1dccfd5a-2ec1-11e5-ae97-0360c65ad001</code>
-            <div h:request="">
-                When I <code h:get="" class="get">/annotations/1dccfd5a-2ec1-11e5-ae97-0360c65ad001</code>
-                then I should receive <code h:status="" class="success">404 Not Found</code>
-                and the response body should contain:
-                <pre h:jsonResponse="" class="json rest-success">{
+<div id="get-non-existent" class="panel panel-default">
+    <div class="panel-heading"><b>What happens when I GET a non-existent annotation?</b></div>
+    <div class="panel-body">
+        Given that no annotation exists with ID <code>1dccfd5a-2ec1-11e5-ae97-0360c65ad001</code>
+        <div h:request="">
+            When I
+            <code h:get="" class="get">/annotations/1dccfd5a-2ec1-11e5-ae97-0360c65ad001</code>
+            then I should receive
+            <code h:status="" class="success">404 Not Found</code>
+            and the response body should contain:
+            <pre h:jsonResponse="" class="json rest-success">{
   "error" : {
     "message" : "No annotation found with id 1dccfd5a-2ec1-11e5-ae97-0360c65ad001"
   }
 }</pre>
-            </div>
         </div>
     </div>
+</div>
+
+<div id="add-annotation" class="panel panel-default">
+    <div class="panel-heading"><b>How can I create an annotation?</b></div>
+    <div class="panel-body">
+        <div h:request="">
+            Given I have
+            <span h:success="" class="success">successfully</span>
+            <code h:put="" class="put">/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</code>
+            the following body:
+            <pre h:jsonBody="" class="json">{
+  "resource" : {
+    "id" : "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+    "ref" : "http://www.example.com/titles/path/to/title/resource"
+  }
+}</pre>
+        </div>
+        <div h:request="">
+            When I
+            <code h:post="" class="post">/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/annotations</code>
+            the following body:
+            <pre h:jsonBody="" class="json">{
+  "annotation" : {
+    "type" : "emotion",
+    "value" : "happy"
+  }
+}</pre>
+            then I should receive:
+            <ul>
+                <li>status <code h:status="" class="success">201 Created</code></li>
+                <li> a Location header starting with
+                    <code type="base" h:location="" class="location success">https://{host}/annotations/</code>
+                    and ending in a <code type="uuid" h:location="" class="location success">well-formed UUID</code>
+                </li>
+                <li>an <code h:responseBody="" class="empty success"> </code> response body</li>
+            </ul>
+        </div>
+    </div>
+</div>
 
 <!--
-    <div c:execute="clear()" class="example">
-        <h3>How do I create an annotation?</h3>
-
-        <ul>
-            <li c:execute="createAnnotation(#type,#value)">Given an annotation
-                of type: <code c:set="#type">emotion</code>
-                and value: <code c:set="#value">happy</code>
-            </li>
-            <li>When I <b c:set="#method">POST</b>
-<pre c:execute="body(#TEXT)">{
-    "annotation": {
-        "type": "emotion",
-        "value": "happy",
-        "createdOn" : "2015-03-23T08:28:36.571Z"
-    }
-}</pre>
-                to <code c:set="#endpoint"><b>/annotations</b></code></li>
-
-            <li c:execute="request(#method, #endpoint)">Then:
-                <ol>
-                    <li>the response status should be <b c:assertEquals="status()">201 Created</b>;</li>
-                    <li>the response contains the Location header
-                        <b c:assertEquals="base()">https://{host}/annotations/</b>
-                        followed by a <b c:assertEquals="uuidQuality()">well-formed UUID</b>;
-                    </li>
-                    <li>the response body looks like:
-<pre json:includesJson="response()">{
-    "annotation": {
-        "type": "emotion",
-        "value": "happy",
-        "annotations": [],
-        "createdOn": "{date.beforeNow}"
-    }
-}</pre>
-                    </li>
-                </ol>
-            </li>
-        </ul>
-    </div>
-
     <div c:execute="clear()" class="example">
         <h3>How can I create an annotation which is annotated itself by an existing annotation?</h3>
 
@@ -272,5 +272,5 @@ ins {
     </div>
 -->
 
-<div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 68 ms on 21-Jul-2015 at 14:26:30 CEST</div></div></body>
+<div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 158 ms on 21-Jul-2015 at 15:06:34 CEST</div></div></body>
 </html>
