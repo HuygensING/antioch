@@ -17,6 +17,7 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.config.AlexandriaServletModule;
 import nl.knaw.huygens.alexandria.jersey.AlexandriaApplication;
+import nl.knaw.huygens.alexandria.util.Scheduler;
 
 public class Server {
   private static final long ONE_HOUR = Duration.ofHours(1).toMillis();
@@ -30,6 +31,7 @@ public class Server {
     URI uri = getBaseURI();
     final HttpServer httpServer = startServer(uri);
     Log.info("Jersey app started with WADL available at {}/application.wadl\n", uri);
+    Scheduler.scheduleExpiredTentativesRemoval();
 
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
       shutdown(httpServer);

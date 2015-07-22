@@ -12,15 +12,23 @@ import com.squarespace.jersey2.guice.JerseyGuiceServletContextListener;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaServletModule;
+import nl.knaw.huygens.alexandria.util.Scheduler;
 
 @WebListener
 public class ContextListener extends JerseyGuiceServletContextListener {
   static final ImmutableList<AbstractModule> MODULES = ImmutableList.of(new AlexandriaServletModule(), new TestConfigurationModule());
 
   @Override
+  protected List<? extends Module> modules() {
+    Log.info("modules() called");
+    return MODULES;
+  }
+
+  @Override
   public void contextInitialized(ServletContextEvent servletContextEvent) {
     Log.info("ContextListener.contextInitialized()");
     super.contextInitialized(servletContextEvent);
+    Scheduler.scheduleExpiredTentativesRemoval();
   }
 
   @Override
@@ -29,9 +37,4 @@ public class ContextListener extends JerseyGuiceServletContextListener {
     super.contextDestroyed(servletContextEvent);
   }
 
-  @Override
-  protected List<? extends Module> modules() {
-    Log.info("modules() called");
-    return MODULES;
-  }
 }
