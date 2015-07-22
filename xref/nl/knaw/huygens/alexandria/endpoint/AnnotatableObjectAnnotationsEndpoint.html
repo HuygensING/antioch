@@ -40,42 +40,46 @@
 <a class="jxr_linenumber" name="L32" href="#L32">32</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/AnnotationCreationRequestBuilder.html">AnnotationCreationRequestBuilder</a> requestBuilder;
 <a class="jxr_linenumber" name="L33" href="#L33">33</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">final</strong> UUID uuid;
 <a class="jxr_linenumber" name="L34" href="#L34">34</a>  
-<a class="jxr_linenumber" name="L35" href="#L35">35</a>    <strong class="jxr_keyword">protected</strong> <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/AnnotatableObjectAnnotationsEndpoint.html">AnnotatableObjectAnnotationsEndpoint</a>(<a href="../../../../../nl/knaw/huygens/alexandria/service/AlexandriaService.html">AlexandriaService</a> service,                   <em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L36" href="#L36">36</a>        <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/AnnotationCreationRequestBuilder.html">AnnotationCreationRequestBuilder</a> requestBuilder,                   <em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L37" href="#L37">37</a>        <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/LocationBuilder.html">LocationBuilder</a> locationBuilder,                   <em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>    <strong class="jxr_keyword">protected</strong> <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/AnnotatableObjectAnnotationsEndpoint.html">AnnotatableObjectAnnotationsEndpoint</a>(<a href="../../../../../nl/knaw/huygens/alexandria/service/AlexandriaService.html">AlexandriaService</a> service, <em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L36" href="#L36">36</a>        <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/AnnotationCreationRequestBuilder.html">AnnotationCreationRequestBuilder</a> requestBuilder, <em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L37" href="#L37">37</a>        <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/LocationBuilder.html">LocationBuilder</a> locationBuilder, <em class="jxr_comment">//</em>
 <a class="jxr_linenumber" name="L38" href="#L38">38</a>        <strong class="jxr_keyword">final</strong> <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/UUIDParam.html">UUIDParam</a> uuidParam) {
 <a class="jxr_linenumber" name="L39" href="#L39">39</a>      Log.trace(<span class="jxr_string">"resourceService=[{}], uuidParam=[{}]"</span>, service, uuidParam);
 <a class="jxr_linenumber" name="L40" href="#L40">40</a>      <strong class="jxr_keyword">this</strong>.service = service;
 <a class="jxr_linenumber" name="L41" href="#L41">41</a>      <strong class="jxr_keyword">this</strong>.requestBuilder = requestBuilder;
 <a class="jxr_linenumber" name="L42" href="#L42">42</a>      <strong class="jxr_keyword">this</strong>.uuid = uuidParam.getValue();
 <a class="jxr_linenumber" name="L43" href="#L43">43</a>      <strong class="jxr_keyword">this</strong>.locationBuilder = locationBuilder;
-<a class="jxr_linenumber" name="L44" href="#L44">44</a>    }
-<a class="jxr_linenumber" name="L45" href="#L45">45</a>  
-<a class="jxr_linenumber" name="L46" href="#L46">46</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">abstract</strong> <a href="../../../../../nl/knaw/huygens/alexandria/model/AbstractAnnotatable.html">AbstractAnnotatable</a> getAnnotatableObject();
-<a class="jxr_linenumber" name="L47" href="#L47">47</a>  
-<a class="jxr_linenumber" name="L48" href="#L48">48</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">abstract</strong> <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/AnnotationCreationRequestBuilder.html">AnnotationCreationRequestBuilder</a> getAnnotationCreationRequestBuilder();
+<a class="jxr_linenumber" name="L44" href="#L44">44</a>  
+<a class="jxr_linenumber" name="L45" href="#L45">45</a>      <em class="jxr_comment">// throw exception if annotatableObject doesn't exist or is tentative</em>
+<a class="jxr_linenumber" name="L46" href="#L46">46</a>      @SuppressWarnings(<span class="jxr_string">"unused"</span>)
+<a class="jxr_linenumber" name="L47" href="#L47">47</a>      <a href="../../../../../nl/knaw/huygens/alexandria/model/AbstractAnnotatable.html">AbstractAnnotatable</a> annotatableObject = getAnnotatableObject();
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>    }
 <a class="jxr_linenumber" name="L49" href="#L49">49</a>  
-<a class="jxr_linenumber" name="L50" href="#L50">50</a>    @GET
-<a class="jxr_linenumber" name="L51" href="#L51">51</a>    @ApiOperation(value = <span class="jxr_string">"get the annotations"</span>, response = AnnotationEntity.<strong class="jxr_keyword">class</strong>)
-<a class="jxr_linenumber" name="L52" href="#L52">52</a>    <strong class="jxr_keyword">public</strong> Response get() {
-<a class="jxr_linenumber" name="L53" href="#L53">53</a>      <strong class="jxr_keyword">final</strong> Set&lt;AnnotationEntity&gt; annotationEntities = getAnnotatableObject().getAnnotations().stream()<em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L54" href="#L54">54</a>          .map((AlexandriaAnnotation a) -&gt; AnnotationEntity.of(a).withLocationBuilder(locationBuilder))<em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L55" href="#L55">55</a>          .collect(toSet());
-<a class="jxr_linenumber" name="L56" href="#L56">56</a>      Map&lt;String, Set&lt;AnnotationEntity&gt;&gt; entity = ImmutableMap.of(<span class="jxr_string">"annotations"</span>, annotationEntities);
-<a class="jxr_linenumber" name="L57" href="#L57">57</a>      <strong class="jxr_keyword">return</strong> Response.ok(entity).build();
-<a class="jxr_linenumber" name="L58" href="#L58">58</a>    }
-<a class="jxr_linenumber" name="L59" href="#L59">59</a>  
-<a class="jxr_linenumber" name="L60" href="#L60">60</a>    @POST
-<a class="jxr_linenumber" name="L61" href="#L61">61</a>    @Consumes(MediaType.APPLICATION_JSON)
-<a class="jxr_linenumber" name="L62" href="#L62">62</a>    @ApiOperation(<span class="jxr_string">"add annotation"</span>)
-<a class="jxr_linenumber" name="L63" href="#L63">63</a>    <strong class="jxr_keyword">public</strong> Response addAnnotation(@NotNull @Valid <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/annotation/AnnotationPrototype.html">AnnotationPrototype</a> prototype) {
-<a class="jxr_linenumber" name="L64" href="#L64">64</a>      prototype.setState(AlexandriaState.TENTATIVE);
-<a class="jxr_linenumber" name="L65" href="#L65">65</a>      <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/AnnotationCreationRequest.html">AnnotationCreationRequest</a> request = getAnnotationCreationRequestBuilder().build(prototype);
-<a class="jxr_linenumber" name="L66" href="#L66">66</a>      <a href="../../../../../nl/knaw/huygens/alexandria/model/AlexandriaAnnotation.html">AlexandriaAnnotation</a> annotation = request.execute(service);
-<a class="jxr_linenumber" name="L67" href="#L67">67</a>      <strong class="jxr_keyword">return</strong> Response.created(locationBuilder.locationOf(annotation)).build();
-<a class="jxr_linenumber" name="L68" href="#L68">68</a>    }
-<a class="jxr_linenumber" name="L69" href="#L69">69</a>  
-<a class="jxr_linenumber" name="L70" href="#L70">70</a>  }
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">abstract</strong> <a href="../../../../../nl/knaw/huygens/alexandria/model/AbstractAnnotatable.html">AbstractAnnotatable</a> getAnnotatableObject();
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>  
+<a class="jxr_linenumber" name="L52" href="#L52">52</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">abstract</strong> <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/AnnotationCreationRequestBuilder.html">AnnotationCreationRequestBuilder</a> getAnnotationCreationRequestBuilder();
+<a class="jxr_linenumber" name="L53" href="#L53">53</a>  
+<a class="jxr_linenumber" name="L54" href="#L54">54</a>    @GET
+<a class="jxr_linenumber" name="L55" href="#L55">55</a>    @ApiOperation(value = <span class="jxr_string">"get the annotations"</span>, response = AnnotationEntity.<strong class="jxr_keyword">class</strong>)
+<a class="jxr_linenumber" name="L56" href="#L56">56</a>    <strong class="jxr_keyword">public</strong> Response get() {
+<a class="jxr_linenumber" name="L57" href="#L57">57</a>      <strong class="jxr_keyword">final</strong> Set&lt;AnnotationEntity&gt; annotationEntities = getAnnotatableObject().getAnnotations().stream()<em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L58" href="#L58">58</a>          .map((AlexandriaAnnotation a) -&gt; AnnotationEntity.of(a).withLocationBuilder(locationBuilder))<em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>          .collect(toSet());
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>      Map&lt;String, Set&lt;AnnotationEntity&gt;&gt; entity = ImmutableMap.of(<span class="jxr_string">"annotations"</span>, annotationEntities);
+<a class="jxr_linenumber" name="L61" href="#L61">61</a>      <strong class="jxr_keyword">return</strong> Response.ok(entity).build();
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>    }
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>  
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>    @POST
+<a class="jxr_linenumber" name="L65" href="#L65">65</a>    @Consumes(MediaType.APPLICATION_JSON)
+<a class="jxr_linenumber" name="L66" href="#L66">66</a>    @ApiOperation(<span class="jxr_string">"add annotation"</span>)
+<a class="jxr_linenumber" name="L67" href="#L67">67</a>    <strong class="jxr_keyword">public</strong> Response addAnnotation(@NotNull @Valid <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/annotation/AnnotationPrototype.html">AnnotationPrototype</a> prototype) {
+<a class="jxr_linenumber" name="L68" href="#L68">68</a>      prototype.setState(AlexandriaState.TENTATIVE);
+<a class="jxr_linenumber" name="L69" href="#L69">69</a>      <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/AnnotationCreationRequest.html">AnnotationCreationRequest</a> request = getAnnotationCreationRequestBuilder().build(prototype);
+<a class="jxr_linenumber" name="L70" href="#L70">70</a>      <a href="../../../../../nl/knaw/huygens/alexandria/model/AlexandriaAnnotation.html">AlexandriaAnnotation</a> annotation = request.execute(service);
+<a class="jxr_linenumber" name="L71" href="#L71">71</a>      <strong class="jxr_keyword">return</strong> Response.created(locationBuilder.locationOf(annotation)).build();
+<a class="jxr_linenumber" name="L72" href="#L72">72</a>    }
+<a class="jxr_linenumber" name="L73" href="#L73">73</a>  
+<a class="jxr_linenumber" name="L74" href="#L74">74</a>  }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2015 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
