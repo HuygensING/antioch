@@ -9,6 +9,7 @@ import nl.knaw.huygens.alexandria.endpoint.AnnotationCreationRequestBuilder;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 @Api("annotations")
@@ -16,17 +17,21 @@ public class ResourceAnnotationsEndpoint extends AnnotatableObjectAnnotationsEnd
 
   // TODO: how to remove this duplicated inject/constructor?
   @Inject
-  public ResourceAnnotationsEndpoint(AlexandriaService service, //
-      AnnotationCreationRequestBuilder requestBuilder, //
-      LocationBuilder locationBuilder, //
+  public ResourceAnnotationsEndpoint(AlexandriaService service,  //
+      AnnotationCreationRequestBuilder requestBuilder,  //
+      LocationBuilder locationBuilder,  //
       @PathParam("uuid") final UUIDParam uuidParam) {
     super(service, requestBuilder, locationBuilder, uuidParam);
   }
 
   @Override
   protected AbstractAnnotatable getAnnotatableObject() {
-    return service.readResource(uuid)//
+    AlexandriaResource resource = service.readResource(uuid)//
         .orElseThrow(ResourcesEndpoint.resourceNotFoundForId(uuid));
+    if (resource.isTentative()) {
+      throw ResourcesEndpoint.resourceIsTentativeException(uuid);
+    }
+    return resource;
   }
 
   @Override

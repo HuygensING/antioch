@@ -38,6 +38,11 @@ public class SubResourcesEndpoint extends JSONEndpoint {
     this.service = service;
     this.requestBuilder = requestBuilder;
     this.parentUuid = uuidParam.getValue();
+    AlexandriaResource resource = service.readResource(parentUuid)//
+        .orElseThrow(ResourcesEndpoint.resourceNotFoundForId(parentUuid));
+    if (resource.isTentative()) {
+      throw ResourcesEndpoint.resourceIsTentativeException(parentUuid);
+    }
   }
 
   @GET

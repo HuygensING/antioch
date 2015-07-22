@@ -32,15 +32,19 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   protected final AnnotationCreationRequestBuilder requestBuilder;
   protected final UUID uuid;
 
-  protected AnnotatableObjectAnnotationsEndpoint(AlexandriaService service,                   //
-      AnnotationCreationRequestBuilder requestBuilder,                   //
-      LocationBuilder locationBuilder,                   //
+  protected AnnotatableObjectAnnotationsEndpoint(AlexandriaService service, //
+      AnnotationCreationRequestBuilder requestBuilder, //
+      LocationBuilder locationBuilder, //
       final UUIDParam uuidParam) {
     Log.trace("resourceService=[{}], uuidParam=[{}]", service, uuidParam);
     this.service = service;
     this.requestBuilder = requestBuilder;
     this.uuid = uuidParam.getValue();
     this.locationBuilder = locationBuilder;
+
+    // throw exception if annotatableObject doesn't exist or is tentative
+    @SuppressWarnings("unused")
+    AbstractAnnotatable annotatableObject = getAnnotatableObject();
   }
 
   protected abstract AbstractAnnotatable getAnnotatableObject();

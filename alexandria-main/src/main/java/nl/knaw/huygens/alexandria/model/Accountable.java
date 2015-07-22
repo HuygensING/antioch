@@ -11,4 +11,8 @@ public interface Accountable {
   AlexandriaState getState();
 
   Instant getStateSince();
+
+  default boolean isTentative() {
+    return AlexandriaState.TENTATIVE.equals(getState());
+  }
 }

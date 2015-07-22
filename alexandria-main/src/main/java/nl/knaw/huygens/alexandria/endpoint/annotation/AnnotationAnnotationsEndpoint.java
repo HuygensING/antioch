@@ -9,6 +9,7 @@ import nl.knaw.huygens.alexandria.endpoint.AnnotationCreationRequestBuilder;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class AnnotationAnnotationsEndpoint extends AnnotatableObjectAnnotationsEndpoint {
@@ -25,8 +26,12 @@ public class AnnotationAnnotationsEndpoint extends AnnotatableObjectAnnotationsE
 
   @Override
   protected AbstractAnnotatable getAnnotatableObject() {
-    return service.readAnnotation(uuid)//
+    AlexandriaAnnotation annotation = service.readAnnotation(uuid)//
         .orElseThrow(AnnotationsEndpoint.annotationNotFoundForId(uuid));
+    if (annotation.isTentative()){
+      throw AnnotationsEndpoint.annotationIsTentative(uuid);
+    }
+    return annotation;
   }
 
   @Override

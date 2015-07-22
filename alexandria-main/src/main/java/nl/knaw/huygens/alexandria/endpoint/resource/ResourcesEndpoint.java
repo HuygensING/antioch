@@ -2,6 +2,7 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import static nl.knaw.huygens.alexandria.endpoint.EndpointPaths.RESOURCES;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
@@ -15,6 +16,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -25,6 +27,7 @@ import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
+import nl.knaw.huygens.alexandria.exception.TentativeObjectException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -82,8 +85,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @Path("{uuid}")
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation(value = "update/confirm/create the resource with the given uuid")
-  public Response setResourceAtSpecificID(@PathParam("uuid") final UUIDParam uuid,
-      @NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
+  public Response setResourceAtSpecificID(@PathParam("uuid") final UUIDParam uuid, @NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
 
     protoType.setState(AlexandriaState.CONFIRMED);
@@ -133,13 +135,16 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @Path("{uuid}/provenance")
   public ResourceProvenanceEndpoint getProvenanceEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
     // If we let Jersey handle the lifecycle, this endpoint doesn't show up in the standard application.wadl
-    // TODO: make the combination subresource as class/application.wadl work
-    // swagger seems to have the same problem
+    // TODO: make the combination subresource as class/application.wadl work swagger seems to have the same problem
     return new ResourceProvenanceEndpoint(alexandriaService, uuidParam, locationBuilder);
   }
 
   public static Supplier<NotFoundException> resourceNotFoundForId(Object id) {
     return () -> new NotFoundException("No resource found with id " + id);
+  }
+
+  public static WebApplicationException resourceIsTentativeException(UUID uuid) {
+    return new TentativeObjectException("resource " + uuid + " is tentative, please confirm first");
   };
 
 }

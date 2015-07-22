@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.endpoint.annotation;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
@@ -9,6 +10,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -18,6 +20,7 @@ import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
+import nl.knaw.huygens.alexandria.exception.TentativeObjectException;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -87,6 +90,10 @@ public class AnnotationsEndpoint extends JSONEndpoint {
 
   public static Supplier<NotFoundException> annotationNotFoundForId(Object id) {
     return () -> new NotFoundException("No annotation found with id " + id);
+  }
+
+  public static WebApplicationException annotationIsTentative(UUID uuid) {
+    return new TentativeObjectException("annotation "+uuid+ " is tentative, please confirm it first");
   };
 
 }
