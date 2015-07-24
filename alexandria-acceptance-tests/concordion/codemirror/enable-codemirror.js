@@ -3,6 +3,16 @@ window.addEventListener('load', ready, false);
 function ready(){
 	enableCodeMirror('.json.rest-success', {name: 'javascript', json: true});
 	enableCodeMirrorMerge('.json.rest-failure', {name: 'javascript', json: true});
+	refreshCodeMirrorEditorOnBootstrapTabSelected();
+}
+
+function refreshCodeMirrorEditorOnBootstrapTabSelected() {
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        var target = $(e.target).attr("href") // activated tab
+        $(target).find('.CodeMirror').each(function(i, el){
+            el.CodeMirror.refresh();
+        });
+    });
 }
 
 function unescape(input){

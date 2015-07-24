@@ -1,6 +1,7 @@
 .json, .xml {
 	padding: 0;
 }
+
 .CodeMirror-merge {
 	border: none;
 }
