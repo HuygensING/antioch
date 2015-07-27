@@ -2,12 +2,15 @@ package nl.knaw.huygens.alexandria.concordion;
 
 import static java.lang.String.format;
 
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
+
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.UriBuilder;
+
+import org.junit.BeforeClass;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
@@ -15,6 +18,7 @@ import com.google.common.collect.Iterables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
@@ -22,15 +26,14 @@ import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerpopAlexandriaService;
-import nl.knaw.huygens.alexandria.storage.Storage;
+import nl.knaw.huygens.alexandria.storage.TinkerGraphStorage;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
 import nl.knaw.huygens.cat.RestFixture;
-import org.junit.BeforeClass;
 
 public class AlexandriaAcceptanceTest extends RestFixture {
   private static final AlexandriaConfiguration CONFIG = testConfiguration();
 
-  private static TinkerpopAlexandriaService service = new TinkerpopAlexandriaService().withStorage(new Storage());
+  private static TinkerpopAlexandriaService service = new TinkerpopAlexandriaService().withStorage(new TinkerGraphStorage());
 
   @BeforeClass
   public static void setupAlexandriaAcceptanceTest() {
@@ -79,7 +82,7 @@ public class AlexandriaAcceptanceTest extends RestFixture {
 
   public void clearStorage() {
     Log.debug("Clearing Storage");
-    service.withStorage(new Storage());
+    service.withStorage(new TinkerGraphStorage());
   }
 
   @Override
