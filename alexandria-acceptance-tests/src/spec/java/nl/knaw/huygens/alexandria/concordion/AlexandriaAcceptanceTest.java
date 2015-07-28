@@ -24,13 +24,19 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerpopAlexandriaService;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
+import nl.knaw.huygens.cat.RestExtension;
 import nl.knaw.huygens.cat.RestFixture;
+import org.concordion.api.extension.Extension;
 import org.junit.BeforeClass;
 
 public class AlexandriaAcceptanceTest extends RestFixture {
   private static final AlexandriaConfiguration CONFIG = testConfiguration();
 
   private static TinkerpopAlexandriaService service = new TinkerpopAlexandriaService().withStorage(new Storage());
+
+  @Extension
+  @SuppressWarnings("unused")
+  public RestExtension extensionFoundViaReflection = new RestExtension().enableCodeMirror().includeBootstrap();
 
   @BeforeClass
   public static void setupAlexandriaAcceptanceTest() {
@@ -77,14 +83,14 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     super.clear();
   }
 
-  public void clearStorage() {
-    Log.debug("Clearing Storage");
-    service.withStorage(new Storage());
-  }
-
   @Override
   protected Application configure() {
     return super.configure(); // maybe move enabling of LOG_TRAFFIC and DUMP_ENTITY from RestFixture here?
+  }
+
+  public void clearStorage() {
+    Log.debug("Clearing Storage");
+    service.withStorage(new Storage());
   }
 
   protected AlexandriaService service() {
