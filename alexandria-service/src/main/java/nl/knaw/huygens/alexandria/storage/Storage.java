@@ -19,9 +19,9 @@ import org.apache.tinkerpop.gremlin.structure.Graph.Features.GraphFeatures;
 import org.apache.tinkerpop.gremlin.structure.Transaction;
 import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AccountablePointer;
@@ -50,10 +50,6 @@ public class Storage {
   private String dumpfile;
   private boolean supportsTransactions;
   private boolean supportsPersistence;
-
-  public Storage() {
-    this(TinkerGraph.open());
-  }
 
   public Storage(Graph graph) {
     this.graph = graph;
@@ -162,11 +158,15 @@ public class Storage {
     startTransaction();
 
     AnnotationVF avf = createAnnotationVF(newAnnotation);
-
-    AnnotationVF annotationToAnnotate = readAnnotationVF(annotation.getId()).get();
-    avf.setAnnotatedAnnotation(annotationToAnnotate);
+    UUID id = annotation.getId();
+    annotate(avf, id);
 
     commitTransaction();
+  }
+
+  private void annotate(AnnotationVF avf, UUID id) {
+    AnnotationVF annotationToAnnotate = readAnnotationVF(id).get();
+    avf.setAnnotatedAnnotation(annotationToAnnotate);
   }
 
   public Optional<AlexandriaAnnotationBody> findAnnotationBodyWithTypeAndValue(Optional<String> type, String value) {
@@ -188,10 +188,37 @@ public class Storage {
   }
 
   public Set<AlexandriaResource> readSubResources(UUID uuid) {
-    ResourceVF resourcevf = readResourceVF(uuid).orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
+    ResourceVF resourcevf = readResourceVF(uuid)//
+        .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
     return resourcevf.getSubResources().stream()//
         .map(this::deframeResource)//
         .collect(toSet());
+  }
+
+  public AlexandriaAnnotation deprecateAnnotation(UUID oldAnnotationId, AnnotationPrototype prototype) {
+    AnnotationVF oldAnnotationVF = readAnnotationVF(oldAnnotationId)//
+        .orElseThrow(() -> new NotFoundException("no annotation found with uuid " + oldAnnotationId));
+    AlexandriaAnnotationBody body = findAnnotationBodyWithTypeAndValue(prototype.getType(), prototype.getValue())//
+        .orElseGet(() -> createAnnotationBody(prototype.getType(), prototype.getValue()));
+
+    AnnotationVF newAnnotationVF = createAnnotationVF(null);
+
+    AnnotationVF annotatedAnnotation = oldAnnotationVF.getAnnotatedAnnotation();
+    if (annotatedAnnotation != null) {
+      newAnnotationVF.setAnnotatedAnnotation(annotatedAnnotation);
+    } else {
+      ResourceVF annotatedResource = oldAnnotationVF.getAnnotatedResource();
+      newAnnotationVF.setAnnotatedResource(annotatedResource);
+    }
+    newAnnotationVF.setDeprecatedAnnotation(oldAnnotationVF);
+
+    oldAnnotationVF.setState(AlexandriaState.DEPRECATED.name());
+
+    return null;
+  }
+
+  private AlexandriaAnnotationBody createAnnotationBody(Optional<String> type, String value) {
+    return null;
   }
 
   public void dumpToGraphSON(OutputStream os) throws IOException {

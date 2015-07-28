@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AccountablePointer;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
@@ -50,5 +51,14 @@ public interface AlexandriaService {
    * remove all unconfirmed objects that have timed out
    */
   void removeExpiredTentatives();
+
+  /**
+   * @param oldAnnotationId
+   *          the id of the {@link AlexandriaAnnotation} to deprecate
+   * @param prototype
+   *          the prototype for the new {@link AlexandriaAnnotation}
+   * @return the new {@link AlexandriaAnnotation} that deprecates the annotation with id oldAnnotationId
+   */
+  AlexandriaAnnotation deprecateAnnotation(UUID oldAnnotationId, AnnotationPrototype prototype);
 
 }

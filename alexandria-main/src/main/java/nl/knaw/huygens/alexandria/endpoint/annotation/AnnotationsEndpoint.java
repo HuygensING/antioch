@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -18,6 +19,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
+import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.exception.TentativeObjectException;
@@ -30,12 +32,18 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 public class AnnotationsEndpoint extends JSONEndpoint {
   private final AlexandriaService service;
   private final AnnotationEntityBuilder entityBuilder;
+  private final LocationBuilder locationBuilder;
+  private final AnnotationDeprecationRequestBuilder requestBuilder;
 
   @Inject
-  public AnnotationsEndpoint(AlexandriaService service,                     //
-      AnnotationEntityBuilder entityBuilder) {
+  public AnnotationsEndpoint(AlexandriaService service, //
+      AnnotationEntityBuilder entityBuilder, //
+      AnnotationDeprecationRequestBuilder requestBuilder, //
+      LocationBuilder locationBuilder) {
     this.service = service;
     this.entityBuilder = entityBuilder;
+    this.requestBuilder = requestBuilder;
+    this.locationBuilder = locationBuilder;
   }
 
   @GET
@@ -69,10 +77,22 @@ public class AnnotationsEndpoint extends JSONEndpoint {
     return Response.noContent().build();
   }
 
+  @POST
+  @Path("{uuid}/deprecation")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @ApiOperation(value = "make a new annotation from the payload and use it to deprecate the annotation with the given uuid")
+  public Response deprecateAnnotation(@PathParam("uuid") UUIDParam uuidParam, AnnotationPrototype prototype) {
+    UUID uuid = uuidParam.getValue();
+    prototype.setState(AlexandriaState.TENTATIVE);
+    AnnotationDeprecationRequest request = requestBuilder.ofAnnotation(uuid).build(prototype);
+    AlexandriaAnnotation newAnnotation = request.execute(service);
+    return Response.created(locationBuilder.locationOf(newAnnotation)).build();
+  }
+
   @DELETE
   @Path("{uuid}")
   public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
-    // set state to expired (or delete when state=default?)
+    // set state to expired (or delete when state=tentative?)
     return methodNotImplemented();
   }
 
@@ -93,7 +113,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   }
 
   public static WebApplicationException annotationIsTentative(UUID uuid) {
-    return new TentativeObjectException("annotation "+uuid+ " is tentative, please confirm it first");
+    return new TentativeObjectException("annotation " + uuid + " is tentative, please confirm it first");
   };
 
 }
