@@ -2,18 +2,15 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import static java.util.stream.Collectors.toSet;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Stream;
-
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import com.google.common.collect.ImmutableMap;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.endpoint.AnnotatableObjectAnnotationsEndpoint;
@@ -25,6 +22,7 @@ import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.util.Optionals;
 
 @Api("annotations")
 public class ResourceAnnotationsEndpoint extends AnnotatableObjectAnnotationsEndpoint {
@@ -62,8 +60,7 @@ public class ResourceAnnotationsEndpoint extends AnnotatableObjectAnnotationsEnd
     Stream<AlexandriaAnnotation> subresourceAnnotationsStream = ((AlexandriaResource) getAnnotatableObject())//
         .getSubResourcePointers().stream()//
         .map(service::dereference)//
-        .filter(Optional::isPresent)//
-        .map(Optional::get)//
+        .flatMap(Optionals::stream)//
         .flatMap(a -> ((AlexandriaResource) a).getAnnotations().stream());
 
     Stream<AlexandriaAnnotation> joinedStream = Stream.concat(resourceAnnotationsStream, subresourceAnnotationsStream);
