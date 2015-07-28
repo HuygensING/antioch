@@ -22,7 +22,7 @@ import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerpopAlexandriaService;
-import nl.knaw.huygens.alexandria.storage.Storage;
+import nl.knaw.huygens.alexandria.storage.TinkerGraphStorage;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
 import nl.knaw.huygens.cat.RestExtension;
 import nl.knaw.huygens.cat.RestFixture;
@@ -32,7 +32,7 @@ import org.junit.BeforeClass;
 public class AlexandriaAcceptanceTest extends RestFixture {
   private static final AlexandriaConfiguration CONFIG = testConfiguration();
 
-  private static TinkerpopAlexandriaService service = new TinkerpopAlexandriaService().withStorage(new Storage());
+  private static TinkerpopAlexandriaService service = new TinkerpopAlexandriaService().withStorage(new TinkerGraphStorage());
 
   @Extension
   @SuppressWarnings("unused")
@@ -90,7 +90,7 @@ public class AlexandriaAcceptanceTest extends RestFixture {
 
   public void clearStorage() {
     Log.debug("Clearing Storage");
-    service.withStorage(new Storage());
+    service.withStorage(new TinkerGraphStorage());
   }
 
   protected AlexandriaService service() {

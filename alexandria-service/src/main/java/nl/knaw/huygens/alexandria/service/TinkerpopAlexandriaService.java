@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
+import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AccountablePointer;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
@@ -124,6 +125,11 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
   private AlexandriaAnnotation createAnnotation(AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
     UUID id = UUID.randomUUID();
     return new AlexandriaAnnotation(id, annotationbody, provenance);
+  }
+
+  @Override
+  public AlexandriaAnnotation deprecateAnnotation(UUID oldAnnotationId, AnnotationPrototype prototype) {
+    return storage.deprecateAnnotation(oldAnnotationId, prototype);
   }
 
 }
