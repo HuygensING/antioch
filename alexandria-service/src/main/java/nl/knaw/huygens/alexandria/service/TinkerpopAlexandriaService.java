@@ -4,6 +4,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.inject.Inject;
+
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AccountablePointer;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
@@ -18,10 +20,7 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
   // not final and no constructor injection because acceptance tests need to (re-)set the storage in between tests.
   private Storage storage;
 
-  public TinkerpopAlexandriaService() {
-  }
-
-  // @Inject
+  @Inject
   public TinkerpopAlexandriaService withStorage(Storage storage) {
     this.storage = storage;
     return this;

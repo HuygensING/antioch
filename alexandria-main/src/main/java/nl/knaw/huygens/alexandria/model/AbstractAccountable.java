@@ -1,7 +1,10 @@
 package nl.knaw.huygens.alexandria.model;
 
 import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
+
+import com.google.common.collect.ImmutableSet;
 
 public abstract class AbstractAccountable implements Accountable {
   private final UUID id;
@@ -39,10 +42,15 @@ public abstract class AbstractAccountable implements Accountable {
     this.stateSince = Instant.now();
   }
 
+  Set<AlexandriaState> ACTIVE_STATES = ImmutableSet.of(AlexandriaState.CONFIRMED, AlexandriaState.TENTATIVE);
+
+  public boolean isActive() {
+    return ACTIVE_STATES.contains(this.state);
+  }
+
   // Only to be used when deframing from graphdb
   public void setStateSince(Instant instant) {
     this.stateSince = instant;
-
   }
 
 }

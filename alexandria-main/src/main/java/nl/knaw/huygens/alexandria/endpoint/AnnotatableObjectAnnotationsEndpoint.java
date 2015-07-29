@@ -32,9 +32,9 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   protected final AnnotationCreationRequestBuilder requestBuilder;
   protected final UUID uuid;
 
-  protected AnnotatableObjectAnnotationsEndpoint(AlexandriaService service, //
-      AnnotationCreationRequestBuilder requestBuilder, //
-      LocationBuilder locationBuilder, //
+  protected AnnotatableObjectAnnotationsEndpoint(AlexandriaService service,        //
+      AnnotationCreationRequestBuilder requestBuilder,        //
+      LocationBuilder locationBuilder,        //
       final UUIDParam uuidParam) {
     Log.trace("resourceService=[{}], uuidParam=[{}]", service, uuidParam);
     this.service = service;
@@ -52,9 +52,10 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   protected abstract AnnotationCreationRequestBuilder getAnnotationCreationRequestBuilder();
 
   @GET
-  @ApiOperation(value = "get the annotations", response = AnnotationEntity.class)
+  @ApiOperation(value = "get the (non-deleted, non-deprecated) annotations", response = AnnotationEntity.class)
   public Response get() {
     final Set<AnnotationEntity> annotationEntities = getAnnotatableObject().getAnnotations().stream()//
+        .filter(AlexandriaAnnotation::isActive)//
         .map((AlexandriaAnnotation a) -> AnnotationEntity.of(a).withLocationBuilder(locationBuilder))//
         .collect(toSet());
     Map<String, Set<AnnotationEntity>> entity = ImmutableMap.of("annotations", annotationEntities);
