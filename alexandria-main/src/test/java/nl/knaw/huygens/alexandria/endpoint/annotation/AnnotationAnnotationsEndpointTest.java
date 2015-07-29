@@ -4,14 +4,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import javax.ws.rs.core.Response;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.ws.rs.core.Response;
+
+import org.junit.Test;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableSet;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
@@ -22,12 +26,10 @@ import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import org.junit.Test;
 
 public class AnnotationAnnotationsEndpointTest {
   @Test
   public void testAnnotationURIsAreCorrect() throws JsonProcessingException {
-
     AlexandriaAnnotationBody body0 = mock(AlexandriaAnnotationBody.class);
     when(body0.getType()).thenReturn("");
     when(body0.getValue()).thenReturn("Bookmark");
@@ -36,6 +38,7 @@ public class AnnotationAnnotationsEndpointTest {
     AlexandriaAnnotation annotation0 = mock(AlexandriaAnnotation.class);
     when(annotation0.getId()).thenReturn(uuid0);
     when(annotation0.getBody()).thenReturn(body0);
+    when(annotation0.isActive()).thenReturn(true);
 
     AlexandriaAnnotationBody body1 = mock(AlexandriaAnnotationBody.class);
     when(body1.getType()).thenReturn("Comment");
@@ -45,6 +48,7 @@ public class AnnotationAnnotationsEndpointTest {
     AlexandriaAnnotation annotation1 = mock(AlexandriaAnnotation.class);
     when(annotation1.getId()).thenReturn(uuid1);
     when(annotation1.getBody()).thenReturn(body1);
+    when(annotation1.isActive()).thenReturn(true);
 
     // annotation1 is an annotation on annotation0
     when(annotation0.getAnnotations()).thenReturn(ImmutableSet.of(annotation1));
