@@ -142,7 +142,7 @@
 
   <issueManagement>
     <system>JIRA</system>
-    <url>http://test173.huygens.knaw.nl/</url>
+    <url>http://jira.huygens.knaw.nl/</url>
   </issueManagement>
 
   <ciManagement>
