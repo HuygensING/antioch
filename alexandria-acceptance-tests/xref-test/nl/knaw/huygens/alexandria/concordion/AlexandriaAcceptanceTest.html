@@ -30,7 +30,7 @@
 <a class="jxr_linenumber" name="L22" href="#L22">22</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 <a class="jxr_linenumber" name="L23" href="#L23">23</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.service.AlexandriaService;
 <a class="jxr_linenumber" name="L24" href="#L24">24</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.service.TinkerpopAlexandriaService;
-<a class="jxr_linenumber" name="L25" href="#L25">25</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.storage.Storage;
+<a class="jxr_linenumber" name="L25" href="#L25">25</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.storage.TinkerGraphStorage;
 <a class="jxr_linenumber" name="L26" href="#L26">26</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.util.UUIDParser;
 <a class="jxr_linenumber" name="L27" href="#L27">27</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.cat.RestExtension;
 <a class="jxr_linenumber" name="L28" href="#L28">28</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.cat.RestFixture;
@@ -40,7 +40,7 @@
 <a class="jxr_linenumber" name="L32" href="#L32">32</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/concordion/AlexandriaAcceptanceTest.html">AlexandriaAcceptanceTest</a> <strong class="jxr_keyword">extends</strong> RestFixture {
 <a class="jxr_linenumber" name="L33" href="#L33">33</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> AlexandriaConfiguration CONFIG = testConfiguration();
 <a class="jxr_linenumber" name="L34" href="#L34">34</a>  
-<a class="jxr_linenumber" name="L35" href="#L35">35</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> TinkerpopAlexandriaService service = <strong class="jxr_keyword">new</strong> TinkerpopAlexandriaService().withStorage(<strong class="jxr_keyword">new</strong> Storage());
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> TinkerpopAlexandriaService service = <strong class="jxr_keyword">new</strong> TinkerpopAlexandriaService().withStorage(<strong class="jxr_keyword">new</strong> TinkerGraphStorage());
 <a class="jxr_linenumber" name="L36" href="#L36">36</a>  
 <a class="jxr_linenumber" name="L37" href="#L37">37</a>    @Extension
 <a class="jxr_linenumber" name="L38" href="#L38">38</a>    @SuppressWarnings(<span class="jxr_string">"unused"</span>)
@@ -98,7 +98,7 @@
 <a class="jxr_linenumber" name="L90" href="#L90">90</a>  
 <a class="jxr_linenumber" name="L91" href="#L91">91</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> clearStorage() {
 <a class="jxr_linenumber" name="L92" href="#L92">92</a>      Log.debug(<span class="jxr_string">"Clearing Storage"</span>);
-<a class="jxr_linenumber" name="L93" href="#L93">93</a>      service.withStorage(<strong class="jxr_keyword">new</strong> Storage());
+<a class="jxr_linenumber" name="L93" href="#L93">93</a>      service.withStorage(<strong class="jxr_keyword">new</strong> TinkerGraphStorage());
 <a class="jxr_linenumber" name="L94" href="#L94">94</a>    }
 <a class="jxr_linenumber" name="L95" href="#L95">95</a>  
 <a class="jxr_linenumber" name="L96" href="#L96">96</a>    <strong class="jxr_keyword">protected</strong> AlexandriaService service() {

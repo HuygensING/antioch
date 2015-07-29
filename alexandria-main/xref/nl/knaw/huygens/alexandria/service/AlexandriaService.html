@@ -40,9 +40,9 @@
 <a class="jxr_linenumber" name="L32" href="#L32">32</a>  
 <a class="jxr_linenumber" name="L33" href="#L33">33</a>    Set&lt;AlexandriaResource&gt; readSubResources(UUID uuid);
 <a class="jxr_linenumber" name="L34" href="#L34">34</a>  
-<a class="jxr_linenumber" name="L35" href="#L35">35</a>    <a href="../../../../../nl/knaw/huygens/alexandria/model/AlexandriaAnnotationBody.html">AlexandriaAnnotationBody</a> createAnnotationBody(UUID uuid, Optional&lt;String&gt; type, String value, <a href="../../../../../nl/knaw/huygens/alexandria/model/TentativeAlexandriaProvenance.html">TentativeAlexandriaProvenance</a> provenance, <a href="../../../../../nl/knaw/huygens/alexandria/model/AlexandriaState.html">AlexandriaState</a> alexandriaState);
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>    <a href="../../../../../nl/knaw/huygens/alexandria/model/AlexandriaAnnotationBody.html">AlexandriaAnnotationBody</a> createAnnotationBody(UUID uuid, String type, String value, <a href="../../../../../nl/knaw/huygens/alexandria/model/TentativeAlexandriaProvenance.html">TentativeAlexandriaProvenance</a> provenance, <a href="../../../../../nl/knaw/huygens/alexandria/model/AlexandriaState.html">AlexandriaState</a> alexandriaState);
 <a class="jxr_linenumber" name="L36" href="#L36">36</a>  
-<a class="jxr_linenumber" name="L37" href="#L37">37</a>    Optional&lt;AlexandriaAnnotationBody&gt; findAnnotationBodyWithTypeAndValue(Optional&lt;String&gt; type, String value);
+<a class="jxr_linenumber" name="L37" href="#L37">37</a>    Optional&lt;AlexandriaAnnotationBody&gt; findAnnotationBodyWithTypeAndValue(String type, String value);
 <a class="jxr_linenumber" name="L38" href="#L38">38</a>  
 <a class="jxr_linenumber" name="L39" href="#L39">39</a>    Optional&lt;AlexandriaAnnotationBody&gt; readAnnotationBody(UUID uuid);
 <a class="jxr_linenumber" name="L40" href="#L40">40</a>  
@@ -59,7 +59,18 @@
 <a class="jxr_linenumber" name="L51" href="#L51">51</a>  <em class="jxr_javadoccomment">   */</em>
 <a class="jxr_linenumber" name="L52" href="#L52">52</a>    <strong class="jxr_keyword">void</strong> removeExpiredTentatives();
 <a class="jxr_linenumber" name="L53" href="#L53">53</a>  
-<a class="jxr_linenumber" name="L54" href="#L54">54</a>  }
+<a class="jxr_linenumber" name="L54" href="#L54">54</a>    <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L55" href="#L55">55</a>  <em class="jxr_javadoccomment">   * @param oldAnnotationId</em>
+<a class="jxr_linenumber" name="L56" href="#L56">56</a>  <em class="jxr_javadoccomment">   *          the id of the {@link AlexandriaAnnotation} to deprecate</em>
+<a class="jxr_linenumber" name="L57" href="#L57">57</a>  <em class="jxr_javadoccomment">   * @param newAnnotation</em>
+<a class="jxr_linenumber" name="L58" href="#L58">58</a>  <em class="jxr_javadoccomment">   *          the new {@link AlexandriaAnnotation}</em>
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>  <em class="jxr_javadoccomment">   * @return the new {@link AlexandriaAnnotation} that deprecates the annotation with id oldAnnotationId</em>
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>  <em class="jxr_javadoccomment">   */</em>
+<a class="jxr_linenumber" name="L61" href="#L61">61</a>    <a href="../../../../../nl/knaw/huygens/alexandria/model/AlexandriaAnnotation.html">AlexandriaAnnotation</a> deprecateAnnotation(UUID oldAnnotationId, <a href="../../../../../nl/knaw/huygens/alexandria/model/AlexandriaAnnotation.html">AlexandriaAnnotation</a> newAnnotation);
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>  
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>    <strong class="jxr_keyword">void</strong> confirmAnnotation(UUID value);
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>  
+<a class="jxr_linenumber" name="L65" href="#L65">65</a>  }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2015 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
