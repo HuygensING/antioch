@@ -25,13 +25,13 @@ public class AnnotationDeprecationRequest implements CreationRequest<AlexandriaA
   @Override
   public AlexandriaAnnotation execute(AlexandriaService service) {
     final TentativeAlexandriaProvenance provenance = providedProvenance().orElse(TentativeAlexandriaProvenance.createDefault());
-    UUID annotationBodyUuid = UUID.randomUUID();
-    Optional<AlexandriaAnnotationBody> result = service.findAnnotationBodyWithTypeAndValue(providedType(), providedValue());
-    AlexandriaState state = prototype.getState();
-    AlexandriaAnnotationBody body = result//
-        .orElseGet(() -> service.createAnnotationBody(annotationBodyUuid, providedType(), providedValue(), provenance, state));
+    String type = providedType().orElse("");
+    AlexandriaAnnotationBody body = service.findAnnotationBodyWithTypeAndValue(type, providedValue())//
+        .orElseGet(() -> new AlexandriaAnnotationBody(UUID.randomUUID(), type, providedValue(), provenance));
+    UUID annotationUuid = UUID.randomUUID();
+    AlexandriaAnnotation newAnnotation = new AlexandriaAnnotation(annotationUuid, body, provenance);
 
-    return service.deprecateAnnotation(oldAnnotationId, prototype);
+    return service.deprecateAnnotation(oldAnnotationId, newAnnotation);
     // return service.annotate(oldAnnotation.getAnnotatablePointer(), body, provenance);
   }
 

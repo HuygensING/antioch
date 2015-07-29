@@ -4,7 +4,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AccountablePointer;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
@@ -33,9 +32,9 @@ public interface AlexandriaService {
 
   Set<AlexandriaResource> readSubResources(UUID uuid);
 
-  AlexandriaAnnotationBody createAnnotationBody(UUID uuid, Optional<String> type, String value, TentativeAlexandriaProvenance provenance, AlexandriaState alexandriaState);
+  AlexandriaAnnotationBody createAnnotationBody(UUID uuid, String type, String value, TentativeAlexandriaProvenance provenance, AlexandriaState alexandriaState);
 
-  Optional<AlexandriaAnnotationBody> findAnnotationBodyWithTypeAndValue(Optional<String> type, String value);
+  Optional<AlexandriaAnnotationBody> findAnnotationBodyWithTypeAndValue(String type, String value);
 
   Optional<AlexandriaAnnotationBody> readAnnotationBody(UUID uuid);
 
@@ -55,10 +54,12 @@ public interface AlexandriaService {
   /**
    * @param oldAnnotationId
    *          the id of the {@link AlexandriaAnnotation} to deprecate
-   * @param prototype
-   *          the prototype for the new {@link AlexandriaAnnotation}
+   * @param newAnnotation
+   *          the new {@link AlexandriaAnnotation}
    * @return the new {@link AlexandriaAnnotation} that deprecates the annotation with id oldAnnotationId
    */
-  AlexandriaAnnotation deprecateAnnotation(UUID oldAnnotationId, AnnotationPrototype prototype);
+  AlexandriaAnnotation deprecateAnnotation(UUID oldAnnotationId, AlexandriaAnnotation newAnnotation);
+
+  void confirmAnnotation(UUID value);
 
 }

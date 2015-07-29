@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
-import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AccountablePointer;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
@@ -53,14 +52,14 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
   }
 
   @Override
-  public AlexandriaAnnotationBody createAnnotationBody(UUID uuid, Optional<String> type, String value, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
-    AlexandriaAnnotationBody body = new AlexandriaAnnotationBody(uuid, type.orElse(""), value, provenance);
-    storage.writeAnnotationBody(body);
+  public AlexandriaAnnotationBody createAnnotationBody(UUID uuid, String type, String value, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
+    AlexandriaAnnotationBody body = new AlexandriaAnnotationBody(uuid, type, value, provenance);
+    storage.storeAnnotationBody(body);
     return body;
   }
 
   @Override
-  public Optional<AlexandriaAnnotationBody> findAnnotationBodyWithTypeAndValue(Optional<String> type, String value) {
+  public Optional<AlexandriaAnnotationBody> findAnnotationBodyWithTypeAndValue(String type, String value) {
     return storage.findAnnotationBodyWithTypeAndValue(type, value);
   }
 
@@ -128,8 +127,13 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
   }
 
   @Override
-  public AlexandriaAnnotation deprecateAnnotation(UUID oldAnnotationId, AnnotationPrototype prototype) {
-    return storage.deprecateAnnotation(oldAnnotationId, prototype);
+  public AlexandriaAnnotation deprecateAnnotation(UUID oldAnnotationId, AlexandriaAnnotation newAnnotation) {
+    return storage.deprecateAnnotation(oldAnnotationId, newAnnotation);
+  }
+
+  @Override
+  public void confirmAnnotation(UUID uuid) {
+    storage.confirmAnnotation(uuid);
   }
 
 }

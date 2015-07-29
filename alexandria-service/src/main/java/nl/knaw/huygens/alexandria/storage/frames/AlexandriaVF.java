@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.storage.frames;
 
+import nl.knaw.huygens.alexandria.model.AlexandriaState;
+
 public abstract class AlexandriaVF {
 
   public abstract String getUuid();
@@ -25,5 +27,9 @@ public abstract class AlexandriaVF {
   public abstract String getProvenanceWhy();
 
   public abstract void setProvenanceWhy(String why);
+
+  public boolean isDeprecated() {
+    return AlexandriaState.DEPRECATED.equals(getState());
+  }
 
 }

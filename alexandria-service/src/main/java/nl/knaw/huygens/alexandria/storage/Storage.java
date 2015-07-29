@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Graph.Features;
@@ -21,7 +22,6 @@ import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AccountablePointer;
@@ -164,14 +164,9 @@ public class Storage {
     commitTransaction();
   }
 
-  private void annotate(AnnotationVF avf, UUID id) {
-    AnnotationVF annotationToAnnotate = readAnnotationVF(id).get();
-    avf.setAnnotatedAnnotation(annotationToAnnotate);
-  }
-
-  public Optional<AlexandriaAnnotationBody> findAnnotationBodyWithTypeAndValue(Optional<String> type, String value) {
+  public Optional<AlexandriaAnnotationBody> findAnnotationBodyWithTypeAndValue(String type, String value) {
     List<AnnotationBodyVF> results = framedGraph.V(AnnotationBodyVF.class)//
-        .has("type", type.orElse(""))//
+        .has("type", type)//
         .has("value", value)//
         .toList();
     if (results.isEmpty()) {
@@ -180,11 +175,10 @@ public class Storage {
     return Optional.of(deframeAnnotationBody(results.get(0)));
   }
 
-  public void writeAnnotationBody(AlexandriaAnnotationBody body) {
-    AnnotationBodyVF abvf = framedGraph.addVertex(AnnotationBodyVF.class);
-    setAlexandriaVFProperties(abvf, body);
-    abvf.setType(body.getType());
-    abvf.setValue(body.getValue());
+  public void storeAnnotationBody(AlexandriaAnnotationBody body) {
+    startTransaction();
+    frameAnnotationBody(body);
+    commitTransaction();
   }
 
   public Set<AlexandriaResource> readSubResources(UUID uuid) {
@@ -195,13 +189,27 @@ public class Storage {
         .collect(toSet());
   }
 
-  public AlexandriaAnnotation deprecateAnnotation(UUID oldAnnotationId, AnnotationPrototype prototype) {
-    AnnotationVF oldAnnotationVF = readAnnotationVF(oldAnnotationId)//
-        .orElseThrow(() -> new NotFoundException("no annotation found with uuid " + oldAnnotationId));
-    AlexandriaAnnotationBody body = findAnnotationBodyWithTypeAndValue(prototype.getType(), prototype.getValue())//
-        .orElseGet(() -> createAnnotationBody(prototype.getType(), prototype.getValue()));
+  public AlexandriaAnnotation deprecateAnnotation(UUID oldAnnotationId, AlexandriaAnnotation tmpAnnotation) {
+    startTransaction();
 
-    AnnotationVF newAnnotationVF = createAnnotationVF(null);
+    // check if there's an annotation with the given id
+    AnnotationVF oldAnnotationVF = readAnnotationVF(oldAnnotationId)//
+        .orElseThrow(annotationNotFound(oldAnnotationId));
+
+    AlexandriaAnnotationBody newBody = tmpAnnotation.getBody();
+    Optional<AlexandriaAnnotationBody> optionalBody = findAnnotationBodyWithTypeAndValue(newBody.getType(), newBody.getValue());
+    AlexandriaAnnotationBody body;
+    if (optionalBody.isPresent()) {
+      body = optionalBody.get();
+    } else {
+      frameAnnotationBody(newBody);
+      body = newBody;
+    }
+
+    AlexandriaProvenance tmpProvenance = tmpAnnotation.getProvenance();
+    TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(tmpProvenance.getWho(), tmpProvenance.getWhen(), tmpProvenance.getWhy());
+    AlexandriaAnnotation newAnnotation = new AlexandriaAnnotation(tmpAnnotation.getId(), body, provenance);
+    AnnotationVF newAnnotationVF = createAnnotationVF(newAnnotation);
 
     AnnotationVF annotatedAnnotation = oldAnnotationVF.getAnnotatedAnnotation();
     if (annotatedAnnotation != null) {
@@ -212,13 +220,21 @@ public class Storage {
     }
     newAnnotationVF.setDeprecatedAnnotation(oldAnnotationVF);
 
-    oldAnnotationVF.setState(AlexandriaState.DEPRECATED.name());
-
-    return null;
+    AlexandriaAnnotation resultAnnotation = deframeAnnotation(newAnnotationVF);
+    commitTransaction();
+    return resultAnnotation;
   }
 
-  private AlexandriaAnnotationBody createAnnotationBody(Optional<String> type, String value) {
-    return null;
+  public void confirmAnnotation(UUID uuid) {
+    startTransaction();
+    AnnotationVF annotationVF = readAnnotationVF(uuid).orElseThrow(annotationNotFound(uuid));
+    updateState(annotationVF, AlexandriaState.CONFIRMED);
+    updateState(annotationVF.getBody(), AlexandriaState.CONFIRMED);
+    AnnotationVF deprecatedAnnotation = annotationVF.getDeprecatedAnnotation();
+    if (deprecatedAnnotation != null && !deprecatedAnnotation.isDeprecated()) {
+      updateState(deprecatedAnnotation, AlexandriaState.DEPRECATED);
+    }
+    commitTransaction();
   }
 
   public void dumpToGraphSON(OutputStream os) throws IOException {
@@ -250,12 +266,21 @@ public class Storage {
   public void removeExpiredTentatives() {
     // Tentative vertices should not have any outgoing or incoming edges!!
     Long threshold = Instant.now().minus(TIMEOUT).getEpochSecond();
+    startTransaction();
     graph.traversal().V()//
         .has("state", AlexandriaState.TENTATIVE.name())//
         .has("stateSince", lt(threshold))//
         .remove();
+    commitTransaction();
   }
 
+  public String getDumpFile() {
+    return dumpfile;
+  }
+
+  public void setDumpFile(String dumpfile) {
+    this.dumpfile = dumpfile;
+  }
   // private methods
 
   private GraphFeatures graphFeatures() {
@@ -356,6 +381,14 @@ public class Storage {
     return annotation;
   }
 
+  private AnnotationBodyVF frameAnnotationBody(AlexandriaAnnotationBody body) {
+    AnnotationBodyVF abvf = framedGraph.addVertex(AnnotationBodyVF.class);
+    setAlexandriaVFProperties(abvf, body);
+    abvf.setType(body.getType());
+    abvf.setValue(body.getValue());
+    return abvf;
+  }
+
   private AlexandriaAnnotationBody deframeAnnotationBody(AnnotationBodyVF annotationBodyVF) {
     TentativeAlexandriaProvenance provenance = deframeProvenance(annotationBodyVF);
     UUID uuid = getUUID(annotationBodyVF);
@@ -383,12 +416,17 @@ public class Storage {
     vf.setProvenanceWhy(provenance.getWhy());
   }
 
-  public String getDumpFile() {
-    return dumpfile;
+  private void updateState(AlexandriaVF vf, AlexandriaState newState) {
+    vf.setState(newState.name());
+    vf.setStateSince(Instant.now().getEpochSecond());
   }
 
-  public void setDumpFile(String dumpfile) {
-    this.dumpfile = dumpfile;
+  private void annotate(AnnotationVF avf, UUID id) {
+    AnnotationVF annotationToAnnotate = readAnnotationVF(id).get();
+    avf.setAnnotatedAnnotation(annotationToAnnotate);
   }
 
+  private Supplier<NotFoundException> annotationNotFound(UUID oldAnnotationId) {
+    return () -> new NotFoundException("no annotation found with uuid " + oldAnnotationId);
+  }
 }

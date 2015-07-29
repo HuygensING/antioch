@@ -36,9 +36,9 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   private final AnnotationDeprecationRequestBuilder requestBuilder;
 
   @Inject
-  public AnnotationsEndpoint(AlexandriaService service, //
-      AnnotationEntityBuilder entityBuilder, //
-      AnnotationDeprecationRequestBuilder requestBuilder, //
+  public AnnotationsEndpoint(AlexandriaService service,   //
+      AnnotationEntityBuilder entityBuilder,   //
+      AnnotationDeprecationRequestBuilder requestBuilder,   //
       LocationBuilder locationBuilder) {
     this.service = service;
     this.entityBuilder = entityBuilder;
@@ -58,22 +58,10 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   @PUT
   @Path("{uuid}")
   @Consumes(MediaType.APPLICATION_JSON)
-  @ApiOperation(value = "update/confirm the annotation")
-  public Response updateAnnotation(@PathParam("uuid") UUIDParam uuidParam, AnnotationPrototype protoType) {
+  @ApiOperation(value = "confirm the annotation")
+  public Response confirmAnnotation(@PathParam("uuid") UUIDParam uuidParam, AnnotationPrototype protoType) {
     protoType.setState(AlexandriaState.CONFIRMED);
-
-    // service.createOrUpdateAnnotation(uuidParam.getValue(), protoType.getProvenance());
-    // AnnotationCreationRequest request = getAnnotationCreationRequestBuilder().build(prototype);
-    // AlexandriaAnnotation annotation = request.execute(service);
-    //
-    // if (request.newResourceWasCreated()) {
-    // return Response.created(locationBuilder.locationOf(resource)).build();
-    // }
-    //
-    // if (request.wasExecutedAsIs()) {
-    // return Response.noContent().build();
-    // }
-
+    service.confirmAnnotation(uuidParam.getValue());
     return Response.noContent().build();
   }
 

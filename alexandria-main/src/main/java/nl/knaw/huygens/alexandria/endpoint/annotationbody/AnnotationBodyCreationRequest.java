@@ -24,7 +24,7 @@ public class AnnotationBodyCreationRequest implements CreationRequest<Alexandria
   @Override
   public AlexandriaAnnotationBody execute(AlexandriaService service) {
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(AlexandriaProvenance.DEFAULT_WHO, Instant.now(), AlexandriaProvenance.DEFAULT_WHY);
-    return service.createAnnotationBody(providedUUID(), providedType(), providedValue(), provenance, prototype.getState());
+    return service.createAnnotationBody(providedUUID(), providedType().orElse(""), providedValue(), provenance, prototype.getState());
   }
 
   private String providedValue() {
