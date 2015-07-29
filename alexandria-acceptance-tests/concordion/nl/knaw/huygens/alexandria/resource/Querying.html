@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns:c="http://www.concordion.org/2007/concordion" xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test" xmlns:xsi="http://www.w3.org/1999/xhtml" xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test                           http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd"><head><style>* {
+  font-family: Arial;
+}
+body {
+  padding: 32px;  
+}
+pre {
+  padding: 6px 28px 6px 28px;
+  background-color: #E8EEF7;
+}
+pre, pre *, code, code *, kbd {
+  font-family: Courier New, Courier;
+  font-size: 10pt;
+}
+h1, h1 * {
+  font-size: 24pt;	
+}
+p, td, th, li, .breadcrumbs {
+  font-size: 10pt;
+}
+p, li {
+  line-height: 140%;
+  max-width: 720px;
+}
+table {
+  border-collapse: collapse;
+  empty-cells: show;
+  margin: 8px 0px 8px 0px;
+}
+th, td {
+  border: 1px solid black;
+  padding: 3px;
+}
+td {
+  background-color: white;
+  vertical-align: top;
+}
+th {
+  background-color: #C3D9FF;
+}
+li {
+  margin-top: 6px;
+  margin-bottom: 6px; 
+}
+
+.example {
+  padding: 6px 16px 6px 16px;
+  border: 1px solid #C3D9FF;
+  margin: 6px 0px 28px 0px;
+  background-color: #F5F9FD;
+}
+.example h3 {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  font-size: 12pt;
+}
+
+p.success {
+  padding: 2px;
+}
+.success, .success * {
+  background-color: #afa !important;
+}
+.success pre {
+  background-color: #bbffbb;
+}
+.failure, .failure * {
+  background-color: #ffb0b0;
+  padding: 1px;
+}
+.failure .expected {
+  text-decoration: line-through;
+  color: #bb5050;
+}
+.ignored, .ignored * {
+  background-color: #f0f0f0 !important;	
+}
+
+ins {
+  text-decoration: none;	
+}
+
+.exceptionMessage {
+  background-color: #fdd;
+  font-family: Courier New, Courier, Monospace;
+  font-size: 10pt;
+  display: block;
+  font-weight: normal;
+  padding: 4px;
+  text-decoration: none !important;
+}
+.stackTrace, .stackTrace * {
+  font-weight: normal;
+}
+.stackTrace {
+  display: none;
+  padding: 1px 4px 4px 4px;
+  background-color: #fdd;
+  border-top: 1px dotted black;
+}
+.stackTraceExceptionMessage {
+  display: block;
+  font-family: Courier New, Courier, Monospace;
+  font-size: 8pt;
+  white-space: wrap;
+  padding: 1px 0px 1px 0px;
+}
+.stackTraceEntry {
+  white-space: nowrap;
+  font-family: Courier New, Courier, Monospace;
+  display: block;
+  font-size: 8pt;
+  padding: 1px 0px 1px 32px;
+}
+.stackTraceButton {
+  font-size: 8pt;
+  margin: 2px 8px 2px 0px;
+  font-weight: normal;
+  font-family: Arial;
+}
+
+.special {
+  font-style: italic;
+}
+.missing, .missing * {
+  background-color: #ff9999;
+  color:#bb5050;
+  text-decoration: line-through;
+}
+.surplus, .surplus * {
+  background-color: #ff9999;
+}
+.footer {
+  text-align: right;
+  margin-top: 40px;
+  font-size: 8pt;
+  width: 100%;
+  color: #999;
+}
+.footer .testTime {
+  padding: 2px 10px 0px 0px;
+}
+
+.idea {
+  font-size: 9pt;
+  color: #888;
+  font-style: italic;	
+}
+.tight li {
+  margin-top: 1px;
+  margin-bottom: 1px; 
+}
+.commentary {
+  float: right;
+  width: 200px;
+  background-color: #ffffd0;
+  padding:8px;
+  border: 3px solid #eeeeb0;	 
+  margin: 10px 0px 10px 10px;	 
+}
+.commentary, .commentary * {
+  font-size: 8pt;
+}
+</style><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+<title>Querying External Resources</title>
+
+<link type="text/css" rel="stylesheet" href="../../../../../codemirror/codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/enable-codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/merge.css" /><script type="text/javascript" src="../../../../../codemirror/codemirror.js"></script><script type="text/javascript" src="../../../../../codemirror/javascript.js"></script><script type="text/javascript" src="../../../../../codemirror/diff_match_patch.js"></script><script type="text/javascript" src="../../../../../codemirror/merge.js"></script><script type="text/javascript" src="../../../../../codemirror/enable-codemirror.js"></script><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/bootstrap.css" /><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/enable-bootstrap.css" /><script type="text/javascript" src="../../../../../jquery/jquery.min.js"></script><script type="text/javascript" src="../../../../../bootstrap/bootstrap.min.js"></script></head><body class="container"><span class="breadcrumbs"><a href="../Alexandria.html">Alexandria</a> &gt; <a href="Resource.html">Resources</a> &gt;</span>
+
+    <h2 class="page-header">Querying external resources</h2>
+
+    <h3>Examples:</h3>
+
+    <div id="get-non-existent" class="panel panel-default" c:execute="clearStorage()">
+        <div class="panel-heading"><b>What happens when I GET a non-existent resource?</b></div>
+        <div class="panel-body">
+            Given that no resource exists with ID <code>3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</code>
+            <div h:request="">
+                When I <code h:get="" class="get">/resources/3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</code>
+                then I should receive <code h:status="" class="success">404 Not Found</code>
+                and the response body should contain:
+                <pre h:jsonResponse="" class="json rest-success">{
+  "error" : {
+    "message" : "No resource found with id 3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44"
+  }
+}</pre>
+            </div>
+        </div>
+    </div>
+
+    <div id="get-all-resource-data" class="panel panel-default" c:execute="clearStorage()">
+        <div class="panel-heading"><b>How can I get all data for a given resource?</b></div>
+        <div class="panel-body">
+            <div h:request="">
+                Given I have <span h:success="" class="success">successfully</span>
+                <code h:put="" class="put">/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</code> the following body:
+                <pre h:jsonBody="" class="json">{
+  "resource" : {
+    "id" : "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+    "ref" : "http://www.example.com/titles/path/to/title/resource"
+  }
+}</pre>
+            </div>
+
+            <div h:request="">
+                When I <code h:get="" class="get">/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</code>
+                I should receive <code h:status="" class="success">200 OK</code> with a response body containing
+                <pre h:jsonResponse="" class="json rest-success">{
+  "resource" : {
+    "id" : "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+    "ref" : "http://www.example.com/titles/path/to/title/resource",
+    "^provenance" : "https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/provenance"
+  }
+}</pre>
+            </div>
+
+            <div h:request="">
+                And <code h:get="" class="get">/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/provenance</code>
+                should return <code h:status="" class="success">200 OK</code> with a response body containing
+                <pre h:jsonResponse="" class="json rest-success">{
+  "provenance" : {
+    "who" : "nederlab",
+    "why" : "",
+    "when" : "{date.beforeNow}",
+    "^what" : "https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01"
+  }
+}</pre>
+            </div>
+        </div>
+    </div>
+
+    <div id="get-resource-ref" class="panel panel-default" c:execute="clearStorage()">
+        <div class="panel-heading"><b>How can I GET the <code>ref</code> of an existing resource?</b></div>
+        <div class="panel-body">
+            <div class="alert alert-info well-sm" role="alert">
+                <strong>Question:</strong>
+                Is this (still) necessary from a Nederlab point of view, or is a regular GET which yields
+                <code>ref</code> as one of the many items also OK?
+            </div>
+
+            <div h:request="">
+                Given I have <span h:success="" class="success">successfully</span>
+                <code h:put="" class="put">/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</code> the following body:
+                <pre h:jsonBody="" class="json">{
+  "resource" : {
+    "id" : "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+    "ref" : "http://www.example.com/titles/path/to/title/resource"
+  }
+}</pre>
+            </div>
+            <div h:request="">
+                When I <code h:get="" class="get">/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/ref</code>
+                I should receive <code h:status="" class="success">200 OK</code> with a response body containing
+                <pre h:jsonResponse="" class="json rest-success">{
+  "ref" : "http://www.example.com/titles/path/to/title/resource"
+}</pre>
+            </div>
+        </div>
+    </div>
+
+    <div id="get-resource-annotations" class="panel panel-default" c:execute="clearStorage()">
+        <div class="panel-heading"><b>How can I GET the <code>annotations</code> of an existing resource?</b></div>
+        <div class="panel-body">
+            <div class="alert alert-warning well-sm" role="alert">
+                <strong>Warning:</strong>
+                This is currently a dressed-down example showing only an empty annotations array.
+                It needs to use real annotations to show that you get <code>^annotation</code> results.
+            </div>
+            <div h:request="">
+                Given I have <span h:success="" class="success">successfully</span>
+                <code h:put="" class="put">/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</code> the following body:
+                <pre h:jsonBody="" class="json">{
+  "resource" : {
+    "id" : "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+    "ref" : "http://www.example.com/titles/path/to/title/resource"
+  }
+}</pre>
+            </div>
+            <div h:request="">
+                When I <code h:get="" class="get">/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/annotations</code>
+                I should receive <code h:status="" class="success">200 OK</code> with a response body containing
+                <pre h:jsonResponse="" class="json rest-success">{
+  "annotations" : [ ]
+}</pre>
+            </div>
+        </div>
+    </div>
+    <!--
+
+    <div c:execute="clear()" class="example">
+        <h3>How can I GET the annotations of an existing resource?</h3>
+
+        <ul>
+            <li c:execute="existingResource(#id)">Given an existing resource
+                <ul>
+                    <li>identified by <code c:set="#id">c6b96360-c0c9-11e4-b947-6bc57448d166</code>;</li>
+                    <li c:execute="withReference(#ref)">referring to
+                        <code c:set="#ref">http://www.example.com/titles/path/to/title/resource</code>;
+                    </li>
+                    <li c:execute="withAnnotation(#annoId)">with an annotation identified by
+                        <code c:set="#annoId">92af4396-cc77-11e4-9b9b-1f1561a91434</code>;
+                    </li>
+                    <li c:execute="withAnnotation(#annoId)">and an annotation identified by
+                        <code c:set="#annoId">42f22020-cc82-11e4-aec9-1be06e873083</code>.
+                    </li>
+                </ul>
+            </li>
+            <li>When I <b c:set="#method">GET</b> <code><b
+                    c:set="#endpoint">/resources/c6b96360-c0c9-11e4-b947-6bc57448d166/annotations</b></code></li>
+
+            <li c:execute="request(#method, #endpoint)">Then:
+                <ol>
+                    <li>the response status should be <b c:assertEquals="status()">200 OK</b>;</li>
+                    <li>And the response body looks like:
+<pre json:includesJson="response()">{
+    "annotations": [{
+        "annotation": {
+            "id": "92af4396-cc77-11e4-9b9b-1f1561a91434"
+        },
+        "annotation": {
+            "id": "42f22020-cc82-11e4-aec9-1be06e873083"
+        }
+    }]
+}</pre>
+                    </li>
+                </ol>
+            </li>
+        </ul>
+    </div>
+</div>
+-->
+<div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 604 ms on 29-Jul-2015 at 14:56:28 CEST</div></div></body>
+</html>
