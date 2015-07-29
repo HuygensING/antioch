@@ -29,7 +29,22 @@ public abstract class AlexandriaVF {
   public abstract void setProvenanceWhy(String why);
 
   public boolean isDeprecated() {
-    return AlexandriaState.DEPRECATED.equals(getState());
+    return hasState(AlexandriaState.DEPRECATED);
   }
 
+  public boolean isDeleted() {
+    return hasState(AlexandriaState.DELETED);
+  }
+
+  public boolean isConfirmed() {
+    return hasState(AlexandriaState.CONFIRMED);
+  }
+
+  public boolean isTentative() {
+    return hasState(AlexandriaState.TENTATIVE);
+  }
+
+  private boolean hasState(AlexandriaState state) {
+    return state.name().equals(getState());
+  }
 }

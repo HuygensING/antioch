@@ -22,6 +22,7 @@ import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AccountablePointer;
@@ -39,7 +40,7 @@ import peapod.FramedGraph;
 import peapod.FramedGraphTraversal;
 import peapod.annotations.Vertex;
 
-public class Storage {
+public abstract class Storage {
   private static final String IDENTIFIER_PROPERTY = "uuid";
   private static final TemporalAmount TIMEOUT = Duration.ofDays(1);
 
@@ -195,6 +196,13 @@ public class Storage {
     // check if there's an annotation with the given id
     AnnotationVF oldAnnotationVF = readAnnotationVF(oldAnnotationId)//
         .orElseThrow(annotationNotFound(oldAnnotationId));
+    if (oldAnnotationVF.isTentative()) {
+      throw incorrectStateException(oldAnnotationId, "tentative");
+    } else if (oldAnnotationVF.isDeleted()) {
+      throw new BadRequestException("annotation " + oldAnnotationId + " is " + "deleted");
+    } else if (oldAnnotationVF.isDeprecated()) {
+      throw new BadRequestException("annotation " + oldAnnotationId + " is " + "already deprecated");
+    }
 
     AlexandriaAnnotationBody newBody = tmpAnnotation.getBody();
     Optional<AlexandriaAnnotationBody> optionalBody = findAnnotationBodyWithTypeAndValue(newBody.getType(), newBody.getValue());
@@ -223,6 +231,10 @@ public class Storage {
     AlexandriaAnnotation resultAnnotation = deframeAnnotation(newAnnotationVF);
     commitTransaction();
     return resultAnnotation;
+  }
+
+  private BadRequestException incorrectStateException(UUID oldAnnotationId, String string) {
+    return new BadRequestException("annotation " + oldAnnotationId + " is " + string);
   }
 
   public void confirmAnnotation(UUID uuid) {

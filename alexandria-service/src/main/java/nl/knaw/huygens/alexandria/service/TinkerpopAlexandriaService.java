@@ -20,6 +20,9 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
   // not final and no constructor injection because acceptance tests need to (re-)set the storage in between tests.
   private Storage storage;
 
+  public TinkerpopAlexandriaService() {
+  }
+
   @Inject
   public TinkerpopAlexandriaService withStorage(Storage storage) {
     this.storage = storage;
