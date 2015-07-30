@@ -71,15 +71,24 @@ public abstract class TinkerPopService implements AlexandriaService {
   // - AlexandriaService methods -//
 
   @Override
-  public AlexandriaAnnotationBody createAnnotationBody(UUID uuid, String type, String value, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
-    AlexandriaAnnotationBody body = new AlexandriaAnnotationBody(uuid, type, value, provenance);
-    storeAnnotationBody(body);
-    return body;
-  }
+  public boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
+    startTransaction();
+    AlexandriaResource resource;
+    boolean newlyCreated;
 
-  @Override
-  public Optional<AlexandriaAnnotationBody> readAnnotationBody(UUID uuid) {
-    throw new NotImplementedError();
+    if (exists(ResourceVF.class, uuid)) {
+      resource = readResource(uuid).get();
+      newlyCreated = false;
+
+    } else {
+      resource = new AlexandriaResource(uuid, provenance);
+      newlyCreated = true;
+    }
+    resource.setCargo(ref);
+    resource.setState(state);
+    createOrUpdateResource(resource);
+    commitTransaction();
+    return newlyCreated;
   }
 
   @Override
@@ -118,27 +127,6 @@ public abstract class TinkerPopService implements AlexandriaService {
     } else {
       throw new RuntimeException("unexpected accountableClass: " + aClass.getName());
     }
-  }
-
-  @Override
-  public boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
-    startTransaction();
-    AlexandriaResource resource;
-    boolean newlyCreated;
-
-    if (exists(ResourceVF.class, uuid)) {
-      resource = readResource(uuid).get();
-      newlyCreated = false;
-
-    } else {
-      resource = new AlexandriaResource(uuid, provenance);
-      newlyCreated = true;
-    }
-    resource.setCargo(ref);
-    resource.setState(state);
-    createOrUpdateResource(resource);
-    commitTransaction();
-    return newlyCreated;
   }
 
   @Override
@@ -274,6 +262,18 @@ public abstract class TinkerPopService implements AlexandriaService {
     }
 
     commitTransaction();
+  }
+
+  @Override
+  public AlexandriaAnnotationBody createAnnotationBody(UUID uuid, String type, String value, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
+    AlexandriaAnnotationBody body = new AlexandriaAnnotationBody(uuid, type, value, provenance);
+    storeAnnotationBody(body);
+    return body;
+  }
+
+  @Override
+  public Optional<AlexandriaAnnotationBody> readAnnotationBody(UUID uuid) {
+    throw new NotImplementedError();
   }
 
   // - other public methods -//
