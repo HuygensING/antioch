@@ -9,13 +9,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
-import nl.knaw.huygens.alexandria.storage.Storage;
+import nl.knaw.huygens.alexandria.storage.TinkerPopService;
 
 @Singleton
 @Path("dump")
 public class GraphDbDumpEndpoint extends JSONEndpoint {
   @Inject
-  Storage storage;
+  TinkerPopService storage;
 
   @GET
   @Path("graphson")

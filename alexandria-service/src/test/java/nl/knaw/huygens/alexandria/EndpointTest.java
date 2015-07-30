@@ -26,7 +26,6 @@ import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.alexandria.storage.Storage;
 
 public abstract class EndpointTest extends JerseyTest {
   private static final AlexandriaConfiguration CONFIG = testConfiguration();
@@ -86,18 +85,15 @@ public abstract class EndpointTest extends JerseyTest {
 
   public static class TestModule extends AbstractModule {
     private AlexandriaService serviceInstance;
-    private Storage storage;
 
-    public TestModule(AlexandriaService serviceInstance, Storage storage) {
+    public TestModule(AlexandriaService serviceInstance) {
       this.serviceInstance = serviceInstance;
-      this.storage = storage;
     }
 
     @Override
     protected void configure() {
       Log.trace("setting up Guice bindings");
       bind(AlexandriaService.class).toInstance(serviceInstance);
-      bind(Storage.class).toInstance(storage);
       bind(AlexandriaConfiguration.class).toInstance(CONFIG);
       bind(AnnotationEntityBuilder.class).in(Scopes.SINGLETON);
       bind(EndpointPathResolver.class).in(Scopes.SINGLETON);

@@ -33,6 +33,7 @@ import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
@@ -40,35 +41,77 @@ import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import peapod.FramedGraph;
 import peapod.FramedGraphTraversal;
 import peapod.annotations.Vertex;
+import scala.NotImplementedError;
 
-public abstract class Storage {
+public abstract class TinkerPopService implements AlexandriaService {
   private static final String IDENTIFIER_PROPERTY = "uuid";
   private static final TemporalAmount TIMEOUT = Duration.ofDays(1);
 
-  private final Graph graph;
-  private final FramedGraph framedGraph;
+  private Graph graph;
+  private FramedGraph framedGraph;
 
   private Transaction tx;
   private String dumpfile;
   private boolean supportsTransactions;
   private boolean supportsPersistence;
 
-  public Storage(Graph graph) {
-    this.graph = graph;
-    this.framedGraph = new FramedGraph(graph, ResourceVF.class.getPackage());
-    GraphFeatures graphFeatures = graph.features().graph();
-    this.supportsPersistence = graphFeatures.supportsPersistence();
-    this.supportsTransactions = graphFeatures.supportsTransactions();
+  public TinkerPopService(Graph graph) {
+    setGraph(graph);
   }
 
-  public boolean supportsTransactions() {
-    return supportsTransactions;
+  // - AlexandriaService methods -//
+
+  @Override
+  public AlexandriaAnnotationBody createAnnotationBody(UUID uuid, String type, String value, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
+    AlexandriaAnnotationBody body = new AlexandriaAnnotationBody(uuid, type, value, provenance);
+    storeAnnotationBody(body);
+    return body;
   }
 
-  public boolean supportsPersistence() {
-    return supportsPersistence;
+  @Override
+  public Optional<AlexandriaAnnotationBody> readAnnotationBody(UUID uuid) {
+    throw new NotImplementedError();
   }
 
+  @Override
+  public AlexandriaAnnotation annotate(AlexandriaResource resource, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
+    AlexandriaAnnotation newAnnotation = createAnnotation(annotationbody, provenance);
+    annotateResourceWithAnnotation(resource, newAnnotation);
+    return newAnnotation;
+  }
+
+  @Override
+  public AlexandriaAnnotation annotate(AlexandriaAnnotation annotation, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
+    AlexandriaAnnotation newAnnotation = createAnnotation(annotationbody, provenance);
+    annotateAnnotationWithAnnotation(annotation, newAnnotation);
+    return newAnnotation;
+  }
+
+  @Override
+  public AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
+    AlexandriaResource subresource = new AlexandriaResource(uuid, provenance);
+    subresource.setCargo(sub);
+    subresource.setParentResourcePointer(new AccountablePointer<AlexandriaResource>(AlexandriaResource.class, parentUuid.toString()));
+    createSubResource(subresource);
+    return subresource;
+  }
+
+  @Override
+  public Optional<? extends Accountable> dereference(AccountablePointer<? extends Accountable> pointer) {
+    Class<? extends Accountable> aClass = pointer.getAccountableClass();
+    UUID uuid = UUID.fromString(pointer.getIdentifier());
+    if (AlexandriaResource.class.equals(aClass)) {
+      return readResource(uuid);
+
+    } else if (AlexandriaAnnotation.class.equals(aClass)) {
+      return readAnnotation(uuid);
+
+    } else {
+      throw new RuntimeException("unexpected accountableClass: " + aClass.getName());
+    }
+  }
+
+  @Override
   public boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
     startTransaction();
     AlexandriaResource resource;
@@ -89,75 +132,29 @@ public abstract class Storage {
     return newlyCreated;
   }
 
+  @Override
   public Optional<AlexandriaResource> readResource(UUID uuid) {
     return readResourceVF(uuid).map(this::deframeResource);
   }
 
+  @Override
   public Optional<AlexandriaAnnotation> readAnnotation(UUID uuid) {
     return readAnnotationVF(uuid).map(this::deframeAnnotation);
   }
 
-  public void createSubResource(AlexandriaResource subResource) {
+  @Override
+  public void removeExpiredTentatives() {
+    // Tentative vertices should not have any outgoing or incoming edges!!
+    Long threshold = Instant.now().minus(TIMEOUT).getEpochSecond();
     startTransaction();
-
-    final ResourceVF rvf;
-    final UUID uuid = subResource.getId();
-    if (exists(ResourceVF.class, uuid)) {
-      rvf = readResourceVF(uuid).get();
-    } else {
-      rvf = framedGraph.addVertex(ResourceVF.class);
-      rvf.setUuid(uuid.toString());
-    }
-
-    rvf.setCargo(subResource.getCargo());
-    final UUID parentId = UUID.fromString(subResource.getParentResourcePointer().get().getIdentifier());
-    Optional<ResourceVF> parentVF = readResourceVF(parentId);
-    rvf.setParentResource(parentVF.get());
-
-    setAlexandriaVFProperties(rvf, subResource);
-
-    commitTransaction();
-
-  }
-
-  public void createOrUpdateAnnotation(AlexandriaAnnotation annotation) {
-    startTransaction();
-
-    final AnnotationVF avf;
-    final UUID uuid = annotation.getId();
-    if (exists(AnnotationVF.class, uuid)) {
-      avf = readAnnotationVF(uuid).get();
-    } else {
-      avf = framedGraph.addVertex(AnnotationVF.class, uuid);
-      avf.setUuid(uuid.toString());
-    }
-
-    setAlexandriaVFProperties(avf, annotation);
-
+    graph.traversal().V()//
+        .has("state", AlexandriaState.TENTATIVE.name())//
+        .has("stateSince", lt(threshold))//
+        .forEachRemaining(Element::remove);
     commitTransaction();
   }
 
-  public void annotateResourceWithAnnotation(AlexandriaResource resource, AlexandriaAnnotation newAnnotation) {
-    startTransaction();
-
-    AnnotationVF avf = createAnnotationVF(newAnnotation);
-
-    ResourceVF resourceToAnnotate = readResourceVF(resource.getId()).get();
-    avf.setAnnotatedResource(resourceToAnnotate);
-
-    commitTransaction();
-  }
-
-  public void annotateAnnotationWithAnnotation(AlexandriaAnnotation annotation, AlexandriaAnnotation newAnnotation) {
-    startTransaction();
-
-    AnnotationVF avf = createAnnotationVF(newAnnotation);
-    UUID id = annotation.getId();
-    annotate(avf, id);
-
-    commitTransaction();
-  }
-
+  @Override
   public Optional<AlexandriaAnnotationBody> findAnnotationBodyWithTypeAndValue(String type, String value) {
     List<AnnotationBodyVF> results = framedGraph.V(AnnotationBodyVF.class)//
         .has("type", type)//
@@ -169,12 +166,7 @@ public abstract class Storage {
     return Optional.of(deframeAnnotationBody(results.get(0)));
   }
 
-  public void storeAnnotationBody(AlexandriaAnnotationBody body) {
-    startTransaction();
-    frameAnnotationBody(body);
-    commitTransaction();
-  }
-
+  @Override
   public Set<AlexandriaResource> readSubResources(UUID uuid) {
     ResourceVF resourcevf = readResourceVF(uuid)//
         .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
@@ -183,6 +175,7 @@ public abstract class Storage {
         .collect(toSet());
   }
 
+  @Override
   public AlexandriaAnnotation deprecateAnnotation(UUID oldAnnotationId, AlexandriaAnnotation tmpAnnotation) {
     startTransaction();
 
@@ -226,10 +219,7 @@ public abstract class Storage {
     return resultAnnotation;
   }
 
-  private BadRequestException incorrectStateException(UUID oldAnnotationId, String string) {
-    return new BadRequestException("annotation " + oldAnnotationId + " is " + string);
-  }
-
+  @Override
   public void confirmAnnotation(UUID uuid) {
     startTransaction();
     AnnotationVF annotationVF = readAnnotationVF(uuid).orElseThrow(annotationNotFound(uuid));
@@ -242,6 +232,7 @@ public abstract class Storage {
     commitTransaction();
   }
 
+  @Override
   public void deleteAnnotation(AlexandriaAnnotation annotation) {
     startTransaction();
     UUID uuid = annotation.getId();
@@ -276,6 +267,83 @@ public abstract class Storage {
     commitTransaction();
   }
 
+  // - other public methods -//
+
+  public void createSubResource(AlexandriaResource subResource) {
+    startTransaction();
+
+    final ResourceVF rvf;
+    final UUID uuid = subResource.getId();
+    if (exists(ResourceVF.class, uuid)) {
+      rvf = readResourceVF(uuid).get();
+    } else {
+      rvf = framedGraph.addVertex(ResourceVF.class);
+      rvf.setUuid(uuid.toString());
+    }
+
+    rvf.setCargo(subResource.getCargo());
+    final UUID parentId = UUID.fromString(subResource.getParentResourcePointer().get().getIdentifier());
+    Optional<ResourceVF> parentVF = readResourceVF(parentId);
+    rvf.setParentResource(parentVF.get());
+
+    setAlexandriaVFProperties(rvf, subResource);
+
+    commitTransaction();
+
+  }
+
+  public boolean supportsTransactions() {
+    return supportsTransactions;
+  }
+
+  public boolean supportsPersistence() {
+    return supportsPersistence;
+  }
+
+  public void createOrUpdateAnnotation(AlexandriaAnnotation annotation) {
+    startTransaction();
+
+    final AnnotationVF avf;
+    final UUID uuid = annotation.getId();
+    if (exists(AnnotationVF.class, uuid)) {
+      avf = readAnnotationVF(uuid).get();
+    } else {
+      avf = framedGraph.addVertex(AnnotationVF.class, uuid);
+      avf.setUuid(uuid.toString());
+    }
+
+    setAlexandriaVFProperties(avf, annotation);
+
+    commitTransaction();
+  }
+
+  public void annotateResourceWithAnnotation(AlexandriaResource resource, AlexandriaAnnotation newAnnotation) {
+    startTransaction();
+
+    AnnotationVF avf = createAnnotationVF(newAnnotation);
+
+    ResourceVF resourceToAnnotate = readResourceVF(resource.getId()).get();
+    avf.setAnnotatedResource(resourceToAnnotate);
+
+    commitTransaction();
+  }
+
+  public void annotateAnnotationWithAnnotation(AlexandriaAnnotation annotation, AlexandriaAnnotation newAnnotation) {
+    startTransaction();
+
+    AnnotationVF avf = createAnnotationVF(newAnnotation);
+    UUID id = annotation.getId();
+    annotate(avf, id);
+
+    commitTransaction();
+  }
+
+  public void storeAnnotationBody(AlexandriaAnnotationBody body) {
+    startTransaction();
+    frameAnnotationBody(body);
+    commitTransaction();
+  }
+
   public void dumpToGraphSON(OutputStream os) throws IOException {
     graph.io(new GraphSONIo.Builder()).writer().create().writeGraph(os, graph);
   }
@@ -302,17 +370,6 @@ public abstract class Storage {
     }
   }
 
-  public void removeExpiredTentatives() {
-    // Tentative vertices should not have any outgoing or incoming edges!!
-    Long threshold = Instant.now().minus(TIMEOUT).getEpochSecond();
-    startTransaction();
-    graph.traversal().V()//
-        .has("state", AlexandriaState.TENTATIVE.name())//
-        .has("stateSince", lt(threshold))//
-        .forEachRemaining(Element::remove);
-    commitTransaction();
-  }
-
   public String getDumpFile() {
     return dumpfile;
   }
@@ -320,7 +377,34 @@ public abstract class Storage {
   public void setDumpFile(String dumpfile) {
     this.dumpfile = dumpfile;
   }
-  // private methods
+
+  // This is for the acceptancetest benefit, so the tests kan start with a clear graph
+  public void setGraph(Graph graph) {
+    this.graph = graph;
+    this.framedGraph = new FramedGraph(graph, ResourceVF.class.getPackage());
+    GraphFeatures graphFeatures = graph.features().graph();
+    this.supportsPersistence = graphFeatures.supportsPersistence();
+    this.supportsTransactions = graphFeatures.supportsTransactions();
+  }
+
+  // - package methods -//
+
+  void createOrUpdateResource(AlexandriaResource resource) {
+    final ResourceVF rvf;
+    final UUID uuid = resource.getId();
+    if (exists(ResourceVF.class, uuid)) {
+      rvf = readResourceVF(uuid).get();
+    } else {
+      rvf = framedGraph.addVertex(ResourceVF.class);
+      rvf.setUuid(uuid.toString());
+    }
+
+    rvf.setCargo(resource.getCargo());
+
+    setAlexandriaVFProperties(rvf, resource);
+  }
+
+  // - private methods -//
 
   private GraphFeatures graphFeatures() {
     return features().graph();
@@ -479,18 +563,13 @@ public abstract class Storage {
     return () -> new NotFoundException("no annotation found with uuid " + oldAnnotationId);
   }
 
-  void createOrUpdateResource(AlexandriaResource resource) {
-    final ResourceVF rvf;
-    final UUID uuid = resource.getId();
-    if (exists(ResourceVF.class, uuid)) {
-      rvf = readResourceVF(uuid).get();
-    } else {
-      rvf = framedGraph.addVertex(ResourceVF.class);
-      rvf.setUuid(uuid.toString());
-    }
-
-    rvf.setCargo(resource.getCargo());
-
-    setAlexandriaVFProperties(rvf, resource);
+  private AlexandriaAnnotation createAnnotation(AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
+    UUID id = UUID.randomUUID();
+    return new AlexandriaAnnotation(id, annotationbody, provenance);
   }
+
+  private BadRequestException incorrectStateException(UUID oldAnnotationId, String string) {
+    return new BadRequestException("annotation " + oldAnnotationId + " is " + string);
+  }
+
 }

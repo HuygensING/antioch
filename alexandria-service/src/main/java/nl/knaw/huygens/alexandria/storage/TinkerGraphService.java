@@ -6,10 +6,10 @@ import javax.inject.Singleton;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
 @Singleton
-public class TinkerGraphStorage extends Storage {
+public class TinkerGraphService extends TinkerPopService {
 
   @Inject
-  public TinkerGraphStorage() {
+  public TinkerGraphService() {
     super(TinkerGraph.open());
   }
 }

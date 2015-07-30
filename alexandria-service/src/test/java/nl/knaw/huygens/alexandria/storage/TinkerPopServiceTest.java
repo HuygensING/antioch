@@ -20,9 +20,9 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
-public class StorageTest {
+public class TinkerPopServiceTest {
 
-  Storage storage = new TinkerGraphStorage();
+  TinkerPopService storage = new TinkerGraphService();
 
   @Test
   public void testReadAfterCreateIsIdentity() {
@@ -58,7 +58,7 @@ public class StorageTest {
 
   TinkerGraph graph = TinkerGraph.open();
 
-  class TestStorage extends Storage {
+  class TestStorage extends TinkerPopService {
     public TestStorage() {
       super(graph);
     }
@@ -67,7 +67,7 @@ public class StorageTest {
   // @Test
   public void testDeleteTentativeAnnotationWithUniqueBodyRemovesAnnotationAndBody() {
     // TODO
-    Storage s = new TestStorage();
+    TinkerPopService s = new TestStorage();
     AlexandriaAnnotation annotation = mock(AlexandriaAnnotation.class);
     s.deleteAnnotation(annotation);
   }
