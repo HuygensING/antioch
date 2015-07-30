@@ -21,6 +21,7 @@ import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
+import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.exception.TentativeObjectException;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
@@ -36,9 +37,9 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   private final AnnotationDeprecationRequestBuilder requestBuilder;
 
   @Inject
-  public AnnotationsEndpoint(AlexandriaService service,   //
-      AnnotationEntityBuilder entityBuilder,   //
-      AnnotationDeprecationRequestBuilder requestBuilder,   //
+  public AnnotationsEndpoint(AlexandriaService service,                  //
+      AnnotationEntityBuilder entityBuilder,                  //
+      AnnotationDeprecationRequestBuilder requestBuilder,                  //
       LocationBuilder locationBuilder) {
     this.service = service;
     this.entityBuilder = entityBuilder;
@@ -79,9 +80,17 @@ public class AnnotationsEndpoint extends JSONEndpoint {
 
   @DELETE
   @Path("{uuid}")
-  public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
-    // set state to expired (or delete when state=tentative?)
-    return methodNotImplemented();
+  public Response deleteNotSupported(@PathParam("uuid") final UUIDParam uuidParam) {
+    UUID uuid = uuidParam.getValue();
+    final AlexandriaAnnotation annotation = service.readAnnotation(uuid)//
+        .orElseThrow(annotationNotFoundForId(uuidParam));
+    if (!annotation.getAnnotations().isEmpty()) {
+      throw new ConflictException("annotation " + uuid + " still has annotations");
+    }
+
+    service.deleteAnnotation(annotation);
+
+    return Response.noContent().build();
   }
 
   // Sub-resource delegation

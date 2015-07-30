@@ -1,13 +1,22 @@
 package nl.knaw.huygens.alexandria.storage;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.mockito.Mockito.mock;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.time.Instant;
 import java.util.UUID;
 
+import org.apache.tinkerpop.gremlin.structure.Element;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.Test;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
@@ -46,4 +55,45 @@ public class StorageTest {
   // throw new RuntimeException(e);
   // }
   // }
+
+  @Test
+  public void testDeleteTentativeAnnotationWithUniqueBodyRemovesAnnotationAndBody() {
+    // TODO
+    AlexandriaAnnotation annotation = mock(AlexandriaAnnotation.class);
+    storage.deleteAnnotation(annotation);
+  }
+
+  @Test
+  public void testDeleteTentativeAnnotationWithSharedBodyRemovesAnnotationAndLeavesBody() {
+    // TODO
+    AlexandriaAnnotation annotation = mock(AlexandriaAnnotation.class);
+    storage.deleteAnnotation(annotation);
+  }
+
+  @Test
+  public void testDeleteConfirmedAnnotationSetsStateToDeleted() {
+    // TODO
+    AlexandriaAnnotation annotation = mock(AlexandriaAnnotation.class);
+    storage.deleteAnnotation(annotation);
+  }
+
+  @Test
+  public void testGraphDrop() throws IOException {
+    TinkerGraph graph = TinkerGraph.open();
+    Vertex a1 = graph.addVertex("A");
+    Vertex a2 = graph.addVertex("A");
+    Vertex b1 = graph.addVertex("B");
+    b1.addEdge("knows", a1, "what", "ever");
+    logGraph(graph);
+
+    graph.traversal().V().hasLabel("A").forEachRemaining(Element::remove);
+    logGraph(graph);
+  }
+
+  private void logGraph(TinkerGraph graph) throws IOException {
+    OutputStream os = new ByteArrayOutputStream();
+    graph.io(new GraphSONIo.Builder()).writer().create().writeGraph(os, graph);
+    Log.info("graph={}", os.toString());
+  }
+
 }

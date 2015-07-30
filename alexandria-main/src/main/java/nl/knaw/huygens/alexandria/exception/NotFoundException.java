@@ -5,6 +5,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 public class NotFoundException extends WebApplicationException {
+  private static final long serialVersionUID = 1L;
   static final ErrorEntity DEFAULT_ENTITY = ErrorEntityBuilder.build("Not Found");
 
   public NotFoundException() {

@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Graph.Features;
 import org.apache.tinkerpop.gremlin.structure.Graph.Features.GraphFeatures;
@@ -249,6 +250,40 @@ public abstract class Storage {
     commitTransaction();
   }
 
+  public void deleteAnnotation(AlexandriaAnnotation annotation) {
+    startTransaction();
+    UUID uuid = annotation.getId();
+    AnnotationVF annotationVF = readAnnotationVF(uuid).get();
+    if (annotation.isTentative()) {
+      // remove from database
+
+      AnnotationBodyVF body = annotationVF.getBody();
+      List<AnnotationVF> ofAnnotations = body.getOfAnnotationList();
+      if (ofAnnotations.size() == 1) {
+        String annotationBodyId = body.getUuid().toString();
+        graph.traversal().V()//
+            .has(IDENTIFIER_PROPERTY, annotationBodyId).next().remove();
+      }
+
+      // remove has_body edge
+      annotationVF.setBody(null);
+
+      // remove annotates edge
+      annotationVF.setAnnotatedAnnotation(null);
+      annotationVF.setAnnotatedResource(null);
+
+      String annotationId = uuid.toString();
+      graph.traversal().V()//
+          .has(IDENTIFIER_PROPERTY, annotationId).next().remove();
+
+    } else {
+      // set state
+      updateState(annotationVF, AlexandriaState.DELETED);
+    }
+
+    commitTransaction();
+  }
+
   public void dumpToGraphSON(OutputStream os) throws IOException {
     graph.io(new GraphSONIo.Builder()).writer().create().writeGraph(os, graph);
   }
@@ -282,7 +317,7 @@ public abstract class Storage {
     graph.traversal().V()//
         .has("state", AlexandriaState.TENTATIVE.name())//
         .has("stateSince", lt(threshold))//
-        .remove();
+        .forEachRemaining(Element::remove);
     commitTransaction();
   }
 
@@ -346,6 +381,7 @@ public abstract class Storage {
 
     String bodyId = newAnnotation.getBody().getId().toString();
     List<AnnotationBodyVF> results = framedGraph.V(AnnotationBodyVF.class).has(IDENTIFIER_PROPERTY, bodyId).toList();
+
     AnnotationBodyVF bodyVF = results.get(0);
 
     avf.setBody(bodyVF);
@@ -441,4 +477,5 @@ public abstract class Storage {
   private Supplier<NotFoundException> annotationNotFound(UUID oldAnnotationId) {
     return () -> new NotFoundException("no annotation found with uuid " + oldAnnotationId);
   }
+
 }

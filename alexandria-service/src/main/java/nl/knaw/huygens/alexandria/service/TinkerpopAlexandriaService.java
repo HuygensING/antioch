@@ -136,4 +136,9 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
     storage.confirmAnnotation(uuid);
   }
 
+  @Override
+  public void deleteAnnotation(AlexandriaAnnotation annotation) {
+    storage.deleteAnnotation(annotation);
+  }
+
 }

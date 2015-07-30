@@ -14,7 +14,7 @@ public abstract class AnnotationVF extends AlexandriaVF {
   static final String ANNOTATES_RESOURCE = "annotates_resource";
   private static final String ANNOTATES_ANNOTATION = "annotates_annotation";
   private static final String DEPRECATES = "deprecates";
-  private static final String HAS_BODY = "has_body";
+  static final String HAS_BODY = "has_body";
 
   @Out
   @Edge(HAS_BODY)
