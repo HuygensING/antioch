@@ -69,13 +69,24 @@ public abstract class Storage {
     return supportsPersistence;
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  public boolean exists(Class clazz, UUID uuid) {
-    if (clazz.getAnnotationsByType(Vertex.class).length == 0) {
-      throw new RuntimeException("Class " + clazz + " has no peapod @Vertex annotation, are you sure it is the correct class?");
+  public boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
+    startTransaction();
+    AlexandriaResource resource;
+    boolean newlyCreated;
+
+    if (exists(ResourceVF.class, uuid)) {
+      resource = readResource(uuid).get();
+      newlyCreated = false;
+
+    } else {
+      resource = new AlexandriaResource(uuid, provenance);
+      newlyCreated = true;
     }
-    FramedGraphTraversal fgt = framedGraph.V(clazz).has(IDENTIFIER_PROPERTY, uuid.toString());
-    return fgt.tryNext().isPresent();
+    resource.setCargo(ref);
+    resource.setState(state);
+    createOrUpdateResource(resource);
+    commitTransaction();
+    return newlyCreated;
   }
 
   public Optional<AlexandriaResource> readResource(UUID uuid) {
@@ -84,25 +95,6 @@ public abstract class Storage {
 
   public Optional<AlexandriaAnnotation> readAnnotation(UUID uuid) {
     return readAnnotationVF(uuid).map(this::deframeAnnotation);
-  }
-
-  public void createOrUpdateResource(AlexandriaResource resource) {
-    startTransaction();
-
-    final ResourceVF rvf;
-    final UUID uuid = resource.getId();
-    if (exists(ResourceVF.class, uuid)) {
-      rvf = readResourceVF(uuid).get();
-    } else {
-      rvf = framedGraph.addVertex(ResourceVF.class);
-      rvf.setUuid(uuid.toString());
-    }
-
-    rvf.setCargo(resource.getCargo());
-
-    setAlexandriaVFProperties(rvf, resource);
-
-    commitTransaction();
   }
 
   public void createSubResource(AlexandriaResource subResource) {
@@ -437,6 +429,15 @@ public abstract class Storage {
     return abvf;
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  private boolean exists(Class clazz, UUID uuid) {
+    if (clazz.getAnnotationsByType(Vertex.class).length == 0) {
+      throw new RuntimeException("Class " + clazz + " has no peapod @Vertex annotation, are you sure it is the correct class?");
+    }
+    FramedGraphTraversal fgt = framedGraph.V(clazz).has(IDENTIFIER_PROPERTY, uuid.toString());
+    return fgt.tryNext().isPresent();
+  }
+
   private AlexandriaAnnotationBody deframeAnnotationBody(AnnotationBodyVF annotationBodyVF) {
     TentativeAlexandriaProvenance provenance = deframeProvenance(annotationBodyVF);
     UUID uuid = getUUID(annotationBodyVF);
@@ -478,4 +479,18 @@ public abstract class Storage {
     return () -> new NotFoundException("no annotation found with uuid " + oldAnnotationId);
   }
 
+  void createOrUpdateResource(AlexandriaResource resource) {
+    final ResourceVF rvf;
+    final UUID uuid = resource.getId();
+    if (exists(ResourceVF.class, uuid)) {
+      rvf = readResourceVF(uuid).get();
+    } else {
+      rvf = framedGraph.addVertex(ResourceVF.class);
+      rvf.setUuid(uuid.toString());
+    }
+
+    rvf.setCargo(resource.getCargo());
+
+    setAlexandriaVFProperties(rvf, resource);
+  }
 }

@@ -56,11 +56,20 @@ public class StorageTest {
   // }
   // }
 
+  TinkerGraph graph = TinkerGraph.open();
+
+  class TestStorage extends Storage {
+    public TestStorage() {
+      super(graph);
+    }
+  }
+
   // @Test
   public void testDeleteTentativeAnnotationWithUniqueBodyRemovesAnnotationAndBody() {
     // TODO
+    Storage s = new TestStorage();
     AlexandriaAnnotation annotation = mock(AlexandriaAnnotation.class);
-    storage.deleteAnnotation(annotation);
+    s.deleteAnnotation(annotation);
   }
 
   // @Test
@@ -81,9 +90,10 @@ public class StorageTest {
   public void testGraphDrop() throws IOException {
     TinkerGraph graph = TinkerGraph.open();
     Vertex a1 = graph.addVertex("A");
+    a1.property("key", "value");
     Vertex a2 = graph.addVertex("A");
     Vertex b1 = graph.addVertex("B");
-    b1.addEdge("knows", a1, "what", "ever");
+    b1.addEdge("knows", a1, "property1", "value1");
     logGraph(graph);
 
     graph.traversal().V().hasLabel("A").forEachRemaining(Element::remove);

@@ -14,7 +14,7 @@ import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.storage.Storage;
-import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
+import scala.NotImplementedError;
 
 public class TinkerpopAlexandriaService implements AlexandriaService {
   // not final and no constructor injection because acceptance tests need to (re-)set the storage in between tests.
@@ -28,22 +28,7 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
 
   @Override
   public boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
-    AlexandriaResource resource;
-    boolean newlyCreated;
-
-    if (storage.exists(ResourceVF.class, uuid)) {
-      resource = readResource(uuid).get();
-      newlyCreated = false;
-
-    } else {
-      resource = new AlexandriaResource(uuid, provenance);
-      newlyCreated = true;
-    }
-    resource.setCargo(ref);
-    resource.setState(state);
-    storage.createOrUpdateResource(resource);
-
-    return newlyCreated;
+    return storage.createOrUpdateResource(uuid, ref, provenance, state);
   }
 
   @Override
@@ -65,7 +50,7 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
 
   @Override
   public Optional<AlexandriaAnnotationBody> readAnnotationBody(UUID uuid) {
-    return null;
+    throw new NotImplementedError();
   }
 
   @Override
