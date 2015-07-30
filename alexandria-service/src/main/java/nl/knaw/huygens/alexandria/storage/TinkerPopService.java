@@ -59,6 +59,15 @@ public abstract class TinkerPopService implements AlexandriaService {
     setGraph(graph);
   }
 
+  // This is for the acceptancetest's benefit, so the tests kan start with a clear graph
+  public void setGraph(Graph graph) {
+    this.graph = graph;
+    this.framedGraph = new FramedGraph(graph, ResourceVF.class.getPackage());
+    GraphFeatures graphFeatures = graph.features().graph();
+    this.supportsPersistence = graphFeatures.supportsPersistence();
+    this.supportsTransactions = graphFeatures.supportsTransactions();
+  }
+
   // - AlexandriaService methods -//
 
   @Override
@@ -376,15 +385,6 @@ public abstract class TinkerPopService implements AlexandriaService {
 
   public void setDumpFile(String dumpfile) {
     this.dumpfile = dumpfile;
-  }
-
-  // This is for the acceptancetest benefit, so the tests kan start with a clear graph
-  public void setGraph(Graph graph) {
-    this.graph = graph;
-    this.framedGraph = new FramedGraph(graph, ResourceVF.class.getPackage());
-    GraphFeatures graphFeatures = graph.features().graph();
-    this.supportsPersistence = graphFeatures.supportsPersistence();
-    this.supportsTransactions = graphFeatures.supportsTransactions();
   }
 
   // - package methods -//
