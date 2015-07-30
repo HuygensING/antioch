@@ -106,11 +106,6 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
     storage.removeExpiredTentatives();
   }
 
-  private AlexandriaAnnotation createAnnotation(AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
-    UUID id = UUID.randomUUID();
-    return new AlexandriaAnnotation(id, annotationbody, provenance);
-  }
-
   @Override
   public AlexandriaAnnotation deprecateAnnotation(UUID oldAnnotationId, AlexandriaAnnotation newAnnotation) {
     return storage.deprecateAnnotation(oldAnnotationId, newAnnotation);
@@ -126,4 +121,8 @@ public class TinkerpopAlexandriaService implements AlexandriaService {
     storage.deleteAnnotation(annotation);
   }
 
+  private AlexandriaAnnotation createAnnotation(AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
+    UUID id = UUID.randomUUID();
+    return new AlexandriaAnnotation(id, annotationbody, provenance);
+  }
 }
