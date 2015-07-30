@@ -56,21 +56,21 @@ public class StorageTest {
   // }
   // }
 
-  @Test
+  // @Test
   public void testDeleteTentativeAnnotationWithUniqueBodyRemovesAnnotationAndBody() {
     // TODO
     AlexandriaAnnotation annotation = mock(AlexandriaAnnotation.class);
     storage.deleteAnnotation(annotation);
   }
 
-  @Test
+  // @Test
   public void testDeleteTentativeAnnotationWithSharedBodyRemovesAnnotationAndLeavesBody() {
     // TODO
     AlexandriaAnnotation annotation = mock(AlexandriaAnnotation.class);
     storage.deleteAnnotation(annotation);
   }
 
-  @Test
+  // @Test
   public void testDeleteConfirmedAnnotationSetsStateToDeleted() {
     // TODO
     AlexandriaAnnotation annotation = mock(AlexandriaAnnotation.class);
