@@ -6,126 +6,115 @@
 
 <title>Querying External Resources</title>
 
-<body class="container">
+<body data-desc="Querying external resources">
 
-    <h2 class="page-header">Querying external resources</h2>
+<div id="get-non-existent" data-desc="What happens when I GET a non-existent resource?" c:execute="clearStorage()">
+    Given that no resource exists with ID <code>3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</code>
+    <h:request>
+        When I <h:get>/resources/3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</h:get>
+        then I should receive <h:status>404 Not Found</h:status>
+        and the response body should contain:
+        <h:jsonResponse>{
+            "error": {
+                "message": "No resource found with id 3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44"
+            }
+        }</h:jsonResponse>
+    </h:request>
+</div>
 
-    <h3>Examples:</h3>
+<div id="get-all-resource-data" data-desc="How can I get all data for a given resource?" c:execute="clearStorage()">
+    <h:request>
+        Given I have <h:success>successfully</h:success>
+        <h:put>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:put> the following body:
+        <h:jsonBody>{
+            "resource": {
+                "id": "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+                "ref": "http://www.example.com/titles/path/to/title/resource"
+            }
+        }</h:jsonBody>
+    </h:request>
 
-    <div id="get-non-existent" class="panel panel-default" c:execute="clearStorage()">
-        <div class="panel-heading"><b>What happens when I GET a non-existent resource?</b></div>
-        <div class="panel-body">
-            Given that no resource exists with ID <code>3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</code>
-            <h:request>
-                When I <h:get>/resources/3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</h:get>
-                then I should receive <h:status>404 Not Found</h:status>
-                and the response body should contain:
-                <h:jsonResponse>{
-                    "error": {
-                        "message": "No resource found with id 3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44"
-                    }
-                }</h:jsonResponse>
-            </h:request>
-        </div>
+    <h:request>
+        When I <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:get>
+        I should receive <h:status>200 OK</h:status> with a response body containing
+        <h:jsonResponse>{
+            "resource": {
+                "id" : "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+                "ref": "http://www.example.com/titles/path/to/title/resource",
+                "^provenance": "https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/provenance"
+            }
+        }</h:jsonResponse>
+    </h:request>
+
+    <h:request>
+        And <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/provenance</h:get>
+        should return <h:status>200 OK</h:status> with a response body containing
+        <h:jsonResponse>{
+            "provenance": {
+                "who": "nederlab",
+                "why": "",
+                "when": "{date.beforeNow}",
+                "^what": "https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01"
+            }
+        } </h:jsonResponse>
+    </h:request>
+</div>
+
+<div id="get-resource-ref" data-desc="How can I GET the 'ref' of an existing resource?" c:execute="clearStorage()">
+    <div class="alert alert-info well-sm" role="alert">
+        <strong>Question:</strong>
+        Is this (still) necessary from a Nederlab point of view, or is a regular GET which yields
+        <code>ref</code> as one of the many items also OK?
     </div>
 
-    <div id="get-all-resource-data" class="panel panel-default" c:execute="clearStorage()">
-        <div class="panel-heading"><b>How can I get all data for a given resource?</b></div>
-        <div class="panel-body">
-            <h:request>
-                Given I have <h:success>successfully</h:success>
-                <h:put>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:put> the following body:
-                <h:jsonBody>{
-                    "resource": {
-                        "id": "6e56c868-c0a9-11e4-a762-cb9a664afc01",
-                        "ref": "http://www.example.com/titles/path/to/title/resource"
-                    }
-                }</h:jsonBody>
-            </h:request>
+    <h:request>
+        Given I have <h:success>successfully</h:success>
+        <h:put>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:put> the following body:
+        <h:jsonBody>{
+            "resource": {
+                "id": "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+                "ref": "http://www.example.com/titles/path/to/title/resource"
+            }
+        }</h:jsonBody>
+    </h:request>
 
-            <h:request>
-                When I <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:get>
-                I should receive <h:status>200 OK</h:status> with a response body containing
-                <h:jsonResponse>{
-                    "resource": {
-                        "id" : "6e56c868-c0a9-11e4-a762-cb9a664afc01",
-                        "ref": "http://www.example.com/titles/path/to/title/resource",
-                        "^provenance": "https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/provenance"
-                    }
-                }</h:jsonResponse>
-            </h:request>
+    <h:request>
+        When I <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/ref</h:get>
+        I should receive <h:status>200 OK</h:status> with a response body containing
+        <h:jsonResponse>{
+            "ref": "http://www.example.com/titles/path/to/title/resource"
+        }</h:jsonResponse>
+    </h:request>
+</div>
 
-            <h:request>
-                And <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/provenance</h:get>
-                should return <h:status>200 OK</h:status> with a response body containing
-                <h:jsonResponse>{
-                    "provenance": {
-                        "who": "nederlab",
-                        "why": "",
-                        "when": "{date.beforeNow}",
-                        "^what": "https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01"
-                    }
-                } </h:jsonResponse>
-            </h:request>
-        </div>
+<div id="get-resource-annotations" c:execute="clearStorage()"
+     data-desc="How can I GET the annotations of an existing resource?">
+
+    <div class="alert alert-warning well-sm" role="alert">
+        <strong>Warning:</strong>
+        This is currently a dressed-down example showing only an empty annotations array.
+        It needs to use real annotations to show that you get <code>^annotation</code> results.
     </div>
 
-    <div id="get-resource-ref" class="panel panel-default" c:execute="clearStorage()">
-        <div class="panel-heading"><b>How can I GET the <code>ref</code> of an existing resource?</b></div>
-        <div class="panel-body">
-            <div class="alert alert-info well-sm" role="alert">
-                <strong>Question:</strong>
-                Is this (still) necessary from a Nederlab point of view, or is a regular GET which yields
-                <code>ref</code> as one of the many items also OK?
-            </div>
+    <h:request>
+        Given I have <h:success>successfully</h:success>
+        <h:put>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:put> the following body:
+        <h:jsonBody>{
+            "resource": {
+            "id": "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+            "ref": "http://www.example.com/titles/path/to/title/resource"
+            }
+            }</h:jsonBody>
+    </h:request>
 
-            <h:request>
-                Given I have <h:success>successfully</h:success>
-                <h:put>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:put> the following body:
-                <h:jsonBody>{
-                    "resource": {
-                        "id": "6e56c868-c0a9-11e4-a762-cb9a664afc01",
-                        "ref": "http://www.example.com/titles/path/to/title/resource"
-                    }
-                }</h:jsonBody>
-            </h:request>
-            <h:request>
-                When I <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/ref</h:get>
-                I should receive <h:status>200 OK</h:status> with a response body containing
-                <h:jsonResponse>{
-                    "ref": "http://www.example.com/titles/path/to/title/resource"
-                }</h:jsonResponse>
-            </h:request>
-        </div>
-    </div>
-
-    <div id="get-resource-annotations" class="panel panel-default" c:execute="clearStorage()">
-        <div class="panel-heading"><b>How can I GET the <code>annotations</code> of an existing resource?</b></div>
-        <div class="panel-body">
-            <div class="alert alert-warning well-sm" role="alert">
-                <strong>Warning:</strong>
-                This is currently a dressed-down example showing only an empty annotations array.
-                It needs to use real annotations to show that you get <code>^annotation</code> results.
-            </div>
-            <h:request>
-                Given I have <h:success>successfully</h:success>
-                <h:put>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:put> the following body:
-                <h:jsonBody>{
-                    "resource": {
-                    "id": "6e56c868-c0a9-11e4-a762-cb9a664afc01",
-                    "ref": "http://www.example.com/titles/path/to/title/resource"
-                    }
-                    }</h:jsonBody>
-            </h:request>
-            <h:request>
-                When I <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/annotations</h:get>
-                I should receive <h:status>200 OK</h:status> with a response body containing
-                <h:jsonResponse>{
-                    "annotations": []
-                }</h:jsonResponse>
-            </h:request>
-        </div>
-    </div>
+    <h:request>
+        When I <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/annotations</h:get>
+        I should receive <h:status>200 OK</h:status> with a response body containing
+        <h:jsonResponse>{
+            "annotations": []
+        }</h:jsonResponse>
+    </h:request>
+</div>
     <!--
 
     <div c:execute="clear()" class="example">
