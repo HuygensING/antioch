@@ -33,7 +33,7 @@
     <classloader-leak-prevention.version>1.13.0</classloader-leak-prevention.version>
 
     <!-- Concordion Acceptance Test extensions -->
-    <cat.version>1.2.0</cat.version>
+    <cat.version>1.2.1</cat.version>
 
     <guice.version>3.0</guice.version>
     <jackson.version>2.6.0</jackson.version>
