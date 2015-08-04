@@ -13,7 +13,7 @@
 <a class="jxr_linenumber" name="L5" href="#L5">5</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/model/AlexandriaAnnotation.html">AlexandriaAnnotation</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../nl/knaw/huygens/alexandria/model/AbstractAnnotatable.html">AbstractAnnotatable</a> {
 <a class="jxr_linenumber" name="L6" href="#L6">6</a>   
 <a class="jxr_linenumber" name="L7" href="#L7">7</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../nl/knaw/huygens/alexandria/model/AlexandriaAnnotationBody.html">AlexandriaAnnotationBody</a> body;
-<a class="jxr_linenumber" name="L8" href="#L8">8</a>     <strong class="jxr_keyword">private</strong> AccountablePointer&lt;?&gt; annotatedPointer;
+<a class="jxr_linenumber" name="L8" href="#L8">8</a>     <strong class="jxr_keyword">private</strong> IdentifiablePointer&lt;?&gt; annotatedPointer;
 <a class="jxr_linenumber" name="L9" href="#L9">9</a>   
 <a class="jxr_linenumber" name="L10" href="#L10">10</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../nl/knaw/huygens/alexandria/model/AlexandriaAnnotation.html">AlexandriaAnnotation</a>(UUID id, <a href="../../../../../nl/knaw/huygens/alexandria/model/AlexandriaAnnotationBody.html">AlexandriaAnnotationBody</a> body, <a href="../../../../../nl/knaw/huygens/alexandria/model/TentativeAlexandriaProvenance.html">TentativeAlexandriaProvenance</a> provenance) {
 <a class="jxr_linenumber" name="L11" href="#L11">11</a>      <strong class="jxr_keyword">super</strong>(id, provenance);
@@ -24,11 +24,11 @@
 <a class="jxr_linenumber" name="L16" href="#L16">16</a>      <strong class="jxr_keyword">return</strong> body;
 <a class="jxr_linenumber" name="L17" href="#L17">17</a>    }
 <a class="jxr_linenumber" name="L18" href="#L18">18</a>  
-<a class="jxr_linenumber" name="L19" href="#L19">19</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> setAnnotatablePointer(AccountablePointer&lt;?&gt; pointer) {
+<a class="jxr_linenumber" name="L19" href="#L19">19</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> setAnnotatablePointer(IdentifiablePointer&lt;?&gt; pointer) {
 <a class="jxr_linenumber" name="L20" href="#L20">20</a>      <strong class="jxr_keyword">this</strong>.annotatedPointer = pointer;
 <a class="jxr_linenumber" name="L21" href="#L21">21</a>    }
 <a class="jxr_linenumber" name="L22" href="#L22">22</a>  
-<a class="jxr_linenumber" name="L23" href="#L23">23</a>    <strong class="jxr_keyword">public</strong> AccountablePointer&lt;?&gt; getAnnotatablePointer() {
+<a class="jxr_linenumber" name="L23" href="#L23">23</a>    <strong class="jxr_keyword">public</strong> IdentifiablePointer&lt;?&gt; getAnnotatablePointer() {
 <a class="jxr_linenumber" name="L24" href="#L24">24</a>      <strong class="jxr_keyword">return</strong> annotatedPointer;
 <a class="jxr_linenumber" name="L25" href="#L25">25</a>    }
 <a class="jxr_linenumber" name="L26" href="#L26">26</a>  

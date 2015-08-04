@@ -22,7 +22,7 @@
 <a class="jxr_linenumber" name="L14" href="#L14">14</a>  
 <a class="jxr_linenumber" name="L15" href="#L15">15</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.Log;
 <a class="jxr_linenumber" name="L16" href="#L16">16</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.Accountable;
-<a class="jxr_linenumber" name="L17" href="#L17">17</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AccountablePointer;
+<a class="jxr_linenumber" name="L17" href="#L17">17</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 <a class="jxr_linenumber" name="L18" href="#L18">18</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 <a class="jxr_linenumber" name="L19" href="#L19">19</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 <a class="jxr_linenumber" name="L20" href="#L20">20</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaResource;
@@ -56,7 +56,7 @@
 <a class="jxr_linenumber" name="L48" href="#L48">48</a>      AnnotationVF annotationVF = mock(AnnotationVF.<strong class="jxr_keyword">class</strong>);
 <a class="jxr_linenumber" name="L49" href="#L49">49</a>      when(annotationVF.getUuid()).thenReturn(id.toString());
 <a class="jxr_linenumber" name="L50" href="#L50">50</a>      when(mockStorage.readVF(AnnotationVF.<strong class="jxr_keyword">class</strong>, id)).thenReturn(Optional.of(annotationVF));
-<a class="jxr_linenumber" name="L51" href="#L51">51</a>      AccountablePointer&lt;AlexandriaAnnotation&gt; ap = <strong class="jxr_keyword">new</strong> AccountablePointer&lt;&gt;(AlexandriaAnnotation.<strong class="jxr_keyword">class</strong>, id.toString());
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>      IdentifiablePointer&lt;AlexandriaAnnotation&gt; ap = <strong class="jxr_keyword">new</strong> IdentifiablePointer&lt;&gt;(AlexandriaAnnotation.<strong class="jxr_keyword">class</strong>, id.toString());
 <a class="jxr_linenumber" name="L52" href="#L52">52</a>  
 <a class="jxr_linenumber" name="L53" href="#L53">53</a>      Optional&lt;? <strong class="jxr_keyword">extends</strong> Accountable&gt; optional = service.dereference(ap);
 <a class="jxr_linenumber" name="L54" href="#L54">54</a>      assertThat(optional.isPresent());
@@ -68,7 +68,7 @@
 <a class="jxr_linenumber" name="L60" href="#L60">60</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testDereferenceWithNonExistingAnnotation() {
 <a class="jxr_linenumber" name="L61" href="#L61">61</a>      UUID id = UUID.randomUUID();
 <a class="jxr_linenumber" name="L62" href="#L62">62</a>      when(mockStorage.readVF(AnnotationVF.<strong class="jxr_keyword">class</strong>, id)).thenReturn(Optional.empty());
-<a class="jxr_linenumber" name="L63" href="#L63">63</a>      AccountablePointer&lt;AlexandriaAnnotation&gt; ap = <strong class="jxr_keyword">new</strong> AccountablePointer&lt;&gt;(AlexandriaAnnotation.<strong class="jxr_keyword">class</strong>, id.toString());
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>      IdentifiablePointer&lt;AlexandriaAnnotation&gt; ap = <strong class="jxr_keyword">new</strong> IdentifiablePointer&lt;&gt;(AlexandriaAnnotation.<strong class="jxr_keyword">class</strong>, id.toString());
 <a class="jxr_linenumber" name="L64" href="#L64">64</a>  
 <a class="jxr_linenumber" name="L65" href="#L65">65</a>      Optional&lt;? <strong class="jxr_keyword">extends</strong> Accountable&gt; optional = service.dereference(ap);
 <a class="jxr_linenumber" name="L66" href="#L66">66</a>      assertThat(optional.isPresent()).isFalse();
@@ -80,7 +80,7 @@
 <a class="jxr_linenumber" name="L72" href="#L72">72</a>      UUID id = UUID.randomUUID();
 <a class="jxr_linenumber" name="L73" href="#L73">73</a>      TentativeAlexandriaProvenance provenance = <strong class="jxr_keyword">new</strong> TentativeAlexandriaProvenance(<span class="jxr_string">"who"</span>, Instant.now(), <span class="jxr_string">"why"</span>);
 <a class="jxr_linenumber" name="L74" href="#L74">74</a>      <em class="jxr_comment">// when(mockStorage.readResource(id)).thenReturn(Optional.of(new AlexandriaResource(id, provenance)));</em>
-<a class="jxr_linenumber" name="L75" href="#L75">75</a>      AccountablePointer&lt;AlexandriaResource&gt; ap = <strong class="jxr_keyword">new</strong> AccountablePointer&lt;&gt;(AlexandriaResource.<strong class="jxr_keyword">class</strong>, id.toString());
+<a class="jxr_linenumber" name="L75" href="#L75">75</a>      IdentifiablePointer&lt;AlexandriaResource&gt; ap = <strong class="jxr_keyword">new</strong> IdentifiablePointer&lt;&gt;(AlexandriaResource.<strong class="jxr_keyword">class</strong>, id.toString());
 <a class="jxr_linenumber" name="L76" href="#L76">76</a>  
 <a class="jxr_linenumber" name="L77" href="#L77">77</a>      Optional&lt;? <strong class="jxr_keyword">extends</strong> Accountable&gt; optional = service.dereference(ap);
 <a class="jxr_linenumber" name="L78" href="#L78">78</a>      assertThat(optional.isPresent());

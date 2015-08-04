@@ -6,6 +6,7 @@ nl.knaw.huygens.alexandria.endpoint.annotation
 nl.knaw.huygens.alexandria.endpoint.annotationbody
 nl.knaw.huygens.alexandria.endpoint.homepage
 nl.knaw.huygens.alexandria.endpoint.resource
+nl.knaw.huygens.alexandria.endpoint.search
 nl.knaw.huygens.alexandria.exception
 nl.knaw.huygens.alexandria.jersey
 nl.knaw.huygens.alexandria.jersey.exceptionmappers
