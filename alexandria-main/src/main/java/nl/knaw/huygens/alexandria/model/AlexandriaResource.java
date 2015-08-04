@@ -9,8 +9,8 @@ import jersey.repackaged.com.google.common.collect.Lists;
 public class AlexandriaResource extends AbstractAnnotatable {
 
   private String cargo; // ref for resource, sub for subresource
-  private Optional<AccountablePointer<AlexandriaResource>> parentResourcePointer = Optional.empty(); // only used in subresources
-  private Collection<AccountablePointer<AlexandriaResource>> subResourcePointers = Lists.newArrayList();
+  private Optional<IdentifiablePointer<AlexandriaResource>> parentResourcePointer = Optional.empty(); // only used in subresources
+  private Collection<IdentifiablePointer<AlexandriaResource>> subResourcePointers = Lists.newArrayList();
 
   public AlexandriaResource(UUID id, TentativeAlexandriaProvenance provenance) {
     super(id, provenance);
@@ -24,19 +24,19 @@ public class AlexandriaResource extends AbstractAnnotatable {
     this.cargo = cargo;
   }
 
-  public Optional<AccountablePointer<AlexandriaResource>> getParentResourcePointer() {
+  public Optional<IdentifiablePointer<AlexandriaResource>> getParentResourcePointer() {
     return parentResourcePointer;
   }
 
-  public void setParentResourcePointer(AccountablePointer<AlexandriaResource> parentResourcePointer) {
+  public void setParentResourcePointer(IdentifiablePointer<AlexandriaResource> parentResourcePointer) {
     this.parentResourcePointer = Optional.of(parentResourcePointer);
   }
 
-  public Collection<AccountablePointer<AlexandriaResource>> getSubResourcePointers() {
+  public Collection<IdentifiablePointer<AlexandriaResource>> getSubResourcePointers() {
     return subResourcePointers;
   }
 
-  public void addSubResourcePointer(AccountablePointer<AlexandriaResource> pointer) {
+  public void addSubResourcePointer(IdentifiablePointer<AlexandriaResource> pointer) {
     subResourcePointers.add(pointer);
   }
 

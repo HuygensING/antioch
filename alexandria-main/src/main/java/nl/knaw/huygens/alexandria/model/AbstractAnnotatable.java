@@ -21,7 +21,7 @@ public abstract class AbstractAnnotatable extends AbstractAccountable {
   public void addAnnotation(AlexandriaAnnotation annotation) {
     annotations.add(annotation);
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    AccountablePointer<? extends Accountable> pointer = new AccountablePointer(this.getClass(), this.getId().toString());
+    IdentifiablePointer<? extends Accountable> pointer = new IdentifiablePointer(this.getClass(), this.getId().toString());
     annotation.setAnnotatablePointer(pointer);
   }
 

@@ -1,11 +1,8 @@
 package nl.knaw.huygens.alexandria.model;
 
 import java.time.Instant;
-import java.util.UUID;
 
-public interface Accountable {
-  UUID getId();
-
+public interface Accountable extends Identifiable {
   AlexandriaProvenance getProvenance();
 
   AlexandriaState getState();

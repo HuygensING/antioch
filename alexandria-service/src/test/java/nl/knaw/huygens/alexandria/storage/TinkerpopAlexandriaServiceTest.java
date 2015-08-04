@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.model.Accountable;
-import nl.knaw.huygens.alexandria.model.AccountablePointer;
+import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
@@ -48,7 +48,7 @@ public class TinkerpopAlexandriaServiceTest {
     AnnotationVF annotationVF = mock(AnnotationVF.class);
     when(annotationVF.getUuid()).thenReturn(id.toString());
     when(mockStorage.readVF(AnnotationVF.class, id)).thenReturn(Optional.of(annotationVF));
-    AccountablePointer<AlexandriaAnnotation> ap = new AccountablePointer<>(AlexandriaAnnotation.class, id.toString());
+    IdentifiablePointer<AlexandriaAnnotation> ap = new IdentifiablePointer<>(AlexandriaAnnotation.class, id.toString());
 
     Optional<? extends Accountable> optional = service.dereference(ap);
     assertThat(optional.isPresent());
@@ -60,7 +60,7 @@ public class TinkerpopAlexandriaServiceTest {
   public void testDereferenceWithNonExistingAnnotation() {
     UUID id = UUID.randomUUID();
     when(mockStorage.readVF(AnnotationVF.class, id)).thenReturn(Optional.empty());
-    AccountablePointer<AlexandriaAnnotation> ap = new AccountablePointer<>(AlexandriaAnnotation.class, id.toString());
+    IdentifiablePointer<AlexandriaAnnotation> ap = new IdentifiablePointer<>(AlexandriaAnnotation.class, id.toString());
 
     Optional<? extends Accountable> optional = service.dereference(ap);
     assertThat(optional.isPresent()).isFalse();
@@ -72,7 +72,7 @@ public class TinkerpopAlexandriaServiceTest {
     UUID id = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
     // when(mockStorage.readResource(id)).thenReturn(Optional.of(new AlexandriaResource(id, provenance)));
-    AccountablePointer<AlexandriaResource> ap = new AccountablePointer<>(AlexandriaResource.class, id.toString());
+    IdentifiablePointer<AlexandriaResource> ap = new IdentifiablePointer<>(AlexandriaResource.class, id.toString());
 
     Optional<? extends Accountable> optional = service.dereference(ap);
     assertThat(optional.isPresent());

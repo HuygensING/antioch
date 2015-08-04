@@ -4,12 +4,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import nl.knaw.huygens.alexandria.endpoint.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.model.Accountable;
-import nl.knaw.huygens.alexandria.model.AccountablePointer;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
 public interface AlexandriaService {
@@ -44,7 +46,7 @@ public interface AlexandriaService {
 
   Optional<AlexandriaAnnotation> readAnnotation(UUID uuid);
 
-  Optional<? extends Accountable> dereference(AccountablePointer<? extends Accountable> pointer);
+  Optional<? extends Accountable> dereference(IdentifiablePointer<? extends Accountable> pointer);
 
   /**
    * remove all unconfirmed objects that have timed out
@@ -70,5 +72,7 @@ public interface AlexandriaService {
    *          The Annotation to delete
    */
   void deleteAnnotation(AlexandriaAnnotation annotation);
+
+  SearchResult execute(AlexandriaQuery query);
 
 }

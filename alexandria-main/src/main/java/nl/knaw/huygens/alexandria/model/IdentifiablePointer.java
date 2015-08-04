@@ -1,15 +1,15 @@
 package nl.knaw.huygens.alexandria.model;
 
-public class AccountablePointer<T extends Accountable> {
+public class IdentifiablePointer<T extends Identifiable> {
   Class<T> clazz;
   String identifier;
 
-  public AccountablePointer(Class<T> clazz, String identifier) {
+  public IdentifiablePointer(Class<T> clazz, String identifier) {
     this.clazz = clazz;
     this.identifier = identifier;
   }
 
-  public Class<T> getAccountableClass() {
+  public Class<T> getIdentifiableClass() {
     return clazz;
   }
 

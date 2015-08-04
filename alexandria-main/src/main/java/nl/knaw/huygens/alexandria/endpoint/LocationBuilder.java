@@ -6,8 +6,8 @@ import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
 
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
-import nl.knaw.huygens.alexandria.model.Accountable;
-import nl.knaw.huygens.alexandria.model.AccountablePointer;
+import nl.knaw.huygens.alexandria.model.Identifiable;
+import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 
 public class LocationBuilder {
 
@@ -20,21 +20,21 @@ public class LocationBuilder {
     this.resolver = resolver;
   }
 
-  public URI locationOf(Accountable accountable) {
+  public URI locationOf(Identifiable accountable) {
     String path = resolver.pathOf(accountable)//
-        .orElseThrow(() -> new RuntimeException("unknown Accountable class " + accountable.getClass()));
+        .orElseThrow(() -> new RuntimeException("unknown Identifiable class " + accountable.getClass()));
     return UriBuilder.fromUri(config.getBaseURI())//
         .path(path).path("{uuid}").build(accountable.getId());
   }
 
-  public URI locationOf(Class<? extends Accountable> accountableClass, String uuid) {
+  public URI locationOf(Class<? extends Identifiable> accountableClass, String uuid) {
     String path = resolver.pathOf(accountableClass)//
-        .orElseThrow(() -> new RuntimeException("unknown Accountable class " + accountableClass));
+        .orElseThrow(() -> new RuntimeException("unknown Identifiable class " + accountableClass));
     return UriBuilder.fromUri(config.getBaseURI())//
         .path(path).path("{uuid}").build(uuid);
   }
 
-  public URI locationOf(AccountablePointer<? extends Accountable> annotatablePointer) {
-    return locationOf(annotatablePointer.getAccountableClass(), annotatablePointer.getIdentifier());
+  public URI locationOf(IdentifiablePointer<? extends Identifiable> annotatablePointer) {
+    return locationOf(annotatablePointer.getIdentifiableClass(), annotatablePointer.getIdentifier());
   }
 }

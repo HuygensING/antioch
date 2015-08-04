@@ -13,15 +13,17 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import nl.knaw.huygens.alexandria.endpoint.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.Accountable;
-import nl.knaw.huygens.alexandria.model.AccountablePointer;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
@@ -84,14 +86,14 @@ public class TinkerPopService implements AlexandriaService {
   public AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
     AlexandriaResource subresource = new AlexandriaResource(uuid, provenance);
     subresource.setCargo(sub);
-    subresource.setParentResourcePointer(new AccountablePointer<AlexandriaResource>(AlexandriaResource.class, parentUuid.toString()));
+    subresource.setParentResourcePointer(new IdentifiablePointer<AlexandriaResource>(AlexandriaResource.class, parentUuid.toString()));
     createSubResource(subresource);
     return subresource;
   }
 
   @Override
-  public Optional<? extends Accountable> dereference(AccountablePointer<? extends Accountable> pointer) {
-    Class<? extends Accountable> aClass = pointer.getAccountableClass();
+  public Optional<? extends Accountable> dereference(IdentifiablePointer<? extends Accountable> pointer) {
+    Class<? extends Accountable> aClass = pointer.getIdentifiableClass();
     UUID uuid = UUID.fromString(pointer.getIdentifier());
     if (AlexandriaResource.class.equals(aClass)) {
       return readResource(uuid);
@@ -247,6 +249,14 @@ public class TinkerPopService implements AlexandriaService {
     throw new NotImplementedError();
   }
 
+  @Override
+  public SearchResult execute(AlexandriaQuery query) {
+    SearchResult searchResult = new SearchResult();
+    searchResult.setId(UUID.randomUUID());
+    searchResult.setQuery(query);
+    return searchResult;
+  }
+
   // - other public methods -//
 
   public void createSubResource(AlexandriaResource subResource) {
@@ -370,10 +380,10 @@ public class TinkerPopService implements AlexandriaService {
     }
     ResourceVF parentResource = rvf.getParentResource();
     if (parentResource != null) {
-      resource.setParentResourcePointer(new AccountablePointer<>(AlexandriaResource.class, parentResource.getUuid()));
+      resource.setParentResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, parentResource.getUuid()));
     }
     rvf.getSubResources().stream()//
-        .forEach(vf -> resource.addSubResourcePointer(new AccountablePointer<>(AlexandriaResource.class, vf.getUuid())));
+        .forEach(vf -> resource.addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
     return resource;
   }
 
@@ -387,9 +397,9 @@ public class TinkerPopService implements AlexandriaService {
     AnnotationVF annotatedAnnotation = annotationVF.getAnnotatedAnnotation();
     if (annotatedAnnotation == null) {
       ResourceVF annotatedResource = annotationVF.getAnnotatedResource();
-      annotation.setAnnotatablePointer(new AccountablePointer<>(AlexandriaResource.class, annotatedResource.getUuid()));
+      annotation.setAnnotatablePointer(new IdentifiablePointer<>(AlexandriaResource.class, annotatedResource.getUuid()));
     } else {
-      annotation.setAnnotatablePointer(new AccountablePointer<>(AlexandriaAnnotation.class, annotatedAnnotation.getUuid()));
+      annotation.setAnnotatablePointer(new IdentifiablePointer<>(AlexandriaAnnotation.class, annotatedAnnotation.getUuid()));
     }
     for (AnnotationVF avf : annotationVF.getAnnotatedBy()) {
       AlexandriaAnnotation annotationAnnotation = deframeAnnotation(avf);

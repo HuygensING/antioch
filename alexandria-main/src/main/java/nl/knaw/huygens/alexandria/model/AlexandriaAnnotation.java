@@ -5,7 +5,7 @@ import java.util.UUID;
 public class AlexandriaAnnotation extends AbstractAnnotatable {
 
   private final AlexandriaAnnotationBody body;
-  private AccountablePointer<?> annotatedPointer;
+  private IdentifiablePointer<?> annotatedPointer;
 
   public AlexandriaAnnotation(UUID id, AlexandriaAnnotationBody body, TentativeAlexandriaProvenance provenance) {
     super(id, provenance);
@@ -16,11 +16,11 @@ public class AlexandriaAnnotation extends AbstractAnnotatable {
     return body;
   }
 
-  public void setAnnotatablePointer(AccountablePointer<?> pointer) {
+  public void setAnnotatablePointer(IdentifiablePointer<?> pointer) {
     this.annotatedPointer = pointer;
   }
 
-  public AccountablePointer<?> getAnnotatablePointer() {
+  public IdentifiablePointer<?> getAnnotatablePointer() {
     return annotatedPointer;
   }
 
