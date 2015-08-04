@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.concordion.api.extension.Extension;
 import org.junit.BeforeClass;
 
@@ -26,9 +27,9 @@ import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.alexandria.service.TinkerpopAlexandriaService;
+import nl.knaw.huygens.alexandria.service.TinkerGraphService;
+import nl.knaw.huygens.alexandria.service.TinkerPopService;
 import nl.knaw.huygens.alexandria.storage.Storage;
-import nl.knaw.huygens.alexandria.storage.TinkerGraphStorage;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
 import nl.knaw.huygens.cat.RestExtension;
 import nl.knaw.huygens.cat.RestFixture;
@@ -36,7 +37,9 @@ import nl.knaw.huygens.cat.RestFixture;
 public class AlexandriaAcceptanceTest extends RestFixture {
   private static final AlexandriaConfiguration CONFIG = testConfiguration();
 
-  private static TinkerpopAlexandriaService service = new TinkerpopAlexandriaService().withStorage(new TinkerGraphStorage());
+  private static Storage storage = tinkerGraphStorage();
+
+  private static TinkerPopService service = new TinkerPopService(storage);
 
   @Extension
   @SuppressWarnings("unused")
@@ -47,6 +50,10 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     Log.debug("Setting up AlexandriaAcceptanceTest");
     setupRestFixture(alexandriaModule());
     register(JsonConfiguration.class);
+  }
+
+  private static Storage tinkerGraphStorage() {
+    return new Storage(TinkerGraph.open());
   }
 
   private static AlexandriaConfiguration testConfiguration() {
@@ -73,7 +80,7 @@ public class AlexandriaAcceptanceTest extends RestFixture {
       @Override
       protected void configure() {
         Log.trace("setting up Guice bindings");
-        bind(Storage.class).to(TinkerGraphStorage.class);
+        bind(TinkerPopService.class).to(TinkerGraphService.class);
         bind(AlexandriaService.class).toInstance(service);
         bind(AlexandriaConfiguration.class).toInstance(CONFIG);
         bind(AnnotationEntityBuilder.class).in(Scopes.SINGLETON);
@@ -96,7 +103,7 @@ public class AlexandriaAcceptanceTest extends RestFixture {
 
   public void clearStorage() {
     Log.debug("Clearing Storage");
-    service.withStorage(new TinkerGraphStorage());
+    service.setStorage(tinkerGraphStorage());
   }
 
   protected AlexandriaService service() {

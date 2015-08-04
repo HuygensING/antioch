@@ -60,13 +60,13 @@ public class EndpointsTest extends TinkergraphServiceEndpointTest {
 
     UUID id = extractId(response);
     Log.debug("uuid={}", id);
-    AlexandriaResource resource = getStorage().readResource(id).get();
+    AlexandriaResource resource = getService().readResource(id).get();
     assertThat(resource.getState()).isEqualTo(AlexandriaState.TENTATIVE);
 
     response = target(ROOTPATH).path(id.toString()).request().put(jsonEntity("{'resource':{'id':'" + id + "','ref':'REF'}}"));
     assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
 
-    resource = getStorage().readResource(id).get();
+    resource = getService().readResource(id).get();
     assertThat(resource.getState()).isEqualTo(AlexandriaState.CONFIRMED);
   }
 
@@ -79,13 +79,13 @@ public class EndpointsTest extends TinkergraphServiceEndpointTest {
 
     UUID id = extractId(response);
     Log.debug("resource uuid={}", id);
-    AlexandriaResource resource = getStorage().readResource(id).get();
+    AlexandriaResource resource = getService().readResource(id).get();
     assertThat(resource.getState()).isEqualTo(AlexandriaState.TENTATIVE);
 
     response = target(ROOTPATH).path(id.toString()).request().put(jsonEntity("{'resource':{'id':'" + id + "','ref':'REF'}}"));
     assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
 
-    resource = getStorage().readResource(id).get();
+    resource = getService().readResource(id).get();
     assertThat(resource.getState()).isEqualTo(AlexandriaState.CONFIRMED);
 
     response = target(ROOTPATH).path(id.toString()).path("annotations").request().post(jsonEntity("{'annotation':{'value':'bladiebla'}}"));
@@ -93,13 +93,13 @@ public class EndpointsTest extends TinkergraphServiceEndpointTest {
 
     UUID annotationId = extractId(response);
     Log.debug("annotation uuid={}", annotationId);
-    AlexandriaAnnotation annotation = getStorage().readAnnotation(annotationId).get();
+    AlexandriaAnnotation annotation = getService().readAnnotation(annotationId).get();
     assertThat(annotation.getState()).isEqualTo(AlexandriaState.TENTATIVE);
 
     response = target("annotations").path(annotationId.toString()).request().put(jsonEntity("{'annotation':{'id':'" + id + "','value':'bladiebla'}}"));
     assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
 
-    annotation = getStorage().readAnnotation(annotationId).get();
+    annotation = getService().readAnnotation(annotationId).get();
     // assertThat(annotation.getState()).isEqualTo(AlexandriaState.CONFIRMED);
   }
 
@@ -133,13 +133,13 @@ public class EndpointsTest extends TinkergraphServiceEndpointTest {
     ResourcesEndpoint re = new ResourcesEndpoint(service, requestBuilder, locationBuilder, entityBuilder);
 
     ResourcePrototype prototype1 = deserialize("{'resource':{'id':'c28626d4-493a-4204-83d9-e9ae17e15654','ref':'Referentie1'}}");
-    UUIDParam uuidparam1=new UUIDParam("c28626d4-493a-4204-83d9-e9ae17e15654");
-    Response response1 = re.setResourceAtSpecificID(uuidparam1,prototype1);
+    UUIDParam uuidparam1 = new UUIDParam("c28626d4-493a-4204-83d9-e9ae17e15654");
+    Response response1 = re.setResourceAtSpecificID(uuidparam1, prototype1);
     assertThat(response1.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
 
     ResourcePrototype prototype2 = deserialize("{'resource':{'id':'d1753214-493a-4204-83d9-e9ae17e15654','ref':'Referentie2'}}");
-    UUIDParam uuidparam2=new UUIDParam("d1753214-493a-4204-83d9-e9ae17e15654");
-    Response response2 = re.setResourceAtSpecificID(uuidparam2,prototype2);
+    UUIDParam uuidparam2 = new UUIDParam("d1753214-493a-4204-83d9-e9ae17e15654");
+    Response response2 = re.setResourceAtSpecificID(uuidparam2, prototype2);
     assertThat(response2.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
   }
 

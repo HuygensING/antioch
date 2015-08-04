@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.storage;
+package nl.knaw.huygens.alexandria.service;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -20,9 +20,9 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
-public class StorageTest {
+public class TinkerPopServiceTest {
 
-  Storage storage = new TinkerGraphStorage();
+  TinkerPopService service = new TinkerGraphService();
 
   @Test
   public void testReadAfterCreateIsIdentity() {
@@ -35,10 +35,10 @@ public class StorageTest {
     resource.setCargo("reference");
     // logGraphAsJson();
     Log.info("resource={}", resource);
-    storage.createOrUpdateResource(resource);
+    service.createOrUpdateResource(resource);
     // logGraphAsJson();
     Log.info("after createOrUpdate");
-    AlexandriaResource read = storage.readResource(id).get();
+    AlexandriaResource read = service.readResource(id).get();
     Log.info("after read");
 
     // logGraphAsJson();
@@ -56,34 +56,44 @@ public class StorageTest {
   // }
   // }
 
+  TinkerGraph graph = TinkerGraph.open();
+
+  // class TestStorage extends TinkerPopService {
+  // public TestStorage() {
+  // super(graph);
+  // }
+  // }
+
   // @Test
   public void testDeleteTentativeAnnotationWithUniqueBodyRemovesAnnotationAndBody() {
     // TODO
+    // TinkerPopService s = new TestStorage();
     AlexandriaAnnotation annotation = mock(AlexandriaAnnotation.class);
-    storage.deleteAnnotation(annotation);
+    service.deleteAnnotation(annotation);
   }
 
   // @Test
   public void testDeleteTentativeAnnotationWithSharedBodyRemovesAnnotationAndLeavesBody() {
     // TODO
     AlexandriaAnnotation annotation = mock(AlexandriaAnnotation.class);
-    storage.deleteAnnotation(annotation);
+    service.deleteAnnotation(annotation);
   }
 
   // @Test
   public void testDeleteConfirmedAnnotationSetsStateToDeleted() {
     // TODO
     AlexandriaAnnotation annotation = mock(AlexandriaAnnotation.class);
-    storage.deleteAnnotation(annotation);
+    service.deleteAnnotation(annotation);
   }
 
   @Test
   public void testGraphDrop() throws IOException {
     TinkerGraph graph = TinkerGraph.open();
     Vertex a1 = graph.addVertex("A");
+    a1.property("key", "value");
     Vertex a2 = graph.addVertex("A");
     Vertex b1 = graph.addVertex("B");
-    b1.addEdge("knows", a1, "what", "ever");
+    b1.addEdge("knows", a1, "property1", "value1");
     logGraph(graph);
 
     graph.traversal().V().hasLabel("A").forEachRemaining(Element::remove);

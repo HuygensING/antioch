@@ -65,7 +65,7 @@ public interface AlexandriaService {
   /**
    * If the annotation is TENTATIVE, it will be removed from the database.
    * Otherwise, its status will be set to DELETED
-   * 
+   *
    * @param annotation
    *          The Annotation to delete
    */
