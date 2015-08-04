@@ -6,81 +6,75 @@
 
 <title>Updating External Resources</title>
 
-<body class="container">
+<body data-desc="Updating external resources">
 
-    <h2 class="page-header">Updating external resources</h2>
-
-    <h3>Examples:</h3>
-
-    <div id="put-updates-resource" class="panel panel-default" c:execute="clearStorage()">
-        <div class="panel-heading"><h4><b>How can I update an external resource?</b></h4></div>
-        <div class="panel-body">
-            <h:request>
-                Given that I have <h:success>successfully</h:success>
-                <h:put>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</h:put> the body:
-                <h:jsonBody>{
-                    "resource": {
-                        "id": "c6b96360-c0c9-11e4-b947-6bc57448d166",
-                        "ref": "http://www.example.com/titles/path/to/title/resource"
-                    }
-                }
-                </h:jsonBody>
-            </h:request>
-
-            <h:request>
-                When I <h:put>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</h:put> the body:
-                <h:jsonBody>{
-                    "resource": {
-                        "ref": "http://www.example.com/titles/path/to/UPDATED/title/resource"
-                    }
-                }</h:jsonBody>
-                Then I should receive <h:status>204 No Content</h:status>
-                and the response body is <h:responseBody/>.
-            </h:request>
-
-            <h:request>
-                Thereafter, <h:get>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</h:get> yields
-                response body:
-                <h:jsonResponse>{
-                    "resource": {
-                        "ref": "http://www.example.com/titles/path/to/UPDATED/title/resource"
-                    }
-                }</h:jsonResponse>
-            </h:request>
-        </div>
-    </div>
-
-    <div id="empty-put-does-not-delete" class="panel panel-default" c:execute="clearStorage()">
-        <div class="panel-heading">
-            <h4><b>What happens when I send an empty PUT request to an existing resource?</b>
-            <small>Or in other words: will an empty PUT effectively delete an existing resource?</small></h4>
-        </div>
-
-        <h:request>
-            Given that I have <h:success>successfully</h:success>
-            <h:put>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</h:put> the body:
-            <h:jsonBody>{
-                "resource": {
-                    "id": "c6b96360-c0c9-11e4-b947-6bc57448d166",
-                    "ref": "http://www.example.com/titles/path/to/title/resource"
-                }
+<div id="put-updates-resource" c:execute="clearStorage()" data-desc="How can I update an external resource?">
+    <h:request>
+        Given that I have <h:success>successfully</h:success>
+        <h:put>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</h:put> the body:
+        <h:jsonBody>{
+            "resource": {
+                "id": "c6b96360-c0c9-11e4-b947-6bc57448d166",
+                "ref": "http://www.example.com/titles/path/to/title/resource"
             }
-            </h:jsonBody>
-        </h:request>
+        }
+        </h:jsonBody>
+    </h:request>
 
-        <h:request>
-        When I <h:put>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</h:put> the following body:
-            <!--
-            <h:jsonBody>{
-                "resource": {
-                }
-            }</h:jsonBody>
-            -->
-            <pre class="json" c:execute="body(#TEXT)"> </pre>
-            Then I should receive <h:status>400 Bad Request</h:status> and the response body contains:
-            <h:jsonResponse>[{"message": "may not be null"}]</h:jsonResponse>
-        </h:request>
+    <h:request>
+        When I <h:put>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</h:put> the body:
+        <h:jsonBody>{
+            "resource": {
+                "ref": "http://www.example.com/titles/path/to/UPDATED/title/resource"
+            }
+        }</h:jsonBody>
+        Then I should receive <h:status>204 No Content</h:status>
+        and the response body is <h:responseBody/>.
+    </h:request>
+
+    <h:request>
+        Thereafter, <h:get>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</h:get> yields
+        response body:
+        <h:jsonResponse>{
+            "resource": {
+                "ref": "http://www.example.com/titles/path/to/UPDATED/title/resource"
+            }
+        }</h:jsonResponse>
+    </h:request>
+</div>
+
+<div id="empty-put-does-not-delete" c:execute="clearStorage()"
+     data-desc="What happens when I send an empty PUT to an existing resource?">
+
+    <div class="alert alert-warning well-sm">
+        In other words: will an empty PUT effectively delete an existing resource?
     </div>
+
+    <h:request>
+        Given that I have <h:success>successfully</h:success>
+        <h:put>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</h:put> the body:
+        <h:jsonBody>{
+            "resource": {
+                "id": "c6b96360-c0c9-11e4-b947-6bc57448d166",
+                "ref": "http://www.example.com/titles/path/to/title/resource"
+            }
+        }
+        </h:jsonBody>
+    </h:request>
+
+    <h:request>
+    When I <h:put>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</h:put> the following body:
+        <!--
+        <h:jsonBody>{
+            "resource": {
+            }
+        }</h:jsonBody>
+        -->
+        <pre class="json" c:execute="body(#TEXT)"> </pre>
+        Then I should receive <h:status>400 Bad Request</h:status> and the response body contains:
+        <h:jsonResponse>[{"message": "may not be null"}]</h:jsonResponse>
+    </h:request>
+</div>
 
 </body>
 </html>
