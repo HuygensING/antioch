@@ -9,21 +9,23 @@
 <a class="jxr_linenumber" name="L1" href="#L1">1</a>   <strong class="jxr_keyword">package</strong> nl.knaw.huygens.alexandria.endpoint;
 <a class="jxr_linenumber" name="L2" href="#L2">2</a>   
 <a class="jxr_linenumber" name="L3" href="#L3">3</a>   <strong class="jxr_keyword">import</strong> java.time.Instant;
-<a class="jxr_linenumber" name="L4" href="#L4">4</a>   
-<a class="jxr_linenumber" name="L5" href="#L5">5</a>   <strong class="jxr_keyword">import</strong> nl.knaw.huygens.Log;
-<a class="jxr_linenumber" name="L6" href="#L6">6</a>   
-<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/InstantParam.html">InstantParam</a> <strong class="jxr_keyword">extends</strong> AbstractParam&lt;Instant&gt; {
-<a class="jxr_linenumber" name="L8" href="#L8">8</a>   
-<a class="jxr_linenumber" name="L9" href="#L9">9</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/InstantParam.html">InstantParam</a>(String param) {
-<a class="jxr_linenumber" name="L10" href="#L10">10</a>      <strong class="jxr_keyword">super</strong>(param);
-<a class="jxr_linenumber" name="L11" href="#L11">11</a>    }
-<a class="jxr_linenumber" name="L12" href="#L12">12</a>  
-<a class="jxr_linenumber" name="L13" href="#L13">13</a>    @Override
-<a class="jxr_linenumber" name="L14" href="#L14">14</a>    <strong class="jxr_keyword">protected</strong> Instant parse(String param) <strong class="jxr_keyword">throws</strong> Throwable {
-<a class="jxr_linenumber" name="L15" href="#L15">15</a>      Log.trace(<span class="jxr_string">"Parsing: [{}]"</span>, param);
-<a class="jxr_linenumber" name="L16" href="#L16">16</a>      <strong class="jxr_keyword">return</strong> Instant.parse(param);
-<a class="jxr_linenumber" name="L17" href="#L17">17</a>    }
-<a class="jxr_linenumber" name="L18" href="#L18">18</a>  }
+<a class="jxr_linenumber" name="L4" href="#L4">4</a>   <strong class="jxr_keyword">import</strong> java.time.format.DateTimeFormatter;
+<a class="jxr_linenumber" name="L5" href="#L5">5</a>   
+<a class="jxr_linenumber" name="L6" href="#L6">6</a>   <strong class="jxr_keyword">import</strong> nl.knaw.huygens.Log;
+<a class="jxr_linenumber" name="L7" href="#L7">7</a>   
+<a class="jxr_linenumber" name="L8" href="#L8">8</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/InstantParam.html">InstantParam</a> <strong class="jxr_keyword">extends</strong> AbstractParam&lt;Instant&gt; {
+<a class="jxr_linenumber" name="L9" href="#L9">9</a>   
+<a class="jxr_linenumber" name="L10" href="#L10">10</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/InstantParam.html">InstantParam</a>(String param) {
+<a class="jxr_linenumber" name="L11" href="#L11">11</a>      <strong class="jxr_keyword">super</strong>(param);
+<a class="jxr_linenumber" name="L12" href="#L12">12</a>    }
+<a class="jxr_linenumber" name="L13" href="#L13">13</a>  
+<a class="jxr_linenumber" name="L14" href="#L14">14</a>    @Override
+<a class="jxr_linenumber" name="L15" href="#L15">15</a>    <strong class="jxr_keyword">protected</strong> Instant parse(String param) <strong class="jxr_keyword">throws</strong> Throwable {
+<a class="jxr_linenumber" name="L16" href="#L16">16</a>      Log.trace(<span class="jxr_string">"Parsing: [{}]"</span>, param);
+<a class="jxr_linenumber" name="L17" href="#L17">17</a>  <em class="jxr_comment">//    return Instant.parse(param);</em>
+<a class="jxr_linenumber" name="L18" href="#L18">18</a>      <strong class="jxr_keyword">return</strong> DateTimeFormatter.ISO_DATE_TIME.parse(param, Instant::from);
+<a class="jxr_linenumber" name="L19" href="#L19">19</a>    }
+<a class="jxr_linenumber" name="L20" href="#L20">20</a>  }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2015 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
