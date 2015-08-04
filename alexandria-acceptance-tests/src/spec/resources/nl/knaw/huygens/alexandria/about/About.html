@@ -5,49 +5,40 @@
 
 <title>About the server</title>
 
-<body class="container">
+<body data-desc="About the server">
 
-<h2 class="page-header">About the server</h2>
-
-<div id="about" class="panel panel-default">
-    <div class="panel-heading"><b>How can I get information about the Alexandria server?</b></div>
-    <div class="panel-body">
-        <h:request>
-            When I <h:get>/about</h:get> then I should receive <h:status>200 OK</h:status>
-            and the body contains <h:jsonResponse>{
-            "buildDate": "{date.anyValid}",
-            "commitId": "{git.validCommitId}",
-            "scmBranch": "develop",
-            "startedAt": "{date.beforeNow}",
-            "version": "1.0-SNAPSHOT"
-        }</h:jsonResponse>
-        </h:request>
-    </div>
+<div id="about" data-desc="How can I get information about the Alexandria server?">
+    <h:request>
+        When I <h:get>/about</h:get> then I should receive <h:status>200 OK</h:status>
+        and the body contains <h:jsonResponse>{
+        "buildDate": "{date.anyValid}",
+        "commitId": "{git.validCommitId}",
+        "scmBranch": "develop",
+        "startedAt": "{date.beforeNow}",
+        "version": "1.0-SNAPSHOT"
+    }</h:jsonResponse>
+    </h:request>
 </div>
 
-<h2 class="page-header">Server homepage (apidocs, wadl)</h2>
+<div id="homepage" data-desc="What resources does the server provide besides REST resources?">
+    <h:request>
+        When I <h:get>/</h:get>
+            using <h:setHeader name="Accept">text/html</h:setHeader>
+        then I should receive <h:status>200 OK</h:status>
+    </h:request>
 
-<div id="homepage" class="panel panel-default">
-    <div class="panel-heading">What resources does the server provide besides REST resources?</div>
-    <div class="panel-body">
-        <h:request>
-            When I <h:get>/</h:get>
-                using <h:setHeader name="Accept">text/html</h:setHeader>
-            then I should receive <h:status>200 OK</h:status>
-        </h:request>
+    <h:request>
+        When I <h:get>/application.wadl</h:get>
+            using <h:setHeader name="Accept">application/xml</h:setHeader>
+        then I should receive <h:status>200 OK</h:status>
+    </h:request>
 
-        <h:request>
-            When I <h:get>/application.wadl</h:get>
-                using <h:setHeader name="Accept">application/xml</h:setHeader>
-            then I should receive <h:status>200 OK</h:status>
-        </h:request>
-
-        <h:request>
-            Alexandria has an empty favicon:
-            <h:get>/favicon.ico</h:get> yields <h:status>204 No Content</h:status>
-        </h:request>
-    </div>
+    <h:request>
+        Alexandria has an empty favicon:
+        <h:get>/favicon.ico</h:get> yields <h:status>204 No Content</h:status>
+    </h:request>
 </div>
+
 </body>
 
 </html>
