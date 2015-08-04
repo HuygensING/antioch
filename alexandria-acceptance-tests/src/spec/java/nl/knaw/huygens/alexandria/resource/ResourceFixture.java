@@ -1,11 +1,9 @@
 package nl.knaw.huygens.alexandria.resource;
 
-import nl.knaw.huygens.cat.RestExtension;
-import org.concordion.api.extension.Extensions;
+import nl.knaw.huygens.alexandria.concordion.AlexandriaAcceptanceTest;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.runner.RunWith;
 
 @RunWith(ConcordionRunner.class)
-@Extensions(RestExtension.class)
-public class ResourceFixture {
+public class ResourceFixture extends AlexandriaAcceptanceTest {
 }
