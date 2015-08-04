@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.endpoint;
 
+import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 
 public abstract class AbstractParam<V> {
@@ -11,7 +12,9 @@ public abstract class AbstractParam<V> {
     try {
       this.value = parse(param);
     } catch (Throwable e) {
-      throw new BadRequestException(getErrorMessage(param, e));
+      final String errorMessage = getErrorMessage(param, e);
+      Log.warn("Failed to parse: [{}]: {}", param, errorMessage);
+      throw new BadRequestException(errorMessage);
     }
   }
 
