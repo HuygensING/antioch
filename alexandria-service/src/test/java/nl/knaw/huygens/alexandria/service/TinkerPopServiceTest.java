@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.storage;
+package nl.knaw.huygens.alexandria.service;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -22,7 +22,7 @@ import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
 public class TinkerPopServiceTest {
 
-  TinkerPopService storage = new TinkerGraphService();
+  TinkerPopService service = new TinkerGraphService();
 
   @Test
   public void testReadAfterCreateIsIdentity() {
@@ -35,10 +35,10 @@ public class TinkerPopServiceTest {
     resource.setCargo("reference");
     // logGraphAsJson();
     Log.info("resource={}", resource);
-    storage.createOrUpdateResource(resource);
+    service.createOrUpdateResource(resource);
     // logGraphAsJson();
     Log.info("after createOrUpdate");
-    AlexandriaResource read = storage.readResource(id).get();
+    AlexandriaResource read = service.readResource(id).get();
     Log.info("after read");
 
     // logGraphAsJson();
@@ -58,32 +58,32 @@ public class TinkerPopServiceTest {
 
   TinkerGraph graph = TinkerGraph.open();
 
-  class TestStorage extends TinkerPopService {
-    public TestStorage() {
-      super(graph);
-    }
-  }
+  // class TestStorage extends TinkerPopService {
+  // public TestStorage() {
+  // super(graph);
+  // }
+  // }
 
   // @Test
   public void testDeleteTentativeAnnotationWithUniqueBodyRemovesAnnotationAndBody() {
     // TODO
-    TinkerPopService s = new TestStorage();
+    // TinkerPopService s = new TestStorage();
     AlexandriaAnnotation annotation = mock(AlexandriaAnnotation.class);
-    s.deleteAnnotation(annotation);
+    service.deleteAnnotation(annotation);
   }
 
   // @Test
   public void testDeleteTentativeAnnotationWithSharedBodyRemovesAnnotationAndLeavesBody() {
     // TODO
     AlexandriaAnnotation annotation = mock(AlexandriaAnnotation.class);
-    storage.deleteAnnotation(annotation);
+    service.deleteAnnotation(annotation);
   }
 
   // @Test
   public void testDeleteConfirmedAnnotationSetsStateToDeleted() {
     // TODO
     AlexandriaAnnotation annotation = mock(AlexandriaAnnotation.class);
-    storage.deleteAnnotation(annotation);
+    service.deleteAnnotation(annotation);
   }
 
   @Test

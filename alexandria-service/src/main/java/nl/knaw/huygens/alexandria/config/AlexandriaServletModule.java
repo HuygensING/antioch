@@ -7,8 +7,8 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.alexandria.storage.PersistentTinkerGraphService;
-import nl.knaw.huygens.alexandria.storage.TinkerPopService;
+import nl.knaw.huygens.alexandria.service.PersistentTinkerGraphService;
+import nl.knaw.huygens.alexandria.service.TinkerPopService;
 
 public class AlexandriaServletModule extends ServletModule {
   @Override

@@ -9,19 +9,19 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
-import nl.knaw.huygens.alexandria.storage.TinkerPopService;
+import nl.knaw.huygens.alexandria.service.TinkerPopService;
 
 @Singleton
 @Path("dump")
 public class GraphDbDumpEndpoint extends JSONEndpoint {
   @Inject
-  TinkerPopService storage;
+  TinkerPopService service;
 
   @GET
   @Path("graphson")
   public Response dumpGraphDbAsJSON() {
     StreamingOutput stream = os -> {
-      storage.dumpToGraphSON(os);
+      service.dumpToGraphSON(os);
     };
     return Response.ok(stream).build();
   }
@@ -31,7 +31,7 @@ public class GraphDbDumpEndpoint extends JSONEndpoint {
   @Produces(MediaType.APPLICATION_XML)
   public Response dumpGraphDbAsGraphML() {
     StreamingOutput stream = os -> {
-      storage.dumpToGraphML(os);
+      service.dumpToGraphML(os);
     };
     return Response.ok(stream).build();
   }

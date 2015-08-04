@@ -1,7 +1,6 @@
-package nl.knaw.huygens.alexandria.storage;
+package nl.knaw.huygens.alexandria.service;
 
 import static java.util.stream.Collectors.toSet;
-import static org.apache.tinkerpop.gremlin.process.traversal.P.lt;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,15 +13,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import org.apache.tinkerpop.gremlin.structure.Element;
-import org.apache.tinkerpop.gremlin.structure.Graph;
-import org.apache.tinkerpop.gremlin.structure.Graph.Features;
-import org.apache.tinkerpop.gremlin.structure.Graph.Features.GraphFeatures;
-import org.apache.tinkerpop.gremlin.structure.Transaction;
-import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
-import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
-
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.Accountable;
@@ -33,50 +23,35 @@ import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
-import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
-import peapod.FramedGraph;
-import peapod.FramedGraphTraversal;
-import peapod.annotations.Vertex;
 import scala.NotImplementedError;
 
-public abstract class TinkerPopService implements AlexandriaService {
-  private static final String IDENTIFIER_PROPERTY = "uuid";
+public class TinkerPopService implements AlexandriaService {
   private static final TemporalAmount TIMEOUT = Duration.ofDays(1);
 
-  private Graph graph;
-  private FramedGraph framedGraph;
+  private Storage storage;
 
-  private Transaction tx;
-  private String dumpfile;
-  private boolean supportsTransactions;
-  private boolean supportsPersistence;
-
-  public TinkerPopService(Graph graph) {
-    setGraph(graph);
+  public TinkerPopService(Storage storage) {
+    setStorage(storage);
   }
 
-  // This is for the acceptancetest's benefit, so the tests kan start with a clear graph
-  public void setGraph(Graph graph) {
-    this.graph = graph;
-    this.framedGraph = new FramedGraph(graph, ResourceVF.class.getPackage());
-    GraphFeatures graphFeatures = graph.features().graph();
-    this.supportsPersistence = graphFeatures.supportsPersistence();
-    this.supportsTransactions = graphFeatures.supportsTransactions();
+  public void setStorage(Storage storage) {
+    this.storage = storage;
   }
 
   // - AlexandriaService methods -//
 
   @Override
   public boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
-    startTransaction();
+    storage.startTransaction();
     AlexandriaResource resource;
     boolean newlyCreated;
 
-    if (exists(ResourceVF.class, uuid)) {
+    if (storage.existsVF(ResourceVF.class, uuid)) {
       resource = readResource(uuid).get();
       newlyCreated = false;
 
@@ -87,7 +62,7 @@ public abstract class TinkerPopService implements AlexandriaService {
     resource.setCargo(ref);
     resource.setState(state);
     createOrUpdateResource(resource);
-    commitTransaction();
+    storage.commitTransaction();
     return newlyCreated;
   }
 
@@ -131,29 +106,26 @@ public abstract class TinkerPopService implements AlexandriaService {
 
   @Override
   public Optional<AlexandriaResource> readResource(UUID uuid) {
-    return readResourceVF(uuid).map(this::deframeResource);
+    return storage.readVF(ResourceVF.class, uuid).map(this::deframeResource);
   }
 
   @Override
   public Optional<AlexandriaAnnotation> readAnnotation(UUID uuid) {
-    return readAnnotationVF(uuid).map(this::deframeAnnotation);
+    return storage.readVF(AnnotationVF.class, uuid).map(this::deframeAnnotation);
   }
 
   @Override
   public void removeExpiredTentatives() {
     // Tentative vertices should not have any outgoing or incoming edges!!
     Long threshold = Instant.now().minus(TIMEOUT).getEpochSecond();
-    startTransaction();
-    graph.traversal().V()//
-        .has("state", AlexandriaState.TENTATIVE.name())//
-        .has("stateSince", lt(threshold))//
-        .forEachRemaining(Element::remove);
-    commitTransaction();
+    storage.startTransaction();
+    storage.removeExpiredTentatives(threshold);
+    storage.commitTransaction();
   }
 
   @Override
   public Optional<AlexandriaAnnotationBody> findAnnotationBodyWithTypeAndValue(String type, String value) {
-    List<AnnotationBodyVF> results = framedGraph.V(AnnotationBodyVF.class)//
+    final List<AnnotationBodyVF> results = storage.find(AnnotationBodyVF.class)//
         .has("type", type)//
         .has("value", value)//
         .toList();
@@ -165,7 +137,7 @@ public abstract class TinkerPopService implements AlexandriaService {
 
   @Override
   public Set<AlexandriaResource> readSubResources(UUID uuid) {
-    ResourceVF resourcevf = readResourceVF(uuid)//
+    ResourceVF resourcevf = storage.readVF(ResourceVF.class, uuid)//
         .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
     return resourcevf.getSubResources().stream()//
         .map(this::deframeResource)//
@@ -174,10 +146,10 @@ public abstract class TinkerPopService implements AlexandriaService {
 
   @Override
   public AlexandriaAnnotation deprecateAnnotation(UUID oldAnnotationId, AlexandriaAnnotation tmpAnnotation) {
-    startTransaction();
+    storage.startTransaction();
 
     // check if there's an annotation with the given id
-    AnnotationVF oldAnnotationVF = readAnnotationVF(oldAnnotationId)//
+    AnnotationVF oldAnnotationVF = storage.readVF(AnnotationVF.class, oldAnnotationId)//
         .orElseThrow(annotationNotFound(oldAnnotationId));
     if (oldAnnotationVF.isTentative()) {
       throw incorrectStateException(oldAnnotationId, "tentative");
@@ -212,28 +184,29 @@ public abstract class TinkerPopService implements AlexandriaService {
     newAnnotationVF.setDeprecatedAnnotation(oldAnnotationVF);
 
     AlexandriaAnnotation resultAnnotation = deframeAnnotation(newAnnotationVF);
-    commitTransaction();
+    storage.commitTransaction();
     return resultAnnotation;
   }
 
   @Override
   public void confirmAnnotation(UUID uuid) {
-    startTransaction();
-    AnnotationVF annotationVF = readAnnotationVF(uuid).orElseThrow(annotationNotFound(uuid));
+    storage.startTransaction();
+    AnnotationVF annotationVF = storage.readVF(AnnotationVF.class, uuid)//
+        .orElseThrow(annotationNotFound(uuid));
     updateState(annotationVF, AlexandriaState.CONFIRMED);
     updateState(annotationVF.getBody(), AlexandriaState.CONFIRMED);
     AnnotationVF deprecatedAnnotation = annotationVF.getDeprecatedAnnotation();
     if (deprecatedAnnotation != null && !deprecatedAnnotation.isDeprecated()) {
       updateState(deprecatedAnnotation, AlexandriaState.DEPRECATED);
     }
-    commitTransaction();
+    storage.commitTransaction();
   }
 
   @Override
   public void deleteAnnotation(AlexandriaAnnotation annotation) {
-    startTransaction();
+    storage.startTransaction();
     UUID uuid = annotation.getId();
-    AnnotationVF annotationVF = readAnnotationVF(uuid).get();
+    AnnotationVF annotationVF = storage.readVF(AnnotationVF.class, uuid).get();
     if (annotation.isTentative()) {
       // remove from database
 
@@ -241,8 +214,7 @@ public abstract class TinkerPopService implements AlexandriaService {
       List<AnnotationVF> ofAnnotations = body.getOfAnnotationList();
       if (ofAnnotations.size() == 1) {
         String annotationBodyId = body.getUuid().toString();
-        graph.traversal().V()//
-            .has(IDENTIFIER_PROPERTY, annotationBodyId).next().remove();
+        storage.removeVertexWithId(annotationBodyId);
       }
 
       // remove has_body edge
@@ -253,15 +225,14 @@ public abstract class TinkerPopService implements AlexandriaService {
       annotationVF.setAnnotatedResource(null);
 
       String annotationId = uuid.toString();
-      graph.traversal().V()//
-          .has(IDENTIFIER_PROPERTY, annotationId).next().remove();
+      storage.removeVertexWithId(annotationId);
 
     } else {
       // set state
       updateState(annotationVF, AlexandriaState.DELETED);
     }
 
-    commitTransaction();
+    storage.commitTransaction();
   }
 
   @Override
@@ -279,112 +250,77 @@ public abstract class TinkerPopService implements AlexandriaService {
   // - other public methods -//
 
   public void createSubResource(AlexandriaResource subResource) {
-    startTransaction();
+    storage.startTransaction();
 
     final ResourceVF rvf;
     final UUID uuid = subResource.getId();
-    if (exists(ResourceVF.class, uuid)) {
-      rvf = readResourceVF(uuid).get();
+    if (storage.existsVF(ResourceVF.class, uuid)) {
+      rvf = storage.readVF(ResourceVF.class, uuid).get();
     } else {
-      rvf = framedGraph.addVertex(ResourceVF.class);
+      rvf = storage.createVF(ResourceVF.class);
       rvf.setUuid(uuid.toString());
     }
 
     rvf.setCargo(subResource.getCargo());
     final UUID parentId = UUID.fromString(subResource.getParentResourcePointer().get().getIdentifier());
-    Optional<ResourceVF> parentVF = readResourceVF(parentId);
+    Optional<ResourceVF> parentVF = storage.readVF(ResourceVF.class, parentId);
     rvf.setParentResource(parentVF.get());
 
     setAlexandriaVFProperties(rvf, subResource);
 
-    commitTransaction();
-
-  }
-
-  public boolean supportsTransactions() {
-    return supportsTransactions;
-  }
-
-  public boolean supportsPersistence() {
-    return supportsPersistence;
+    storage.commitTransaction();
   }
 
   public void createOrUpdateAnnotation(AlexandriaAnnotation annotation) {
-    startTransaction();
+    storage.startTransaction();
 
     final AnnotationVF avf;
     final UUID uuid = annotation.getId();
-    if (exists(AnnotationVF.class, uuid)) {
-      avf = readAnnotationVF(uuid).get();
+    if (storage.existsVF(AnnotationVF.class, uuid)) {
+      avf = storage.readVF(AnnotationVF.class, uuid).get();
     } else {
-      avf = framedGraph.addVertex(AnnotationVF.class, uuid);
+      avf = storage.createVF(AnnotationVF.class);
       avf.setUuid(uuid.toString());
     }
 
     setAlexandriaVFProperties(avf, annotation);
 
-    commitTransaction();
+    storage.commitTransaction();
   }
 
   public void annotateResourceWithAnnotation(AlexandriaResource resource, AlexandriaAnnotation newAnnotation) {
-    startTransaction();
+    storage.startTransaction();
 
     AnnotationVF avf = createAnnotationVF(newAnnotation);
 
-    ResourceVF resourceToAnnotate = readResourceVF(resource.getId()).get();
+    ResourceVF resourceToAnnotate = storage.readVF(ResourceVF.class, resource.getId()).get();
     avf.setAnnotatedResource(resourceToAnnotate);
 
-    commitTransaction();
+    storage.commitTransaction();
+  }
+
+  public void storeAnnotationBody(AlexandriaAnnotationBody body) {
+    storage.startTransaction();
+    frameAnnotationBody(body);
+    storage.commitTransaction();
   }
 
   public void annotateAnnotationWithAnnotation(AlexandriaAnnotation annotation, AlexandriaAnnotation newAnnotation) {
-    startTransaction();
+    storage.startTransaction();
 
     AnnotationVF avf = createAnnotationVF(newAnnotation);
     UUID id = annotation.getId();
     annotate(avf, id);
 
-    commitTransaction();
-  }
-
-  public void storeAnnotationBody(AlexandriaAnnotationBody body) {
-    startTransaction();
-    frameAnnotationBody(body);
-    commitTransaction();
+    storage.commitTransaction();
   }
 
   public void dumpToGraphSON(OutputStream os) throws IOException {
-    graph.io(new GraphSONIo.Builder()).writer().create().writeGraph(os, graph);
+    storage.dumpToGraphSON(os);
   }
 
   public void dumpToGraphML(OutputStream os) throws IOException {
-    graph.io(new GraphMLIo.Builder()).writer().create().writeGraph(os, graph);
-  }
-
-  public void loadFromDisk(String file) {
-    try {
-      graph.io(new GraphMLIo.Builder()).readGraph(file);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  public void saveToDisk(String file) {
-    if (file != null) {
-      try {
-        graph.io(new GraphMLIo.Builder()).writeGraph(file);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
-  }
-
-  public String getDumpFile() {
-    return dumpfile;
-  }
-
-  public void setDumpFile(String dumpfile) {
-    this.dumpfile = dumpfile;
+    storage.dumpToGraphML(os);
   }
 
   // - package methods -//
@@ -392,10 +328,10 @@ public abstract class TinkerPopService implements AlexandriaService {
   void createOrUpdateResource(AlexandriaResource resource) {
     final ResourceVF rvf;
     final UUID uuid = resource.getId();
-    if (exists(ResourceVF.class, uuid)) {
-      rvf = readResourceVF(uuid).get();
+    if (storage.existsVF(ResourceVF.class, uuid)) {
+      rvf = storage.readVF(ResourceVF.class, uuid).get();
     } else {
-      rvf = framedGraph.addVertex(ResourceVF.class);
+      rvf = storage.createVF(ResourceVF.class);
       rvf.setUuid(uuid.toString());
     }
 
@@ -409,6 +345,16 @@ public abstract class TinkerPopService implements AlexandriaService {
   private AlexandriaAnnotation createAnnotation(AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
     UUID id = UUID.randomUUID();
     return new AlexandriaAnnotation(id, annotationbody, provenance);
+  }
+
+  AnnotationVF createAnnotationVF(AlexandriaAnnotation newAnnotation) {
+    AnnotationVF avf = storage.createVF(AnnotationVF.class);
+    setAlexandriaVFProperties(avf, newAnnotation);
+
+    UUID bodyId = newAnnotation.getBody().getId();
+    AnnotationBodyVF bodyVF = storage.readVF(AnnotationBodyVF.class, bodyId).get();
+    avf.setBody(bodyVF);
+    return avf;
   }
 
   private AlexandriaResource deframeResource(ResourceVF rvf) {
@@ -453,7 +399,7 @@ public abstract class TinkerPopService implements AlexandriaService {
   }
 
   private AnnotationBodyVF frameAnnotationBody(AlexandriaAnnotationBody body) {
-    AnnotationBodyVF abvf = framedGraph.addVertex(AnnotationBodyVF.class);
+    AnnotationBodyVF abvf = storage.createVF(AnnotationBodyVF.class);
     setAlexandriaVFProperties(abvf, body);
     abvf.setType(body.getType());
     abvf.setValue(body.getValue());
@@ -471,19 +417,6 @@ public abstract class TinkerPopService implements AlexandriaService {
     return new TentativeAlexandriaProvenance(avf.getProvenanceWho(), Instant.parse(provenanceWhen), avf.getProvenanceWhy());
   }
 
-  private AnnotationVF createAnnotationVF(AlexandriaAnnotation newAnnotation) {
-    AnnotationVF avf = framedGraph.addVertex(AnnotationVF.class);
-    setAlexandriaVFProperties(avf, newAnnotation);
-
-    String bodyId = newAnnotation.getBody().getId().toString();
-    List<AnnotationBodyVF> results = framedGraph.V(AnnotationBodyVF.class).has(IDENTIFIER_PROPERTY, bodyId).toList();
-
-    AnnotationBodyVF bodyVF = results.get(0);
-
-    avf.setBody(bodyVF);
-    return avf;
-  }
-
   private void setAlexandriaVFProperties(AlexandriaVF vf, Accountable accountable) {
     vf.setUuid(accountable.getId().toString());
 
@@ -498,41 +431,6 @@ public abstract class TinkerPopService implements AlexandriaService {
 
   // framedGraph methods
 
-  private Optional<ResourceVF> readResourceVF(UUID uuid) {
-    return firstOrEmpty(framedGraph.V(ResourceVF.class).has(IDENTIFIER_PROPERTY, uuid.toString()).toList());
-  }
-
-  private Optional<AnnotationVF> readAnnotationVF(UUID uuid) {
-    return firstOrEmpty(framedGraph.V(AnnotationVF.class).has(IDENTIFIER_PROPERTY, uuid.toString()).toList());
-  }
-
-  private <T> Optional<T> firstOrEmpty(List<T> results) {
-    return results.isEmpty() ? Optional.empty() : Optional.ofNullable(results.get(0));
-  }
-
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  private boolean exists(Class clazz, UUID uuid) {
-    if (clazz.getAnnotationsByType(Vertex.class).length == 0) {
-      throw new RuntimeException("Class " + clazz + " has no peapod @Vertex annotation, are you sure it is the correct class?");
-    }
-    FramedGraphTraversal fgt = framedGraph.V(clazz).has(IDENTIFIER_PROPERTY, uuid.toString());
-    return fgt.tryNext().isPresent();
-  }
-
-  private UUID getUUID(AlexandriaVF vf) {
-    return UUID.fromString(vf.getUuid());
-  }
-
-  private void updateState(AlexandriaVF vf, AlexandriaState newState) {
-    vf.setState(newState.name());
-    vf.setStateSince(Instant.now().getEpochSecond());
-  }
-
-  private void annotate(AnnotationVF avf, UUID id) {
-    AnnotationVF annotationToAnnotate = readAnnotationVF(id).get();
-    avf.setAnnotatedAnnotation(annotationToAnnotate);
-  }
-
   private Supplier<NotFoundException> annotationNotFound(UUID oldAnnotationId) {
     return () -> new NotFoundException("no annotation found with uuid " + oldAnnotationId);
   }
@@ -541,36 +439,18 @@ public abstract class TinkerPopService implements AlexandriaService {
     return new BadRequestException("annotation " + oldAnnotationId + " is " + string);
   }
 
-  private GraphFeatures graphFeatures() {
-    return features().graph();
+  private UUID getUUID(AlexandriaVF vf) {
+    return UUID.fromString(vf.getUuid());
   }
 
-  private Features features() {
-    return graph.features();
+  void updateState(AlexandriaVF vf, AlexandriaState newState) {
+    vf.setState(newState.name());
+    vf.setStateSince(Instant.now().getEpochSecond());
   }
 
-  private void startTransaction() {
-    if (supportsTransactions()) {
-      tx = framedGraph.tx();
-    }
+  void annotate(AnnotationVF avf, UUID id) {
+    AnnotationVF annotationToAnnotate = storage.readVF(AnnotationVF.class, id).get();
+    avf.setAnnotatedAnnotation(annotationToAnnotate);
   }
 
-  private void commitTransaction() {
-    if (supportsTransactions()) {
-      tx.commit();
-      tx.close();
-    }
-    if (!supportsPersistence()) {
-      saveToDisk(getDumpFile());
-    }
-  }
-
-  private void rollbackTransaction() {
-    if (supportsTransactions()) {
-      tx.rollback();
-      tx.close();
-    } else {
-      Log.error("rollback called, but transactions are not supported by graph {}", graph);
-    }
-  }
 }

@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.storage;
+package nl.knaw.huygens.alexandria.service;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -17,10 +17,10 @@ public class PersistentTinkerGraphService extends TinkerGraphService {
   public PersistentTinkerGraphService(AlexandriaConfiguration config) {
     super();
     String dumpfile = config.getStorageDirectory() + "/" + DUMPFILE;
-    setDumpFile(dumpfile);
-    if (!supportsPersistence() && Files.exists(Paths.get(dumpfile))) {
+    STORAGE.setDumpFile(dumpfile);
+    if (!STORAGE.supportsPersistence() && Files.exists(Paths.get(dumpfile))) {
       Log.info("reading stored db from {}", dumpfile);
-      loadFromDisk(dumpfile);
+      STORAGE.loadFromDisk(dumpfile);
     }
   }
 }

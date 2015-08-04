@@ -2,6 +2,7 @@ package nl.knaw.huygens.alexandria.storage;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -19,9 +20,12 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
+import nl.knaw.huygens.alexandria.service.TinkerPopService;
+import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 
 public class TinkerpopAlexandriaServiceTest {
-  private final TinkerPopService service = new TinkerGraphService();
+  private Storage mockStorage = mock(Storage.class);
+  private final TinkerPopService service = new TinkerPopService(mockStorage);
 
   // @Test
   public void test() {
@@ -41,7 +45,9 @@ public class TinkerpopAlexandriaServiceTest {
     UUID id = UUID.randomUUID();
     AlexandriaAnnotationBody body = mock(AlexandriaAnnotationBody.class);
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
-    // when(mockStorage.readAnnotation(id)).thenReturn(Optional.of(new AlexandriaAnnotation(id, body, provenance)));
+    AnnotationVF annotationVF = mock(AnnotationVF.class);
+    when(annotationVF.getUuid()).thenReturn(id.toString());
+    when(mockStorage.readVF(AnnotationVF.class, id)).thenReturn(Optional.of(annotationVF));
     AccountablePointer<AlexandriaAnnotation> ap = new AccountablePointer<>(AlexandriaAnnotation.class, id.toString());
 
     Optional<? extends Accountable> optional = service.dereference(ap);
@@ -53,7 +59,7 @@ public class TinkerpopAlexandriaServiceTest {
   @Test
   public void testDereferenceWithNonExistingAnnotation() {
     UUID id = UUID.randomUUID();
-    // when(mockStorage.readAnnotation(id)).thenReturn(Optional.empty());
+    when(mockStorage.readVF(AnnotationVF.class, id)).thenReturn(Optional.empty());
     AccountablePointer<AlexandriaAnnotation> ap = new AccountablePointer<>(AlexandriaAnnotation.class, id.toString());
 
     Optional<? extends Accountable> optional = service.dereference(ap);

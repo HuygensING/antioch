@@ -27,8 +27,9 @@ import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.alexandria.storage.TinkerGraphService;
-import nl.knaw.huygens.alexandria.storage.TinkerPopService;
+import nl.knaw.huygens.alexandria.service.TinkerGraphService;
+import nl.knaw.huygens.alexandria.service.TinkerPopService;
+import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.util.UUIDParser;
 import nl.knaw.huygens.cat.RestExtension;
 import nl.knaw.huygens.cat.RestFixture;
@@ -36,7 +37,9 @@ import nl.knaw.huygens.cat.RestFixture;
 public class AlexandriaAcceptanceTest extends RestFixture {
   private static final AlexandriaConfiguration CONFIG = testConfiguration();
 
-  private static TinkerPopService service = new TinkerGraphService();
+  private static Storage storage = tinkerGraphStorage();
+
+  private static TinkerPopService service = new TinkerPopService(storage);
 
   @Extension
   @SuppressWarnings("unused")
@@ -47,6 +50,10 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     Log.debug("Setting up AlexandriaAcceptanceTest");
     setupRestFixture(alexandriaModule());
     register(JsonConfiguration.class);
+  }
+
+  private static Storage tinkerGraphStorage() {
+    return new Storage(TinkerGraph.open());
   }
 
   private static AlexandriaConfiguration testConfiguration() {
@@ -96,7 +103,7 @@ public class AlexandriaAcceptanceTest extends RestFixture {
 
   public void clearStorage() {
     Log.debug("Clearing Storage");
-    service.setGraph(TinkerGraph.open());
+    service.setStorage(tinkerGraphStorage());
   }
 
   protected AlexandriaService service() {
