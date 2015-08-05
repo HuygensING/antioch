@@ -4,6 +4,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -17,10 +18,13 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+import nl.knaw.huygens.alexandria.endpoint.StatePrototype;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
+import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.exception.TentativeObjectException;
@@ -37,9 +41,9 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   private final AnnotationDeprecationRequestBuilder requestBuilder;
 
   @Inject
-  public AnnotationsEndpoint(AlexandriaService service,                  //
-      AnnotationEntityBuilder entityBuilder,                  //
-      AnnotationDeprecationRequestBuilder requestBuilder,                  //
+  public AnnotationsEndpoint(AlexandriaService service,                      //
+      AnnotationEntityBuilder entityBuilder,                      //
+      AnnotationDeprecationRequestBuilder requestBuilder,                      //
       LocationBuilder locationBuilder) {
     this.service = service;
     this.entityBuilder = entityBuilder;
@@ -56,15 +60,15 @@ public class AnnotationsEndpoint extends JSONEndpoint {
     return Response.ok(entityBuilder.build(annotation)).build();
   }
 
-  @PUT
-  @Path("{uuid}")
-  @Consumes(MediaType.APPLICATION_JSON)
-  @ApiOperation(value = "confirm the annotation")
-  public Response confirmAnnotation(@PathParam("uuid") UUIDParam uuidParam, AnnotationPrototype protoType) {
-    protoType.setState(AlexandriaState.CONFIRMED);
-    service.confirmAnnotation(uuidParam.getValue());
-    return Response.noContent().build();
-  }
+  // @PUT
+  // @Path("{uuid}")
+  // @Consumes(MediaType.APPLICATION_JSON)
+  // @ApiOperation(value = "confirm the annotation")
+  // public Response confirmAnnotation(@PathParam("uuid") UUIDParam uuidParam, AnnotationPrototype protoType) {
+  // protoType.setState(AlexandriaState.CONFIRMED);
+  // service.confirmAnnotation(uuidParam.getValue());
+  // return Response.noContent().build();
+  // }
 
   @POST
   @Path("{uuid}/deprecation")
@@ -91,6 +95,25 @@ public class AnnotationsEndpoint extends JSONEndpoint {
     service.deleteAnnotation(annotation);
 
     return Response.noContent().build();
+  }
+
+  @PUT
+  @Path("{uuid}/state")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @ApiOperation(value = "update the state of the annotation (only state=CONFIRMED accepted for now)")
+  public Response setAnnotationState(@PathParam("uuid") final UUIDParam uuidParam, @NotNull StatePrototype protoType) {
+    Log.trace("protoType=[{}]", protoType);
+    UUID id = uuidParam.getValue();
+    AlexandriaAnnotation annotation = service.readAnnotation(id)//
+        .orElseThrow(annotationNotFoundForId(uuidParam));
+    if (protoType.isConfirmed()) {
+      if (!annotation.isActive()) {
+        throw new ConflictException(annotation.getState() + " annotations cannot be set to CONFIRMED");
+      }
+      service.confirmAnnotation(id);
+      return Response.ok().build();
+    }
+    throw new BadRequestException("for now, you can only set the state to CONFIRMED");
   }
 
   // Sub-resource delegation

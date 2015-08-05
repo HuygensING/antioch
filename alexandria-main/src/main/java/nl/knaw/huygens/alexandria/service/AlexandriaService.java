@@ -62,7 +62,9 @@ public interface AlexandriaService {
    */
   AlexandriaAnnotation deprecateAnnotation(UUID oldAnnotationId, AlexandriaAnnotation newAnnotation);
 
-  void confirmAnnotation(UUID value);
+  void confirmResource(UUID id);
+
+  void confirmAnnotation(UUID id);
 
   /**
    * If the annotation is TENTATIVE, it will be removed from the database.

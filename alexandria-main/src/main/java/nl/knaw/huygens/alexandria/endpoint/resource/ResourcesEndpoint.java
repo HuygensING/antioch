@@ -25,7 +25,10 @@ import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+import nl.knaw.huygens.alexandria.endpoint.StatePrototype;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
+import nl.knaw.huygens.alexandria.exception.BadRequestException;
+import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.exception.TentativeObjectException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
@@ -43,9 +46,9 @@ public class ResourcesEndpoint extends JSONEndpoint {
   private final LocationBuilder locationBuilder;
 
   @Inject
-  public ResourcesEndpoint(AlexandriaService service, //
-      ResourceCreationRequestBuilder requestBuilder, //
-      LocationBuilder locationBuilder, //
+  public ResourcesEndpoint(AlexandriaService service,                      //
+      ResourceCreationRequestBuilder requestBuilder,                      //
+      LocationBuilder locationBuilder,                      //
       ResourceEntityBuilder entityBuilder) {
     this.locationBuilder = locationBuilder;
     this.alexandriaService = service;
@@ -57,9 +60,8 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @GET
   @Path("{uuid}")
   @ApiOperation(value = "Get the resource with the given uuid", response = ResourceEntity.class)
-  public Response getResourceByID(@PathParam("uuid") final UUIDParam uuid) {
-    AlexandriaResource resource = alexandriaService.readResource(uuid.getValue())//
-        .orElseThrow(resourceNotFoundForId(uuid));
+  public Response getResourceByID(@PathParam("uuid") final UUIDParam uuidParam) {
+    AlexandriaResource resource = readExistingResource(uuidParam.getValue());
     return Response.ok(entityBuilder.build(resource)).build();
   }
 
@@ -82,9 +84,42 @@ public class ResourcesEndpoint extends JSONEndpoint {
   }
 
   @PUT
+  @Path("{uuid}/state")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @ApiOperation(value = "update the state of the resource (only state=CONFIRMED accepted for now)")
+  public Response setResourceState(@PathParam("uuid") final UUIDParam uuidParam, @NotNull StatePrototype protoType) {
+    Log.trace("protoType=[{}]", protoType);
+    UUID id = uuidParam.getValue();
+    AlexandriaResource resource = readExistingResource(id);
+    if (protoType.isConfirmed()) {
+      if (!resource.isActive()) {
+        throw new ConflictException(resource.getState() + " resources cannot be set to CONFIRMED");
+      }
+      alexandriaService.confirmResource(id);
+      return Response.ok().build();
+    }
+    throw new BadRequestException("for now, you can only set the state to CONFIRMED");
+  }
+
+  @DELETE
+  @Path("{uuid}")
+  public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
+    return methodNotImplemented();
+  }
+
+  // TODO: replace with sub-resource analogous to {uuid}/annotations (see below)
+  @GET
+  @Path("{uuid}/ref")
+  @ApiOperation(value = "Get just the ref of the resource with the given uuid", response = RefEntity.class)
+  public Response getResourceRef(@PathParam("uuid") final UUIDParam uuidParam) {
+    AlexandriaResource resource = readExistingResource(uuidParam.getValue());
+    return Response.ok(new RefEntity(resource.getCargo())).build();
+  }
+
+  @PUT
   @Path("{uuid}")
   @Consumes(MediaType.APPLICATION_JSON)
-  @ApiOperation(value = "update/confirm/create the resource with the given uuid")
+  @ApiOperation(value = "update/create the resource with the given uuid")
   public Response setResourceAtSpecificID(@PathParam("uuid") final UUIDParam uuid, @NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
 
@@ -102,22 +137,6 @@ public class ResourcesEndpoint extends JSONEndpoint {
     }
 
     return Response.ok().build();
-  }
-
-  @DELETE
-  @Path("{uuid}")
-  public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
-    return methodNotImplemented();
-  }
-
-  // TODO: replace with sub-resource analogous to {uuid}/annotations (see below)
-  @GET
-  @Path("{uuid}/ref")
-  @ApiOperation(value = "Get just the ref of the resource with the given uuid", response = RefEntity.class)
-  public Response getResourceRef(@PathParam("uuid") final UUIDParam uuidParam) {
-    AlexandriaResource resource = alexandriaService.readResource(uuidParam.getValue())//
-        .orElseThrow(resourceNotFoundForId(uuidParam));
-    return Response.ok(new RefEntity(resource.getCargo())).build();
   }
 
   // Sub-resource delegation
@@ -139,7 +158,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
     return new ResourceProvenanceEndpoint(alexandriaService, uuidParam, locationBuilder);
   }
 
-  public static Supplier<NotFoundException> resourceNotFoundForId(Object id) {
+  public static Supplier<NotFoundException> resourceNotFoundForId(UUID id) {
     return () -> new NotFoundException("No resource found with id " + id);
   }
 
@@ -147,4 +166,8 @@ public class ResourcesEndpoint extends JSONEndpoint {
     return new TentativeObjectException("resource " + uuid + " is tentative, please confirm first");
   };
 
+  private AlexandriaResource readExistingResource(UUID id) {
+    return alexandriaService.readResource(id)//
+        .orElseThrow(resourceNotFoundForId(id));
+  }
 }

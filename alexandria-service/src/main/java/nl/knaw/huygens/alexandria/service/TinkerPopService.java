@@ -191,6 +191,15 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
+  public void confirmResource(UUID uuid) {
+    storage.startTransaction();
+    ResourceVF resourceVF = storage.readVF(ResourceVF.class, uuid)//
+        .orElseThrow(resourceNotFound(uuid));
+    updateState(resourceVF, AlexandriaState.CONFIRMED);
+    storage.commitTransaction();
+  }
+
+  @Override
   public void confirmAnnotation(UUID uuid) {
     storage.startTransaction();
     AnnotationVF annotationVF = storage.readVF(AnnotationVF.class, uuid)//
@@ -441,8 +450,12 @@ public class TinkerPopService implements AlexandriaService {
 
   // framedGraph methods
 
-  private Supplier<NotFoundException> annotationNotFound(UUID oldAnnotationId) {
-    return () -> new NotFoundException("no annotation found with uuid " + oldAnnotationId);
+  private Supplier<NotFoundException> annotationNotFound(UUID id) {
+    return () -> new NotFoundException("no annotation found with uuid " + id);
+  }
+
+  private Supplier<NotFoundException> resourceNotFound(UUID id) {
+    return () -> new NotFoundException("no resource found with uuid " + id);
   }
 
   private BadRequestException incorrectStateException(UUID oldAnnotationId, String string) {
