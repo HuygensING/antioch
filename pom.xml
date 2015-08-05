@@ -60,7 +60,7 @@
     <reflections.version>0.9.10</reflections.version>
     <servlet-api.version>3.1.0</servlet-api.version>
     <swagger-maven-plugin.version>3.1.0</swagger-maven-plugin.version>
-    <swagger.version>1.5.1</swagger.version>
+    <swagger.version>1.5.2</swagger.version>
     <tinkerpop.groupId>org.apache.tinkerpop</tinkerpop.groupId>
     <tinkerpop.version>3.0.0.M9-incubating</tinkerpop.version>
     <tomcat7-maven.version>2.2</tomcat7-maven.version>
