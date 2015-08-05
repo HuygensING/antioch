@@ -1,40 +1,191 @@
-<html xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
       xmlns:xsi="http://www.w3.org/1999/xhtml"
       xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
                           http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
 
-<title>About the server</title>
+<title>Creating tags for Nederlab</title>
 
 <body data-desc="Create tag">
 
 <div id="create-tag" data-desc="How can I create a tag?">
-    <h:request>
-        Send
-        <h:put>/resources/e480f748-3a9d-11e5-abc7-339c977c9f7e</h:put>
-        the following body:
-        <h:jsonBody>{
-            "resource": {
-            "id": "e480f748-3a9d-11e5-abc7-339c977c9f7e",
-            "ref": "http://www.example.com/titles/path/to/title/resource",
-            "provenance": {
-            "who": "hennie.brugman@meertens.knaw.nl",
-            "why": "initial registration",
-            "when": "2015-08-04T13:46:39+02:00"
-            } } }
-        </h:jsonBody>
-        then I should receive:
-        <h:status>201 Created</h:status>
-    </h:request>
+    <ol>
+        <li>
+            Register the resource at Alexandria, if this is the first use of the resource.
+            <h:request>
+                We
+                <h:put>/resources/e480f748-3a9d-11e5-abc7-339c977c9f7e</h:put>
+                the following body
+                <h:jsonBody>{
+                    "resource": {
+                    "ref": "http://www.example.com/titles/path/to/title/resource",
+                    "provenance": {
+                    "who": "nederlab",
+                    "why": "initial registration",
+                    "when": "2015-08-04T13:46:39+02:00"
+                    } } }
+                </h:jsonBody>
+                and observe status:
+                <h:status>201 Created</h:status>
+            </h:request>
+        </li>
+
+        <li>
+            Register and confirm the subresource at Alexandria, if this is the first use.
+            <ul>
+                <li>
+                    To register, we
+                    <h:request>
+                        <h:post>/resources/e480f748-3a9d-11e5-abc7-339c977c9f7e/subresources</h:post>
+                        the following body
+                        <h:jsonBody>{ "subresource": { "sub": "/some/folia/expression/marker" } }</h:jsonBody>
+                        and observe status:
+                        <h:status>201 Created</h:status>
+                        and a location header starting with
+                        <h:location type="base">https://{host}/resources/</h:location>
+                        and ending in the
+                        <h:location type="uuid">well-formed UUID</h:location>
+                        of the newly created subresource.
+                    </h:request>
+                </li>
+                <div c:execute="#uuid = uuid()">In this case the generated uuid happened to be:
+                    <strong c:echo="#uuid"></strong>.
+                </div>
+                <li>
+                    To confirm, we
+                    <h:request>
+                        <h:put>/resources/$uuid/state</h:put>
+                        the following body
+                        <h:jsonBody>{"state": "CONFIRMED"}</h:jsonBody>
+                        and observe status:
+                        <h:status>200 OK</h:status>
+                    </h:request>
+                </li>
+            </ul>
+        </li>
+
+        <li>
+            Register and confirm the annotation at the (confirmed) subresource.
+            <ul>
+                <li>
+                    To register, we
+                    <h:request>
+                        <h:post>/resources/$uuid/annotations</h:post>
+                        the following body:
+                        <h:jsonBody>{ "annotation": { "type": "emotion", "value": "happy" } }</h:jsonBody>
+                        and observe status:
+                        <h:status>201 Created</h:status>
+                    </h:request>
+                </li>
+                <div c:execute="#anno = uuid()">In this case we got uuid <strong c:echo="#anno"></strong> as the uuid
+                    for the annotation we just created.
+                </div>
+                <li>
+                    <h:request>
+                        <strong>(optional)</strong>
+                        As an intermediate verification step, we can
+                        <h:get>/annotations/$anno</h:get>
+                        and observe status:
+                        <h:status>200 OK</h:status>
+                        and body:
+                        <h:jsonResponse> {
+                            "annotation" : {
+                            "value" : "happy",
+                            "type" : "emotion",
+                            "id" : "$anno",
+                            "state" : {
+                            "value" : "TENTATIVE",
+                            "since" : "{date.beforeNow}"
+                            },
+                            "^annotates" : "https://{host}/resources/$uuid",
+                            "^annotations" : [ ]
+                            } }
+                        </h:jsonResponse>
+                    </h:request>
+                </li>
+                <li>
+                    To confirm, we
+                    <h:request>
+                        <h:put>/annotations/$anno/state</h:put>
+                        the following body
+                        <h:jsonBody>{"state": "CONFIRMED"}</h:jsonBody>
+                        and observe status:
+                        <h:status>200 OK</h:status>
+                    </h:request>
+                </li>
+                <li>
+                    <h:request>
+                        <strong>(optional)</strong>
+                        As a final verification, we can
+                        <h:get>/annotations/$anno</h:get>
+                        and observe status:
+                        <h:status>200 OK</h:status>
+                        and body:
+                        <h:jsonResponse> {
+                            "annotation" : {
+                            "value" : "happy",
+                            "type" : "emotion",
+                            "id" : "$anno",
+                            "state" : {
+                            "value" : "CONFIRMED",
+                            "since" : "{date.beforeNow}"
+                            },
+                            "^annotates" : "https://{host}/resources/$uuid",
+                            "^annotations" : [ ]
+                            } }
+                        </h:jsonResponse>
+                    </h:request>
+                </li>
+            </ul>
+        </li>
+    </ol>
+</div>
+
+<div id="use-before-confirm" c:execute="clearStorage()"
+     data-desc="Why do I get a 409 Conflict when using a newly created subresource?">
+
+    <div class="alert alert-warning sm">
+        The <a href="http://www.atomikos.com/Publications/TryCancelConfirm">try-confirm-cancel</a>
+        pattern dictates we first confirm any newly created resources before using them.
+
+        <p><i>Failure to follow this pattern leads to grief when operating on the resource!</i></p>
+    </div>
+
+    <h4>Example: adding an annotation to an unconfirmed resource</h4>
+
+    <ul>
+        <li>
+            <div c:execute="resourceExists(#uuid)">Given that a resource with id
+                <span c:set="#uuid">6244b9d8-3b5e-11e5-aca2-5befb33d5e4d</span> exists and
+            </div>
+        </li>
+        <li>
+            <h:request>
+                a subresource is
+                <h:success>successfully</h:success>
+                registered via
+                <h:post>/resources/$uuid/subresources</h:post>
+                with body:
+                <h:jsonBody>{"subresource":{"sub":"/some/folia/path"}}</h:jsonBody>
+            </h:request>
+            <div c:execute="#uuid = uuid()">in this case yielding uuid <span c:echo="#uuid"></span>.</div>
+        </li>
+    </ul>
 
     <h:request>
-        Send
-        <h:post>/resources/e480f748-3a9d-11e5-abc7-339c977c9f7e/subresources</h:post>
-        the following body:
-        <h:jsonBody>{
-            "subresource": {
-                "sub": "/some/folia/expression/marker"
-            } }
-        </h:jsonBody>
+        <ul>
+            <li>When I
+                <h:post>/resources/$uuid/annotations</h:post>
+                an example annotation body:
+                <h:jsonBody>{"annotation": {"type": "t", "value": "v"}}</h:jsonBody>
+            </li>
+            <li>Then I will get status
+                <h:status>409 Conflict</h:status>
+                and a response body containing:
+                <h:jsonResponse>{"error":{"message": "resource $uuid is tentative, please confirm first"}}
+                </h:jsonResponse>
+            </li>
+        </ul>
     </h:request>
 </div>
 
