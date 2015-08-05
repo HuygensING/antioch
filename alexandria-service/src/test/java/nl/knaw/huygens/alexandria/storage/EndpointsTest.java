@@ -71,7 +71,7 @@ public class EndpointsTest extends TinkergraphServiceEndpointTest {
   }
 
   @Test
-  public void testPostResourceAnnotationSetsStateToTentativeAndPutAnnotationSetsStateToConfirmed() {
+  public void testPostResourceAnnotationSetsStateToTentativeAndPutConfirmedToState() {
     Response response = target(ROOTPATH).request().post(jsonEntity("{'resource':{'ref':'REF'}}"));
     Log.debug("response={}", response);
     assertThat(response.getLocation().toString()).contains("/resources/");
@@ -82,8 +82,8 @@ public class EndpointsTest extends TinkergraphServiceEndpointTest {
     AlexandriaResource resource = getService().readResource(id).get();
     assertThat(resource.getState()).isEqualTo(AlexandriaState.TENTATIVE);
 
-    response = target(ROOTPATH).path(id.toString()).request().put(jsonEntity("{'resource':{'id':'" + id + "','ref':'REF'}}"));
-    assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
+    response = target(ROOTPATH).path(id.toString()).path("state").request().put(jsonEntity("{'state':'CONFIRMED'}"));
+    assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
     resource = getService().readResource(id).get();
     assertThat(resource.getState()).isEqualTo(AlexandriaState.CONFIRMED);
@@ -96,11 +96,11 @@ public class EndpointsTest extends TinkergraphServiceEndpointTest {
     AlexandriaAnnotation annotation = getService().readAnnotation(annotationId).get();
     assertThat(annotation.getState()).isEqualTo(AlexandriaState.TENTATIVE);
 
-    response = target("annotations").path(annotationId.toString()).request().put(jsonEntity("{'annotation':{'id':'" + id + "','value':'bladiebla'}}"));
-    assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
+    response = target("annotations").path(annotationId.toString()).path("state").request().put(jsonEntity("{'state':'CONFIRMED'}"));
+    assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
     annotation = getService().readAnnotation(annotationId).get();
-    // assertThat(annotation.getState()).isEqualTo(AlexandriaState.CONFIRMED);
+    assertThat(annotation.getState()).isEqualTo(AlexandriaState.CONFIRMED);
   }
 
   private UUID extractId(Response response) {
