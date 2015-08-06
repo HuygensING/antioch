@@ -34,4 +34,5 @@ public class SearchResultTest {
     assertThat(sr.getTotalResultPages()).isEqualTo(2);
     assertThat(sr.getFirstResultPage()).hasToString(config.getBaseURI() + "search/" + id + "/resultpages/1");
   }
+
 }

@@ -34,11 +34,14 @@ import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
+import nl.knaw.huygens.alexandria.query.AlexandriaQueryParser;
+import nl.knaw.huygens.alexandria.query.ParsedAlexandriaQuery;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
+import peapod.FramedGraphTraversal;
 import scala.NotImplementedError;
 
 public class TinkerPopService implements AlexandriaService {
@@ -275,12 +278,23 @@ public class TinkerPopService implements AlexandriaService {
     SearchResult searchResult = new SearchResult(locationBuilder);
     searchResult.setId(UUID.randomUUID());
     searchResult.setQuery(query);
-    List<Map<String, Object>> results = dummyResults();
+    List<Map<String, Object>> results = processQuery(query);
     searchResult.setResults(results);
     return searchResult;
   }
 
   // - other public methods -//
+
+  private List<Map<String, Object>> processQuery(AlexandriaQuery query) {
+    List<Map<String, Object>> results = dummyResults();
+
+    ParsedAlexandriaQuery pQuery = AlexandriaQueryParser.parse(query);
+
+    FramedGraphTraversal<Object, ? extends AlexandriaVF> fgt;
+    fgt = storage.find(pQuery.getVFClass());
+
+    return results;
+  }
 
   public void createSubResource(AlexandriaResource subResource) {
     storage.startTransaction();
