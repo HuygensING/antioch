@@ -4,15 +4,24 @@ import static java.util.stream.Collectors.toSet;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import javax.inject.Inject;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
@@ -36,6 +45,9 @@ public class TinkerPopService implements AlexandriaService {
   private static final TemporalAmount TIMEOUT = Duration.ofDays(1);
 
   private Storage storage;
+
+  @Inject
+  private LocationBuilder locationBuilder;
 
   public TinkerPopService(Storage storage) {
     setStorage(storage);
@@ -260,9 +272,11 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public SearchResult execute(AlexandriaQuery query) {
-    SearchResult searchResult = new SearchResult();
+    SearchResult searchResult = new SearchResult(locationBuilder);
     searchResult.setId(UUID.randomUUID());
     searchResult.setQuery(query);
+    List<Map<String, Object>> results = dummyResults();
+    searchResult.setResults(results);
     return searchResult;
   }
 
@@ -474,6 +488,20 @@ public class TinkerPopService implements AlexandriaService {
   void annotate(AnnotationVF avf, UUID id) {
     AnnotationVF annotationToAnnotate = storage.readVF(AnnotationVF.class, id).get();
     avf.setAnnotatedAnnotation(annotationToAnnotate);
+  }
+
+  private List<Map<String, Object>> dummyResults() {
+    List<Map<String, Object>> list = Lists.newArrayList();
+    int num = new Random().nextInt(100);
+    for (int i = 0; i < num; i++) {
+      String displayName = "Annotation " + i;
+      URI annotationLocation = locationBuilder.locationOf(AlexandriaAnnotation.class, UUID.randomUUID().toString());
+      Map<String, Object> map = Maps.newHashMap();
+      map.put("displayName", displayName);
+      map.put("annotation", annotationLocation);
+      list.add(map);
+    }
+    return list;
   }
 
 }

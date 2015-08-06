@@ -33,8 +33,8 @@ public class SearchEndpoint extends JSONEndpoint {
   private final LocationBuilder locationBuilder;
 
   @Inject
-  public SearchEndpoint(final AlexandriaService service,                                   //
-      final SearchResultEntityBuilder entityBuilder,                                  //
+  public SearchEndpoint(final AlexandriaService service,                                                //
+      final SearchResultEntityBuilder entityBuilder,                                               //
       final LocationBuilder locationBuilder) {
     this.service = service;
     this.entityBuilder = entityBuilder;
@@ -53,11 +53,31 @@ public class SearchEndpoint extends JSONEndpoint {
 
   @GET
   @Path("{uuid}")
-  @ApiOperation(value = "Get the SearchResult with the given uuid", response = SearchEntity.class)
+  @ApiOperation(value = "Get the SearchResult with the given uuid", response = SearchResult.class)
   public Response getSearchResultsByID(@PathParam("uuid") final UUIDParam uuid) {
+    SearchResult search = getSearchResult(uuid);
+    return Response.ok(entityBuilder.build(search)).build();
+  }
+
+  @GET
+  @Path("{uuid}/resultpages/{pageNum:[0-9]+}")
+  @ApiOperation(value = "Get the SearchResultPage with the given uuid and pagenumber", response = SearchResultPage.class)
+  public Response getResultPage(@PathParam("uuid") final UUIDParam uuid, @PathParam("pageNum") int pageNum) {
+    SearchResult searchResult = getSearchResult(uuid);
+    if (pageNum < 1 || pageNum > searchResult.getTotalResultPages()) {
+      throw new NotFoundException("pageNum should be between 1 and " + searchResult.getTotalResultPages());
+    }
+    String baseURI = locationBuilder.locationOf(searchResult).toString() + "/searchpages/";
+    boolean isLast = searchResult.getTotalResultPages() == pageNum;
+    SearchResultPage page = new SearchResultPage(baseURI, pageNum, isLast);
+    page.setResults(searchResult.getRecordsForPage(pageNum));
+    return Response.ok(page).build();
+  }
+
+  private SearchResult getSearchResult(final UUIDParam uuid) {
     SearchResult search = SearchResultCache.get(uuid.getValue())//
         .orElseThrow(() -> new NotFoundException("no SearchResult found with id " + uuid));
-    return Response.ok(entityBuilder.build(search)).build();
+    return search;
   }
 
 }
