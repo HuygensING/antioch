@@ -2,6 +2,7 @@ package nl.knaw.huygens.alexandria.query;
 
 import java.util.List;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import nl.knaw.huygens.alexandria.endpoint.search.AlexandriaQuery;
@@ -41,12 +42,16 @@ public class AlexandriaQueryParser {
   }
 
   private static void parseWhere(String where, ParsedAlexandriaQuery paq) {
+    // TODO: implement!
   }
 
   private static void parseSort(String sort, ParsedAlexandriaQuery paq) {
+    // TODO: implement!
   }
 
-  private static void parseReturn(String fields, ParsedAlexandriaQuery paq) {
+  private static void parseReturn(String fieldString, ParsedAlexandriaQuery paq) {
+    List<String> fields = Splitter.on(",").trimResults().splitToList(fieldString);
+    paq.setReturnFields(fields);
   }
 
 }

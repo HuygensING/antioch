@@ -285,17 +285,6 @@ public class TinkerPopService implements AlexandriaService {
 
   // - other public methods -//
 
-  private List<Map<String, Object>> processQuery(AlexandriaQuery query) {
-    List<Map<String, Object>> results = dummyResults();
-
-    ParsedAlexandriaQuery pQuery = AlexandriaQueryParser.parse(query);
-
-    FramedGraphTraversal<Object, ? extends AlexandriaVF> fgt;
-    fgt = storage.find(pQuery.getVFClass());
-
-    return results;
-  }
-
   public void createSubResource(AlexandriaResource subResource) {
     storage.startTransaction();
 
@@ -502,6 +491,19 @@ public class TinkerPopService implements AlexandriaService {
   void annotate(AnnotationVF avf, UUID id) {
     AnnotationVF annotationToAnnotate = storage.readVF(AnnotationVF.class, id).get();
     avf.setAnnotatedAnnotation(annotationToAnnotate);
+  }
+
+  private List<Map<String, Object>> processQuery(AlexandriaQuery query) {
+    List<Map<String, Object>> results = dummyResults();
+
+    ParsedAlexandriaQuery pQuery = AlexandriaQueryParser.parse(query);
+
+    FramedGraphTraversal<Object, ? extends AlexandriaVF> fgt;
+    fgt = storage.find(pQuery.getVFClass());
+    // Predicate<Traverser<? extends AlexandriaVF>> predicate = null;
+//    fgt = fgt.filter(null);
+
+    return results;
   }
 
   private List<Map<String, Object>> dummyResults() {
