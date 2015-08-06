@@ -1,4 +1,6 @@
 nl.knaw.huygens.alexandria.config
+nl.knaw.huygens.alexandria.jersey.exceptionmappers
+nl.knaw.huygens.alexandria.query
 nl.knaw.huygens.alexandria.service
 nl.knaw.huygens.alexandria.storage
 nl.knaw.huygens.alexandria.storage.frames

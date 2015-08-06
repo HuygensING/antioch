@@ -116,6 +116,7 @@
 								<li><a href="#Package_List" title="Package List">Package List</a></li>
 								<li class="divider"></li>
 								<li><a href="#nlknawhuygensalexandriaservice" title="nl.knaw.huygens.alexandria.service">nl.knaw.huygens.alexandria.service</a></li>
+								<li><a href="#nlknawhuygensalexandriaquery" title="nl.knaw.huygens.alexandria.query">nl.knaw.huygens.alexandria.query</a></li>
 								<li><a href="#nlknawhuygensalexandriastorage" title="nl.knaw.huygens.alexandria.storage">nl.knaw.huygens.alexandria.storage</a></li>
 
 							</ul>
@@ -130,6 +131,7 @@
 								<li><a href="#TinkerpopAlexandriaServiceTest" title="TinkerpopAlexandriaServiceTest">TinkerpopAlexandriaServiceTest</a></li>
 								<li><a href="#EndpointsTest" title="EndpointsTest">EndpointsTest</a></li>
 								<li><a href="#TinkerPopServiceTest" title="TinkerPopServiceTest">TinkerPopServiceTest</a></li>
+								<li><a href="#AlexandriaQueryParserTest" title="AlexandriaQueryParserTest">AlexandriaQueryParserTest</a></li>
 
 							</ul>
 						</li>
@@ -184,12 +186,12 @@ function toggleDisplay(elementId) {
   </thead> 
   <tbody> 
    <tr class="b"> 
-    <td>7</td> 
+    <td>8</td> 
     <td>0</td> 
     <td>0</td> 
     <td>0</td> 
     <td>100%</td> 
-    <td>3.207</td> 
+    <td>2.756</td> 
    </tr> 
   </tbody> 
  </table> 
@@ -222,16 +224,25 @@ function toggleDisplay(elementId) {
     <td>0</td> 
     <td>0</td> 
     <td>100%</td> 
-    <td>0.418</td> 
+    <td>0.434</td> 
    </tr> 
    <tr class="a"> 
+    <td><a href="#nl.knaw.huygens.alexandria.query">nl.knaw.huygens.alexandria.query</a></td> 
+    <td>1</td> 
+    <td>0</td> 
+    <td>0</td> 
+    <td>0</td> 
+    <td>100%</td> 
+    <td>0</td> 
+   </tr> 
+   <tr class="b"> 
     <td><a href="#nl.knaw.huygens.alexandria.storage">nl.knaw.huygens.alexandria.storage</a></td> 
     <td>5</td> 
     <td>0</td> 
     <td>0</td> 
     <td>0</td> 
     <td>100%</td> 
-    <td>2.789</td> 
+    <td>2.322</td> 
    </tr> 
   </tbody> 
  </table> 
@@ -262,7 +273,37 @@ function toggleDisplay(elementId) {
      <td>0</td> 
      <td>0</td> 
      <td>100%</td> 
-     <td>0.418</td> 
+     <td>0.434</td> 
+    </tr> 
+   </tbody> 
+  </table> 
+ </div> 
+ <div class="section"> 
+  <h3 id="nlknawhuygensalexandriaquery">nl.knaw.huygens.alexandria.query</h3> 
+  <a name="nl.knaw.huygens.alexandria.query"></a> 
+  <table border="1" class="bodyTable table table-striped table-hover"> 
+   <thead> 
+    <tr class="a"> 
+     <th></th> 
+     <th>Class</th> 
+     <th>Tests</th> 
+     <th>Errors </th> 
+     <th>Failures</th> 
+     <th>Skipped</th> 
+     <th>Success Rate</th> 
+     <th>Time</th> 
+    </tr> 
+   </thead> 
+   <tbody> 
+    <tr class="b"> 
+     <td><a href="#nl.knaw.huygens.alexandria.queryAlexandriaQueryParserTest"><i class="icon-ok"></i></a></td> 
+     <td><a href="#nl.knaw.huygens.alexandria.queryAlexandriaQueryParserTest">AlexandriaQueryParserTest</a></td> 
+     <td>1</td> 
+     <td>0</td> 
+     <td>0</td> 
+     <td>0</td> 
+     <td>100%</td> 
+     <td>0</td> 
     </tr> 
    </tbody> 
   </table> 
@@ -302,7 +343,7 @@ function toggleDisplay(elementId) {
      <td>0</td> 
      <td>0</td> 
      <td>100%</td> 
-     <td>2.772</td> 
+     <td>2.305</td> 
     </tr> 
    </tbody> 
   </table> 
@@ -334,22 +375,22 @@ function toggleDisplay(elementId) {
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
      <td>testPutAndAnnotate</td> 
-     <td>1.514</td> 
+     <td>1.417</td> 
     </tr> 
     <tr class="b"> 
      <td><i class="icon-ok"></i></td> 
      <td>testPostResourceAnnotationSetsStateToTentativeAndPutConfirmedToState</td> 
-     <td>0.581</td> 
+     <td>0.382</td> 
     </tr> 
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
      <td>testPostResourceSetsStateToTentativeAndPutSetsStateToConfirmed</td> 
-     <td>0.408</td> 
+     <td>0.306</td> 
     </tr> 
     <tr class="b"> 
      <td><i class="icon-ok"></i></td> 
      <td>testGettingANonExistingResourceGivesANotFoundError</td> 
-     <td>0.269</td> 
+     <td>0.2</td> 
     </tr> 
    </tbody> 
   </table> 
@@ -362,12 +403,25 @@ function toggleDisplay(elementId) {
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
      <td>testGraphDrop</td> 
-     <td>0.305</td> 
+     <td>0.325</td> 
     </tr> 
     <tr class="b"> 
      <td><i class="icon-ok"></i></td> 
      <td>testReadAfterCreateIsIdentity</td> 
-     <td>0.113</td> 
+     <td>0.109</td> 
+    </tr> 
+   </tbody> 
+  </table> 
+ </div> 
+ <div class="section"> 
+  <h3 id="AlexandriaQueryParserTest">AlexandriaQueryParserTest</h3> 
+  <a name="nl.knaw.huygens.alexandria.queryAlexandriaQueryParserTest"></a> 
+  <table border="1" class="bodyTable table table-striped table-hover"> 
+   <tbody> 
+    <tr class="a"> 
+     <td><i class="icon-ok"></i></td> 
+     <td>testUnkownFindValueThrowsException</td> 
+     <td>0</td> 
     </tr> 
    </tbody> 
   </table> 
