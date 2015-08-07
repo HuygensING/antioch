@@ -9,13 +9,17 @@
 <body data-desc="Create tag">
 
 <div id="create-tag" data-desc="How can I create a tag?">
-    <ol>
+
+    <h4>Register the resource at Alexandria
+        <small>(once per resource)</small>
+    </h4>
+
+    <ul>
         <li>
-            Register the resource at Alexandria, if this is the first use of the resource.
             <h:request>
                 We
                 <h:put>/resources/e480f748-3a9d-11e5-abc7-339c977c9f7e</h:put>
-                the following body
+                the body
                 <h:jsonBody>{
                     "resource": {
                     "ref": "http://www.example.com/titles/path/to/title/resource",
@@ -25,120 +29,141 @@
                     "when": "2015-08-04T13:46:39+02:00"
                     } } }
                 </h:jsonBody>
-                and observe status:
+                and observe status
                 <h:status>201 Created</h:status>
             </h:request>
         </li>
+    </ul>
 
-        <li>
-            Register and confirm the subresource at Alexandria, if this is the first use.
-            <ul>
-                <li>
-                    To register, we
-                    <h:request>
-                        <h:post>/resources/e480f748-3a9d-11e5-abc7-339c977c9f7e/subresources</h:post>
-                        the following body
-                        <h:jsonBody>{ "subresource": { "sub": "/some/folia/expression/marker" } }</h:jsonBody>
-                        and observe status:
-                        <h:status>201 Created</h:status>
-                        and a location header starting with
-                        <h:location type="base">https://{host}/resources/</h:location>
-                        and ending in the
-                        <h:location type="uuid">well-formed UUID</h:location>
-                        of the newly created subresource.
-                    </h:request>
-                </li>
-                <div c:execute="#uuid = uuid()">In this case the generated uuid happened to be:
-                    <strong c:echo="#uuid"></strong>.
-                </div>
-                <li>
-                    To confirm, we
-                    <h:request>
-                        <h:put>/resources/$uuid/state</h:put>
-                        the following body
-                        <h:jsonBody>{"state": "CONFIRMED"}</h:jsonBody>
-                        and observe status:
-                        <h:status>200 OK</h:status>
-                    </h:request>
-                </li>
-            </ul>
-        </li>
+    <h4>Register and confirm the subresource at Alexandria
+        <small>(once per subresource)</small>
+    </h4>
 
+    <ul>
         <li>
-            Register and confirm the annotation at the (confirmed) subresource.
-            <ul>
-                <li>
-                    To register, we
-                    <h:request>
-                        <h:post>/resources/$uuid/annotations</h:post>
-                        the following body:
-                        <h:jsonBody>{ "annotation": { "type": "emotion", "value": "happy" } }</h:jsonBody>
-                        and observe status:
-                        <h:status>201 Created</h:status>
-                    </h:request>
-                </li>
-                <div c:execute="#anno = uuid()">In this case we got uuid <strong c:echo="#anno"></strong> as the uuid
-                    for the annotation we just created.
-                </div>
-                <li>
-                    <h:request>
-                        <strong>(optional)</strong>
-                        As an intermediate verification step, we can
-                        <h:get>/annotations/$anno</h:get>
-                        and observe status:
-                        <h:status>200 OK</h:status>
-                        and body:
-                        <h:jsonResponse> {
-                            "annotation" : {
-                            "value" : "happy",
-                            "type" : "emotion",
-                            "id" : "$anno",
-                            "state" : {
-                            "value" : "TENTATIVE",
-                            "since" : "{date.beforeNow}"
-                            },
-                            "^annotates" : "https://{host}/resources/$uuid",
-                            "^annotations" : [ ]
-                            } }
-                        </h:jsonResponse>
-                    </h:request>
-                </li>
-                <li>
-                    To confirm, we
-                    <h:request>
-                        <h:put>/annotations/$anno/state</h:put>
-                        the following body
-                        <h:jsonBody>{"state": "CONFIRMED"}</h:jsonBody>
-                        and observe status:
-                        <h:status>200 OK</h:status>
-                    </h:request>
-                </li>
-                <li>
-                    <h:request>
-                        <strong>(optional)</strong>
-                        As a final verification, we can
-                        <h:get>/annotations/$anno</h:get>
-                        and observe status:
-                        <h:status>200 OK</h:status>
-                        and body:
-                        <h:jsonResponse> {
-                            "annotation" : {
-                            "value" : "happy",
-                            "type" : "emotion",
-                            "id" : "$anno",
-                            "state" : {
-                            "value" : "CONFIRMED",
-                            "since" : "{date.beforeNow}"
-                            },
-                            "^annotates" : "https://{host}/resources/$uuid",
-                            "^annotations" : [ ]
-                            } }
-                        </h:jsonResponse>
-                    </h:request>
-                </li>
-            </ul>
+            <h:request>
+                To register, we
+                <h:post>/resources/e480f748-3a9d-11e5-abc7-339c977c9f7e/subresources</h:post>
+                the body
+                <h:jsonBody>{ "subresource": { "sub": "/some/folia/expression/marker" } }</h:jsonBody>
+                and observe status
+                <h:status>201 Created</h:status>
+                and a location header starting with
+                <h:location type="base">https://{host}/resources/</h:location>
+                and ending in a generated
+                <h:location type="uuid">well-formed UUID</h:location>
+                for the newly created subresource.
+            </h:request>
         </li>
-    </ol>
+        <div c:execute="#uuid = uuid()">In this case the generated uuid happened to be:
+            <strong c:echo="#uuid"></strong>.
+        </div>
+        <li>
+            <h:request>
+                To confirm our subresource, we
+                <h:put>/resources/$uuid/state</h:put>
+                the body
+                <h:jsonBody>{"state": "CONFIRMED"}</h:jsonBody>
+                and observe status
+                <h:status>200 OK</h:status>
+            </h:request>
+        </li>
+    </ul>
+
+    <h4>Register and confirm the annotation at the subresource.</h4>
+
+    <ul>
+        <li>
+            <h:request>
+                To register, we
+                <h:post>/resources/$uuid/annotations</h:post>
+                the body
+                <h:jsonBody>{ "annotation": { "type": "emotion", "value": "happy" } }</h:jsonBody>
+                and observe status
+                <h:status>201 Created</h:status>
+            </h:request>
+        </li>
+        <div c:execute="#anno = uuid()">In this case we got uuid <strong c:echo="#anno"></strong> as the uuid
+            for the annotation we just created.
+        </div>
+        <li>
+            <h:request>
+                <strong>(optional)</strong>
+                As an intermediate verification step, we can
+                <h:get>/annotations/$anno</h:get>
+                and observe status
+                <h:status>200 OK</h:status>
+                and body:
+                <h:jsonResponse>{
+                    "annotation" : {
+                    "value" : "happy",
+                    "type" : "emotion",
+                    "id" : "$anno",
+                    "state" : {
+                    "value" : "TENTATIVE",
+                    "since" : "{date.beforeNow}"
+                    },
+                    "^annotates" : "https://{host}/resources/$uuid",
+                    "^annotations" : [ ]
+                    } }
+                </h:jsonResponse>
+                <div class="alert alert-info sm">
+                    Note the <code>TENTATIVE</code> state of our newly created annotation.
+                </div>
+            </h:request>
+        </li>
+        <li>
+            <h:request>
+                To confirm, we
+                <h:put>/annotations/$anno/state</h:put>
+                the body
+                <h:jsonBody>{"state": "CONFIRMED"}</h:jsonBody>
+                and observe status
+                <h:status>200 OK</h:status>
+            </h:request>
+        </li>
+        <li>
+            <h:request>
+                <strong>(optional)</strong>
+                To verify our <mark>annotation</mark>, we can
+                <h:get>/annotations/$anno</h:get>
+                and observe status
+                <h:status>200 OK</h:status>
+                and body <span class="text-muted">(only relevant fields shown for brevity)</span>
+                <h:jsonResponse> {
+                    "annotation" : {
+                    "value" : "happy",
+                    "type" : "emotion",
+                    "id" : "$anno",
+                    "^annotates" : "https://{host}/resources/$uuid"
+                    } }
+                </h:jsonResponse>
+                <div class="alert alert-info sm">
+                    Note that <code>^annotates</code> indeed points to our subresource.
+                </div>
+            </h:request>
+        </li>
+        <li>
+            <h:request>
+                <strong>(optional)</strong>
+                To verify our <mark>subresource</mark>, we can
+                <h:get>/resources/$uuid</h:get>
+                and observe status
+                <h:status>200 OK</h:status>
+                and body <span class="text-muted">(again, only relevant fields shown for brevity)</span>
+                <h:jsonResponse> {
+                    "subresource": {
+                    "id": "$uuid",
+                    "^annotations": [
+                    "https://{host}/annotations/$anno"
+                    ] } }
+                </h:jsonResponse>
+                <div class="alert alert-info sm">
+                    Note that <code>^annotations</code> indeed includes our new annotation.
+                </div>
+            </h:request>
+        </li>
+    </ul>
 </div>
 
 <div id="use-before-confirm" c:execute="clearStorage()"

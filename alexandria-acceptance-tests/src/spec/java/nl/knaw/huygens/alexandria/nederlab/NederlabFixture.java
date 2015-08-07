@@ -3,8 +3,6 @@ package nl.knaw.huygens.alexandria.nederlab;
 import java.time.Instant;
 import java.util.UUID;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
 import nl.knaw.huygens.alexandria.concordion.AlexandriaAcceptanceTest;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
@@ -17,13 +15,9 @@ import org.junit.runner.RunWith;
 @RunWith(ConcordionRunner.class)
 public class NederlabFixture extends AlexandriaAcceptanceTest {
   @BeforeClass
-  public static void registerEndpoint() {
+  public static void registerEndpoints() {
     register(ResourcesEndpoint.class);
     register(AnnotationsEndpoint.class);
-  }
-
-  public String uuid() {
-    return Iterables.getLast(Splitter.on('/').split(location().orElse("(not set)")));
   }
 
   public void resourceExists(String id) {
