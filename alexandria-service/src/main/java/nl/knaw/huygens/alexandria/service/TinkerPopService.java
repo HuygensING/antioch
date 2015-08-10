@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.service;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import java.io.IOException;
@@ -8,19 +9,25 @@ import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
+import org.apache.tinkerpop.gremlin.process.traversal.Traverser;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
@@ -41,7 +48,6 @@ import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
-import peapod.FramedGraphTraversal;
 import scala.NotImplementedError;
 
 public class TinkerPopService implements AlexandriaService {
@@ -498,11 +504,17 @@ public class TinkerPopService implements AlexandriaService {
 
     ParsedAlexandriaQuery pQuery = AlexandriaQueryParser.parse(query);
 
-    FramedGraphTraversal<Object, ? extends AlexandriaVF> fgt;
-    fgt = storage.find(pQuery.getVFClass());
-    // Predicate<Traverser<? extends AlexandriaVF>> predicate = null;
-//    fgt = fgt.filter(null);
+    Predicate<Traverser<AnnotationVF>> predicate = pQuery.getPredicate();// t -> t.get().getProvenanceWho().equals("me");
+    Comparator<AnnotationVF> comparator = pQuery.getResultComparator();
+    Function<AnnotationVF, Map<String, Object>> mapper = pQuery.getResultMapper();
 
+    results = storage.find(AnnotationVF.class)//
+        .filter(predicate)//
+        .toList().stream()//
+        .sorted(comparator)//
+        .map(mapper)//
+        .collect(toList());
+    Log.info("results={}", results);
     return results;
   }
 
