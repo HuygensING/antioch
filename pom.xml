@@ -36,7 +36,7 @@
     <cat.version>1.2.2</cat.version>
 
     <guice.version>3.0</guice.version>
-    <jackson.version>2.6.0</jackson.version>
+    <jackson.version>2.6.1</jackson.version>
     <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
     <jdk.version>1.8</jdk.version>
 
