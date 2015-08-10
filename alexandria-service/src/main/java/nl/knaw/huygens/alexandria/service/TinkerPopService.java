@@ -55,8 +55,13 @@ public class TinkerPopService implements AlexandriaService {
 
   private Storage storage;
 
-  @Inject
   private LocationBuilder locationBuilder;
+
+  @Inject
+  public TinkerPopService(LocationBuilder locationBuilder) {
+    Log.trace("{} created, locationBuilder=[{}]", getClass().getSimpleName(), locationBuilder);
+    this.locationBuilder = locationBuilder;
+  }
 
   public TinkerPopService(Storage storage) {
     setStorage(storage);
@@ -107,7 +112,7 @@ public class TinkerPopService implements AlexandriaService {
   public AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
     AlexandriaResource subresource = new AlexandriaResource(uuid, provenance);
     subresource.setCargo(sub);
-    subresource.setParentResourcePointer(new IdentifiablePointer<AlexandriaResource>(AlexandriaResource.class, parentUuid.toString()));
+    subresource.setParentResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, parentUuid.toString()));
     createSubResource(subresource);
     return subresource;
   }
@@ -245,7 +250,7 @@ public class TinkerPopService implements AlexandriaService {
       AnnotationBodyVF body = annotationVF.getBody();
       List<AnnotationVF> ofAnnotations = body.getOfAnnotationList();
       if (ofAnnotations.size() == 1) {
-        String annotationBodyId = body.getUuid().toString();
+        String annotationBodyId = body.getUuid();
         storage.removeVertexWithId(annotationBodyId);
       }
 
