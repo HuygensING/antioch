@@ -2,6 +2,7 @@ package nl.knaw.huygens.alexandria.service;
 
 import static java.util.stream.Collectors.toSet;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
@@ -16,11 +17,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
+import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
@@ -49,8 +48,13 @@ public class TinkerPopService implements AlexandriaService {
 
   private Storage storage;
 
-  @Inject
   private LocationBuilder locationBuilder;
+
+  @Inject
+  public TinkerPopService(LocationBuilder locationBuilder) {
+    Log.trace("{} created, locationBuilder=[{}]", getClass().getSimpleName(), locationBuilder);
+    this.locationBuilder = locationBuilder;
+  }
 
   public TinkerPopService(Storage storage) {
     setStorage(storage);
@@ -101,7 +105,7 @@ public class TinkerPopService implements AlexandriaService {
   public AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
     AlexandriaResource subresource = new AlexandriaResource(uuid, provenance);
     subresource.setCargo(sub);
-    subresource.setParentResourcePointer(new IdentifiablePointer<AlexandriaResource>(AlexandriaResource.class, parentUuid.toString()));
+    subresource.setParentResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, parentUuid.toString()));
     createSubResource(subresource);
     return subresource;
   }
@@ -239,7 +243,7 @@ public class TinkerPopService implements AlexandriaService {
       AnnotationBodyVF body = annotationVF.getBody();
       List<AnnotationVF> ofAnnotations = body.getOfAnnotationList();
       if (ofAnnotations.size() == 1) {
-        String annotationBodyId = body.getUuid().toString();
+        String annotationBodyId = body.getUuid();
         storage.removeVertexWithId(annotationBodyId);
       }
 

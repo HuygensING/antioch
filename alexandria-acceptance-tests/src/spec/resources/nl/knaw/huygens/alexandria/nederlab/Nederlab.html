@@ -8,6 +8,39 @@
 
 <body data-desc="Create tag">
 
+<div id="modify-tag" data-desc="How can I modify a tag?">
+    <h4>Retrieve all annotations for all subresources of a given resource</h4>
+
+    Given that a resource with id <code c:set="#resId">13e53670-3f3f-11e5-96ef-dff0c5cf4b9b</code>
+    <span c:execute="resourceExists(#resId)">exists</span> with two subresources with ids
+    <ol class="table" c:execute="subResourceHasAnnotation(#TEXT, #resId)">
+        <li><code c:set="#subResId">3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c</code></li>
+        <li><code c:set="#subResId">3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85</code></li>
+    </ol>
+
+    <h:request>
+        We
+        <h:get>/resources/$resId/annotations</h:get>
+        and observe status
+        <h:status>200 OK</h:status>
+        and the expected annotation references in the body
+        <h:jsonResponse>{
+            "annotations": [
+            {
+            "type": "type",
+            "value": "value",
+            "^annotates": "https://{host}/resources/3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c"
+            },
+            {
+            "type": "type",
+            "value": "value",
+            "^annotates": "https://{host}/resources/3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85"
+            }
+            ] }
+        </h:jsonResponse>
+    </h:request>
+</div>
+
 <div id="create-tag" data-desc="How can I create a tag?">
 
     <h4>Register the resource at Alexandria
@@ -125,7 +158,9 @@
         <li>
             <h:request>
                 <strong>(optional)</strong>
-                To verify our <mark>annotation</mark>, we can
+                To verify our
+                <mark>annotation</mark>
+                , we can
                 <h:get>/annotations/$anno</h:get>
                 and observe status
                 <h:status>200 OK</h:status>
@@ -146,7 +181,9 @@
         <li>
             <h:request>
                 <strong>(optional)</strong>
-                To verify our <mark>subresource</mark>, we can
+                To verify our
+                <mark>subresource</mark>
+                , we can
                 <h:get>/resources/$uuid</h:get>
                 and observe status
                 <h:status>200 OK</h:status>
