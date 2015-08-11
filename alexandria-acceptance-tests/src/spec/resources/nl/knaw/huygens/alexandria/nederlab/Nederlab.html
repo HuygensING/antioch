@@ -434,6 +434,19 @@
             </h:request>
             <div c:execute="#uuid = uuid()">in this case yielding uuid <span c:echo="#uuid"></span>.</div>
         </li>
+        <li>
+            <h:request>
+                <strong>(verification)</strong> We
+                <h:get>/resources/$uuid</h:get>
+                and observe its <code>TENTATIVE</code> state
+                <h:jsonResponse>{"subresource":{
+                    "id": "$uuid",
+                    "sub": "/some/folia/path",
+                    "state": { "value": "TENTATIVE"
+                    } } }
+                </h:jsonResponse>
+            </h:request>
+        </li>
     </ul>
 
     <h:request>
