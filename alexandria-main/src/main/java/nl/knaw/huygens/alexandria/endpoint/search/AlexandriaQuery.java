@@ -9,7 +9,7 @@ import nl.knaw.huygens.alexandria.endpoint.Prototype;
 @JsonTypeName("query")
 public class AlexandriaQuery extends JsonWrapperObject implements Prototype {
   // find: find(annotation|resource)
-  String find = "";
+  String find = "annotation";
 
   // where: field.function(params)
   // functions: eq(par) - equals
@@ -19,11 +19,11 @@ public class AlexandriaQuery extends JsonWrapperObject implements Prototype {
   String where = "";
 
   // sort: sort([-|+]field,...) - = descending, default = + = ascending
-  String sort = "";
+  String sort = "when";
 
   // return: return(field,...)
   @JsonProperty("return")
-  String fields = "";
+  String fields = "id";
 
   public String getFind() {
     return find;
