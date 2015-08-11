@@ -190,13 +190,13 @@
         <tbody>
         <tr>
             <td><code>3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c</code></td>
-            <td>subres-1-type</td>
-            <td>subres-1-value</td>
+            <td><code>subres-1-type</code></td>
+            <td><code>subres-1-value</code></td>
         </tr>
         <tr>
             <td><code>3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85</code></td>
-            <td>subres-2-type</td>
-            <td>subres-2-value</td>
+            <td><code>subres-2-type</code></td>
+            <td><code>subres-2-value</code></td>
         </tr>
         </tbody>
     </table>
@@ -241,9 +241,9 @@
 
         <li>
             <h:request>
-                <strong>(verification)</strong> When we
+                <strong>(verification)</strong> We
                 <h:get>/resources/$resId</h:get>
-                we observe status
+                and observe status
                 <h:status>200 OK</h:status>
                 and body
                 <h:jsonResponse>{ "resource": {
@@ -257,9 +257,9 @@
 
         <li>
             <h:request>
-                When we
+                We
                 <h:delete>/annotations/$annoId</h:delete>
-                we observe status
+                and observe status
                 <h:status>204 No Content</h:status>
                 and response body
                 <h:responseBody/>
@@ -268,9 +268,27 @@
 
         <li>
             <h:request>
-                <strong>(verification)</strong> If we
+                <strong>(verification)</strong> We
+                <h:get>/annotations/$annoId</h:get>
+                and observe status
+                <h:status>200 OK</h:status>
+                and body
+                <h:jsonResponse>{ "annotation": {
+                    "id": "$annoId",
+                    "state" : { "value" : "DELETED", "since" : "{date.beforeNow}" }
+                    } }
+                </h:jsonResponse>
+                <div class="alert alert-info sm">
+                    Note the <code>DELETED</code> state of the annotation.
+                </div>
+            </h:request>
+        </li>
+
+        <li>
+            <h:request>
+                <strong>(verification)</strong> We
                 <h:get>/resources/$resId</h:get>
-                we observe status
+                and observe status
                 <h:status>200 OK</h:status>
                 and body
                 <h:jsonResponse>{ "resource": {
@@ -279,23 +297,9 @@
                     "https://{host}/annotations/$annoId"
                     ] } }
                 </h:jsonResponse>
-                showing us that the <code>DELETED</code> annotation can still be found via our resource.
-            </h:request>
-        </li>
-
-        <li>
-            <h:request>
-                <strong>(verification)</strong> If we
-                <h:get>/annotations/$annoId</h:get>
-                we observe status
-                <h:status>200 OK</h:status>
-                and body
-                <h:jsonResponse>{ "annotation": {
-                    "id": "$annoId",
-                    "state" : { "value" : "DELETED", "since" : "{date.beforeNow}" }
-                    } }
-                </h:jsonResponse>
-                confirming the <code>DELETED</code> status of the annotation.
+                <div class="alert alert-info sm">
+                    A <code>DELETED</code> annotation can indeed still be found via the resource it belonged to.
+                </div>
             </h:request>
         </li>
     </ul>
