@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.query.AlexandriaQueryParser.SortToken;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 
@@ -140,11 +141,32 @@ public class AlexandriaQueryParserTest {
     Function<AnnotationVF, Map<String, Object>> resultMapper = paq.getResultMapper();
     Map<String, Object> resultMap = resultMapper.apply(passAnnotation);
     assertThat(resultMap).contains(//
-        MapEntry.entry("when", "1"),                                   //
-        MapEntry.entry("value", "Value"),                                   //
-        MapEntry.entry("resource.id", "resourceId"),                                   //
+        MapEntry.entry("when", "1"),                                           //
+        MapEntry.entry("value", "Value"),                                           //
+        MapEntry.entry("resource.id", "resourceId"),                                           //
         MapEntry.entry("subresource.id", "subresourceId")//
     );
+  }
+
+  @Test
+  public void testGenerateSortTokenFromString1() {
+    SortToken st1 = AlexandriaQueryParser.sortToken("field1");
+    assertThat(st1.isAscending()).isTrue();
+    assertThat(st1.getField()).isEqualTo("field1");
+  }
+
+  @Test
+  public void testGenerateSortTokenFromString2() {
+    SortToken st1 = AlexandriaQueryParser.sortToken("+field2");
+    assertThat(st1.isAscending()).isTrue();
+    assertThat(st1.getField()).isEqualTo("field2");
+  }
+
+  @Test
+  public void testGenerateSortTokenFromString3() {
+    SortToken st1 = AlexandriaQueryParser.sortToken("-field3");
+    assertThat(st1.isAscending()).isFalse();
+    assertThat(st1.getField()).isEqualTo("field3");
   }
 
 }
