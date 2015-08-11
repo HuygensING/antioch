@@ -60,25 +60,31 @@ public class AlexandriaQueryParser {
   }
 
   static final Map<String, Function<AnnotationVF, Object>> valueMapping = ImmutableMap.<String, Function<AnnotationVF, Object>> builder()
-    .put("id", AnnotationVF::getUuid)
-    .put("when", AnnotationVF::getProvenanceWhen)
-    .put("who", AnnotationVF::getProvenanceWho)
-    .put("why", AnnotationVF::getProvenanceWhy)
-    .put("type", AnnotationVF::getType)
-    .put("value", AnnotationVF::getValue)
-    .put("resource.id", AnnotationVF::getResourceId)
-    .put("subresource.id", AnnotationVF::getSubResourceId)
-    .build();
+      .put("id", AnnotationVF::getUuid)
+      .put("when", AnnotationVF::getProvenanceWhen)
+      .put("who", AnnotationVF::getProvenanceWho)
+      .put("why", AnnotationVF::getProvenanceWhy)
+      .put("type", AnnotationVF::getType)
+      .put("value", AnnotationVF::getValue)
+      .put("resource.id", AnnotationVF::getResourceId)
+      .put("subresource.id", AnnotationVF::getSubResourceId)
+      .build();
 
   static final String ALLOWEDFIELDS = ", available fields: " + Joiner.on(", ")
-    .join(valueMapping.keySet());
+      .join(valueMapping.keySet());
 
   private static Predicate<Traverser<AnnotationVF>> parseWhere(String whereString) {
     // TODO: implement!
     List<String> tokens = Splitter.on(",")
-      .trimResults()
-      .splitToList(whereString);
-    Predicate<Traverser<AnnotationVF>> predicate = null;
+        .trimResults()
+        .splitToList(whereString);
+    Predicate<Traverser<AnnotationVF>> predicate = at -> {
+      Object y = at.get();
+      Log.debug("y={}", y.getClass());
+      AnnotationVF x = at.get();
+      Log.debug("{}", x);
+      return x.isConfirmed();
+    };
     return predicate;
   }
 
@@ -106,11 +112,11 @@ public class AlexandriaQueryParser {
 
   private static List<SortToken> parseSortString(String sortString) {
     List<SortToken> sortFields = Splitter.on(",")
-      .trimResults()
-      .splitToList(sortString)
-      .stream()
-      .map(f -> sortToken(f))
-      .collect(toList());
+        .trimResults()
+        .splitToList(sortString)
+        .stream()
+        .map(f -> sortToken(f))
+        .collect(toList());
     return sortFields;
   }
 
@@ -158,21 +164,21 @@ public class AlexandriaQueryParser {
 
   private static void parseReturn(String fieldString, ParsedAlexandriaQuery paq) {
     List<String> fields = Splitter.on(",")
-      .trimResults()
-      .splitToList(fieldString);
+        .trimResults()
+        .splitToList(fieldString);
     Set<String> allowedFields = valueMapping.keySet();
     List<String> unknownFields = Lists.newArrayList(fields);
     unknownFields.removeAll(allowedFields);
     if (!unknownFields.isEmpty()) {
       parseErrors.add("return: unknown field(s) " + Joiner.on(", ")
-        .join(unknownFields) + ALLOWEDFIELDS);
+          .join(unknownFields) + ALLOWEDFIELDS);
 
     } else {
       paq.setReturnFields(fields);
 
       Function<AnnotationVF, Map<String, Object>> mapper = avf -> fields.stream()
-        .collect(toMap(Function.identity(), f -> valueMapping.get(f)
-          .apply(avf)));
+          .collect(toMap(Function.identity(), f -> valueMapping.get(f)
+              .apply(avf)));
       // TODO: cache resultmapper?
       paq.setResultMapper(mapper);
     }
@@ -180,7 +186,7 @@ public class AlexandriaQueryParser {
 
   private static Comparator<AnnotationVF> getComparator(Function<AnnotationVF, String> sortKeyGenerator) {
     return (a1, a2) -> sortKeyGenerator.apply(a1)
-      .compareTo(sortKeyGenerator.apply(a2));
+        .compareTo(sortKeyGenerator.apply(a2));
   }
 
   public static class SortToken {

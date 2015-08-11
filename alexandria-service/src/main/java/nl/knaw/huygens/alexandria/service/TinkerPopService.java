@@ -131,18 +131,22 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Optional<AlexandriaResource> readResource(UUID uuid) {
-    return storage.readVF(ResourceVF.class, uuid).map(this::deframeResource);
+    return storage.readVF(ResourceVF.class, uuid)
+        .map(this::deframeResource);
   }
 
   @Override
   public Optional<AlexandriaAnnotation> readAnnotation(UUID uuid) {
-    return storage.readVF(AnnotationVF.class, uuid).map(this::deframeAnnotation);
+    return storage.readVF(AnnotationVF.class, uuid)
+        .map(this::deframeAnnotation);
   }
 
   @Override
   public void removeExpiredTentatives() {
     // Tentative vertices should not have any outgoing or incoming edges!!
-    Long threshold = Instant.now().minus(TIMEOUT).getEpochSecond();
+    Long threshold = Instant.now()
+        .minus(TIMEOUT)
+        .getEpochSecond();
     storage.startTransaction();
     storage.removeExpiredTentatives(threshold);
     storage.commitTransaction();
@@ -164,7 +168,8 @@ public class TinkerPopService implements AlexandriaService {
   public Set<AlexandriaResource> readSubResources(UUID uuid) {
     ResourceVF resourcevf = storage.readVF(ResourceVF.class, uuid)//
         .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
-    return resourcevf.getSubResources().stream()//
+    return resourcevf.getSubResources()
+        .stream()//
         .map(this::deframeResource)//
         .collect(toSet());
   }
@@ -240,7 +245,8 @@ public class TinkerPopService implements AlexandriaService {
   public void deleteAnnotation(AlexandriaAnnotation annotation) {
     storage.startTransaction();
     UUID uuid = annotation.getId();
-    AnnotationVF annotationVF = storage.readVF(AnnotationVF.class, uuid).get();
+    AnnotationVF annotationVF = storage.readVF(AnnotationVF.class, uuid)
+        .get();
     if (annotation.isTentative()) {
       // remove from database
 
@@ -299,14 +305,17 @@ public class TinkerPopService implements AlexandriaService {
     final ResourceVF rvf;
     final UUID uuid = subResource.getId();
     if (storage.existsVF(ResourceVF.class, uuid)) {
-      rvf = storage.readVF(ResourceVF.class, uuid).get();
+      rvf = storage.readVF(ResourceVF.class, uuid)
+          .get();
     } else {
       rvf = storage.createVF(ResourceVF.class);
       rvf.setUuid(uuid.toString());
     }
 
     rvf.setCargo(subResource.getCargo());
-    final UUID parentId = UUID.fromString(subResource.getParentResourcePointer().get().getIdentifier());
+    final UUID parentId = UUID.fromString(subResource.getParentResourcePointer()
+        .get()
+        .getIdentifier());
     Optional<ResourceVF> parentVF = storage.readVF(ResourceVF.class, parentId);
     rvf.setParentResource(parentVF.get());
 
@@ -321,7 +330,8 @@ public class TinkerPopService implements AlexandriaService {
     final AnnotationVF avf;
     final UUID uuid = annotation.getId();
     if (storage.existsVF(AnnotationVF.class, uuid)) {
-      avf = storage.readVF(AnnotationVF.class, uuid).get();
+      avf = storage.readVF(AnnotationVF.class, uuid)
+          .get();
     } else {
       avf = storage.createVF(AnnotationVF.class);
       avf.setUuid(uuid.toString());
@@ -337,7 +347,8 @@ public class TinkerPopService implements AlexandriaService {
 
     AnnotationVF avf = createAnnotationVF(newAnnotation);
 
-    ResourceVF resourceToAnnotate = storage.readVF(ResourceVF.class, resource.getId()).get();
+    ResourceVF resourceToAnnotate = storage.readVF(ResourceVF.class, resource.getId())
+        .get();
     avf.setAnnotatedResource(resourceToAnnotate);
 
     storage.commitTransaction();
@@ -373,7 +384,8 @@ public class TinkerPopService implements AlexandriaService {
     final ResourceVF rvf;
     final UUID uuid = resource.getId();
     if (storage.existsVF(ResourceVF.class, uuid)) {
-      rvf = storage.readVF(ResourceVF.class, uuid).get();
+      rvf = storage.readVF(ResourceVF.class, uuid)
+          .get();
     } else {
       rvf = storage.createVF(ResourceVF.class);
       rvf.setUuid(uuid.toString());
@@ -395,8 +407,10 @@ public class TinkerPopService implements AlexandriaService {
     AnnotationVF avf = storage.createVF(AnnotationVF.class);
     setAlexandriaVFProperties(avf, newAnnotation);
 
-    UUID bodyId = newAnnotation.getBody().getId();
-    AnnotationBodyVF bodyVF = storage.readVF(AnnotationBodyVF.class, bodyId).get();
+    UUID bodyId = newAnnotation.getBody()
+        .getId();
+    AnnotationBodyVF bodyVF = storage.readVF(AnnotationBodyVF.class, bodyId)
+        .get();
     avf.setBody(bodyVF);
     return avf;
   }
@@ -416,7 +430,8 @@ public class TinkerPopService implements AlexandriaService {
     if (parentResource != null) {
       resource.setParentResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, parentResource.getUuid()));
     }
-    rvf.getSubResources().stream()//
+    rvf.getSubResources()
+        .stream()//
         .forEach(vf -> resource.addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
     return resource;
   }
@@ -462,13 +477,17 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   private void setAlexandriaVFProperties(AlexandriaVF vf, Accountable accountable) {
-    vf.setUuid(accountable.getId().toString());
+    vf.setUuid(accountable.getId()
+        .toString());
 
-    vf.setState(accountable.getState().toString());
-    vf.setStateSince(accountable.getStateSince().getEpochSecond());
+    vf.setState(accountable.getState()
+        .toString());
+    vf.setStateSince(accountable.getStateSince()
+        .getEpochSecond());
 
     AlexandriaProvenance provenance = accountable.getProvenance();
-    vf.setProvenanceWhen(provenance.getWhen().toString());
+    vf.setProvenanceWhen(provenance.getWhen()
+        .toString());
     vf.setProvenanceWho(provenance.getWho());
     vf.setProvenanceWhy(provenance.getWhy());
   }
@@ -493,11 +512,13 @@ public class TinkerPopService implements AlexandriaService {
 
   void updateState(AlexandriaVF vf, AlexandriaState newState) {
     vf.setState(newState.name());
-    vf.setStateSince(Instant.now().getEpochSecond());
+    vf.setStateSince(Instant.now()
+        .getEpochSecond());
   }
 
   void annotate(AnnotationVF avf, UUID id) {
-    AnnotationVF annotationToAnnotate = storage.readVF(AnnotationVF.class, id).get();
+    AnnotationVF annotationToAnnotate = storage.readVF(AnnotationVF.class, id)
+        .get();
     avf.setAnnotatedAnnotation(annotationToAnnotate);
   }
 
@@ -510,11 +531,12 @@ public class TinkerPopService implements AlexandriaService {
     Comparator<AnnotationVF> comparator = pQuery.getResultComparator();
     Function<AnnotationVF, Map<String, Object>> mapper = pQuery.getResultMapper();
 
-    results = storage.find(AnnotationVF.class)//
-        .filter(predicate)//
-        .toList().stream()//
-        .sorted(comparator)//
-        .map(mapper)//
+    results = storage.find(AnnotationVF.class)
+        // .filter(predicate)
+        .toList()
+        .stream()
+        .sorted(comparator)
+        .map(mapper)
         .collect(toList());
     Log.info("results={}", results);
     return results;
@@ -525,7 +547,8 @@ public class TinkerPopService implements AlexandriaService {
     int num = new Random().nextInt(100);
     for (int i = 0; i < num; i++) {
       String displayName = "Annotation " + i;
-      URI annotationLocation = locationBuilder.locationOf(AlexandriaAnnotation.class, UUID.randomUUID().toString());
+      URI annotationLocation = locationBuilder.locationOf(AlexandriaAnnotation.class, UUID.randomUUID()
+          .toString());
       Map<String, Object> map = Maps.newHashMap();
       map.put("displayName", displayName);
       map.put("annotation", annotationLocation);
