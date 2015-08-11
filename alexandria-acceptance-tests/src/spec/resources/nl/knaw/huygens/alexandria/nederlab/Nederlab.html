@@ -8,54 +8,7 @@
 
 <body data-desc="Create tag">
 
-<div id="modify-tag" data-desc="How can I modify a tag?">
-    <h4>Retrieve all annotations for all subresources of a given resource</h4>
-
-    Given that a resource with id <code c:set="#resId">13e53670-3f3f-11e5-96ef-dff0c5cf4b9b</code>
-    <span c:execute="resourceExists(#resId)">exists</span> with annotated subresources
-    <table class="table" c:execute="subResourceHasAnnotation(#subId, #resId, #type, #value)">
-        <tr>
-            <th c:set="#subId">Subresource Id</th>
-            <th c:set="#type">Type</th>
-            <th c:set="#value">Value</th>
-        </tr>
-        <tr>
-            <td><code>3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c</code></td>
-            <td>type-1</td>
-            <td>value-1</td>
-        </tr>
-        <tr>
-            <td><code>3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85</code></td>
-            <td>type-2</td>
-            <td>value-2</td>
-        </tr>
-    </table>
-
-    <h:request>
-        We
-        <h:get>/resources/$resId/annotations</h:get>
-        and observe status
-        <h:status>200 OK</h:status>
-        and the expected annotation references in the body
-        <h:jsonResponse>{
-            "annotations": [
-            {
-            "type": "type-1",
-            "value": "value-1",
-            "^annotates": "https://{host}/resources/3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c"
-            },
-            {
-            "type": "type-2",
-            "value": "value-2",
-            "^annotates": "https://{host}/resources/3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85"
-            }
-            ] }
-        </h:jsonResponse>
-    </h:request>
-</div>
-
-<div id="create-tag" data-desc="How can I create a tag?">
-
+<div id="create-tag" data-desc="How can I create a tag?" c:execute="clearStorage()">
     <h4>Register the resource at Alexandria
         <small>(once per resource)</small>
     </h4>
@@ -211,6 +164,138 @@
                 <div class="alert alert-info sm">
                     Note that <code>^annotations</code> indeed includes our new annotation.
                 </div>
+            </h:request>
+        </li>
+    </ul>
+</div>
+
+<div id="modify-tag" data-desc="How can I modify a tag?" c:execute="clearStorage()">
+    <h4>Retrieve all annotations for all subresources of a given resource</h4>
+
+    Given a resource with id <code c:set="#resId">13e53670-3f3f-11e5-96ef-dff0c5cf4b9b</code>
+    <span c:execute="resourceExists(#resId)">exists</span> which has
+    <span c:execute="resourceHasAnnotation(#resId, #type, #value)">an annotation
+        of type <code c:set="#type">res-type</code>
+        and value <code c:set="#value">res-value</code>
+    </span> and which has annotated subresources:
+    <table class="table"
+           c:execute="subResourceHasAnnotation(#subId, #resId, #type, #value)">
+        <thead>
+        <tr>
+            <th c:set="#subId">Subresource Id</th>
+            <th c:set="#type">Annotation type</th>
+            <th c:set="#value">Annotation value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c</code></td>
+            <td>subres-1-type</td>
+            <td>subres-1-value</td>
+        </tr>
+        <tr>
+            <td><code>3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85</code></td>
+            <td>subres-2-type</td>
+            <td>subres-2-value</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h:request>
+        We
+        <h:get>/resources/$resId/annotations</h:get>
+        and observe status
+        <h:status>200 OK</h:status>
+        and the expected annotation references in the body
+        <h:jsonResponse>{
+            "annotations": [
+            {
+            "type": "res-type",
+            "value": "res-value",
+            "^annotates": "https://{host}/resources/13e53670-3f3f-11e5-96ef-dff0c5cf4b9b"
+            },
+            {
+            "type": "subres-1-type",
+            "value": "subres-1-value",
+            "^annotates": "https://{host}/resources/3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c"
+            },
+            {
+            "type": "subres-2-type",
+            "value": "subres-2-value",
+            "^annotates": "https://{host}/resources/3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85"
+            }
+            ] }
+        </h:jsonResponse>
+    </h:request>
+</div>
+
+<div id="delete-tag" data-desc="How can I delete a tag?" c:execute="clearStorage()">
+    <h4>Delete the annotation at its REST endpoint</h4>
+
+    <ul>
+        <li>
+            Given a resource with id <code c:set="#resId">349103a0-4006-11e5-8889-e3cb0d4e45c3</code>
+            <span c:execute="resourceExists(#resId)">exists</span> which is
+            <span c:execute="#annoId = resourceHasAnnotation(#resId)">annotated</span>.
+        </li>
+
+        <li>
+            <h:request>
+                <strong>(verification)</strong> When we
+                <h:get>/resources/$resId</h:get>
+                we observe status
+                <h:status>200 OK</h:status>
+                and body
+                <h:jsonResponse>{ "resource": {
+                    "id": "$resId",
+                    "^annotations": [
+                    "https://{host}/annotations/$annoId"
+                    ] } }
+                </h:jsonResponse>
+            </h:request>
+        </li>
+
+        <li>
+            <h:request>
+                When we
+                <h:delete>/annotations/$annoId</h:delete>
+                we observe status
+                <h:status>204 No Content</h:status>
+                and response body
+                <h:responseBody/>
+            </h:request>
+        </li>
+
+        <li>
+            <h:request>
+                <strong>(verification)</strong> If we
+                <h:get>/resources/$resId</h:get>
+                we observe status
+                <h:status>200 OK</h:status>
+                and body
+                <h:jsonResponse>{ "resource": {
+                    "id": "$resId",
+                    "^annotations": [
+                    "https://{host}/annotations/$annoId"
+                    ] } }
+                </h:jsonResponse>
+                showing us that the <code>DELETED</code> annotation can still be found via our resource.
+            </h:request>
+        </li>
+
+        <li>
+            <h:request>
+                <strong>(verification)</strong> If we
+                <h:get>/annotations/$annoId</h:get>
+                we observe status
+                <h:status>200 OK</h:status>
+                and body
+                <h:jsonResponse>{ "annotation": {
+                    "id": "$annoId",
+                    "state" : { "value" : "DELETED", "since" : "{date.beforeNow}" }
+                    } }
+                </h:jsonResponse>
+                confirming the <code>DELETED</code> status of the annotation.
             </h:request>
         </li>
     </ul>
