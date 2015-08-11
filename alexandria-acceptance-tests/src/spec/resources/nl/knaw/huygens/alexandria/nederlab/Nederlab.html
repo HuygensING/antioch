@@ -12,11 +12,24 @@
     <h4>Retrieve all annotations for all subresources of a given resource</h4>
 
     Given that a resource with id <code c:set="#resId">13e53670-3f3f-11e5-96ef-dff0c5cf4b9b</code>
-    <span c:execute="resourceExists(#resId)">exists</span> with two subresources with ids
-    <ol class="table" c:execute="subResourceHasAnnotation(#TEXT, #resId)">
-        <li><code c:set="#subResId">3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c</code></li>
-        <li><code c:set="#subResId">3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85</code></li>
-    </ol>
+    <span c:execute="resourceExists(#resId)">exists</span> with annotated subresources
+    <table class="table" c:execute="subResourceHasAnnotation(#subId, #resId, #type, #value)">
+        <tr>
+            <th c:set="#subId">Subresource Id</th>
+            <th c:set="#type">Type</th>
+            <th c:set="#value">Value</th>
+        </tr>
+        <tr>
+            <td><code>3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c</code></td>
+            <td>type-1</td>
+            <td>value-1</td>
+        </tr>
+        <tr>
+            <td><code>3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85</code></td>
+            <td>type-2</td>
+            <td>value-2</td>
+        </tr>
+    </table>
 
     <h:request>
         We
@@ -27,13 +40,13 @@
         <h:jsonResponse>{
             "annotations": [
             {
-            "type": "type",
-            "value": "value",
+            "type": "type-1",
+            "value": "value-1",
             "^annotates": "https://{host}/resources/3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c"
             },
             {
-            "type": "type",
-            "value": "value",
+            "type": "type-2",
+            "value": "value-2",
             "^annotates": "https://{host}/resources/3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85"
             }
             ] }
