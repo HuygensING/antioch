@@ -83,7 +83,7 @@ public class EndpointsTest extends TinkergraphServiceEndpointTest {
     assertThat(resource.getState()).isEqualTo(AlexandriaState.TENTATIVE);
 
     response = target(ROOTPATH).path(id.toString()).path("state").request().put(jsonEntity("{'state':'CONFIRMED'}"));
-    assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
+    assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
 
     resource = getService().readResource(id).get();
     assertThat(resource.getState()).isEqualTo(AlexandriaState.CONFIRMED);
@@ -97,7 +97,7 @@ public class EndpointsTest extends TinkergraphServiceEndpointTest {
     assertThat(annotation.getState()).isEqualTo(AlexandriaState.TENTATIVE);
 
     response = target("annotations").path(annotationId.toString()).path("state").request().put(jsonEntity("{'state':'CONFIRMED'}"));
-    assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
+    assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
 
     annotation = getService().readAnnotation(annotationId).get();
     assertThat(annotation.getState()).isEqualTo(AlexandriaState.CONFIRMED);
