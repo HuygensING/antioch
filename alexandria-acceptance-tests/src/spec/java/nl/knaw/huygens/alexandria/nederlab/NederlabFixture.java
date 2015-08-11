@@ -32,26 +32,29 @@ public class NederlabFixture extends AlexandriaAcceptanceTest {
   public AlexandriaResource subResourceExists(String id, String parentId) {
     UUID uuid = UUID.fromString(id);
     UUID parentUUID = UUID.fromString(parentId);
-    final AlexandriaResource subResource = service().createSubResource(uuid, parentUUID, aSub(), aProvenance(), confirmed());
+    final AlexandriaResource subResource = service().createSubResource(uuid, parentUUID, aSub(), aProvenance(),
+        confirmed());
     Log.trace("subResource created: {}", subResource);
     return subResource;
   }
 
-  public void resourceHasAnnotation(String id) {
+  public String resourceHasAnnotation(String id) {
+    return resourceHasAnnotation(id, "type", "value");
+  }
+
+  public String resourceHasAnnotation(String id, String type, String value) {
     UUID uuid = UUID.fromString(id);
     AlexandriaResource resource = service().readResource(uuid).get();
-    AlexandriaAnnotationBody annotationBody = anAnnotation();
-    service().confirmAnnotation(service().annotate(resource, annotationBody, aProvenance()).getId());
+    AlexandriaAnnotationBody annotationBody = anAnnotation(type, value);
+    final UUID annotationId = service().annotate(resource, annotationBody, aProvenance()).getId();
+    service().confirmAnnotation(annotationId);
+    return annotationId.toString();
   }
 
   public void subResourceHasAnnotation(String id, String parentId, String type, String value) {
     AlexandriaResource resource = subResourceExists(id, parentId);
     AlexandriaAnnotationBody annotationBody = anAnnotation(type, value);
     service().confirmAnnotation(service().annotate(resource, annotationBody, aProvenance()).getId());
-  }
-
-  private AlexandriaAnnotationBody anAnnotation() {
-    return anAnnotation("type", "value");
   }
 
   private AlexandriaAnnotationBody anAnnotation(String type, String value) {
