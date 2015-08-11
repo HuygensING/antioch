@@ -49,7 +49,6 @@ public class AlexandriaQueryParserTest {
       assertThat(e.getMessage()).contains("huey");
       assertThat(e.getMessage()).contains("duey");
       assertThat(e.getMessage()).contains("luey");
-      assertThat(e.getMessage()).doesNotContain("id");
     }
   }
 
@@ -66,7 +65,6 @@ public class AlexandriaQueryParserTest {
       assertThat(e.getMessage()).contains("huey");
       assertThat(e.getMessage()).contains("duey");
       assertThat(e.getMessage()).contains("luey");
-      assertThat(e.getMessage()).doesNotContain("id");
     }
   }
 
@@ -141,9 +139,9 @@ public class AlexandriaQueryParserTest {
     Function<AnnotationVF, Map<String, Object>> resultMapper = paq.getResultMapper();
     Map<String, Object> resultMap = resultMapper.apply(passAnnotation);
     assertThat(resultMap).contains(//
-        MapEntry.entry("when", "1"),                                           //
-        MapEntry.entry("value", "Value"),                                           //
-        MapEntry.entry("resource.id", "resourceId"),                                           //
+        MapEntry.entry("when", "1"),                                            //
+        MapEntry.entry("value", "Value"),                                            //
+        MapEntry.entry("resource.id", "resourceId"),                                            //
         MapEntry.entry("subresource.id", "subresourceId")//
     );
   }

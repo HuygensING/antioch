@@ -30,8 +30,8 @@ public class AlexandriaQueryParser {
 
   public static ParsedAlexandriaQuery parse(AlexandriaQuery query) {
     parseErrors.clear();
-    ParsedAlexandriaQuery paq = new ParsedAlexandriaQuery();
 
+    ParsedAlexandriaQuery paq = new ParsedAlexandriaQuery();
     paq.setVFClass(parseFind(query.getFind()));
     paq.setPredicate(parseWhere(query.getWhere()));
     paq.setResultComparator(parseSort(query.getSort()));
@@ -59,7 +59,7 @@ public class AlexandriaQueryParser {
     return null;
   }
 
-  static Map<String, Function<AnnotationVF, Object>> valueMapping = ImmutableMap.<String, Function<AnnotationVF, Object>> builder()
+  static final Map<String, Function<AnnotationVF, Object>> valueMapping = ImmutableMap.<String, Function<AnnotationVF, Object>> builder()
     .put("id", AnnotationVF::getUuid)
     .put("when", AnnotationVF::getProvenanceWhen)
     .put("who", AnnotationVF::getProvenanceWho)
@@ -69,6 +69,9 @@ public class AlexandriaQueryParser {
     .put("resource.id", AnnotationVF::getResourceId)
     .put("subresource.id", AnnotationVF::getSubResourceId)
     .build();
+
+  static final String ALLOWEDFIELDS = ", available fields: " + Joiner.on(", ")
+    .join(valueMapping.keySet());
 
   private static Predicate<Traverser<AnnotationVF>> parseWhere(String whereString) {
     // TODO: implement!
@@ -88,7 +91,7 @@ public class AlexandriaQueryParser {
       String field = token.getField();
       Function<AnnotationVF, Object> valueMapper = valueMapping.get(field);
       if (valueMapper == null) {
-        parseErrors.add("sort: unknown field: " + field);
+        parseErrors.add("sort: unknown field: " + field + ALLOWEDFIELDS);
         errorInSort = true;
       } else {
         valueFunctions.add(valueMapper);
@@ -162,7 +165,7 @@ public class AlexandriaQueryParser {
     unknownFields.removeAll(allowedFields);
     if (!unknownFields.isEmpty()) {
       parseErrors.add("return: unknown field(s) " + Joiner.on(", ")
-        .join(unknownFields));
+        .join(unknownFields) + ALLOWEDFIELDS);
 
     } else {
       paq.setReturnFields(fields);
