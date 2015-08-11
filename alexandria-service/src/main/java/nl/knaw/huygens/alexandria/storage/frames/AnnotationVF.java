@@ -10,6 +10,7 @@ import peapod.annotations.Vertex;
 
 @Vertex(Labels.ANNOTATION)
 public abstract class AnnotationVF extends AlexandriaVF {
+  private static final String NO_VALUE = ":null";
   // TODO: double-check if (update of) peapod supports outgoing edges with the same label to different types of VF
   static final String ANNOTATES_RESOURCE = "annotates_resource";
   private static final String ANNOTATES_ANNOTATION = "annotates_annotation";
@@ -70,7 +71,7 @@ public abstract class AnnotationVF extends AlexandriaVF {
       ResourceVF parentResource = annotatedResource.getParentResource();
       return parentResource == null ? annotatedResource.getUuid() : parentResource.getUuid();
     }
-    return null;
+    return NO_VALUE;
   }
 
   public String getSubResourceId() {
@@ -78,7 +79,7 @@ public abstract class AnnotationVF extends AlexandriaVF {
     if (annotatedResource != null && annotatedResource.isSubresource()) {
       return annotatedResource.getUuid();
     }
-    return null;
+    return NO_VALUE;
   }
 
 }
