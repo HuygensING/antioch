@@ -4,9 +4,9 @@
       xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
                           http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
 
-<title>Creating tags for Nederlab</title>
+<title>Nederlab Scenarios</title>
 
-<body data-desc="Create tag">
+<body data-desc="Nederlab Scenarios">
 
 <div id="create-tag" data-desc="How can I create a tag?" c:execute="clearStorage()">
     <h4>Register the resource at Alexandria
@@ -87,8 +87,8 @@
         </div>
         <li>
             <h:request>
-                <strong>(optional)</strong>
-                As an intermediate verification step, we can
+                <strong>(verification)</strong>
+                We
                 <h:get>/annotations/$anno</h:get>
                 and observe status
                 <h:status>200 OK</h:status>
@@ -123,10 +123,8 @@
         </li>
         <li>
             <h:request>
-                <strong>(optional)</strong>
-                To verify our
-                <mark>annotation</mark>
-                , we can
+                <strong>(verification)</strong>
+                We
                 <h:get>/annotations/$anno</h:get>
                 and observe status
                 <h:status>200 OK</h:status>
@@ -146,10 +144,8 @@
         </li>
         <li>
             <h:request>
-                <strong>(optional)</strong>
-                To verify our
-                <mark>subresource</mark>
-                , we can
+                <strong>(verification)</strong>
+                We
                 <h:get>/resources/$uuid</h:get>
                 and observe status
                 <h:status>200 OK</h:status>
@@ -170,14 +166,15 @@
 </div>
 
 <div id="modify-tag" data-desc="How can I modify a tag?" c:execute="clearStorage()">
-    <h4>Retrieve all annotations for all subresources of a given resource</h4>
-
-    Given a resource with id <code c:set="#resId">13e53670-3f3f-11e5-96ef-dff0c5cf4b9b</code>
+    Given a
+    <mark>resource</mark>
+    with id <code c:set="#resId">13e53670-3f3f-11e5-96ef-dff0c5cf4b9b</code>
     <span c:execute="resourceExists(#resId)">exists</span> which has
-    <span c:execute="resourceHasAnnotation(#resId, #type, #value)">an annotation
+    <span c:execute="#annoId = resourceHasAnnotation(#resId, #type, #value)">an annotation
         of type <code c:set="#type">res-type</code>
         and value <code c:set="#value">res-value</code>
-    </span> and which has annotated subresources:
+    </span> and which has the following annotated
+    <mark>subresources</mark>
     <table class="table"
            c:execute="subResourceHasAnnotation(#subId, #resId, #type, #value)">
         <thead>
@@ -201,32 +198,136 @@
         </tbody>
     </table>
 
-    <h:request>
-        We
-        <h:get>/resources/$resId/annotations</h:get>
-        and observe status
-        <h:status>200 OK</h:status>
-        and the expected annotation references in the body
-        <h:jsonResponse>{
-            "annotations": [
-            {
-            "type": "res-type",
-            "value": "res-value",
-            "^annotates": "https://{host}/resources/13e53670-3f3f-11e5-96ef-dff0c5cf4b9b"
-            },
-            {
-            "type": "subres-1-type",
-            "value": "subres-1-value",
-            "^annotates": "https://{host}/resources/3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c"
-            },
-            {
-            "type": "subres-2-type",
-            "value": "subres-2-value",
-            "^annotates": "https://{host}/resources/3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85"
-            }
-            ] }
-        </h:jsonResponse>
-    </h:request>
+    <h4>Retrieve all annotations for all subresources of a given resource</h4>
+    <ul>
+        <li>
+            <h:request>We
+                <h:get>/resources/$resId/annotations</h:get>
+                and observe status
+                <h:status>200 OK</h:status>
+                and the expected annotation values in the body
+                <h:jsonResponse>{
+                    "annotations": [
+                    {
+                    "type": "res-type",
+                    "value": "res-value",
+                    "^annotates": "https://{host}/resources/13e53670-3f3f-11e5-96ef-dff0c5cf4b9b"
+                    },
+                    {
+                    "type": "subres-1-type",
+                    "value": "subres-1-value",
+                    "^annotates": "https://{host}/resources/3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c"
+                    },
+                    {
+                    "type": "subres-2-type",
+                    "value": "subres-2-value",
+                    "^annotates": "https://{host}/resources/3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85"
+                    }
+                    ] }
+                </h:jsonResponse>
+            </h:request>
+        </li>
+    </ul>
+
+    <h4>Update the annotation body</h4>
+    <ul>
+        <li>
+            <h:request>
+                We
+                <h:post>/annotations/$annoId/deprecation</h:post>
+                the body
+                <h:jsonBody>{ "annotation": {
+                    "type": "res-type",
+                    "value": "UPDATED-VALUE"
+                    } }
+                </h:jsonBody>
+                and observe status
+                <h:status>201 Created</h:status>
+            </h:request>
+        </li>
+        <div c:execute="#anno = uuid()">The updated annotation currently gets a new uuid <strong
+                c:echo="#anno"></strong>.
+        </div>
+        <li>
+            <div class="alert alert-warning sm">
+                <strong>Warning:</strong> This test intentionally left failing to demonstrate what a failed test looks
+                like.
+            </div>
+            <h:request>
+                To confirm, we
+                <h:put>/annotations/$anno/state</h:put>
+                the body
+                <h:jsonBody>{"state": "CONFIRMED"}</h:jsonBody>
+                and observe status
+                <h:status>204 No Content</h:status>
+            </h:request>
+        </li>
+        <li>
+            <h:request>
+                <strong>(verification)</strong> We
+                <h:get>/resources/$resId/annotations</h:get>
+                and observe status
+                <h:status>200 OK</h:status>
+                and the body
+                <h:jsonResponse>{
+                    "annotations": [
+                    {
+                    "type": "res-type",
+                    "value": "UPDATED-VALUE",
+                    "^annotates": "https://{host}/resources/13e53670-3f3f-11e5-96ef-dff0c5cf4b9b"
+                    },
+                    {
+                    "type": "subres-1-type",
+                    "value": "subres-1-value",
+                    "^annotates": "https://{host}/resources/3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c"
+                    },
+                    {
+                    "type": "subres-2-type",
+                    "value": "subres-2-value",
+                    "^annotates": "https://{host}/resources/3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85"
+                    }
+                    ] }
+                </h:jsonResponse>
+            </h:request>
+            <div class="alert alert-info sm">
+                The <code>value</code> on the annotated resource has changed and the other annotations remain unchanged.
+            </div>
+        </li>
+        <li>
+            <h:request>
+                <strong>(verification)</strong> We
+                <h:get>/resources/$resId</h:get>
+                and observe status
+                <h:status>200 OK</h:status>
+                and the body
+                <h:jsonResponse>{ "resource": {
+                    "id": "$resId",
+                    "^annotations": [
+                    "https://{host}/annotations/$annoId",
+                    "https://{host}/annotations/$anno"
+                    ] } }
+                </h:jsonResponse>
+            </h:request>
+            <div class="alert alert-info sm">
+                Both the new and the deprecated annotation links are indeed included.
+            </div>
+        </li>
+        <li>
+            <h:request>
+                <strong>(verification)</strong> We
+                <h:get>/annotations/$annoId</h:get>
+                and observe the body
+                <h:jsonResponse>{ "annotation": {
+                    "id": "$annoId",
+                    "state": { "value": "DEPRECATED" }
+                    } }
+                </h:jsonResponse>
+            </h:request>
+            <div class="alert alert-info sm">
+                The old annotation has indeed become <code>DEPRECATED</code>.
+            </div>
+        </li>
+    </ul>
 </div>
 
 <div id="delete-tag" data-desc="How can I delete a tag?" c:execute="clearStorage()">
@@ -333,6 +434,19 @@
                 <h:jsonBody>{"subresource":{"sub":"/some/folia/path"}}</h:jsonBody>
             </h:request>
             <div c:execute="#uuid = uuid()">in this case yielding uuid <span c:echo="#uuid"></span>.</div>
+        </li>
+        <li>
+            <h:request>
+                <strong>(verification)</strong> We
+                <h:get>/resources/$uuid</h:get>
+                and observe its <code>TENTATIVE</code> state
+                <h:jsonResponse>{"subresource":{
+                    "id": "$uuid",
+                    "sub": "/some/folia/path",
+                    "state": { "value": "TENTATIVE"
+                    } } }
+                </h:jsonResponse>
+            </h:request>
         </li>
     </ul>
 

@@ -51,10 +51,12 @@ public class NederlabFixture extends AlexandriaAcceptanceTest {
     return annotationId.toString();
   }
 
-  public void subResourceHasAnnotation(String id, String parentId, String type, String value) {
+  public String subResourceHasAnnotation(String id, String parentId, String type, String value) {
     AlexandriaResource resource = subResourceExists(id, parentId);
     AlexandriaAnnotationBody annotationBody = anAnnotation(type, value);
-    service().confirmAnnotation(service().annotate(resource, annotationBody, aProvenance()).getId());
+    final UUID annotationId = service().annotate(resource, annotationBody, aProvenance()).getId();
+    service().confirmAnnotation(annotationId);
+    return annotationId.toString();
   }
 
   private AlexandriaAnnotationBody anAnnotation(String type, String value) {
