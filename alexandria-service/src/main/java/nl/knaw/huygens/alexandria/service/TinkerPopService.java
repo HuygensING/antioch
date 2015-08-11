@@ -58,12 +58,9 @@ public class TinkerPopService implements AlexandriaService {
   private LocationBuilder locationBuilder;
 
   @Inject
-  public TinkerPopService(LocationBuilder locationBuilder) {
+  public TinkerPopService(Storage storage, LocationBuilder locationBuilder) {
     Log.trace("{} created, locationBuilder=[{}]", getClass().getSimpleName(), locationBuilder);
     this.locationBuilder = locationBuilder;
-  }
-
-  public TinkerPopService(Storage storage) {
     setStorage(storage);
   }
 

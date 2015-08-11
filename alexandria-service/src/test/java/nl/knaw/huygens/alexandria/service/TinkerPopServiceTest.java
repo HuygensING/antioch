@@ -16,13 +16,16 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.Test;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.config.MockConfiguration;
+import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
+import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
 public class TinkerPopServiceTest {
 
-  TinkerPopService service = new TinkerGraphService();
+  TinkerPopService service = new TinkerGraphService(new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()));
 
   @Test
   public void testReadAfterCreateIsIdentity() {

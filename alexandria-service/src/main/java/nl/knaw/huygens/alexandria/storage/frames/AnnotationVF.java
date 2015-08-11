@@ -56,4 +56,29 @@ public abstract class AnnotationVF extends AlexandriaVF {
   @Edge(AnnotationVF.DEPRECATES)
   public abstract AnnotationVF getDeprecatedBy();
 
+  public String getType() {
+    return getBody().getType();
+  }
+
+  public String getValue() {
+    return getBody().getValue();
+  }
+
+  public String getResourceId() {
+    ResourceVF annotatedResource = getAnnotatedResource();
+    if (annotatedResource != null) {
+      ResourceVF parentResource = annotatedResource.getParentResource();
+      return parentResource == null ? annotatedResource.getUuid() : parentResource.getUuid();
+    }
+    return null;
+  }
+
+  public String getSubResourceId() {
+    ResourceVF annotatedResource = getAnnotatedResource();
+    if (annotatedResource != null && annotatedResource.isSubresource()) {
+      return annotatedResource.getUuid();
+    }
+    return null;
+  }
+
 }

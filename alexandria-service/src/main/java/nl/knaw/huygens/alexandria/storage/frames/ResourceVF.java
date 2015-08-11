@@ -32,4 +32,8 @@ public abstract class ResourceVF extends AlexandriaVF {
   @Edge(PART_OF)
   public abstract void setParentResource(ResourceVF resourceVF);
 
+  public boolean isSubresource() {
+    return getParentResource() != null;
+  }
+
 }

@@ -21,7 +21,6 @@ import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import peapod.FramedGraph;
 import peapod.FramedGraphTraversal;
-import peapod.annotations.Vertex;
 
 public class Storage {
   private static final String IDENTIFIER_PROPERTY = "uuid";
@@ -89,17 +88,17 @@ public class Storage {
     return find(vfClass, uuid).tryNext().isPresent();
   }
 
-  public <T extends AlexandriaVF> T createVF(final Class<T> vfClass) {
+  public <A extends AlexandriaVF> A createVF(final Class<A> vfClass) {
     assertClass(vfClass);
     return framedGraph.addVertex(vfClass);
   }
 
-  public <T extends AlexandriaVF> Optional<T> readVF(final Class<T> vfClass, final UUID uuid) {
+  public <A extends AlexandriaVF> Optional<A> readVF(final Class<A> vfClass, final UUID uuid) {
     assertClass(vfClass);
     return firstOrEmpty(find(vfClass, uuid).toList());
   }
 
-  public <T extends AlexandriaVF> FramedGraphTraversal<Object, T> find(Class<T> vfClass) {
+  public <A extends AlexandriaVF> FramedGraphTraversal<Object, A> find(Class<A> vfClass) {
     return framedGraph.V(vfClass);
   }
 
@@ -149,7 +148,7 @@ public class Storage {
 
   // - private methods - //
 
-  private <T extends AlexandriaVF> FramedGraphTraversal<Object, T> find(final Class<T> vfClass, final UUID uuid) {
+  private <A extends AlexandriaVF> FramedGraphTraversal<Object, A> find(final Class<A> vfClass, final UUID uuid) {
     return find(vfClass).has(IDENTIFIER_PROPERTY, uuid.toString());
   }
 
@@ -157,12 +156,12 @@ public class Storage {
     return dumpfile;
   }
 
-  private <T> Optional<T> firstOrEmpty(final List<T> results) {
+  private <A> Optional<A> firstOrEmpty(final List<A> results) {
     return results.isEmpty() ? Optional.empty() : Optional.ofNullable(results.get(0));
   }
 
   private void assertClass(final Class<? extends AlexandriaVF> clazz) {
-    if (clazz.getAnnotationsByType(Vertex.class).length == 0) {
+    if (clazz.getAnnotationsByType(peapod.annotations.Vertex.class).length == 0) {
       throw new RuntimeException("Class " + clazz + " has no peapod @Vertex annotation, are you sure it is the correct class?");
     }
   }
