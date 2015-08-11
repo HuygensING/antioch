@@ -267,7 +267,7 @@
                 <h:get>/resources/$resId/annotations</h:get>
                 and observe status
                 <h:status>200 OK</h:status>
-                and the expected annotation values in the body
+                and the body
                 <h:jsonResponse>{
                     "annotations": [
                     {
@@ -288,6 +288,9 @@
                     ] }
                 </h:jsonResponse>
             </h:request>
+            <div class="alert alert-info sm">
+                The <code>value</code> on the annotated resource has changed and the other annotations remain unchanged.
+            </div>
         </li>
         <li>
             <h:request>
@@ -304,6 +307,24 @@
                     ] } }
                 </h:jsonResponse>
             </h:request>
+            <div class="alert alert-info sm">
+                Both the new and the deprecated annotation links are indeed included.
+            </div>
+        </li>
+        <li>
+            <h:request>
+                <strong>(verification)</strong> We
+                <h:get>/annotations/$annoId</h:get>
+                and observe the body
+                <h:jsonResponse>{ "annotation": {
+                    "id": "$annoId",
+                    "state": { "value": "DEPRECATED" }
+                    } }
+                </h:jsonResponse>
+            </h:request>
+            <div class="alert alert-info sm">
+                The old annotation has indeed become <code>DEPRECATED</code>.
+            </div>
         </li>
     </ul>
 </div>
