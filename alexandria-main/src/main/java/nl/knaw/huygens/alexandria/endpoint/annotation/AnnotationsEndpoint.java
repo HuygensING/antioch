@@ -41,9 +41,9 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   private final AnnotationDeprecationRequestBuilder requestBuilder;
 
   @Inject
-  public AnnotationsEndpoint(AlexandriaService service,                      //
-      AnnotationEntityBuilder entityBuilder,                      //
-      AnnotationDeprecationRequestBuilder requestBuilder,                      //
+  public AnnotationsEndpoint(AlexandriaService service,                        //
+      AnnotationEntityBuilder entityBuilder,                        //
+      AnnotationDeprecationRequestBuilder requestBuilder,                        //
       LocationBuilder locationBuilder) {
     this.service = service;
     this.entityBuilder = entityBuilder;
@@ -70,6 +70,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   // return Response.noContent().build();
   // }
 
+  // TODO: implement versioning instead
   @POST
   @Path("{uuid}/deprecation")
   @Consumes(MediaType.APPLICATION_JSON)
@@ -84,7 +85,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
 
   @DELETE
   @Path("{uuid}")
-  public Response deleteNotSupported(@PathParam("uuid") final UUIDParam uuidParam) {
+  public Response deleteAnnotation(@PathParam("uuid") final UUIDParam uuidParam) {
     UUID uuid = uuidParam.getValue();
     final AlexandriaAnnotation annotation = service.readAnnotation(uuid)//
         .orElseThrow(annotationNotFoundForId(uuidParam));
@@ -111,7 +112,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
         throw new ConflictException(annotation.getState() + " annotations cannot be set to CONFIRMED");
       }
       service.confirmAnnotation(id);
-      return Response.ok().build();
+      return Response.noContent().build();
     }
     throw new BadRequestException("for now, you can only set the state to CONFIRMED");
   }

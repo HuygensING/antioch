@@ -46,9 +46,9 @@ public class ResourcesEndpoint extends JSONEndpoint {
   private final LocationBuilder locationBuilder;
 
   @Inject
-  public ResourcesEndpoint(AlexandriaService service,                      //
-      ResourceCreationRequestBuilder requestBuilder,                      //
-      LocationBuilder locationBuilder,                      //
+  public ResourcesEndpoint(AlexandriaService service,                       //
+      ResourceCreationRequestBuilder requestBuilder,                       //
+      LocationBuilder locationBuilder,                       //
       ResourceEntityBuilder entityBuilder) {
     this.locationBuilder = locationBuilder;
     this.alexandriaService = service;
@@ -96,7 +96,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
         throw new ConflictException(resource.getState() + " resources cannot be set to CONFIRMED");
       }
       alexandriaService.confirmResource(id);
-      return Response.ok().build();
+      return Response.noContent().build();
     }
     throw new BadRequestException("for now, you can only set the state to CONFIRMED");
   }
