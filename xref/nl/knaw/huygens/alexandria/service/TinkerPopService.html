@@ -514,35 +514,38 @@
 <a class="jxr_linenumber" name="L506" href="#L506">506</a> 
 <a class="jxr_linenumber" name="L507" href="#L507">507</a>     <a href="../../../../../nl/knaw/huygens/alexandria/query/ParsedAlexandriaQuery.html">ParsedAlexandriaQuery</a> pQuery = AlexandriaQueryParser.parse(query);
 <a class="jxr_linenumber" name="L508" href="#L508">508</a> 
-<a class="jxr_linenumber" name="L509" href="#L509">509</a>     Predicate&lt;Traverser&lt;AnnotationVF&gt;&gt; predicate = pQuery.getPredicate();<em class="jxr_comment">// t -&gt; t.get().getProvenanceWho().equals("me");</em>
-<a class="jxr_linenumber" name="L510" href="#L510">510</a>     Comparator&lt;AnnotationVF&gt; comparator = pQuery.getResultComparator();
-<a class="jxr_linenumber" name="L511" href="#L511">511</a>     Function&lt;AnnotationVF, Map&lt;String, Object&gt;&gt; mapper = pQuery.getResultMapper();
-<a class="jxr_linenumber" name="L512" href="#L512">512</a> 
-<a class="jxr_linenumber" name="L513" href="#L513">513</a>     results = storage.find(AnnotationVF.<strong class="jxr_keyword">class</strong>)<em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L514" href="#L514">514</a>         .filter(predicate)<em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L515" href="#L515">515</a>         .toList().stream()<em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L516" href="#L516">516</a>         .sorted(comparator)<em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L517" href="#L517">517</a>         .map(mapper)<em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L518" href="#L518">518</a>         .collect(toList());
-<a class="jxr_linenumber" name="L519" href="#L519">519</a>     Log.info(<span class="jxr_string">"results={}"</span>, results);
-<a class="jxr_linenumber" name="L520" href="#L520">520</a>     <strong class="jxr_keyword">return</strong> results;
-<a class="jxr_linenumber" name="L521" href="#L521">521</a>   }
-<a class="jxr_linenumber" name="L522" href="#L522">522</a> 
-<a class="jxr_linenumber" name="L523" href="#L523">523</a>   <strong class="jxr_keyword">private</strong> List&lt;Map&lt;String, Object&gt;&gt; dummyResults() {
-<a class="jxr_linenumber" name="L524" href="#L524">524</a>     List&lt;Map&lt;String, Object&gt;&gt; list = Lists.newArrayList();
-<a class="jxr_linenumber" name="L525" href="#L525">525</a>     <strong class="jxr_keyword">int</strong> num = <strong class="jxr_keyword">new</strong> Random().nextInt(100);
-<a class="jxr_linenumber" name="L526" href="#L526">526</a>     <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; num; i++) {
-<a class="jxr_linenumber" name="L527" href="#L527">527</a>       String displayName = <span class="jxr_string">"Annotation "</span> + i;
-<a class="jxr_linenumber" name="L528" href="#L528">528</a>       URI annotationLocation = locationBuilder.locationOf(AlexandriaAnnotation.<strong class="jxr_keyword">class</strong>, UUID.randomUUID().toString());
-<a class="jxr_linenumber" name="L529" href="#L529">529</a>       Map&lt;String, Object&gt; map = Maps.newHashMap();
-<a class="jxr_linenumber" name="L530" href="#L530">530</a>       map.put(<span class="jxr_string">"displayName"</span>, displayName);
-<a class="jxr_linenumber" name="L531" href="#L531">531</a>       map.put(<span class="jxr_string">"annotation"</span>, annotationLocation);
-<a class="jxr_linenumber" name="L532" href="#L532">532</a>       list.add(map);
-<a class="jxr_linenumber" name="L533" href="#L533">533</a>     }
-<a class="jxr_linenumber" name="L534" href="#L534">534</a>     <strong class="jxr_keyword">return</strong> list;
-<a class="jxr_linenumber" name="L535" href="#L535">535</a>   }
-<a class="jxr_linenumber" name="L536" href="#L536">536</a> 
-<a class="jxr_linenumber" name="L537" href="#L537">537</a> }
+<a class="jxr_linenumber" name="L509" href="#L509">509</a>     <em class="jxr_comment">// Predicate&lt;Traverser&lt;AnnotationVF&gt;&gt; predicate = pQuery.getPredicate();// t -&gt; t.get().getProvenanceWho().equals("me");</em>
+<a class="jxr_linenumber" name="L510" href="#L510">510</a>     Predicate&lt;Traverser&lt;AnnotationVF&gt;&gt; predicate = t -&gt; t.get().getProvenanceWho().equals(<span class="jxr_string">"nederlab"</span>);
+<a class="jxr_linenumber" name="L511" href="#L511">511</a>     Comparator&lt;AnnotationVF&gt; comparator = pQuery.getResultComparator();
+<a class="jxr_linenumber" name="L512" href="#L512">512</a>     Function&lt;AnnotationVF, Map&lt;String, Object&gt;&gt; mapper = pQuery.getResultMapper();
+<a class="jxr_linenumber" name="L513" href="#L513">513</a> 
+<a class="jxr_linenumber" name="L514" href="#L514">514</a>     <em class="jxr_comment">// type.eq("Tag"),who.eq("nederlab"),state.eq("CONFIRMED")</em>
+<a class="jxr_linenumber" name="L515" href="#L515">515</a>     List&lt;Object&gt; list = storage.find(AnnotationBodyVF.<strong class="jxr_keyword">class</strong>)<em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L516" href="#L516">516</a>         .has(<span class="jxr_string">"type"</span>, <span class="jxr_string">"Tag"</span>).in(<span class="jxr_string">"has_body"</span>).has(<span class="jxr_string">"provenanceWho"</span>, <span class="jxr_string">"nederlab"</span>).has(<span class="jxr_string">"state"</span>, <span class="jxr_string">"CONFIRMED"</span>).value().toList();
+<a class="jxr_linenumber" name="L517" href="#L517">517</a>     Log.debug(<span class="jxr_string">"list={}"</span>, list);
+<a class="jxr_linenumber" name="L518" href="#L518">518</a> 
+<a class="jxr_linenumber" name="L519" href="#L519">519</a>     results = storage.find(AnnotationVF.<strong class="jxr_keyword">class</strong>)
+<a class="jxr_linenumber" name="L520" href="#L520">520</a>         <em class="jxr_comment">// .filter(predicate)</em>
+<a class="jxr_linenumber" name="L521" href="#L521">521</a>         .toList().stream().sorted(comparator).map(mapper).collect(toList());
+<a class="jxr_linenumber" name="L522" href="#L522">522</a>     Log.info(<span class="jxr_string">"results={}"</span>, results);
+<a class="jxr_linenumber" name="L523" href="#L523">523</a>     <strong class="jxr_keyword">return</strong> results;
+<a class="jxr_linenumber" name="L524" href="#L524">524</a>   }
+<a class="jxr_linenumber" name="L525" href="#L525">525</a> 
+<a class="jxr_linenumber" name="L526" href="#L526">526</a>   <strong class="jxr_keyword">private</strong> List&lt;Map&lt;String, Object&gt;&gt; dummyResults() {
+<a class="jxr_linenumber" name="L527" href="#L527">527</a>     List&lt;Map&lt;String, Object&gt;&gt; list = Lists.newArrayList();
+<a class="jxr_linenumber" name="L528" href="#L528">528</a>     <strong class="jxr_keyword">int</strong> num = <strong class="jxr_keyword">new</strong> Random().nextInt(100);
+<a class="jxr_linenumber" name="L529" href="#L529">529</a>     <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; num; i++) {
+<a class="jxr_linenumber" name="L530" href="#L530">530</a>       String displayName = <span class="jxr_string">"Annotation "</span> + i;
+<a class="jxr_linenumber" name="L531" href="#L531">531</a>       URI annotationLocation = locationBuilder.locationOf(AlexandriaAnnotation.<strong class="jxr_keyword">class</strong>, UUID.randomUUID().toString());
+<a class="jxr_linenumber" name="L532" href="#L532">532</a>       Map&lt;String, Object&gt; map = Maps.newHashMap();
+<a class="jxr_linenumber" name="L533" href="#L533">533</a>       map.put(<span class="jxr_string">"displayName"</span>, displayName);
+<a class="jxr_linenumber" name="L534" href="#L534">534</a>       map.put(<span class="jxr_string">"annotation"</span>, annotationLocation);
+<a class="jxr_linenumber" name="L535" href="#L535">535</a>       list.add(map);
+<a class="jxr_linenumber" name="L536" href="#L536">536</a>     }
+<a class="jxr_linenumber" name="L537" href="#L537">537</a>     <strong class="jxr_keyword">return</strong> list;
+<a class="jxr_linenumber" name="L538" href="#L538">538</a>   }
+<a class="jxr_linenumber" name="L539" href="#L539">539</a> 
+<a class="jxr_linenumber" name="L540" href="#L540">540</a> }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2015 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
