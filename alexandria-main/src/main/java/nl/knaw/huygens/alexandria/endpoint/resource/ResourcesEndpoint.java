@@ -2,9 +2,6 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import static nl.knaw.huygens.alexandria.endpoint.EndpointPaths.RESOURCES;
 
-import java.util.UUID;
-import java.util.function.Supplier;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.Valid;
@@ -19,6 +16,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.UUID;
+import java.util.function.Supplier;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -107,15 +106,6 @@ public class ResourcesEndpoint extends JSONEndpoint {
     return methodNotImplemented();
   }
 
-  // TODO: replace with sub-resource analogous to {uuid}/annotations (see below)
-  @GET
-  @Path("{uuid}/ref")
-  @ApiOperation(value = "Get just the ref of the resource with the given uuid", response = RefEntity.class)
-  public Response getResourceRef(@PathParam("uuid") final UUIDParam uuidParam) {
-    AlexandriaResource resource = readExistingResource(uuidParam.getValue());
-    return Response.ok(new RefEntity(resource.getCargo())).build();
-  }
-
   @PUT
   @Path("{uuid}")
   @Consumes(MediaType.APPLICATION_JSON)
@@ -164,7 +154,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   public static WebApplicationException resourceIsTentativeException(UUID uuid) {
     return new TentativeObjectException("resource " + uuid + " is tentative, please confirm first");
-  };
+  }
 
   private AlexandriaResource readExistingResource(UUID id) {
     return alexandriaService.readResource(id)//

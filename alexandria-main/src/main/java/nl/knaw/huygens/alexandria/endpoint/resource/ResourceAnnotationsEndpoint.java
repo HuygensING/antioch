@@ -23,7 +23,6 @@ import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.alexandria.util.Optionals;
 
 @Api("annotations")
 public class ResourceAnnotationsEndpoint extends AnnotatableObjectAnnotationsEndpoint {
@@ -58,11 +57,12 @@ public class ResourceAnnotationsEndpoint extends AnnotatableObjectAnnotationsEnd
   }
 
   @GET
-  @ApiOperation(value = "get the annotations of the resource and its immediate subresources", response = AnnotationEntity.class)
+  @ApiOperation(value = "get the annotations of this resource", response = AnnotationEntity.class)
   @Override
   public Response get() {
     Stream<AlexandriaAnnotation> resourceAnnotationsStream = getAnnotatableObject().getAnnotations().stream();
 
+    /* TODO: migrate to search endpoint (left as example code)
     Stream<AlexandriaAnnotation> subresourceAnnotationsStream = asResource(getAnnotatableObject()) //
         .getSubResourcePointers().stream() //
         .map(service::dereference) //
@@ -72,13 +72,14 @@ public class ResourceAnnotationsEndpoint extends AnnotatableObjectAnnotationsEnd
         .flatMap(Set::stream);
 
     Stream<AlexandriaAnnotation> joinedStream = Stream.concat(resourceAnnotationsStream, subresourceAnnotationsStream);
+    */
 
-    final Set<AnnotationEntity> annotationEntities = joinedStream//
-        .filter(AlexandriaAnnotation::isActive)//
-        .map((AlexandriaAnnotation a) -> AnnotationEntity.of(a).withLocationBuilder(locationBuilder))//
+    final Set<AnnotationEntity> annotationEntities = resourceAnnotationsStream //
+        .filter(AlexandriaAnnotation::isActive) //
+        .map((AlexandriaAnnotation a) -> AnnotationEntity.of(a).withLocationBuilder(locationBuilder)) //
         .collect(toSet());
 
-    Map<String, Set<AnnotationEntity>> entity = ImmutableMap.of("annotations", annotationEntities);
+    final Map<String, Set<AnnotationEntity>> entity = ImmutableMap.of("annotations", annotationEntities);
     return Response.ok(entity).build();
   }
 
