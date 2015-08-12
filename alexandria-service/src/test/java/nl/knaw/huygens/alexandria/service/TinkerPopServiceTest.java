@@ -103,6 +103,12 @@ public class TinkerPopServiceTest {
     logGraph(graph);
   }
 
+  @Test
+  public void testUuid() {
+    UUID u = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    assertThat(u).isNotNull();
+  }
+
   private void logGraph(TinkerGraph graph) throws IOException {
     OutputStream os = new ByteArrayOutputStream();
     graph.io(new GraphSONIo.Builder()).writer().create().writeGraph(os, graph);

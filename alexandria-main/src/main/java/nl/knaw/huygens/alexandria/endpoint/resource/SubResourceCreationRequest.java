@@ -33,9 +33,15 @@ class SubResourceCreationRequest implements CreationRequest<AlexandriaResource> 
 
     String sub = providedSub();
     TentativeAlexandriaProvenance provenance = providedProvenance().orElse(TentativeAlexandriaProvenance.createDefault());
-    service.createSubResource(uuid, parentId, sub, provenance, prototype.getState());
-
-    return service.readResource(uuid).get();
+    Optional<AlexandriaResource> existingSubResource = service.findSubresourceWithSubAndParentId(sub, parentId);
+    if (!existingSubResource.isPresent()) {
+      service.createSubResource(uuid, parentId, sub, provenance, prototype.getState());
+      subResourceWasCreated = true;
+      return service.readResource(uuid).get();
+    } else {
+      subResourceWasCreated = false;
+      return existingSubResource.get();
+    }
   }
 
   public boolean wasExecutedAsIs() {
@@ -64,4 +70,5 @@ class SubResourceCreationRequest implements CreationRequest<AlexandriaResource> 
   private Optional<TentativeAlexandriaProvenance> providedProvenance() {
     return prototype.getProvenance().map(ProvenancePrototype::getValue);
   }
+
 }

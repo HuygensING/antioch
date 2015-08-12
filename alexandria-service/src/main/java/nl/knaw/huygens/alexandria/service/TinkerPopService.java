@@ -161,6 +161,23 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
+  public Optional<AlexandriaResource> findSubresourceWithSubAndParentId(String sub, UUID parentId) {
+    // TODO: find the gremlin way to do this in one:
+    // in cypher: match (r:Resource{uuid:parentId})<-[:PART_OF]-(s:Resource{cargo:sub}) return s.uuid
+    final List<ResourceVF> results = storage.find(ResourceVF.class)//
+        .has("cargo", sub)//
+        .toList();
+    if (results.isEmpty()) {
+      return Optional.empty();
+    }
+
+    results.stream()//
+        .filter(r -> r.getParentResource() != null && r.getParentResource().getUuid().equals(parentId))//
+        .collect(toList());
+    return Optional.of(deframeResource(results.get(0)));
+  }
+
+  @Override
   public Set<AlexandriaResource> readSubResources(UUID uuid) {
     ResourceVF resourcevf = storage.readVF(ResourceVF.class, uuid)//
         .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));

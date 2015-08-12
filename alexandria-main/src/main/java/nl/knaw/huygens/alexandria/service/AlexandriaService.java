@@ -36,8 +36,6 @@ public interface AlexandriaService {
 
   AlexandriaAnnotationBody createAnnotationBody(UUID uuid, String type, String value, TentativeAlexandriaProvenance provenance, AlexandriaState alexandriaState);
 
-  Optional<AlexandriaAnnotationBody> findAnnotationBodyWithTypeAndValue(String type, String value);
-
   Optional<AlexandriaAnnotationBody> readAnnotationBody(UUID uuid);
 
   AlexandriaAnnotation annotate(AlexandriaResource resource, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance);
@@ -76,5 +74,10 @@ public interface AlexandriaService {
   void deleteAnnotation(AlexandriaAnnotation annotation);
 
   SearchResult execute(AlexandriaQuery query);
+
+  // TODO: refactor these find methods to something more generic (search)
+  Optional<AlexandriaResource> findSubresourceWithSubAndParentId(String sub, UUID parentId);
+
+  Optional<AlexandriaAnnotationBody> findAnnotationBodyWithTypeAndValue(String type, String value);
 
 }
