@@ -20,7 +20,7 @@ public class AlexandriaApplication extends ResourceConfig {
     register(new LoggingFilter(getAnonymousLogger(), true));
 
     // Validation configuration
-    // register(ValidationConfigurationContextResolver.class);
+    register(ValidationConfigurationContextResolver.class);
 
     // JSON configuration
     register(JsonConfiguration.class);
