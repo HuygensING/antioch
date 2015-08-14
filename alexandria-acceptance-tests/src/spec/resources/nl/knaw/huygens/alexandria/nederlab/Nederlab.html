@@ -8,6 +8,20 @@
 
 <body data-desc="Nederlab Scenarios">
 
+<!-- TODO: Move to 'cat' and generate -->
+<div class="dropdown">
+    <button class="btn btn-primary pull-right dropdown-toggle" type="button" data-toggle="dropdown">Test Sources
+        <span class="caret"></span></button>
+    <ul class="dropdown-menu dropdown-menu-right">
+        <li>
+            <a href="https://github.com/HuygensING/alexandria/blob/develop/alexandria-acceptance-tests/src/spec/resources/nl/knaw/huygens/alexandria/nederlab/Nederlab.html">Concordion</a>
+        </li>
+        <li>
+            <a href="https://github.com/HuygensING/alexandria/blob/develop/alexandria-acceptance-tests/src/spec/java/nl/knaw/huygens/alexandria/nederlab/NederlabFixture.java">Java</a>
+        </li>
+    </ul>
+</div>
+
 <div id="create-tag" data-desc="How can I create a tag?" c:execute="clearStorage()">
     <h4>Register the resource at Alexandria
         <small>(once per resource)</small>
@@ -66,6 +80,22 @@
                 and observe status
                 <h:status>204 No Content</h:status>
             </h:request>
+        </li>
+        <li>
+            <div class="alert alert-info sm">
+                <strong>Duplicate submission of subresources is allowed</strong>
+                <h:request>
+                    Now that we know the subresource already exists, if we again
+                    <h:post>/resources/e480f748-3a9d-11e5-abc7-339c977c9f7e/subresources</h:post>
+                    the body
+                    <h:jsonBody>{ "subresource": { "sub": "/some/folia/expression/marker" } }</h:jsonBody>
+                    then we receive status
+                    <h:status>204 No Content</h:status>
+                    (instead of <code>201 Created</code>)
+                    with the <strong>same</strong> location header:
+                    <h:location type="full">https://{host}/resources/$uuid</h:location>
+                </h:request>
+            </div>
         </li>
     </ul>
 
@@ -199,6 +229,7 @@
     </table>
 
     <h4>Retrieve all annotations for all subresources of a given resource</h4>
+
     <div class="alert alert-warning sm">
         Currently defunct. Awaiting <a href="http://jira.huygens.knaw.nl/browse/NLA-93">NLA-93</a>
     </div>
