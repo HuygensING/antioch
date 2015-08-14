@@ -111,19 +111,13 @@
 <a class="jxr_linenumber" name="L103" href="#L103">103</a>     logGraph(graph);
 <a class="jxr_linenumber" name="L104" href="#L104">104</a>   }
 <a class="jxr_linenumber" name="L105" href="#L105">105</a> 
-<a class="jxr_linenumber" name="L106" href="#L106">106</a>   @Test
-<a class="jxr_linenumber" name="L107" href="#L107">107</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testUuid() {
-<a class="jxr_linenumber" name="L108" href="#L108">108</a>     UUID u = UUID.fromString(<span class="jxr_string">"11111111-1111-1111-1111-111111111111"</span>);
-<a class="jxr_linenumber" name="L109" href="#L109">109</a>     assertThat(u).isNotNull();
+<a class="jxr_linenumber" name="L106" href="#L106">106</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> logGraph(TinkerGraph graph) <strong class="jxr_keyword">throws</strong> IOException {
+<a class="jxr_linenumber" name="L107" href="#L107">107</a>     OutputStream os = <strong class="jxr_keyword">new</strong> ByteArrayOutputStream();
+<a class="jxr_linenumber" name="L108" href="#L108">108</a>     graph.io(<strong class="jxr_keyword">new</strong> GraphSONIo.Builder()).writer().create().writeGraph(os, graph);
+<a class="jxr_linenumber" name="L109" href="#L109">109</a>     Log.info(<span class="jxr_string">"graph={}"</span>, os.toString());
 <a class="jxr_linenumber" name="L110" href="#L110">110</a>   }
 <a class="jxr_linenumber" name="L111" href="#L111">111</a> 
-<a class="jxr_linenumber" name="L112" href="#L112">112</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> logGraph(TinkerGraph graph) <strong class="jxr_keyword">throws</strong> IOException {
-<a class="jxr_linenumber" name="L113" href="#L113">113</a>     OutputStream os = <strong class="jxr_keyword">new</strong> ByteArrayOutputStream();
-<a class="jxr_linenumber" name="L114" href="#L114">114</a>     graph.io(<strong class="jxr_keyword">new</strong> GraphSONIo.Builder()).writer().create().writeGraph(os, graph);
-<a class="jxr_linenumber" name="L115" href="#L115">115</a>     Log.info(<span class="jxr_string">"graph={}"</span>, os.toString());
-<a class="jxr_linenumber" name="L116" href="#L116">116</a>   }
-<a class="jxr_linenumber" name="L117" href="#L117">117</a> 
-<a class="jxr_linenumber" name="L118" href="#L118">118</a> }
+<a class="jxr_linenumber" name="L112" href="#L112">112</a> }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2015 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
