@@ -233,7 +233,12 @@
     <h:request>We
         <h:post>/search</h:post>
         the following body
-        <h:jsonBody>{"query":{ "find": "annotation", "where": "type.eq(\"type\"),who.eq(\"nederlab\")" } }</h:jsonBody>
+        <h:jsonBody>{ "query": {
+            "find": "annotation",
+            "where": "who.eq(\"nederlab\")",
+            "return": "id,resource.id,subresource.id,type,value"
+            } }
+        </h:jsonBody>
     </h:request>
 
     <div c:execute="#searchId = uuid()">The uuid for the search result is:
@@ -244,6 +249,15 @@
         <h:get>/search/$searchId/resultpages/1</h:get>
         and observe
         <h:status>200 OK</h:status>
+        and the expected annotation values in the body
+        <h:jsonResponse>{ "searchresultPage": {
+            "records": [ {
+            "type": "res-type",
+            "value": "res-value",
+            "resource.id": <!-- https://{host}/resources/ --> "13e53670-3f3f-11e5-96ef-dff0c5cf4b9b"
+            }
+            ] } }
+        </h:jsonResponse>
     </h:request>
 
     <div class="alert alert-warning sm">
