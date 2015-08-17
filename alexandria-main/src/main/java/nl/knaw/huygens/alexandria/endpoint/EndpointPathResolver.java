@@ -16,7 +16,7 @@ import nl.knaw.huygens.alexandria.model.Identifiable;
 
 @Singleton
 public class EndpointPathResolver {
-  private Map<Class<? extends Identifiable>, String> identifiableEndpoints;
+  private final Map<Class<? extends Identifiable>, String> identifiableEndpoints;
 
   public EndpointPathResolver() {
     Log.trace("EndpointPathResolver created");
@@ -27,12 +27,8 @@ public class EndpointPathResolver {
     identifiableEndpoints.put(SearchResult.class, EndpointPaths.SEARCHES);
   }
 
-  public Optional<String> pathOf(Identifiable accountable) {
-    return pathOf(accountable.getClass());
-  }
-
-  public Optional<String> pathOf(Class<? extends Identifiable> accountableClass) {
-    return Optional.ofNullable(identifiableEndpoints.get(accountableClass));
+  public Optional<String> pathOf(Class<? extends Identifiable> identifiableClass) {
+    return Optional.ofNullable(identifiableEndpoints.get(identifiableClass));
   }
 
 }

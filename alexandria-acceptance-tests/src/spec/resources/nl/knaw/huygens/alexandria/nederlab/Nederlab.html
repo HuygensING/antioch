@@ -14,10 +14,10 @@
         <span class="caret"></span></button>
     <ul class="dropdown-menu dropdown-menu-right">
         <li>
-            <a href="https://github.com/HuygensING/alexandria/blob/develop/alexandria-acceptance-tests/src/spec/resources/nl/knaw/huygens/alexandria/nederlab/Nederlab.html">Concordion</a>
+            <a href="https://github.com/HuygensING/alexandria/blob/develop/alexandria-acceptance-tests/src/spec/java/nl/knaw/huygens/alexandria/nederlab/NederlabFixture.java">Fixture</a>
         </li>
         <li>
-            <a href="https://github.com/HuygensING/alexandria/blob/develop/alexandria-acceptance-tests/src/spec/java/nl/knaw/huygens/alexandria/nederlab/NederlabFixture.java">Java</a>
+            <a href="https://github.com/HuygensING/alexandria/blob/develop/alexandria-acceptance-tests/src/spec/resources/nl/knaw/huygens/alexandria/nederlab/Nederlab.html">Specification</a>
         </li>
     </ul>
 </div>
@@ -229,6 +229,22 @@
     </table>
 
     <h4>Retrieve all annotations for all subresources of a given resource</h4>
+
+    <h:request>We
+        <h:post>/search</h:post>
+        the following body
+        <h:jsonBody>{"query":{ "find": "annotation", "where": "type.eq(\"type\"),who.eq(\"nederlab\")" } }</h:jsonBody>
+    </h:request>
+
+    <div c:execute="#searchId = uuid()">The uuid for the search result is:
+        <strong c:echo="#searchId"></strong>.
+    </div>
+
+    <h:request>We
+        <h:get>/search/$searchId/resultpages/1</h:get>
+        and observe
+        <h:status>200 OK</h:status>
+    </h:request>
 
     <div class="alert alert-warning sm">
         Currently defunct. Awaiting <a href="http://jira.huygens.knaw.nl/browse/NLA-93">NLA-93</a>
