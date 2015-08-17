@@ -1,7 +1,6 @@
 package nl.knaw.huygens.alexandria.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.StrictAssertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -11,15 +10,14 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.apache.tinkerpop.gremlin.process.traversal.Traverser;
-import org.assertj.core.data.MapEntry;
-import org.junit.Test;
-
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.query.AlexandriaQueryParser.SortToken;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
+import org.apache.tinkerpop.gremlin.process.traversal.Traverser;
+import org.assertj.core.data.MapEntry;
+import org.junit.Test;
 
 public class AlexandriaQueryParserTest {
   @Test
@@ -49,6 +47,7 @@ public class AlexandriaQueryParserTest {
       assertThat(e.getMessage()).contains("huey");
       assertThat(e.getMessage()).contains("duey");
       assertThat(e.getMessage()).contains("luey");
+      assertThat(e.getMessage()).doesNotContain("unknown field: id");
     }
   }
 
@@ -65,6 +64,7 @@ public class AlexandriaQueryParserTest {
       assertThat(e.getMessage()).contains("huey");
       assertThat(e.getMessage()).contains("duey");
       assertThat(e.getMessage()).contains("luey");
+      assertThat(e.getMessage()).doesNotContain("unknown field: id");
     }
   }
 
@@ -138,11 +138,11 @@ public class AlexandriaQueryParserTest {
     assertThat(paq.getReturnFields()).containsExactly("when", "value", "resource.id", "subresource.id");
     Function<AnnotationVF, Map<String, Object>> resultMapper = paq.getResultMapper();
     Map<String, Object> resultMap = resultMapper.apply(passAnnotation);
-    assertThat(resultMap).contains(//
-        MapEntry.entry("when", "1"),                                            //
-        MapEntry.entry("value", "Value"),                                            //
-        MapEntry.entry("resource.id", "resourceId"),                                            //
-        MapEntry.entry("subresource.id", "subresourceId")//
+    assertThat(resultMap).contains( //
+        MapEntry.entry("when", "1"), //
+        MapEntry.entry("value", "Value"), //
+        MapEntry.entry("resource.id", "resourceId"), //
+        MapEntry.entry("subresource.id", "subresourceId") //
     );
   }
 
