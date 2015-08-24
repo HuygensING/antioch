@@ -6,15 +6,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.Test;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
+import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+import org.junit.Test;
 
 public class SearchResultTest {
   @Test
@@ -22,7 +21,7 @@ public class SearchResultTest {
     AlexandriaConfiguration config = new MockConfiguration();
     SearchResult sr = new SearchResult(new LocationBuilder(config, new EndpointPathResolver()));
     Map<String, Object> map = ImmutableMap.of("what", "ever");
-    List<Map<String, Object>> results = ImmutableList.<Map<String, Object>> builder()//
+    List<Map<String, Object>> results = ImmutableList.<Map<String, Object>>builder()//
         .add(map).add(map).add(map).add(map).add(map)//
         .add(map).add(map).add(map).add(map).add(map)//
         .add(map)//
@@ -32,7 +31,7 @@ public class SearchResultTest {
     sr.setId(id);
     assertThat(sr.getTotalResults()).isEqualTo(11);
     assertThat(sr.getTotalResultPages()).isEqualTo(2);
-    assertThat(sr.getFirstResultPage()).hasToString(config.getBaseURI() + "search/" + id + "/resultpages/1");
+    assertThat(sr.getFirstResultPage()).hasToString(config.getBaseURI() + EndpointPaths.SEARCHES + "/" + id + "/resultpages/1");
   }
 
 }

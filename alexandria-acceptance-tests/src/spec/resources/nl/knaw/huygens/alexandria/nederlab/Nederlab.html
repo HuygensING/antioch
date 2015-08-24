@@ -231,7 +231,7 @@
     <h4>Retrieve all annotations for all subresources of a given resource</h4>
 
     <h:request>We
-        <h:post>/search</h:post>
+        <h:post>/searches</h:post>
         the following body
         <h:jsonBody>{ "query": {
             "find": "annotation",
@@ -241,20 +241,33 @@
         </h:jsonBody>
     </h:request>
 
-    <div c:execute="#searchId = uuid()">The uuid for the search result is:
+    <div c:execute="#searchId = uuid()">The uuid for this particular search was:
         <strong c:echo="#searchId"></strong>.
     </div>
 
     <h:request>We
-        <h:get>/search/$searchId/resultpages/1</h:get>
+        <h:get>/searches/$searchId/resultpages/1</h:get>
         and observe
         <h:status>200 OK</h:status>
-        and the expected annotation values in the body
+        and the expected annotation values, resource and subresource <code>id</code>s in the body
         <h:jsonResponse>{ "searchresultPage": {
-            "records": [ {
+            "records": [
+            {
             "type": "res-type",
             "value": "res-value",
             "resource.id": <!-- https://{host}/resources/ --> "13e53670-3f3f-11e5-96ef-dff0c5cf4b9b"
+            },
+            {
+            "type": "subres-1-type",
+            "value": "subres-1-value",
+            "resource.id": "13e53670-3f3f-11e5-96ef-dff0c5cf4b9b",
+            "subresource.id": "3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c"
+            },
+            {
+            "type": "subres-2-type",
+            "value": "subres-2-value",
+            "resource.id": "13e53670-3f3f-11e5-96ef-dff0c5cf4b9b",
+            "subresource.id": "3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85"
             }
             ] } }
         </h:jsonResponse>
