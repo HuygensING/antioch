@@ -467,7 +467,9 @@ public class TinkerPopService implements AlexandriaService {
     AnnotationVF annotatedAnnotation = annotationVF.getAnnotatedAnnotation();
     if (annotatedAnnotation == null) {
       ResourceVF annotatedResource = annotationVF.getAnnotatedResource();
-      annotation.setAnnotatablePointer(new IdentifiablePointer<>(AlexandriaResource.class, annotatedResource.getUuid()));
+      if (annotatedResource != null) {
+        annotation.setAnnotatablePointer(new IdentifiablePointer<>(AlexandriaResource.class, annotatedResource.getUuid()));
+      }
     } else {
       annotation.setAnnotatablePointer(new IdentifiablePointer<>(AlexandriaAnnotation.class, annotatedAnnotation.getUuid()));
     }

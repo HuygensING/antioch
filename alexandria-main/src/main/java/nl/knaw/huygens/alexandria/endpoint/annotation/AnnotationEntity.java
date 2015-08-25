@@ -10,6 +10,7 @@ import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.PropertyPrefix;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 
 @JsonTypeName("annotation")
 @ApiModel("annotation")
@@ -45,7 +46,8 @@ public class AnnotationEntity extends AbstractAnnotatableEntity {
 
   @JsonProperty(PropertyPrefix.LINK + "annotates")
   public String getAnnotates() {
-    return locationBuilder.locationOf(annotation.getAnnotatablePointer()).toString();
+    IdentifiablePointer<?> annotatablePointer = annotation.getAnnotatablePointer();
+    return annotatablePointer == null ? "" : locationBuilder.locationOf(annotatablePointer).toString();
   }
 
   @JsonProperty(PropertyPrefix.LINK + "deprecates")
