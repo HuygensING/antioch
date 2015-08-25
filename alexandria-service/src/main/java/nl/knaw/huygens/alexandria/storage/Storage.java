@@ -98,6 +98,11 @@ public class Storage {
     return firstOrEmpty(find(vfClass, uuid).toList());
   }
 
+  public <A extends AlexandriaVF> Optional<A> readVF(final Class<A> vfClass, final UUID uuid, final Integer revision) {
+    assertClass(vfClass);
+    return firstOrEmpty(find(vfClass, uuid, revision).toList());
+  }
+
   public <A extends AlexandriaVF> FramedGraphTraversal<Object, A> find(Class<A> vfClass) {
     return framedGraph.V(vfClass);
   }
@@ -150,6 +155,10 @@ public class Storage {
 
   private <A extends AlexandriaVF> FramedGraphTraversal<Object, A> find(final Class<A> vfClass, final UUID uuid) {
     return find(vfClass).has(IDENTIFIER_PROPERTY, uuid.toString());
+  }
+
+  private <A extends AlexandriaVF> FramedGraphTraversal<Object, A> find(final Class<A> vfClass, final UUID uuid, final Integer revision) {
+    return find(vfClass).has(IDENTIFIER_PROPERTY, uuid.toString() + "." + revision);
   }
 
   private String getDumpFile() {

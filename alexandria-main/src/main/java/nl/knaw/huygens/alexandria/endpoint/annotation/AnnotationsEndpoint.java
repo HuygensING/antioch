@@ -8,7 +8,6 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -35,15 +34,17 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 @Path(EndpointPaths.ANNOTATIONS)
 @Api("annotations")
 public class AnnotationsEndpoint extends JSONEndpoint {
+  public final static String REVPATH = "/rev/";
+
   private final AlexandriaService service;
   private final AnnotationEntityBuilder entityBuilder;
   private final LocationBuilder locationBuilder;
   private final AnnotationDeprecationRequestBuilder requestBuilder;
 
   @Inject
-  public AnnotationsEndpoint(AlexandriaService service,                        //
-      AnnotationEntityBuilder entityBuilder,                        //
-      AnnotationDeprecationRequestBuilder requestBuilder,                        //
+  public AnnotationsEndpoint(AlexandriaService service, //
+      AnnotationEntityBuilder entityBuilder, //
+      AnnotationDeprecationRequestBuilder requestBuilder, //
       LocationBuilder locationBuilder) {
     this.service = service;
     this.entityBuilder = entityBuilder;
@@ -60,25 +61,40 @@ public class AnnotationsEndpoint extends JSONEndpoint {
     return Response.ok(entityBuilder.build(annotation)).build();
   }
 
-  // @PUT
-  // @Path("{uuid}")
+  @GET
+  @Path("{uuid}" + REVPATH + "{revision}")
+  @ApiOperation(value = "get the given revision of the annotation", response = AnnotationEntity.class)
+  public Response readVersionedAnnotation( //
+      @PathParam("uuid") UUIDParam uuidParam, //
+      @PathParam("revision") Integer revision //
+  ) {
+    final AlexandriaAnnotation annotation = service.readAnnotation(uuidParam.getValue(), revision)//
+        .orElseThrow(annotationNotFoundForIdAndRevision(uuidParam, revision));
+    return Response.ok(entityBuilder.build(annotation)).build();
+  }
+
+  // @POST
+  // @Path("{uuid}/deprecation")
   // @Consumes(MediaType.APPLICATION_JSON)
-  // @ApiOperation(value = "confirm the annotation")
-  // public Response confirmAnnotation(@PathParam("uuid") UUIDParam uuidParam, AnnotationPrototype protoType) {
-  // protoType.setState(AlexandriaState.CONFIRMED);
-  // service.confirmAnnotation(uuidParam.getValue());
-  // return Response.noContent().build();
+  // @ApiOperation(value = "make a new annotation from the payload and use it to deprecate the annotation with the given uuid")
+  // public Response deprecateAnnotation(@PathParam("uuid") UUIDParam uuidParam, AnnotationPrototype prototype) {
+  // UUID uuid = uuidParam.getValue();
+  // prototype.setState(AlexandriaState.TENTATIVE);
+  // AnnotationDeprecationRequest request = requestBuilder.ofAnnotation(uuid).build(prototype);
+  // AlexandriaAnnotation newAnnotation = request.execute(service);
+  // return Response.created(locationBuilder.locationOf(newAnnotation)).build();
   // }
 
-  // TODO: implement versioning instead
-  @POST
-  @Path("{uuid}/deprecation")
+  @PUT
+  @Path("{uuid}")
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation(value = "make a new annotation from the payload and use it to deprecate the annotation with the given uuid")
-  public Response deprecateAnnotation(@PathParam("uuid") UUIDParam uuidParam, AnnotationPrototype prototype) {
+  public Response deprecateAnnotation(@PathParam("uuid") UUIDParam uuidParam, AnnotationUpdatePrototype prototype) {
     UUID uuid = uuidParam.getValue();
+    final AlexandriaAnnotation annotation = service.readAnnotation(uuid)//
+        .orElseThrow(annotationNotFoundForId(uuidParam));
     prototype.setState(AlexandriaState.TENTATIVE);
-    AnnotationDeprecationRequest request = requestBuilder.ofAnnotation(uuid).build(prototype);
+    AnnotationDeprecationRequest request = requestBuilder.ofAnnotation(annotation).build(prototype);
     AlexandriaAnnotation newAnnotation = request.execute(service);
     return Response.created(locationBuilder.locationOf(newAnnotation)).build();
   }
@@ -130,7 +146,15 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   }
 
   public static Supplier<NotFoundException> annotationNotFoundForId(Object id) {
-    return () -> new NotFoundException("No annotation found with id " + id);
+    return () -> new NotFoundException(NoAnnotationFoundWithId(id));
+  }
+
+  private static String NoAnnotationFoundWithId(Object id) {
+    return "No annotation found with id " + id;
+  }
+
+  public static Supplier<NotFoundException> annotationNotFoundForIdAndRevision(Object id, Integer revision) {
+    return () -> new NotFoundException(NoAnnotationFoundWithId(id) + ", revision " + revision);
   }
 
   public static WebApplicationException annotationIsTentative(UUID uuid) {

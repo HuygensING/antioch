@@ -6,7 +6,7 @@ public class AlexandriaAnnotation extends AbstractAnnotatable {
 
   private final AlexandriaAnnotationBody body;
   private IdentifiablePointer<?> annotatedPointer;
-  private long rev = 0;
+  private Integer rev = 0;
 
   public AlexandriaAnnotation(UUID id, AlexandriaAnnotationBody body, TentativeAlexandriaProvenance provenance) {
     super(id, provenance);
@@ -25,11 +25,11 @@ public class AlexandriaAnnotation extends AbstractAnnotatable {
     return annotatedPointer;
   }
 
-  public long getRev() {
+  public Integer getRevision() {
     return rev;
   }
 
-  public void setRev(long rev) {
+  public void setRevision(Integer rev) {
     this.rev = rev;
   }
 

@@ -12,10 +12,14 @@ import peapod.annotations.Vertex;
 public abstract class AnnotationVF extends AlexandriaVF {
   public static final String NO_VALUE = ":null";
   // TODO: double-check if (update of) peapod supports outgoing edges with the same label to different types of VF
-  static final String ANNOTATES_RESOURCE = "annotates_resource";
   private static final String ANNOTATES_ANNOTATION = "annotates_annotation";
   private static final String DEPRECATES = "deprecates";
+  static final String ANNOTATES_RESOURCE = "annotates_resource";
   static final String HAS_BODY = "has_body";
+
+  public abstract void setRevision(Integer revision);
+
+  public abstract Integer getRevision();
 
   @Out
   @Edge(HAS_BODY)

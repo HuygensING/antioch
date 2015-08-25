@@ -44,6 +44,8 @@ public interface AlexandriaService {
 
   Optional<AlexandriaAnnotation> readAnnotation(UUID uuid);
 
+  Optional<AlexandriaAnnotation> readAnnotation(UUID uuid, Integer revision);
+
   Optional<? extends Accountable> dereference(IdentifiablePointer<? extends Accountable> pointer);
 
   /**

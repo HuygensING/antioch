@@ -143,6 +143,11 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
+  public Optional<AlexandriaAnnotation> readAnnotation(UUID uuid, Integer revision) {
+    return storage.readVF(AnnotationVF.class, uuid, revision).map(this::deframeAnnotation);
+  }
+
+  @Override
   public void removeExpiredTentatives() {
     // Tentative vertices should not have any outgoing or incoming edges!!
     Long threshold = Instant.now().minus(TIMEOUT).getEpochSecond();
@@ -190,34 +195,35 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public AlexandriaAnnotation deprecateAnnotation(UUID oldAnnotationId, AlexandriaAnnotation tmpAnnotation) {
+  public AlexandriaAnnotation deprecateAnnotation(UUID annotationId, AlexandriaAnnotation updatedAnnotation) {
     storage.startTransaction();
 
     // check if there's an annotation with the given id
-    AnnotationVF oldAnnotationVF = storage.readVF(AnnotationVF.class, oldAnnotationId)//
-        .orElseThrow(annotationNotFound(oldAnnotationId));
+    AnnotationVF oldAnnotationVF = storage.readVF(AnnotationVF.class, annotationId)//
+        .orElseThrow(annotationNotFound(annotationId));
     if (oldAnnotationVF.isTentative()) {
-      throw incorrectStateException(oldAnnotationId, "tentative");
+      throw incorrectStateException(annotationId, "tentative");
     } else if (oldAnnotationVF.isDeleted()) {
-      throw new BadRequestException("annotation " + oldAnnotationId + " is " + "deleted");
+      throw new BadRequestException("annotation " + annotationId + " is " + "deleted");
     } else if (oldAnnotationVF.isDeprecated()) {
-      throw new BadRequestException("annotation " + oldAnnotationId + " is " + "already deprecated");
+      throw new BadRequestException("annotation " + annotationId + " is " + "already deprecated");
     }
 
-    AlexandriaAnnotationBody newBody = tmpAnnotation.getBody();
+    AlexandriaAnnotationBody newBody = updatedAnnotation.getBody();
     Optional<AlexandriaAnnotationBody> optionalBody = findAnnotationBodyWithTypeAndValue(newBody.getType(), newBody.getValue());
     AlexandriaAnnotationBody body;
     if (optionalBody.isPresent()) {
       body = optionalBody.get();
     } else {
-      frameAnnotationBody(newBody);
+      AnnotationBodyVF annotationBodyVF = frameAnnotationBody(newBody);
+      annotationBodyVF.setState(AlexandriaState.CONFIRMED.toString());
       body = newBody;
     }
 
-    AlexandriaProvenance tmpProvenance = tmpAnnotation.getProvenance();
+    AlexandriaProvenance tmpProvenance = updatedAnnotation.getProvenance();
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(tmpProvenance.getWho(), tmpProvenance.getWhen(), tmpProvenance.getWhy());
-    AlexandriaAnnotation newAnnotation = new AlexandriaAnnotation(tmpAnnotation.getId(), body, provenance);
-    AnnotationVF newAnnotationVF = createAnnotationVF(newAnnotation);
+    AlexandriaAnnotation newAnnotation = new AlexandriaAnnotation(updatedAnnotation.getId(), body, provenance);
+    AnnotationVF newAnnotationVF = frameAnnotation(newAnnotation);
 
     AnnotationVF annotatedAnnotation = oldAnnotationVF.getAnnotatedAnnotation();
     if (annotatedAnnotation != null) {
@@ -227,6 +233,12 @@ public class TinkerPopService implements AlexandriaService {
       newAnnotationVF.setAnnotatedResource(annotatedResource);
     }
     newAnnotationVF.setDeprecatedAnnotation(oldAnnotationVF);
+    newAnnotationVF.setRevision(oldAnnotationVF.getRevision() + 1);
+    newAnnotationVF.setState(AlexandriaState.CONFIRMED.toString());
+
+    oldAnnotationVF.setAnnotatedAnnotation(null);
+    oldAnnotationVF.setAnnotatedResource(null);
+    oldAnnotationVF.setUuid(oldAnnotationVF.getUuid() + "." + oldAnnotationVF.getRevision());
 
     AlexandriaAnnotation resultAnnotation = deframeAnnotation(newAnnotationVF);
     storage.commitTransaction();
@@ -355,7 +367,7 @@ public class TinkerPopService implements AlexandriaService {
   public void annotateResourceWithAnnotation(AlexandriaResource resource, AlexandriaAnnotation newAnnotation) {
     storage.startTransaction();
 
-    AnnotationVF avf = createAnnotationVF(newAnnotation);
+    AnnotationVF avf = frameAnnotation(newAnnotation);
 
     ResourceVF resourceToAnnotate = storage.readVF(ResourceVF.class, resource.getId()).get();
     avf.setAnnotatedResource(resourceToAnnotate);
@@ -372,7 +384,7 @@ public class TinkerPopService implements AlexandriaService {
   public void annotateAnnotationWithAnnotation(AlexandriaAnnotation annotation, AlexandriaAnnotation newAnnotation) {
     storage.startTransaction();
 
-    AnnotationVF avf = createAnnotationVF(newAnnotation);
+    AnnotationVF avf = frameAnnotation(newAnnotation);
     UUID id = annotation.getId();
     annotate(avf, id);
 
@@ -411,9 +423,10 @@ public class TinkerPopService implements AlexandriaService {
     return new AlexandriaAnnotation(id, annotationbody, provenance);
   }
 
-  AnnotationVF createAnnotationVF(AlexandriaAnnotation newAnnotation) {
+  AnnotationVF frameAnnotation(AlexandriaAnnotation newAnnotation) {
     AnnotationVF avf = storage.createVF(AnnotationVF.class);
     setAlexandriaVFProperties(avf, newAnnotation);
+    avf.setRevision(newAnnotation.getRevision());
 
     UUID bodyId = newAnnotation.getBody().getId();
     AnnotationBodyVF bodyVF = storage.readVF(AnnotationBodyVF.class, bodyId).get();
@@ -448,6 +461,8 @@ public class TinkerPopService implements AlexandriaService {
     AlexandriaAnnotation annotation = new AlexandriaAnnotation(uuid, body, provenance);
     annotation.setState(AlexandriaState.valueOf(annotationVF.getState()));
     annotation.setStateSince(Instant.ofEpochSecond(annotationVF.getStateSince()));
+    annotation.setRevision(annotationVF.getRevision());
+
     AnnotationVF annotatedAnnotation = annotationVF.getAnnotatedAnnotation();
     if (annotatedAnnotation == null) {
       ResourceVF annotatedResource = annotationVF.getAnnotatedResource();
@@ -508,7 +523,7 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   private UUID getUUID(AlexandriaVF vf) {
-    return UUID.fromString(vf.getUuid());
+    return UUID.fromString(vf.getUuid().replaceFirst("\\..$", "")); // remove revision suffix for deprecated annotations
   }
 
   void updateState(AlexandriaVF vf, AlexandriaState newState) {

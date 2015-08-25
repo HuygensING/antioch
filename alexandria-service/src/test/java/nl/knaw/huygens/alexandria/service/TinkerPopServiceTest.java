@@ -20,7 +20,9 @@ import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
 public class TinkerPopServiceTest {
@@ -107,6 +109,46 @@ public class TinkerPopServiceTest {
   public void testUuid() {
     UUID u = UUID.fromString("11111111-1111-1111-1111-111111111111");
     assertThat(u).isNotNull();
+  }
+
+  @Test
+  public void testDeprecateAnnotation() {
+    // given
+    UUID resourceId = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
+    AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
+    service.createOrUpdateResource(resource);
+
+    UUID annotationBodyId = UUID.fromString("22222222-2222-2222-2222-222222222222");
+    TentativeAlexandriaProvenance provenance1 = new TentativeAlexandriaProvenance("who1", Instant.now(), "why1");
+    AlexandriaAnnotationBody body1 = service.createAnnotationBody(annotationBodyId, "type", "value", provenance1, AlexandriaState.CONFIRMED);
+
+    UUID annotationId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    TentativeAlexandriaProvenance provenance2 = new TentativeAlexandriaProvenance("who2", Instant.now(), "why2");
+    AlexandriaAnnotation annotation = new AlexandriaAnnotation(annotationId, body1, provenance2);
+    service.annotateResourceWithAnnotation(resource, annotation);
+    service.confirmAnnotation(annotationId);
+    assertThat(annotation.getRevision()).isEqualTo(0);
+
+    UUID annotationBodyId2 = UUID.fromString("22222222-2222-2222-2222-222222222223");
+    TentativeAlexandriaProvenance provenance3 = new TentativeAlexandriaProvenance("who3", Instant.now(), "why3");
+    AlexandriaAnnotationBody body2 = service.createAnnotationBody(annotationBodyId2, "type", "updated value", provenance3, AlexandriaState.CONFIRMED);
+    TentativeAlexandriaProvenance provenance4 = new TentativeAlexandriaProvenance("who4", Instant.now(), "why4");
+    AlexandriaAnnotation updatedAnnotation = new AlexandriaAnnotation(annotationId, body2, provenance4);
+
+    // when
+    AlexandriaAnnotation newAnnotation = service.deprecateAnnotation(annotationId, updatedAnnotation);
+
+    // then expect
+    assertThat(newAnnotation.getId()).isEqualTo(annotationId);
+    assertThat(newAnnotation.getState()).isEqualTo(AlexandriaState.CONFIRMED);
+    assertThat(newAnnotation.getBody().getType()).isEqualTo("type");
+    assertThat(newAnnotation.getBody().getValue()).isEqualTo("updated value");
+    assertThat(newAnnotation.getAnnotatablePointer().getIdentifier()).isEqualTo(resourceId.toString());
+    assertThat(newAnnotation.getProvenance().getWhen()).isEqualTo(provenance4.getWhen());
+    assertThat(newAnnotation.getProvenance().getWho()).isEqualTo(provenance4.getWho());
+    assertThat(newAnnotation.getProvenance().getWhy()).isEqualTo(provenance4.getWhy());
+    assertThat(newAnnotation.getRevision()).isEqualTo(1);
   }
 
   private void logGraph(TinkerGraph graph) throws IOException {

@@ -12,6 +12,7 @@ import javax.inject.Inject;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class AnnotationDeprecationRequestBuilder {
@@ -20,26 +21,26 @@ public class AnnotationDeprecationRequestBuilder {
   public static final String MISSING_ANNOTATION_BODY_MESSAGE = "Missing or empty annotation request body";
 
   private final AlexandriaService service;
-  private UUID uuid;
+  private AlexandriaAnnotation originalAnnotation;
 
   @Inject
   public AnnotationDeprecationRequestBuilder(AlexandriaService service) {
     this.service = requireNonNull(service, "AlexandriaService MUST not be null");
   }
 
-  public AnnotationDeprecationRequestBuilder ofAnnotation(UUID uuid) {
-    this.uuid = uuid;
+  public AnnotationDeprecationRequestBuilder ofAnnotation(AlexandriaAnnotation annotation) {
+    this.originalAnnotation = annotation;
     return this;
   }
 
-  public AnnotationDeprecationRequest build(AnnotationPrototype prototype) {
-    return new AnnotationDeprecationRequest(uuid, prototype);
+  public AnnotationDeprecationRequest build(AnnotationUpdatePrototype prototype) {
+    return new AnnotationDeprecationRequest(originalAnnotation, prototype);
   }
 
   protected void validateId(AnnotationPrototype prototype) {
     Log.trace("Validating id");
     return; // missing or empty Id means client does not override server
-            // generated value.
+    // generated value.
   }
 
   protected void validateType(AnnotationPrototype prototype) {
@@ -55,7 +56,7 @@ public class AnnotationDeprecationRequestBuilder {
   protected void validateProvenance(AnnotationPrototype prototype) {
     Log.trace("Validating provenance");
     return; // missing or empty provenance means client does not override server
-            // set value.
+    // set value.
   }
 
   // protected void validateAnnotations(AnnotationPrototype prototype) {
@@ -67,7 +68,7 @@ public class AnnotationDeprecationRequestBuilder {
 
   protected <T> Stream<T> stream(Collection<T> c) {
     return c.parallelStream(); // override in case you prefer stream() over
-                               // parallelStream()
+    // parallelStream()
   }
 
   protected void validateAnnotationId(UUID uuid) {
