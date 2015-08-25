@@ -10,7 +10,7 @@ import peapod.annotations.Vertex;
 
 @Vertex(Labels.ANNOTATION)
 public abstract class AnnotationVF extends AlexandriaVF {
-  private static final String NO_VALUE = ":null";
+  public static final String NO_VALUE = ":null";
   // TODO: double-check if (update of) peapod supports outgoing edges with the same label to different types of VF
   static final String ANNOTATES_RESOURCE = "annotates_resource";
   private static final String ANNOTATES_ANNOTATION = "annotates_annotation";
@@ -66,7 +66,7 @@ public abstract class AnnotationVF extends AlexandriaVF {
   }
 
   public String getResourceId() {
-    ResourceVF annotatedResource = getAnnotatedResource();
+    ResourceVF annotatedResource = getFirstAnnotatedResource();
     if (annotatedResource != null) {
       ResourceVF parentResource = annotatedResource.getParentResource();
       return parentResource == null ? annotatedResource.getUuid() : parentResource.getUuid();
@@ -75,11 +75,25 @@ public abstract class AnnotationVF extends AlexandriaVF {
   }
 
   public String getSubResourceId() {
-    ResourceVF annotatedResource = getAnnotatedResource();
+    ResourceVF annotatedResource = getFirstAnnotatedResource();
     if (annotatedResource != null && annotatedResource.isSubresource()) {
       return annotatedResource.getUuid();
     }
     return NO_VALUE;
   }
 
+  private ResourceVF getFirstAnnotatedResource() {
+    AnnotationVF annotation = findActiveVersionOf(this);
+    while (annotation.getAnnotatedResource() == null) {
+      annotation = findActiveVersionOf(annotation.getAnnotatedAnnotation());
+    }
+    return annotation.getAnnotatedResource();
+  }
+
+  private AnnotationVF findActiveVersionOf(AnnotationVF annotation) {
+    while (annotation.isDeprecated()) {
+      annotation = annotation.getDeprecatedAnnotation();
+    }
+    return annotation;
+  }
 }

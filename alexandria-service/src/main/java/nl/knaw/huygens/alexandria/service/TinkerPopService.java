@@ -57,10 +57,13 @@ public class TinkerPopService implements AlexandriaService {
 
   private LocationBuilder locationBuilder;
 
+  private AlexandriaQueryParser alexandriaQueryParser;
+
   @Inject
   public TinkerPopService(Storage storage, LocationBuilder locationBuilder) {
     Log.trace("{} created, locationBuilder=[{}]", getClass().getSimpleName(), locationBuilder);
     this.locationBuilder = locationBuilder;
+    this.alexandriaQueryParser = new AlexandriaQueryParser(locationBuilder);
     setStorage(storage);
   }
 
@@ -521,7 +524,7 @@ public class TinkerPopService implements AlexandriaService {
   private List<Map<String, Object>> processQuery(AlexandriaQuery query) {
     List<Map<String, Object>> results = dummyResults();
 
-    ParsedAlexandriaQuery pQuery = AlexandriaQueryParser.parse(query);
+    ParsedAlexandriaQuery pQuery = alexandriaQueryParser.parse(query);
 
     // Predicate<Traverser<AnnotationVF>> predicate = pQuery.getPredicate();// t -> t.get().getProvenanceWho().equals("me");
     Predicate<Traverser<AnnotationVF>> predicate = t -> t.get().getProvenanceWho().equals("nederlab");
@@ -535,7 +538,10 @@ public class TinkerPopService implements AlexandriaService {
 
     results = storage.find(AnnotationVF.class)
         // .filter(predicate)
-        .toList().stream().sorted(comparator).map(mapper).collect(toList());
+        .toList().stream()//
+        .sorted(comparator)//
+        .map(mapper)//
+        .collect(toList());
     Log.info("results={}", results);
     return results;
   }
