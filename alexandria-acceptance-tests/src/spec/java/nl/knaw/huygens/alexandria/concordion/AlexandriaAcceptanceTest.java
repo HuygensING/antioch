@@ -99,13 +99,13 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     super.clear();
   }
 
-  public String uuid() {
-    return Iterables.getLast(Splitter.on('/').split(location().orElse("(not set)")));
-  }
-
   @Override
   protected Application configure() {
     return super.configure(); // maybe move enabling of LOG_TRAFFIC and DUMP_ENTITY from RestFixture here?
+  }
+
+  public String uuid() {
+    return Iterables.getLast(Splitter.on('/').split(location().orElse("(not set)")));
   }
 
   public void clearStorage() {

@@ -255,56 +255,23 @@
             {
             "type": "res-type",
             "value": "res-value",
-            "resource.id": <!-- https://{host}/resources/ --> "13e53670-3f3f-11e5-96ef-dff0c5cf4b9b"
+            "resource.url": "https://{host}/resources/13e53670-3f3f-11e5-96ef-dff0c5cf4b9b"
             },
             {
             "type": "subres-1-type",
             "value": "subres-1-value",
-            "resource.id": "13e53670-3f3f-11e5-96ef-dff0c5cf4b9b",
-            "subresource.id": "3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c"
+            "resource.url": "https://{host}/resources/13e53670-3f3f-11e5-96ef-dff0c5cf4b9b",
+            "subresource.url": "https://{host}/resources/3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c"
             },
             {
             "type": "subres-2-type",
             "value": "subres-2-value",
-            "resource.id": "13e53670-3f3f-11e5-96ef-dff0c5cf4b9b",
-            "subresource.id": "3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85"
+            "resource.url": "https://{host}/resources/13e53670-3f3f-11e5-96ef-dff0c5cf4b9b",
+            "subresource.url": "https://{host}/resources/3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85"
             }
             ] } }
         </h:jsonResponse>
     </h:request>
-
-    <div class="alert alert-warning sm">
-        Currently defunct. Awaiting <a href="http://jira.huygens.knaw.nl/browse/NLA-93">NLA-93</a>
-    </div>
-    <ul>
-        <li>
-            <h:request>We
-                <h:get>/resources/$resId/annotations</h:get>
-                and observe status
-                <h:status>200 OK</h:status>
-                and the expected annotation values in the body
-                <h:jsonResponse>{
-                    "annotations": [
-                    {
-                    "type": "res-type",
-                    "value": "res-value",
-                    "^annotates": "https://{host}/resources/13e53670-3f3f-11e5-96ef-dff0c5cf4b9b"
-                    },
-                    {
-                    "type": "subres-1-type",
-                    "value": "subres-1-value",
-                    "^annotates": "https://{host}/resources/3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c"
-                    },
-                    {
-                    "type": "subres-2-type",
-                    "value": "subres-2-value",
-                    "^annotates": "https://{host}/resources/3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85"
-                    }
-                    ] }
-                </h:jsonResponse>
-            </h:request>
-        </li>
-    </ul>
 
     <h4>Update the annotation body</h4>
     <ul>
