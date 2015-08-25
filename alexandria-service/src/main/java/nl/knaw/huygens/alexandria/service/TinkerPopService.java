@@ -216,7 +216,7 @@ public class TinkerPopService implements AlexandriaService {
       body = optionalBody.get();
     } else {
       AnnotationBodyVF annotationBodyVF = frameAnnotationBody(newBody);
-      annotationBodyVF.setState(AlexandriaState.CONFIRMED.toString());
+      updateState(annotationBodyVF, AlexandriaState.CONFIRMED);
       body = newBody;
     }
 
@@ -234,11 +234,12 @@ public class TinkerPopService implements AlexandriaService {
     }
     newAnnotationVF.setDeprecatedAnnotation(oldAnnotationVF);
     newAnnotationVF.setRevision(oldAnnotationVF.getRevision() + 1);
-    newAnnotationVF.setState(AlexandriaState.CONFIRMED.toString());
+    updateState(newAnnotationVF, AlexandriaState.CONFIRMED);
 
     oldAnnotationVF.setAnnotatedAnnotation(null);
     oldAnnotationVF.setAnnotatedResource(null);
     oldAnnotationVF.setUuid(oldAnnotationVF.getUuid() + "." + oldAnnotationVF.getRevision());
+    updateState(oldAnnotationVF, AlexandriaState.DEPRECATED);
 
     AlexandriaAnnotation resultAnnotation = deframeAnnotation(newAnnotationVF);
     storage.commitTransaction();
