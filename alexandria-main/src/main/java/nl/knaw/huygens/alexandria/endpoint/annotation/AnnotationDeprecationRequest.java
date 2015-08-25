@@ -27,8 +27,7 @@ public class AnnotationDeprecationRequest implements CreationRequest<AlexandriaA
     String type = originalAnnotation.getBody().getType();
     AlexandriaAnnotationBody body = service.findAnnotationBodyWithTypeAndValue(type, providedValue())//
         .orElseGet(() -> new AlexandriaAnnotationBody(UUID.randomUUID(), type, providedValue(), provenance));
-    UUID annotationUuid = UUID.randomUUID();
-    AlexandriaAnnotation newAnnotation = new AlexandriaAnnotation(annotationUuid, body, provenance);
+    AlexandriaAnnotation newAnnotation = new AlexandriaAnnotation(originalAnnotation.getId(), body, provenance);
 
     return service.deprecateAnnotation(originalAnnotation.getId(), newAnnotation);
   }

@@ -93,10 +93,10 @@ public class AnnotationsEndpoint extends JSONEndpoint {
     UUID uuid = uuidParam.getValue();
     final AlexandriaAnnotation annotation = service.readAnnotation(uuid)//
         .orElseThrow(annotationNotFoundForId(uuidParam));
-    prototype.setState(AlexandriaState.TENTATIVE);
+    prototype.setState(AlexandriaState.CONFIRMED);
     AnnotationDeprecationRequest request = requestBuilder.ofAnnotation(annotation).build(prototype);
-    AlexandriaAnnotation newAnnotation = request.execute(service);
-    return Response.created(locationBuilder.locationOf(newAnnotation)).build();
+    request.execute(service);
+    return Response.noContent().build();
   }
 
   @DELETE
