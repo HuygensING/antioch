@@ -12,11 +12,11 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class AnnotationDeprecationRequest implements CreationRequest<AlexandriaAnnotation> {
 
-  private final AnnotationUpdatePrototype prototype;
+  private final AnnotationPrototype prototype;
 
   private AlexandriaAnnotation originalAnnotation;
 
-  public AnnotationDeprecationRequest(AlexandriaAnnotation originalAnnotation, AnnotationUpdatePrototype prototype) {
+  public AnnotationDeprecationRequest(AlexandriaAnnotation originalAnnotation, AnnotationPrototype prototype) {
     this.prototype = prototype;
     this.originalAnnotation = originalAnnotation;
   }
