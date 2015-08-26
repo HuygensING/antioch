@@ -6,17 +6,17 @@ import javax.ws.rs.core.UriBuilder;
 
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 
-public class TestConfiguration implements AlexandriaConfiguration {
+public class AcceptanceConfiguration implements AlexandriaConfiguration {
 
   @Override
   public URI getBaseURI() {
     // TODO: hide url
-    return UriBuilder.fromUri("http://test.alexandria.huygens.knaw.nl/").build();
+    return UriBuilder.fromUri("https://alexandria.huygens.knaw.nl/").build();
   }
 
   @Override
   public String getStorageDirectory() {
-    return "/data/alexandria/storage/test/";
+    return "/data/alexandria/storage/acceptance/";
   }
 
 }
