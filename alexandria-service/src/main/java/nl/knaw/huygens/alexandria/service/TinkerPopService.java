@@ -472,6 +472,9 @@ public class TinkerPopService implements AlexandriaService {
     AlexandriaAnnotation annotation = new AlexandriaAnnotation(uuid, body, provenance);
     annotation.setState(AlexandriaState.valueOf(annotationVF.getState()));
     annotation.setStateSince(Instant.ofEpochSecond(annotationVF.getStateSince()));
+    if (annotationVF.getRevision() == null) { // update old data
+      annotationVF.setRevision(0);
+    }
     annotation.setRevision(annotationVF.getRevision());
 
     AnnotationVF annotatedAnnotation = annotationVF.getAnnotatedAnnotation();
