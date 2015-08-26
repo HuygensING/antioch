@@ -12,6 +12,7 @@ import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Graph.Features.GraphFeatures;
 import org.apache.tinkerpop.gremlin.structure.Transaction;
+import org.apache.tinkerpop.gremlin.structure.io.IoCore;
 import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
 
@@ -131,7 +132,7 @@ public class Storage {
 
   public void loadFromDisk(final String file) {
     try {
-      graph.io(new GraphMLIo.Builder()).readGraph(file);
+      graph.io(IoCore.graphml()).readGraph(file);
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
@@ -140,7 +141,7 @@ public class Storage {
   public void saveToDisk(final String file) {
     if (file != null) {
       try {
-        graph.io(new GraphMLIo.Builder()).writeGraph(file);
+        graph.io(IoCore.graphml()).writeGraph(file);
       } catch (final IOException e) {
         throw new RuntimeException(e);
       }
