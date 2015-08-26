@@ -236,7 +236,7 @@
         <h:jsonBody>{ "query": {
             "find": "annotation",
             "where": "who.eq(\"nederlab\")",
-            "return": "id,resource.id,subresource.id,type,value"
+            "return": "id,resource.url,subresource.url,type,value"
             } }
         </h:jsonBody>
     </h:request>
@@ -278,7 +278,7 @@
         <li>
             <h:request>
                 We
-                <h:post>/annotations/$annoId/deprecation</h:post>
+                <h:put>/annotations/$annoId</h:put>
                 the body
                 <h:jsonBody>{ "annotation": {
                     "type": "res-type",
@@ -286,27 +286,11 @@
                     } }
                 </h:jsonBody>
                 and observe status
-                <h:status>201 Created</h:status>
-            </h:request>
-        </li>
-        <div c:execute="#anno = uuid()">The updated annotation currently gets a new uuid <strong
-                c:echo="#anno"></strong>.
-        </div>
-        <li>
-            <h:request>
-                To confirm, we
-                <h:put>/annotations/$anno/state</h:put>
-                the body
-                <h:jsonBody>{"state": "CONFIRMED"}</h:jsonBody>
-                and observe status
                 <h:status>204 No Content</h:status>
             </h:request>
         </li>
         <li>
             <h:request>
-                <div class="alert alert-warning sm">
-                    Currently defunct. Awaiting <a href="http://jira.huygens.knaw.nl/browse/NLA-93">NLA-93</a>
-                </div>
                 <strong>(verification)</strong> We
                 <h:get>/resources/$resId/annotations</h:get>
                 and observe status
