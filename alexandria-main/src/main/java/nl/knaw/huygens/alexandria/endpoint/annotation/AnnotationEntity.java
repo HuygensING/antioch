@@ -2,6 +2,7 @@ package nl.knaw.huygens.alexandria.endpoint.annotation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import io.swagger.annotations.ApiModel;
@@ -13,6 +14,7 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 
 @JsonTypeName("annotation")
+@JsonPropertyOrder({ "id", "revision", "state", "type", "value" })
 @ApiModel("annotation")
 public class AnnotationEntity extends AbstractAnnotatableEntity {
 

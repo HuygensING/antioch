@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import io.swagger.annotations.ApiModel;
@@ -16,6 +17,7 @@ import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 
 @JsonTypeName("resource")
+@JsonPropertyOrder({ "id", "ref" })
 @ApiModel("resource")
 public class ResourceEntity extends AbstractAnnotatableEntity {
 
