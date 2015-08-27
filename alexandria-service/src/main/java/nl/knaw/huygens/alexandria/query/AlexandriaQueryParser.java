@@ -17,6 +17,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.Traverser;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
@@ -40,13 +41,13 @@ public class AlexandriaQueryParser {
     this.locationBuilder = locationBuilder;
   }
 
-  public static ParsedAlexandriaQuery parse(final AlexandriaQuery query) {
+  public ParsedAlexandriaQuery parse(final AlexandriaQuery query) {
     parseErrors.clear();
 
-    final ParsedAlexandriaQuery paq = new ParsedAlexandriaQuery();
-    paq.setVFClass(parseFind(query.getFind()));
-    paq.setPredicate(parseWhere(query.getWhere()));
-    paq.setResultComparator(parseSort(query.getSort()));
+    final ParsedAlexandriaQuery paq = new ParsedAlexandriaQuery()//
+        .setVFClass(parseFind(query.getFind()))//
+        .setPredicate(parseWhere(query.getWhere()))//
+        .setResultComparator(parseSort(query.getSort()));
     parseReturn(query.getFields(), paq);
 
     if (!parseErrors.isEmpty()) {
@@ -56,7 +57,7 @@ public class AlexandriaQueryParser {
     return paq;
   }
 
-  private static Class<? extends AlexandriaVF> parseFind(final String find) {
+  private Class<? extends AlexandriaVF> parseFind(final String find) {
     if (find.equals("annotation")) {
       return AnnotationVF.class;
 
@@ -87,16 +88,40 @@ public class AlexandriaQueryParser {
   static final String ALLOWEDFIELDS = ", available fields: " + Joiner.on(", ").join(valueMapping.keySet());
 
   private static Predicate<Traverser<AnnotationVF>> parseWhere(final String whereString) {
-    // TODO: implement!
-    final List<String> tokens = Splitter.on(",").trimResults().splitToList(whereString);
-    final Predicate<Traverser<AnnotationVF>> predicate = at -> {
-      final Object y = at.get();
-      Log.debug("y={}", y.getClass());
-      final AnnotationVF x = at.get();
-      Log.debug("{}", x);
-      return x.isConfirmed();
+    final List<WhereToken> tokens = tokenize(whereString);
+    return createPredicate(tokens);
+  }
+
+  static List<WhereToken> tokenize(final String whereString) {
+    List<String> strings = splitToList(whereString);
+    List<WhereToken> list = Lists.newArrayListWithExpectedSize(strings.size());
+    for (String string : strings) {
+      // TODO
+      WhereToken token = new WhereToken();
+      list.add(token);
+    }
+    return list;
+  }
+
+  private static Predicate<Traverser<AnnotationVF>> createPredicate(List<WhereToken> tokens) {
+    return annotationVFTraverser -> {
+      boolean pass = true;
+      final AnnotationVF annotationVF = annotationVFTraverser.get();
+      for (WhereToken token : tokens) {
+        pass = pass && assertMatch(annotationVF, token);
+      }
+      return pass;
     };
-    return predicate;
+  }
+
+  private static final WhereToken STATE_IS_CONFIRMED = new WhereToken()//
+      .setProperty("state").setFunction(MatchFunction.eq).setParameters(ImmutableList.of("CONFIRMED"));
+
+  private static boolean assertMatch(AnnotationVF annotationVF, WhereToken token) {
+    if (STATE_IS_CONFIRMED.equals(token)) {
+      return annotationVF.isConfirmed();
+    }
+    return true;
   }
 
   private static String getResourceURL(final AnnotationVF avf) {
@@ -137,7 +162,7 @@ public class AlexandriaQueryParser {
   }
 
   private static List<SortToken> parseSortString(final String sortString) {
-    final List<SortToken> sortFields = Splitter.on(",").trimResults().splitToList(sortString).stream().map(f -> sortToken(f)).collect(toList());
+    final List<SortToken> sortFields = splitToList(sortString).stream().map(f -> sortToken(f)).collect(toList());
     return sortFields;
   }
 
@@ -184,7 +209,7 @@ public class AlexandriaQueryParser {
   }
 
   private static void parseReturn(final String fieldString, final ParsedAlexandriaQuery paq) {
-    final List<String> fields = Splitter.on(",").trimResults().splitToList(fieldString);
+    final List<String> fields = splitToList(fieldString);
     final Set<String> allowedFields = valueMapping.keySet();
     final List<String> unknownFields = Lists.newArrayList(fields);
     unknownFields.removeAll(allowedFields);
@@ -200,11 +225,15 @@ public class AlexandriaQueryParser {
     }
   }
 
+  private static List<String> splitToList(final String fieldString) {
+    return Splitter.on(",").trimResults().splitToList(fieldString);
+  }
+
   private static Comparator<AnnotationVF> getComparator(final Function<AnnotationVF, String> sortKeyGenerator) {
     return (a1, a2) -> sortKeyGenerator.apply(a1).compareTo(sortKeyGenerator.apply(a2));
   }
 
-  public static class SortToken {
+  static class SortToken {
     private String field = "";
     private boolean ascending = true;
 
@@ -223,5 +252,43 @@ public class AlexandriaQueryParser {
     public void setAscending(final boolean ascending) {
       this.ascending = ascending;
     }
+  }
+
+  enum MatchFunction {
+    eq, match, inSet, inRange
+  }
+
+  static class WhereToken {
+    String property;
+    MatchFunction function;
+    List<Object> parameters = Lists.newArrayList();
+
+    public String getProperty() {
+      return property;
+    }
+
+    public WhereToken setProperty(String property) {
+      this.property = property;
+      return this;
+    }
+
+    public MatchFunction getFunction() {
+      return function;
+    }
+
+    public WhereToken setFunction(MatchFunction function) {
+      this.function = function;
+      return this;
+    }
+
+    public List<Object> getParameters() {
+      return parameters;
+    }
+
+    public WhereToken setParameters(List<Object> parameters) {
+      this.parameters = parameters;
+      return this;
+    }
+
   }
 }

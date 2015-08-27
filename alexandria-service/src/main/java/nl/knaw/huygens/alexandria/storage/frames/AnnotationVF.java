@@ -11,11 +11,13 @@ import peapod.annotations.Vertex;
 @Vertex(Labels.ANNOTATION)
 public abstract class AnnotationVF extends AlexandriaVF {
   public static final String NO_VALUE = ":null";
+
   // TODO: double-check if (update of) peapod supports outgoing edges with the same label to different types of VF
-  private static final String ANNOTATES_ANNOTATION = "annotates_annotation";
-  private static final String DEPRECATES = "deprecates";
-  static final String ANNOTATES_RESOURCE = "annotates_resource";
-  static final String HAS_BODY = "has_body";
+  // edge labels
+  public static final String ANNOTATES_RESOURCE = "annotates_resource";
+  public static final String ANNOTATES_ANNOTATION = "annotates_annotation";
+  public static final String DEPRECATES = "deprecates";
+  public static final String HAS_BODY = "has_body";
 
   public abstract void setRevision(Integer revision);
 
@@ -46,19 +48,19 @@ public abstract class AnnotationVF extends AlexandriaVF {
   public abstract void setAnnotatedResource(ResourceVF resourceToAnnotate);
 
   @In
-  @Edge(AnnotationVF.ANNOTATES_ANNOTATION)
+  @Edge(ANNOTATES_ANNOTATION)
   public abstract List<AnnotationVF> getAnnotatedBy();
 
   @Out
-  @Edge(AnnotationVF.DEPRECATES)
+  @Edge(DEPRECATES)
   public abstract void setDeprecatedAnnotation(AnnotationVF annotationToDeprecate);
 
   @Out
-  @Edge(AnnotationVF.DEPRECATES)
+  @Edge(DEPRECATES)
   public abstract AnnotationVF getDeprecatedAnnotation();
 
   @In
-  @Edge(AnnotationVF.DEPRECATES)
+  @Edge(DEPRECATES)
   public abstract AnnotationVF getDeprecatedBy();
 
   public String getType() {

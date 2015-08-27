@@ -18,8 +18,9 @@ public class ParsedAlexandriaQuery {
   private Comparator<AnnotationVF> comparator;
   private Function<AnnotationVF, Map<String, Object>> mapper;
 
-  public void setVFClass(Class<? extends AlexandriaVF> vfClass) {
+  public ParsedAlexandriaQuery setVFClass(Class<? extends AlexandriaVF> vfClass) {
     this.vfClazz = vfClass;
+    return this;
   }
 
   public Class<? extends AlexandriaVF> getVFClass() {
@@ -42,16 +43,18 @@ public class ParsedAlexandriaQuery {
     return mapper;
   }
 
-  public void setPredicate(Predicate<Traverser<AnnotationVF>> predicate) {
+  public ParsedAlexandriaQuery setPredicate(Predicate<Traverser<AnnotationVF>> predicate) {
     this.predicate = predicate;
+    return this;
   }
 
   public Predicate<Traverser<AnnotationVF>> getPredicate() {
     return predicate;
   }
 
-  public void setResultComparator(Comparator<AnnotationVF> comparator) {
+  public ParsedAlexandriaQuery setResultComparator(Comparator<AnnotationVF> comparator) {
     this.comparator = comparator;
+    return this;
   }
 
   public Comparator<AnnotationVF> getResultComparator() {

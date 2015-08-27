@@ -157,4 +157,12 @@ public class TinkerPopServiceTest {
     Log.info("graph={}", os.toString());
   }
 
+  // @Test
+  // public void testTraversal() {
+  // GraphTraversal<Vertex, Vertex> traversal = graph.traversal().V();
+  // traversal = traversal.and(hasLabel("Annotation"), hasLabel("Resource"))//
+  // .values("uuid");
+  // Map<String, Object> propertyMap = traversal.propertyMap().next();
+  // }
+
 }
