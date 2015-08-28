@@ -53,7 +53,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
     this.locationBuilder = locationBuilder;
   }
 
-  public static Supplier<NotFoundException> annotationNotFoundForId(Object id) {
+  static Supplier<NotFoundException> annotationNotFoundForId(Object id) {
     return () -> new NotFoundException(NoAnnotationFoundWithId(id));
   }
 
@@ -74,11 +74,11 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   // return Response.created(locationBuilder.locationOf(newAnnotation)).build();
   // }
 
-  public static Supplier<NotFoundException> annotationNotFoundForIdAndRevision(Object id, Integer revision) {
+  private static Supplier<NotFoundException> annotationNotFoundForIdAndRevision(Object id, Integer revision) {
     return () -> new NotFoundException(NoAnnotationFoundWithId(id) + ", revision " + revision);
   }
 
-  public static WebApplicationException annotationIsTentative(UUID uuid) {
+  static WebApplicationException annotationIsTentative(UUID uuid) {
     return new TentativeObjectException("annotation " + uuid + " is tentative, please confirm it first");
   }
 
@@ -86,9 +86,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   @Path("{uuid}")
   @ApiOperation(value = "get the annotation", response = AnnotationEntity.class)
   public Response readAnnotation(@PathParam("uuid") UUIDParam uuidParam) {
-    final AlexandriaAnnotation annotation = service.readAnnotation(uuidParam.getValue())//
-        .orElseThrow(annotationNotFoundForId(uuidParam));
-    return Response.ok(entityBuilder.build(annotation)).build();
+    return ok(readExistingAnnotation(uuidParam));
   }
 
   // Sub-resource delegation
@@ -98,9 +96,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   @ApiOperation(value = "get the given revision of the annotation", response = AnnotationEntity.class)
   public Response readVersionedAnnotation(@PathParam("uuid") UUIDParam uuidParam, //
                                           @PathParam("revision") Integer revision) {
-    final AlexandriaAnnotation annotation = service.readAnnotation(uuidParam.getValue(), revision)//
-        .orElseThrow(annotationNotFoundForIdAndRevision(uuidParam, revision));
-    return Response.ok(entityBuilder.build(annotation)).build();
+    return ok(readExistingAnnotationWithIdAndRevision(uuidParam, revision));
   }
 
   @PUT
@@ -110,28 +106,24 @@ public class AnnotationsEndpoint extends JSONEndpoint {
       = "make a new annotation from the payload and use it to deprecate the annotation with the given uuid")
   public Response deprecateAnnotation(@PathParam("uuid") UUIDParam uuidParam, //
                                       @NotNull @OmittedOrMatchingType AnnotationPrototype prototype) {
-    UUID uuid = uuidParam.getValue();
-    final AlexandriaAnnotation annotation = service.readAnnotation(uuid)//
-        .orElseThrow(annotationNotFoundForId(uuidParam));
+    AlexandriaAnnotation annotation = readExistingAnnotation(uuidParam);
     prototype.setState(AlexandriaState.CONFIRMED);
     AnnotationDeprecationRequest request = requestBuilder.ofAnnotation(annotation).build(prototype);
     request.execute(service);
-    return Response.noContent().build();
+    return noContent();
   }
 
   @DELETE
   @Path("{uuid}")
   public Response deleteAnnotation(@PathParam("uuid") final UUIDParam uuidParam) {
-    UUID uuid = uuidParam.getValue();
-    final AlexandriaAnnotation annotation = service.readAnnotation(uuid)//
-        .orElseThrow(annotationNotFoundForId(uuidParam));
+    AlexandriaAnnotation annotation = readExistingAnnotation(uuidParam);
     if (!annotation.getAnnotations().isEmpty()) {
-      throw new ConflictException("annotation " + uuid + " still has annotations");
+      throw new ConflictException("annotation " + annotation.getId() + " still has annotations");
     }
 
     service.deleteAnnotation(annotation);
 
-    return Response.noContent().build();
+    return noContent();
   }
 
   @PUT
@@ -140,15 +132,13 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   @ApiOperation(value = "update the state of the annotation (only state=CONFIRMED accepted for now)")
   public Response setAnnotationState(@PathParam("uuid") final UUIDParam uuidParam, @NotNull StatePrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
-    UUID id = uuidParam.getValue();
-    AlexandriaAnnotation annotation = service.readAnnotation(id)//
-        .orElseThrow(annotationNotFoundForId(uuidParam));
+    AlexandriaAnnotation annotation = readExistingAnnotation(uuidParam);
     if (protoType.isConfirmed()) {
       if (!annotation.isActive()) {
         throw new ConflictException(annotation.getState() + " annotations cannot be set to CONFIRMED");
       }
-      service.confirmAnnotation(id);
-      return Response.noContent().build();
+      service.confirmAnnotation(annotation.getId());
+      return noContent();
     }
     throw new BadRequestException("for now, you can only set the state to CONFIRMED");
   }
@@ -161,6 +151,20 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   @Path("{uuid}/provenance")
   public Class<AnnotationProvenanceEndpoint> getProvenance() {
     return AnnotationProvenanceEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
+  }
+
+  private Response ok(AlexandriaAnnotation annotation) {
+    return ok(entityBuilder.build(annotation));
+  }
+
+  private AlexandriaAnnotation readExistingAnnotation(UUIDParam uuidParam) {
+    return service.readAnnotation(uuidParam.getValue()) //
+        .orElseThrow(annotationNotFoundForId(uuidParam));
+  }
+
+  private AlexandriaAnnotation readExistingAnnotationWithIdAndRevision(UUIDParam uuidParam, int revision) {
+    return service.readAnnotation(uuidParam.getValue(), revision) //
+        .orElseThrow(annotationNotFoundForIdAndRevision(uuidParam, revision));
   }
 
 }
