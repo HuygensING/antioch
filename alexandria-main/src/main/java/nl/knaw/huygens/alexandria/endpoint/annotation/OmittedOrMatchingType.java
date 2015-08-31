@@ -14,6 +14,7 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 import javax.ws.rs.PathParam;
 
+import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
@@ -50,7 +51,7 @@ public @interface OmittedOrMatchingType {
         return true; // Non-null validation, if desired, should be enforced via @NotNull
       }
 
-      return prototype.getType().map(currentType::equals).orElse(false);
+      return prototype.getType().map(currentType::equals).orElse(true);
     }
   }
 }
