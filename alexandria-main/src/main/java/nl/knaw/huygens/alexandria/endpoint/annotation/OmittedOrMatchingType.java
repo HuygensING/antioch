@@ -2,19 +2,17 @@ package nl.knaw.huygens.alexandria.endpoint.annotation;
 
 import static nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint.annotationNotFoundForId;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import javax.inject.Inject;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 import javax.ws.rs.PathParam;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
@@ -31,6 +29,8 @@ public @interface OmittedOrMatchingType {
   Class<? extends Payload>[] payload() default {};
 
   class Validator implements ConstraintValidator<OmittedOrMatchingType, AnnotationPrototype> {
+    private static final boolean OMITTED_TYPE_CONSIDERED_VALID = true;
+
     private final String currentType;
 
     @Inject
@@ -51,7 +51,7 @@ public @interface OmittedOrMatchingType {
         return true; // Non-null validation, if desired, should be enforced via @NotNull
       }
 
-      return prototype.getType().map(currentType::equals).orElse(true);
+      return prototype.getType().map(currentType::equals).orElse(OMITTED_TYPE_CONSIDERED_VALID);
     }
   }
 }
