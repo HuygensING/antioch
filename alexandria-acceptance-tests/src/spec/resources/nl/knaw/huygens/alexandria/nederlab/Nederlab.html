@@ -217,13 +217,13 @@
         <tbody>
         <tr>
             <td><code>3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c</code></td>
-            <td><code>subres-1-type</code></td>
-            <td><code>subres-1-value</code></td>
+            <td><code>subres1-type</code></td>
+            <td><code>subres1-value</code></td>
         </tr>
         <tr>
             <td><code>3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85</code></td>
-            <td><code>subres-2-type</code></td>
-            <td><code>subres-2-value</code></td>
+            <td><code>subres2-type</code></td>
+            <td><code>subres2-value</code></td>
         </tr>
         </tbody>
     </table>
@@ -249,7 +249,7 @@
         <h:get>/searches/$searchId/resultpages/1</h:get>
         and observe
         <h:status>200 OK</h:status>
-        and the expected annotation values, resource and subresource <code>id</code>s in the body
+        and the relevant, resource and subresource <code>url</code>s in the body
         <h:jsonResponse>{ "searchresultPage": {
             "records": [
             {
@@ -258,14 +258,14 @@
             "resource.url": "https://{host}/resources/13e53670-3f3f-11e5-96ef-dff0c5cf4b9b"
             },
             {
-            "type": "subres-1-type",
-            "value": "subres-1-value",
+            "type": "subres1-type",
+            "value": "subres1-value",
             "resource.url": "https://{host}/resources/13e53670-3f3f-11e5-96ef-dff0c5cf4b9b",
             "subresource.url": "https://{host}/resources/3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c"
             },
             {
-            "type": "subres-2-type",
-            "value": "subres-2-value",
+            "type": "subres2-type",
+            "value": "subres2-value",
             "resource.url": "https://{host}/resources/13e53670-3f3f-11e5-96ef-dff0c5cf4b9b",
             "subresource.url": "https://{host}/resources/3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85"
             }
@@ -281,7 +281,6 @@
                 <h:put>/annotations/$annoId</h:put>
                 the body
                 <h:jsonBody>{ "annotation": {
-                    "type": "res-type",
                     "value": "UPDATED-VALUE"
                     } }
                 </h:jsonBody>
@@ -292,32 +291,32 @@
         <li>
             <h:request>
                 <strong>(verification)</strong> We
-                <h:get>/resources/$resId/annotations</h:get>
+                <h:get>/annotations/$annoId</h:get>
                 and observe status
                 <h:status>200 OK</h:status>
                 and the body
-                <h:jsonResponse>{
-                    "annotations": [
-                    {
+                <h:jsonResponse>{ "annotation": {
+                    "id": "$annoId",
                     "type": "res-type",
                     "value": "UPDATED-VALUE",
-                    "^annotates": "https://{host}/resources/13e53670-3f3f-11e5-96ef-dff0c5cf4b9b"
-                    },
-                    {
-                    "type": "subres-1-type",
-                    "value": "subres-1-value",
-                    "^annotates": "https://{host}/resources/3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c"
-                    },
-                    {
-                    "type": "subres-2-type",
-                    "value": "subres-2-value",
-                    "^annotates": "https://{host}/resources/3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85"
-                    }
-                    ] }
+                    "state": { "value": "CONFIRMED" },
+                    "revision": 1,
+                    "^annotates": "https://{host}/resources/$resId",
+                    "^deprecates": "https://{host}/annotations/$annoId/rev/0",
+                    "^current_version": "https://{host}/annotations/$annoId",
+                    "^versioned_self": "https://{host}/annotations/$annoId/rev/1"
+                    } }
                 </h:jsonResponse>
             </h:request>
             <div class="alert alert-info sm">
-                The <code>value</code> on the annotated resource has changed and the other annotations remain unchanged.
+                <ul>
+                    <li>The annotation <code>value</code> is updated, and its <code>type</code> remains untouched</li>
+                    <li>The annotation <code>state</code> is <code>CONFIRMED</code></li>
+                    <li>The revision number has increased to <code>1</code></li>
+                    <li>The new version <code>^deprecates</code> the previous one</li>
+                    <li>The annotation has corresponding convenience links to the <code>^current_version</code>
+                        and to this particular revision: <code>^versioned_self</code></li>
+                </ul>
             </div>
         </li>
         <li>
@@ -329,29 +328,30 @@
                 and the body
                 <h:jsonResponse>{ "resource": {
                     "id": "$resId",
-                    "^annotations": [
-                    "https://{host}/annotations/$annoId",
-                    "https://{host}/annotations/$anno"
-                    ] } }
+                    "^annotations": [ "https://{host}/annotations/$annoId" ]
+                    } }
                 </h:jsonResponse>
             </h:request>
             <div class="alert alert-info sm">
-                Both the new and the deprecated annotation links are indeed included.
+                The resource still points to the same annotation (now containing the updated value).
             </div>
         </li>
         <li>
             <h:request>
-                <strong>(verification)</strong> We
-                <h:get>/annotations/$annoId</h:get>
+                <strong>(verification)</strong> We inspect the previous revision of the annotation by
+                <h:get>/annotations/$annoId/rev/0</h:get>
                 and observe the body
                 <h:jsonResponse>{ "annotation": {
                     "id": "$annoId",
+                    "revision": 0,
+                    "type": "res-type",
+                    "value" : "res-value",
                     "state": { "value": "DEPRECATED" }
                     } }
                 </h:jsonResponse>
             </h:request>
             <div class="alert alert-info sm">
-                The old annotation has indeed become <code>DEPRECATED</code>.
+                The previous revision of the annotation has indeed become <code>DEPRECATED</code>.
             </div>
         </li>
     </ul>
