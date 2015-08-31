@@ -14,7 +14,7 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ValidatorTest {
+public class OmittedOrMatchingTypeTest {
   private final UUIDParam uuidParam = new UUIDParam(UUID.randomUUID().toString());
 
   private AlexandriaService service;
