@@ -50,7 +50,7 @@ public @interface OmittedOrMatchingType {
         return true; // Non-null validation, if desired, should be enforced via @NotNull
       }
 
-      return prototype.getType().map(newType -> newType.equals(currentType)).orElse(false);
+      return prototype.getType().map(currentType::equals).orElse(false);
     }
   }
 }
