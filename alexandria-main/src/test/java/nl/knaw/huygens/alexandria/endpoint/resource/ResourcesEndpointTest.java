@@ -62,11 +62,11 @@ public class ResourcesEndpointTest extends MockedServiceEndpointTest {
     assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
   }
 
-  @Test
-  public void testPostResource() {
-    // Object entity;
-    // target(EndpointPaths.RESOURCES).request().post(Entity.json(entity));
-  }
+  // @Test
+  // public void testPostResource() {
+  // // Object entity;
+  // // target(EndpointPaths.RESOURCES).request().post(Entity.json(entity));
+  // }
 
   // @Test
   public void testTwoPutsWillNotProduceAnError() throws IOException {
@@ -77,13 +77,13 @@ public class ResourcesEndpointTest extends MockedServiceEndpointTest {
     ResourcesEndpoint re = new ResourcesEndpoint(service, requestBuilder, locationBuilder, entityBuilder);
 
     ResourcePrototype prototype1 = deserialize("{'resource':{'id':'c28626d4-493a-4204-83d9-e9ae17e15654','ref':'Referentie1'}}");
-    UUIDParam uuidparam1=new UUIDParam("c28626d4-493a-4204-83d9-e9ae17e15654");
-    Response response1 = re.setResourceAtSpecificID(uuidparam1,prototype1);
+    UUIDParam uuidparam1 = new UUIDParam("c28626d4-493a-4204-83d9-e9ae17e15654");
+    Response response1 = re.setResourceAtSpecificID(uuidparam1, prototype1);
     assertThat(response1.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
 
     ResourcePrototype prototype2 = deserialize("{'resource':{'id':'d1753214-493a-4204-83d9-e9ae17e15654','ref':'Referentie2'}}");
-    UUIDParam uuidparam2=new UUIDParam("d1753214-493a-4204-83d9-e9ae17e15654");
-    Response response2 = re.setResourceAtSpecificID(uuidparam2,prototype2);
+    UUIDParam uuidparam2 = new UUIDParam("d1753214-493a-4204-83d9-e9ae17e15654");
+    Response response2 = re.setResourceAtSpecificID(uuidparam2, prototype2);
     assertThat(response2.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
   }
 

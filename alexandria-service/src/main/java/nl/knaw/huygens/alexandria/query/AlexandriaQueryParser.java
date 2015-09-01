@@ -9,11 +9,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tinkerpop.gremlin.process.traversal.Traverser;
 
@@ -25,6 +27,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.antlr.AQLLexer;
+import nl.knaw.huygens.alexandria.antlr.AQLParser;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
@@ -36,11 +40,11 @@ public class AlexandriaQueryParser {
 
   private static LocationBuilder locationBuilder;
 
-  static List<String> parseErrors = Lists.newArrayList();
+  List<String> parseErrors = Lists.newArrayList();
 
   @Inject
   public AlexandriaQueryParser(final LocationBuilder locationBuilder) {
-    this.locationBuilder = locationBuilder;
+    AlexandriaQueryParser.locationBuilder = locationBuilder;
   }
 
   public ParsedAlexandriaQuery parse(final AlexandriaQuery query) {
@@ -89,54 +93,77 @@ public class AlexandriaQueryParser {
 
   static final String ALLOWEDFIELDS = ", available fields: " + Joiner.on(", ").join(valueMapping.keySet());
 
-  private static Predicate<Traverser<AnnotationVF>> parseWhere(final String whereString) {
+  private Predicate<Traverser<AnnotationVF>> parseWhere(final String whereString) {
     final List<WhereToken> tokens = tokenize(whereString);
     return createPredicate(tokens);
   }
 
-  static final Pattern P1 = Pattern.compile("([a-z\\.]+)\\.([a-z]+)\\((.*)\\)");
+  // static final Pattern P1 = Pattern.compile("([a-z\\.]+)\\.([a-z]+)\\((.*)\\)");
+  //
+  // static List<WhereToken> tokenize(final String whereString) {
+  // Log.info("whereString=<{}>", whereString);
+  // List<String> strings = splitToList(whereString);
+  // List<WhereToken> list = Lists.newArrayListWithExpectedSize(strings.size());
+  // for (String string : strings) {
+  // Log.info("part=<{}>", string);
+  // Matcher matcher = P1.matcher(string);
+  // if (!matcher.matches()) {
+  // parseErrors.add("unparsable part in where: '" + string + "'");
+  //
+  // } else {
+  // WhereToken token = new WhereToken();
+  // String property = matcher.group(1);
+  // Log.info("property=<{}>", property);
+  // String functionString = matcher.group(2);
+  // Log.info("function=<{}>", functionString);
+  // String parameterString = matcher.group(3);
+  // Log.info("parameterString=<{}>", parameterString);
+  // try {
+  // MatchFunction function = MatchFunction.valueOf(functionString);
+  // List<Object> parameters = Splitter.on(",").splitToList(parameterString).stream()//
+  // .map(AlexandriaQueryParser::parseParameter)//
+  // .collect(toList());
+  //
+  // token.setProperty(property);
+  // token.setFunction(function);
+  // token.setParameters(parameters);
+  // list.add(token);
+  // } catch (IllegalArgumentException e) {
+  // parseErrors.add("invalid part in where: unknown function " + functionString);
+  // }
+  // }
+  // }
+  // return list;
+  // }
 
-  static List<WhereToken> tokenize(final String whereString) {
+  List<WhereToken> tokenize(String whereString) {
     Log.info("whereString=<{}>", whereString);
-    List<String> strings = splitToList(whereString);
-    List<WhereToken> list = Lists.newArrayListWithExpectedSize(strings.size());
-    for (String string : strings) {
-      Log.info("part=<{}>", string);
-      Matcher matcher = P1.matcher(string);
-      if (!matcher.matches()) {
-        parseErrors.add("unparsable part in where: " + string);
-
-      } else {
-        WhereToken token = new WhereToken();
-        String property = matcher.group(1);
-        Log.info("property=<{}>", property);
-        String functionString = matcher.group(2);
-        Log.info("function=<{}>", functionString);
-        String parameterString = matcher.group(3);
-        Log.info("parameterString=<{}>", parameterString);
-        try {
-          MatchFunction function = MatchFunction.valueOf(functionString);
-          List<Object> parameters = Splitter.on(",").splitToList(parameterString).stream()//
-              .map(AlexandriaQueryParser::parseParameter)//
-              .collect(toList());
-
-          token.setProperty(property);
-          token.setFunction(function);
-          token.setParameters(parameters);
-          list.add(token);
-        } catch (IllegalArgumentException e) {
-          parseErrors.add("invalid part in where: unknown function " + functionString);
-        }
-      }
+    if (StringUtils.isEmpty(whereString)) {
+      // parseErrors.add("empty or missing where");
+      return Lists.newArrayList();
     }
-    return list;
-  }
 
-  static Object parseParameter(String parameterString) {
-    if (parameterString.startsWith("\"") && parameterString.endsWith("\"")) {
-      return parameterString.replace("\"", "");
+    QueryErrorListener errorListener = new QueryErrorListener();
+    CharStream stream = new ANTLRInputStream(whereString);
+    AQLLexer lex = new AQLLexer(stream);
+    lex.removeErrorListeners();
+    lex.addErrorListener(errorListener);
+    CommonTokenStream tokenStream = new CommonTokenStream(lex);
+    AQLParser parser = new AQLParser(tokenStream);
+    parser.removeErrorListeners();
+    parser.addErrorListener(errorListener);
+    parser.setBuildParseTree(true);
+    ParseTree tree = parser.root();
+    Log.info("tree={}", tree.toStringTree(parser));
+    if (errorListener.heardErrors()) {
+      parseErrors.addAll(errorListener.getParseErrors());
+      return Lists.newArrayList();
     }
-    return Double.valueOf(parameterString);
+
+    QueryVisitor visitor = new QueryVisitor();
+    visitor.visit(tree);
+    parseErrors.addAll(errorListener.getParseErrors());
+    return visitor.getWhereTokens();
   }
 
   private static Predicate<Traverser<AnnotationVF>> createPredicate(List<WhereToken> tokens) {
@@ -175,7 +202,7 @@ public class AlexandriaQueryParser {
     return id2url(avf.getSubResourceId());
   }
 
-  private static Comparator<AnnotationVF> parseSort(final String sortString) {
+  private Comparator<AnnotationVF> parseSort(final String sortString) {
     // TODO: cache resultcomparator?
     boolean errorInSort = false;
     final List<SortToken> sortTokens = parseSortString(sortString);
@@ -209,6 +236,7 @@ public class AlexandriaQueryParser {
     return token;
   }
 
+  @SuppressWarnings("unused")
   private static Comparator<AnnotationVF> getComparator(final List<Function<AnnotationVF, Object>> valueFunctions) {
     // valueFunctions.stream().map(f -> new )
     // convert to Order<AnnotationVF> functions, return compound
@@ -225,9 +253,10 @@ public class AlexandriaQueryParser {
 
   private static Ordering<AnnotationVF> ordering(final Function<AnnotationVF, Object> function) {
     return new Ordering<AnnotationVF>() {
+      @SuppressWarnings("unchecked")
       @Override
       public int compare(final AnnotationVF left, final AnnotationVF right) {
-        return ((Comparable) function.apply(left)).compareTo(function.apply(right));
+        return ((Comparable<Object>) function.apply(left)).compareTo(function.apply(right));
       }
     };
   }
@@ -244,7 +273,7 @@ public class AlexandriaQueryParser {
     };
   }
 
-  private static void parseReturn(final String fieldString, final ParsedAlexandriaQuery paq) {
+  private void parseReturn(final String fieldString, final ParsedAlexandriaQuery paq) {
     final List<String> fields = splitToList(fieldString);
     final Set<String> allowedFields = valueMapping.keySet();
     final List<String> unknownFields = Lists.newArrayList(fields);
