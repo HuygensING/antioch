@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -92,15 +94,50 @@ public class AlexandriaQueryParser {
     return createPredicate(tokens);
   }
 
+  static final Pattern P0 = Pattern.compile("([a-z\\.]+\\.[a-z]+\\(.*\\)");
+  static final Pattern P1 = Pattern.compile("([a-z\\.]+)\\.([a-z]+)\\((.*)\\)");
+
   static List<WhereToken> tokenize(final String whereString) {
+    Log.info("whereString=<{}>", whereString);
     List<String> strings = splitToList(whereString);
     List<WhereToken> list = Lists.newArrayListWithExpectedSize(strings.size());
     for (String string : strings) {
-      // TODO
-      WhereToken token = new WhereToken();
-      list.add(token);
+      Log.info("part=<{}>", string);
+      Matcher matcher = P1.matcher(string);
+      if (!matcher.matches()) {
+        parseErrors.add("unparsable part in where: " + string);
+
+      } else {
+        WhereToken token = new WhereToken();
+        String property = matcher.group(1);
+        Log.info("property=<{}>", property);
+        String functionString = matcher.group(2);
+        Log.info("function=<{}>", functionString);
+        String parameterString = matcher.group(3);
+        Log.info("parameterString=<{}>", parameterString);
+        try {
+          MatchFunction function = MatchFunction.valueOf(functionString);
+          List<Object> parameters = Splitter.on(",").splitToList(parameterString).stream()//
+              .map(AlexandriaQueryParser::parseParameter)//
+              .collect(toList());
+
+          token.setProperty(property);
+          token.setFunction(function);
+          token.setParameters(parameters);
+          list.add(token);
+        } catch (IllegalArgumentException e) {
+          parseErrors.add("invalid part in where: unknown function " + functionString);
+        }
+      }
     }
     return list;
+  }
+
+  static Object parseParameter(String parameterString) {
+    if (parameterString.startsWith("\"") && parameterString.endsWith("\"")) {
+      return parameterString.replace("\"", "");
+    }
+    return Double.valueOf(parameterString);
   }
 
   private static Predicate<Traverser<AnnotationVF>> createPredicate(List<WhereToken> tokens) {

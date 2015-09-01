@@ -182,8 +182,10 @@ public class AlexandriaQueryParserTest {
 
   @Test
   public void testWhereTokenization() {
+    // String where = "type.eq(\"Tag\"),who.eq(\"nederlab\"),state.eq(\"CONFIRMED\")";
     String where = "type.eq(\"Tag\"),who.eq(\"nederlab\"),state.eq(\"CONFIRMED\"),resource.id.inSet(\"11111-111-111-11-111\",\"11111-111-111-11-112\")";
-    List<WhereToken> tokens = AlexandriaQueryParser.tokenize(where);
+    List<WhereToken> tokens = alexandriaQueryParser.tokenize(where);
+    Log.info("errors:{}", alexandriaQueryParser.parseErrors);
     assertThat(tokens).hasSize(4);
 
     WhereToken typeToken = tokens.get(0);
@@ -201,7 +203,7 @@ public class AlexandriaQueryParserTest {
     assertThat(stateToken.getFunction()).isEqualTo(MatchFunction.eq);
     assertThat(stateToken.getParameters()).containsExactly("CONFIRMED");
 
-    WhereToken resourceToken = tokens.get(2);
+    WhereToken resourceToken = tokens.get(3);
     assertThat(resourceToken.getProperty()).isEqualTo("resource.id");
     assertThat(resourceToken.getFunction()).isEqualTo(MatchFunction.inSet);
     assertThat(resourceToken.getParameters()).containsExactly("11111-111-111-11-111", "11111-111-111-11-112");
