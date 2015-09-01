@@ -18,7 +18,6 @@ import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 
-@ExpectedToFail
 @RunWith(ConcordionRunner.class)
 public class NederlabFixture extends AlexandriaAcceptanceTest {
   @BeforeClass
