@@ -310,12 +310,13 @@
             </h:request>
             <div class="alert alert-info sm">
                 <ul>
-                    <li>The annotation <code>value</code> is updated, and its <code>type</code> remains untouched</li>
+                    <li>The annotation <code>value</code> is updated, and its <code>type</code> is unchanged</li>
                     <li>The annotation <code>state</code> is <code>CONFIRMED</code></li>
                     <li>The revision number has increased to <code>1</code></li>
-                    <li>The new version <code>^deprecates</code> the previous one</li>
-                    <li>The annotation has corresponding convenience links to the <code>^current_version</code>
-                        and to this particular revision: <code>^versioned_self</code></li>
+                    <li>The new revision <code>^deprecates</code> the previous one</li>
+                    <li>Convenience links to both the <code>^current_version</code> and to this particular revision
+                        <code>^versioned_self</code> are included
+                    </li>
                 </ul>
             </div>
         </li>
@@ -433,66 +434,6 @@
     </ul>
 </div>
 
-<div id="use-before-confirm" c:execute="clearStorage()"
-     data-desc="Why do I get a 409 Conflict when using a newly created subresource?">
-
-    <div class="alert alert-warning sm">
-        The <a href="http://www.atomikos.com/Publications/TryCancelConfirm">try-confirm-cancel</a>
-        pattern dictates we first confirm any newly created resources before using them.
-
-        <p><i>Failure to follow this pattern leads to grief when operating on the resource!</i></p>
-    </div>
-
-    <h4>Example: adding an annotation to an unconfirmed resource</h4>
-
-    <ul>
-        <li>
-            <div c:execute="resourceExists(#uuid)">Given that a resource with id
-                <span c:set="#uuid">6244b9d8-3b5e-11e5-aca2-5befb33d5e4d</span> exists and
-            </div>
-        </li>
-        <li>
-            <h:request>
-                a subresource is
-                <h:success>successfully</h:success>
-                registered via
-                <h:post>/resources/$uuid/subresources</h:post>
-                with body:
-                <h:jsonBody>{"subresource":{"sub":"/some/folia/path"}}</h:jsonBody>
-            </h:request>
-            <div c:execute="#uuid = uuid()">in this case yielding uuid <span c:echo="#uuid"></span>.</div>
-        </li>
-        <li>
-            <h:request>
-                <strong>(verification)</strong> We
-                <h:get>/resources/$uuid</h:get>
-                and observe its <code>TENTATIVE</code> state
-                <h:jsonResponse>{"subresource":{
-                    "id": "$uuid",
-                    "sub": "/some/folia/path",
-                    "state": { "value": "TENTATIVE"
-                    } } }
-                </h:jsonResponse>
-            </h:request>
-        </li>
-    </ul>
-
-    <h:request>
-        <ul>
-            <li>When I
-                <h:post>/resources/$uuid/annotations</h:post>
-                an example annotation body:
-                <h:jsonBody>{"annotation": {"type": "t", "value": "v"}}</h:jsonBody>
-            </li>
-            <li>Then I will get status
-                <h:status>409 Conflict</h:status>
-                and a response body containing:
-                <h:jsonResponse>{"error":{"message": "resource $uuid is tentative, please confirm first"}}
-                </h:jsonResponse>
-            </li>
-        </ul>
-    </h:request>
-</div>
 
 </body>
 </html>
