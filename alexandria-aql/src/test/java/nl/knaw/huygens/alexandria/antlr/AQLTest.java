@@ -18,10 +18,10 @@ public class AQLTest {
 
   @Test
   public void testCorrectAQLStatement() {
-    String statement = "type:eq(\"Tag\"),"//
-        + " who:eq(\"nedlab\")," //
-        + " state:eq(\"CONFIRMED\"),"//
-        + " resource.id:inSet(1,2),"//
+    String statement = "type:eq(\"Tag\")"//
+        + " who:eq(\"nedlab\")" //
+        + " state:eq(\"CONFIRMED\")"//
+        + " resource.id:inSet(1,2)"//
         + " value:match(\"whatever\")";
     CharStream stream = new ANTLRInputStream(statement);
     AQLLexer lex = new AQLLexer(stream);
@@ -36,7 +36,7 @@ public class AQLTest {
     parser.setBuildParseTree(true);
     ParseTree tree = parser.root();
     Log.info("tree={}", tree.toStringTree(parser));
-    assertThat(tree.getChildCount()).isEqualTo(9); // 5 subqueries + 4 commas
+    assertThat(tree.getChildCount()).isEqualTo(5); // 5 subqueries
 
     int numberOfSyntaxErrors = parser.getNumberOfSyntaxErrors();
     assertThat(numberOfSyntaxErrors).isEqualTo(0); // no syntax errors
@@ -45,7 +45,7 @@ public class AQLTest {
     for (int i = 0; i < tree.getChildCount(); i++) {
       Log.info("root.child={}", tree.getChild(i).getText());
     }
-    assertThat(allTokens).hasSize(36);
+    assertThat(allTokens).hasSize(32);
   }
 
 }

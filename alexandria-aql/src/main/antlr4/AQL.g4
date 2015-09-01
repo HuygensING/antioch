@@ -4,16 +4,20 @@ grammar AQL;
 package nl.knaw.huygens.alexandria.antlr;
 }
 
-root : subquery ( ',' subquery )*;
+root : subquery ( subquery )*;
 
-subquery : FIELDNAME ':' function '(' parameters ')';
+subquery : FIELDNAME ':' FUNCTION '(' parameters ')';
 
-parameters : PARAMETER ( ',' PARAMETER )*;
+FIELDNAME: 'id' | 'type' | 'value' | 'resource.id' | 'subresource.id' | 'resource.url' | 'subresource.url' | 'state' | 'who' | 'when' | 'why';
 
-FIELDNAME: [a-z.]+ ;
+FUNCTION : 'eq' | 'match' | 'inSet' | 'inRange';
 
-function : 'eq' | 'match' | 'inSet' | 'inRange';
+parameters : parameter ( ',' parameter )*;
 
-PARAMETER: [a-zA-Z0-9"]+ ;
+parameter : STRINGPARAMETER | LONGPARAMETER ;
+
+STRINGPARAMETER: '"' [a-zA-Z 0-9]+ '"' ;
+
+LONGPARAMETER: [0-9]+ ;
 
 WS: [ \t\r\n]+ -> skip; // skip spaces, tabs, newlines
