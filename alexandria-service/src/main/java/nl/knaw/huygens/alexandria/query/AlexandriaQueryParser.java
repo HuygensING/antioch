@@ -94,7 +94,6 @@ public class AlexandriaQueryParser {
     return createPredicate(tokens);
   }
 
-  static final Pattern P0 = Pattern.compile("([a-z\\.]+\\.[a-z]+\\(.*\\)");
   static final Pattern P1 = Pattern.compile("([a-z\\.]+)\\.([a-z]+)\\((.*)\\)");
 
   static List<WhereToken> tokenize(final String whereString) {
