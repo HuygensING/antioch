@@ -573,7 +573,8 @@ public class TinkerPopService implements AlexandriaService {
     // findAllConfirmedAnnotationsRelatedToResource("uuid");
 
     results = storage.find(AnnotationVF.class)//
-        .filter(predicate).toList().stream()//
+        // .filter(predicate)//
+        .toList().stream()//
         .sorted(comparator)//
         .map(mapper)//
         .collect(toList());

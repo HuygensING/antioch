@@ -98,7 +98,7 @@ public abstract class AnnotationVF extends AlexandriaVF {
 
   private AnnotationVF findActiveVersionOf(AnnotationVF annotation) {
     while (annotation.isDeprecated()) {
-      annotation = annotation.getDeprecatedAnnotation();
+      annotation = annotation.getDeprecatedBy();
     }
     return annotation;
   }

@@ -167,6 +167,9 @@ public class AlexandriaQueryParser {
   }
 
   private static Predicate<Traverser<AnnotationVF>> createPredicate(List<WhereToken> tokens) {
+    if (tokens.isEmpty()) {
+      return alwaysTrue();
+    }
     return annotationVFTraverser -> {
       boolean pass = true;
       final AnnotationVF annotationVF = annotationVFTraverser.get();
@@ -177,8 +180,16 @@ public class AlexandriaQueryParser {
     };
   }
 
+  private static Predicate<Traverser<AnnotationVF>> alwaysTrue() {
+    return x -> {
+      return true;
+    };
+  }
+
   private static final WhereToken STATE_IS_CONFIRMED = new WhereToken()//
-      .setProperty("state").setFunction(MatchFunction.eq).setParameters(ImmutableList.of("CONFIRMED"));
+      .setProperty("state")//
+      .setFunction(MatchFunction.eq)//
+      .setParameters(ImmutableList.of("CONFIRMED"));
 
   private static boolean assertMatch(AnnotationVF annotationVF, WhereToken token) {
     if (STATE_IS_CONFIRMED.equals(token)) {
@@ -225,25 +236,23 @@ public class AlexandriaQueryParser {
   }
 
   private static List<SortToken> parseSortString(final String sortString) {
-    final List<SortToken> sortFields = splitToList(sortString).stream().map(f -> sortToken(f)).collect(toList());
+    final List<SortToken> sortFields = splitToList(sortString).stream()//
+        .map(AlexandriaQueryParser::sortToken)//
+        .collect(toList());
     return sortFields;
   }
 
   static SortToken sortToken(final String f) {
-    final SortToken token = new SortToken();
-    token.setAscending(!f.startsWith("-"));
-    token.setField(f.replaceFirst("^[\\-\\+]", ""));
-    return token;
+    return new SortToken()//
+        .setAscending(!f.startsWith("-"))//
+        .setField(f.replaceFirst("^[\\-\\+]", ""));
   }
 
   @SuppressWarnings("unused")
   private static Comparator<AnnotationVF> getComparator(final List<Function<AnnotationVF, Object>> valueFunctions) {
-    // valueFunctions.stream().map(f -> new )
-    // convert to Order<AnnotationVF> functions, return compound
-    final List<Ordering<AnnotationVF>> subOrders = Lists.newArrayList();
-    for (final Function<AnnotationVF, Object> function : valueFunctions) {
-      subOrders.add(ordering(function));
-    }
+    final List<Ordering<AnnotationVF>> subOrders = valueFunctions.stream()//
+        .map(AlexandriaQueryParser::ordering)//
+        .collect(toList());
     Ordering<AnnotationVF> order = subOrders.remove(0);
     for (final Ordering<AnnotationVF> suborder : subOrders) {
       order = order.compound(suborder);
@@ -268,7 +277,7 @@ public class AlexandriaQueryParser {
         sb.append(function.apply(avf));
         sb.append("|");
       }
-      Log.debug("sortKey=" + sb);
+      // Log.debug("sortKey=" + sb);
       return sb.toString();
     };
   }
@@ -284,7 +293,8 @@ public class AlexandriaQueryParser {
     } else {
       paq.setReturnFields(fields);
 
-      final Function<AnnotationVF, Map<String, Object>> mapper = avf -> fields.stream().collect(toMap(Function.identity(), f -> valueMapping.get(f).apply(avf)));
+      final Function<AnnotationVF, Map<String, Object>> mapper = avf -> fields.stream()//
+          .collect(toMap(Function.identity(), f -> valueMapping.get(f).apply(avf)));
       // TODO: cache resultmapper?
       paq.setResultMapper(mapper);
     }
@@ -306,16 +316,18 @@ public class AlexandriaQueryParser {
       return field;
     }
 
-    public void setField(final String field) {
+    public SortToken setField(final String field) {
       this.field = field;
+      return this;
     }
 
     public boolean isAscending() {
       return ascending;
     }
 
-    public void setAscending(final boolean ascending) {
+    public SortToken setAscending(final boolean ascending) {
       this.ascending = ascending;
+      return this;
     }
   }
 
