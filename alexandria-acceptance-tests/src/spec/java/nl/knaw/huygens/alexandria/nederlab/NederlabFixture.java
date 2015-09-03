@@ -4,7 +4,10 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import nl.knaw.huygens.Log;
+import org.concordion.integration.junit4.ConcordionRunner;
+import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+
 import nl.knaw.huygens.alexandria.concordion.AlexandriaAcceptanceTest;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
@@ -13,10 +16,6 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
-import org.concordion.api.ExpectedToFail;
-import org.concordion.integration.junit4.ConcordionRunner;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
 
 @RunWith(ConcordionRunner.class)
 public class NederlabFixture extends AlexandriaAcceptanceTest {
@@ -69,7 +68,7 @@ public class NederlabFixture extends AlexandriaAcceptanceTest {
   }
 
   private TentativeAlexandriaProvenance aProvenance() {
-    return new TentativeAlexandriaProvenance("who", Instant.now(), "why");
+    return new TentativeAlexandriaProvenance("nederlab", Instant.now(), "why");
   }
 
   private String aRef() {
