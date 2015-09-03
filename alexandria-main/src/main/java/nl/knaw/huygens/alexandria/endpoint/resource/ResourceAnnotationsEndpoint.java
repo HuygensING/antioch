@@ -2,15 +2,17 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import static java.util.stream.Collectors.toSet;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Response;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
+
 import com.google.common.collect.ImmutableMap;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.endpoint.AnnotatableObjectAnnotationsEndpoint;
@@ -29,10 +31,10 @@ public class ResourceAnnotationsEndpoint extends AnnotatableObjectAnnotationsEnd
 
   // TODO: how to remove this duplicated inject/constructor?
   @Inject
-  public ResourceAnnotationsEndpoint(AlexandriaService service,     //
-                                     AnnotationCreationRequestBuilder requestBuilder,     //
-                                     LocationBuilder locationBuilder,     //
-                                     @PathParam("uuid") final UUIDParam uuidParam) {
+  public ResourceAnnotationsEndpoint(AlexandriaService service, //
+      AnnotationCreationRequestBuilder requestBuilder, //
+      LocationBuilder locationBuilder, //
+      @PathParam("uuid") final UUIDParam uuidParam) {
     super(service, requestBuilder, locationBuilder, uuidParam);
   }
 
@@ -61,18 +63,6 @@ public class ResourceAnnotationsEndpoint extends AnnotatableObjectAnnotationsEnd
   @Override
   public Response get() {
     Stream<AlexandriaAnnotation> resourceAnnotationsStream = getAnnotatableObject().getAnnotations().stream();
-
-    /* TODO: migrate to search endpoint (left as example code)
-    Stream<AlexandriaAnnotation> subresourceAnnotationsStream = asResource(getAnnotatableObject()) //
-        .getSubResourcePointers().stream() //
-        .map(service::dereference) //
-        .flatMap(Optionals::stream) //
-        .map(ResourceAnnotationsEndpoint::asResource) //
-        .map(AlexandriaResource::getAnnotations) //
-        .flatMap(Set::stream);
-
-    Stream<AlexandriaAnnotation> joinedStream = Stream.concat(resourceAnnotationsStream, subresourceAnnotationsStream);
-    */
 
     final Set<AnnotationEntity> annotationEntities = resourceAnnotationsStream //
         .filter(AlexandriaAnnotation::isActive) //
