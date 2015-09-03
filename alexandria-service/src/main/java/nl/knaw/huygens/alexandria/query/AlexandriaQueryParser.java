@@ -6,9 +6,12 @@ import static java.util.stream.Collectors.toMap;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -18,6 +21,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tinkerpop.gremlin.process.traversal.Traverser;
+import org.parboiled.common.Predicates;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -52,8 +56,10 @@ public class AlexandriaQueryParser {
 
     final ParsedAlexandriaQuery paq = new ParsedAlexandriaQuery()//
         .setVFClass(parseFind(query.getFind()))//
-        .setPredicate(parseWhere(query.getWhere()))//
         .setResultComparator(parseSort(query.getSort()));
+
+    setFilter(paq, query.getWhere());
+
     parseReturn(query.getFields(), paq);
 
     if (!parseErrors.isEmpty()) {
@@ -61,6 +67,65 @@ public class AlexandriaQueryParser {
     }
 
     return paq;
+  }
+
+  private void setFilter(final ParsedAlexandriaQuery paq, String where) {
+    final List<WhereToken> tokens = tokenize(where);
+
+    kludgeForHandlingNLA87(paq, tokens);
+
+    paq.setPredicate(createPredicate(tokens));
+  }
+
+  private void kludgeForHandlingNLA87(final ParsedAlexandriaQuery paq, final List<WhereToken> tokens) {
+    WhereToken resourceWhereToken = null;
+    List<WhereToken> filteredTokens = Lists.newArrayList();
+    for (WhereToken whereToken : tokens) {
+      // NLA-87
+      if (whereToken.getProperty().equals("resource.id")//
+          && whereToken.getFunction().equals(MatchFunction.eq)) {
+        resourceWhereToken = whereToken;
+      } else {
+        filteredTokens.add(whereToken);
+      }
+    }
+
+    if (resourceWhereToken != null) {
+      String uuid = (String) resourceWhereToken.getParameters().get(0);
+      paq.setAnnotationVFFinder(storage -> {
+        Optional<ResourceVF> optionalResource = storage.readVF(ResourceVF.class, UUID.fromString(uuid));
+        if (optionalResource.isPresent()) {
+          ResourceVF resourceVF = optionalResource.get();
+          Stream<AnnotationVF> resourceAnnotationsStream = resourceVF.getAnnotatedBy().stream();
+          Stream<AnnotationVF> subresourceAnnotationsStream = resourceVF.getSubResources().stream()//
+              .flatMap(rvf -> rvf.getAnnotatedBy().stream());//
+          Stream<AnnotationVF> annotationVFStream = Stream.concat(resourceAnnotationsStream, subresourceAnnotationsStream);
+
+          // TODO: recurse over annotations to also return annotations (on annotations)+ on resource ?
+          for (WhereToken whereToken : filteredTokens) {
+            annotationVFStream = annotationVFStream.filter(predicate(whereToken));
+          }
+
+          return annotationVFStream.collect(toList());
+        }
+        // Should return error, since no resource found with given uuid
+        return Lists.newArrayList();
+      });
+    }
+
+  }
+
+  private Predicate<AnnotationVF> predicate(WhereToken whereToken) {
+    // who.eq("someone")
+    if (whereToken.getProperty().equals("who")//
+        && whereToken.getFunction().equals(MatchFunction.eq)) {
+      String value = (String) whereToken.getParameters().get(0);
+      return (AnnotationVF avf) -> {
+        return avf.getProvenanceWho().equals(value);
+      };
+    }
+    // TODO implement predicate generation
+    return (Predicate<AnnotationVF>) Predicates.alwaysTrue();
   }
 
   private Class<? extends AlexandriaVF> parseFind(final String find) {
@@ -92,11 +157,6 @@ public class AlexandriaQueryParser {
       .build();
 
   static final String ALLOWEDFIELDS = ", available fields: " + Joiner.on(", ").join(valueMapping.keySet());
-
-  private Predicate<Traverser<AnnotationVF>> parseWhere(final String whereString) {
-    final List<WhereToken> tokens = tokenize(whereString);
-    return createPredicate(tokens);
-  }
 
   // static final Pattern P1 = Pattern.compile("([a-z\\.]+)\\.([a-z]+)\\((.*)\\)");
   //

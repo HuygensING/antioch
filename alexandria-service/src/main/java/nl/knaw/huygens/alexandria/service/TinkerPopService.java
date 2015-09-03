@@ -572,13 +572,14 @@ public class TinkerPopService implements AlexandriaService {
     //
     // findAllConfirmedAnnotationsRelatedToResource("uuid");
 
-    results = storage.find(AnnotationVF.class)//
-        // .filter(predicate)//
-        .toList().stream()//
+    List<AnnotationVF> list = pQuery.getAnnotationVFFinder().apply(storage);
+    Log.debug("list={}", list);
+
+    results = list.stream()//
         .sorted(comparator)//
         .map(mapper)//
         .collect(toList());
-    Log.info("results={}", results);
+    Log.debug("results={}", results);
     return results;
   }
 
