@@ -235,7 +235,7 @@
         the following body
         <h:jsonBody>{ "query": {
             "find": "annotation",
-            "where": "who.eq(\"nederlab\")",
+            "where": "who:eq(\"nederlab\") resource:eq(\"13e53670-3f3f-11e5-96ef-dff0c5cf4b9b\")",
             "return": "id,resource.url,subresource.url,type,value"
             } }
         </h:jsonBody>
