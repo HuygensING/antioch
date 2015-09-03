@@ -34,7 +34,7 @@
     <classloader-leak-prevention.version>1.13.0</classloader-leak-prevention.version>
 
     <!-- Concordion Acceptance Test extensions -->
-    <cat.version>1.2.3</cat.version>
+    <cat.version>1.2.4</cat.version>
 
     <guice.version>3.0</guice.version>
     <jackson.version>2.6.1</jackson.version>
@@ -81,8 +81,7 @@
 
     <!-- Settings for maven-scm-publish-plugin used to publish site to GitHub -->
     <scmpublish.checkinComment>Publishing Site Docs for
-      ${project.artifactId}:${project.version}
-    </scmpublish.checkinComment>
+      ${project.artifactId}:${project.version}</scmpublish.checkinComment>
     <scmpublish.pubScmUrl>scm:git:git@github.com:huygensING/alexandria.git</scmpublish.pubScmUrl>
     <scmpublish.scm.branch>gh-pages</scmpublish.scm.branch>
 
