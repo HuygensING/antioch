@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -46,10 +47,10 @@ public class ResourcesEndpoint extends JSONEndpoint {
   private final LocationBuilder locationBuilder;
 
   @Inject
-  public ResourcesEndpoint(AlexandriaService service,                       //
-      ResourceCreationRequestBuilder requestBuilder,                       //
-      LocationBuilder locationBuilder,                       //
-      ResourceEntityBuilder entityBuilder) {
+  public ResourcesEndpoint(AlexandriaService service, //
+                           ResourceCreationRequestBuilder requestBuilder, //
+                           LocationBuilder locationBuilder, //
+                           ResourceEntityBuilder entityBuilder) {
     this.locationBuilder = locationBuilder;
     this.alexandriaService = service;
     this.entityBuilder = entityBuilder;
@@ -57,12 +58,19 @@ public class ResourcesEndpoint extends JSONEndpoint {
     Log.trace("Resources created, alexandriaService=[{}]", service);
   }
 
+  public static Supplier<NotFoundException> resourceNotFoundForId(Object id) {
+    return () -> new NotFoundException("No resource found with id " + id);
+  }
+
+  public static WebApplicationException resourceIsTentativeException(UUID uuid) {
+    return new TentativeObjectException("resource " + uuid + " is tentative, please confirm first");
+  }
+
   @GET
   @Path("{uuid}")
   @ApiOperation(value = "Get the resource with the given uuid", response = ResourceEntity.class)
   public Response getResourceByID(@PathParam("uuid") final UUIDParam uuidParam) {
-    AlexandriaResource resource = readExistingResource(uuidParam.getValue());
-    return Response.ok(entityBuilder.build(resource)).build();
+    return ok(readExistingResource(uuidParam));
   }
 
   @POST
@@ -76,11 +84,10 @@ public class ResourcesEndpoint extends JSONEndpoint {
     AlexandriaResource resource = request.execute(alexandriaService);
 
     if (request.wasExecutedAsIs()) {
-      return Response.noContent().build();
+      return noContent();
     }
 
-    // final ResourceEntity entity = entityBuilder.build(resource);
-    return Response.created(locationBuilder.locationOf(resource)).build();
+    return created(resource);
   }
 
   @PUT
@@ -89,14 +96,13 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @ApiOperation(value = "update the state of the resource (only state=CONFIRMED accepted for now)")
   public Response setResourceState(@PathParam("uuid") final UUIDParam uuidParam, @NotNull StatePrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
-    UUID id = uuidParam.getValue();
-    AlexandriaResource resource = readExistingResource(id);
+    AlexandriaResource resource = readExistingResource(uuidParam);
     if (protoType.isConfirmed()) {
       if (!resource.isActive()) {
         throw new ConflictException(resource.getState() + " resources cannot be set to CONFIRMED");
       }
-      alexandriaService.confirmResource(id);
-      return Response.noContent().build();
+      alexandriaService.confirmResource(resource.getId());
+      return noContent();
     }
     throw new BadRequestException("for now, you can only set the state to CONFIRMED");
   }
@@ -107,20 +113,12 @@ public class ResourcesEndpoint extends JSONEndpoint {
     return methodNotImplemented();
   }
 
-  // TODO: replace with sub-resource analogous to {uuid}/annotations (see below)
-  @GET
-  @Path("{uuid}/ref")
-  @ApiOperation(value = "Get just the ref of the resource with the given uuid", response = RefEntity.class)
-  public Response getResourceRef(@PathParam("uuid") final UUIDParam uuidParam) {
-    AlexandriaResource resource = readExistingResource(uuidParam.getValue());
-    return Response.ok(new RefEntity(resource.getCargo())).build();
-  }
-
   @PUT
   @Path("{uuid}")
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation(value = "update/create the resource with the given uuid")
-  public Response setResourceAtSpecificID(@PathParam("uuid") final UUIDParam uuid, @NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
+  public Response setResourceAtSpecificID(@PathParam("uuid") final UUIDParam uuid, @NotNull @Valid @MatchesPathId
+  ResourcePrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
 
     protoType.setState(AlexandriaState.CONFIRMED);
@@ -129,14 +127,14 @@ public class ResourcesEndpoint extends JSONEndpoint {
     AlexandriaResource resource = request.execute(alexandriaService);
 
     if (request.newResourceWasCreated()) {
-      return Response.created(locationBuilder.locationOf(resource)).build();
+      return created(resource);
     }
 
     if (request.wasExecutedAsIs()) {
-      return Response.noContent().build();
+      return noContent();
     }
 
-    return Response.ok().build();
+    return ok(resource);
   }
 
   // Sub-resource delegation
@@ -158,16 +156,15 @@ public class ResourcesEndpoint extends JSONEndpoint {
     return new ResourceProvenanceEndpoint(alexandriaService, uuidParam, locationBuilder);
   }
 
-  public static Supplier<NotFoundException> resourceNotFoundForId(UUID id) {
-    return () -> new NotFoundException("No resource found with id " + id);
+  private Response created(AlexandriaResource resource) {
+    return created(locationBuilder.locationOf(resource));
   }
 
-  public static WebApplicationException resourceIsTentativeException(UUID uuid) {
-    return new TentativeObjectException("resource " + uuid + " is tentative, please confirm first");
-  };
+  private Response ok(AlexandriaResource resource) {
+    return ok(entityBuilder.build(resource));
+  }
 
-  private AlexandriaResource readExistingResource(UUID id) {
-    return alexandriaService.readResource(id)//
-        .orElseThrow(resourceNotFoundForId(id));
+  private AlexandriaResource readExistingResource(UUIDParam id) {
+    return alexandriaService.readResource(id.getValue()).orElseThrow(resourceNotFoundForId(id));
   }
 }

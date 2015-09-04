@@ -2,6 +2,7 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import static java.util.stream.Collectors.toSet;
 
+import java.net.URI;
 import java.util.Set;
 import java.util.UUID;
 
@@ -62,7 +63,12 @@ public class SubResourcesEndpoint extends JSONEndpoint {
     prototype.setState(AlexandriaState.TENTATIVE);
     SubResourceCreationRequest request = requestBuilder.build(parentUuid, prototype);
     AlexandriaResource resource = request.execute(service);
-    return Response.created(locationBuilder.locationOf(resource)).build();
+    URI subresourceLocation = locationBuilder.locationOf(resource);
+    if (request.newResourceWasCreated()) {
+      return Response.created(subresourceLocation).build();
+    } else {
+      return Response.noContent().header("Location", subresourceLocation).build();
+    }
   }
 
 }

@@ -17,6 +17,8 @@ import nl.knaw.huygens.alexandria.util.Scheduler;
 @WebListener
 public class ContextListener extends JerseyGuiceServletContextListener {
   static final ImmutableList<AbstractModule> MODULES = ImmutableList.of(new AlexandriaServletModule(), new TestConfigurationModule());
+  // for acceptance:
+  // static final ImmutableList<AbstractModule> MODULES = ImmutableList.of(new AlexandriaServletModule(), new AcceptanceConfigurationModule());
 
   @Override
   protected List<? extends Module> modules() {

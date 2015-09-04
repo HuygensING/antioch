@@ -8,18 +8,28 @@ import java.util.function.Predicate;
 
 import org.apache.tinkerpop.gremlin.process.traversal.Traverser;
 
+import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 
 public class ParsedAlexandriaQuery {
+  private static final Function<Storage, List<AnnotationVF>> DEFAULT_ANNOTATIONVF_FINDER = storage -> {
+    List<AnnotationVF> list = storage.find(AnnotationVF.class)//
+        // .filter(predicate)//
+        .toList();
+    return list;
+  };
+
   private Class<? extends AlexandriaVF> vfClazz;
   private List<String> returnFields;
   private Predicate<Traverser<AnnotationVF>> predicate;
   private Comparator<AnnotationVF> comparator;
   private Function<AnnotationVF, Map<String, Object>> mapper;
+  private Function<Storage, List<AnnotationVF>> annotationVFFinder = DEFAULT_ANNOTATIONVF_FINDER;
 
-  public void setVFClass(Class<? extends AlexandriaVF> vfClass) {
+  public ParsedAlexandriaQuery setVFClass(Class<? extends AlexandriaVF> vfClass) {
     this.vfClazz = vfClass;
+    return this;
   }
 
   public Class<? extends AlexandriaVF> getVFClass() {
@@ -42,20 +52,30 @@ public class ParsedAlexandriaQuery {
     return mapper;
   }
 
-  public void setPredicate(Predicate<Traverser<AnnotationVF>> predicate) {
+  public ParsedAlexandriaQuery setPredicate(Predicate<Traverser<AnnotationVF>> predicate) {
     this.predicate = predicate;
+    return this;
   }
 
   public Predicate<Traverser<AnnotationVF>> getPredicate() {
     return predicate;
   }
 
-  public void setResultComparator(Comparator<AnnotationVF> comparator) {
+  public ParsedAlexandriaQuery setResultComparator(Comparator<AnnotationVF> comparator) {
     this.comparator = comparator;
+    return this;
   }
 
   public Comparator<AnnotationVF> getResultComparator() {
     return comparator;
+  }
+
+  public void setAnnotationVFFinder(Function<Storage, List<AnnotationVF>> annotationVFFinder) {
+    this.annotationVFFinder = annotationVFFinder;
+  }
+
+  public Function<Storage, List<AnnotationVF>> getAnnotationVFFinder() {
+    return annotationVFFinder;
   }
 
 }

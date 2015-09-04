@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>nl.knaw.huygens.alexandria</groupId>
   <artifactId>alexandria</artifactId>
@@ -16,6 +16,7 @@
     <module>alexandria-server</module>
     <module>alexandria-webapp</module>
     <module>alexandria-test</module>
+    <module>alexandria-aql</module>
   </modules>
 
   <properties>
@@ -33,7 +34,7 @@
     <classloader-leak-prevention.version>1.13.0</classloader-leak-prevention.version>
 
     <!-- Concordion Acceptance Test extensions -->
-    <cat.version>1.2.2</cat.version>
+    <cat.version>1.2.4</cat.version>
 
     <guice.version>3.0</guice.version>
     <jackson.version>2.6.1</jackson.version>
@@ -46,10 +47,11 @@
 
     <junit.version>4.12</junit.version>
     <junitparams.version>1.0.4</junitparams.version>
-    <log.version>1.0.1</log.version>
-    <logback.version>1.1.2</logback.version>
+    <antlr.version>4.5.1-1</antlr.version>
+    <log.version>1.1.0</log.version>
     <maven-assembly.version>2.4</maven-assembly.version>
-    <maven-compiler.version>3.1</maven-compiler.version> <!-- 3.2,3.3 leads to compiler error in Jenkins: java.lang.IllegalStateException: endPosTable already set -->
+    <maven-compiler.version>3.1</maven-compiler.version> <!-- 3.2,3.3 leads to compiler error in Jenkins: java.lang.IllegalStateException: 
+      endPosTable already set -->
     <maven-surefire.version>2.18.1</maven-surefire.version>
     <maven-war.version>2.6</maven-war.version>
     <maven-javadoc.version>2.10.3</maven-javadoc.version>
@@ -60,7 +62,7 @@
     <reflections.version>0.9.10</reflections.version>
     <servlet-api.version>3.1.0</servlet-api.version>
     <swagger-maven-plugin.version>3.1.0</swagger-maven-plugin.version>
-    <swagger.version>1.5.2</swagger.version>
+    <swagger.version>1.5.3</swagger.version>
     <tinkerpop.groupId>org.apache.tinkerpop</tinkerpop.groupId>
     <tinkerpop.version>3.0.0.M9-incubating</tinkerpop.version>
     <tomcat7-maven.version>2.2</tomcat7-maven.version>
@@ -78,8 +80,8 @@
     <port>9000</port>
 
     <!-- Settings for maven-scm-publish-plugin used to publish site to GitHub -->
-    <scmpublish.checkinComment>Publishing Site Docs for ${project.artifactId}:${project.version}
-    </scmpublish.checkinComment>
+    <scmpublish.checkinComment>Publishing Site Docs for
+      ${project.artifactId}:${project.version}</scmpublish.checkinComment>
     <scmpublish.pubScmUrl>scm:git:git@github.com:huygensING/alexandria.git</scmpublish.pubScmUrl>
     <scmpublish.scm.branch>gh-pages</scmpublish.scm.branch>
 
@@ -184,17 +186,6 @@
         <checksumPolicy>fail</checksumPolicy>
       </snapshots>
     </repository>
-    <repository>
-      <id>sonatype-nexus-snapshots</id>
-      <name>Sonatype Nexus Snapshots</name>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
   </repositories>
 
   <build>
@@ -230,6 +221,7 @@
           <target>${jdk.version}</target>
           <testSource>${jdk.version}</testSource>
           <testTarget>${jdk.version}</testTarget>
+          <generatedSourcesDirectory>src/generated/java</generatedSourcesDirectory>
         </configuration>
       </plugin>
 
@@ -258,7 +250,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-scm-publish-plugin</artifactId>
         <version>${plugin.scm-publish.version}</version>
-        <!-- this plugin configuration should apply to POMs which inherit from this one -->
+        <!-- this plugin configuration should apply to POMs which inherit 
+          from this one -->
         <inherited>true</inherited>
       </plugin>
 
@@ -328,7 +321,8 @@
 
     <pluginManagement>
       <plugins>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+        <!--This plugin's configuration is used to store Eclipse m2e settings 
+          only. It has no influence on the Maven build itself. -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>
@@ -346,7 +340,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore/>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>

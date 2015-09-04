@@ -11,12 +11,12 @@ public class TestConfiguration implements AlexandriaConfiguration {
   @Override
   public URI getBaseURI() {
     // TODO: hide url
-    return UriBuilder.fromUri("http://tc23.huygens.knaw.nl/test-alexandria/").build();
+    return UriBuilder.fromUri("http://test.alexandria.huygens.knaw.nl/").build();
   }
 
   @Override
   public String getStorageDirectory() {
-    return "/data/alexandria/storage/";
+    return "/data/alexandria/storage/test/";
   }
 
 }

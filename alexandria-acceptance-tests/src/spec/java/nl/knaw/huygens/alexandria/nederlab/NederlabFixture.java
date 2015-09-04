@@ -4,17 +4,18 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import nl.knaw.huygens.Log;
+import org.concordion.integration.junit4.ConcordionRunner;
+import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+
 import nl.knaw.huygens.alexandria.concordion.AlexandriaAcceptanceTest;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
+import nl.knaw.huygens.alexandria.endpoint.search.SearchEndpoint;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
-import org.concordion.integration.junit4.ConcordionRunner;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
 
 @RunWith(ConcordionRunner.class)
 public class NederlabFixture extends AlexandriaAcceptanceTest {
@@ -22,20 +23,17 @@ public class NederlabFixture extends AlexandriaAcceptanceTest {
   public static void registerEndpoints() {
     register(ResourcesEndpoint.class);
     register(AnnotationsEndpoint.class);
+    register(SearchEndpoint.class);
   }
 
   public void resourceExists(String id) {
-    UUID uuid = UUID.fromString(id);
-    service().createOrUpdateResource(uuid, aRef(), aProvenance(), confirmed());
+    service().createOrUpdateResource(UUID.fromString(id), aRef(), aProvenance(), confirmed());
   }
 
   public AlexandriaResource subResourceExists(String id, String parentId) {
-    UUID uuid = UUID.fromString(id);
+    UUID resourceId = UUID.fromString(id);
     UUID parentUUID = UUID.fromString(parentId);
-    final AlexandriaResource subResource = service().createSubResource(uuid, parentUUID, aSub(), aProvenance(),
-        confirmed());
-    Log.trace("subResource created: {}", subResource);
-    return subResource;
+    return service().createSubResource(resourceId, parentUUID, aSub(), aProvenance(), confirmed());
   }
 
   public String resourceHasAnnotation(String id) {
@@ -43,17 +41,17 @@ public class NederlabFixture extends AlexandriaAcceptanceTest {
   }
 
   public String resourceHasAnnotation(String id, String type, String value) {
-    UUID uuid = UUID.fromString(id);
-    AlexandriaResource resource = service().readResource(uuid).get();
-    AlexandriaAnnotationBody annotationBody = anAnnotation(type, value);
+    final UUID uuid = UUID.fromString(id);
+    final AlexandriaResource resource = service().readResource(uuid).get();
+    final AlexandriaAnnotationBody annotationBody = anAnnotation(type, value);
     final UUID annotationId = service().annotate(resource, annotationBody, aProvenance()).getId();
     service().confirmAnnotation(annotationId);
     return annotationId.toString();
   }
 
   public String subResourceHasAnnotation(String id, String parentId, String type, String value) {
-    AlexandriaResource resource = subResourceExists(id, parentId);
-    AlexandriaAnnotationBody annotationBody = anAnnotation(type, value);
+    final AlexandriaResource resource = subResourceExists(id, parentId);
+    final AlexandriaAnnotationBody annotationBody = anAnnotation(type, value);
     final UUID annotationId = service().annotate(resource, annotationBody, aProvenance()).getId();
     service().confirmAnnotation(annotationId);
     return annotationId.toString();
@@ -70,7 +68,7 @@ public class NederlabFixture extends AlexandriaAcceptanceTest {
   }
 
   private TentativeAlexandriaProvenance aProvenance() {
-    return new TentativeAlexandriaProvenance("who", Instant.now(), "why");
+    return new TentativeAlexandriaProvenance("nederlab", Instant.now(), "why");
   }
 
   private String aRef() {

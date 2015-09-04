@@ -8,10 +8,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Graph.Features.GraphFeatures;
 import org.apache.tinkerpop.gremlin.structure.Transaction;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.apache.tinkerpop.gremlin.structure.io.IoCore;
 import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
 
@@ -23,7 +26,7 @@ import peapod.FramedGraph;
 import peapod.FramedGraphTraversal;
 
 public class Storage {
-  private static final String IDENTIFIER_PROPERTY = "uuid";
+  public static final String IDENTIFIER_PROPERTY = "uuid";
 
   private Graph graph;
   private FramedGraph framedGraph;
@@ -98,21 +101,30 @@ public class Storage {
     return firstOrEmpty(find(vfClass, uuid).toList());
   }
 
+  public <A extends AlexandriaVF> Optional<A> readVF(final Class<A> vfClass, final UUID uuid, final Integer revision) {
+    assertClass(vfClass);
+    return firstOrEmpty(find(vfClass, uuid, revision).toList());
+  }
+
   public <A extends AlexandriaVF> FramedGraphTraversal<Object, A> find(Class<A> vfClass) {
     return framedGraph.V(vfClass);
+  }
+
+  public GraphTraversal<Vertex, Vertex> getVertexTraversal(Object... vertexIds) {
+    return graph.traversal().V(vertexIds);
   }
 
   // graph methods
 
   public void removeExpiredTentatives(final Long threshold) {
-    graph.traversal().V()//
+    getVertexTraversal()//
         .has("state", AlexandriaState.TENTATIVE.name())//
         .has("stateSince", lt(threshold))//
         .forEachRemaining(Element::remove);
   }
 
   public void removeVertexWithId(final String annotationBodyId) {
-    graph.traversal().V()//
+    getVertexTraversal()//
         .has(IDENTIFIER_PROPERTY, annotationBodyId).next().remove();
   }
 
@@ -126,7 +138,7 @@ public class Storage {
 
   public void loadFromDisk(final String file) {
     try {
-      graph.io(new GraphMLIo.Builder()).readGraph(file);
+      graph.io(IoCore.graphml()).readGraph(file);
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
@@ -135,7 +147,7 @@ public class Storage {
   public void saveToDisk(final String file) {
     if (file != null) {
       try {
-        graph.io(new GraphMLIo.Builder()).writeGraph(file);
+        graph.io(IoCore.graphml()).writeGraph(file);
       } catch (final IOException e) {
         throw new RuntimeException(e);
       }
@@ -150,6 +162,10 @@ public class Storage {
 
   private <A extends AlexandriaVF> FramedGraphTraversal<Object, A> find(final Class<A> vfClass, final UUID uuid) {
     return find(vfClass).has(IDENTIFIER_PROPERTY, uuid.toString());
+  }
+
+  private <A extends AlexandriaVF> FramedGraphTraversal<Object, A> find(final Class<A> vfClass, final UUID uuid, final Integer revision) {
+    return find(vfClass).has(IDENTIFIER_PROPERTY, uuid.toString() + "." + revision);
   }
 
   private String getDumpFile() {

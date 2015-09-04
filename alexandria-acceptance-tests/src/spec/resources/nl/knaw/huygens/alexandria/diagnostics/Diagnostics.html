@@ -1,0 +1,125 @@
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+
+<title>Nederlab Scenarios</title>
+
+<body data-desc="Nederlab Scenarios">
+
+<!-- TODO: Move to 'cat' and generate -->
+<div class="dropdown">
+    <button class="btn btn-primary pull-right dropdown-toggle" type="button" data-toggle="dropdown">Test Sources
+        <span class="caret"></span></button>
+    <ul class="dropdown-menu dropdown-menu-right">
+        <li>
+            <a href="https://github.com/HuygensING/alexandria/blob/develop/alexandria-acceptance-tests/src/spec/java/nl/knaw/huygens/alexandria/diagnostics/DiagnosticsFixture.java">Fixture</a>
+        </li>
+        <li>
+            <a href="https://github.com/HuygensING/alexandria/blob/develop/alexandria-acceptance-tests/src/spec/resources/nl/knaw/huygens/alexandria/diagnostics/Diagnostics.html">Specification</a>
+        </li>
+    </ul>
+</div>
+
+<div id="dia-404" data-desc="When can I expect a 404 Not Found?" c:execute="clearStorage()">
+    <ul>
+        <li>
+            <h4>Accessing a non-existent endpoint</h4>
+
+            <h:request>When we
+                <h:get>/resource/fa1303c2-5072-11e5-af91-6b4599821240</h:get>
+                we observe
+                <h:status>404 Not Found</h:status>
+                and an
+                <h:responseBody/>
+                response body.
+            </h:request>
+
+            <div class="alert alert-info sm">
+                In this case the address of the resources endpoint was misspelled:
+                <del>/resource/</del>
+                instead of /resources/
+            </div>
+
+        </li>
+
+        <li>
+            <h4>Accessing a non-existent resource at the correct endpoint</h4>
+
+            <h:request>When we
+                <h:get>/resources/fa1303c2-5072-11e5-af91-6b4599821240</h:get>
+                we observe
+                <h:status>404 Not Found</h:status>
+                and the body contains the following hint
+                <h:jsonResponse>{
+                    "error": {
+                    "message": "No resource found with id fa1303c2-5072-11e5-af91-6b4599821240"
+                    } }
+                </h:jsonResponse>
+            </h:request>
+        </li>
+    </ul>
+</div>
+
+<div id="use-before-confirm" data-desc="When can I expect a 409 Conflict?" c:execute="clearStorage()">
+
+    <div class="alert alert-warning sm">
+        The <a href="http://www.atomikos.com/Publications/TryCancelConfirm">try-confirm-cancel</a>
+        pattern dictates we first confirm any newly created resources before using them.
+
+        <p><i>Failure to follow this pattern leads to grief when operating on the resource!</i></p>
+    </div>
+
+    <h4>Example: adding an annotation to an unconfirmed resource</h4>
+
+    <ul>
+        <li>
+            <div c:execute="resourceExists(#uuid)">Given that a resource with id
+                <span c:set="#uuid">6244b9d8-3b5e-11e5-aca2-5befb33d5e4d</span> exists and
+            </div>
+        </li>
+        <li>
+            <h:request>
+                a subresource is
+                <h:success>successfully</h:success>
+                registered via
+                <h:post>/resources/$uuid/subresources</h:post>
+                with body:
+                <h:jsonBody>{"subresource":{"sub":"/some/folia/path"}}</h:jsonBody>
+            </h:request>
+            <div c:execute="#uuid = uuid()">in this case yielding uuid <span c:echo="#uuid"></span>.</div>
+        </li>
+        <li>
+            <h:request>
+                <strong>(verification)</strong> We
+                <h:get>/resources/$uuid</h:get>
+                and observe its <code>TENTATIVE</code> state
+                <h:jsonResponse>{"subresource":{
+                    "id": "$uuid",
+                    "sub": "/some/folia/path",
+                    "state": { "value": "TENTATIVE"
+                    } } }
+                </h:jsonResponse>
+            </h:request>
+        </li>
+    </ul>
+
+    <h:request>
+        <ul>
+            <li>When I
+                <h:post>/resources/$uuid/annotations</h:post>
+                an example annotation body:
+                <h:jsonBody>{"annotation": {"type": "t", "value": "v"}}</h:jsonBody>
+            </li>
+            <li>Then I will get status
+                <h:status>409 Conflict</h:status>
+                and a response body containing:
+                <h:jsonResponse>{"error":{"message": "resource $uuid is tentative, please confirm first"}}
+                </h:jsonResponse>
+            </li>
+        </ul>
+    </h:request>
+</div>
+</body>
+</html>

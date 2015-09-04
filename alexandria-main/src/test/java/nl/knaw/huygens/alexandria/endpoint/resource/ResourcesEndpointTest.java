@@ -5,20 +5,13 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
@@ -29,14 +22,24 @@ import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class ResourcesEndpointTest extends MockedServiceEndpointTest {
   private static final String ROOTPATH = EndpointPaths.RESOURCES;
-  ObjectMapper om = new ObjectMapper();
+
+  private final ObjectMapper om = new ObjectMapper();
 
   @BeforeClass
   public static void registerEndpoint() {
     register(ResourcesEndpoint.class);
+  }
+
+  @Test
+  public void getResourcesRefNoLongerExists() {
+    when(SERVICE_MOCK.readResource(any(UUID.class))).thenReturn(Optional.empty());
+    Response response = target(ROOTPATH).path(UUID.randomUUID().toString()).path("/ref").request().get();
+    assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
   }
 
   @Test
@@ -59,14 +62,14 @@ public class ResourcesEndpointTest extends MockedServiceEndpointTest {
     assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
   }
 
-  @Test
-  public void testPostResource() {
-    // Object entity;
-    // target(EndpointPaths.RESOURCES).request().post(Entity.json(entity));
-  }
+  // @Test
+  // public void testPostResource() {
+  // // Object entity;
+  // // target(EndpointPaths.RESOURCES).request().post(Entity.json(entity));
+  // }
 
   // @Test
-  public void testTwoPutsWillNotProduceAnError() throws JsonParseException, JsonMappingException, IOException {
+  public void testTwoPutsWillNotProduceAnError() throws IOException {
     AlexandriaService service = mock(AlexandriaService.class);
     ResourceCreationRequestBuilder requestBuilder = new ResourceCreationRequestBuilder();
     LocationBuilder locationBuilder = new LocationBuilder(new MockConfiguration(), new EndpointPathResolver());
@@ -74,17 +77,17 @@ public class ResourcesEndpointTest extends MockedServiceEndpointTest {
     ResourcesEndpoint re = new ResourcesEndpoint(service, requestBuilder, locationBuilder, entityBuilder);
 
     ResourcePrototype prototype1 = deserialize("{'resource':{'id':'c28626d4-493a-4204-83d9-e9ae17e15654','ref':'Referentie1'}}");
-    UUIDParam uuidparam1=new UUIDParam("c28626d4-493a-4204-83d9-e9ae17e15654");
-    Response response1 = re.setResourceAtSpecificID(uuidparam1,prototype1);
+    UUIDParam uuidparam1 = new UUIDParam("c28626d4-493a-4204-83d9-e9ae17e15654");
+    Response response1 = re.setResourceAtSpecificID(uuidparam1, prototype1);
     assertThat(response1.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
 
     ResourcePrototype prototype2 = deserialize("{'resource':{'id':'d1753214-493a-4204-83d9-e9ae17e15654','ref':'Referentie2'}}");
-    UUIDParam uuidparam2=new UUIDParam("d1753214-493a-4204-83d9-e9ae17e15654");
-    Response response2 = re.setResourceAtSpecificID(uuidparam2,prototype2);
+    UUIDParam uuidparam2 = new UUIDParam("d1753214-493a-4204-83d9-e9ae17e15654");
+    Response response2 = re.setResourceAtSpecificID(uuidparam2, prototype2);
     assertThat(response2.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
   }
 
-  private ResourcePrototype deserialize(String json1) throws JsonParseException, JsonMappingException, IOException {
+  private ResourcePrototype deserialize(String json1) throws IOException {
     return om.readValue(json1.replace("'", "\""), ResourcePrototype.class);
   }
 }
