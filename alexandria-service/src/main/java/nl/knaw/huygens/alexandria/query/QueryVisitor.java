@@ -9,8 +9,6 @@ import com.google.common.collect.Lists;
 import nl.knaw.huygens.alexandria.antlr.AQLBaseVisitor;
 import nl.knaw.huygens.alexandria.antlr.AQLParser.ParameterContext;
 import nl.knaw.huygens.alexandria.antlr.AQLParser.SubqueryContext;
-import nl.knaw.huygens.alexandria.query.AlexandriaQueryParser.MatchFunction;
-import nl.knaw.huygens.alexandria.query.AlexandriaQueryParser.WhereToken;
 
 public class QueryVisitor extends AQLBaseVisitor<Void> {
   private List<WhereToken> whereTokens = Lists.newArrayList();
@@ -21,12 +19,9 @@ public class QueryVisitor extends AQLBaseVisitor<Void> {
         .map(ParameterContext::getText)//
         .map(QueryVisitor::parseParameterString)//
         .collect(toList());
-    MatchFunction function = MatchFunction.valueOf(ctx.FUNCTION().getText());
-    String property = ctx.FIELDNAME().getText();
-    WhereToken wToken = new WhereToken()//
-        .setProperty(property)//
-        .setFunction(function)//
-        .setParameters(parameters);
+    QueryFunction function = QueryFunction.valueOf(ctx.FUNCTION().getText());
+    QueryField property = QueryField.fromExternalName(ctx.FIELDNAME().getText());
+    WhereToken wToken = new WhereToken(property, function, parameters);
     whereTokens.add(wToken);
     return null;
   }

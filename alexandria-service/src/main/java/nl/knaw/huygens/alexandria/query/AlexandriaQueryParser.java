@@ -7,7 +7,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -20,13 +19,10 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tinkerpop.gremlin.process.traversal.Traverser;
 import org.parboiled.common.Predicates;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 
@@ -36,11 +32,14 @@ import nl.knaw.huygens.alexandria.antlr.AQLParser;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 
 public class AlexandriaQueryParser {
+
+  static final String ALLOWEDFIELDS = ", available fields: " + Joiner.on(", ").join(QueryField.ALL_EXTERNAL_NAMES);
 
   private static LocationBuilder locationBuilder;
 
@@ -74,7 +73,26 @@ public class AlexandriaQueryParser {
 
     kludgeForHandlingNLA87(paq, tokens);
 
+    // any tokens with resource.id or subresource.id need to be filtered out and lead to an annotationVFFinder
+    List<WhereToken> resourceWhereTokens = filterResourceWhereTokens(tokens);
+    if (!resourceWhereTokens.isEmpty()) {
+      paq.setAnnotationVFFinder(createAnnotationVFFinder(resourceWhereTokens));
+    }
+
+    tokens.removeAll(resourceWhereTokens);
+
+    // create a predicate for filtering the list of annotationVFs based on the remaining tokens
     paq.setPredicate(createPredicate(tokens));
+  }
+
+  private Function<Storage, List<AnnotationVF>> createAnnotationVFFinder(List<WhereToken> resourceWhereTokens) {
+    return null;
+  }
+
+  private List<WhereToken> filterResourceWhereTokens(List<WhereToken> tokens) {
+    return tokens.stream()//
+        .filter(WhereToken::hasResourceProperty)//
+        .collect(toList());
   }
 
   private void kludgeForHandlingNLA87(final ParsedAlexandriaQuery paq, final List<WhereToken> tokens) {
@@ -83,7 +101,7 @@ public class AlexandriaQueryParser {
     for (WhereToken whereToken : tokens) {
       // NLA-87
       if (whereToken.getProperty().equals("resource.id")//
-          && whereToken.getFunction().equals(MatchFunction.eq)) {
+          && whereToken.getFunction().equals(QueryFunction.eq)) {
         resourceWhereToken = whereToken;
       } else {
         filteredTokens.add(whereToken);
@@ -118,7 +136,7 @@ public class AlexandriaQueryParser {
   private Predicate<AnnotationVF> predicate(WhereToken whereToken) {
     // who.eq("someone")
     if (whereToken.getProperty().equals("who")//
-        && whereToken.getFunction().equals(MatchFunction.eq)) {
+        && whereToken.getFunction().equals(QueryFunction.eq)) {
       String value = (String) whereToken.getParameters().get(0);
       return (AnnotationVF avf) -> {
         return avf.getProvenanceWho().equals(value);
@@ -142,21 +160,6 @@ public class AlexandriaQueryParser {
     }
     return null;
   }
-
-  static final Map<String, Function<AnnotationVF, Object>> valueMapping = ImmutableMap.<String, Function<AnnotationVF, Object>> builder()//
-      .put("id", AnnotationVF::getUuid)//
-      .put("when", AnnotationVF::getProvenanceWhen)//
-      .put("who", AnnotationVF::getProvenanceWho)//
-      .put("why", AnnotationVF::getProvenanceWhy)//
-      .put("type", AnnotationVF::getType)//
-      .put("value", AnnotationVF::getValue)//
-      .put("resource.id", AnnotationVF::getResourceId)//
-      .put("subresource.id", AnnotationVF::getSubResourceId)//
-      .put("resource.url", AlexandriaQueryParser::getResourceURL)//
-      .put("subresource.url", AlexandriaQueryParser::getSubResourceURL)//
-      .build();
-
-  static final String ALLOWEDFIELDS = ", available fields: " + Joiner.on(", ").join(valueMapping.keySet());
 
   // static final Pattern P1 = Pattern.compile("([a-z\\.]+)\\.([a-z]+)\\((.*)\\)");
   //
@@ -226,40 +229,52 @@ public class AlexandriaQueryParser {
     return visitor.getWhereTokens();
   }
 
-  private static Predicate<Traverser<AnnotationVF>> createPredicate(List<WhereToken> tokens) {
+  private static Predicate<AnnotationVF> createPredicate(List<WhereToken> tokens) {
     if (tokens.isEmpty()) {
       return alwaysTrue();
     }
-    return annotationVFTraverser -> {
-      boolean pass = true;
-      final AnnotationVF annotationVF = annotationVFTraverser.get();
-      for (WhereToken token : tokens) {
-        pass = pass && assertMatch(annotationVF, token);
-      }
-      return pass;
-    };
+    Predicate<AnnotationVF> predicate = tokens.stream()//
+        .map(AlexandriaQueryParser::toPredicate)//
+        .reduce(alwaysTrue(), (p, np) -> p = p.and(np));
+    return predicate;
   }
 
-  private static Predicate<Traverser<AnnotationVF>> alwaysTrue() {
+  static Predicate<AnnotationVF> toPredicate(WhereToken whereToken) {
+    // eq
+    if (QueryFunction.eq.equals(whereToken.getFunction())) {
+      Function<AnnotationVF, Object> getter = whereToken.getProperty().getter;
+      Object value = whereToken.getParameters().get(0);
+      return (AnnotationVF avf) -> {
+        return getter.apply(avf).equals(value);
+      };
+    }
+    return alwaysTrue();
+  }
+
+  private static Predicate<AnnotationVF> alwaysTrue() {
     return x -> {
       return true;
     };
   }
 
-  private static final WhereToken STATE_IS_CONFIRMED = new WhereToken()//
-      .setProperty("state")//
-      .setFunction(MatchFunction.eq)//
-      .setParameters(ImmutableList.of("CONFIRMED"));
+  // private static final WhereToken STATE_IS_CONFIRMED = new WhereToken()//
+  // .setProperty("state")//
+  // .setFunction(MatchFunction.eq)//
+  // .setParameters(ImmutableList.of("CONFIRMED"));
+  //
+  // private static boolean assertMatch(AnnotationVF annotationVF, WhereToken token) {
+  // if (STATE_IS_CONFIRMED.equals(token)) {
+  // return annotationVF.isConfirmed();
+  // }
+  // return true;
+  // }
 
-  private static boolean assertMatch(AnnotationVF annotationVF, WhereToken token) {
-    if (STATE_IS_CONFIRMED.equals(token)) {
-      return annotationVF.isConfirmed();
-    }
-    return true;
+  static String getResourceURL(final AnnotationVF avf) {
+    return id2url(avf.getResourceId());
   }
 
-  private static String getResourceURL(final AnnotationVF avf) {
-    return id2url(avf.getResourceId());
+  static String getSubResourceURL(final AnnotationVF avf) {
+    return id2url(avf.getSubResourceId());
   }
 
   private static String id2url(String resourceId) {
@@ -269,43 +284,51 @@ public class AlexandriaQueryParser {
     return ":null";
   }
 
-  private static String getSubResourceURL(final AnnotationVF avf) {
-    return id2url(avf.getSubResourceId());
-  }
-
   private Comparator<AnnotationVF> parseSort(final String sortString) {
     // TODO: cache resultcomparator?
-    boolean errorInSort = false;
     final List<SortToken> sortTokens = parseSortString(sortString);
+    if (sortTokens == null) {
+      // there were parse errors
+      return null;
+    }
     final List<Function<AnnotationVF, Object>> valueFunctions = Lists.newArrayList();
     for (final SortToken token : sortTokens) {
-      final String field = token.getField();
-      final Function<AnnotationVF, Object> valueMapper = valueMapping.get(field);
-      if (valueMapper == null) {
-        parseErrors.add("sort: unknown field: " + field + ALLOWEDFIELDS);
-        errorInSort = true;
-      } else {
-        valueFunctions.add(valueMapper);
-      }
+      final QueryField field = token.getField();
+      final Function<AnnotationVF, Object> valueMapper = field.getter;
+      valueFunctions.add(valueMapper);
     }
-    if (!errorInSort) {
-      return (getComparator(sortKeyGenerator(valueFunctions)));
-      // return getComparator(valueFunctions);
-    }
-    return null;
+    return (getComparator(sortKeyGenerator(valueFunctions)));
   }
 
-  private static List<SortToken> parseSortString(final String sortString) {
-    final List<SortToken> sortFields = splitToList(sortString).stream()//
+  private List<SortToken> parseSortString(final String sortString) {
+    List<String> sortTokenStrings = splitToList(sortString);
+
+    List<String> sortParseErrors = sortTokenStrings.stream()//
+        .map(AlexandriaQueryParser::extractExternalName)//
+        .filter(externalName -> !QueryField.ALL_EXTERNAL_NAMES.contains(externalName))//
+        .map(invalidFieldName -> "sort: unknown field: " + invalidFieldName + ALLOWEDFIELDS)//
+        .collect(toList());
+    if (!sortParseErrors.isEmpty()) {
+      parseErrors.addAll(sortParseErrors);
+      return null;
+    }
+
+    final List<SortToken> sortFields = sortTokenStrings.stream()//
         .map(AlexandriaQueryParser::sortToken)//
         .collect(toList());
     return sortFields;
   }
 
   static SortToken sortToken(final String f) {
+    boolean ascending = !f.startsWith("-");
+    String externalName = extractExternalName(f);
     return new SortToken()//
-        .setAscending(!f.startsWith("-"))//
-        .setField(f.replaceFirst("^[\\-\\+]", ""));
+        .setAscending(ascending)//
+        .setField(QueryField.fromExternalName(externalName));
+  }
+
+  private static String extractExternalName(final String sortParameter) {
+    return sortParameter.replaceFirst("^[\\-\\+]", "");
   }
 
   @SuppressWarnings("unused")
@@ -344,7 +367,7 @@ public class AlexandriaQueryParser {
 
   private void parseReturn(final String fieldString, final ParsedAlexandriaQuery paq) {
     final List<String> fields = splitToList(fieldString);
-    final Set<String> allowedFields = valueMapping.keySet();
+    final List<String> allowedFields = QueryField.ALL_EXTERNAL_NAMES;
     final List<String> unknownFields = Lists.newArrayList(fields);
     unknownFields.removeAll(allowedFields);
     if (!unknownFields.isEmpty()) {
@@ -354,7 +377,7 @@ public class AlexandriaQueryParser {
       paq.setReturnFields(fields);
 
       final Function<AnnotationVF, Map<String, Object>> mapper = avf -> fields.stream()//
-          .collect(toMap(Function.identity(), f -> valueMapping.get(f).apply(avf)));
+          .collect(toMap(Function.identity(), f -> QueryField.fromExternalName(f).getter.apply(avf)));
       // TODO: cache resultmapper?
       paq.setResultMapper(mapper);
     }
@@ -368,64 +391,4 @@ public class AlexandriaQueryParser {
     return (a1, a2) -> sortKeyGenerator.apply(a1).compareTo(sortKeyGenerator.apply(a2));
   }
 
-  static class SortToken {
-    private String field = "";
-    private boolean ascending = true;
-
-    public String getField() {
-      return field;
-    }
-
-    public SortToken setField(final String field) {
-      this.field = field;
-      return this;
-    }
-
-    public boolean isAscending() {
-      return ascending;
-    }
-
-    public SortToken setAscending(final boolean ascending) {
-      this.ascending = ascending;
-      return this;
-    }
-  }
-
-  enum MatchFunction {
-    eq, match, inSet, inRange
-  }
-
-  static class WhereToken {
-    String property;
-    MatchFunction function;
-    List<Object> parameters = Lists.newArrayList();
-
-    public String getProperty() {
-      return property;
-    }
-
-    public WhereToken setProperty(String property) {
-      this.property = property;
-      return this;
-    }
-
-    public MatchFunction getFunction() {
-      return function;
-    }
-
-    public WhereToken setFunction(MatchFunction function) {
-      this.function = function;
-      return this;
-    }
-
-    public List<Object> getParameters() {
-      return parameters;
-    }
-
-    public WhereToken setParameters(List<Object> parameters) {
-      this.parameters = parameters;
-      return this;
-    }
-
-  }
 }

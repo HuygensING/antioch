@@ -6,23 +6,21 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.apache.tinkerpop.gremlin.process.traversal.Traverser;
-
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 
 public class ParsedAlexandriaQuery {
+  // this is just a container class for the results of processing the AlexandriaQuery parameters
   private static final Function<Storage, List<AnnotationVF>> DEFAULT_ANNOTATIONVF_FINDER = storage -> {
     List<AnnotationVF> list = storage.find(AnnotationVF.class)//
-        // .filter(predicate)//
         .toList();
     return list;
   };
 
   private Class<? extends AlexandriaVF> vfClazz;
   private List<String> returnFields;
-  private Predicate<Traverser<AnnotationVF>> predicate;
+  private Predicate<AnnotationVF> predicate;
   private Comparator<AnnotationVF> comparator;
   private Function<AnnotationVF, Map<String, Object>> mapper;
   private Function<Storage, List<AnnotationVF>> annotationVFFinder = DEFAULT_ANNOTATIONVF_FINDER;
@@ -52,12 +50,12 @@ public class ParsedAlexandriaQuery {
     return mapper;
   }
 
-  public ParsedAlexandriaQuery setPredicate(Predicate<Traverser<AnnotationVF>> predicate) {
+  public ParsedAlexandriaQuery setPredicate(Predicate<AnnotationVF> predicate) {
     this.predicate = predicate;
     return this;
   }
 
-  public Predicate<Traverser<AnnotationVF>> getPredicate() {
+  public Predicate<AnnotationVF> getPredicate() {
     return predicate;
   }
 

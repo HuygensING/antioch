@@ -22,11 +22,6 @@ import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
-import org.apache.tinkerpop.gremlin.process.traversal.Traverser;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
-import org.apache.tinkerpop.gremlin.structure.Vertex;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -560,22 +555,15 @@ public class TinkerPopService implements AlexandriaService {
 
     ParsedAlexandriaQuery pQuery = alexandriaQueryParser.parse(query);
 
-    Predicate<Traverser<AnnotationVF>> predicate = pQuery.getPredicate();// t -> t.get().getProvenanceWho().equals("me");
-    // Predicate<Traverser<AnnotationVF>> predicate = t -> t.get().getProvenanceWho().equals("nederlab");
+    Predicate<AnnotationVF> predicate = pQuery.getPredicate();
     Comparator<AnnotationVF> comparator = pQuery.getResultComparator();
     Function<AnnotationVF, Map<String, Object>> mapper = pQuery.getResultMapper();
-
-    // // type.eq("Tag"),who.eq("nederlab"),state.eq("CONFIRMED")
-    // List<Object> list = storage.find(AnnotationBodyVF.class)//
-    // .has("type", "Tag").in("has_body").has("provenanceWho", "nederlab").has("state", "CONFIRMED").value().toList();
-    // Log.debug("list={}", list);
-    //
-    // findAllConfirmedAnnotationsRelatedToResource("uuid");
 
     List<AnnotationVF> list = pQuery.getAnnotationVFFinder().apply(storage);
     Log.debug("list={}", list);
 
     results = list.stream()//
+        .filter(predicate)//
         .sorted(comparator)//
         .map(mapper)//
         .collect(toList());
@@ -583,21 +571,21 @@ public class TinkerPopService implements AlexandriaService {
     return results;
   }
 
-  @SuppressWarnings("unchecked")
-  private void findAllConfirmedAnnotationsRelatedToResource(String uuid) {
-    // case: find all annotations related to a given resource (or its subresources)
-    // start with the resource
-    // from there: find subresources, add them to resource list
-    // foreach resource in the list, get the confirmed annotations of that resource, add them to annotations list
-    // foreach annotation in the annotationlist, find the confirmed annotations of that annotation, add them to annotations list
-    GraphTraversal<Vertex, Vertex> traversal = storage.getVertexTraversal();
-    traversal.has("uuid", uuid).in(ResourceVF.PART_OF).in("annotates").has("state", "CONFIRMED").as("a").out("has_body").as("b").toList();
-    traversal.has("uuid", uuid)
-        .union(//
-            __.in(ResourceVF.PART_OF).in(AnnotationVF.ANNOTATES_RESOURCE), //
-            __.in(AnnotationVF.ANNOTATES_RESOURCE)//
-    ).has("state", AlexandriaState.CONFIRMED.name()).as("a").out(AnnotationVF.HAS_BODY).as("b").toList();
-  }
+  // @SuppressWarnings("unchecked")
+  // private void findAllConfirmedAnnotationsRelatedToResource(String uuid) {
+  // // case: find all annotations related to a given resource (or its subresources)
+  // // start with the resource
+  // // from there: find subresources, add them to resource list
+  // // foreach resource in the list, get the confirmed annotations of that resource, add them to annotations list
+  // // foreach annotation in the annotationlist, find the confirmed annotations of that annotation, add them to annotations list
+  // GraphTraversal<Vertex, Vertex> traversal = storage.getVertexTraversal();
+  // traversal.has("uuid", uuid).in(ResourceVF.PART_OF).in("annotates").has("state", "CONFIRMED").as("a").out("has_body").as("b").toList();
+  // traversal.has("uuid", uuid)
+  // .union(//
+  // __.in(ResourceVF.PART_OF).in(AnnotationVF.ANNOTATES_RESOURCE), //
+  // __.in(AnnotationVF.ANNOTATES_RESOURCE)//
+  // ).has("state", AlexandriaState.CONFIRMED.name()).as("a").out(AnnotationVF.HAS_BODY).as("b").toList();
+  // }
 
   private List<Map<String, Object>> dummyResults() {
     List<Map<String, Object>> list = Lists.newArrayList();
