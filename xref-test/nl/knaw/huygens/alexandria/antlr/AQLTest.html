@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>AQLTest xref</title>
+<link type="text/css" rel="stylesheet" href="../../../../../stylesheet.css" />
+</head>
+<body>
+<div id="overview"><a href="../../../../../../testapidocs/nl/knaw/huygens/alexandria/antlr/AQLTest.html">View Javadoc</a></div><pre>
+<a class="jxr_linenumber" name="L1" href="#L1">1</a>   <strong class="jxr_keyword">package</strong> nl.knaw.huygens.alexandria.antlr;
+<a class="jxr_linenumber" name="L2" href="#L2">2</a>   
+<a class="jxr_linenumber" name="L3" href="#L3">3</a>   <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.assertj.core.api.Assertions.assertThat;
+<a class="jxr_linenumber" name="L4" href="#L4">4</a>   <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.assertj.core.api.StrictAssertions.assertThat;
+<a class="jxr_linenumber" name="L5" href="#L5">5</a>   
+<a class="jxr_linenumber" name="L6" href="#L6">6</a>   <strong class="jxr_keyword">import</strong> java.util.List;
+<a class="jxr_linenumber" name="L7" href="#L7">7</a>   
+<a class="jxr_linenumber" name="L8" href="#L8">8</a>   <strong class="jxr_keyword">import</strong> org.antlr.v4.runtime.ANTLRInputStream;
+<a class="jxr_linenumber" name="L9" href="#L9">9</a>   <strong class="jxr_keyword">import</strong> org.antlr.v4.runtime.CharStream;
+<a class="jxr_linenumber" name="L10" href="#L10">10</a>  <strong class="jxr_keyword">import</strong> org.antlr.v4.runtime.CommonTokenStream;
+<a class="jxr_linenumber" name="L11" href="#L11">11</a>  <strong class="jxr_keyword">import</strong> org.antlr.v4.runtime.Token;
+<a class="jxr_linenumber" name="L12" href="#L12">12</a>  <strong class="jxr_keyword">import</strong> org.antlr.v4.runtime.tree.ParseTree;
+<a class="jxr_linenumber" name="L13" href="#L13">13</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a class="jxr_linenumber" name="L14" href="#L14">14</a>  
+<a class="jxr_linenumber" name="L15" href="#L15">15</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.Log;
+<a class="jxr_linenumber" name="L16" href="#L16">16</a>  
+<a class="jxr_linenumber" name="L17" href="#L17">17</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/antlr/AQLTest.html">AQLTest</a> {
+<a class="jxr_linenumber" name="L18" href="#L18">18</a>  
+<a class="jxr_linenumber" name="L19" href="#L19">19</a>    @Test
+<a class="jxr_linenumber" name="L20" href="#L20">20</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCorrectAQLStatement() {
+<a class="jxr_linenumber" name="L21" href="#L21">21</a>      String statement = <span class="jxr_string">"type:eq(\&quot;Tag\&quot;)"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L22" href="#L22">22</a>          + <span class="jxr_string">" who:eq(\&quot;nedlab\&quot;)"</span> <em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L23" href="#L23">23</a>          + <span class="jxr_string">" state:eq(\&quot;CONFIRMED\&quot;)"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L24" href="#L24">24</a>          + <span class="jxr_string">" resource.id:inSet(1,2)"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L25" href="#L25">25</a>          + <span class="jxr_string">" value:match(\&quot;whatever\&quot;)"</span>;
+<a class="jxr_linenumber" name="L26" href="#L26">26</a>      CharStream stream = <strong class="jxr_keyword">new</strong> ANTLRInputStream(statement);
+<a class="jxr_linenumber" name="L27" href="#L27">27</a>      AQLLexer lex = <strong class="jxr_keyword">new</strong> AQLLexer(stream);
+<a class="jxr_linenumber" name="L28" href="#L28">28</a>      List&lt;? <strong class="jxr_keyword">extends</strong> Token&gt; allTokens = lex.getAllTokens();
+<a class="jxr_linenumber" name="L29" href="#L29">29</a>      <strong class="jxr_keyword">for</strong> (Token token : allTokens) {
+<a class="jxr_linenumber" name="L30" href="#L30">30</a>        Log.info(<span class="jxr_string">"token: [{}] &lt;&lt;{}&gt;&gt;"</span>, lex.getRuleNames()[token.getType() - 1], token.getText());
+<a class="jxr_linenumber" name="L31" href="#L31">31</a>      }
+<a class="jxr_linenumber" name="L32" href="#L32">32</a>      lex.reset();
+<a class="jxr_linenumber" name="L33" href="#L33">33</a>  
+<a class="jxr_linenumber" name="L34" href="#L34">34</a>      CommonTokenStream tokens = <strong class="jxr_keyword">new</strong> CommonTokenStream(lex);
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>      AQLParser parser = <strong class="jxr_keyword">new</strong> AQLParser(tokens);
+<a class="jxr_linenumber" name="L36" href="#L36">36</a>      parser.setBuildParseTree(<strong class="jxr_keyword">true</strong>);
+<a class="jxr_linenumber" name="L37" href="#L37">37</a>      ParseTree tree = parser.root();
+<a class="jxr_linenumber" name="L38" href="#L38">38</a>      Log.info(<span class="jxr_string">"tree={}"</span>, tree.toStringTree(parser));
+<a class="jxr_linenumber" name="L39" href="#L39">39</a>      assertThat(tree.getChildCount()).isEqualTo(5); <em class="jxr_comment">// 5 subqueries</em>
+<a class="jxr_linenumber" name="L40" href="#L40">40</a>  
+<a class="jxr_linenumber" name="L41" href="#L41">41</a>      <strong class="jxr_keyword">int</strong> numberOfSyntaxErrors = parser.getNumberOfSyntaxErrors();
+<a class="jxr_linenumber" name="L42" href="#L42">42</a>      assertThat(numberOfSyntaxErrors).isEqualTo(0); <em class="jxr_comment">// no syntax errors</em>
+<a class="jxr_linenumber" name="L43" href="#L43">43</a>      Log.info(<span class="jxr_string">"numberOfSyntaxErrors={}"</span>, numberOfSyntaxErrors);
+<a class="jxr_linenumber" name="L44" href="#L44">44</a>  
+<a class="jxr_linenumber" name="L45" href="#L45">45</a>      <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; tree.getChildCount(); i++) {
+<a class="jxr_linenumber" name="L46" href="#L46">46</a>        Log.info(<span class="jxr_string">"root.child={}"</span>, tree.getChild(i).getText());
+<a class="jxr_linenumber" name="L47" href="#L47">47</a>      }
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>      assertThat(allTokens).hasSize(32);
+<a class="jxr_linenumber" name="L49" href="#L49">49</a>    }
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>  
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>  }
+</pre>
+<hr/>
+<div id="footer">Copyright &#169; 2015 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
+</body>
+</html>

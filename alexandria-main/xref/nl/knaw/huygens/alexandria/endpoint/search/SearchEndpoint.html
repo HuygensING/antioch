@@ -41,8 +41,8 @@
 <a class="jxr_linenumber" name="L33" href="#L33">33</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/LocationBuilder.html">LocationBuilder</a> locationBuilder;
 <a class="jxr_linenumber" name="L34" href="#L34">34</a>  
 <a class="jxr_linenumber" name="L35" href="#L35">35</a>    @Inject
-<a class="jxr_linenumber" name="L36" href="#L36">36</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/search/SearchEndpoint.html">SearchEndpoint</a>(<strong class="jxr_keyword">final</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/service/AlexandriaService.html">AlexandriaService</a> service,                                                <em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L37" href="#L37">37</a>        <strong class="jxr_keyword">final</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/search/SearchResultEntityBuilder.html">SearchResultEntityBuilder</a> entityBuilder,                                               <em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L36" href="#L36">36</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/search/SearchEndpoint.html">SearchEndpoint</a>(<strong class="jxr_keyword">final</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/service/AlexandriaService.html">AlexandriaService</a> service, <em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L37" href="#L37">37</a>        <strong class="jxr_keyword">final</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/search/SearchResultEntityBuilder.html">SearchResultEntityBuilder</a> entityBuilder, <em class="jxr_comment">//</em>
 <a class="jxr_linenumber" name="L38" href="#L38">38</a>        <strong class="jxr_keyword">final</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/LocationBuilder.html">LocationBuilder</a> locationBuilder) {
 <a class="jxr_linenumber" name="L39" href="#L39">39</a>      <strong class="jxr_keyword">this</strong>.service = service;
 <a class="jxr_linenumber" name="L40" href="#L40">40</a>      <strong class="jxr_keyword">this</strong>.entityBuilder = entityBuilder;
@@ -69,26 +69,30 @@
 <a class="jxr_linenumber" name="L61" href="#L61">61</a>  
 <a class="jxr_linenumber" name="L62" href="#L62">62</a>    @GET
 <a class="jxr_linenumber" name="L63" href="#L63">63</a>    @Path(<span class="jxr_string">"{uuid}/resultpages/{pageNum:[0-9]+}"</span>)
-<a class="jxr_linenumber" name="L64" href="#L64">64</a>    @ApiOperation(value = <span class="jxr_string">"Get the SearchResultPage with the given uuid and pagenumber"</span>, response = SearchResultPage.<strong class="jxr_keyword">class</strong>)
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>    @ApiOperation(value = <span class="jxr_string">"Get the SearchResultPage with the given uuid and page number"</span>, response = SearchResultPage.<strong class="jxr_keyword">class</strong>)
 <a class="jxr_linenumber" name="L65" href="#L65">65</a>    <strong class="jxr_keyword">public</strong> Response getResultPage(@PathParam(<span class="jxr_string">"uuid"</span>) <strong class="jxr_keyword">final</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/UUIDParam.html">UUIDParam</a> uuid, @PathParam(<span class="jxr_string">"pageNum"</span>) <strong class="jxr_keyword">int</strong> pageNum) {
 <a class="jxr_linenumber" name="L66" href="#L66">66</a>      <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/search/SearchResult.html">SearchResult</a> searchResult = getSearchResult(uuid);
-<a class="jxr_linenumber" name="L67" href="#L67">67</a>      <strong class="jxr_keyword">if</strong> (pageNum &lt; 1 || pageNum &gt; searchResult.getTotalResultPages()) {
-<a class="jxr_linenumber" name="L68" href="#L68">68</a>        <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/exception/NotFoundException.html">NotFoundException</a>(<span class="jxr_string">"pageNum should be between 1 and "</span> + searchResult.getTotalResultPages());
-<a class="jxr_linenumber" name="L69" href="#L69">69</a>      }
-<a class="jxr_linenumber" name="L70" href="#L70">70</a>      String baseURI = locationBuilder.locationOf(searchResult).toString() + <span class="jxr_string">"/searchpages/"</span>;
-<a class="jxr_linenumber" name="L71" href="#L71">71</a>      <strong class="jxr_keyword">boolean</strong> isLast = searchResult.getTotalResultPages() == pageNum;
-<a class="jxr_linenumber" name="L72" href="#L72">72</a>      <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/search/SearchResultPage.html">SearchResultPage</a> page = <strong class="jxr_keyword">new</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/search/SearchResultPage.html">SearchResultPage</a>(baseURI, pageNum, isLast);
-<a class="jxr_linenumber" name="L73" href="#L73">73</a>      page.setResults(searchResult.getRecordsForPage(pageNum));
-<a class="jxr_linenumber" name="L74" href="#L74">74</a>      <strong class="jxr_keyword">return</strong> Response.ok(page).build();
-<a class="jxr_linenumber" name="L75" href="#L75">75</a>    }
-<a class="jxr_linenumber" name="L76" href="#L76">76</a>  
-<a class="jxr_linenumber" name="L77" href="#L77">77</a>    <strong class="jxr_keyword">private</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/search/SearchResult.html">SearchResult</a> getSearchResult(<strong class="jxr_keyword">final</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/UUIDParam.html">UUIDParam</a> uuid) {
-<a class="jxr_linenumber" name="L78" href="#L78">78</a>      <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/search/SearchResult.html">SearchResult</a> search = SearchResultCache.get(uuid.getValue())<em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L79" href="#L79">79</a>          .orElseThrow(() -&gt; <strong class="jxr_keyword">new</strong> NotFoundException(<span class="jxr_string">"no SearchResult found with id "</span> + uuid));
-<a class="jxr_linenumber" name="L80" href="#L80">80</a>      <strong class="jxr_keyword">return</strong> search;
-<a class="jxr_linenumber" name="L81" href="#L81">81</a>    }
-<a class="jxr_linenumber" name="L82" href="#L82">82</a>  
-<a class="jxr_linenumber" name="L83" href="#L83">83</a>  }
+<a class="jxr_linenumber" name="L67" href="#L67">67</a>      <strong class="jxr_keyword">int</strong> totalResultPages = searchResult.getTotalResultPages();
+<a class="jxr_linenumber" name="L68" href="#L68">68</a>      <strong class="jxr_keyword">if</strong> (totalResultPages == 0) {
+<a class="jxr_linenumber" name="L69" href="#L69">69</a>        <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/exception/NotFoundException.html">NotFoundException</a>(<span class="jxr_string">"no resultpages found"</span>);
+<a class="jxr_linenumber" name="L70" href="#L70">70</a>      }
+<a class="jxr_linenumber" name="L71" href="#L71">71</a>      <strong class="jxr_keyword">if</strong> (pageNum &lt; 1 || pageNum &gt; totalResultPages) {
+<a class="jxr_linenumber" name="L72" href="#L72">72</a>        <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/exception/NotFoundException.html">NotFoundException</a>(<span class="jxr_string">"pageNum should be between 1 and "</span> + totalResultPages);
+<a class="jxr_linenumber" name="L73" href="#L73">73</a>      }
+<a class="jxr_linenumber" name="L74" href="#L74">74</a>      String baseURI = locationBuilder.locationOf(searchResult) + <span class="jxr_string">"/resultpages/"</span>;
+<a class="jxr_linenumber" name="L75" href="#L75">75</a>      <strong class="jxr_keyword">boolean</strong> isLast = totalResultPages == pageNum;
+<a class="jxr_linenumber" name="L76" href="#L76">76</a>      <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/search/SearchResultPage.html">SearchResultPage</a> page = <strong class="jxr_keyword">new</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/search/SearchResultPage.html">SearchResultPage</a>(baseURI, pageNum, isLast);
+<a class="jxr_linenumber" name="L77" href="#L77">77</a>      page.setResults(searchResult.getRecordsForPage(pageNum));
+<a class="jxr_linenumber" name="L78" href="#L78">78</a>      <strong class="jxr_keyword">return</strong> Response.ok(page).build();
+<a class="jxr_linenumber" name="L79" href="#L79">79</a>    }
+<a class="jxr_linenumber" name="L80" href="#L80">80</a>  
+<a class="jxr_linenumber" name="L81" href="#L81">81</a>    <strong class="jxr_keyword">private</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/search/SearchResult.html">SearchResult</a> getSearchResult(<strong class="jxr_keyword">final</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/UUIDParam.html">UUIDParam</a> uuid) {
+<a class="jxr_linenumber" name="L82" href="#L82">82</a>      <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/search/SearchResult.html">SearchResult</a> search = SearchResultCache.get(uuid.getValue()) <em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L83" href="#L83">83</a>          .orElseThrow(() -&gt; <strong class="jxr_keyword">new</strong> NotFoundException(<span class="jxr_string">"no SearchResult found with id "</span> + uuid));
+<a class="jxr_linenumber" name="L84" href="#L84">84</a>      <strong class="jxr_keyword">return</strong> search;
+<a class="jxr_linenumber" name="L85" href="#L85">85</a>    }
+<a class="jxr_linenumber" name="L86" href="#L86">86</a>  
+<a class="jxr_linenumber" name="L87" href="#L87">87</a>  }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2015 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
