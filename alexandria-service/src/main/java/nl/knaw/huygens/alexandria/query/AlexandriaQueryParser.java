@@ -19,7 +19,6 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang3.StringUtils;
-import org.parboiled.common.Predicates;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -71,12 +70,11 @@ public class AlexandriaQueryParser {
   private void setFilter(final ParsedAlexandriaQuery paq, String where) {
     final List<WhereToken> tokens = tokenize(where);
 
-    kludgeForHandlingNLA87(paq, tokens);
-
     // any tokens with resource.id or subresource.id need to be filtered out and lead to an annotationVFFinder
     List<WhereToken> resourceWhereTokens = filterResourceWhereTokens(tokens);
     if (!resourceWhereTokens.isEmpty()) {
-      paq.setAnnotationVFFinder(createAnnotationVFFinder(resourceWhereTokens));
+      kludgeForHandlingNLA87(paq, tokens);
+      // paq.setAnnotationVFFinder(createAnnotationVFFinder(resourceWhereTokens));
     }
 
     tokens.removeAll(resourceWhereTokens);
@@ -86,6 +84,7 @@ public class AlexandriaQueryParser {
   }
 
   private Function<Storage, List<AnnotationVF>> createAnnotationVFFinder(List<WhereToken> resourceWhereTokens) {
+    // TODO: implement
     return null;
   }
 
@@ -95,12 +94,13 @@ public class AlexandriaQueryParser {
         .collect(toList());
   }
 
+  @Deprecated
   private void kludgeForHandlingNLA87(final ParsedAlexandriaQuery paq, final List<WhereToken> tokens) {
     WhereToken resourceWhereToken = null;
     List<WhereToken> filteredTokens = Lists.newArrayList();
     for (WhereToken whereToken : tokens) {
       // NLA-87
-      if (whereToken.getProperty().equals("resource.id")//
+      if (whereToken.getProperty().equals(QueryField.resource_id)//
           && whereToken.getFunction().equals(QueryFunction.eq)) {
         resourceWhereToken = whereToken;
       } else {
@@ -133,9 +133,10 @@ public class AlexandriaQueryParser {
 
   }
 
+  @Deprecated
   private Predicate<AnnotationVF> predicate(WhereToken whereToken) {
     // who.eq("someone")
-    if (whereToken.getProperty().equals("who")//
+    if (whereToken.getProperty().equals(QueryField.who)//
         && whereToken.getFunction().equals(QueryFunction.eq)) {
       String value = (String) whereToken.getParameters().get(0);
       return (AnnotationVF avf) -> {
@@ -143,7 +144,7 @@ public class AlexandriaQueryParser {
       };
     }
     // TODO implement predicate generation
-    return (Predicate<AnnotationVF>) Predicates.alwaysTrue();
+    return alwaysTrue();
   }
 
   private Class<? extends AlexandriaVF> parseFind(final String find) {
