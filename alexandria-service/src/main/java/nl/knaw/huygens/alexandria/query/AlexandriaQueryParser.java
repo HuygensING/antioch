@@ -37,7 +37,6 @@ import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 
 public class AlexandriaQueryParser {
-
   static final String ALLOWEDFIELDS = ", available fields: " + Joiner.on(", ").join(QueryField.ALL_EXTERNAL_NAMES);
 
   private static LocationBuilder locationBuilder;
@@ -58,7 +57,7 @@ public class AlexandriaQueryParser {
 
     setFilter(paq, query.getWhere());
 
-    parseReturn(query.getFields(), paq);
+    parseReturn(paq, query.getFields());
 
     if (!parseErrors.isEmpty()) {
       throw new AlexandriaQueryParseException(parseErrors);
@@ -83,15 +82,15 @@ public class AlexandriaQueryParser {
     paq.setPredicate(createPredicate(tokens));
   }
 
-  private Function<Storage, List<AnnotationVF>> createAnnotationVFFinder(List<WhereToken> resourceWhereTokens) {
-    // TODO: implement
-    return null;
-  }
-
   private List<WhereToken> filterResourceWhereTokens(List<WhereToken> tokens) {
     return tokens.stream()//
         .filter(WhereToken::hasResourceProperty)//
         .collect(toList());
+  }
+
+  private Function<Storage, List<AnnotationVF>> createAnnotationVFFinder(List<WhereToken> resourceWhereTokens) {
+    // TODO: implement
+    return null;
   }
 
   @Deprecated
@@ -162,44 +161,6 @@ public class AlexandriaQueryParser {
     return null;
   }
 
-  // static final Pattern P1 = Pattern.compile("([a-z\\.]+)\\.([a-z]+)\\((.*)\\)");
-  //
-  // static List<WhereToken> tokenize(final String whereString) {
-  // Log.info("whereString=<{}>", whereString);
-  // List<String> strings = splitToList(whereString);
-  // List<WhereToken> list = Lists.newArrayListWithExpectedSize(strings.size());
-  // for (String string : strings) {
-  // Log.info("part=<{}>", string);
-  // Matcher matcher = P1.matcher(string);
-  // if (!matcher.matches()) {
-  // parseErrors.add("unparsable part in where: '" + string + "'");
-  //
-  // } else {
-  // WhereToken token = new WhereToken();
-  // String property = matcher.group(1);
-  // Log.info("property=<{}>", property);
-  // String functionString = matcher.group(2);
-  // Log.info("function=<{}>", functionString);
-  // String parameterString = matcher.group(3);
-  // Log.info("parameterString=<{}>", parameterString);
-  // try {
-  // MatchFunction function = MatchFunction.valueOf(functionString);
-  // List<Object> parameters = Splitter.on(",").splitToList(parameterString).stream()//
-  // .map(AlexandriaQueryParser::parseParameter)//
-  // .collect(toList());
-  //
-  // token.setProperty(property);
-  // token.setFunction(function);
-  // token.setParameters(parameters);
-  // list.add(token);
-  // } catch (IllegalArgumentException e) {
-  // parseErrors.add("invalid part in where: unknown function " + functionString);
-  // }
-  // }
-  // }
-  // return list;
-  // }
-
   List<WhereToken> tokenize(String whereString) {
     Log.info("whereString=<{}>", whereString);
     if (StringUtils.isEmpty(whereString)) {
@@ -257,18 +218,6 @@ public class AlexandriaQueryParser {
       return true;
     };
   }
-
-  // private static final WhereToken STATE_IS_CONFIRMED = new WhereToken()//
-  // .setProperty("state")//
-  // .setFunction(MatchFunction.eq)//
-  // .setParameters(ImmutableList.of("CONFIRMED"));
-  //
-  // private static boolean assertMatch(AnnotationVF annotationVF, WhereToken token) {
-  // if (STATE_IS_CONFIRMED.equals(token)) {
-  // return annotationVF.isConfirmed();
-  // }
-  // return true;
-  // }
 
   static String getResourceURL(final AnnotationVF avf) {
     return id2url(avf.getResourceId());
@@ -366,7 +315,7 @@ public class AlexandriaQueryParser {
     };
   }
 
-  private void parseReturn(final String fieldString, final ParsedAlexandriaQuery paq) {
+  private void parseReturn(final ParsedAlexandriaQuery paq, final String fieldString) {
     final List<String> fields = splitToList(fieldString);
     final List<String> allowedFields = QueryField.ALL_EXTERNAL_NAMES;
     final List<String> unknownFields = Lists.newArrayList(fields);
