@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -78,7 +80,7 @@ public class AlexandriaQueryParser {
 
     tokens.removeAll(resourceWhereTokens);
 
-    // create a predicate for filtering the list of annotationVFs based on the remaining tokens
+    // create a predicate for filtering the annotationVF stream based on the remaining tokens
     paq.setPredicate(createPredicate(tokens));
   }
 
@@ -110,60 +112,6 @@ public class AlexandriaQueryParser {
     }
     return null;
   }
-
-  // @Deprecated
-  // private void kludgeForHandlingNLA87(final ParsedAlexandriaQuery paq, final List<WhereToken> tokens) {
-  // WhereToken resourceWhereToken = null;
-  // List<WhereToken> filteredTokens = Lists.newArrayList();
-  // for (WhereToken whereToken : tokens) {
-  // // NLA-87
-  // if (whereToken.getProperty().equals(QueryField.resource_id)//
-  // && whereToken.getFunction().equals(QueryFunction.eq)) {
-  // resourceWhereToken = whereToken;
-  // } else {
-  // filteredTokens.add(whereToken);
-  // }
-  // }
-  //
-  // if (resourceWhereToken != null) {
-  // String uuid = (String) resourceWhereToken.getParameters().get(0);
-  // Function<Storage, List<AnnotationVF>> annotationVFFinder = storage -> {
-  // Optional<ResourceVF> optionalResource = storage.readVF(ResourceVF.class, UUID.fromString(uuid));
-  // if (optionalResource.isPresent()) {
-  // ResourceVF resourceVF = optionalResource.get();
-  // Stream<AnnotationVF> resourceAnnotationsStream = resourceVF.getAnnotatedBy().stream();
-  // Stream<AnnotationVF> subresourceAnnotationsStream = resourceVF.getSubResources().stream()//
-  // .flatMap(rvf -> rvf.getAnnotatedBy().stream());//
-  // Stream<AnnotationVF> annotationVFStream = Stream.concat(resourceAnnotationsStream, subresourceAnnotationsStream);
-  //
-  // // TODO: recurse over annotations to also return annotations (on annotations)+ on resource ?
-  // for (WhereToken whereToken : filteredTokens) {
-  // annotationVFStream = annotationVFStream.filter(predicate(whereToken));
-  // }
-  //
-  // return annotationVFStream.collect(toList());
-  // }
-  // // Should return error, since no resource found with given uuid
-  // return Lists.newArrayList();
-  // };
-  // paq.setAnnotationVFFinder(annotationVFFinder);
-  // }
-  //
-  // }
-  //
-  // @Deprecated
-  // private Predicate<AnnotationVF> predicate(WhereToken whereToken) {
-  // // who.eq("someone")
-  // if (whereToken.getProperty().equals(QueryField.who)//
-  // && whereToken.getFunction().equals(QueryFunction.eq)) {
-  // String value = (String) whereToken.getParameters().get(0);
-  // return (AnnotationVF avf) -> {
-  // return avf.getProvenanceWho().equals(value);
-  // };
-  // }
-  // // TODO implement predicate generation
-  // return alwaysTrue();
-  // }
 
   private Class<? extends AlexandriaVF> parseFind(final String find) {
     if (find.equals("annotation")) {
@@ -221,14 +169,56 @@ public class AlexandriaQueryParser {
   }
 
   static Predicate<AnnotationVF> toPredicate(WhereToken whereToken) {
+    Function<AnnotationVF, Object> getter = whereToken.getProperty().getter;
     // eq
     if (QueryFunction.eq.equals(whereToken.getFunction())) {
-      Function<AnnotationVF, Object> getter = whereToken.getProperty().getter;
-      Object value = whereToken.getParameters().get(0);
+      Object eqValue = whereToken.getParameters().get(0);
       return (AnnotationVF avf) -> {
-        return getter.apply(avf).equals(value);
+        return getter.apply(avf).equals(eqValue);
       };
     }
+
+    // match
+    if (QueryFunction.match.equals(whereToken.getFunction())) {
+      // TODO: catch errors
+      String matchValue = (String) whereToken.getParameters().get(0);
+      Pattern p = Pattern.compile(matchValue);
+      return (AnnotationVF avf) -> {
+        String propertyValue = (String) getter.apply(avf);
+        Matcher matcher = p.matcher(propertyValue);
+        return matcher.matches();
+      };
+    }
+
+    // inSet
+    if (QueryFunction.inSet.equals(whereToken.getFunction())) {
+      List<Object> possibleValues = whereToken.getParameters();
+      return (AnnotationVF avf) -> {
+        Object propertyValue = getter.apply(avf);
+        return possibleValues.contains(propertyValue);
+      };
+    }
+
+    // inRange
+    if (QueryFunction.inRange.equals(whereToken.getFunction())) {
+      List<Object> rangeLimits = whereToken.getParameters();
+      Object lowerLimit = rangeLimits.get(0);
+      Object upperLimit = rangeLimits.get(1);
+      return (AnnotationVF avf) -> {
+        Object propertyValue = getter.apply(avf);
+        if (propertyValue instanceof String) {
+          return ((String) propertyValue).compareTo((String) lowerLimit) >= 0//
+              && ((String) propertyValue).compareTo((String) upperLimit) <= 0;
+        }
+        if (propertyValue instanceof Long) {
+          return ((Long) propertyValue).compareTo((Long) lowerLimit) >= 0//
+              && ((Long) propertyValue).compareTo((Long) upperLimit) <= 0;
+
+        }
+        return true;
+      };
+    }
+
     return alwaysTrue();
   }
 
