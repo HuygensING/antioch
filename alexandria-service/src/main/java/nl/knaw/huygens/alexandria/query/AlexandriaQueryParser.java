@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang3.StringUtils;
+import org.parboiled.common.ImmutableList;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -72,8 +73,7 @@ public class AlexandriaQueryParser {
     // any tokens with resource.id or subresource.id need to be filtered out and lead to an annotationVFFinder
     List<WhereToken> resourceWhereTokens = filterResourceWhereTokens(tokens);
     if (!resourceWhereTokens.isEmpty()) {
-      kludgeForHandlingNLA87(paq, tokens);
-      // paq.setAnnotationVFFinder(createAnnotationVFFinder(resourceWhereTokens));
+      paq.setAnnotationVFFinder(createAnnotationVFFinder(resourceWhereTokens));
     }
 
     tokens.removeAll(resourceWhereTokens);
@@ -88,28 +88,11 @@ public class AlexandriaQueryParser {
         .collect(toList());
   }
 
-  private Function<Storage, List<AnnotationVF>> createAnnotationVFFinder(List<WhereToken> resourceWhereTokens) {
-    // TODO: implement
-    return null;
-  }
-
-  @Deprecated
-  private void kludgeForHandlingNLA87(final ParsedAlexandriaQuery paq, final List<WhereToken> tokens) {
-    WhereToken resourceWhereToken = null;
-    List<WhereToken> filteredTokens = Lists.newArrayList();
-    for (WhereToken whereToken : tokens) {
-      // NLA-87
-      if (whereToken.getProperty().equals(QueryField.resource_id)//
-          && whereToken.getFunction().equals(QueryFunction.eq)) {
-        resourceWhereToken = whereToken;
-      } else {
-        filteredTokens.add(whereToken);
-      }
-    }
-
-    if (resourceWhereToken != null) {
+  private Function<Storage, Stream<AnnotationVF>> createAnnotationVFFinder(List<WhereToken> resourceWhereTokens) {
+    WhereToken resourceWhereToken = resourceWhereTokens.get(0);
+    if (resourceWhereTokens.size() == 1 && resourceWhereToken.getFunction().equals(QueryFunction.eq)) {
       String uuid = (String) resourceWhereToken.getParameters().get(0);
-      paq.setAnnotationVFFinder(storage -> {
+      return storage -> {
         Optional<ResourceVF> optionalResource = storage.readVF(ResourceVF.class, UUID.fromString(uuid));
         if (optionalResource.isPresent()) {
           ResourceVF resourceVF = optionalResource.get();
@@ -118,33 +101,69 @@ public class AlexandriaQueryParser {
               .flatMap(rvf -> rvf.getAnnotatedBy().stream());//
           Stream<AnnotationVF> annotationVFStream = Stream.concat(resourceAnnotationsStream, subresourceAnnotationsStream);
 
-          // TODO: recurse over annotations to also return annotations (on annotations)+ on resource ?
-          for (WhereToken whereToken : filteredTokens) {
-            annotationVFStream = annotationVFStream.filter(predicate(whereToken));
-          }
-
-          return annotationVFStream.collect(toList());
+          return annotationVFStream;
         }
         // Should return error, since no resource found with given uuid
-        return Lists.newArrayList();
-      });
-    }
-
-  }
-
-  @Deprecated
-  private Predicate<AnnotationVF> predicate(WhereToken whereToken) {
-    // who.eq("someone")
-    if (whereToken.getProperty().equals(QueryField.who)//
-        && whereToken.getFunction().equals(QueryFunction.eq)) {
-      String value = (String) whereToken.getParameters().get(0);
-      return (AnnotationVF avf) -> {
-        return avf.getProvenanceWho().equals(value);
+        return ImmutableList.<AnnotationVF> of().stream();
       };
+
     }
-    // TODO implement predicate generation
-    return alwaysTrue();
+    return null;
   }
+
+  // @Deprecated
+  // private void kludgeForHandlingNLA87(final ParsedAlexandriaQuery paq, final List<WhereToken> tokens) {
+  // WhereToken resourceWhereToken = null;
+  // List<WhereToken> filteredTokens = Lists.newArrayList();
+  // for (WhereToken whereToken : tokens) {
+  // // NLA-87
+  // if (whereToken.getProperty().equals(QueryField.resource_id)//
+  // && whereToken.getFunction().equals(QueryFunction.eq)) {
+  // resourceWhereToken = whereToken;
+  // } else {
+  // filteredTokens.add(whereToken);
+  // }
+  // }
+  //
+  // if (resourceWhereToken != null) {
+  // String uuid = (String) resourceWhereToken.getParameters().get(0);
+  // Function<Storage, List<AnnotationVF>> annotationVFFinder = storage -> {
+  // Optional<ResourceVF> optionalResource = storage.readVF(ResourceVF.class, UUID.fromString(uuid));
+  // if (optionalResource.isPresent()) {
+  // ResourceVF resourceVF = optionalResource.get();
+  // Stream<AnnotationVF> resourceAnnotationsStream = resourceVF.getAnnotatedBy().stream();
+  // Stream<AnnotationVF> subresourceAnnotationsStream = resourceVF.getSubResources().stream()//
+  // .flatMap(rvf -> rvf.getAnnotatedBy().stream());//
+  // Stream<AnnotationVF> annotationVFStream = Stream.concat(resourceAnnotationsStream, subresourceAnnotationsStream);
+  //
+  // // TODO: recurse over annotations to also return annotations (on annotations)+ on resource ?
+  // for (WhereToken whereToken : filteredTokens) {
+  // annotationVFStream = annotationVFStream.filter(predicate(whereToken));
+  // }
+  //
+  // return annotationVFStream.collect(toList());
+  // }
+  // // Should return error, since no resource found with given uuid
+  // return Lists.newArrayList();
+  // };
+  // paq.setAnnotationVFFinder(annotationVFFinder);
+  // }
+  //
+  // }
+  //
+  // @Deprecated
+  // private Predicate<AnnotationVF> predicate(WhereToken whereToken) {
+  // // who.eq("someone")
+  // if (whereToken.getProperty().equals(QueryField.who)//
+  // && whereToken.getFunction().equals(QueryFunction.eq)) {
+  // String value = (String) whereToken.getParameters().get(0);
+  // return (AnnotationVF avf) -> {
+  // return avf.getProvenanceWho().equals(value);
+  // };
+  // }
+  // // TODO implement predicate generation
+  // return alwaysTrue();
+  // }
 
   private Class<? extends AlexandriaVF> parseFind(final String find) {
     if (find.equals("annotation")) {

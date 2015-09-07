@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
@@ -12,10 +14,10 @@ import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 
 public class ParsedAlexandriaQuery {
   // this is just a container class for the results of processing the AlexandriaQuery parameters
-  private static final Function<Storage, List<AnnotationVF>> DEFAULT_ANNOTATIONVF_FINDER = storage -> {
-    List<AnnotationVF> list = storage.find(AnnotationVF.class)//
-        .toList();
-    return list;
+  private static final Function<Storage, Stream<AnnotationVF>> DEFAULT_ANNOTATIONVF_FINDER = storage -> {
+    Iterable<AnnotationVF> iterable = () -> storage.find(AnnotationVF.class);
+    Stream<AnnotationVF> stream = StreamSupport.stream(iterable.spliterator(), false);
+    return stream;
   };
 
   private Class<? extends AlexandriaVF> vfClazz;
@@ -23,7 +25,7 @@ public class ParsedAlexandriaQuery {
   private Predicate<AnnotationVF> predicate;
   private Comparator<AnnotationVF> comparator;
   private Function<AnnotationVF, Map<String, Object>> mapper;
-  private Function<Storage, List<AnnotationVF>> annotationVFFinder = DEFAULT_ANNOTATIONVF_FINDER;
+  private Function<Storage, Stream<AnnotationVF>> annotationVFFinder = DEFAULT_ANNOTATIONVF_FINDER;
 
   public ParsedAlexandriaQuery setVFClass(Class<? extends AlexandriaVF> vfClass) {
     this.vfClazz = vfClass;
@@ -68,11 +70,11 @@ public class ParsedAlexandriaQuery {
     return comparator;
   }
 
-  public void setAnnotationVFFinder(Function<Storage, List<AnnotationVF>> annotationVFFinder) {
+  public void setAnnotationVFFinder(Function<Storage, Stream<AnnotationVF>> annotationVFFinder) {
     this.annotationVFFinder = annotationVFFinder;
   }
 
-  public Function<Storage, List<AnnotationVF>> getAnnotationVFFinder() {
+  public Function<Storage, Stream<AnnotationVF>> getAnnotationVFFinder() {
     return annotationVFFinder;
   }
 

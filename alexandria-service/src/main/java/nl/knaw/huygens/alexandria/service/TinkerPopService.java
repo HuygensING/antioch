@@ -19,6 +19,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -559,10 +560,10 @@ public class TinkerPopService implements AlexandriaService {
     Comparator<AnnotationVF> comparator = pQuery.getResultComparator();
     Function<AnnotationVF, Map<String, Object>> mapper = pQuery.getResultMapper();
 
-    List<AnnotationVF> list = pQuery.getAnnotationVFFinder().apply(storage);
-    Log.debug("list={}", list);
+    Stream<AnnotationVF> stream = pQuery.getAnnotationVFFinder().apply(storage);
+    Log.debug("list={}", stream);
 
-    results = list.stream()//
+    results = stream//
         .filter(predicate)//
         .sorted(comparator)//
         .map(mapper)//
