@@ -6,9 +6,11 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -302,5 +304,48 @@ public class AlexandriaQueryParserTest {
         MapEntry.entry("resource.id", "resourceId"), //
         MapEntry.entry("subresource.id", "subresourceId") //
     );
+  }
+
+  AtomicInteger alwaysTrueCalled = new AtomicInteger(0);
+  Predicate<Object> alwaysTrue = o -> {
+    int times = alwaysTrueCalled.incrementAndGet();
+    Log.info("alwaysTrue called {} times", times);
+    return true;
+  };
+  AtomicInteger alwaysFalseCalled = new AtomicInteger(0);
+  Predicate<Object> alwaysFalse = o -> {
+    int times = alwaysFalseCalled.incrementAndGet();
+    Log.info("alwaysFalse called {} times", times);
+    return false;
+  };
+
+  @Test
+  public void testPredicates() {
+    List<Predicate<Object>> list = new ArrayList<>();
+    list.add(alwaysTrue);
+    list.add(alwaysTrue);
+    list.add(alwaysFalse);
+    list.add(alwaysFalse);
+    list.add(alwaysFalse);
+    list.add(alwaysFalse);
+    list.add(alwaysTrue);
+    list.add(alwaysTrue);
+    list.add(alwaysTrue);
+
+    Predicate<Object> combination = list.stream()//
+        .reduce(alwaysTrue, (p, np) -> p = p.and(np));
+
+    assertThat(combination.test("whtvr")).isFalse();
+    assertThat(alwaysTrueCalled.get()).isEqualTo(3);
+    assertThat(alwaysFalseCalled.get()).isEqualTo(1);
+
+    // alwaysTrueCalled = new AtomicInteger(0);
+    // alwaysFalseCalled = new AtomicInteger(0);
+    // Predicate<Object> parallel = list.parallelStream()//
+    // .reduce(alwaysTrue, (p, np) -> p = p.and(np));
+    //
+    // assertThat(parallel.test("whtvr")).isFalse();
+    // assertThat(alwaysTrueCalled.get()).isEqualTo(5);
+    // assertThat(alwaysFalseCalled.get()).isEqualTo(1);
   }
 }
