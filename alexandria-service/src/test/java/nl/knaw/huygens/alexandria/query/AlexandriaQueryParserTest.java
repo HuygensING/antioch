@@ -204,7 +204,7 @@ public class AlexandriaQueryParserTest {
     assertThat(predicate.test(failingAnnotationVF)).isFalse();
   }
 
-  // @Test TODO: make it work
+  @Test
   public void testPredicateForValueMatch() {
     WhereToken whereToken = new WhereToken(QueryField.value, QueryFunction.match, ImmutableList.of("super.*"));
     AnnotationVF passingAnnotationVF = mock(AnnotationVF.class);
@@ -222,7 +222,7 @@ public class AlexandriaQueryParserTest {
     assertThat(predicate.test(failingAnnotationVF)).isFalse();
   }
 
-  // @Test TODO: makeit work
+  @Test //
   public void testPredicateForWhenInRange() {
     WhereToken whereToken = new WhereToken(QueryField.when, QueryFunction.inRange, ImmutableList.of("20150101", "20151231"));
     AnnotationVF passingAnnotationVF = mock(AnnotationVF.class);
