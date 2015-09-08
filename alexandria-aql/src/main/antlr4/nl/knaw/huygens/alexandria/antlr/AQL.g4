@@ -1,9 +1,5 @@
 grammar AQL;
 
-@header {
-package nl.knaw.huygens.alexandria.antlr;
-}
-
 root : subquery ( subquery )*;
 
 subquery : FIELDNAME ':' FUNCTION '(' parameters ')';

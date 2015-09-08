@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>nl.knaw.huygens.alexandria</groupId>
@@ -36,34 +36,23 @@
   </dependencies>
 
   <build>
-  <!-- using antlr4-maven-plugin in combination with antlr4 eclipse plugin leads to failing tests, until this is fixed, don't use antlr4-maven-plugin -->
-    <!-- <pluginManagement> <plugins> <plugin> <groupId>org.antlr</groupId> 
-      <artifactId>antlr4-maven-plugin</artifactId> <version>${antlr.version}</version> 
-      </plugin> </plugins> </pluginManagement> -->
-
     <plugins>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr4-maven-plugin</artifactId>
+        <version>${antlr.version}</version>
+        <configuration>
+          <!-- Generate parse tree visitor interface and base class. -->
+          <visitor>true</visitor>
+        </configuration>
         <executions>
           <execution>
-            <phase>generate-sources</phase>
             <goals>
-              <goal>add-source</goal>
+              <goal>antlr4</goal>
             </goals>
-            <configuration>
-              <sources>
-                <source>src/generated/java</source>
-              </sources>
-            </configuration>
           </execution>
         </executions>
       </plugin>
-
-      <!-- <plugin> <groupId>org.antlr</groupId> <artifactId>antlr4-maven-plugin</artifactId> 
-        <configuration> <outputDirectory>src/generated/java/nl/knaw/huygens/alexandria/antlr</outputDirectory> 
-        </configuration> <executions> <execution> <id>antlr</id> <goals> <goal>antlr4</goal> 
-        </goals> </execution> </executions> </plugin> -->
     </plugins>
   </build>
 </project>
