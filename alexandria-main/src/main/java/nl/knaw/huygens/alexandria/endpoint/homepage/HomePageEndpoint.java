@@ -24,7 +24,11 @@ public class HomePageEndpoint {
   public Response getHomePage() throws IOException {
     InputStream resourceAsStream = Thread.currentThread()//
         .getContextClassLoader().getResourceAsStream("index.html");
-    return Response.ok(resourceAsStream).header("Pragma", "public").header("Cache-Control", "public").build();
+    return Response//
+        .ok(resourceAsStream)//
+        .header("Pragma", "public")//
+        .header("Cache-Control", "public")//
+        .build();
 
   }
 
