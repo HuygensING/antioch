@@ -1,0 +1,60 @@
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+
+<title>Transactions in Alexandria</title>
+
+<body data-desc="Transactions in Alexandria">
+
+<div id="try-confirm-cancel" data-desc="What is the try-confirm-cancel pattern?" c:execute="clearStorage()">
+    <div class="alert alert-warning sm">
+        The <a href="http://www.atomikos.com/Publications/TryCancelConfirm">try-confirm-cancel</a>
+        pattern dictates we first confirm any newly created resources before using them.
+
+        <p><i>Failure to follow this pattern leads to grief when operating on the resource!</i></p>
+    </div>
+
+    <div c:execute="resourceExists(#uuid)">Given that the resource with id
+        <code c:set="#uuid">6244b9d8-3b5e-11e5-aca2-5befb33d5e4d</code> exists, and that
+        a subresource is
+    </div>
+    <h:request>
+        <h:success>successfully</h:success>
+        registered via
+        <h:post>/resources/$uuid/subresources</h:post>
+        with body:
+        <h:jsonBody>{"subresource":{"sub":"/some/folia/path"}}</h:jsonBody>
+    </h:request>
+    <div c:execute="#uuid = uuid()">in this case yielding uuid <span c:echo="#uuid"></span>.</div>
+    <div>
+        <h:request>
+            To <strong>verify</strong> we
+            <h:get>/resources/$uuid</h:get>
+            and observe its <code>TENTATIVE</code> state
+            <h:jsonResponse>{"subresource":{
+                "id": "$uuid",
+                "sub": "/some/folia/path",
+                "state": { "value": "TENTATIVE"
+                } } }
+            </h:jsonResponse>
+        </h:request>
+    </div>
+    <div>
+        <h:request>
+            When I
+            <h:post>/resources/$uuid/annotations</h:post>
+            an example annotation body:
+            <h:jsonBody>{"annotation": {"type": "t", "value": "v"}}</h:jsonBody>
+            Then I will get status
+            <h:status>409 Conflict</h:status>
+            and a response body containing:
+            <h:jsonResponse>{"error":{"message": "resource $uuid is tentative, please confirm first"}}
+            </h:jsonResponse>
+        </h:request>
+    </div>
+</div>
+
+</body>
+</html>
