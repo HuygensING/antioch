@@ -36,6 +36,9 @@
     <!-- Concordion Acceptance Test extensions -->
     <cat.version>1.2.4</cat.version>
 
+    <antlr4.version>4.5.1-1</antlr4.version>
+    <antlr4.visitor>true</antlr4.visitor> <!-- Generate parse tree visitor interface and base class. -->
+
     <guice.version>3.0</guice.version>
     <jackson.version>2.6.1</jackson.version>
     <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
@@ -47,7 +50,6 @@
 
     <junit.version>4.12</junit.version>
     <junitparams.version>1.0.4</junitparams.version>
-    <antlr.version>4.5.1-1</antlr.version>
     <log.version>1.1.0</log.version>
     <maven-assembly.version>2.4</maven-assembly.version>
     <maven-compiler.version>3.1</maven-compiler.version> <!-- 3.2,3.3 leads to compiler error in Jenkins: java.lang.IllegalStateException: 

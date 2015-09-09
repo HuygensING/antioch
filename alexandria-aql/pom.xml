@@ -12,7 +12,7 @@
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime</artifactId>
-      <version>${antlr.version}</version>
+      <version>${antlr4.version}</version>
     </dependency>
     <dependency>
       <groupId>nl.knaw.huygens</groupId>
@@ -40,11 +40,7 @@
       <plugin>
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-maven-plugin</artifactId>
-        <version>${antlr.version}</version>
-        <configuration>
-          <!-- Generate parse tree visitor interface and base class. -->
-          <visitor>true</visitor>
-        </configuration>
+        <version>${antlr4.version}</version>
         <executions>
           <execution>
             <goals>
