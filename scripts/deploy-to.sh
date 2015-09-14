@@ -32,4 +32,3 @@ if [[ -n "$profile" && -n "$base" ]]; then
 else
   usage
 fi
-  
