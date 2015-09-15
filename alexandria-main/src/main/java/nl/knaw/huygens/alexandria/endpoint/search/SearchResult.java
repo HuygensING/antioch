@@ -20,7 +20,7 @@ import nl.knaw.huygens.alexandria.model.Identifiable;
 
 @JsonInclude(Include.NON_NULL)
 public class SearchResult implements Identifiable {
-  static final double PAGESIZE = 10;
+  static final double PAGE_SIZE = 10;
   private UUID id;
   private AlexandriaQuery query;
   private List<Map<String, Object>> results = Lists.newArrayList();
@@ -55,7 +55,7 @@ public class SearchResult implements Identifiable {
   }
 
   public int getTotalResultPages() {
-    return (int) Math.ceil(getTotalResults() / PAGESIZE);
+    return (int) Math.ceil(getTotalResults() / PAGE_SIZE);
   }
 
   @JsonIgnore
@@ -72,12 +72,12 @@ public class SearchResult implements Identifiable {
   }
 
   @JsonIgnore
-  public List<Map<String, Object>> getRecordsForPage(int pageNum) {
-    if (pageNum < 1 || pageNum > getTotalResultPages()) {
+  public List<Map<String, Object>> getRecordsForPage(int pageNumber) {
+    if (pageNumber < 1 || pageNumber > getTotalResultPages()) {
       return Lists.newArrayList();
     }
-    int fromIndex = (int) ((pageNum - 1) * PAGESIZE);
-    int toIndex = Math.min((int) (fromIndex + PAGESIZE), getTotalResults());
+    int fromIndex = (int) ((pageNumber - 1) * PAGE_SIZE);
+    int toIndex = Math.min((int) (fromIndex + PAGE_SIZE), getTotalResults());
     return results.subList(fromIndex, toIndex);
   }
 

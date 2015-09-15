@@ -61,22 +61,22 @@ public class SearchEndpoint extends JSONEndpoint {
   }
 
   @GET
-  @Path("{uuid}/resultPages/{pageNum:[0-9]+}")
+  @Path("{uuid}/resultPages/{pageNumber:[0-9]+}")
   @ApiOperation(value = "Get the SearchResultPage with the given uuid and page number", response = SearchResultPage
       .class)
-  public Response getResultPage(@PathParam("uuid") final UUIDParam uuid, @PathParam("pageNum") int pageNum) {
+  public Response getResultPage(@PathParam("uuid") final UUIDParam uuid, @PathParam("pageNumber") int pageNumber) {
     SearchResult searchResult = getSearchResult(uuid);
     int totalResultPages = searchResult.getTotalResultPages();
     if (totalResultPages == 0) {
       throw new NotFoundException("no result pages found");
     }
-    if (pageNum < 1 || pageNum > totalResultPages) {
-      throw new NotFoundException("pageNum should be between 1 and " + totalResultPages);
+    if (pageNumber < 1 || pageNumber > totalResultPages) {
+      throw new NotFoundException("pageNumber should be between 1 and " + totalResultPages);
     }
     String baseURI = locationBuilder.locationOf(searchResult) + "/resultPages/";
-    boolean isLast = totalResultPages == pageNum;
-    SearchResultPage page = new SearchResultPage(baseURI, pageNum, isLast);
-    page.setResults(searchResult.getRecordsForPage(pageNum));
+    boolean isLast = totalResultPages == pageNumber;
+    SearchResultPage page = new SearchResultPage(baseURI, pageNumber, isLast);
+    page.setResults(searchResult.getRecordsForPage(pageNumber));
     return Response.ok(page).build();
   }
 

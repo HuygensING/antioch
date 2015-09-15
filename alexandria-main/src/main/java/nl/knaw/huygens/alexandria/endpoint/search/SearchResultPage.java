@@ -20,7 +20,7 @@ import nl.knaw.huygens.alexandria.endpoint.resource.PropertyPrefix;
 @JsonInclude(Include.NON_NULL)
 @JsonTypeName("searchResultPage")
 public class SearchResultPage extends JsonWrapperObject {
-  private int pageNum;
+  private int pageNumber;
   @JsonIgnore
   private String baseURI;
   @JsonIgnore
@@ -32,22 +32,22 @@ public class SearchResultPage extends JsonWrapperObject {
   @JsonIgnore
   private AtomicInteger counter;
 
-  public SearchResultPage(String baseURI, int pageNum, boolean isLast) {
+  public SearchResultPage(String baseURI, int pageNumber, boolean isLast) {
     this.baseURI = baseURI;
-    this.pageNum = pageNum;
+    this.pageNumber = pageNumber;
     this.isLast = isLast;
-    this.counter = new AtomicInteger((int) SearchResult.PAGESIZE * (pageNum - 1));
+    this.counter = new AtomicInteger((int) SearchResult.PAGE_SIZE * (pageNumber - 1));
     this.counterFunction = t -> counter.incrementAndGet();
   }
 
   @JsonProperty(PropertyPrefix.LINK + "previousPage")
   public URI getPreviousPage() {
-    return pageNum > 1 ? URI.create(baseURI + (pageNum - 1)) : null;
+    return pageNumber > 1 ? URI.create(baseURI + (pageNumber - 1)) : null;
   }
 
   @JsonProperty(PropertyPrefix.LINK + "nextPage")
   public URI getNextPage() {
-    return isLast ? null : URI.create(baseURI + (pageNum + 1));
+    return isLast ? null : URI.create(baseURI + (pageNumber + 1));
   }
 
   public void setResults(List<Map<String, Object>> results) {
