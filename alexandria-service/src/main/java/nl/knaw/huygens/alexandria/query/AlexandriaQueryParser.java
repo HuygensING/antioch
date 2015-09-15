@@ -305,30 +305,6 @@ public class AlexandriaQueryParser {
     return sortParameter.replaceFirst("^[\\-\\+]", "");
   }
 
-  // @SuppressWarnings("unused")
-  // private static Comparator<AnnotationVF> getComparator(final List<Function<AnnotationVF, Object>> valueFunctions) {
-  // final List<Ordering<AnnotationVF>> subOrders = valueFunctions.stream()//
-  // .map(AlexandriaQueryParser::ordering)//
-  // .collect(toList());
-  // Ordering<AnnotationVF> order = subOrders.remove(0);
-  // for (final Ordering<AnnotationVF> suborder : subOrders) {
-  // order = order.compound(suborder);
-  // }
-  // return order;
-  // }
-
-  // private static Function<AnnotationVF, String> sortKeyGenerator(final List<Function<AnnotationVF, Object>> valueFunctions) {
-  // return (final AnnotationVF avf) -> {
-  // final StringBuilder sb = new StringBuilder();
-  // for (final Function<AnnotationVF, Object> function : valueFunctions) {
-  // sb.append(function.apply(avf));
-  // sb.append("|");
-  // }
-  // // Log.debug("sortKey=" + sb);
-  // return sb.toString();
-  // };
-  // }
-
   private void parseReturn(final ParsedAlexandriaQuery paq, final String fieldString) {
     final List<String> fields = splitToList(fieldString);
     final List<String> allowedFields = QueryField.ALL_EXTERNAL_NAMES;
@@ -349,10 +325,6 @@ public class AlexandriaQueryParser {
 
   private static List<String> splitToList(final String fieldString) {
     return Splitter.on(",").trimResults().splitToList(fieldString);
-  }
-
-  private static Comparator<AnnotationVF> getComparator(final Function<AnnotationVF, String> sortKeyGenerator) {
-    return (a1, a2) -> sortKeyGenerator.apply(a1).compareTo(sortKeyGenerator.apply(a2));
   }
 
 }
