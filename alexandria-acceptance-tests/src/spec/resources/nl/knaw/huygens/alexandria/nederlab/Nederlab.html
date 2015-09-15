@@ -39,7 +39,7 @@
         <tbody>
         <tr>
             <td><code>00000001-3f4e-11e5-91d3-bfea30e2969c</code></td>
-            <td><code>A relevant user comment.</code></td>
+            <td><code>An early user comment.</code></td>
             <td><code>user-4242</code></td>
             <td><code>2015-07-07T07:07:07+02:00</code></td>
         </tr>
@@ -51,7 +51,7 @@
         </tr>
         <tr>
             <td><code>00000002-5b7f-11e5-898c-237ee1c6d1d4</code></td>
-            <td><code>Another interesting user comment.</code></td>
+            <td><code>A more recent user comment.</code></td>
             <td><code>user-4242</code></td>
             <td><code>2015-09-09T09:09:09+02:00</code></td>
         </tr>
@@ -70,7 +70,8 @@
             } }
         </h:jsonBody>
         and observe status
-        <h:status>201 Created</h:status> with the Location header pointing to the results of our query.
+        <h:status>201 Created</h:status>
+        with the Location header pointing to the results of our query.
     </h:request>
 
     <div c:execute="#searchId = uuid()"></div>
@@ -110,14 +111,16 @@
             "pageNumber": 1,
             "records": [
             {
+            "id": "{uuid.anyValid}",
             "type": "Tag",
-            "value": "Another interesting user comment.",
+            "value": "A more recent user comment.",
             "resource.url": "https://{host}/resources/00000002-5b7f-11e5-898c-237ee1c6d1d4",
             "_resultNumber": 1
             },
             {
+            "id": "{uuid.anyValid}",
             "type": "Tag",
-            "value": "A relevant user comment.",
+            "value": "An early user comment.",
             "resource.url": "https://{host}/resources/00000001-3f4e-11e5-91d3-bfea30e2969c",
             "_resultNumber": 2
             } ] } }
@@ -125,6 +128,42 @@
     </h:request>
 
     <h4>Refine these user tags based on a full-text search string</h4>
+
+    <!--
+    <h:request>
+        <h:post>/searches</h:post>
+        the body
+        <h:jsonBody>{
+            "query": {
+            "find": "annotation",
+            "where": "who:eq(\"user-4242\") type:eq(\"Tag\") value:match(\"Book.*\")",
+            "return": "id,type,value,resource.url"
+            } }
+        </h:jsonBody>
+        and observe status
+        <h:status>201 Created</h:status>
+        with the Location header pointing to the results of our query.
+    </h:request>
+
+    <div c:execute="#searchId2 = uuid()"></div>
+
+    <h:request>We follow the Location header and
+        <h:get>/searches/$searchId2</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body (selected fields shown only for brevity)
+        <h:jsonResponse>{
+            "searchResult" : {
+            "query" : {
+            "where" : "who:eq(\"user-4242\") type:eq(\"Tag\") value:match(\".*early.*\")"
+            },
+            "totalResults" : 1,
+            "firstResultPage": "https://{host}/searches/$searchId/resultPages/1"
+            } }
+        </h:jsonResponse>
+    </h:request>
+    -->
+
     <h4>Refine these user tags based on a date / time range</h4>
 </div>
 
