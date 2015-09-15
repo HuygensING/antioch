@@ -19,7 +19,7 @@ public class AlexandriaQuery extends JsonWrapperObject implements Prototype {
   private String where = "";
 
   // sort: sort([-|+]field,...) - = descending, default = + = ascending
-  private String sort = "when";
+  private String sort = "-when";
 
   // return: return(field,...)
   @JsonProperty("return")
