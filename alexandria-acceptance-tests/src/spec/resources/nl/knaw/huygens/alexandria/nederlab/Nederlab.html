@@ -477,6 +477,13 @@
 
     <h4>I. Get a (paged) overview of all tags owned by a user, sorted on timestamp</h4>
 
+    <div class="alert alert-info sm">
+        We show how to find all annotations of type
+        <mark><strong>Tag</strong></mark>
+        for user with id
+        <mark><strong>user-4242</strong></mark>
+    </div>
+
     <h:request>
         We
         <h:post>/searches</h:post>
@@ -514,12 +521,12 @@
             "firstResultPage": "https://{host}/searches/$searchId/resultPages/1"
             } }
         </h:jsonResponse>
-
-        <div class="alert alert-info sm">
-            The <code>sort</code> field, which we left unspecified, defaults to <code>"-when"</code>
-            (= reverse timestamp order: "most recent first").
-        </div>
     </h:request>
+
+    <div class="alert alert-warning sm">
+        The <code>sort</code> field, which we left unspecified, defaults to <code>"-when"</code>
+        (= reverse timestamp order: "most recent first").
+    </div>
 
     <h:request>We
         <h:get>/searches/$searchId/resultPages/1</h:get>
