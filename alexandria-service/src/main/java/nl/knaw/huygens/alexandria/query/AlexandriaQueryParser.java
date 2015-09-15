@@ -250,13 +250,28 @@ public class AlexandriaQueryParser {
       // there were parse errors
       return null;
     }
-    final List<Function<AnnotationVF, Object>> valueFunctions = Lists.newArrayList();
-    for (final SortToken token : sortTokens) {
-      final QueryField field = token.getField();
-      final Function<AnnotationVF, Object> valueMapper = field.getter;
-      valueFunctions.add(valueMapper);
+    List<Ordering<AnnotationVF>> orderings = sortTokens.stream()//
+        .map(AlexandriaQueryParser::ordering)//
+        .collect(toList());
+    Ordering<AnnotationVF> order = orderings.remove(0);
+    for (final Ordering<AnnotationVF> suborder : orderings) {
+      order = order.compound(suborder);
     }
-    return (getComparator(sortKeyGenerator(valueFunctions)));
+    return order;
+  }
+
+  private static Ordering<AnnotationVF> ordering(SortToken token) {
+    boolean ascending = token.isAscending();
+    Function<AnnotationVF, Object> function = token.getField().getter;
+    return new Ordering<AnnotationVF>() {
+      @SuppressWarnings("unchecked")
+      @Override
+      public int compare(final AnnotationVF left, final AnnotationVF right) {
+        return ascending//
+            ? ((Comparable<Object>) function.apply(left)).compareTo(function.apply(right))//
+            : ((Comparable<Object>) function.apply(right)).compareTo(function.apply(left));
+      }
+    };
   }
 
   private List<SortToken> parseSortString(final String sortString) {
@@ -290,39 +305,29 @@ public class AlexandriaQueryParser {
     return sortParameter.replaceFirst("^[\\-\\+]", "");
   }
 
-  @SuppressWarnings("unused")
-  private static Comparator<AnnotationVF> getComparator(final List<Function<AnnotationVF, Object>> valueFunctions) {
-    final List<Ordering<AnnotationVF>> subOrders = valueFunctions.stream()//
-        .map(AlexandriaQueryParser::ordering)//
-        .collect(toList());
-    Ordering<AnnotationVF> order = subOrders.remove(0);
-    for (final Ordering<AnnotationVF> suborder : subOrders) {
-      order = order.compound(suborder);
-    }
-    return order;
-  }
+  // @SuppressWarnings("unused")
+  // private static Comparator<AnnotationVF> getComparator(final List<Function<AnnotationVF, Object>> valueFunctions) {
+  // final List<Ordering<AnnotationVF>> subOrders = valueFunctions.stream()//
+  // .map(AlexandriaQueryParser::ordering)//
+  // .collect(toList());
+  // Ordering<AnnotationVF> order = subOrders.remove(0);
+  // for (final Ordering<AnnotationVF> suborder : subOrders) {
+  // order = order.compound(suborder);
+  // }
+  // return order;
+  // }
 
-  private static Ordering<AnnotationVF> ordering(final Function<AnnotationVF, Object> function) {
-    return new Ordering<AnnotationVF>() {
-      @SuppressWarnings("unchecked")
-      @Override
-      public int compare(final AnnotationVF left, final AnnotationVF right) {
-        return ((Comparable<Object>) function.apply(left)).compareTo(function.apply(right));
-      }
-    };
-  }
-
-  private static Function<AnnotationVF, String> sortKeyGenerator(final List<Function<AnnotationVF, Object>> valueFunctions) {
-    return (final AnnotationVF avf) -> {
-      final StringBuilder sb = new StringBuilder();
-      for (final Function<AnnotationVF, Object> function : valueFunctions) {
-        sb.append(function.apply(avf));
-        sb.append("|");
-      }
-      // Log.debug("sortKey=" + sb);
-      return sb.toString();
-    };
-  }
+  // private static Function<AnnotationVF, String> sortKeyGenerator(final List<Function<AnnotationVF, Object>> valueFunctions) {
+  // return (final AnnotationVF avf) -> {
+  // final StringBuilder sb = new StringBuilder();
+  // for (final Function<AnnotationVF, Object> function : valueFunctions) {
+  // sb.append(function.apply(avf));
+  // sb.append("|");
+  // }
+  // // Log.debug("sortKey=" + sb);
+  // return sb.toString();
+  // };
+  // }
 
   private void parseReturn(final ParsedAlexandriaQuery paq, final String fieldString) {
     final List<String> fields = splitToList(fieldString);
