@@ -1,0 +1,59 @@
+SEARCH USER STORIES
+===================
+ad 4 show the user’s tags
+Doel is een ‘tag overzicht’ pagina met alle tags van de gebruiker. Die set van tags is op basis van filteren en verfijnen in te perken. De gebruiker kan daarna een tag aanklikken en in context bekijken (zie scenario 5)
+- gebruiker logt in —> userID bekend
+- gebruiker gaat naar ‘tag overzicht’ pagina
+- REQUEST naar Alexandria: geef eerste pagina met tags voor gebruiker userID terug, op basis van sorteren op ‘time stamp'
+- op pagina wordt een tabel getoond met:
+     - rijen voor de eerste n annotaties. Mogelijke kolommen: resourceID, subresourceID, time stamp, vrije tekstwaarde
+     - totaal aantal annotaties en/of pagina's
+     - een paginator om vorige/volgende pagina’s op te halen —> leidt tot vervolg-REQUESTS
+
+>> find(annotation).where(type:eq("Tag"),who:eq("$userId"),state:eq("CONFIRMED")).sort(when).return(when,value,resource.id,subresource.id)
+
+- er kan ook worden gesorteerd op resourceID
+
+>> find(annotation).where(type:eq("Tag"),who:eq("$userId"),state:eq("CONFIRMED")).sort(resource.id).return(when,value,resource.id,subresource.id)
+
+     - variant: op resourceID, daarbinnen op time stamp sorteren
+
+>> find(annotation).where(type:eq("Tag"),who:eq("$userId"),state:eq("CONFIRMED")).sort(resource.id,when).return(when,value,resource.id,subresource.id)
+
+- gebruiker voert een substring of regexpr in in een invoerveld ‘filter op tekstwaarde'
+- REQUEST naar Alexandria: alle tags zoals bovenstaand, gefilterd op die substring of regexpr
+
+>> find(annotation).where(type:eq("Tag") who:eq("$userId") state:eq("CONFIRMED") value.match("$regexp")).sort(resource.id,when).return(when,value,resource.id,subresource.id)
+
+- gebruiker specificeert een tijdinterval
+- REQUEST naar Alexandria: alle tags zoals bovenstaand, gefilterd op dat tijdinterval
+
+>> find(annotation).where(type:eq("Tag") who:eq("$userId") state:eq("CONFIRMED") when.inRange($first,$last)).sort(resource.id,when).return(when,value,resource.id,subresource.id)
+
+- variant: combinatie van de 2 voorgaande queries
+
+>> find(annotation).where(type:eq("Tag",who:eq("$userId",state:eq("CONFIRMED",when:inRange($first,$last),value:match$regexp").sort(resource.id,when).return(when,value,resource.id,subresource.id)
+
+ad 6 show tags for specific set of resources
+als scenario 4, maar beperk request tot een set van specifiek bij resourceID genoemde resources
+
+>> find(annotation).where(type:eq("Tag",who:eq("$userId",state:eq("CONFIRMED",resource.id.inSet(id1,id2,id3),value=~"$regexp").sort(resource.id,when).return(when,value,resource.id,subresource.id)
+
+find: find(annotation|resource)
+where: field:function(params)
+  functions: eq(par) - equals
+  			 match(par) - match regexp
+  			 inSet(par0,par1,...,parn) - equals in set
+  			 inRange(par0,par1) - par0 <= value <= par1
+sort: sort([-|+]field,...) - = descending, default = + = ascending
+return: return(field,...)
+
+fields:
+- annotation:
+    id, type, value, resource.id, subresource.id, state, who, when, why
+
+
+Return all annotations (directly or indirectly) annotating the given resource or one of its subresources:
+>> find(annotation).where(resource.id:eq(id1)).return(type,value,resource.id,subresource.id)
+t.has('uuid',id1){.in('annotates')}*.out('has_body').
+
