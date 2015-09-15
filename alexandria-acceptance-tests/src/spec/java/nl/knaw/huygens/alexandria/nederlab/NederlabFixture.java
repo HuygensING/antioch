@@ -1,9 +1,11 @@
 package nl.knaw.huygens.alexandria.nederlab;
 
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.concordion.api.ExpectedToFail;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -18,7 +20,10 @@ import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
 @RunWith(ConcordionRunner.class)
+@ExpectedToFail
 public class NederlabFixture extends AlexandriaAcceptanceTest {
+  private final AtomicInteger id = new AtomicInteger();
+
   @BeforeClass
   public static void registerEndpoints() {
     register(ResourcesEndpoint.class);
@@ -49,6 +54,18 @@ public class NederlabFixture extends AlexandriaAcceptanceTest {
     return annotationId.toString();
   }
 
+  public String resourceHasTagForUserAtInstant(String resId, String value, String who, String when) {
+    resourceExists(resId);
+    final AlexandriaResource resource = service().readResource(UUID.fromString(resId)).get();
+
+    final AlexandriaAnnotationBody annotationBody = aTag(value);
+    final TentativeAlexandriaProvenance provenance = aProvenance(who, parse(when));
+    final UUID annotationId = service().annotate(resource, annotationBody, provenance).getId();
+    service().confirmAnnotation(annotationId);
+
+    return annotationId.toString();
+  }
+
   public String subResourceHasAnnotation(String id, String parentId, String type, String value) {
     final AlexandriaResource resource = subResourceExists(id, parentId);
     final AlexandriaAnnotationBody annotationBody = anAnnotation(type, value);
@@ -57,18 +74,28 @@ public class NederlabFixture extends AlexandriaAcceptanceTest {
     return annotationId.toString();
   }
 
+  private AlexandriaAnnotationBody aTag(String value) {
+    return anAnnotation("Tag", value);
+  }
+
+  private Instant parse(String when) {
+    return DateTimeFormatter.ISO_DATE_TIME.parse(when, Instant::from);
+  }
+
   private AlexandriaAnnotationBody anAnnotation(String type, String value) {
     return service().createAnnotationBody(UUID.randomUUID(), type, value, aProvenance(), confirmed());
   }
-
-  private final AtomicInteger id = new AtomicInteger();
 
   private String aSub() {
     return "/some/folia/expression/" + id.getAndIncrement();
   }
 
   private TentativeAlexandriaProvenance aProvenance() {
-    return new TentativeAlexandriaProvenance("nederlab", Instant.now(), "why");
+    return aProvenance("nederlab", Instant.now());
+  }
+
+  private TentativeAlexandriaProvenance aProvenance(String who, Instant when) {
+    return new TentativeAlexandriaProvenance(who, when, "why");
   }
 
   private String aRef() {
