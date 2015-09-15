@@ -18,7 +18,7 @@ import nl.knaw.huygens.alexandria.endpoint.JsonWrapperObject;
 import nl.knaw.huygens.alexandria.endpoint.resource.PropertyPrefix;
 
 @JsonInclude(Include.NON_NULL)
-@JsonTypeName("searchresultPage")
+@JsonTypeName("searchResultPage")
 public class SearchResultPage extends JsonWrapperObject {
   private int pageNum;
   @JsonIgnore

@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -34,8 +35,8 @@ public class SearchEndpoint extends JSONEndpoint {
 
   @Inject
   public SearchEndpoint(final AlexandriaService service, //
-      final SearchResultEntityBuilder entityBuilder, //
-      final LocationBuilder locationBuilder) {
+                        final SearchResultEntityBuilder entityBuilder, //
+                        final LocationBuilder locationBuilder) {
     this.service = service;
     this.entityBuilder = entityBuilder;
     this.locationBuilder = locationBuilder;
@@ -60,18 +61,19 @@ public class SearchEndpoint extends JSONEndpoint {
   }
 
   @GET
-  @Path("{uuid}/resultpages/{pageNum:[0-9]+}")
-  @ApiOperation(value = "Get the SearchResultPage with the given uuid and page number", response = SearchResultPage.class)
+  @Path("{uuid}/resultPages/{pageNum:[0-9]+}")
+  @ApiOperation(value = "Get the SearchResultPage with the given uuid and page number", response = SearchResultPage
+      .class)
   public Response getResultPage(@PathParam("uuid") final UUIDParam uuid, @PathParam("pageNum") int pageNum) {
     SearchResult searchResult = getSearchResult(uuid);
     int totalResultPages = searchResult.getTotalResultPages();
     if (totalResultPages == 0) {
-      throw new NotFoundException("no resultpages found");
+      throw new NotFoundException("no result pages found");
     }
     if (pageNum < 1 || pageNum > totalResultPages) {
       throw new NotFoundException("pageNum should be between 1 and " + totalResultPages);
     }
-    String baseURI = locationBuilder.locationOf(searchResult) + "/resultpages/";
+    String baseURI = locationBuilder.locationOf(searchResult) + "/resultPages/";
     boolean isLast = totalResultPages == pageNum;
     SearchResultPage page = new SearchResultPage(baseURI, pageNum, isLast);
     page.setResults(searchResult.getRecordsForPage(pageNum));
@@ -79,9 +81,8 @@ public class SearchEndpoint extends JSONEndpoint {
   }
 
   private SearchResult getSearchResult(final UUIDParam uuid) {
-    SearchResult search = SearchResultCache.get(uuid.getValue()) //
+    return SearchResultCache.get(uuid.getValue()) //
         .orElseThrow(() -> new NotFoundException("no SearchResult found with id " + uuid));
-    return search;
   }
 
 }
