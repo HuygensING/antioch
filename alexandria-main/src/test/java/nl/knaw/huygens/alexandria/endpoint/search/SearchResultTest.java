@@ -6,14 +6,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.junit.Test;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
-import org.junit.Test;
 
 public class SearchResultTest {
   @Test
@@ -31,7 +33,7 @@ public class SearchResultTest {
     sr.setId(id);
     assertThat(sr.getTotalResults()).isEqualTo(11);
     assertThat(sr.getTotalResultPages()).isEqualTo(2);
-    assertThat(sr.getFirstResultPage()).hasToString(config.getBaseURI() + EndpointPaths.SEARCHES + "/" + id + "/resultpages/1");
+    assertThat(sr.getFirstResultPage()).hasToString(config.getBaseURI() + EndpointPaths.SEARCHES + "/" + id + "/resultPages/1");
   }
 
 }

@@ -68,7 +68,7 @@ public class SearchResult implements Identifiable {
   }
 
   public URI getFirstResultPage() {
-    return getTotalResults() > 0 ? URI.create(locationBuilder.locationOf(this) + "/resultpages/1") : null;
+    return getTotalResults() > 0 ? URI.create(locationBuilder.locationOf(this) + "/resultPages/1") : null;
   }
 
   @JsonIgnore
