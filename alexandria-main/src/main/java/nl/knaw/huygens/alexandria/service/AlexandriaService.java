@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.service;
 
+import java.time.temporal.TemporalAmount;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -52,6 +53,8 @@ public interface AlexandriaService {
    * remove all unconfirmed objects that have timed out
    */
   void removeExpiredTentatives();
+
+  TemporalAmount getTentativesTimeToLive();
 
   /**
    * @param oldAnnotationId

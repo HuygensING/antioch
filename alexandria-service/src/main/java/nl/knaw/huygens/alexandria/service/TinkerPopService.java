@@ -50,7 +50,7 @@ import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import scala.NotImplementedError;
 
 public class TinkerPopService implements AlexandriaService {
-  private static final TemporalAmount TIMEOUT = Duration.ofDays(1);
+  private static final TemporalAmount TENTATIVES_TTL = Duration.ofDays(1);
 
   private Storage storage;
 
@@ -157,9 +157,14 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
+  public TemporalAmount getTentativesTimeToLive() {
+    return TENTATIVES_TTL;
+  }
+
+  @Override
   public void removeExpiredTentatives() {
     // Tentative vertices should not have any outgoing or incoming edges!!
-    Long threshold = Instant.now().minus(TIMEOUT).getEpochSecond();
+    Long threshold = Instant.now().minus(TENTATIVES_TTL).getEpochSecond();
     storage.startTransaction();
     storage.removeExpiredTentatives(threshold);
     storage.commitTransaction();
