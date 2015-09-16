@@ -25,7 +25,6 @@ import javax.inject.Inject;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import scala.NotImplementedError;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -48,6 +47,7 @@ import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
+import scala.NotImplementedError;
 
 public class TinkerPopService implements AlexandriaService {
   private static final TemporalAmount TENTATIVES_TTL = Duration.ofDays(1);
@@ -194,7 +194,8 @@ public class TinkerPopService implements AlexandriaService {
     }
 
     results.stream()//
-        .filter(r -> r.getParentResource() != null && r.getParentResource().getUuid().equals(parentId))//
+        .filter(r -> r.getParentResource() != null//
+            && r.getParentResource().getUuid().equals(parentId.toString()))//
         .collect(toList());
     return Optional.of(deframeResource(results.get(0)));
   }
@@ -465,8 +466,7 @@ public class TinkerPopService implements AlexandriaService {
       resource.setParentResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, parentResource.getUuid()));
     }
     rvf.getSubResources().stream()//
-        .forEach(vf -> resource
-            .addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
+        .forEach(vf -> resource.addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
     return resource;
   }
 
