@@ -1,0 +1,65 @@
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+
+<title>Anatomy of a resource</title>
+
+<body data-desc="Anatomy of a resource">
+
+<div id="resource-anatomy" data-desc="What does a resource look like?" c:execute="clearStorage()">
+    <div c:execute="resourceExists(#resId)">
+        Assuming a resource with uuid <code c:set="#resId">69f182ac-5c5f-11e5-8745-ef1581a11364</code> exists.
+    </div>
+    What does this resource look like when I <code>GET</code> it and what is the meaning of the properties?
+
+    <h:request>We
+        <h:get>/resources/69f182ac-5c5f-11e5-8745-ef1581a11364</h:get>
+        and receive
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "resource" : {
+            "id" : "$resId",
+            "ref" : "http://www.example.com/some/ref",
+            "state" : {
+            "value" : "CONFIRMED",
+            "since" : "{date.beforeNow}"
+            },
+            "^subresources" : [ ],
+            "^provenance" : "https://{host}/resources/$resId/provenance",
+            "^annotations" : [ ]
+            } }
+        </h:jsonResponse>
+    </h:request>
+    <ul>
+        <li><code>id</code> shows the uuid of this resource</li>
+        <li><code>ref</code> shows the external reference of this resource (which is where the actual contents this
+            resource refers to can be found)
+        </li>
+        <li><code>state</code> is one of
+            <dl class="dl-horizontal">
+                <dt>TENTATIVE</dt>
+                <dd>the object has just been created, but not confirmed</dd>
+                <dt>CONFIRMED</dt>
+                <dd>the object has been confirmed and is in full operational order</dd>
+                <dt>DELETED</dt>
+                <dd>the object is marked as deleted</dd>
+                <dt>DEPRECATED</dt>
+                <dd>the object (usually an annotation) has been deprecated by a more recent version</dd>
+            </dl>
+        </li>
+        <li><code>^subresources</code> contains the (possibly empty) array of links to resources which are registered as
+            being a subresource of this resource
+        </li>
+        <li><code>^provenance</code> contains a link to the provenance object for this resource
+            (who,what,when,why was this object created?)
+        </li>
+        <li><code>^annotations</code> contains the (possibly empty) array of links to the annotations on this resource
+        </li>
+    </ul>
+</div>
+
+</body>
+</html>
