@@ -19,6 +19,8 @@ import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
 @RunWith(ConcordionRunner.class)
 public class TransactionsFixture extends AlexandriaAcceptanceTest {
+  private final AtomicInteger id = new AtomicInteger();
+
   @BeforeClass
   public static void registerEndpoints() {
     register(ResourcesEndpoint.class);
@@ -60,8 +62,6 @@ public class TransactionsFixture extends AlexandriaAcceptanceTest {
   private AlexandriaAnnotationBody anAnnotation(String type, String value) {
     return service().createAnnotationBody(UUID.randomUUID(), type, value, aProvenance(), confirmed());
   }
-
-  private final AtomicInteger id = new AtomicInteger();
 
   private String aSub() {
     return "/some/folia/expression/" + id.getAndIncrement();
