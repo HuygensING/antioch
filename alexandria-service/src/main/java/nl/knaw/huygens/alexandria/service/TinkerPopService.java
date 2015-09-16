@@ -189,7 +189,7 @@ public class TinkerPopService implements AlexandriaService {
     }
 
     results.stream()//
-        .filter(r -> r.getParentResource() != null && r.getParentResource().getUuid().equals(parentId))//
+        .filter(r -> r.getParentResource() != null && r.getParentResource().getUuid().toString().equals(parentId))//
         .collect(toList());
     return Optional.of(deframeResource(results.get(0)));
   }
