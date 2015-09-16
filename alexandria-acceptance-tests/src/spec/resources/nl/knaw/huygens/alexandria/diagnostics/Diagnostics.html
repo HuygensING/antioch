@@ -63,63 +63,22 @@
 </div>
 
 <div id="use-before-confirm" data-desc="When can I expect a 409 Conflict?" c:execute="clearStorage()">
+    This is has to do with following the
+    <mark>try-confirm-cancel</mark>
+    pattern which the
+    <a href="../transactions/Transactions.html">Transactions</a> section explains in detail.
+
+    <hr/>
 
     <div class="alert alert-warning sm">
-        The <a href="http://www.atomikos.com/Publications/TryCancelConfirm">try-confirm-cancel</a>
-        pattern dictates we first confirm any newly created resources before using them.
-
-        <p><i>Failure to follow this pattern leads to grief when operating on the resource!</i></p>
-    </div>
-
-    <h4>Example: adding an annotation to an unconfirmed resource</h4>
-
-    <ul>
-        <li>
-            <div c:execute="resourceExists(#uuid)">Given that a resource with id
-                <span c:set="#uuid">6244b9d8-3b5e-11e5-aca2-5befb33d5e4d</span> exists and
-            </div>
-        </li>
-        <li>
-            <h:request>
-                a subresource is
-                <h:success>successfully</h:success>
-                registered via
-                <h:post>/resources/$uuid/subresources</h:post>
-                with body:
-                <h:jsonBody>{"subresource":{"sub":"/some/folia/path"}}</h:jsonBody>
-            </h:request>
-            <div c:execute="#uuid = uuid()">in this case yielding uuid <span c:echo="#uuid"></span>.</div>
-        </li>
-        <li>
-            <h:request>
-                <strong>(verification)</strong> We
-                <h:get>/resources/$uuid</h:get>
-                and observe its <code>TENTATIVE</code> state
-                <h:jsonResponse>{"subresource":{
-                    "id": "$uuid",
-                    "sub": "/some/folia/path",
-                    "state": { "value": "TENTATIVE"
-                    } } }
-                </h:jsonResponse>
-            </h:request>
-        </li>
-    </ul>
-
-    <h:request>
+        <strong data-toggle="tooltip" title="Too long; didn't read">tl;dr</strong>
+        If you have just created a (sub)resource or annotation via <code>POST</code>
+        (not <code>PUT</code>) remember to:
         <ul>
-            <li>When I
-                <h:post>/resources/$uuid/annotations</h:post>
-                an example annotation body:
-                <h:jsonBody>{"annotation": {"type": "t", "value": "v"}}</h:jsonBody>
-            </li>
-            <li>Then I will get status
-                <h:status>409 Conflict</h:status>
-                and a response body containing:
-                <h:jsonResponse>{"error":{"message": "resource $uuid is tentative, please confirm first"}}
-                </h:jsonResponse>
-            </li>
+            <li>check the Location header on the <code>201 Created</code> server response</li>
+            <li><code>POST</code> the body <code>{"state":"CONFIRMED"}</code> to this location</li>
         </ul>
-    </h:request>
+    </div>
 </div>
 
 </body>
