@@ -63,10 +63,8 @@
 </div>
 
 <div id="use-before-confirm" data-desc="When can I expect a 409 Conflict?" c:execute="clearStorage()">
-    This is has to do with following the
-    <mark>try-confirm-cancel</mark>
-    pattern which the
-    <a href="../transactions/Transactions.html">Transactions</a> section explains in detail.
+    This has to do with implementing the
+    <a href="../transactions/Transactions.html">try-confirm-cancel</a> pattern.
 
     <hr/>
 
@@ -75,8 +73,14 @@
         If you have just created a (sub)resource or annotation via <code>POST</code>
         (not <code>PUT</code>) remember to:
         <ul>
-            <li>check the Location header on the <code>201 Created</code> server response</li>
-            <li><code>POST</code> the body <code>{"state":"CONFIRMED"}</code> to this location</li>
+            <li>check the Location header on the <code>201 Created</code> server response<br/>
+                <small><code>e.g. Location: https://{host}/annotations/69f182ac-5c5f-11e5-8745-ef1581a11364</code>
+                </small>
+            </li>
+            <li><code>PUT</code> the body <code>{"state":"CONFIRMED"}</code> to the <code>/state</code>
+                of this object's location<br/>
+                <small><code>e.g. /annotations/69f182ac-5c5f-11e5-8745-ef1581a11364/state</code></small>
+            </li>
         </ul>
     </div>
 </div>
