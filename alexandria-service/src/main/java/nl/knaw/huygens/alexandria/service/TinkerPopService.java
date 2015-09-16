@@ -25,6 +25,7 @@ import javax.inject.Inject;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import scala.NotImplementedError;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -47,10 +48,9 @@ import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
-import scala.NotImplementedError;
 
 public class TinkerPopService implements AlexandriaService {
-  private static final TemporalAmount TIMEOUT = Duration.ofDays(1);
+  private static final TemporalAmount TENTATIVES_TTL = Duration.ofDays(1);
 
   private Storage storage;
 
@@ -157,9 +157,14 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
+  public TemporalAmount getTentativesTimeToLive() {
+    return TENTATIVES_TTL;
+  }
+
+  @Override
   public void removeExpiredTentatives() {
     // Tentative vertices should not have any outgoing or incoming edges!!
-    Long threshold = Instant.now().minus(TIMEOUT).getEpochSecond();
+    Long threshold = Instant.now().minus(TENTATIVES_TTL).getEpochSecond();
     storage.startTransaction();
     storage.removeExpiredTentatives(threshold);
     storage.commitTransaction();
@@ -460,7 +465,8 @@ public class TinkerPopService implements AlexandriaService {
       resource.setParentResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, parentResource.getUuid()));
     }
     rvf.getSubResources().stream()//
-        .forEach(vf -> resource.addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
+        .forEach(vf -> resource
+            .addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
     return resource;
   }
 

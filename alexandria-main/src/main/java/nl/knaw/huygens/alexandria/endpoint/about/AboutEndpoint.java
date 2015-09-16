@@ -1,20 +1,25 @@
 package nl.knaw.huygens.alexandria.endpoint.about;
 
-import javax.inject.Singleton;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.time.Instant;
+import java.time.temporal.TemporalAmount;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.PropertyResourceBundle;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
+
 import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 @Singleton
 @Path("about")
@@ -23,6 +28,13 @@ public class AboutEndpoint extends JSONEndpoint {
   private static final Instant startedAt = Instant.now();
 
   private static PropertyResourceBundle propertyResourceBundle;
+
+  private final TemporalAmount tentativesTTL;
+
+  @Inject
+  public AboutEndpoint(AlexandriaService service) {
+    this.tentativesTTL = service.getTentativesTimeToLive();
+  }
 
   private static synchronized String getProperty(String key) {
     if (propertyResourceBundle == null) {
@@ -58,6 +70,7 @@ public class AboutEndpoint extends JSONEndpoint {
     data.put("commitId", getProperty("commitId"));
     data.put("scmBranch", getProperty("scmBranch"));
     data.put("startedAt", startedAt.toString());
+    data.put("tentativesTTL", tentativesTTL.toString());
     data.put("version", getProperty("version"));
     return Response.ok(data).build();
   }

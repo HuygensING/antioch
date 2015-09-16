@@ -9,33 +9,53 @@
 
 <div id="about" data-desc="How can I get information about the Alexandria server?">
     <h:request>
-        When I <h:get>/about</h:get> then I should receive <h:status>200 OK</h:status>
-        and the body contains <h:jsonResponse>{
-        "buildDate": "{date.anyValid}",
-        "commitId": "{git.validCommitId}",
-        "scmBranch": "develop",
-        "startedAt": "{date.beforeNow}",
-        "version": "1.0-SNAPSHOT"
-    }</h:jsonResponse>
+        When I
+        <h:get>/about</h:get>
+        then I should receive
+        <h:status>200 OK</h:status>
+        and the body contains
+        <h:jsonResponse>{
+            "buildDate": "{date.anyValid}",
+            "commitId": "{git.validCommitId}",
+            "scmBranch": "develop",
+            "startedAt": "{date.beforeNow}",
+            "tentativesTTL": "PT24H",
+            "version": "1.0-SNAPSHOT"
+            }
+        </h:jsonResponse>
     </h:request>
+
+    <div class="alert alert-warning sm">
+        The <code>tentativesTTL</code> value determines the Time to Live for (unconfirmed) tentative objects.
+        <a href="../transactions/Transactions.html">Tentative objects should be confirmed</a> before their allotted
+        life span is over as they risk <strong>automatic purging by the server</strong> any time thereafter.
+    </div>
 </div>
 
 <div id="homepage" data-desc="What resources does the server provide besides REST resources?">
     <h:request>
-        When I <h:get>/</h:get>
-            using <h:setHeader name="Accept">text/html</h:setHeader>
-        then I should receive <h:status>200 OK</h:status>
+        When I
+        <h:get>/</h:get>
+        using
+        <h:setHeader name="Accept">text/html</h:setHeader>
+        then I should receive
+        <h:status>200 OK</h:status>
     </h:request>
 
     <h:request>
-        When I <h:get>/application.wadl</h:get>
-            using <h:setHeader name="Accept">application/xml</h:setHeader>
-        then I should receive <h:status>200 OK</h:status>
+        When I
+        <h:get>/application.wadl</h:get>
+        using
+        <h:setHeader name="Accept">application/xml</h:setHeader>
+        then I should receive
+        <h:status>200 OK</h:status>
     </h:request>
 
     <h:request>
         Alexandria has an empty favicon:
-        <h:get>/favicon.ico</h:get> yields <h:status>204 No Content</h:status>
+        <h:get>/favicon.ico</h:get>
+        yields
+        <h:status>204 No Content</h:status>
     </h:request>
 </div>
 

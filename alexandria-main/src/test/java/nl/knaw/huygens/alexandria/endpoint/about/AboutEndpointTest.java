@@ -1,14 +1,19 @@
 package nl.knaw.huygens.alexandria.endpoint.about;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.time.temporal.TemporalAmount;
+import java.util.Map;
 
 import javax.ws.rs.core.Response;
-import java.util.Map;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.MockedServiceEndpointTest;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 public class AboutEndpointTest extends MockedServiceEndpointTest {
   @BeforeClass
@@ -18,11 +23,17 @@ public class AboutEndpointTest extends MockedServiceEndpointTest {
 
   @Test
   public void test() {
+    when(SERVICE_MOCK.getTentativesTimeToLive()).thenReturn(aTemporalAmount());
+
     Response response = target("about").request().get();
     Log.info("response={}", response);
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat(responseEntityAsMap(response))
-        .containsKeys("version", "buildDate", "commitId", "startedAt", "scmBranch");
+        .containsKeys("version", "buildDate", "commitId", "startedAt", "scmBranch", "tentativesTTL");
+  }
+
+  private TemporalAmount aTemporalAmount() {
+    return mock(TemporalAmount.class);
   }
 
   @SuppressWarnings("unchecked")
