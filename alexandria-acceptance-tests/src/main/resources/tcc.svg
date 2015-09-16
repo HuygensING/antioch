@@ -1,0 +1,239 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: fig2dev Version 3.2 Patchlevel 5e -->
+<!-- CreationDate: Wed Sep 16 10:00:12 2015 -->
+<!-- Magnification: 1.050 -->
+<svg	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="6.1in" height="4.4in"
+	viewBox="223 866 7348 5291">
+<g style="stroke-width:.025in; fill:none">
+<!-- Line: box -->
+<rect x="5196" y="3307" width="1889" height="944" rx="110" 
+style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#dddddd;
+"/>
+<!-- Line: box -->
+<rect x="944" y="944" width="1889" height="944" rx="110" 
+style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#dddddd;
+"/>
+<!-- Line: box -->
+<rect x="944" y="3307" width="1889" height="944" rx="110" 
+style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#dddddd;
+"/>
+<!-- Line: box -->
+<rect x="5196" y="944" width="1889" height="944" rx="110" 
+style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#dddddd;
+"/>
+<!-- Line: box -->
+<rect x="944" y="5196" width="1889" height="944" rx="110" 
+style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#dddddd;
+"/>
+<!-- Line: box -->
+<rect x="5196" y="5196" width="1889" height="944" rx="110" 
+style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#dddddd;
+"/>
+<!-- Line: box -->
+<rect x="6377" y="3496" width="566" height="330" rx="0" 
+style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+stroke-dasharray:41 41;fill:#ffffff;
+"/>
+<!-- Line: box -->
+<rect x="2173" y="3448" width="566" height="330" rx="0" 
+style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#ffd600;
+"/>
+<!-- Line: box -->
+<rect x="2173" y="1133" width="614" height="330" rx="0" 
+style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#ffd600;
+"/>
+<!-- Line: box -->
+<rect x="6425" y="1133" width="566" height="330" rx="0" 
+style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#ffd600;
+"/>
+<!-- Line: box -->
+<rect x="6377" y="5385" width="566" height="330" rx="0" 
+style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#ffd600;
+"/>
+<!-- Line: box -->
+<rect x="2173" y="5338" width="566" height="330" rx="0" 
+style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#ffd600;
+"/>
+<!-- Line -->
+<polyline points="2960,5905
+5196,5905
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 5196 5905 - 2818 5905-->
+<polygon points="2961 5874
+2835 5905
+2961 5937
+2961 5874
+
+" style="stroke:#000000;stroke-width:8;stroke-miterlimit:8;
+fill:#000000;"/>
+<!-- Line -->
+<polyline points="2960,4015
+5196,4015
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 5196 4015 - 2818 4015-->
+<polygon points="2961 3984
+2835 4015
+2961 4047
+2961 3984
+
+" style="stroke:#000000;stroke-width:8;stroke-miterlimit:8;
+fill:#000000;"/>
+<!-- Line -->
+<polyline points="2834,3543
+5070,3543
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 2834 3543 - 5212 3543-->
+<polygon points="5069 3574
+5195 3543
+5069 3511
+5069 3574
+
+" style="stroke:#000000;stroke-width:8;stroke-miterlimit:8;
+fill:#000000;"/>
+<!-- Line -->
+<polyline points="2960,1653
+5196,1653
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 5196 1653 - 2818 1653-->
+<polygon points="2961 1622
+2835 1653
+2961 1685
+2961 1622
+
+" style="stroke:#000000;stroke-width:8;stroke-miterlimit:8;
+fill:#000000;"/>
+<!-- Line -->
+<polyline points="2834,1181
+5070,1181
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 2834 1181 - 5212 1181-->
+<polygon points="5069 1212
+5195 1181
+5069 1149
+5069 1212
+
+" style="stroke:#000000;stroke-width:8;stroke-miterlimit:8;
+fill:#000000;"/>
+<!-- Line -->
+<polyline points="236,2598
+7559,2598
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+stroke-dasharray:41 41;"/>
+<!-- Line -->
+<polyline points="2834,5433
+5070,5433
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 2834 5433 - 5212 5433-->
+<polygon points="5069 5464
+5195 5433
+5069 5401
+5069 5464
+
+" style="stroke:#000000;stroke-width:8;stroke-miterlimit:8;
+fill:#000000;"/>
+<!-- Text -->
+<text xml:space="preserve" x="1086" y="3732" fill="#000000"  font-family="AvantGarde" font-style="normal" font-weight="normal" font-size="152" text-anchor="start">Nederlab</text>
+<!-- Text -->
+<text xml:space="preserve" x="1086" y="3968" fill="#000000"  font-family="AvantGarde" font-style="normal" font-weight="normal" font-size="152" text-anchor="start">Frontend</text>
+<!-- Text -->
+<text xml:space="preserve" x="1039" y="5622" fill="#000000"  font-family="AvantGarde" font-style="normal" font-weight="normal" font-size="152" text-anchor="start">Nederlab</text>
+<!-- Text -->
+<text xml:space="preserve" x="1039" y="5858" fill="#000000"  font-family="AvantGarde" font-style="normal" font-weight="normal" font-size="152" text-anchor="start">Frontend</text>
+<!-- Text -->
+<text xml:space="preserve" x="3826" y="3448" fill="#000000"  font-family="AvantGarde" font-style="normal" font-weight="normal" font-size="126" text-anchor="start">/resources</text>
+<!-- Text -->
+<text xml:space="preserve" x="3212" y="3448" fill="#000000"  font-family="AvantGarde" font-style="normal" font-weight="normal" font-size="152" text-anchor="start">POST</text>
+<!-- Text -->
+<text xml:space="preserve" x="3637" y="1039" fill="#000000"  font-family="AvantGarde" font-style="normal" font-weight="normal" font-size="126" text-anchor="start">/resources/4242</text>
+<!-- Text -->
+<text xml:space="preserve" x="3165" y="1039" fill="#000000"  font-family="AvantGarde" font-style="normal" font-weight="normal" font-size="152" text-anchor="start">PUT</text>
+<!-- Text -->
+<text xml:space="preserve" x="5291" y="3826" fill="#000000"  font-family="AvantGarde" font-style="normal" font-weight="normal" font-size="152" text-anchor="start">Alexandria</text>
+<!-- Text -->
+<text xml:space="preserve" x="6519" y="3779" fill="#000000"  font-family="Times" font-style="italic" font-weight="bold" font-size="101" text-anchor="start">Res</text>
+<!-- Text -->
+<text xml:space="preserve" x="6425" y="3590" fill="#000000"  font-family="AvantGarde" font-style="italic" font-weight="normal" font-size="76" text-anchor="start">ID: 1337</text>
+<!-- Text -->
+<text xml:space="preserve" x="2314" y="3732" fill="#000000"  font-family="Times" font-style="italic" font-weight="bold" font-size="101" text-anchor="start">Res</text>
+<!-- Text -->
+<text xml:space="preserve" x="2220" y="3543" fill="#000000"  font-family="AvantGarde" font-style="italic" font-weight="normal" font-size="76" text-anchor="start">ID: ?</text>
+<!-- Text -->
+<text xml:space="preserve" x="2929" y="5338" fill="#000000"  font-family="AvantGarde" font-style="normal" font-weight="normal" font-size="152" text-anchor="start">PUT</text>
+<!-- Text -->
+<text xml:space="preserve" x="3448" y="5338" fill="#000000"  font-family="AvantGarde" font-style="normal" font-weight="normal" font-size="126" text-anchor="start">/resources/1337/state</text>
+<!-- Text -->
+<text xml:space="preserve" x="5338" y="1464" fill="#000000"  font-family="AvantGarde" font-style="normal" font-weight="normal" font-size="152" text-anchor="start">Alexandria</text>
+<!-- Text -->
+<text xml:space="preserve" x="1086" y="1559" fill="#000000"  font-family="AvantGarde" font-style="normal" font-weight="normal" font-size="152" text-anchor="start">Frontend</text>
+<!-- Text -->
+<text xml:space="preserve" x="1086" y="1322" fill="#000000"  font-family="AvantGarde" font-style="normal" font-weight="normal" font-size="152" text-anchor="start">Nederlab</text>
+<!-- Text -->
+<text xml:space="preserve" x="2220" y="1228" fill="#000000"  font-family="AvantGarde" font-style="italic" font-weight="normal" font-size="76" text-anchor="start">ID: 4242</text>
+<!-- Text -->
+<text xml:space="preserve" x="2362" y="1417" fill="#000000"  font-family="Times" font-style="italic" font-weight="bold" font-size="101" text-anchor="start">Res</text>
+<!-- Text -->
+<text xml:space="preserve" x="6472" y="1228" fill="#000000"  font-family="AvantGarde" font-style="italic" font-weight="normal" font-size="76" text-anchor="start">ID: 4242</text>
+<!-- Text -->
+<text xml:space="preserve" x="6566" y="1417" fill="#000000"  font-family="Times" font-style="italic" font-weight="bold" font-size="101" text-anchor="start">Res</text>
+<!-- Text -->
+<text xml:space="preserve" x="3307" y="6141" fill="#000000"  font-family="AvantGarde" font-style="normal" font-weight="normal" font-size="152" text-anchor="start">204 No Content</text>
+<!-- Text -->
+<text xml:space="preserve" x="3637" y="1889" fill="#000000"  font-family="AvantGarde" font-style="normal" font-weight="normal" font-size="152" text-anchor="start">200 Ok</text>
+<!-- Text -->
+<text xml:space="preserve" x="5291" y="5716" fill="#000000"  font-family="AvantGarde" font-style="normal" font-weight="normal" font-size="152" text-anchor="start">Alexandria</text>
+<!-- Text -->
+<text xml:space="preserve" x="6519" y="5669" fill="#000000"  font-family="Times" font-style="italic" font-weight="bold" font-size="101" text-anchor="start">Res</text>
+<!-- Text -->
+<text xml:space="preserve" x="6425" y="5480" fill="#000000"  font-family="AvantGarde" font-style="italic" font-weight="normal" font-size="76" text-anchor="start">ID: 1337</text>
+<!-- Text -->
+<text xml:space="preserve" x="3354" y="3968" fill="#000000"  font-family="AvantGarde" font-style="normal" font-weight="normal" font-size="152" text-anchor="start">201 Created</text>
+<!-- Text -->
+<text xml:space="preserve" x="3212" y="4204" fill="#000000"  font-family="AvantGarde" font-style="normal" font-weight="normal" font-size="101" text-anchor="start">Location: /resources/1337</text>
+<!-- Text -->
+<text xml:space="preserve" x="3118" y="5574" fill="#000000"  font-family="AvantGarde" font-style="italic" font-weight="normal" font-size="101" text-anchor="start">{"state": "CONFIRMED"}</text>
+<!-- Text -->
+<text xml:space="preserve" x="2314" y="5622" fill="#000000"  font-family="Times" font-style="italic" font-weight="bold" font-size="101" text-anchor="start">Res</text>
+<!-- Text -->
+<text xml:space="preserve" x="2220" y="5433" fill="#000000"  font-family="AvantGarde" font-style="italic" font-weight="normal" font-size="76" text-anchor="start">ID: 1337</text>
+</g>
+</svg>

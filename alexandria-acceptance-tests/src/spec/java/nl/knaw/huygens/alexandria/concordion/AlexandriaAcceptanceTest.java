@@ -11,6 +11,8 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.concordion.api.Resource;
+import org.concordion.api.extension.ConcordionExtension;
 import org.concordion.api.extension.Extension;
 import org.junit.BeforeClass;
 
@@ -45,8 +47,13 @@ public class AlexandriaAcceptanceTest extends RestFixture {
   private static TinkerPopService service = new TinkerPopService(storage, locationBuilder);
 
   @Extension
-  // @SuppressWarnings("unused")
+  @SuppressWarnings("unused")
   public RestExtension extensionFoundViaReflection = new RestExtension().enableCodeMirror().includeBootstrap();
+
+  @Extension
+  @SuppressWarnings("unused")
+  public ConcordionExtension imagesExtension = concordionExtender //
+      -> concordionExtender.withResource("/tcc.svg", new Resource("/nl/knaw/huygens/alexandria/transactions/tcc.svg"));
 
   @BeforeClass
   public static void setupAlexandriaAcceptanceTest() {
