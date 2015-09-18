@@ -9,14 +9,26 @@
 <body data-desc="Anatomy of a resource">
 
 <div id="resource-anatomy" data-desc="What does a resource look like?" c:execute="clearStorage()">
-    <div c:execute="resourceExists(#resId)">
-        Assuming a resource with uuid <code c:set="#resId">69f182ac-5c5f-11e5-8745-ef1581a11364</code> exists.
-    </div>
-    What does this resource look like when I <code>GET</code> it and what is the meaning of the properties?
+    When we <code>GET</code> a resource, what does it look like and what is the meaning of the properties?
+    Let us assume that:
+    <ul>
+        <li c:execute="resourceExists(#resId)">
+            a (parent) resource exists with uuid: <code c:set="#resId">69f182ac-5c5f-11e5-8745-ef1581a11364</code>
+        </li>
+        <li c:execute="#annoId = hasAnnotation(#resId)">
+            this resource has an annotation: <code c:echo="#annoId"></code>
+        </li>
+        <li c:execute="#subId = hasSubresource(#resId)">
+            this resource has a subresource: <code c:echo="#subId"></code>
+        </li>
+        <li c:execute="#subAnnoId = hasAnnotation(#subId)">
+            this subresource has an annotation: <code c:echo="#subAnnoId"></code>
+        </li>
+    </ul>
 
-    <h:request>We
+    <h:request>When we
         <h:get>/resources/69f182ac-5c5f-11e5-8745-ef1581a11364</h:get>
-        and receive
+        we receive
         <h:status>200 OK</h:status>
         and body
         <h:jsonResponse>{
@@ -27,9 +39,9 @@
             "value" : "CONFIRMED",
             "since" : "{date.beforeNow}"
             },
-            "^subresources" : [ ],
+            "^annotations" : [ "https://{host}/annotations/$annoId" ],
             "^provenance" : "https://{host}/resources/$resId/provenance",
-            "^annotations" : [ ]
+            "^subresources" : [ "https://{host}/resources/$subId" ]
             } }
         </h:jsonResponse>
     </h:request>
@@ -38,7 +50,7 @@
         <li><code>ref</code> shows the external reference of this resource (which is where the actual contents this
             resource refers to can be found)
         </li>
-        <li><code>state</code> is one of
+        <li><code>state.value</code> is one of
             <dl class="dl-horizontal">
                 <dt>TENTATIVE</dt>
                 <dd>the object has just been created, but not confirmed</dd>
@@ -50,13 +62,20 @@
                 <dd>the object (usually an annotation) has been deprecated by a more recent version</dd>
             </dl>
         </li>
-        <li><code>^subresources</code> contains the (possibly empty) array of links to resources which are registered as
-            being a subresource of this resource
+        <li><code>state.since</code> is the instant at which this resource's state was set to its current value</li>
+        <li><code>^annotations</code> contains a (possibly empty) array of links to the annotations on this resource
+            <div class="alert alert-warning sm">
+                Note that annotations of a subresource (i.c. <code c:echo="#subAnnoId"></code>)
+                are <strong>not</strong> shown in the <code>^annotations</code> of the (parent) resource.
+                <small>(They can be fetched by explicitly <code>GET</code>ting the subresource,
+                or via the <a href="../todo/query">Query facility</a>.)</small>
+            </div>
         </li>
         <li><code>^provenance</code> contains a link to the provenance object for this resource
-            (who,what,when,why was this object created?)
+            <small>(who-what-when-why was this object created?)</small>
         </li>
-        <li><code>^annotations</code> contains the (possibly empty) array of links to the annotations on this resource
+        <li><code>^subresources</code> contains a (possibly empty) array of links to resources which are registered as
+            being a subresource of this resource (in this case <code c:echo="#subId"></code>).
         </li>
     </ul>
 </div>
