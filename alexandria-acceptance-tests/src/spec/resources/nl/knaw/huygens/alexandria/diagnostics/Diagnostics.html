@@ -22,7 +22,14 @@
     </ul>
 </div>
 
-<div id="dia-404" data-desc="When can I expect a 404 Not Found?" c:execute="clearStorage()">
+<div id="dia-400" data-desc="When can I expect a 400 Bad Request?" c:execute="clearStorage()">
+    <div class="alert alert-warning sm">
+        In general, whenever there is "something wrong" with the client side of the request, you will
+        get a <code>400 Bad Request</code>
+        <br/>
+        Only particularly noteworthy cases are explicitly documented here.
+    </div>
+
     <ul>
         <li>
             <h4>Accessing a non-existent endpoint</h4>
@@ -30,20 +37,23 @@
             <h:request>When we
                 <h:get>/resource/fa1303c2-5072-11e5-af91-6b4599821240</h:get>
                 we observe
-                <h:status>404 Not Found</h:status>
-                and an
-                <h:responseBody/>
-                response body.
+                <h:status>400 Bad Request</h:status>
+                and body
+                <h:jsonResponse>{
+                    "error" : {
+                    "message" : "No such endpoint"
+                    } }
+                </h:jsonResponse>
             </h:request>
 
-            <div class="alert alert-info sm">
-                In this case the address of the resources endpoint was misspelled:
-                <del>/resource/</del>
-                instead of /resources/
-            </div>
-
+            In this case the address of the resources endpoint was misspelled:
+            <code><del>/resource/</del></code> instead of <code>/resources/</code>
         </li>
+    </ul>
+</div>
 
+<div id="dia-404" data-desc="When can I expect a 404 Not Found?" c:execute="clearStorage()">
+    <ul>
         <li>
             <h4>Accessing a non-existent resource at the correct endpoint</h4>
 
@@ -59,6 +69,10 @@
                 </h:jsonResponse>
             </h:request>
         </li>
+        <div class="alert alert-warning sm">
+            Obviously this case extends to accessing non-existent <code>annotations</code>,
+            <code>provenance</code> objects, etc.
+        </div>
     </ul>
 </div>
 

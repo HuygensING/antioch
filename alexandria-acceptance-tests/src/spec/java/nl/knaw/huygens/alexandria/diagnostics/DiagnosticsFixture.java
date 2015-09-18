@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.concordion.AlexandriaAcceptanceTest;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
+import nl.knaw.huygens.alexandria.jersey.exceptionmappers.NotFoundExceptionMapper;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
 @RunWith(ConcordionRunner.class)
@@ -20,6 +21,7 @@ public class DiagnosticsFixture extends AlexandriaAcceptanceTest {
   public static void registerEndpoints() {
     Log.trace("Registering endpoints");
     register(ResourcesEndpoint.class);
+    register(NotFoundExceptionMapper.class);
   }
 
   public void resourceExists(String id) {
