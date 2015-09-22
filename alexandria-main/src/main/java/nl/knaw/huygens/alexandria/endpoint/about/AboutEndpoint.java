@@ -1,6 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint.about;
 
 import java.io.IOException;
+import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
 import java.util.Map;
@@ -18,6 +19,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
@@ -30,9 +32,11 @@ public class AboutEndpoint extends JSONEndpoint {
   private static PropertyResourceBundle propertyResourceBundle;
 
   private final TemporalAmount tentativesTTL;
+  private final URI baseURI;
 
   @Inject
-  public AboutEndpoint(AlexandriaService service) {
+  public AboutEndpoint(AlexandriaConfiguration config, AlexandriaService service) {
+    this.baseURI = config.getBaseURI();
     this.tentativesTTL = service.getTentativesTimeToLive();
   }
 
@@ -66,6 +70,7 @@ public class AboutEndpoint extends JSONEndpoint {
   @ApiOperation("get information about the server (version,buildDate,commitId,startedAt)")
   public Response getMetadata() {
     final Map<String, String> data = Maps.newLinkedHashMap();
+    data.put("baseURI", baseURI.toString());
     data.put("buildDate", getProperty("buildDate"));
     data.put("commitId", getProperty("commitId"));
     data.put("scmBranch", getProperty("scmBranch"));

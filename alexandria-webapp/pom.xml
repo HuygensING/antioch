@@ -89,6 +89,8 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
+        <config.baseURI>https://test.alexandria.huygens.knaw.nl/</config.baseURI>
+        <config.storageDirectory>/data/alexandria/storage/test/</config.storageDirectory>
         <tomcat.server>tomcat.hi23</tomcat.server>
         <tomcat.manager.url>${tc23-manager}</tomcat.manager.url>
         <tomcat.path>/test-alexandria</tomcat.path>
@@ -98,6 +100,8 @@
     <profile>
       <id>prod</id>
       <properties>
+        <config.baseURI>https://alexandria.huygens.knaw.nl/</config.baseURI>
+        <config.storageDirectory>/data/alexandria/storage/acceptance/</config.storageDirectory>
         <tomcat.server>tomcat.hi23</tomcat.server>
         <tomcat.manager.url>${tc23-manager}</tomcat.manager.url>
         <tomcat.path>/alexandria</tomcat.path>
