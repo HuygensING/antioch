@@ -80,25 +80,55 @@ public class ContextListener extends JerseyGuiceServletContextListener {
     return new AbstractModule() {
       @Override
       protected void configure() {
-        bind(AlexandriaConfiguration.class).toInstance(bindConfiguration());
+        bind(AlexandriaConfiguration.class).toInstance(cache(propertyBackedConfiguration()));
       }
     };
   }
 
-  private AlexandriaConfiguration bindConfiguration() {
-    return new AlexandriaConfiguration() {
-      private final URI baseURI = UriBuilder.fromUri(getProperty(BASE_URI_PROP)).build();
-      private final String storageDirectory = getProperty(STORAGE_DIRECTORY_PROP);
+  private AlexandriaConfiguration cache(AlexandriaConfiguration delegate) {
+    return new CachedConfiguration(delegate);
+  }
 
+  private AlexandriaConfiguration propertyBackedConfiguration() {
+    return new AlexandriaConfiguration() {
       @Override
       public URI getBaseURI() {
-        return baseURI;
+        return UriBuilder.fromUri(getProperty(BASE_URI_PROP)).build();
       }
 
       @Override
       public String getStorageDirectory() {
-        return storageDirectory;
+        return getProperty(STORAGE_DIRECTORY_PROP);
       }
     };
+  }
+
+  private static class CachedConfiguration implements AlexandriaConfiguration {
+    private final AlexandriaConfiguration delegate;
+
+    private URI cachedBaseURI;
+    private String cachedStorageDirectory;
+
+    public CachedConfiguration(AlexandriaConfiguration delegate) {
+      this.delegate = delegate;
+    }
+
+    @Override
+    public URI getBaseURI() {
+      if (cachedBaseURI == null) {
+        cachedBaseURI = delegate.getBaseURI();
+      }
+
+      return cachedBaseURI;
+    }
+
+    @Override
+    public String getStorageDirectory() {
+      if (cachedStorageDirectory == null) {
+        cachedStorageDirectory = delegate.getStorageDirectory();
+      }
+
+      return cachedStorageDirectory;
+    }
   }
 }
