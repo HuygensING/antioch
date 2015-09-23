@@ -53,21 +53,12 @@ public class ContextListener extends JerseyGuiceServletContextListener {
 
   @Override
   protected List<? extends Module> modules() {
-    Log.info("modules() called");
     return ImmutableList.of(new AlexandriaServletModule(), configurationModule());
   }
 
   @Override
   public void contextInitialized(ServletContextEvent servletContextEvent) {
-    Log.info("ContextListener.contextInitialized()");
-    super.contextInitialized(servletContextEvent);
     Scheduler.scheduleExpiredTentativesRemoval();
-  }
-
-  @Override
-  public void contextDestroyed(ServletContextEvent servletContextEvent) {
-    Log.info("ContextListener.contextDestroyed()");
-    super.contextDestroyed(servletContextEvent);
   }
 
   private String getProperty(String key) {
