@@ -1,10 +1,15 @@
 package nl.knaw.huygens.alexandria.concordion;
 
 import static java.lang.String.format;
+import static java.util.UUID.fromString;
+import static java.util.UUID.randomUUID;
+import static nl.knaw.huygens.alexandria.model.AlexandriaState.CONFIRMED;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 import javax.ws.rs.core.Application;
@@ -29,6 +34,10 @@ import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.Identifiable;
+import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerGraphService;
 import nl.knaw.huygens.alexandria.service.TinkerPopService;
@@ -45,6 +54,8 @@ public class AlexandriaAcceptanceTest extends RestFixture {
   private static LocationBuilder locationBuilder = new LocationBuilder(testConfiguration(), new EndpointPathResolver());
 
   private static TinkerPopService service = new TinkerPopService(storage, locationBuilder);
+
+  private final AtomicInteger nextUniqueExpressionNumber = new AtomicInteger();
 
   @Extension
   @SuppressWarnings("unused")
@@ -120,8 +131,47 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     service.setStorage(tinkerGraphStorage());
   }
 
+  public void resourceExists(String resId) {
+    service.createOrUpdateResource(fromString(resId), aRef(), aProvenance(), CONFIRMED);
+  }
+
   protected AlexandriaService service() {
     return service;
+  }
+
+  protected String idOf(Identifiable it) {
+    return it.getId().toString();
+  }
+
+  protected AlexandriaResource theResource(UUID resId) {
+    return service().readResource(resId).get();
+  }
+
+  protected String annotate(AlexandriaResource resource, AlexandriaAnnotationBody annotationBody,
+                            TentativeAlexandriaProvenance provenance) {
+    return idOf(service.annotate(resource, annotationBody, provenance));
+  }
+
+  protected TentativeAlexandriaProvenance aProvenance() {
+    return new TentativeAlexandriaProvenance("nederlab", Instant.now(), "why");
+  }
+
+  protected String aRef() {
+    return "http://www.example.com/some/ref";
+  }
+
+  protected String aSub() {
+    return "/some/folia/expression/" + nextUniqueExpressionNumber.getAndIncrement();
+  }
+
+  protected UUID hasConfirmedAnnotation(AlexandriaResource resource, AlexandriaAnnotationBody annotationBody) {
+    final UUID annotationId = service().annotate(resource, annotationBody, aProvenance()).getId();
+    service().confirmAnnotation(annotationId);
+    return annotationId;
+  }
+
+  protected AlexandriaAnnotationBody anAnnotation(String type, String value) {
+    return service().createAnnotationBody(randomUUID(), type, value, aProvenance(), CONFIRMED);
   }
 
   private Optional<UUID> parse(String idStr) {
