@@ -6,7 +6,6 @@ import static java.util.UUID.randomUUID;
 import java.time.Instant;
 import java.util.UUID;
 
-import org.concordion.api.ExpectedToFail;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.runner.RunWith;
 
@@ -16,7 +15,6 @@ import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
 @RunWith(ConcordionRunner.class)
-@ExpectedToFail
 public class AnatomyFixture extends AnnotationsBase {
 
   public void resourceExists(String id) {

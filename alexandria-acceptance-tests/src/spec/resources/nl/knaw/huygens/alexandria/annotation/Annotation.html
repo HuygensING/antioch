@@ -1,105 +1,18 @@
 <html xmlns:c="http://www.concordion.org/2007/concordion"
-      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
       xmlns:xsi="http://www.w3.org/1999/xhtml"
       xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
                           http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
 
-<title>Accessing Annotations</title>
+<title>Annotations</title>
 
-<body data-desc="Accessing annotations">
+<body class="container">
 
-<div id="get-non-existent" data-desc="What happens when I GET a non-existent annotation?">
-    Given that no annotation exists with ID <code>1dccfd5a-2ec1-11e5-ae97-0360c65ad001</code>
-    <h:request>
-        When I
-        <h:get>/annotations/1dccfd5a-2ec1-11e5-ae97-0360c65ad001</h:get>
-        then I should receive
-        <h:status>404 Not Found</h:status>
-        and the response body should contain:
-        <h:jsonResponse>{ "error": {
-            "message": "No annotation found with id 1dccfd5a-2ec1-11e5-ae97-0360c65ad001"
-            } }
-        </h:jsonResponse>
-    </h:request>
-</div>
+<h2>Annotations</h2>
 
-<div id="add-annotation" data-desc="How can I create an annotation?">
-    <h:request>
-        Given I have
-        <h:success>successfully</h:success>
-        <h:put>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:put>
-        the following body:
-        <h:jsonBody>{ "resource": {
-            "id": "6e56c868-c0a9-11e4-a762-cb9a664afc01",
-            "ref": "http://www.example.com/titles/path/to/title/resource"
-            } }
-        </h:jsonBody>
-    </h:request>
-
-    <h:request>
-        When I
-        <h:post>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/annotations</h:post>
-        the following body:
-        <h:jsonBody>{ "annotation": {
-            "type": "emotion",
-            "value": "happy"
-            } }
-        </h:jsonBody>
-        then I should receive:
-        <ul>
-            <li>status <h:status>201 Created</h:status></li>
-            <li> a Location header starting with
-                <h:location type="base">https://{host}/annotations/</h:location>
-                and ending in a <h:location type="uuid">well-formed UUID</h:location>
-            </li>
-            <li>an <h:responseBody/> response body</li>
-        </ul>
-    </h:request>
-</div>
-
-<!--
-    <div c:execute="clear()" class="example">
-        <h3>How can I create an annotation which is annotated itself by an existing annotation?</h3>
-
-        <ul>
-            <li c:execute="createAnnotation(#type,#value)">Given an annotation
-                of type: <code c:set="#type">emotion</code>
-                and value: <code c:set="#value">happy</code>
-            </li>
-            <li c:execute="validAnnotation(#id)">and that another valid annotation exists with id:
-                <code c:set="#id">7631e9ef-a41e-40fa-a3dc-ba03267ef34a</code>
-            </li>
-            <li>When I <b c:set="#method">POST</b>
-<pre c:execute="body(#TEXT)">{
-    "annotation": {
-        "type": "emotion",
-        "value": "happy",
-        "annotations" : [ "7631e9ef-a41e-40fa-a3dc-ba03267ef34a" ]
-    }
-}</pre>
-                to <code c:set="#endpoint"><b>/annotations</b></code></li>
-
-            <li c:execute="request(#method, #endpoint)">Then:
-                <ol>
-                    <li>the response status should be <b c:assertEquals="status()">201 Created</b>;</li>
-                    <li>the response body looks like:
-<pre json:includesJson="response()">{
-    "annotation": {
-        "type": "emotion",
-        "value": "happy",
-        "annotations": [
-            "https://{host}/annotations/7631e9ef-a41e-40fa-a3dc-ba03267ef34a"
-        ]
-    }
-}</pre>
-                    </li>
-                </ol>
-            </li>
-        </ul>
-    </div>
-
-    </div>
--->
+<ul>
+    <li><a c:run="concordion" href="Anatomy.html">Anatomy of an annotation</a></li>
+    <li><a c:run="concordion" href="Working.html">Working with annotations</a></li>
+</ul>
 
 </body>
 </html>
