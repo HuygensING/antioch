@@ -17,7 +17,7 @@
         <h:jsonResponse>{
             "buildDate": "{date.anyValid}",
             "commitId": "{git.validCommitId}",
-            "scmBranch": "develop",
+            "scmBranch": "{git.validBranch}",
             "startedAt": "{date.beforeNow}",
             "tentativesTTL": "PT24H",
             "version": "1.0-SNAPSHOT"
