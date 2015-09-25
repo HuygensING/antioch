@@ -25,6 +25,8 @@ public class AlexandriaQuery extends JsonWrapperObject implements Prototype {
   @JsonProperty("return")
   private String fields = "id";
 
+  private int pageSize = 10;
+
   public String getFind() {
     return find;
   }
@@ -55,6 +57,15 @@ public class AlexandriaQuery extends JsonWrapperObject implements Prototype {
 
   public void setFields(String fields) {
     this.fields = fields;
+  }
+
+  public int getPageSize() {
+    return pageSize;
+  }
+
+  public AlexandriaQuery setPageSize(Integer pageSize) {
+    this.pageSize = pageSize;
+    return this;
   }
 
 }

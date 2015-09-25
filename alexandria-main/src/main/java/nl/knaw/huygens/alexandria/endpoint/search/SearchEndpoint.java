@@ -16,7 +16,6 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -35,8 +34,8 @@ public class SearchEndpoint extends JSONEndpoint {
 
   @Inject
   public SearchEndpoint(final AlexandriaService service, //
-                        final SearchResultEntityBuilder entityBuilder, //
-                        final LocationBuilder locationBuilder) {
+      final SearchResultEntityBuilder entityBuilder, //
+      final LocationBuilder locationBuilder) {
     this.service = service;
     this.entityBuilder = entityBuilder;
     this.locationBuilder = locationBuilder;
@@ -62,8 +61,7 @@ public class SearchEndpoint extends JSONEndpoint {
 
   @GET
   @Path("{uuid}/resultPages/{pageNumber:[0-9]+}")
-  @ApiOperation(value = "Get the SearchResultPage with the given uuid and page number", response = SearchResultPage
-      .class)
+  @ApiOperation(value = "Get the SearchResultPage with the given uuid and page number", response = SearchResultPage.class)
   public Response getResultPage(@PathParam("uuid") final UUIDParam uuid, @PathParam("pageNumber") int pageNumber) {
     SearchResult searchResult = getSearchResult(uuid);
     int totalResultPages = searchResult.getTotalResultPages();
@@ -75,7 +73,7 @@ public class SearchEndpoint extends JSONEndpoint {
     }
     String baseURI = locationBuilder.locationOf(searchResult) + "/resultPages/";
     boolean isLast = totalResultPages == pageNumber;
-    SearchResultPage page = new SearchResultPage(baseURI, pageNumber, isLast);
+    SearchResultPage page = new SearchResultPage(baseURI, pageNumber, isLast, searchResult.getPageSize());
     page.setResults(searchResult.getRecordsForPage(pageNumber));
     return Response.ok(page).build();
   }

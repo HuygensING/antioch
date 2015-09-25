@@ -22,8 +22,9 @@ public class SearchResultTest {
   public void testTotalPages() {
     AlexandriaConfiguration config = new MockConfiguration();
     SearchResult sr = new SearchResult(new LocationBuilder(config, new EndpointPathResolver()));
+    sr.setQuery(new AlexandriaQuery().setPageSize(10));
     Map<String, Object> map = ImmutableMap.of("what", "ever");
-    List<Map<String, Object>> results = ImmutableList.<Map<String, Object>>builder()//
+    List<Map<String, Object>> results = ImmutableList.<Map<String, Object>> builder()//
         .add(map).add(map).add(map).add(map).add(map)//
         .add(map).add(map).add(map).add(map).add(map)//
         .add(map)//
