@@ -24,7 +24,8 @@ function a-find-annotations-for-resource {
 		\"find\" : \"annotation\",
 		\"where\" : \"who:eq(\\\"nederlab\\\") resource.id:eq(\\\"${resource_id}\\\")\",
 		\"sort\" : \"-when\",
-		\"return\" : \"id,when,who,type,value,resource.id,resource.url,subresource.id,subresource.url\"
+		\"return\" : \"id,when,who,type,value,resource.id,resource.url,subresource.id,subresource.url\",
+		\"pageSize\" : 100
     }}" 2>/dev/null|a-location)
     echo "search URI=" $url
     curl ${url}/resultpages/1
