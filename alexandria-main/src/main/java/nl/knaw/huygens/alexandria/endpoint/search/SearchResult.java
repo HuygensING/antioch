@@ -10,12 +10,14 @@ import javax.inject.Inject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.google.common.collect.Lists;
 
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+import nl.knaw.huygens.alexandria.endpoint.resource.PropertyPrefix;
 import nl.knaw.huygens.alexandria.model.Identifiable;
 
 @JsonInclude(Include.NON_NULL)
@@ -67,6 +69,7 @@ public class SearchResult implements Identifiable {
     this.results = results;
   }
 
+  @JsonProperty(PropertyPrefix.LINK + "firstResultPage")
   public URI getFirstResultPage() {
     return getTotalResults() > 0 ? URI.create(locationBuilder.locationOf(this) + "/resultPages/1") : null;
   }
