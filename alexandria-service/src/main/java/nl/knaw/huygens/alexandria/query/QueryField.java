@@ -12,6 +12,7 @@ import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 
 enum QueryField {
   id(AnnotationVF::getUuid), //
+  url(AlexandriaQueryParser::getAnnotationURL), //
   when(AnnotationVF::getProvenanceWhen), //
   who(AnnotationVF::getProvenanceWho), //
   why(AnnotationVF::getProvenanceWhy), //

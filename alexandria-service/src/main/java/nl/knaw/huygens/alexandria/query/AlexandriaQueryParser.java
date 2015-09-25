@@ -33,6 +33,7 @@ import nl.knaw.huygens.alexandria.antlr.AQLLexer;
 import nl.knaw.huygens.alexandria.antlr.AQLParser;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
@@ -226,6 +227,10 @@ public class AlexandriaQueryParser {
     return x -> {
       return true;
     };
+  }
+
+  static String getAnnotationURL(final AnnotationVF avf) {
+    return locationBuilder.locationOf(AlexandriaAnnotation.class, avf.getUuid()).toString();
   }
 
   static String getResourceURL(final AnnotationVF avf) {
