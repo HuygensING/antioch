@@ -23,6 +23,7 @@ package nl.knaw.huygens.alexandria.endpoint.search;
  */
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.StrictAssertions.assertThat;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,17 +45,22 @@ public class SearchResultPageTest {
   }
 
   List<Map<String, Object>> ten_results = ImmutableList.<Map<String, Object>> builder()//
-      .add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map))//
-      .add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map))//
+      .add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map))//
+      .add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map))//
+      .add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map))//
+      .add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map))//
+      .add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map))//
       .build();
 
   List<Map<String, Object>> five_results = ImmutableList.<Map<String, Object>> builder()//
-      .add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map))//
+      .add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map))//
+      .add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map))//
+      .add(new HashMap<String, Object>(map))//
       .build();
 
   @Test
   public void testFirstPageOfSeveral() {
-    SearchResultPage srp = new SearchResultPage(baseURI, 1, false);
+    SearchResultPage srp = new SearchResultPage(baseURI, 1, false, 10);
     srp.setResults(ten_results);
     assertThat(srp.getPreviousPage()).isNull();
     assertThat(srp.getNextPage()).hasToString(baseURI + 2);
@@ -67,7 +73,7 @@ public class SearchResultPageTest {
 
   @Test
   public void testSecondPageOfThree() {
-    SearchResultPage srp = new SearchResultPage(baseURI, 2, false);
+    SearchResultPage srp = new SearchResultPage(baseURI, 2, false, 10);
     srp.setResults(ten_results);
     assertThat(srp.getPreviousPage()).hasToString(baseURI + 1);
     assertThat(srp.getNextPage()).hasToString(baseURI + 3);
@@ -80,7 +86,7 @@ public class SearchResultPageTest {
 
   @Test
   public void testLastPageOfSeveral() {
-    SearchResultPage srp = new SearchResultPage(baseURI, 2, true);
+    SearchResultPage srp = new SearchResultPage(baseURI, 2, true, 10);
     srp.setResults(five_results);
     assertThat(srp.getPreviousPage()).hasToString(baseURI + 1);
     assertThat(srp.getNextPage()).isNull();

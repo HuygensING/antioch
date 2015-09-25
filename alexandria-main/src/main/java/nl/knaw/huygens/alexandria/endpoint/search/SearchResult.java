@@ -32,17 +32,18 @@ import javax.inject.Inject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.google.common.collect.Lists;
 
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+import nl.knaw.huygens.alexandria.endpoint.resource.PropertyPrefix;
 import nl.knaw.huygens.alexandria.model.Identifiable;
 
 @JsonInclude(Include.NON_NULL)
 public class SearchResult implements Identifiable {
-  static final double PAGE_SIZE = 10;
   private UUID id;
   private AlexandriaQuery query;
   private List<Map<String, Object>> results = Lists.newArrayList();
@@ -77,7 +78,7 @@ public class SearchResult implements Identifiable {
   }
 
   public int getTotalResultPages() {
-    return (int) Math.ceil(getTotalResults() / PAGE_SIZE);
+    return (int) Math.ceil(getTotalResults() / (double) query.getPageSize());
   }
 
   @JsonIgnore
@@ -89,6 +90,7 @@ public class SearchResult implements Identifiable {
     this.results = results;
   }
 
+  @JsonProperty(PropertyPrefix.LINK + "firstResultPage")
   public URI getFirstResultPage() {
     return getTotalResults() > 0 ? URI.create(locationBuilder.locationOf(this) + "/resultPages/1") : null;
   }
@@ -98,9 +100,13 @@ public class SearchResult implements Identifiable {
     if (pageNumber < 1 || pageNumber > getTotalResultPages()) {
       return Lists.newArrayList();
     }
-    int fromIndex = (int) ((pageNumber - 1) * PAGE_SIZE);
-    int toIndex = Math.min((int) (fromIndex + PAGE_SIZE), getTotalResults());
+    int fromIndex = (pageNumber - 1) * getPageSize();
+    int toIndex = Math.min(fromIndex + getPageSize(), getTotalResults());
     return results.subList(fromIndex, toIndex);
+  }
+
+  public int getPageSize() {
+    return query.getPageSize();
   }
 
 }

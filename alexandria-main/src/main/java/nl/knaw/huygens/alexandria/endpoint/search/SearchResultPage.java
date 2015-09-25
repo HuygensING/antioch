@@ -54,11 +54,11 @@ public class SearchResultPage extends JsonWrapperObject {
   @JsonIgnore
   private AtomicInteger counter;
 
-  public SearchResultPage(String baseURI, int pageNumber, boolean isLast) {
+  public SearchResultPage(String baseURI, int pageNumber, boolean isLast, int pageSize) {
     this.baseURI = baseURI;
     this.pageNumber = pageNumber;
     this.isLast = isLast;
-    this.counter = new AtomicInteger((int) SearchResult.PAGE_SIZE * (pageNumber - 1));
+    this.counter = new AtomicInteger(pageSize * (pageNumber - 1));
     this.counterFunction = t -> counter.incrementAndGet();
   }
 

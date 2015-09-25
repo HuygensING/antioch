@@ -22,6 +22,8 @@ package nl.knaw.huygens.alexandria.endpoint.search;
  * #L%
  */
 
+import javax.validation.constraints.Min;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
@@ -46,6 +48,9 @@ public class AlexandriaQuery extends JsonWrapperObject implements Prototype {
   // return: return(field,...)
   @JsonProperty("return")
   private String fields = "id";
+
+  @Min(1)
+  private int pageSize = 10;
 
   public String getFind() {
     return find;
@@ -77,6 +82,15 @@ public class AlexandriaQuery extends JsonWrapperObject implements Prototype {
 
   public void setFields(String fields) {
     this.fields = fields;
+  }
+
+  public int getPageSize() {
+    return pageSize;
+  }
+
+  public AlexandriaQuery setPageSize(Integer pageSize) {
+    this.pageSize = pageSize;
+    return this;
   }
 
 }

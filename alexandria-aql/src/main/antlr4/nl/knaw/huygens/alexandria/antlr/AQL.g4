@@ -5,6 +5,7 @@ root : subquery ( subquery )*;
 subquery : FIELDNAME ':' FUNCTION '(' parameters ')';
 
 FIELDNAME: 'id' 
+         | 'url' 
          | 'type' 
          | 'value'
          | 'resource.id' 
@@ -27,7 +28,7 @@ parameters : parameter ( ',' parameter )*;
 
 parameter : STRINGPARAMETER | LONGPARAMETER ;
 
-STRINGPARAMETER : '"' [a-zA-Z 0-9.;:\-\*]+ '"' ;
+STRINGPARAMETER : '"' [a-zA-Z 0-9.;:\-\*\?\!]+ '"' ;
 
 LONGPARAMETER: [0-9]+ ;
 
