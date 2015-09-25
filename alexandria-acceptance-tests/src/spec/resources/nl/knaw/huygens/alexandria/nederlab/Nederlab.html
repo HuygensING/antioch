@@ -206,7 +206,7 @@
     </span> and which has the following annotated
     <mark>subresources</mark>
     <table class="table"
-           c:execute="subResourceHasAnnotation(#subId, #resId, #type, #value)">
+           c:execute="subResourceExistsWithAnnotation(#subId, #resId, #type, #value)">
         <thead>
         <tr>
             <th c:set="#subId">Subresource Id</th>
@@ -438,7 +438,7 @@
     Given the following annotated resources (for brevity, all annotations are considered to be of type 'Tag')
     in order of creation timestamp
     <table class="table"
-           c:execute="resourceHasTagForUserAtInstant(#resId, #value, #who, #when)">
+           c:execute="resourceExistsWithTagForUserAtInstant(#resId, #value, #who, #when)">
         <thead>
         <tr>
             <th c:set="#resId">Resource Id</th>

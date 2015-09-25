@@ -43,19 +43,12 @@ public class NederlabFixture extends AlexandriaAcceptanceTest {
     return hasConfirmedAnnotation(theResource(fromString(resId)), anAnnotation(type, value)).toString();
   }
 
-  public String resourceHasTagForUserAtInstant(String resId, String value, String who, String when) {
+  public String resourceExistsWithTagForUserAtInstant(String resId, String value, String who, String when) {
     resourceExists(resId);
-    final AlexandriaResource resource = theResource(fromString(resId));
-
-    final AlexandriaAnnotationBody annotationBody = aTag(value);
-    final TentativeAlexandriaProvenance provenance = aProvenance(who, parse(when));
-    final UUID annotationId = service().annotate(resource, annotationBody, provenance).getId();
-    service().confirmAnnotation(annotationId);
-
-    return annotationId.toString();
+    return annotate(theResource(fromString(resId)), aTag(value), aProvenance(who, parse(when)));
   }
 
-  public String subResourceHasAnnotation(String id, String parentId, String type, String value) {
+  public String subResourceExistsWithAnnotation(String id, String parentId, String type, String value) {
     final AlexandriaResource resource = subResourceExists(id, parentId);
     return hasConfirmedAnnotation(resource, anAnnotation(type, value)).toString();
   }
