@@ -1,5 +1,27 @@
 package nl.knaw.huygens.alexandria.query;
 
+/*
+ * #%L
+ * alexandria-service
+ * =======
+ * Copyright (C) 2015 Huygens ING (KNAW)
+ * =======
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
@@ -114,18 +136,19 @@ public class AlexandriaQueryParser {
   }
 
   private Class<? extends AlexandriaVF> parseFind(final String find) {
-    if (find.equals("annotation")) {
-      return AnnotationVF.class;
+    switch (find) {
+      case "annotation":
+        return AnnotationVF.class;
 
-    } else if (find.equals("resource")) {
-      parseErrors.add("find: type 'resource' not supported yet");
-      return ResourceVF.class;
+      case "resource":
+        parseErrors.add("find: type 'resource' not supported yet");
+        return ResourceVF.class;
 
-    } else {
-      parseErrors.add("find: unknown type '" + find + "', should be 'annotation'");
-      // parseErrors.add("unknown type '" + find + "' in find, should be 'annotation' or 'resource'");
+      default:
+        parseErrors.add("find: unknown type '" + find + "', should be 'annotation'");
+        // parseErrors.add("unknown type '" + find + "' in find, should be 'annotation' or 'resource'");
+        return null;
     }
-    return null;
   }
 
   List<WhereToken> tokenize(String whereString) {
@@ -223,9 +246,7 @@ public class AlexandriaQueryParser {
   }
 
   private static Predicate<AnnotationVF> alwaysTrue() {
-    return x -> {
-      return true;
-    };
+    return x -> true;
   }
 
   static String getResourceURL(final AnnotationVF avf) {
