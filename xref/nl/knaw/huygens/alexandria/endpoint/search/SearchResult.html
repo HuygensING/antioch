@@ -28,7 +28,7 @@
 <a class="jxr_linenumber" name="L20" href="#L20">20</a>  
 <a class="jxr_linenumber" name="L21" href="#L21">21</a>  @JsonInclude(Include.NON_NULL)
 <a class="jxr_linenumber" name="L22" href="#L22">22</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/search/SearchResult.html">SearchResult</a> <strong class="jxr_keyword">implements</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/model/Identifiable.html">Identifiable</a> {
-<a class="jxr_linenumber" name="L23" href="#L23">23</a>    <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">double</strong> PAGESIZE = 10;
+<a class="jxr_linenumber" name="L23" href="#L23">23</a>    <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">double</strong> PAGE_SIZE = 10;
 <a class="jxr_linenumber" name="L24" href="#L24">24</a>    <strong class="jxr_keyword">private</strong> UUID id;
 <a class="jxr_linenumber" name="L25" href="#L25">25</a>    <strong class="jxr_keyword">private</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/search/AlexandriaQuery.html">AlexandriaQuery</a> query;
 <a class="jxr_linenumber" name="L26" href="#L26">26</a>    <strong class="jxr_keyword">private</strong> List&lt;Map&lt;String, Object&gt;&gt; results = Lists.newArrayList();
@@ -63,7 +63,7 @@
 <a class="jxr_linenumber" name="L55" href="#L55">55</a>    }
 <a class="jxr_linenumber" name="L56" href="#L56">56</a>  
 <a class="jxr_linenumber" name="L57" href="#L57">57</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">int</strong> getTotalResultPages() {
-<a class="jxr_linenumber" name="L58" href="#L58">58</a>      <strong class="jxr_keyword">return</strong> (<strong class="jxr_keyword">int</strong>) Math.ceil(getTotalResults() / PAGESIZE);
+<a class="jxr_linenumber" name="L58" href="#L58">58</a>      <strong class="jxr_keyword">return</strong> (<strong class="jxr_keyword">int</strong>) Math.ceil(getTotalResults() / PAGE_SIZE);
 <a class="jxr_linenumber" name="L59" href="#L59">59</a>    }
 <a class="jxr_linenumber" name="L60" href="#L60">60</a>  
 <a class="jxr_linenumber" name="L61" href="#L61">61</a>    @JsonIgnore
@@ -76,16 +76,16 @@
 <a class="jxr_linenumber" name="L68" href="#L68">68</a>    }
 <a class="jxr_linenumber" name="L69" href="#L69">69</a>  
 <a class="jxr_linenumber" name="L70" href="#L70">70</a>    <strong class="jxr_keyword">public</strong> URI getFirstResultPage() {
-<a class="jxr_linenumber" name="L71" href="#L71">71</a>      <strong class="jxr_keyword">return</strong> getTotalResults() &gt; 0 ? URI.create(locationBuilder.locationOf(<strong class="jxr_keyword">this</strong>) + <span class="jxr_string">"/resultpages/1"</span>) : <strong class="jxr_keyword">null</strong>;
+<a class="jxr_linenumber" name="L71" href="#L71">71</a>      <strong class="jxr_keyword">return</strong> getTotalResults() &gt; 0 ? URI.create(locationBuilder.locationOf(<strong class="jxr_keyword">this</strong>) + <span class="jxr_string">"/resultPages/1"</span>) : <strong class="jxr_keyword">null</strong>;
 <a class="jxr_linenumber" name="L72" href="#L72">72</a>    }
 <a class="jxr_linenumber" name="L73" href="#L73">73</a>  
 <a class="jxr_linenumber" name="L74" href="#L74">74</a>    @JsonIgnore
-<a class="jxr_linenumber" name="L75" href="#L75">75</a>    <strong class="jxr_keyword">public</strong> List&lt;Map&lt;String, Object&gt;&gt; getRecordsForPage(<strong class="jxr_keyword">int</strong> pageNum) {
-<a class="jxr_linenumber" name="L76" href="#L76">76</a>      <strong class="jxr_keyword">if</strong> (pageNum &lt; 1 || pageNum &gt; getTotalResultPages()) {
+<a class="jxr_linenumber" name="L75" href="#L75">75</a>    <strong class="jxr_keyword">public</strong> List&lt;Map&lt;String, Object&gt;&gt; getRecordsForPage(<strong class="jxr_keyword">int</strong> pageNumber) {
+<a class="jxr_linenumber" name="L76" href="#L76">76</a>      <strong class="jxr_keyword">if</strong> (pageNumber &lt; 1 || pageNumber &gt; getTotalResultPages()) {
 <a class="jxr_linenumber" name="L77" href="#L77">77</a>        <strong class="jxr_keyword">return</strong> Lists.newArrayList();
 <a class="jxr_linenumber" name="L78" href="#L78">78</a>      }
-<a class="jxr_linenumber" name="L79" href="#L79">79</a>      <strong class="jxr_keyword">int</strong> fromIndex = (<strong class="jxr_keyword">int</strong>) ((pageNum - 1) * PAGESIZE);
-<a class="jxr_linenumber" name="L80" href="#L80">80</a>      <strong class="jxr_keyword">int</strong> toIndex = Math.min((<strong class="jxr_keyword">int</strong>) (fromIndex + PAGESIZE), getTotalResults());
+<a class="jxr_linenumber" name="L79" href="#L79">79</a>      <strong class="jxr_keyword">int</strong> fromIndex = (<strong class="jxr_keyword">int</strong>) ((pageNumber - 1) * PAGE_SIZE);
+<a class="jxr_linenumber" name="L80" href="#L80">80</a>      <strong class="jxr_keyword">int</strong> toIndex = Math.min((<strong class="jxr_keyword">int</strong>) (fromIndex + PAGE_SIZE), getTotalResults());
 <a class="jxr_linenumber" name="L81" href="#L81">81</a>      <strong class="jxr_keyword">return</strong> results.subList(fromIndex, toIndex);
 <a class="jxr_linenumber" name="L82" href="#L82">82</a>    }
 <a class="jxr_linenumber" name="L83" href="#L83">83</a>  
