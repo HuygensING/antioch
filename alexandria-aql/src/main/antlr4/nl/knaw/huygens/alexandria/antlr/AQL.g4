@@ -28,7 +28,7 @@ parameters : parameter ( ',' parameter )*;
 
 parameter : STRINGPARAMETER | LONGPARAMETER ;
 
-STRINGPARAMETER : '"' [a-zA-Z 0-9.;:\-\*\?\!]+ '"' ;
+STRINGPARAMETER : '"' ('\\"'|.)*? '"' ;
 
 LONGPARAMETER: [0-9]+ ;
 
