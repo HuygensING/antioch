@@ -8,14 +8,47 @@
 
 <body data-desc="Searching in Alexandria">
 
-<div id="where-clause-grammar" data-desc="What should my 'where' clauses look like?">
-    <a href="https://github.com/HuygensING/alexandria/blob/master/alexandria-aql/src/main/antlr4/nl/knaw/huygens/alexandria/antlr/AQL.g4">
-        ANTLR4 Grammar
-    </a>
-</div>
-
-<div id="">
-
+<div id="search-anno" data-desc="What is the basic structure of a query?" c:execute="clearStorage()">
+    <h:request>We can
+        <h:success>successfully</h:success>
+        <h:post>/searches</h:post>
+        the following body
+        <h:jsonBody>{
+            "query": {
+            "find": "annotation",
+            "where": "who:eq(\"nederlab\")",
+            "sort": "-when",
+            "return": "id,resource.url",
+            "pageSize": 10
+            } }
+        </h:jsonBody>
+    </h:request>
+    where the properties of <code>query</code> have the following semantics:
+    <dl class="dl-horizontal">
+        <dt><code>find</code></dt>
+        <dd>the Alexandria concept to look for.
+            <small>(currently <code>annotation</code> is the default as well as the only valid value)</small>
+        </dd>
+        <dt><code>where</code></dt>
+        <dd>used to filter records, you can
+            <a href="https://github.com/HuygensING/alexandria/blob/master/alexandria-aql/src/main/antlr4/nl/knaw/huygens/alexandria/antlr/AQL.g4">
+                check the ANTLR v4 grammar file</a> for field names and functions.
+            <small>(caveat: multiple <code>where</code> clauses are treated as a conjunction, meaning ALL clauses have
+                to match)
+            </small>
+        </dd>
+        <dt><code>sort</code></dt>
+        <dd>used to sort the result-set on a field (ref. <code>where</code>).
+            Use <code>+</code> for ascending (default) and <code>-</code> for descending order.
+            <small>(specifying <code>sort</code> is optional, defaulting to <code>-when</code> if left out)
+            </small>
+        </dd>
+        <dt><code>return</code></dt>
+        <dd>used to select which fields (ref. <code>where</code>) from the result-set are returned in the output.</dd>
+        <dt><code>pageSize</code></dt>
+        <dd>how many results from the result-set to include in each page of results.
+        <small>(specifying <code>pageSize</code> is optional, defaulting to 10 results per page if left out)</small></dd>
+    </dl>
 </div>
 
 </body>
