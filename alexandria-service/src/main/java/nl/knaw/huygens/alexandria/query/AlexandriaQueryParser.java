@@ -63,7 +63,7 @@ import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 
 public class AlexandriaQueryParser {
-  static final String ALLOWEDFIELDS = ", available fields: " + Joiner.on(", ").join(QueryField.ALL_EXTERNAL_NAMES);
+  static final String ALLOWED_FIELDS = ", available fields: " + Joiner.on(", ").join(QueryField.ALL_EXTERNAL_NAMES);
 
   private static LocationBuilder locationBuilder;
 
@@ -123,10 +123,8 @@ public class AlexandriaQueryParser {
           ResourceVF resourceVF = optionalResource.get();
           Stream<AnnotationVF> resourceAnnotationsStream = resourceVF.getAnnotatedBy().stream();
           Stream<AnnotationVF> subresourceAnnotationsStream = resourceVF.getSubResources().stream()//
-              .flatMap(rvf -> rvf.getAnnotatedBy().stream());//
-          Stream<AnnotationVF> annotationVFStream = Stream.concat(resourceAnnotationsStream, subresourceAnnotationsStream);
-
-          return annotationVFStream;
+              .flatMap(rvf -> rvf.getAnnotatedBy().stream());
+          return Stream.concat(resourceAnnotationsStream, subresourceAnnotationsStream);
         }
         // Should return error, since no resource found with given uuid
         return ImmutableList.<AnnotationVF> of().stream();
@@ -186,10 +184,10 @@ public class AlexandriaQueryParser {
     if (tokens.isEmpty()) {
       return alwaysTrue();
     }
-    Predicate<AnnotationVF> predicate = tokens.stream()//
+
+    return tokens.stream()//
         .map(AlexandriaQueryParser::toPredicate)//
-        .reduce(alwaysTrue(), (p, np) -> p = p.and(np));
-    return predicate;
+        .reduce(alwaysTrue(), Predicate::and);
   }
 
   static Predicate<AnnotationVF> toPredicate(WhereToken whereToken) {
@@ -197,9 +195,7 @@ public class AlexandriaQueryParser {
     // eq
     if (QueryFunction.eq.equals(whereToken.getFunction())) {
       Object eqValue = whereToken.getParameters().get(0);
-      return (AnnotationVF avf) -> {
-        return getter.apply(avf).equals(eqValue);
-      };
+      return avf -> getter.apply(avf).equals(eqValue);
     }
 
     // match
@@ -247,9 +243,7 @@ public class AlexandriaQueryParser {
   }
 
   private static Predicate<AnnotationVF> alwaysTrue() {
-    return x -> {
-      return true;
-    };
+    return x -> true;
   }
 
   static String getAnnotationURL(final AnnotationVF avf) {
@@ -308,17 +302,16 @@ public class AlexandriaQueryParser {
     List<String> sortParseErrors = sortTokenStrings.stream()//
         .map(AlexandriaQueryParser::extractExternalName)//
         .filter(externalName -> !QueryField.ALL_EXTERNAL_NAMES.contains(externalName))//
-        .map(invalidFieldName -> "sort: unknown field: " + invalidFieldName + ALLOWEDFIELDS)//
+        .map(invalidFieldName -> "sort: unknown field: " + invalidFieldName + ALLOWED_FIELDS)//
         .collect(toList());
     if (!sortParseErrors.isEmpty()) {
       parseErrors.addAll(sortParseErrors);
       return null;
     }
 
-    final List<SortToken> sortFields = sortTokenStrings.stream()//
+    return sortTokenStrings.stream()//
         .map(AlexandriaQueryParser::sortToken)//
         .collect(toList());
-    return sortFields;
   }
 
   static SortToken sortToken(final String f) {
@@ -339,7 +332,7 @@ public class AlexandriaQueryParser {
     final List<String> unknownFields = Lists.newArrayList(fields);
     unknownFields.removeAll(allowedFields);
     if (!unknownFields.isEmpty()) {
-      parseErrors.add("return: unknown field(s) " + Joiner.on(", ").join(unknownFields) + ALLOWEDFIELDS);
+      parseErrors.add("return: unknown field(s) " + Joiner.on(", ").join(unknownFields) + ALLOWED_FIELDS);
 
     } else {
       paq.setReturnFields(fields);
