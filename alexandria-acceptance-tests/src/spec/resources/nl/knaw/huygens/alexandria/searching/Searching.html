@@ -8,6 +8,141 @@
 
 <body data-desc="Searching in Alexandria">
 
+<div id="search-paging" data-desc="How are search results paged?" c:execute="setupPagingStorage()">
+    Given there are 8 annotated resources in the database owned by user <code>nederlab</code>,
+
+    <h:request>When we
+        <h:post>/searches</h:post>
+        the following body
+        <h:jsonBody>{
+            "query": {
+            "where": "who:eq(\"nederlab\")",
+            "pageSize": 3
+            } }
+        </h:jsonBody>
+        we expect status
+        <h:status>201 Created</h:status>, an <h:responseBody/> response body, and a
+        <h:location type="base">https://{host}/searches/</h:location> <code>Location</code> header.
+    </h:request>
+
+    <div c:execute="#searchId = uuid()">In this case the generated search id (taken from the <code>Location</code>
+        header) is: <code c:echo="#searchId"></code>.
+    </div>
+
+    <hr/>
+
+    <h:request>When we
+        <h:get>/searches/$searchId</h:get>
+        we expect status
+        <h:status>200 OK</h:status>
+        and a response body containing:
+        <small>(only paging details shown for brevity)</small>
+        <h:jsonResponse>{
+            "searchResult" : {
+            "totalResults" : 8,
+            "totalResultPages" : 3,
+            "pageSize" : 3,
+            "^firstResultPage" : "https://{host}/searches/$searchId/resultPages/1"
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+    <hr/>
+
+    <h:request>
+        When we
+        <h:get>/searches/$searchId/resultPages/1</h:get>
+        we expect status
+        <h:status>200 OK</h:status>
+        and body
+        <small>(showing only details relevant to paging, actual record details withheld for brevity)</small>
+        <h:jsonResponse>{
+            "searchResultPage" : {
+            "pageNumber" : 1,
+            "records" : [
+            { "_resultNumber" : 1 },
+            { "_resultNumber" : 2 },
+            { "_resultNumber" : 3 }
+            ],
+            "^nextPage" : "https://{host}/searches/$searchId/resultPages/2"
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+    <div class="alert alert-info sm">A convenience link <code>^nextPage</code> is included on the first page.</div>
+
+    <hr/>
+
+    <h:request>
+        Now
+        <h:get>/searches/$searchId/resultPages/2</h:get>
+        results in status
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "searchResultPage" : {
+            "pageNumber" : 2,
+            "records" : [
+            { "_resultNumber" : 4 },
+            { "_resultNumber" : 5 },
+            { "_resultNumber" : 6 }
+            ],
+            "^nextPage" : "https://{host}/searches/$searchId/resultPages/3",
+            "^previousPage" : "https://{host}/searches/$searchId/resultPages/1"
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+    <div class="alert alert-info sm">Both <code>^nextPage</code> and <code>^previousPage</code> convenience links are
+        included on the middle pages.
+    </div>
+
+    <hr/>
+
+    <h:request>
+        And
+        <h:get>/searches/$searchId/resultPages/3</h:get>
+        results in status
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "searchResultPage" : {
+            "pageNumber" : 3,
+            "records" : [
+            { "_resultNumber" : 7 },
+            { "_resultNumber" : 8 }
+            ],
+            "^previousPage" : "https://{host}/searches/$searchId/resultPages/2"
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+    <div class="alert alert-info sm">The convenience link <code>^nextPage</code> is now absent, signaling this
+        is the final page.
+    </div>
+
+    <hr/>
+
+    <h:request>When we try to
+        <h:get>/searches/$searchId/resultPages/0</h:get>
+        we receive
+        <h:status>404 Not Found</h:status>
+    </h:request>
+
+    <h:request>
+        Likewise
+        <h:get>/searches/$searchId/resultPages/4</h:get>
+        results in status
+        <h:status>404 Not Found</h:status>
+        as the requested page lies beyond the maximum.
+    </h:request>
+
+    <div class="alert alert-warning sm">
+        Valid result page numbers are <code>1</code> up to and including the number of <code>totalResultPages</code>.
+    </div>
+
+</div>
+
 <div id="search-anno" data-desc="What is the basic structure of a query?" c:execute="clearStorage()">
     <h:request>We can
         <h:success>successfully</h:success>
