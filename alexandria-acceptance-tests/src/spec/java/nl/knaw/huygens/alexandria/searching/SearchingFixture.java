@@ -8,7 +8,6 @@ import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.concordion.AlexandriaAcceptanceTest;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchEndpoint;
 
@@ -19,10 +18,10 @@ public class SearchingFixture extends AlexandriaAcceptanceTest {
     register(SearchEndpoint.class);
   }
 
-  public void setupPagingStorage() {
+  public void setupPagingStorage(String num) {
     clearStorage();
-    for (int i = 0; i < 8; i++) {
-      Log.trace("Generating annotated resource #{}", i);
+
+    for (int i = 0; i < Integer.valueOf(num); i++) {
       generateAnnotatedResource(randomUUID());
     }
   }

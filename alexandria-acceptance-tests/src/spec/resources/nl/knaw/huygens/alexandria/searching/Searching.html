@@ -8,8 +8,54 @@
 
 <body data-desc="Searching in Alexandria">
 
-<div id="search-paging" data-desc="How are search results paged?" c:execute="setupPagingStorage()">
-    Given there are 8 annotated resources in the database owned by user <code>nederlab</code>,
+<div id="search-anno" data-desc="What is the basic structure of a query?" c:execute="clearStorage()">
+    <h:request>We can
+        <h:success>successfully</h:success>
+        <h:post>/searches</h:post>
+        the following body
+        <h:jsonBody>{
+            "query": {
+            "find": "annotation",
+            "where": "who:eq(\"nederlab\")",
+            "sort": "-when",
+            "return": "id,resource.url",
+            "pageSize": 10
+            } }
+        </h:jsonBody>
+    </h:request>
+    where the properties of <code>query</code> have the following semantics:
+    <dl class="dl-horizontal">
+        <dt><code>find</code></dt>
+        <dd>the Alexandria concept to look for.
+            <small>(currently <code>annotation</code> is the default as well as the only valid value)</small>
+        </dd>
+        <dt><code>where</code></dt>
+        <dd>(<strong>mandatory</strong>) used to filter records. Check the
+            <a href="https://github.com/HuygensING/alexandria/blob/master/alexandria-aql/src/main/antlr4/nl/knaw/huygens/alexandria/antlr/AQL.g4">
+                ANTLR v4 grammar file</a> for syntax, field names and functions.
+            <small>(caveat: multiple <code>where</code> clauses are treated as a conjunction, meaning ALL clauses have
+                to match)
+            </small>
+        </dd>
+        <dt><code>sort</code></dt>
+        <dd>used to sort the result-set on a field (ref. <code>where</code>).
+            Use <code>+</code> for ascending and <code>-</code> for descending order.
+            <small>(if left unspecified, <code>-when</code> is used by default)
+            </small>
+        </dd>
+        <dt><code>return</code></dt>
+        <dd>used to select which fields (ref. <code>where</code>) from the result-set are returned in the output.
+            <small>(if left unspecified, <code>id</code> is returned by default)</small>
+        </dd>
+        <dt><code>pageSize</code></dt>
+        <dd>how many results from the result-set to include in each page of results.
+            <small>(if left unspecified, 10 results per page are included by default)</small>
+        </dd>
+    </dl>
+</div>
+
+<div id="search-paging" data-desc="How are search results paged?" c:execute="setupPagingStorage(#num)">
+    Given there are <code c:set="#num">8</code> annotated resources in the database owned by user <code>nederlab</code>,
 
     <h:request>When we
         <h:post>/searches</h:post>
@@ -21,8 +67,12 @@
             } }
         </h:jsonBody>
         we expect status
-        <h:status>201 Created</h:status>, an <h:responseBody/> response body, and a
-        <h:location type="base">https://{host}/searches/</h:location> <code>Location</code> header.
+        <h:status>201 Created</h:status>
+        , an
+        <h:responseBody/>
+        response body, and a
+        <h:location type="base">https://{host}/searches/</h:location>
+        <code>Location</code> header.
     </h:request>
 
     <div c:execute="#searchId = uuid()">In this case the generated search id (taken from the <code>Location</code>
@@ -141,52 +191,6 @@
         Valid result page numbers are <code>1</code> up to and including the number of <code>totalResultPages</code>.
     </div>
 
-</div>
-
-<div id="search-anno" data-desc="What is the basic structure of a query?" c:execute="clearStorage()">
-    <h:request>We can
-        <h:success>successfully</h:success>
-        <h:post>/searches</h:post>
-        the following body
-        <h:jsonBody>{
-            "query": {
-            "find": "annotation",
-            "where": "who:eq(\"nederlab\")",
-            "sort": "-when",
-            "return": "id,resource.url",
-            "pageSize": 10
-            } }
-        </h:jsonBody>
-    </h:request>
-    where the properties of <code>query</code> have the following semantics:
-    <dl class="dl-horizontal">
-        <dt><code>find</code></dt>
-        <dd>the Alexandria concept to look for.
-            <small>(currently <code>annotation</code> is the default as well as the only valid value)</small>
-        </dd>
-        <dt><code>where</code></dt>
-        <dd>(<strong>mandatory</strong>) used to filter records. Check the
-            <a href="https://github.com/HuygensING/alexandria/blob/master/alexandria-aql/src/main/antlr4/nl/knaw/huygens/alexandria/antlr/AQL.g4">
-                ANTLR v4 grammar file</a> for syntax, field names and functions.
-            <small>(caveat: multiple <code>where</code> clauses are treated as a conjunction, meaning ALL clauses have
-                to match)
-            </small>
-        </dd>
-        <dt><code>sort</code></dt>
-        <dd>used to sort the result-set on a field (ref. <code>where</code>).
-            Use <code>+</code> for ascending and <code>-</code> for descending order.
-            <small>(if left unspecified, <code>-when</code> is used by default)
-            </small>
-        </dd>
-        <dt><code>return</code></dt>
-        <dd>used to select which fields (ref. <code>where</code>) from the result-set are returned in the output.
-            <small>(if left unspecified, <code>id</code> is returned by default)</small>
-        </dd>
-        <dt><code>pageSize</code></dt>
-        <dd>how many results from the result-set to include in each page of results.
-            <small>(if left unspecified, 10 results per page are included by default)</small>
-        </dd>
-    </dl>
 </div>
 
 </body>
