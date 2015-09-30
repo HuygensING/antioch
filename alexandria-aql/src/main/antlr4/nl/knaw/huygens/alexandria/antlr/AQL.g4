@@ -1,10 +1,10 @@
 grammar AQL;
 
-root : subquery ( subquery )*;
+root : subQuery ( subQuery )*;
 
-subquery : FIELDNAME ':' FUNCTION '(' parameters ')';
+subQuery : FIELD_NAME ':' FUNCTION '(' parameters ')';
 
-FIELDNAME: 'id' 
+FIELD_NAME: 'id'
          | 'url' 
          | 'type' 
          | 'value'
@@ -26,10 +26,10 @@ FUNCTION : 'eq'
 
 parameters : parameter ( ',' parameter )*;
 
-parameter : STRINGPARAMETER | LONGPARAMETER ;
+parameter : STRING_PARAMETER | LONG_PARAMETER ;
 
-STRINGPARAMETER : '"' ('\\"'|.)*? '"' ;
+STRING_PARAMETER : '"' ('\\"'|.)*? '"' ;
 
-LONGPARAMETER: [0-9]+ ;
+LONG_PARAMETER: [0-9]+ ;
 
 WS: [ \t\r\n]+ -> skip; // skip spaces, tabs, newlines

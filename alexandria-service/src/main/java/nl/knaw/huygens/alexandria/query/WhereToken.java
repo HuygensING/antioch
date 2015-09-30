@@ -24,12 +24,10 @@ package nl.knaw.huygens.alexandria.query;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 class WhereToken {
-  QueryField property;
-  QueryFunction function;
-  List<Object> parameters = Lists.newArrayList();
+  private final QueryField property;
+  private final QueryFunction function;
+  private final List<Object> parameters;
 
   public WhereToken(QueryField property, QueryFunction function, List<Object> parameters) {
     this.property = property;
