@@ -30,24 +30,27 @@
             <small>(currently <code>annotation</code> is the default as well as the only valid value)</small>
         </dd>
         <dt><code>where</code></dt>
-        <dd>used to filter records, you can
+        <dd>(<strong>mandatory</strong>) used to filter records. Check the
             <a href="https://github.com/HuygensING/alexandria/blob/master/alexandria-aql/src/main/antlr4/nl/knaw/huygens/alexandria/antlr/AQL.g4">
-                check the ANTLR v4 grammar file</a> for field names and functions.
+                ANTLR v4 grammar file</a> for syntax, field names and functions.
             <small>(caveat: multiple <code>where</code> clauses are treated as a conjunction, meaning ALL clauses have
                 to match)
             </small>
         </dd>
         <dt><code>sort</code></dt>
         <dd>used to sort the result-set on a field (ref. <code>where</code>).
-            Use <code>+</code> for ascending (default) and <code>-</code> for descending order.
-            <small>(specifying <code>sort</code> is optional, defaulting to <code>-when</code> if left out)
+            Use <code>+</code> for ascending and <code>-</code> for descending order.
+            <small>(if left unspecified, <code>-when</code> is used by default)
             </small>
         </dd>
         <dt><code>return</code></dt>
-        <dd>used to select which fields (ref. <code>where</code>) from the result-set are returned in the output.</dd>
+        <dd>used to select which fields (ref. <code>where</code>) from the result-set are returned in the output.
+            <small>(if left unspecified, <code>id</code> is returned by default)</small>
+        </dd>
         <dt><code>pageSize</code></dt>
         <dd>how many results from the result-set to include in each page of results.
-        <small>(specifying <code>pageSize</code> is optional, defaulting to 10 results per page if left out)</small></dd>
+            <small>(if left unspecified, 10 results per page are included by default)</small>
+        </dd>
     </dl>
 </div>
 
