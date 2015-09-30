@@ -23,6 +23,7 @@ package nl.knaw.huygens.alexandria.query;
  */
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class AlexandriaQueryParseException extends RuntimeException {
   private static final long serialVersionUID = 1L;
@@ -32,11 +33,9 @@ public class AlexandriaQueryParseException extends RuntimeException {
   }
 
   private static String buildMessage(List<String> parseErrors) {
-    StringBuilder builder = new StringBuilder("parse errors:\n");
-    int i = 1;
-    for (String error : parseErrors) {
-      builder.append(i++).append(": ").append(error).append("\n");
-    }
+    final StringBuilder builder = new StringBuilder("parse errors:\n");
+    final AtomicInteger counter = new AtomicInteger(1);
+    parseErrors.forEach(error -> builder.append(counter.getAndIncrement()).append(": ").append(error).append("\n"));
     return builder.toString();
   }
 
