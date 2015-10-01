@@ -29,9 +29,9 @@
     <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
 
     <!-- Software versions -->
-    <assertj.version>3.1.0</assertj.version>
+    <assertj.version>3.2.0</assertj.version>
     <build-helper-maven-plugin.version>1.9.1</build-helper-maven-plugin.version>
-    <classloader-leak-prevention.version>1.13.0</classloader-leak-prevention.version>
+    <classloader-leak-prevention.version>1.14.0</classloader-leak-prevention.version>
 
     <!-- Concordion Acceptance Test extensions -->
     <cat.version>1.3.0</cat.version>
@@ -74,7 +74,7 @@
     <swagger.version>1.5.3</swagger.version>
 
     <tinkerpop.groupId>org.apache.tinkerpop</tinkerpop.groupId>
-    <tinkerpop.version>3.0.0.M9-incubating</tinkerpop.version>
+    <tinkerpop.version>3.0.1-incubating</tinkerpop.version>
     <tomcat7-maven.version>2.2</tomcat7-maven.version>
 
     <!-- Concordion settings (move to acceptance-test module?) -->
@@ -90,8 +90,7 @@
     <port>9000</port>
 
     <!-- Settings for maven-scm-publish-plugin used to publish site to GitHub -->
-    <scmpublish.checkinComment>Publishing Site Docs for ${project.artifactId}:${project.version}
-    </scmpublish.checkinComment>
+    <scmpublish.checkinComment>Publishing Site Docs for ${project.artifactId}:${project.version}</scmpublish.checkinComment>
     <scmpublish.pubScmUrl>scm:git:git@github.com:huygensING/alexandria.git</scmpublish.pubScmUrl>
     <scmpublish.scm.branch>gh-pages</scmpublish.scm.branch>
 
