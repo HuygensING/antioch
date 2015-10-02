@@ -31,31 +31,23 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 
 import nl.knaw.huygens.Log;
 
 public class SearchResultPageTest {
-  String baseURI = "http://example.org/search/1/page/";
-  static Map<String, Object> map = Maps.newHashMap();
+  private static final ImmutableMap<String, String> SAMPLE_MAP = ImmutableMap.of("what", "ever");
 
-  static {
-    map.put("what", "ever");
+  private final String baseURI = "http://example.org/search/1/page/";
+
+  private final List<Map<String, Object>> five_results = ImmutableList.of(map(), map(), map(), map(), map());
+
+  private final List<Map<String, Object>> ten_results = ImmutableList.of( //
+      map(), map(), map(), map(), map(), map(), map(), map(), map(), map());
+
+  private static Map<String, Object> map() {
+    return new HashMap<>(SAMPLE_MAP);
   }
-
-  List<Map<String, Object>> ten_results = ImmutableList.<Map<String, Object>> builder()//
-      .add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map))//
-      .add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map))//
-      .add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map))//
-      .add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map))//
-      .add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map))//
-      .build();
-
-  List<Map<String, Object>> five_results = ImmutableList.<Map<String, Object>> builder()//
-      .add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map))//
-      .add(new HashMap<String, Object>(map)).add(new HashMap<String, Object>(map))//
-      .add(new HashMap<String, Object>(map))//
-      .build();
 
   @Test
   public void testFirstPageOfSeveral() {
