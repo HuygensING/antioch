@@ -59,4 +59,10 @@ public class HomePageEndpoint {
   public Response getFavIcon() {
     return Response.noContent().build();
   }
+
+  @GET
+  @Path("robots.txt")
+  public String noRobots() {
+    return "User-agent: *\nDisallow: /\n";
+  }
 }

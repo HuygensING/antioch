@@ -54,30 +54,44 @@
 </div>
 
 <div id="homepage" data-desc="What resources does the server provide besides REST resources?">
-    <h:request>
-        When I
-        <h:get>/</h:get>
-        using
-        <h:setHeader name="Accept">text/html</h:setHeader>
-        then I should receive
-        <h:status>200 OK</h:status>
-    </h:request>
-
-    <h:request>
-        When I
-        <h:get>/application.wadl</h:get>
-        using
-        <h:setHeader name="Accept">application/xml</h:setHeader>
-        then I should receive
-        <h:status>200 OK</h:status>
-    </h:request>
-
-    <h:request>
-        Alexandria has an empty favicon:
-        <h:get>/favicon.ico</h:get>
-        yields
-        <h:status>204 No Content</h:status>
-    </h:request>
+    <ul>
+        <li>
+            <h:request>
+                When I
+                <h:get>/</h:get>
+                using
+                <h:setHeader name="Accept">text/html</h:setHeader>
+                then I should receive
+                <h:status>200 OK</h:status>
+            </h:request>
+        </li>
+        <li>
+            <h:request>
+                When I
+                <h:get>/application.wadl</h:get>
+                using
+                <h:setHeader name="Accept">application/xml</h:setHeader>
+                then I should receive
+                <h:status>200 OK</h:status>
+            </h:request>
+        </li>
+        <li>
+            <h:request>
+                When I
+                <h:get>/favicon.ico</h:get>
+                then I should receive
+                <h:status>204 No Content</h:status>
+            </h:request>
+        </li>
+        <li>
+            <h:request>
+                When I
+                <h:get>/robots.txt</h:get>
+                then I should receive
+                <h:status>200 OK</h:status>
+            </h:request>
+        </li>
+    </ul>
 </div>
 
 </body>
