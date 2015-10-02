@@ -90,7 +90,8 @@
     <port>9000</port>
 
     <!-- Settings for maven-scm-publish-plugin used to publish site to GitHub -->
-    <scmpublish.checkinComment>Publishing Site Docs for ${project.artifactId}:${project.version}</scmpublish.checkinComment>
+    <scmpublish.checkinComment>Publishing Site Docs for ${project.artifactId}:${project.version}
+    </scmpublish.checkinComment>
     <scmpublish.pubScmUrl>scm:git:git@github.com:huygensING/alexandria.git</scmpublish.pubScmUrl>
     <scmpublish.scm.branch>gh-pages</scmpublish.scm.branch>
 
