@@ -238,6 +238,14 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
         <version>${maven-license.version}</version>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>update-file-header</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
           <licenseName>gpl_v3</licenseName>
           <sectionDelimiter>=======</sectionDelimiter>
