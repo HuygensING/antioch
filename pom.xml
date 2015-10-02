@@ -75,6 +75,8 @@
 
     <tinkerpop.groupId>org.apache.tinkerpop</tinkerpop.groupId>
     <tinkerpop.version>3.0.1-incubating</tinkerpop.version>
+    <titan.version>1.0.0</titan.version>
+    <sleepycat.version>5.0.73</sleepycat.version>
     <tomcat7-maven.version>2.2</tomcat7-maven.version>
 
     <!-- Concordion settings (move to acceptance-test module?) -->

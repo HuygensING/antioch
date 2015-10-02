@@ -37,9 +37,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 import com.google.common.collect.Maps;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
@@ -55,9 +55,11 @@ public class AboutEndpoint extends JSONEndpoint {
 
   private final TemporalAmount tentativesTTL;
   private final URI baseURI;
+  private final AlexandriaService service;
 
   @Inject
   public AboutEndpoint(AlexandriaConfiguration config, AlexandriaService service) {
+    this.service = service;
     this.baseURI = config.getBaseURI();
     this.tentativesTTL = service.getTentativesTimeToLive();
   }
@@ -100,6 +102,18 @@ public class AboutEndpoint extends JSONEndpoint {
     data.put("tentativesTTL", tentativesTTL.toString());
     data.put("version", getProperty("version"));
     return Response.ok(data).build();
+  }
+
+  /**
+   * Show information about the back-end
+   *
+   * @return about-data map
+   */
+  @GET
+  @Path("service")
+  @ApiOperation("get information about the service")
+  public Response getGraphMetadata() {
+    return Response.ok(service.getMetadata()).build();
   }
 
 }

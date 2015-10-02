@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.query;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -43,10 +43,10 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang3.StringUtils;
-import org.parboiled.common.ImmutableList;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 
@@ -136,17 +136,17 @@ public class AlexandriaQueryParser {
 
   private Class<? extends AlexandriaVF> parseFind(final String find) {
     switch (find) {
-      case "annotation":
-        return AnnotationVF.class;
+    case "annotation":
+      return AnnotationVF.class;
 
-      case "resource":
-        parseErrors.add("find: type 'resource' not supported yet");
-        return ResourceVF.class;
+    case "resource":
+      parseErrors.add("find: type 'resource' not supported yet");
+      return ResourceVF.class;
 
-      default:
-        parseErrors.add("find: unknown type '" + find + "', should be 'annotation'");
-        // parseErrors.add("unknown type '" + find + "' in find, should be 'annotation' or 'resource'");
-        return null;
+    default:
+      parseErrors.add("find: unknown type '" + find + "', should be 'annotation'");
+      // parseErrors.add("unknown type '" + find + "' in find, should be 'annotation' or 'resource'");
+      return null;
     }
   }
 

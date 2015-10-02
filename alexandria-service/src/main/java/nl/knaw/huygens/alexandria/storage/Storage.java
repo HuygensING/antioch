@@ -27,10 +27,12 @@ import static org.apache.tinkerpop.gremlin.process.traversal.P.lt;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Graph.Features.GraphFeatures;
@@ -39,6 +41,8 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.io.IoCore;
 import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
+
+import com.google.common.collect.Maps;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
@@ -202,6 +206,19 @@ public class Storage {
     if (clazz.getAnnotationsByType(peapod.annotations.Vertex.class).length == 0) {
       throw new RuntimeException("Class " + clazz + " has no peapod @Vertex annotation, are you sure it is the correct class?");
     }
+  }
+
+  public Map<String, Object> getMetadata() {
+    Map<String, Object> metadata = Maps.newLinkedHashMap();
+    metadata.put("features", graph.features().toString().split(System.lineSeparator()));
+    GraphTraversalSource traversal = graph.traversal();
+    metadata.put("vertices", count(traversal.V()));
+    metadata.put("edges", count(traversal.E()));
+    return metadata;
+  }
+
+  private Long count(GraphTraversal<?, ?> graphTraversal) {
+    return graphTraversal.count().next();
   }
 
 }

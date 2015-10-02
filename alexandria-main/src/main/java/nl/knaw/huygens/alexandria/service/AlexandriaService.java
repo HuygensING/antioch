@@ -23,6 +23,9 @@ package nl.knaw.huygens.alexandria.service;
  */
 
 import java.time.temporal.TemporalAmount;
+import java.util.Map;
+import java.util.Map;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -106,5 +109,7 @@ public interface AlexandriaService {
   Optional<AlexandriaResource> findSubresourceWithSubAndParentId(String sub, UUID parentId);
 
   Optional<AlexandriaAnnotationBody> findAnnotationBodyWithTypeAndValue(String type, String value);
+
+  Map<String, Object> getMetadata();
 
 }

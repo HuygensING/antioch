@@ -36,6 +36,7 @@ import nl.knaw.huygens.alexandria.config.ValidationConfigurationContextResolver;
 
 @ApplicationPath("/")
 public class AlexandriaApplication extends ResourceConfig {
+
   public AlexandriaApplication() {
     Log.info("initializing AlexandriaApplication...");
     packages("nl.knaw.huygens.alexandria.endpoint", "nl.knaw.huygens.alexandria.jersey");
