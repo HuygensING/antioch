@@ -1,5 +1,11 @@
 package nl.knaw.huygens.alexandria.service;
 
+import static java.util.stream.Collectors.toList;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.StreamSupport;
+
 /*
  * #%L
  * alexandria-service
@@ -25,11 +31,15 @@ package nl.knaw.huygens.alexandria.service;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.tinkerpop.gremlin.structure.Edge;
+import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import com.thinkaurelius.titan.core.PropertyKey;
 import com.thinkaurelius.titan.core.TitanFactory;
 import com.thinkaurelius.titan.core.TitanGraph;
+import com.thinkaurelius.titan.core.VertexLabel;
+import com.thinkaurelius.titan.core.schema.TitanGraphIndex;
 import com.thinkaurelius.titan.core.schema.TitanManagement;
 import com.thinkaurelius.titan.graphdb.database.management.ManagementSystem;
 
@@ -41,44 +51,69 @@ import nl.knaw.huygens.alexandria.storage.Storage;
 @Singleton
 public class TitanService extends TinkerPopService {
   private static final String PROP_UUID = "uuid";
-  private static final String IDX_UUID = "byUUID";
+  private static final String IDX_RESOURCE_UUID = "resourceByUUID";
+  private static final String IDX_ANNOTATION_UUID = "annotationByUUID";
+  private static final String IDX_ANNOTATIONBODY_UUID = "annotationBodyByUUID";
+  private static TitanGraph titanGraph;
 
   @Inject
   public TitanService(LocationBuilder locationBuilder, AlexandriaConfiguration configuration) {
     super(getStorage(configuration), locationBuilder);
   }
 
-  private static Storage getStorage(AlexandriaConfiguration configuration) {
-    TitanGraph tg = TitanFactory.open(configuration.getStorageDirectory() + "/titan.properties");
-    setIndexes(tg);
-    return new Storage(tg);
+  @Override
+  public Map<String, Object> getMetadata() {
+    TitanManagement mgmt = titanGraph.openManagement();
+    Map<String, Object> metadata = super.getMetadata();
+    Map<String, Object> storageMap = (Map<String, Object>) metadata.get("storage");
+    storageMap.put("vertexIndexes", indexNames(mgmt, Vertex.class));
+    storageMap.put("edgeIndexes", indexNames(mgmt, Edge.class));
+    return metadata;
   }
 
-  private static void setIndexes(TitanGraph tg) {
-    TitanManagement tm = tg.openManagement();
-    if (!tm.containsGraphIndex(IDX_UUID)) {
-      PropertyKey uuidKey = tm.containsPropertyKey(PROP_UUID)//
-          ? tm.getPropertyKey(PROP_UUID)//
-          : tm.makePropertyKey(PROP_UUID).dataType(String.class).make();
-      Log.info("creating index '{}' for property '{}'", IDX_UUID, PROP_UUID);
-      tm.buildIndex(IDX_UUID, Vertex.class).addKey(uuidKey).unique().buildCompositeIndex();
-      tm.commit();
-      tg.tx().commit();
+  private List<String> indexNames(TitanManagement mgmt, Class<? extends Element> elementClass) {
+    return StreamSupport.stream(mgmt.getGraphIndexes(elementClass).spliterator(), false)//
+        .map(TitanGraphIndex::name)//
+        .collect(toList());
+  }
+
+  private static Storage getStorage(AlexandriaConfiguration configuration) {
+    titanGraph = TitanFactory.open(configuration.getStorageDirectory() + "/titan.properties");
+    setIndexes();
+    return new Storage(titanGraph);
+  }
+
+  private static void setIndexes() {
+    createIndexWhenAbsent(IDX_RESOURCE_UUID, "Resource");
+    createIndexWhenAbsent(IDX_ANNOTATION_UUID, "Annotation");
+    createIndexWhenAbsent(IDX_ANNOTATIONBODY_UUID, "AnnotationBody");
+  }
+
+  private static void createIndexWhenAbsent(String uuidIdx, String label) {
+    TitanManagement mgmt = titanGraph.openManagement();
+    if (!mgmt.containsGraphIndex(uuidIdx)) {
+      PropertyKey uuidKey = mgmt.containsPropertyKey(PROP_UUID)//
+          ? mgmt.getPropertyKey(PROP_UUID)//
+          : mgmt.makePropertyKey(PROP_UUID).dataType(String.class).make();
+      VertexLabel vertexLabel = mgmt.containsVertexLabel(label)//
+          ? mgmt.getVertexLabel(label)//
+          : mgmt.makeVertexLabel(label).make();
+      Log.info("creating index '{}' for label '{}' + property '{}'", uuidIdx, label, PROP_UUID);
+      mgmt.buildIndex(uuidIdx, Vertex.class)//
+          .addKey(uuidKey)//
+          .indexOnly(vertexLabel)//
+          .unique()//
+          .buildCompositeIndex();
+      mgmt.commit();
 
       try {
-        ManagementSystem.awaitGraphIndexStatus(tg, IDX_UUID).call();
+        ManagementSystem.awaitGraphIndexStatus(titanGraph, uuidIdx).call();
       } catch (InterruptedException e) {
         e.printStackTrace();
         throw new RuntimeException(e);
       }
-    }
 
-    // try {
-    // tm.updateIndex(tm.getGraphIndex(IDX_UUID), SchemaAction.REINDEX).get();
-    // } catch (InterruptedException | ExecutionException e) {
-    // e.printStackTrace();
-    // throw new RuntimeException(e);
-    // }
-    tm.commit();
+      titanGraph.tx().commit();
+    }
   }
 }
