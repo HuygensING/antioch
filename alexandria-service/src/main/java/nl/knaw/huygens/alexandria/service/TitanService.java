@@ -1,7 +1,5 @@
 package nl.knaw.huygens.alexandria.service;
 
-import java.util.concurrent.ExecutionException;
-
 /*
  * #%L
  * alexandria-service
@@ -12,12 +10,12 @@ import java.util.concurrent.ExecutionException;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -32,7 +30,6 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import com.thinkaurelius.titan.core.PropertyKey;
 import com.thinkaurelius.titan.core.TitanFactory;
 import com.thinkaurelius.titan.core.TitanGraph;
-import com.thinkaurelius.titan.core.schema.SchemaAction;
 import com.thinkaurelius.titan.core.schema.TitanManagement;
 import com.thinkaurelius.titan.graphdb.database.management.ManagementSystem;
 
@@ -53,15 +50,16 @@ public class TitanService extends TinkerPopService {
 
   private static Storage getStorage(AlexandriaConfiguration configuration) {
     TitanGraph tg = TitanFactory.open(configuration.getStorageDirectory() + "/titan.properties");
-    // setIndexes(tg);
+    setIndexes(tg);
     return new Storage(tg);
   }
 
   private static void setIndexes(TitanGraph tg) {
     TitanManagement tm = tg.openManagement();
     if (!tm.containsGraphIndex(IDX_UUID)) {
-      PropertyKey uuidKey = tm.getPropertyKey(PROP_UUID);
-      // tm.buildPropertyIndex(uuidKey, IDX_UUID, uuidKey);
+      PropertyKey uuidKey = tm.containsPropertyKey(PROP_UUID)//
+          ? tm.getPropertyKey(PROP_UUID)//
+          : tm.makePropertyKey(PROP_UUID).dataType(String.class).make();
       Log.info("creating index '{}' for property '{}'", IDX_UUID, PROP_UUID);
       tm.buildIndex(IDX_UUID, Vertex.class).addKey(uuidKey).unique().buildCompositeIndex();
       tm.commit();
@@ -75,12 +73,12 @@ public class TitanService extends TinkerPopService {
       }
     }
 
-    try {
-      tm.updateIndex(tm.getGraphIndex(IDX_UUID), SchemaAction.REINDEX).get();
-    } catch (InterruptedException | ExecutionException e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
-    }
+    // try {
+    // tm.updateIndex(tm.getGraphIndex(IDX_UUID), SchemaAction.REINDEX).get();
+    // } catch (InterruptedException | ExecutionException e) {
+    // e.printStackTrace();
+    // throw new RuntimeException(e);
+    // }
     tm.commit();
   }
 }
