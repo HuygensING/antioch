@@ -39,11 +39,9 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
-import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.StatePrototype;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
@@ -61,18 +59,15 @@ public class AnnotationsEndpoint extends JSONEndpoint {
 
   private final AlexandriaService service;
   private final AnnotationEntityBuilder entityBuilder;
-  private final LocationBuilder locationBuilder;
   private final AnnotationDeprecationRequestBuilder requestBuilder;
 
   @Inject
   public AnnotationsEndpoint(AlexandriaService service, //
                              AnnotationEntityBuilder entityBuilder, //
-                             AnnotationDeprecationRequestBuilder requestBuilder, //
-                             LocationBuilder locationBuilder) {
+                             AnnotationDeprecationRequestBuilder requestBuilder) {
     this.service = service;
     this.entityBuilder = entityBuilder;
     this.requestBuilder = requestBuilder;
-    this.locationBuilder = locationBuilder;
   }
 
   static Supplier<NotFoundException> annotationNotFoundForId(Object id) {
