@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.StreamSupport;
 
 /*
@@ -31,16 +32,22 @@ import java.util.stream.StreamSupport;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
+import com.google.common.collect.Lists;
 import com.thinkaurelius.titan.core.PropertyKey;
 import com.thinkaurelius.titan.core.TitanFactory;
 import com.thinkaurelius.titan.core.TitanGraph;
 import com.thinkaurelius.titan.core.VertexLabel;
+import com.thinkaurelius.titan.core.schema.SchemaAction;
+import com.thinkaurelius.titan.core.schema.SchemaStatus;
 import com.thinkaurelius.titan.core.schema.TitanGraphIndex;
 import com.thinkaurelius.titan.core.schema.TitanManagement;
+import com.thinkaurelius.titan.core.schema.TitanManagement.IndexBuilder;
+import com.thinkaurelius.titan.graphdb.database.management.GraphIndexStatusReport;
 import com.thinkaurelius.titan.graphdb.database.management.ManagementSystem;
 
 import nl.knaw.huygens.Log;
@@ -50,10 +57,32 @@ import nl.knaw.huygens.alexandria.storage.Storage;
 
 @Singleton
 public class TitanService extends TinkerPopService {
+  private static final boolean UNIQUE = true;
   private static final String PROP_UUID = "uuid";
-  private static final String IDX_RESOURCE_UUID = "resourceByUUID";
-  private static final String IDX_ANNOTATION_UUID = "annotationByUUID";
-  private static final String IDX_ANNOTATIONBODY_UUID = "annotationBodyByUUID";
+  private static final String PROP_TYPE = "type";
+  private static final String PROP_WHO = "who";
+
+  enum VertexCompositeIndex {
+    IDX_RESOURCE_UUID("Resource", PROP_UUID, UNIQUE), //
+    IDX_ANNOTATION_UUID("Annotation", PROP_UUID, UNIQUE), //
+    IDX_ANNOTATION_WHO("Annotation", PROP_WHO, !UNIQUE), //
+    IDX_ANNOTATIONBODY_UUID("AnnotationBody", PROP_UUID, UNIQUE), //
+    IDX_ANNOTATIONBODY_TYPE("AnnotationBody", PROP_TYPE, !UNIQUE);
+
+    public String label;
+    public String property;
+    public boolean unique;
+    public String name;
+
+    VertexCompositeIndex(String label, String property, boolean unique) {
+      this.label = label;
+      this.property = property;
+      this.unique = unique;
+      this.name = label + "By" + WordUtils.capitalize(property);
+    }
+
+  }
+
   private static TitanGraph titanGraph;
 
   @Inject
@@ -66,15 +95,47 @@ public class TitanService extends TinkerPopService {
     TitanManagement mgmt = titanGraph.openManagement();
     Map<String, Object> metadata = super.getMetadata();
     Map<String, Object> storageMap = (Map<String, Object>) metadata.get("storage");
-    storageMap.put("vertexIndexes", indexNames(mgmt, Vertex.class));
-    storageMap.put("edgeIndexes", indexNames(mgmt, Edge.class));
+    storageMap.put("vertexIndexes", indexInfo(mgmt, Vertex.class));
+    storageMap.put("edgeIndexes", indexInfo(mgmt, Edge.class));
     return metadata;
   }
 
-  private List<String> indexNames(TitanManagement mgmt, Class<? extends Element> elementClass) {
+  private List<IndexInfo> indexInfo(TitanManagement mgmt, Class<? extends Element> elementClass) {
     return StreamSupport.stream(mgmt.getGraphIndexes(elementClass).spliterator(), false)//
-        .map(TitanGraphIndex::name)//
+        .map(IndexInfo::new)//
         .collect(toList());
+  }
+
+  static class IndexInfo {
+    private String name;
+    private String backingIndex;
+    private Class<? extends Element> indexedElement;
+    private SchemaStatus indexStatus;
+
+    public IndexInfo(TitanGraphIndex index) {
+      name = index.name();
+      backingIndex = index.getBackingIndex();
+      indexedElement = index.getIndexedElement();
+      PropertyKey[] fieldKeys = index.getFieldKeys();
+      indexStatus = index.getIndexStatus(fieldKeys[0]);
+    }
+
+    public String getBackingIndex() {
+      return backingIndex;
+    }
+
+    public Class<? extends Element> getIndexedElement() {
+      return indexedElement;
+    }
+
+    public SchemaStatus getIndexStatus() {
+      return indexStatus;
+    }
+
+    public String getName() {
+      return name;
+    }
+
   }
 
   private static Storage getStorage(AlexandriaConfiguration configuration) {
@@ -84,36 +145,77 @@ public class TitanService extends TinkerPopService {
   }
 
   private static void setIndexes() {
-    createIndexWhenAbsent(IDX_RESOURCE_UUID, "Resource");
-    createIndexWhenAbsent(IDX_ANNOTATION_UUID, "Annotation");
-    createIndexWhenAbsent(IDX_ANNOTATIONBODY_UUID, "AnnotationBody");
+    List<String> reindex = Lists.newArrayList();
+    TitanManagement mgmt = titanGraph.openManagement();
+    for (VertexCompositeIndex compositeIndex : VertexCompositeIndex.values()) {
+      boolean created = createIndexWhenAbsent(mgmt, compositeIndex);
+      if (created) {
+        reindex.add(compositeIndex.name);
+      }
+    }
+    Log.info("saving indexes");
+    mgmt.commit();
+
+    mgmt = titanGraph.openManagement();
+    Log.info("wait for completion");
+    for (VertexCompositeIndex compositeIndex : VertexCompositeIndex.values()) {
+      waitForCompletion(mgmt, compositeIndex);
+    }
+    mgmt.commit();
+
+    mgmt = titanGraph.openManagement();
+    for (String newIndex : reindex) {
+      Log.info("reindexing {}", newIndex);
+      try {
+        mgmt.updateIndex(mgmt.getGraphIndex(newIndex), SchemaAction.REINDEX).get();
+      } catch (InterruptedException | ExecutionException e) {
+        e.printStackTrace();
+        throw new RuntimeException(e);
+      }
+    }
+    mgmt.commit();
+
+    titanGraph.tx().rollback();
   }
 
-  private static void createIndexWhenAbsent(String uuidIdx, String label) {
-    TitanManagement mgmt = titanGraph.openManagement();
-    if (!mgmt.containsGraphIndex(uuidIdx)) {
-      PropertyKey uuidKey = mgmt.containsPropertyKey(PROP_UUID)//
-          ? mgmt.getPropertyKey(PROP_UUID)//
-          : mgmt.makePropertyKey(PROP_UUID).dataType(String.class).make();
+  private static boolean createIndexWhenAbsent(TitanManagement mgmt, VertexCompositeIndex compositeIndex) {
+    String name = compositeIndex.name;
+    if (!mgmt.containsGraphIndex(name)) {
+      String property = compositeIndex.property;
+      PropertyKey uuidKey = mgmt.containsPropertyKey(property)//
+          ? mgmt.getPropertyKey(property)//
+          : mgmt.makePropertyKey(property).dataType(String.class).make();
+      String label = compositeIndex.label;
       VertexLabel vertexLabel = mgmt.containsVertexLabel(label)//
           ? mgmt.getVertexLabel(label)//
           : mgmt.makeVertexLabel(label).make();
-      Log.info("creating index '{}' for label '{}' + property '{}'", uuidIdx, label, PROP_UUID);
-      mgmt.buildIndex(uuidIdx, Vertex.class)//
+      boolean unique = compositeIndex.unique;
+      Log.info("building {} index '{}' for label '{}' + property '{}'", unique ? "unique" : "non-unique", name, label, property);
+      IndexBuilder indexBuilder = mgmt.buildIndex(name, Vertex.class)//
           .addKey(uuidKey)//
-          .indexOnly(vertexLabel)//
-          .unique()//
-          .buildCompositeIndex();
-      mgmt.commit();
+          .indexOnly(vertexLabel);
+      if (unique) {
+        indexBuilder = indexBuilder.unique();
+      }
+      indexBuilder.buildCompositeIndex();
+      return true;
+    }
+    return false;
+  }
 
+  private static void waitForCompletion(TitanManagement mgmt, VertexCompositeIndex compositeIndex) {
+    String name = compositeIndex.name;
+    TitanGraphIndex graphIndex = mgmt.getGraphIndex(name);
+    PropertyKey propertyKey = graphIndex.getFieldKeys()[0];
+    // For composite indexes, the propertyKey is ignored and the status of the index as a whole is returned
+    if (!SchemaStatus.ENABLED.equals(graphIndex.getIndexStatus(propertyKey))) {
       try {
-        ManagementSystem.awaitGraphIndexStatus(titanGraph, uuidIdx).call();
+        GraphIndexStatusReport report = ManagementSystem.awaitGraphIndexStatus(titanGraph, name).call();
+        Log.info("report={}", report);
       } catch (InterruptedException e) {
         e.printStackTrace();
         throw new RuntimeException(e);
       }
-
-      titanGraph.tx().commit();
     }
   }
 }
