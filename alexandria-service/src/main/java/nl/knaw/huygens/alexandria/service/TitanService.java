@@ -61,8 +61,10 @@ public class TitanService extends TinkerPopService {
   private static final String PROP_UUID = "uuid";
   private static final String PROP_TYPE = "type";
   private static final String PROP_WHO = "who";
+  private static final String PROP_STATE = "state";
 
   enum VertexCompositeIndex {
+    IDX_ANY_STATE(null, PROP_STATE, !UNIQUE), //
     IDX_RESOURCE_UUID("Resource", PROP_UUID, UNIQUE), //
     IDX_ANNOTATION_UUID("Annotation", PROP_UUID, UNIQUE), //
     IDX_ANNOTATION_WHO("Annotation", PROP_WHO, !UNIQUE), //
@@ -78,7 +80,7 @@ public class TitanService extends TinkerPopService {
       this.label = label;
       this.property = property;
       this.unique = unique;
-      this.name = label + "By" + WordUtils.capitalize(property);
+      this.name = (label == null ? "" : label) + "By" + WordUtils.capitalize(property);
     }
 
   }
@@ -182,21 +184,28 @@ public class TitanService extends TinkerPopService {
     String name = compositeIndex.name;
     if (!mgmt.containsGraphIndex(name)) {
       String property = compositeIndex.property;
+      String label = compositeIndex.label;
+      boolean unique = compositeIndex.unique;
+      Log.info("building {} index '{}' for label '{}' + property '{}'", unique ? "unique" : "non-unique", name, label, property);
+
       PropertyKey uuidKey = mgmt.containsPropertyKey(property)//
           ? mgmt.getPropertyKey(property)//
           : mgmt.makePropertyKey(property).dataType(String.class).make();
-      String label = compositeIndex.label;
-      VertexLabel vertexLabel = mgmt.containsVertexLabel(label)//
-          ? mgmt.getVertexLabel(label)//
-          : mgmt.makeVertexLabel(label).make();
-      boolean unique = compositeIndex.unique;
-      Log.info("building {} index '{}' for label '{}' + property '{}'", unique ? "unique" : "non-unique", name, label, property);
+
       IndexBuilder indexBuilder = mgmt.buildIndex(name, Vertex.class)//
-          .addKey(uuidKey)//
-          .indexOnly(vertexLabel);
+          .addKey(uuidKey);
+
+      if (label != null) {
+        VertexLabel vertexLabel = mgmt.containsVertexLabel(label)//
+            ? mgmt.getVertexLabel(label)//
+            : mgmt.makeVertexLabel(label).make();
+        indexBuilder = indexBuilder.indexOnly(vertexLabel);
+      }
+
       if (unique) {
         indexBuilder = indexBuilder.unique();
       }
+
       indexBuilder.buildCompositeIndex();
       return true;
     }
