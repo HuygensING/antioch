@@ -37,9 +37,9 @@ import com.squarespace.jersey2.guice.BootstrapUtils;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
-import nl.knaw.huygens.alexandria.config.AlexandriaServletModule;
 import nl.knaw.huygens.alexandria.jersey.AlexandriaApplication;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.service.AlexandriaServletModule;
 import nl.knaw.huygens.alexandria.util.Scheduler;
 
 public class Server {

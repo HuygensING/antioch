@@ -16,7 +16,7 @@ public class Neo4JService extends TinkerPopService {
   }
 
   private static Storage getStorage(AlexandriaConfiguration config) {
-    Neo4jGraph graph = Neo4jGraph.open(config.getStorageDirectory()+"/neo4jdb");
+    Neo4jGraph graph = Neo4jGraph.open(config.getStorageDirectory() + "/neo4jdb");
     return new Storage(graph);
   }
 

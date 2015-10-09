@@ -13,6 +13,8 @@
     <module>alexandria-main</module>
     <module>alexandria-acceptance-tests</module>
     <module>alexandria-service</module>
+    <module>alexandria-service-tinkerpop-titan</module>
+    <module>alexandria-service-tinkerpop-neo4j</module>
     <module>alexandria-server</module>
     <module>alexandria-webapp</module>
     <module>alexandria-test</module>

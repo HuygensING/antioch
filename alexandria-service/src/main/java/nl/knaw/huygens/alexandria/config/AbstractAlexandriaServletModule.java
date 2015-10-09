@@ -30,22 +30,19 @@ import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerPopService;
-import nl.knaw.huygens.alexandria.service.TitanService;
 
-public class AlexandriaServletModule extends ServletModule {
+public abstract class AbstractAlexandriaServletModule extends ServletModule {
   @Override
   protected void configureServlets() {
     // guice binds here
     Log.trace("configureServlets(): setting up Guice bindings");
-    bindServiceTo(TitanService.class);
-    // bindServiceTo(Neo4JService.class);
+    Class<? extends TinkerPopService> tinkerpopServiceClass = getTinkerPopServiceClass();
+    bind(AlexandriaService.class).to(tinkerpopServiceClass);
+    bind(TinkerPopService.class).to(tinkerpopServiceClass);
     bind(AnnotationEntityBuilder.class).in(Scopes.SINGLETON);
     bind(ResourceEntityBuilder.class).in(Scopes.SINGLETON);
     super.configureServlets();
   }
 
-  private void bindServiceTo(Class<? extends TinkerPopService> tinkerpopServiceClass) {
-    bind(AlexandriaService.class).to(tinkerpopServiceClass);
-    bind(TinkerPopService.class).to(tinkerpopServiceClass);
-  }
+  abstract public Class<? extends TinkerPopService> getTinkerPopServiceClass();
 }
