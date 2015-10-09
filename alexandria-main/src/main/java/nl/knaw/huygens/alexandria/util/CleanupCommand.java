@@ -22,7 +22,6 @@ package nl.knaw.huygens.alexandria.util;
  * #L%
  */
 
-
 import javax.inject.Inject;
 
 import nl.knaw.huygens.Log;
