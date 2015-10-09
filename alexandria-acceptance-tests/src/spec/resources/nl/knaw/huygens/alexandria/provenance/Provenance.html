@@ -44,23 +44,89 @@
 </div>
 
 <div id="provenance-anatomy" data-desc="How is provenance information represented?" c:execute="clearStorage()">
+    <div>
+        <strong>Each and every Alexandria
+            <mark>resource</mark>
+            and
+            <mark>annotation</mark>
+            object has provenance information associated with it.</strong>
+
+        <p>
+            This information allows attributing the object to a person or entity, as well as keeping track of when
+            annotations have become deprecated due to new revisions. A (brief) rationale for the object's existence
+            or the reason for a change can also be documented.
+        </p>
+
+        Provenance information maintained in Alexandria contains the following elements:
+
+        <dl class="dl-horizontal">
+            <dt><code>who</code></dt>
+            <dd>the user information that was passed when the object was created
+                (<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a>)
+            </dd>
+            <dt><code>why</code></dt>
+            <dd>the reason that was passed when the object was created
+                (<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a>)
+            </dd>
+            <dt><code>when</code></dt>
+            <dd>the date and time the object was created
+                (ISO-8601 representation of
+                <a href="https://docs.oracle.com/javase/8/docs/api/java/time/Instant.html">Instant</a>)
+            </dd>
+            <dt><code>^what</code></dt>
+            <dd>a link back to the object that this provenance information is about
+                (<a href="https://docs.oracle.com/javase/8/docs/api/java/net/URL.html">URL</a>)
+            </dd>
+        </dl>
+    </div>
+
+    <div class="alert alert-warning sm">
+        In Nederlab scenario's, the provenance fields <code>who</code>, <code>why</code>, and <code>when</code>
+        can be set by providing overriding provenance elements at
+        <a href="../resource/Creation.html">resource creation</a> and annotation creation time, respectively.
+        <br/>
+        <small>The <code>^what</code> field is always set by Alexandria to ensure correct linking between an object and
+            its provenance.
+        </small>
+    </div>
+
+    <hr/>
+
     <div c:execute="resourceExists(#uuid)">Given that a resource with id
-        <code c:set="#uuid">6244b9d8-3b5e-11e5-aca2-5befb33d5e4d</code> exists
+        <code c:set="#uuid">6244b9d8-3b5e-11e5-aca2-5befb33d5e4d</code> exists.
     </div>
 
     <h:request>
-        When we
+        <strong>(verification)</strong> When we
         <h:get>/resources/$uuid</h:get>
         we observe
         <h:status>200 OK</h:status>
         and body
         <h:jsonResponse>{
             "resource": {
+            "id": "$uuid",
+            "^provenance": "https://{host}/resources/$uuid/provenance"
             } }
         </h:jsonResponse>
     </h:request>
 
     <hr/>
+
+    <h:request>
+        When we
+        <h:get>/resources/$uuid/provenance</h:get>
+        we observe
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "provenance": {
+            "who": "nederlab",
+            "why": "details warranting this object's existence",
+            "when": "{date.beforeNow}",
+            "^what": "https://{host}/resources/$uuid"
+            } }
+        </h:jsonResponse>
+    </h:request>
 </div>
 
 </body>

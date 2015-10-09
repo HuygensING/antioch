@@ -175,7 +175,7 @@ public class AlexandriaAcceptanceTest extends RestFixture {
   }
 
   protected TentativeAlexandriaProvenance aProvenance() {
-    return new TentativeAlexandriaProvenance("nederlab", Instant.now(), "why");
+    return new TentativeAlexandriaProvenance("nederlab", Instant.now(), "details warranting this object's existence");
   }
 
   protected String aRef() {
