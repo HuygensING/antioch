@@ -39,6 +39,7 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.config.AlexandriaServletModule;
 import nl.knaw.huygens.alexandria.jersey.AlexandriaApplication;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.util.Scheduler;
 
 public class Server {
@@ -79,6 +80,9 @@ public class Server {
 
   protected HttpServer startServer(URI uri) throws IOException {
     ServiceLocator locator = createServiceLocator();
+    // init service
+    AlexandriaService service = locator.getService(AlexandriaService.class);
+    Log.info("AlexandriaService {} initialized", service);
     ResourceConfig config = new AlexandriaApplication();
     Log.info("Starting grizzly at {} ...", uri);
     return GrizzlyHttpServerFactory.createHttpServer(uri, config, locator);
