@@ -52,9 +52,11 @@
             object has provenance information associated with it.</strong>
 
         <p>
-            This information allows attributing the object to a person or entity, as well as keeping track of when
-            annotations have become deprecated due to new revisions. A (brief) rationale for the object's existence
-            or the reason for a change can also be documented.
+            This information allows
+            <small>(= can be used to implement, but does not guarantee correctness of)</small>
+            attribution of Alexandria objects to a person or entity, as well as keeping track of when annotations have
+            become deprecated due to new revisions. A (brief) rationale for the object's existence or the reason for a
+            change can also be documented.
         </p>
 
         Provenance information maintained in Alexandria contains the following elements:
@@ -80,7 +82,7 @@
         </dl>
     </div>
 
-    <div class="alert alert-warning sm">
+    <div class="alert alert-info sm">
         In Nederlab scenario's, the provenance fields <code>who</code>, <code>why</code>, and <code>when</code>
         can be set by providing overriding provenance elements at
         <a href="../resource/Creation.html">resource creation</a> and annotation creation time, respectively.
@@ -93,7 +95,7 @@
     <hr/>
 
     <div c:execute="resourceExists(#uuid)">Given that a resource with id
-        <code c:set="#uuid">6244b9d8-3b5e-11e5-aca2-5befb33d5e4d</code> exists.
+        <code c:set="#uuid">761fd88a-6e66-11e5-8b51-23caeac9ef8a</code> exists.
     </div>
 
     <h:request>
@@ -127,6 +129,46 @@
             } }
         </h:jsonResponse>
     </h:request>
+
+    <hr/>
+
+    <div class="alert alert-warning sm">
+        <strong>&#9888; Provenance details are immutable</strong>
+        <p>(so be sure to enter the correct details when creating new resources and annotations)</p>
+    </div>
+
+    This implies, for example, that:
+    <ul>
+        <li>the creator of a resource cannot be changed:
+            <h:request>
+                When we
+                <h:put>/resources/$uuid</h:put>
+                <h:jsonBody>{
+                    "resource": {
+                    "provenance": {
+                    "who": "david-lightman"
+                    } } }
+                </h:jsonBody>
+                we observe
+                <h:status>400 Bad Request</h:status>
+            </h:request>
+        </li>
+
+        <li>an explanation cannot be entered retroactively:
+            <h:request>
+                When we
+                <h:put>/resources/$uuid</h:put>
+                <h:jsonBody>{
+                    "resource": {
+                    "provenance": {
+                    "why": "forgot to supply a reason when creating the resource, so now I am hosed"
+                    } } }
+                </h:jsonBody>
+                we also observe
+                <h:status>400 Bad Request</h:status>
+            </h:request>
+        </li>
+    </ul>
 </div>
 
 </body>
