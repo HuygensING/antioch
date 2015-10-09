@@ -42,6 +42,7 @@ import com.thinkaurelius.titan.core.PropertyKey;
 import com.thinkaurelius.titan.core.TitanFactory;
 import com.thinkaurelius.titan.core.TitanGraph;
 import com.thinkaurelius.titan.core.VertexLabel;
+import com.thinkaurelius.titan.core.schema.ConsistencyModifier;
 import com.thinkaurelius.titan.core.schema.SchemaAction;
 import com.thinkaurelius.titan.core.schema.SchemaStatus;
 import com.thinkaurelius.titan.core.schema.TitanGraphIndex;
@@ -58,17 +59,16 @@ import nl.knaw.huygens.alexandria.storage.Storage;
 @Singleton
 public class TitanService extends TinkerPopService {
   private static final boolean UNIQUE = true;
-  private static final String PROP_UUID = "uuid";
   private static final String PROP_TYPE = "type";
   private static final String PROP_WHO = "who";
   private static final String PROP_STATE = "state";
 
   enum VertexCompositeIndex {
     IDX_ANY_STATE(null, PROP_STATE, !UNIQUE), //
-    IDX_RESOURCE_UUID("Resource", PROP_UUID, UNIQUE), //
-    IDX_ANNOTATION_UUID("Annotation", PROP_UUID, UNIQUE), //
+    IDX_RESOURCE_UUID("Resource", Storage.IDENTIFIER_PROPERTY, UNIQUE), //
+    IDX_ANNOTATION_UUID("Annotation", Storage.IDENTIFIER_PROPERTY, UNIQUE), //
     IDX_ANNOTATION_WHO("Annotation", PROP_WHO, !UNIQUE), //
-    IDX_ANNOTATIONBODY_UUID("AnnotationBody", PROP_UUID, UNIQUE), //
+    IDX_ANNOTATIONBODY_UUID("AnnotationBody", Storage.IDENTIFIER_PROPERTY, UNIQUE), //
     IDX_ANNOTATIONBODY_TYPE("AnnotationBody", PROP_TYPE, !UNIQUE);
 
     public String label;
@@ -206,7 +206,9 @@ public class TitanService extends TinkerPopService {
         indexBuilder = indexBuilder.unique();
       }
 
-      indexBuilder.buildCompositeIndex();
+      TitanGraphIndex index = indexBuilder.buildCompositeIndex();
+      mgmt.setConsistency(index, ConsistencyModifier.LOCK);
+
       return true;
     }
     return false;
