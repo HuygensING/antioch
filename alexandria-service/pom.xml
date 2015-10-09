@@ -54,12 +54,19 @@
       <artifactId>je</artifactId>
       <version>${sleepycat.version}</version>
     </dependency>
-    <!-- neo4j -->
-    <!-- <dependency> <groupId>org.apache.tinkerpop</groupId> <artifactId>neo4j-gremlin</artifactId> 
-      <version>${neo4j-gremlin.version}</version> </dependency> -->
 
-    <!-- <dependency> <groupId>org.neo4j</groupId> <artifactId>neo4j-tinkerpop-api-impl</artifactId> 
-      <version>0.1-2.2</version> </dependency> -->
+    <!-- neo4j -->
+    <dependency>
+      <groupId>org.apache.tinkerpop</groupId>
+      <artifactId>neo4j-gremlin</artifactId>
+      <version>${tinkerpop.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.neo4j</groupId>
+      <artifactId>neo4j-tinkerpop-api-impl</artifactId>
+      <version>0.1-2.2</version>
+    </dependency>
+
     <!-- tinkerpop3 ogm -->
     <dependency>
       <groupId>org.bayofmany.peapod</groupId>
