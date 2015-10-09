@@ -37,10 +37,15 @@ public class AlexandriaServletModule extends ServletModule {
   protected void configureServlets() {
     // guice binds here
     Log.trace("configureServlets(): setting up Guice bindings");
-    bind(AlexandriaService.class).to(TitanService.class);
-    bind(TinkerPopService.class).to(TitanService.class);
+    bindServiceTo(TitanService.class);
+    // bindServiceTo(Neo4JService.class);
     bind(AnnotationEntityBuilder.class).in(Scopes.SINGLETON);
     bind(ResourceEntityBuilder.class).in(Scopes.SINGLETON);
     super.configureServlets();
+  }
+
+  private void bindServiceTo(Class<? extends TinkerPopService> tinkerpopServiceClass) {
+    bind(AlexandriaService.class).to(tinkerpopServiceClass);
+    bind(TinkerPopService.class).to(tinkerpopServiceClass);
   }
 }
