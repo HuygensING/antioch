@@ -221,7 +221,9 @@ public class Storage {
 
   public void destroy() {
     try {
+      Log.info("closing graph {}", graph);
       graph.close();
+      Log.info("graph closed: {}", graph);
     } catch (Exception e) {
       e.printStackTrace();
       throw new RuntimeException(e);
