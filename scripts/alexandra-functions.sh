@@ -35,3 +35,13 @@ function a-show-first-resultpage {
 	a-location | while read l; do curl -i ${l}/resultPages/1;done
 }
 
+function a-generate-random-resource-with-annotation {
+  id=$(uuidgen)
+  curl -i -X PUT $be/resources/$id -H 'Content-type: application/json' \
+  --data-binary "{\"resource\":{
+    \"id\":\"$id\",
+    \"ref\":\"reference $n\"
+  }}"
+  url=$(a-annotate-resource "$id" "Tag" "Test annotation for resource $id" | a-location)
+  a-confirm $url
+}
