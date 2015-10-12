@@ -85,11 +85,12 @@ public class ContextListener extends JerseyGuiceServletContextListener {
 
   @Override
   public void contextDestroyed(ServletContextEvent sce) {
-    super.contextDestroyed(sce);
     Log.info("contextDestroyed called");
     getInjector()//
         .getInstance(new AlexandriaServletModule().getTinkerPopServiceClass())//
         .destroy();
+    super.contextDestroyed(sce);
+    Log.info("contextDestroyed done");
   }
 
   private String getProperty(String key) {

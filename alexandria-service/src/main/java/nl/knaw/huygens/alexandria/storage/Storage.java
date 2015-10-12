@@ -220,6 +220,7 @@ public class Storage {
   }
 
   public void destroy() {
+    Log.info("destroy called");
     try {
       Log.info("closing graph {}", graph);
       graph.close();
@@ -228,6 +229,7 @@ public class Storage {
       e.printStackTrace();
       throw new RuntimeException(e);
     }
+    Log.info("destroy done");
   }
 
 }
