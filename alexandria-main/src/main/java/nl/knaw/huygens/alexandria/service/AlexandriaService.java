@@ -112,4 +112,6 @@ public interface AlexandriaService {
 
   Map<String, Object> getMetadata();
 
+  void destroy();
+
 }

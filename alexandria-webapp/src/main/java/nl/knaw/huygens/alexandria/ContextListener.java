@@ -83,6 +83,19 @@ public class ContextListener extends JerseyGuiceServletContextListener {
     Scheduler.scheduleExpiredTentativesRemoval();
   }
 
+  @Override
+  public void contextDestroyed(ServletContextEvent sce) {
+    super.contextDestroyed(sce);
+    Log.info("contextDestroyed called");
+    // TODO: there's probably a better way to do this.
+    try {
+      new AlexandriaServletModule().getTinkerPopServiceClass().newInstance().destroy();
+    } catch (InstantiationException | IllegalAccessException e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
+  }
+
   private String getProperty(String key) {
     Log.trace("getProperty: [{}]", key);
     try {

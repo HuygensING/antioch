@@ -639,4 +639,9 @@ public class TinkerPopService implements AlexandriaService {
     return metadata;
   }
 
+  @Override
+  public void destroy() {
+    storage.destroy();
+  }
+
 }

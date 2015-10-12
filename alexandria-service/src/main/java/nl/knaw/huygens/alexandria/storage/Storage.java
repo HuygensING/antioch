@@ -219,4 +219,13 @@ public class Storage {
     return graphTraversal.count().next();
   }
 
+  public void destroy() {
+    try {
+      graph.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
+  }
+
 }
