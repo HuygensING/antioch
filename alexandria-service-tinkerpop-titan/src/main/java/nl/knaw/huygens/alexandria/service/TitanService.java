@@ -232,12 +232,12 @@ public class TitanService extends TinkerPopService {
 
   @Override
   public void destroy() {
-    Log.info("destroy called");
+    // Log.info("destroy called");
     super.destroy();
     if (titanGraph.isOpen()) {
       Log.info("closing {}:", titanGraph);
       titanGraph.close();
     }
-    Log.info("destroy finished");
+    // Log.info("destroy finished");
   }
 }

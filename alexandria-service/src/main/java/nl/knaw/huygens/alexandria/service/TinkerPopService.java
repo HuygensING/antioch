@@ -641,9 +641,9 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public void destroy() {
-    Log.info("destroy called");
+    // Log.info("destroy called");
     storage.destroy();
-    Log.info("destroy done");
+    // Log.info("destroy done");
   }
 
 }
