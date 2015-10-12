@@ -36,7 +36,6 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSo
 import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Graph.Features.GraphFeatures;
-import org.apache.tinkerpop.gremlin.structure.Transaction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.io.IoCore;
 import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
@@ -57,7 +56,6 @@ public class Storage {
   private Graph graph;
   private FramedGraph framedGraph;
 
-  private Transaction tx;
   private String dumpfile;
   private boolean supportsTransactions;
   private boolean supportsPersistence;
@@ -89,14 +87,14 @@ public class Storage {
 
   public void startTransaction() {
     if (supportsTransactions()) {
-      tx = framedGraph.tx();
+      framedGraph.tx().rollback();
     }
   }
 
   public void commitTransaction() {
     if (supportsTransactions()) {
-      tx.commit();
-      tx.close();
+      framedGraph.tx().commit();
+      // framedGraph.tx().close();
     }
     if (!supportsPersistence()) {
       saveToDisk(getDumpFile());
@@ -105,8 +103,8 @@ public class Storage {
 
   public void rollbackTransaction() {
     if (supportsTransactions()) {
-      tx.rollback();
-      tx.close();
+      framedGraph.tx().rollback();
+      // framedGraph.tx().close();
     } else {
       Log.error("rollback called, but transactions are not supported by graph {}", graph);
     }
