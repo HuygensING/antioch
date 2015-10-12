@@ -87,27 +87,6 @@ public class TitanService extends TinkerPopService {
 
   private static TitanGraph titanGraph;
 
-  @Inject
-  public TitanService(LocationBuilder locationBuilder, AlexandriaConfiguration configuration) {
-    super(getStorage(configuration), locationBuilder);
-  }
-
-  @Override
-  public Map<String, Object> getMetadata() {
-    TitanManagement mgmt = titanGraph.openManagement();
-    Map<String, Object> metadata = super.getMetadata();
-    Map<String, Object> storageMap = (Map<String, Object>) metadata.get("storage");
-    storageMap.put("vertexIndexes", indexInfo(mgmt, Vertex.class));
-    storageMap.put("edgeIndexes", indexInfo(mgmt, Edge.class));
-    return metadata;
-  }
-
-  private List<IndexInfo> indexInfo(TitanManagement mgmt, Class<? extends Element> elementClass) {
-    return StreamSupport.stream(mgmt.getGraphIndexes(elementClass).spliterator(), false)//
-        .map(IndexInfo::new)//
-        .collect(toList());
-  }
-
   static class IndexInfo {
     private String name;
     private String backingIndex;
@@ -140,10 +119,31 @@ public class TitanService extends TinkerPopService {
 
   }
 
+  @Inject
+  public TitanService(LocationBuilder locationBuilder, AlexandriaConfiguration configuration) {
+    super(getStorage(configuration), locationBuilder);
+  }
+
+  @Override
+  public Map<String, Object> getMetadata() {
+    TitanManagement mgmt = titanGraph.openManagement();
+    Map<String, Object> metadata = super.getMetadata();
+    Map<String, Object> storageMap = (Map<String, Object>) metadata.get("storage");
+    storageMap.put("vertexIndexes", indexInfo(mgmt, Vertex.class));
+    storageMap.put("edgeIndexes", indexInfo(mgmt, Edge.class));
+    return metadata;
+  }
+
   private static Storage getStorage(AlexandriaConfiguration configuration) {
     titanGraph = TitanFactory.open(configuration.getStorageDirectory() + "/titan.properties");
     setIndexes();
     return new Storage(titanGraph);
+  }
+
+  private List<IndexInfo> indexInfo(TitanManagement mgmt, Class<? extends Element> elementClass) {
+    return StreamSupport.stream(mgmt.getGraphIndexes(elementClass).spliterator(), false)//
+        .map(IndexInfo::new)//
+        .collect(toList());
   }
 
   private static void setIndexes() {
@@ -228,5 +228,16 @@ public class TitanService extends TinkerPopService {
         throw new RuntimeException(e);
       }
     }
+  }
+
+  @Override
+  public void destroy() {
+    Log.info("destroy called");
+    super.destroy();
+    if (titanGraph.isOpen()) {
+      Log.info("closing {}:", titanGraph);
+      titanGraph.close();
+    }
+    Log.info("destroy finished");
   }
 }
