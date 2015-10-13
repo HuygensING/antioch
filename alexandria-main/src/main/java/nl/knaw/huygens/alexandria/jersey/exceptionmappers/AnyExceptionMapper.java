@@ -23,7 +23,6 @@ package nl.knaw.huygens.alexandria.jersey.exceptionmappers;
  */
 
 import javax.inject.Singleton;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -40,13 +39,6 @@ public class AnyExceptionMapper implements ExceptionMapper<Exception> {
   public Response toResponse(Exception e) {
     Log.error("error:{}", e);
 
-    if (e instanceof WebApplicationException) {
-      Response response = ((WebApplicationException) e).getResponse();
-      return Response//
-          .status(response.getStatus())//
-          .entity(ErrorEntityBuilder.build(e.getMessage()))//
-          .build();
-    }
     return Response//
         .status(Status.INTERNAL_SERVER_ERROR)//
         .entity(ErrorEntityBuilder.build(e))//
