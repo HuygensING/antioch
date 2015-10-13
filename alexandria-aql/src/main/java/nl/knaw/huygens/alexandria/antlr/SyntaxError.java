@@ -44,6 +44,6 @@ public class SyntaxError {
 
   @Override
   public String toString() {
-    return "SyntaxError({" + line + "," + charPositionInLine + "} " + offendingSymbol + " : " + msg + ")";
+    return "syntax error: " + msg + " at " + line + ":" + charPositionInLine + " " + offendingSymbol;
   }
 }
