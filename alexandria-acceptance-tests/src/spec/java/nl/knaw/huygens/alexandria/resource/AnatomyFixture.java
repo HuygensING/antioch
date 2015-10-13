@@ -24,7 +24,6 @@ package nl.knaw.huygens.alexandria.resource;
 
 import static java.util.UUID.fromString;
 import static java.util.UUID.randomUUID;
-import static nl.knaw.huygens.alexandria.model.AlexandriaState.CONFIRMED;
 
 import java.util.UUID;
 
@@ -37,16 +36,21 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 public class AnatomyFixture extends ResourcesBase {
 
   public String hasSubresource(String id) {
-    return idOf(service().createSubResource(randomUUID(), fromString(id), aSub(), aProvenance(), CONFIRMED));
+    final UUID subId = service().createSubResource(randomUUID(), fromString(id), aSub(), aProvenance())
+                                .getId();
+    service().confirmResource(subId);
+    return subId.toString();
   }
 
   public String hasAnnotation(String id) {
     final UUID resId = fromString(id);
-    return idOf(service().annotate(theResource(resId), anAnnotationBody(resId), aProvenance()));
+    final UUID annoId = service().annotate(theResource(resId), anAnnotationBody(resId), aProvenance()).getId();
+    service().confirmAnnotation(annoId);
+    return annoId.toString();
   }
 
   private AlexandriaAnnotationBody anAnnotationBody(UUID resId) {
-    return service().createAnnotationBody(resId, aType(), aValue(), aProvenance(), CONFIRMED);
+    return service().createAnnotationBody(resId, aType(), aValue(), aProvenance());
   }
 
   private String aType() {

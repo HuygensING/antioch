@@ -197,7 +197,7 @@ public class AlexandriaAcceptanceTest extends RestFixture {
   }
 
   protected AlexandriaAnnotationBody anAnnotation(String type, String value) {
-    return service().createAnnotationBody(randomUUID(), type, value, aProvenance(), CONFIRMED);
+    return service().createAnnotationBody(randomUUID(), type, value, aProvenance());
   }
 
   private Optional<UUID> parse(String idStr) {

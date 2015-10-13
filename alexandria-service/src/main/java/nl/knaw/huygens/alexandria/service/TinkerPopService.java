@@ -27,7 +27,6 @@ import static java.util.stream.Collectors.toSet;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
@@ -35,7 +34,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
@@ -47,7 +45,6 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang.NotImplementedException;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import nl.knaw.huygens.Log;
@@ -131,7 +128,8 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
+  public AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub,
+                                              TentativeAlexandriaProvenance provenance) {
     AlexandriaResource subresource = new AlexandriaResource(uuid, provenance);
     subresource.setCargo(sub);
     subresource.setParentResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, parentUuid.toString()));
@@ -341,7 +339,8 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public AlexandriaAnnotationBody createAnnotationBody(UUID uuid, String type, String value, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
+  public AlexandriaAnnotationBody createAnnotationBody(UUID uuid, String type, String value,
+                                                       TentativeAlexandriaProvenance provenance) {
     AlexandriaAnnotationBody body = new AlexandriaAnnotationBody(uuid, type, value, provenance);
     storeAnnotationBody(body);
     return body;
@@ -581,7 +580,7 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   private List<Map<String, Object>> processQuery(AlexandriaQuery query) {
-    List<Map<String, Object>> results = dummyResults();
+    List<Map<String, Object>> results;
 
     ParsedAlexandriaQuery pQuery = alexandriaQueryParser.parse(query);
 
@@ -616,20 +615,6 @@ public class TinkerPopService implements AlexandriaService {
   // __.in(AnnotationVF.ANNOTATES_RESOURCE)//
   // ).has("state", AlexandriaState.CONFIRMED.name()).as("a").out(AnnotationVF.HAS_BODY).as("b").toList();
   // }
-
-  private List<Map<String, Object>> dummyResults() {
-    List<Map<String, Object>> list = Lists.newArrayList();
-    int num = new Random().nextInt(100);
-    for (int i = 0; i < num; i++) {
-      String displayName = "Annotation " + i;
-      URI annotationLocation = locationBuilder.locationOf(AlexandriaAnnotation.class, UUID.randomUUID().toString());
-      Map<String, Object> map = Maps.newHashMap();
-      map.put("displayName", displayName);
-      map.put("annotation", annotationLocation);
-      list.add(map);
-    }
-    return list;
-  }
 
   @Override
   public Map<String, Object> getMetadata() {

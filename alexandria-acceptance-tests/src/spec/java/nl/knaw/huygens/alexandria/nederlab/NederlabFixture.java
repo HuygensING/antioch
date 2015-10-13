@@ -38,7 +38,6 @@ import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchEndpoint;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
 @RunWith(ConcordionRunner.class)
@@ -54,7 +53,7 @@ public class NederlabFixture extends AlexandriaAcceptanceTest {
   public AlexandriaResource subResourceExists(String id, String parentId) {
     UUID resourceId = fromString(id);
     UUID parentUUID = fromString(parentId);
-    return service().createSubResource(resourceId, parentUUID, aSub(), aProvenance(), AlexandriaState.CONFIRMED);
+    return service().createSubResource(resourceId, parentUUID, aSub(), aProvenance());
   }
 
   public String resourceHasAnnotation(String id) {

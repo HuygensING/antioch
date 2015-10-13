@@ -24,8 +24,6 @@ package nl.knaw.huygens.alexandria.service;
 
 import java.time.temporal.TemporalAmount;
 import java.util.Map;
-import java.util.Map;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -44,23 +42,17 @@ public interface AlexandriaService {
   // NOTE: should these service methods all be atomic?
   /**
    *
-   * @param uuid
-   * @param ref
-   * @param provenance
-   * @param alexandriaState
    * @return true if the resource was created, false if it was updated
    */
   boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance, AlexandriaState alexandriaState);
 
-  // boolean createOrUpdateAnnotation(UUID uuid, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance, AlexandriaState alexandriaState);
-
-  AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance, AlexandriaState alexandriaState);
+  AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance);
 
   Optional<AlexandriaResource> readResource(UUID uuid);
 
   Set<AlexandriaResource> readSubResources(UUID uuid);
 
-  AlexandriaAnnotationBody createAnnotationBody(UUID uuid, String type, String value, TentativeAlexandriaProvenance provenance, AlexandriaState alexandriaState);
+  AlexandriaAnnotationBody createAnnotationBody(UUID uuid, String type, String value, TentativeAlexandriaProvenance provenance);
 
   Optional<AlexandriaAnnotationBody> readAnnotationBody(UUID uuid);
 
