@@ -110,7 +110,7 @@ public class AQL2Test {
   public void testAQLStatementWithBadFindArgument() {
     String statement = "find whatever" //
         + " where"//
-        + " type:eq(\"Tag\")"//
+        + " typo:eq(\"Tag\")"//
         + " return id,who,when,type,value";
     CharStream stream = new ANTLRInputStream(statement);
     AQL2Lexer lex = new AQL2Lexer(stream);
@@ -132,11 +132,11 @@ public class AQL2Test {
     assertThat(tree.getChildCount()).isEqualTo(3); // find, where, return
 
     int numberOfSyntaxErrors = parser.getNumberOfSyntaxErrors();
-    assertThat(numberOfSyntaxErrors).isEqualTo(1); // no syntax errors
+    assertThat(numberOfSyntaxErrors).isEqualTo(2); // 2 syntax errors
     Log.info("numberOfSyntaxErrors={}", numberOfSyntaxErrors);
 
     List<SyntaxError> errors = errorListener.getErrors();
-    assertThat(errors).hasSize(1);
+    assertThat(errors).hasSize(2);
     Log.info("errors:{}", errors);
 
     for (int i = 0; i < tree.getChildCount(); i++) {
