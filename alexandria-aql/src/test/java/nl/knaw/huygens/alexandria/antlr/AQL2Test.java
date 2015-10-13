@@ -23,7 +23,6 @@ package nl.knaw.huygens.alexandria.antlr;
  */
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.StrictAssertions.assertThat;
 
 import java.util.List;
 
@@ -105,6 +104,45 @@ public class AQL2Test {
       Log.info("root.child={}", tree.getChild(i).getText());
     }
     assertThat(allTokens).hasSize(20);
+  }
+
+  @Test
+  public void testAQLStatementWithBadFindArgument() {
+    String statement = "find whatever" //
+        + " where"//
+        + " type:eq(\"Tag\")"//
+        + " return id,who,when,type,value";
+    CharStream stream = new ANTLRInputStream(statement);
+    AQL2Lexer lex = new AQL2Lexer(stream);
+    lex.removeErrorListeners();
+    List<? extends Token> allTokens = lex.getAllTokens();
+    for (Token token : allTokens) {
+      Log.info("token: [{}] <<{}>>", lex.getRuleNames()[token.getType() - 1], token.getText());
+    }
+    lex.reset();
+
+    CommonTokenStream tokens = new CommonTokenStream(lex);
+    AQL2Parser parser = new AQL2Parser(tokens);
+    parser.removeErrorListeners();
+    CollectingErrorListener errorListener = new CollectingErrorListener();
+    parser.addErrorListener(errorListener);
+    parser.setBuildParseTree(true);
+    ParseTree tree = parser.query();
+    Log.info("tree={}", tree.toStringTree(parser));
+    assertThat(tree.getChildCount()).isEqualTo(3); // find, where, return
+
+    int numberOfSyntaxErrors = parser.getNumberOfSyntaxErrors();
+    assertThat(numberOfSyntaxErrors).isEqualTo(1); // no syntax errors
+    Log.info("numberOfSyntaxErrors={}", numberOfSyntaxErrors);
+
+    List<SyntaxError> errors = errorListener.getErrors();
+    assertThat(errors).hasSize(1);
+    Log.info("errors:{}", errors);
+
+    for (int i = 0; i < tree.getChildCount(); i++) {
+      Log.info("root.child={}", tree.getChild(i).getText());
+    }
+    // assertThat(allTokens).hasSize(55);
   }
 
 }
