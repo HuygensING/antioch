@@ -161,7 +161,6 @@ public class AlexandriaQueryParser {
     CharStream stream = new ANTLRInputStream(whereString);
     AQLLexer lex = new AQLLexer(stream);
     lex.removeErrorListeners();
-    lex.addErrorListener(errorListener);
     CommonTokenStream tokenStream = new CommonTokenStream(lex);
     AQLParser parser = new AQLParser(tokenStream);
     parser.removeErrorListeners();
