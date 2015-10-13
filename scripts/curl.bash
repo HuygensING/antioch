@@ -194,6 +194,6 @@ done
 curl -i -X POST $be/searches -H 'Content-type: application/json' \
 --data-binary '{"query":{
 	"find" : "annotation",
-	"where" : "who:eq(\"nederlab\") resource.id:eq(\"d28626d4-493a-4204-83d9-e9ae17e15654\")",
+	"where" : "who:eq(\"nederlab\")",
 	"return" : "id,resource.url,subresource.url,type,value"
 }}'
