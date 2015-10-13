@@ -197,3 +197,12 @@ curl -i -X POST $be/searches -H 'Content-type: application/json' \
 	"where" : "who:eq(\"nederlab\")",
 	"return" : "id,resource.url,subresource.url,type,value"
 }}'
+
+# NLA-104 handle errors in where clause for searches
+
+curl -i -X POST $be/searches -H 'Content-type: application/json' \
+--data-binary '{"query":{
+  "find" : "annotation",
+  "where" : "bla:xeq(\"nederlab\",c)",
+  "return" : "id,resource.url,subresource.url,type,value"
+}}'
