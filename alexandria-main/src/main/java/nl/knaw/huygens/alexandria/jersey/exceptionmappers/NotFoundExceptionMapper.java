@@ -37,7 +37,10 @@ public class NotFoundExceptionMapper implements ExceptionMapper<NotFoundExceptio
 
   @Override
   public Response toResponse(NotFoundException e) {
-    return Response.status(Status.BAD_REQUEST).entity(ErrorEntityBuilder.build("No such endpoint")).build();
+    return Response//
+        .status(Status.BAD_REQUEST)//
+        .entity(ErrorEntityBuilder.build("No such endpoint"))//
+        .build();
   }
 
 }
