@@ -59,7 +59,7 @@ public class AnnotationCreationRequest implements CreationRequest<AlexandriaAnno
     Optional<AlexandriaAnnotationBody> result = service.findAnnotationBodyWithTypeAndValue(type, providedValue());
     AlexandriaState state = prototype.getState();
     AlexandriaAnnotationBody body = result//
-        .orElseGet(() -> service.createAnnotationBody(annotationBodyUuid, type, providedValue(), provenance, state));
+        .orElseGet(() -> service.createAnnotationBody(annotationBodyUuid, type, providedValue(), provenance));
 
     if (resource.isPresent()) {
       return service.annotate(resource.get(), body, provenance);

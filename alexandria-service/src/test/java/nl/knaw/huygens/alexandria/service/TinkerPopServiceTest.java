@@ -144,7 +144,7 @@ public class TinkerPopServiceTest {
 
     UUID annotationBodyId = UUID.fromString("22222222-2222-2222-2222-222222222222");
     TentativeAlexandriaProvenance provenance1 = new TentativeAlexandriaProvenance("who1", Instant.now(), "why1");
-    AlexandriaAnnotationBody body1 = service.createAnnotationBody(annotationBodyId, "type", "value", provenance1, AlexandriaState.CONFIRMED);
+    AlexandriaAnnotationBody body1 = service.createAnnotationBody(annotationBodyId, "type", "value", provenance1);
 
     UUID annotationId = UUID.fromString("11111111-1111-1111-1111-111111111111");
     TentativeAlexandriaProvenance provenance2 = new TentativeAlexandriaProvenance("who2", Instant.now(), "why2");
@@ -155,7 +155,7 @@ public class TinkerPopServiceTest {
 
     UUID annotationBodyId2 = UUID.fromString("22222222-2222-2222-2222-222222222223");
     TentativeAlexandriaProvenance provenance3 = new TentativeAlexandriaProvenance("who3", Instant.now(), "why3");
-    AlexandriaAnnotationBody body2 = service.createAnnotationBody(annotationBodyId2, "type", "updated value", provenance3, AlexandriaState.CONFIRMED);
+    AlexandriaAnnotationBody body2 = service.createAnnotationBody(annotationBodyId2, "type", "updated value", provenance3);
     TentativeAlexandriaProvenance provenance4 = new TentativeAlexandriaProvenance("who4", Instant.now(), "why4");
     AlexandriaAnnotation updatedAnnotation = new AlexandriaAnnotation(annotationId, body2, provenance4);
 

@@ -47,7 +47,7 @@ public class AnatomyFixture extends AnnotationsBase {
   }
 
   private AlexandriaAnnotationBody anAnnotationBody(UUID resId) {
-    return service().createAnnotationBody(resId, aType(), aValue(), aProvenance(), AlexandriaState.CONFIRMED);
+    return service().createAnnotationBody(resId, aType(), aValue(), aProvenance());
   }
 
   private String aType() {
