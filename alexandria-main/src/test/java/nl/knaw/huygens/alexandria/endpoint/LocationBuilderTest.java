@@ -28,13 +28,14 @@ import static org.mockito.Mockito.mock;
 import java.net.URI;
 import java.util.UUID;
 
+import org.junit.Test;
+
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
+import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
-
-import org.junit.Test;
 
 public class LocationBuilderTest {
   LocationBuilder lb = new LocationBuilder(new MockConfiguration(), new EndpointPathResolver());
@@ -49,6 +50,16 @@ public class LocationBuilderTest {
     URI locationOf = lb.locationOf(annotation);
 
     assertThat(locationOf.toString()).isEqualTo("http://alexandria.eg/annotations/" + randomUUID);
+  }
+
+  @Test
+  public void testGetLocationOfDeprecatedAlexandriaAnnotation() {
+    UUID randomUUID = UUID.randomUUID();
+    String deprecatedId = randomUUID.toString() + ".0";
+
+    URI locationOf = lb.locationOf(AlexandriaAnnotation.class, deprecatedId);
+
+    assertThat(locationOf.toString()).isEqualTo("http://alexandria.eg/annotations/" + randomUUID + AnnotationsEndpoint.REVPATH + "0");
   }
 
   @Test
