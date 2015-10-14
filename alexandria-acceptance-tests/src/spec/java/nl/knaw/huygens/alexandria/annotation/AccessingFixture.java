@@ -41,7 +41,7 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 
 @RunWith(ConcordionRunner.class)
-public class WorkingFixture extends AnnotationsBase {
+public class AccessingFixture extends AnnotationsBase {
 
   private final Map<String, List<String>> annotatedReferences = Maps.newHashMap();
 
