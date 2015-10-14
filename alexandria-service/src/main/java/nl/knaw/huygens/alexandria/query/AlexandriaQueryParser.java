@@ -64,6 +64,7 @@ import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 
 public class AlexandriaQueryParser {
   static final String ALLOWED_FIELDS = ", available fields: " + Joiner.on(", ").join(QueryField.ALL_EXTERNAL_NAMES);
+  static final String ALLOWED_FUNCTIONS = ", available functions: " + Joiner.on(", ").join(QueryFunction.values());
 
   private static LocationBuilder locationBuilder;
 
@@ -161,7 +162,6 @@ public class AlexandriaQueryParser {
     CharStream stream = new ANTLRInputStream(whereString);
     AQLLexer lex = new AQLLexer(stream);
     lex.removeErrorListeners();
-    lex.addErrorListener(errorListener);
     CommonTokenStream tokenStream = new CommonTokenStream(lex);
     AQLParser parser = new AQLParser(tokenStream);
     parser.removeErrorListeners();
@@ -170,7 +170,9 @@ public class AlexandriaQueryParser {
     ParseTree tree = parser.root();
     Log.info("tree={}", tree.toStringTree(parser));
     if (errorListener.heardErrors()) {
-      parseErrors.addAll(errorListener.getParseErrors());
+      parseErrors.addAll(errorListener.getParseErrors().stream()//
+          .map(AlexandriaQueryParser::clarifyParseError)//
+          .collect(toList()));
       return Lists.newArrayList();
     }
 
@@ -178,6 +180,19 @@ public class AlexandriaQueryParser {
     visitor.visit(tree);
     parseErrors.addAll(errorListener.getParseErrors());
     return visitor.getWhereTokens();
+  }
+
+  private static final String MISSING_FIELD_NAME = "missing FIELD_NAME";
+  private static final String MISSING_FUNCTION = "missing FUNCTION";
+
+  private static String clarifyParseError(String parseError) {
+    if (parseError.contains(MISSING_FIELD_NAME)) {
+      return parseError.replace(MISSING_FIELD_NAME, "missing or invalid field") + ALLOWED_FIELDS;
+    }
+    if (parseError.contains(MISSING_FUNCTION)) {
+      return parseError.replace(MISSING_FUNCTION, "missing or invalid function") + ALLOWED_FUNCTIONS;
+    }
+    return parseError;
   }
 
   private static Predicate<AnnotationVF> createPredicate(List<WhereToken> tokens) {
