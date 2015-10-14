@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -368,5 +369,16 @@ public class AlexandriaQueryParserTest {
     // assertThat(parallel.test("whtvr")).isFalse();
     // assertThat(alwaysTrueCalled.get()).isEqualTo(5);
     // assertThat(alwaysFalseCalled.get()).isEqualTo(1);
+  }
+
+  @Test
+  public void testGetAnnotationIdFromDeprecatedAnnotationRemovesRevisionNumber() {
+    AnnotationVF avf = mock(AnnotationVF.class);
+    String randomUUID = UUID.randomUUID().toString();
+    when(avf.getUuid()).thenReturn(randomUUID + ".0");
+
+    String annotationId = AlexandriaQueryParser.getAnnotationId(avf);
+
+    assertThat(annotationId).isEqualTo(randomUUID);
   }
 }

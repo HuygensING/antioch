@@ -265,6 +265,11 @@ public class AlexandriaQueryParser {
     return locationBuilder.locationOf(AlexandriaAnnotation.class, avf.getUuid()).toString();
   }
 
+  static String getAnnotationId(final AnnotationVF avf) {
+    // for deprecated annotations, remove the revision from the id.
+    return avf.getUuid().replaceFirst("\\..*$", "");
+  }
+
   static String getResourceURL(final AnnotationVF avf) {
     return id2url(avf.getResourceId());
   }
