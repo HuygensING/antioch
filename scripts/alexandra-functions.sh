@@ -45,3 +45,37 @@ function a-generate-random-resource-with-annotation {
   url=$(a-annotate-resource "$id" "Tag" "Test annotation for resource $id" | a-location)
   a-confirm $url
 }
+
+function a-set-backend {
+	export be=$1
+	echo -n "backend set to "
+	a-show-backend
+}
+
+function a-use-localhost {
+	a-set-backend http://localhost:2015
+}
+
+function a-use-test {
+	a-set-backend http://test.alexandria.huygens.knaw.nl/
+}
+
+function a-use-acceptance {
+	a-set-backend https://acc.alexandria.huygens.knaw.nl/
+}
+
+function a-use-production {
+	a-set-backend https://alexandria.huygens.knaw.nl/
+}
+
+function a-show-backend {
+	echo ${be}
+}
+
+function a-about {
+  curl $be/about
+}
+
+function a-about-service {
+  curl $be/about/service
+}
