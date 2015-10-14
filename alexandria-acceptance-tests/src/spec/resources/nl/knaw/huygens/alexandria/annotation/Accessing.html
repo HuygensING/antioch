@@ -1,0 +1,266 @@
+<!--
+  #%L
+  alexandria-acceptance-tests
+  =======
+  Copyright (C) 2015 Huygens ING (KNAW)
+  =======
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/gpl-3.0.html>.
+  #L%
+  -->
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+
+<title>Accessing Annotations</title>
+
+<body data-desc="Accessing annotations">
+
+<div id="get-non-existent" data-desc="What happens when I GET a non-existent annotation?">
+    Given that no annotation exists with ID <code>1dccfd5a-2ec1-11e5-ae97-0360c65ad001</code>
+    <h:request>
+        When I
+        <h:get>/annotations/1dccfd5a-2ec1-11e5-ae97-0360c65ad001</h:get>
+        then I should receive
+        <h:status>404 Not Found</h:status>
+        and the response body should contain:
+        <h:jsonResponse>{ "error": {
+            "message": "No annotation found with id 1dccfd5a-2ec1-11e5-ae97-0360c65ad001"
+            } }
+        </h:jsonResponse>
+    </h:request>
+</div>
+
+<div id="add-annotation" data-desc="How can I create an annotation?">
+    <h:request>
+        Given I have
+        <h:success>successfully</h:success>
+        <h:put>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:put>
+        the following body:
+        <h:jsonBody>{ "resource": {
+            "id": "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+            "ref": "http://www.example.com/titles/path/to/title/resource"
+            } }
+        </h:jsonBody>
+    </h:request>
+
+    <h:request>
+        When I
+        <h:post>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/annotations</h:post>
+        the following body:
+        <h:jsonBody>{ "annotation": {
+            "type": "emotion",
+            "value": "happy"
+            } }
+        </h:jsonBody>
+        then I should receive:
+        <ul>
+            <li>status
+                <h:status>201 Created</h:status>
+            </li>
+            <li> a Location header starting with
+                <h:location type="base">https://{host}/annotations/</h:location>
+                and ending in a
+                <h:location type="uuid">well-formed UUID</h:location>
+            </li>
+            <li>an
+                <h:responseBody/>
+                response body
+            </li>
+        </ul>
+    </h:request>
+</div>
+
+<div id="get-annotation" data-desc="How can I retrieve annotations?" c:execute="clearStorage()">
+    Annotations can be found both via <code>GET</code> on the object they are annotating,
+    or via the <code>/searches</code> endpoint using a query. Here we show how the state
+    of an annotation influences when it shows up. Annotations are always in one of four states:
+
+    <dl class="dl-horizontal">
+        <dt><code>TENTATIVE</code></dt>
+        <dd>The annotation has just been created, but is not yet confirmed</dd>
+
+        <dt><code>CONFIRMED</code></dt>
+        <dd>The annotation has been confirmed and is fully operational</dd>
+
+        <dt><code>DEPRECATED</code></dt>
+        <dd>This revision of the annotation has been deprecated by a newer revision</dd>
+
+        <dt><code>DELETED</code></dt>
+        <dd>The annotation is considered deleted (but is still available for review)</dd>
+    </dl>
+
+    <hr/>
+
+    <div c:execute="resourceExists(#resId)">
+        Assume a resource exists with uuid: <code c:set="#resId">6cf02b7a-7244-11e5-a68b-ab226ffa3019</code>
+    </div>
+
+    <ol>
+        <li>
+            <h:request>We
+                <h:success>add</h:success>
+                an annotation via
+                <h:post>/resources/$resId/annotations</h:post>
+                <h:jsonBody>{"annotation":{"value":"a tentative annotation"}}</h:jsonBody>
+            </h:request>
+            <div c:execute="#tentativeId=uuid()">which gets id <code c:echo="#tentativeId"></code></div>
+            We leave this annotation in its <code>TENTATIVE</code> state.
+        </li>
+
+        <li>
+            <h:request>We
+                <h:success>add</h:success>
+                an annotation via
+                <h:post>/resources/$resId/annotations</h:post>
+                <h:jsonBody>{"annotation":{"value":"a confirmed annotation"}}</h:jsonBody>
+            </h:request>
+            <div c:execute="#confirmedId=uuid()">which gets id <code c:echo="#confirmedId"></code></div>
+            <h:request>We
+                <h:success>confirm</h:success>
+                it
+                <h:put>/annotations/$confirmedId/state</h:put>
+                <h:jsonBody>{"state":"CONFIRMED"}</h:jsonBody>
+            </h:request>
+        </li>
+
+        <li>
+            <h:request>We
+                <h:success>add</h:success>
+                an annotation via
+                <h:post>/resources/$resId/annotations</h:post>
+                <h:jsonBody>{"annotation":{"value":"a deleted-before-confirmation annotation"}}</h:jsonBody>
+            </h:request>
+            <div c:execute="#delBeforeConfirmId=uuid()">which gets id <code c:echo="#delBeforeConfirmId"></code></div>
+            <h:request>We then
+                <h:success>delete</h:success>
+                it via
+                <h:delete>/annotations/$delBeforeConfirmId</h:delete>
+                before having confirmed it.
+            </h:request>
+            <div class="alert alert-warning sm">
+                A <code>TENTATIVE</code> annotation that is deleted in this way will be <strong>removed</strong>
+                from the database. It will not show up when we <code>GET</code> the resource later on.
+            </div>
+        </li>
+
+        <li>
+            <h:request>We
+                <h:success>add</h:success>
+                an annotation via
+                <h:post>/resources/$resId/annotations</h:post>
+                <h:jsonBody>{"annotation":{"value":"a deleted-after-confirmation annotation"}}</h:jsonBody>
+            </h:request>
+            <div c:execute="#delAfterConfirmId=uuid()">which gets id <code c:echo="#delAfterConfirmId"></code></div>
+            <h:request>We
+                <h:success>confirm</h:success>
+                it:
+                <h:put>/annotations/$delAfterConfirmId/state</h:put>
+                <h:jsonBody>{"state":"CONFIRMED"}</h:jsonBody>
+            </h:request>
+            <h:request>We then
+                <h:success>delete</h:success>
+                it via
+                <h:delete>/annotations/$delAfterConfirmId</h:delete>
+            </h:request>
+        </li>
+
+        <li>
+            <h:request>We
+                <h:success>add</h:success>
+                an annotation via
+                <h:post>/resources/$resId/annotations</h:post>
+                <h:jsonBody>{"annotation":{"value":"an annotation to be deprecated"}}</h:jsonBody>
+            </h:request>
+            <div c:execute="#deprecatedId=uuid()">which gets id <code c:echo="#deprecatedId"></code></div>
+            <h:request>We
+                <h:success>confirm</h:success>
+                it:
+                <h:put>/annotations/$deprecatedId/state</h:put>
+                <h:jsonBody>{"state":"CONFIRMED"}</h:jsonBody>
+            </h:request>
+            <h:request>We
+                <h:success>deprecate</h:success>
+                it:
+                <h:put>/annotations/$deprecatedId</h:put>
+                <h:jsonBody>{ "annotation": { "value": "the annotation value after deprecation" } }</h:jsonBody>
+            </h:request>
+        </li>
+    </ol>
+
+    <h:request>When we
+        <h:get>/resources/$resId</h:get>
+        we expect
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "resource": {
+            "id": "$resId",
+            "^annotations": [
+            "https://{host}/annotations/$tentativeId",
+            "https://{host}/annotations/$confirmedId",
+            "https://{host}/annotations/$delAfterConfirmId",
+            "https://{host}/annotations/$deprecatedId"
+            ] } }
+        </h:jsonResponse>
+    </h:request>
+
+    <h:request>We
+        <h:success>successfully</h:success>
+        <h:post>/searches</h:post>
+        <h:jsonBody>{
+            "query": {
+            "find": "annotation",
+            "where": "who:eq(\"nederlab\")",
+            "return": "value"
+            } }
+        </h:jsonBody>
+    </h:request>
+
+    <div c:execute="#searchId=uuid()">which gets id <code c:echo="#searchId"></code></div>
+
+    <h:request>We
+        <h:get>/searches/$searchId</h:get>
+        and inspect the number of results
+        <h:jsonResponse>{
+            "searchResult" : {
+            "id" : "$searchId",
+            "totalResults" : 5,
+            "^firstResultPage" : "https://{host}/searches/$searchId/resultPages/1"
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+    <h:request>We
+        <h:success>successfully</h:success>
+        <h:get>/searches/$searchId/resultPages/1</h:get>
+        and find <strong>all</strong> the annotations:
+        <h:jsonResponse>{
+            "searchResultPage" : {
+            "pageNumber" : 1,
+            "records" : [
+            {"value" : "the annotation value after deprecation"},
+            {"value" : "an annotation to be deprecated"},
+            {"value" : "a deleted-after-confirmation annotation"},
+            {"value" : "a confirmed annotation"},
+            {"value" : "a tentative annotation"}
+            ] } }
+        </h:jsonResponse>
+    </h:request>
+</div>
+
+</body>
+</html>
