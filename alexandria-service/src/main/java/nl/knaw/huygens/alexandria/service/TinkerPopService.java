@@ -128,8 +128,7 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub,
-                                              TentativeAlexandriaProvenance provenance) {
+  public AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance) {
     AlexandriaResource subresource = new AlexandriaResource(uuid, provenance);
     subresource.setCargo(sub);
     subresource.setParentResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, parentUuid.toString()));
@@ -339,8 +338,7 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public AlexandriaAnnotationBody createAnnotationBody(UUID uuid, String type, String value,
-                                                       TentativeAlexandriaProvenance provenance) {
+  public AlexandriaAnnotationBody createAnnotationBody(UUID uuid, String type, String value, TentativeAlexandriaProvenance provenance) {
     AlexandriaAnnotationBody body = new AlexandriaAnnotationBody(uuid, type, value, provenance);
     storeAnnotationBody(body);
     return body;
@@ -353,12 +351,10 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public SearchResult execute(AlexandriaQuery query) {
-    SearchResult searchResult = new SearchResult(locationBuilder);
-    searchResult.setId(UUID.randomUUID());
-    searchResult.setQuery(query);
-    List<Map<String, Object>> results = processQuery(query);
-    searchResult.setResults(results);
-    return searchResult;
+    return new SearchResult(locationBuilder)//
+        .setId(UUID.randomUUID())//
+        .setQuery(query)//
+        .setResults(processQuery(query));
   }
 
   // - other public methods -//
@@ -580,7 +576,6 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   private List<Map<String, Object>> processQuery(AlexandriaQuery query) {
-    List<Map<String, Object>> results;
 
     ParsedAlexandriaQuery pQuery = alexandriaQueryParser.parse(query);
 
@@ -591,7 +586,7 @@ public class TinkerPopService implements AlexandriaService {
     Stream<AnnotationVF> stream = pQuery.getAnnotationVFFinder().apply(storage);
     Log.debug("list={}", stream);
 
-    results = stream//
+    List<Map<String, Object>> results = stream//
         .filter(predicate)//
         .sorted(comparator)//
         .map(mapper)//

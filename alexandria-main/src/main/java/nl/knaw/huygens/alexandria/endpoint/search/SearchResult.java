@@ -55,8 +55,9 @@ public class SearchResult implements Identifiable {
     this.locationBuilder = locationBuilder;
   }
 
-  public void setId(UUID id) {
+  public SearchResult setId(UUID id) {
     this.id = id;
+    return this;
   }
 
   @Override
@@ -69,8 +70,9 @@ public class SearchResult implements Identifiable {
     return query;
   }
 
-  public void setQuery(AlexandriaQuery query) {
+  public SearchResult setQuery(AlexandriaQuery query) {
     this.query = query;
+    return this;
   }
 
   public int getTotalResults() {
@@ -86,8 +88,9 @@ public class SearchResult implements Identifiable {
     return results;
   }
 
-  public void setResults(List<Map<String, Object>> results) {
+  public SearchResult setResults(List<Map<String, Object>> results) {
     this.results = results;
+    return this;
   }
 
   @JsonProperty(PropertyPrefix.LINK + "firstResultPage")
