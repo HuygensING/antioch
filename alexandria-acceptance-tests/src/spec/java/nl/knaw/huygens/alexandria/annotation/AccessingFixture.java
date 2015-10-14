@@ -22,6 +22,7 @@ package nl.knaw.huygens.alexandria.annotation;
  * #L%
  */
 
+import static java.util.UUID.fromString;
 import static org.concordion.api.MultiValueResult.multiValueResult;
 import static org.mockito.Mockito.when;
 
@@ -29,28 +30,66 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.concordion.api.MultiValueResult;
+import org.concordion.integration.junit4.ConcordionRunner;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
-import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
+
+import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.endpoint.search.SearchEndpoint;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
-import org.concordion.api.MultiValueResult;
-import org.concordion.integration.junit4.ConcordionRunner;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
+import nl.knaw.huygens.alexandria.model.AlexandriaState;
 
 @RunWith(ConcordionRunner.class)
 public class AccessingFixture extends AnnotationsBase {
 
+  @BeforeClass
+  public static void registerSearchEndpoint() {
+    register(SearchEndpoint.class);
+  }
+
   private final Map<String, List<String>> annotatedReferences = Maps.newHashMap();
 
-  @BeforeClass
-  public static void registerEndpoint() {
-    register(AnnotationsEndpoint.class);
-//    register(AnnotationAnnotationsEndpoint.class);
-//    register(AnnotatableObjectAnnotationsEndpoint.class);
-    register(ResourcesEndpoint.class);
+  public void resourceExistsWithAnnotationInState(String resIdStr, String annoState, String annoValue) {
+    Log.trace("resourceExistsWithAnnotationInState: resIdStr=[{}], annoState=[{}]", resIdStr, annoState);
+    final UUID resId = fromString(resIdStr);
+    final UUID annoBodyId = UUID.randomUUID();
+    final AlexandriaAnnotationBody annoBody = service().createAnnotationBody(annoBodyId, "t", annoValue, aProvenance());
+    final AlexandriaAnnotation annotation = service().annotate(theResource(resId), annoBody, aProvenance());
+    final UUID annoId = annotation.getId();
+    Log.trace("annotation.id: [{}]", annoId);
+
+    switch (annoState) {
+      case "tentative":
+        // no-op intentional: newly created annotations are tentative by default
+        Assert.assertEquals(AlexandriaState.TENTATIVE, annotation.getState());
+        break;
+      case "confirmed":
+        service().confirmAnnotation(annoId);
+        break;
+      case "deleted-after-confirmation":
+        service().confirmAnnotation(annoId);
+        service().deleteAnnotation(annotation);
+        break;
+      case "deleted-before-confirmation":
+        service().deleteAnnotation(annotation);
+        break;
+      case "deprecated":
+        service().confirmAnnotation(annoId);
+        final AlexandriaAnnotation revisedAnno = service().annotate(theResource(resId), annoBody, aProvenance());
+        service().deprecateAnnotation(annoId, revisedAnno);
+        break;
+      default:
+        Assert.assertTrue("Never reached", false);
+        break;
+    }
   }
 
   public void noSuchAnnotation(String id) {
@@ -100,10 +139,7 @@ public class AccessingFixture extends AnnotationsBase {
   }
 
   private UUID asUUID(String s) {
-    return UUID.fromString(s);
+    return fromString(s);
   }
 
-  private UUID randomUUID() {
-    return UUID.randomUUID();
-  }
 }
