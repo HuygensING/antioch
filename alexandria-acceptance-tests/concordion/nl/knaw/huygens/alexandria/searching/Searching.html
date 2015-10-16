@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns:c="http://www.concordion.org/2007/concordion" xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test" xmlns:xsi="http://www.w3.org/1999/xhtml" xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test                           http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd"><head><style>* {
+  font-family: Arial;
+}
+body {
+  padding: 32px;  
+}
+pre {
+  padding: 6px 28px 6px 28px;
+  background-color: #E8EEF7;
+}
+pre, pre *, code, code *, kbd {
+  font-family: Courier New, Courier;
+  font-size: 10pt;
+}
+h1, h1 * {
+  font-size: 24pt;	
+}
+p, td, th, li, .breadcrumbs {
+  font-size: 10pt;
+}
+p, li {
+  line-height: 140%;
+  max-width: 720px;
+}
+table {
+  border-collapse: collapse;
+  empty-cells: show;
+  margin: 8px 0px 8px 0px;
+}
+th, td {
+  border: 1px solid black;
+  padding: 3px;
+}
+td {
+  background-color: white;
+  vertical-align: top;
+}
+th {
+  background-color: #C3D9FF;
+}
+li {
+  margin-top: 6px;
+  margin-bottom: 6px; 
+}
+
+.example {
+  padding: 6px 16px 6px 16px;
+  border: 1px solid #C3D9FF;
+  margin: 6px 0px 28px 0px;
+  background-color: #F5F9FD;
+}
+.example h3 {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  font-size: 12pt;
+}
+
+p.success {
+  padding: 2px;
+}
+.success, .success * {
+  background-color: #afa !important;
+}
+.success pre {
+  background-color: #bbffbb;
+}
+.failure, .failure * {
+  background-color: #ffb0b0;
+  padding: 1px;
+}
+.failure .expected {
+  text-decoration: line-through;
+  color: #bb5050;
+}
+.ignored, .ignored * {
+  background-color: #f0f0f0 !important;	
+}
+
+ins {
+  text-decoration: none;	
+}
+
+.exceptionMessage {
+  background-color: #fdd;
+  font-family: Courier New, Courier, Monospace;
+  font-size: 10pt;
+  display: block;
+  font-weight: normal;
+  padding: 4px;
+  text-decoration: none !important;
+}
+.stackTrace, .stackTrace * {
+  font-weight: normal;
+}
+.stackTrace {
+  display: none;
+  padding: 1px 4px 4px 4px;
+  background-color: #fdd;
+  border-top: 1px dotted black;
+}
+.stackTraceExceptionMessage {
+  display: block;
+  font-family: Courier New, Courier, Monospace;
+  font-size: 8pt;
+  white-space: wrap;
+  padding: 1px 0px 1px 0px;
+}
+.stackTraceEntry {
+  white-space: nowrap;
+  font-family: Courier New, Courier, Monospace;
+  display: block;
+  font-size: 8pt;
+  padding: 1px 0px 1px 32px;
+}
+.stackTraceButton {
+  font-size: 8pt;
+  margin: 2px 8px 2px 0px;
+  font-weight: normal;
+  font-family: Arial;
+}
+
+.special {
+  font-style: italic;
+}
+.missing, .missing * {
+  background-color: #ff9999;
+  color:#bb5050;
+  text-decoration: line-through;
+}
+.surplus, .surplus * {
+  background-color: #ff9999;
+}
+.footer {
+  text-align: right;
+  margin-top: 40px;
+  font-size: 8pt;
+  width: 100%;
+  color: #999;
+}
+.footer .testTime {
+  padding: 2px 10px 0px 0px;
+}
+
+.idea {
+  font-size: 9pt;
+  color: #888;
+  font-style: italic;	
+}
+.tight li {
+  margin-top: 1px;
+  margin-bottom: 1px; 
+}
+.commentary {
+  float: right;
+  width: 200px;
+  background-color: #ffffd0;
+  padding:8px;
+  border: 3px solid #eeeeb0;	 
+  margin: 10px 0px 10px 10px;	 
+}
+.commentary, .commentary * {
+  font-size: 8pt;
+}
+</style><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+<title>Searching in Alexandria</title>
+
+<link type="text/css" rel="stylesheet" href="../../../../../codemirror/codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/enable-codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/merge.css" /><script type="text/javascript" src="../../../../../codemirror/codemirror.js"></script><script type="text/javascript" src="../../../../../codemirror/javascript.js"></script><script type="text/javascript" src="../../../../../codemirror/diff_match_patch.js"></script><script type="text/javascript" src="../../../../../codemirror/merge.js"></script><script type="text/javascript" src="../../../../../codemirror/enable-codemirror.js"></script><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/bootstrap.css" /><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/enable-bootstrap.css" /><script type="text/javascript" src="../../../../../jquery/jquery.min.js"></script><script type="text/javascript" src="../../../../../bootstrap/bootstrap.min.js"></script></head><body><span class="breadcrumbs"><a href="../Alexandria.html">Alexandria</a> &gt;</span>
+
+
+
+
+
+<div class="container"><div class="jumbotron"><h1>Searching in Alexandria</h1></div><div class="row"><div class="col-md-3"><ul class="nav nav-pills nav-stacked"><li class="active"><a href="#query-anatomy" data-toggle="tab">Anatomy of a query</a></li><li><a href="#search-paging" data-toggle="tab">How are search results paged?</a></li></ul></div><div class="col-md-9"><div class="tab-content"><div id="query-anatomy" c:execute="clearStorage()" class="tab-pane fade active in"><div class="panel panel-default"><div class="panel-heading"><strong>Anatomy of a query</strong></div><div class="panel-body">
+    <div h:request="">We can
+        <span h:success="" class="success">successfully</span>
+        <code class="post">/searches</code>
+        the following body
+        <pre h:jsonBody="" class="json">{
+  "query" : {
+    "find" : "annotation",
+    "where" : "who:eq(\"nederlab\")",
+    "sort" : "-when",
+    "return" : "id,resource.url",
+    "pageSize" : 10
+  }
+}</pre>
+    </div>
+    where the properties of <code>query</code> have the following semantics:
+    <dl class="dl-horizontal">
+        <dt><code>find</code></dt>
+        <dd>the Alexandria concept to look for.
+            <small>(currently <code>annotation</code> is the default as well as the only valid value)</small>
+        </dd>
+        <dt><code>where</code></dt>
+        <dd>(<strong>mandatory</strong>) used to filter records. Check the
+            <a href="https://github.com/HuygensING/alexandria/blob/master/alexandria-aql/src/main/antlr4/nl/knaw/huygens/alexandria/antlr/AQL.g4">
+                ANTLR v4 grammar file</a> for syntax, field names and functions.
+            <small>(caveat: multiple <code>where</code> clauses are treated as a conjunction, meaning ALL clauses have
+                to match)
+            </small>
+        </dd>
+        <dt><code>sort</code></dt>
+        <dd>used to sort the result-set on a field (ref. <code>where</code>).
+            Use <code>+</code> for ascending and <code>-</code> for descending order.
+            <small>(if left unspecified, <code>-when</code> is used by default)
+            </small>
+        </dd>
+        <dt><code>return</code></dt>
+        <dd>used to select which fields (ref. <code>where</code>) from the result-set are returned in the output.
+            <small>(if left unspecified, <code>id</code> is returned by default)</small>
+        </dd>
+        <dt><code>pageSize</code></dt>
+        <dd>how many results from the result-set to include in each page of results.
+            <small>(if left unspecified, 10 results per page are included by default)</small>
+        </dd>
+    </dl>
+</div></div></div><div id="search-paging" c:execute="setupPagingStorage(#num)" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>How are search results paged?</strong></div><div class="panel-body">
+    Given there are <code c:set="#num">8</code> annotated resources in the database owned by user <code>nederlab</code>,
+
+    <div h:request="">When we
+        <code class="post">/searches</code>
+        the following body
+        <pre h:jsonBody="" class="json">{
+  "query" : {
+    "where" : "who:eq(\"nederlab\")",
+    "pageSize" : 3
+  }
+}</pre>
+        we expect status
+        <code h:status="" class="success">201 Created</code>
+        , an
+        <code h:responseBody="" class="empty success"> </code>
+        response body, and a
+        <code class="location success">https://{host}/searches/</code>
+        <code>Location</code> header.
+    </div>
+
+    <div c:execute="#searchId = uuid()">In this case the generated search id (taken from the <code>Location</code>
+        header) is: <code c:echo="#searchId">7374fdeb-b210-4161-aee7-98b5708966a7</code>.
+    </div>
+
+    <hr />
+
+    <div h:request="">When we
+        <code class="get">/searches/7374fdeb-b210-4161-aee7-98b5708966a7</code>
+        we expect status
+        <code h:status="" class="success">200 OK</code>
+        and a response body containing:
+        <small>(only paging details shown for brevity)</small>
+        <pre class="json rest-success">{
+  "searchResult" : {
+    "totalResults" : 8,
+    "totalResultPages" : 3,
+    "pageSize" : 3,
+    "^firstResultPage" : "https://{host}/searches/7374fdeb-b210-4161-aee7-98b5708966a7/resultPages/1"
+  }
+}</pre>
+    </div>
+
+    <hr />
+
+    <div h:request="">
+        When we
+        <code class="get">/searches/7374fdeb-b210-4161-aee7-98b5708966a7/resultPages/1</code>
+        we expect status
+        <code h:status="" class="success">200 OK</code>
+        and body
+        <small>(showing only details relevant to paging, actual record details withheld for brevity)</small>
+        <pre class="json rest-success">{
+  "searchResultPage" : {
+    "pageNumber" : 1,
+    "records" : [ {
+      "_resultNumber" : 1
+    }, {
+      "_resultNumber" : 2
+    }, {
+      "_resultNumber" : 3
+    } ],
+    "^nextPage" : "https://{host}/searches/7374fdeb-b210-4161-aee7-98b5708966a7/resultPages/2"
+  }
+}</pre>
+    </div>
+
+    <div class="alert alert-info sm">A convenience link <code>^nextPage</code> is included on the first page.</div>
+
+    <hr />
+
+    <div h:request="">
+        Now
+        <code class="get">/searches/7374fdeb-b210-4161-aee7-98b5708966a7/resultPages/2</code>
+        results in status
+        <code h:status="" class="success">200 OK</code>
+        and body
+        <pre class="json rest-success">{
+  "searchResultPage" : {
+    "pageNumber" : 2,
+    "records" : [ {
+      "_resultNumber" : 4
+    }, {
+      "_resultNumber" : 5
+    }, {
+      "_resultNumber" : 6
+    } ],
+    "^nextPage" : "https://{host}/searches/7374fdeb-b210-4161-aee7-98b5708966a7/resultPages/3",
+    "^previousPage" : "https://{host}/searches/7374fdeb-b210-4161-aee7-98b5708966a7/resultPages/1"
+  }
+}</pre>
+    </div>
+
+    <div class="alert alert-info sm">Both <code>^nextPage</code> and <code>^previousPage</code> convenience links are
+        included on the middle pages.
+    </div>
+
+    <hr />
+
+    <div h:request="">
+        And
+        <code class="get">/searches/7374fdeb-b210-4161-aee7-98b5708966a7/resultPages/3</code>
+        results in status
+        <code h:status="" class="success">200 OK</code>
+        and body
+        <pre class="json rest-success">{
+  "searchResultPage" : {
+    "pageNumber" : 3,
+    "records" : [ {
+      "_resultNumber" : 7
+    }, {
+      "_resultNumber" : 8
+    } ],
+    "^previousPage" : "https://{host}/searches/7374fdeb-b210-4161-aee7-98b5708966a7/resultPages/2"
+  }
+}</pre>
+    </div>
+
+    <div class="alert alert-info sm">The convenience link <code>^nextPage</code> is now absent, signaling this
+        is the final page.
+    </div>
+
+    <hr />
+
+    <div h:request="">When we try to
+        <code class="get">/searches/7374fdeb-b210-4161-aee7-98b5708966a7/resultPages/0</code>
+        we receive
+        <code h:status="" class="success">404 Not Found</code>
+    </div>
+
+    <div h:request="">
+        Likewise
+        <code class="get">/searches/7374fdeb-b210-4161-aee7-98b5708966a7/resultPages/4</code>
+        results in status
+        <code h:status="" class="success">404 Not Found</code>
+        as the requested page lies beyond the maximum.
+    </div>
+
+    <div class="alert alert-warning sm">
+        Valid result page numbers are <code>1</code> up to and including the number of <code>totalResultPages</code>.
+    </div>
+
+</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 300 ms on 16-Oct-2015 at 13:24:07 CEST</div></div></body>
+</html>

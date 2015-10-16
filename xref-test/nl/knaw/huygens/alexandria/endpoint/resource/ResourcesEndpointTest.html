@@ -8,97 +8,123 @@
 <div id="overview"><a href="../../../../../../../testapidocs/nl/knaw/huygens/alexandria/endpoint/resource/ResourcesEndpointTest.html">View Javadoc</a></div><pre>
 <a class="jxr_linenumber" name="L1" href="#L1">1</a>   <strong class="jxr_keyword">package</strong> nl.knaw.huygens.alexandria.endpoint.resource;
 <a class="jxr_linenumber" name="L2" href="#L2">2</a>   
-<a class="jxr_linenumber" name="L3" href="#L3">3</a>   <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.assertj.core.api.StrictAssertions.assertThat;
-<a class="jxr_linenumber" name="L4" href="#L4">4</a>   <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.mockito.Matchers.any;
-<a class="jxr_linenumber" name="L5" href="#L5">5</a>   <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.mockito.Mockito.mock;
-<a class="jxr_linenumber" name="L6" href="#L6">6</a>   <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.mockito.Mockito.when;
-<a class="jxr_linenumber" name="L7" href="#L7">7</a>   
-<a class="jxr_linenumber" name="L8" href="#L8">8</a>   <strong class="jxr_keyword">import</strong> javax.ws.rs.core.Response;
-<a class="jxr_linenumber" name="L9" href="#L9">9</a>   <strong class="jxr_keyword">import</strong> javax.ws.rs.core.Response.Status;
-<a class="jxr_linenumber" name="L10" href="#L10">10</a>  <strong class="jxr_keyword">import</strong> java.io.IOException;
-<a class="jxr_linenumber" name="L11" href="#L11">11</a>  <strong class="jxr_keyword">import</strong> java.util.Optional;
-<a class="jxr_linenumber" name="L12" href="#L12">12</a>  <strong class="jxr_keyword">import</strong> java.util.UUID;
-<a class="jxr_linenumber" name="L13" href="#L13">13</a>  
-<a class="jxr_linenumber" name="L14" href="#L14">14</a>  <strong class="jxr_keyword">import</strong> com.fasterxml.jackson.databind.ObjectMapper;
-<a class="jxr_linenumber" name="L15" href="#L15">15</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.Log;
-<a class="jxr_linenumber" name="L16" href="#L16">16</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.config.MockConfiguration;
-<a class="jxr_linenumber" name="L17" href="#L17">17</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
-<a class="jxr_linenumber" name="L18" href="#L18">18</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
-<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
-<a class="jxr_linenumber" name="L20" href="#L20">20</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.MockedServiceEndpointTest;
-<a class="jxr_linenumber" name="L21" href="#L21">21</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.UUIDParam;
-<a class="jxr_linenumber" name="L22" href="#L22">22</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaResource;
-<a class="jxr_linenumber" name="L23" href="#L23">23</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
-<a class="jxr_linenumber" name="L24" href="#L24">24</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.service.AlexandriaService;
-<a class="jxr_linenumber" name="L25" href="#L25">25</a>  <strong class="jxr_keyword">import</strong> org.junit.BeforeClass;
-<a class="jxr_linenumber" name="L26" href="#L26">26</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
-<a class="jxr_linenumber" name="L27" href="#L27">27</a>  
-<a class="jxr_linenumber" name="L28" href="#L28">28</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/resource/ResourcesEndpointTest.html">ResourcesEndpointTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/MockedServiceEndpointTest.html">MockedServiceEndpointTest</a> {
-<a class="jxr_linenumber" name="L29" href="#L29">29</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String ROOTPATH = EndpointPaths.RESOURCES;
+<a class="jxr_linenumber" name="L3" href="#L3">3</a>   <em class="jxr_comment">/*</em>
+<a class="jxr_linenumber" name="L4" href="#L4">4</a>   <em class="jxr_comment"> * #%L</em>
+<a class="jxr_linenumber" name="L5" href="#L5">5</a>   <em class="jxr_comment"> * alexandria-main</em>
+<a class="jxr_linenumber" name="L6" href="#L6">6</a>   <em class="jxr_comment"> * =======</em>
+<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <em class="jxr_comment"> * Copyright (C) 2015 Huygens ING (KNAW)</em>
+<a class="jxr_linenumber" name="L8" href="#L8">8</a>   <em class="jxr_comment"> * =======</em>
+<a class="jxr_linenumber" name="L9" href="#L9">9</a>   <em class="jxr_comment"> * This program is free software: you can redistribute it and/or modify</em>
+<a class="jxr_linenumber" name="L10" href="#L10">10</a>  <em class="jxr_comment"> * it under the terms of the GNU General Public License as</em>
+<a class="jxr_linenumber" name="L11" href="#L11">11</a>  <em class="jxr_comment"> * published by the Free Software Foundation, either version 3 of the</em>
+<a class="jxr_linenumber" name="L12" href="#L12">12</a>  <em class="jxr_comment"> * License, or (at your option) any later version.</em>
+<a class="jxr_linenumber" name="L13" href="#L13">13</a>  <em class="jxr_comment"> * </em>
+<a class="jxr_linenumber" name="L14" href="#L14">14</a>  <em class="jxr_comment"> * This program is distributed in the hope that it will be useful,</em>
+<a class="jxr_linenumber" name="L15" href="#L15">15</a>  <em class="jxr_comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</em>
+<a class="jxr_linenumber" name="L16" href="#L16">16</a>  <em class="jxr_comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</em>
+<a class="jxr_linenumber" name="L17" href="#L17">17</a>  <em class="jxr_comment"> * GNU General Public License for more details.</em>
+<a class="jxr_linenumber" name="L18" href="#L18">18</a>  <em class="jxr_comment"> * </em>
+<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <em class="jxr_comment"> * You should have received a copy of the GNU General Public</em>
+<a class="jxr_linenumber" name="L20" href="#L20">20</a>  <em class="jxr_comment"> * License along with this program.  If not, see</em>
+<a class="jxr_linenumber" name="L21" href="#L21">21</a>  <em class="jxr_comment"> * &lt;<a href="http://www.gnu.org/licenses/gpl-3.0.html&gt;" target="alexandria_uri">http://www.gnu.org/licenses/gpl-3.0.html&gt;</a>.</em>
+<a class="jxr_linenumber" name="L22" href="#L22">22</a>  <em class="jxr_comment"> * #L%</em>
+<a class="jxr_linenumber" name="L23" href="#L23">23</a>  <em class="jxr_comment"> */</em>
+<a class="jxr_linenumber" name="L24" href="#L24">24</a>  
+<a class="jxr_linenumber" name="L25" href="#L25">25</a>  
+<a class="jxr_linenumber" name="L26" href="#L26">26</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.assertj.core.api.Assertions.assertThat;
+<a class="jxr_linenumber" name="L27" href="#L27">27</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.mockito.Matchers.any;
+<a class="jxr_linenumber" name="L28" href="#L28">28</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.mockito.Mockito.mock;
+<a class="jxr_linenumber" name="L29" href="#L29">29</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.mockito.Mockito.when;
 <a class="jxr_linenumber" name="L30" href="#L30">30</a>  
-<a class="jxr_linenumber" name="L31" href="#L31">31</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> ObjectMapper om = <strong class="jxr_keyword">new</strong> ObjectMapper();
-<a class="jxr_linenumber" name="L32" href="#L32">32</a>  
-<a class="jxr_linenumber" name="L33" href="#L33">33</a>    @BeforeClass
-<a class="jxr_linenumber" name="L34" href="#L34">34</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">void</strong> registerEndpoint() {
-<a class="jxr_linenumber" name="L35" href="#L35">35</a>      register(ResourcesEndpoint.<strong class="jxr_keyword">class</strong>);
-<a class="jxr_linenumber" name="L36" href="#L36">36</a>    }
+<a class="jxr_linenumber" name="L31" href="#L31">31</a>  <strong class="jxr_keyword">import</strong> java.io.IOException;
+<a class="jxr_linenumber" name="L32" href="#L32">32</a>  <strong class="jxr_keyword">import</strong> java.util.Optional;
+<a class="jxr_linenumber" name="L33" href="#L33">33</a>  <strong class="jxr_keyword">import</strong> java.util.UUID;
+<a class="jxr_linenumber" name="L34" href="#L34">34</a>  
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <strong class="jxr_keyword">import</strong> javax.ws.rs.core.Response;
+<a class="jxr_linenumber" name="L36" href="#L36">36</a>  <strong class="jxr_keyword">import</strong> javax.ws.rs.core.Response.Status;
 <a class="jxr_linenumber" name="L37" href="#L37">37</a>  
-<a class="jxr_linenumber" name="L38" href="#L38">38</a>    @Test
-<a class="jxr_linenumber" name="L39" href="#L39">39</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getResourcesRefNoLongerExists() {
-<a class="jxr_linenumber" name="L40" href="#L40">40</a>      when(SERVICE_MOCK.readResource(any(UUID.<strong class="jxr_keyword">class</strong>))).thenReturn(Optional.empty());
-<a class="jxr_linenumber" name="L41" href="#L41">41</a>      Response response = target(ROOTPATH).path(UUID.randomUUID().toString()).path(<span class="jxr_string">"/ref"</span>).request().get();
-<a class="jxr_linenumber" name="L42" href="#L42">42</a>      assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
-<a class="jxr_linenumber" name="L43" href="#L43">43</a>    }
-<a class="jxr_linenumber" name="L44" href="#L44">44</a>  
-<a class="jxr_linenumber" name="L45" href="#L45">45</a>    @Test
-<a class="jxr_linenumber" name="L46" href="#L46">46</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGettingANonExistingResourceGivesANotFoundError() {
-<a class="jxr_linenumber" name="L47" href="#L47">47</a>      when(SERVICE_MOCK.readResource(any(UUID.<strong class="jxr_keyword">class</strong>))).thenReturn(Optional.empty());
-<a class="jxr_linenumber" name="L48" href="#L48">48</a>      Response response = target(ROOTPATH).path(<span class="jxr_string">"c28626d4-493a-4204-83d9-e9ae17e15654"</span>).request().get();
-<a class="jxr_linenumber" name="L49" href="#L49">49</a>      Log.debug(<span class="jxr_string">"response={}"</span>, response);
-<a class="jxr_linenumber" name="L50" href="#L50">50</a>      assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
-<a class="jxr_linenumber" name="L51" href="#L51">51</a>    }
-<a class="jxr_linenumber" name="L52" href="#L52">52</a>  
-<a class="jxr_linenumber" name="L53" href="#L53">53</a>    @Test
-<a class="jxr_linenumber" name="L54" href="#L54">54</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testPost() {
-<a class="jxr_linenumber" name="L55" href="#L55">55</a>      TentativeAlexandriaProvenance provenance = mock(TentativeAlexandriaProvenance.<strong class="jxr_keyword">class</strong>);
-<a class="jxr_linenumber" name="L56" href="#L56">56</a>      UUID id = UUID.randomUUID();
-<a class="jxr_linenumber" name="L57" href="#L57">57</a>      AlexandriaResource resource = <strong class="jxr_keyword">new</strong> AlexandriaResource(id, provenance);
-<a class="jxr_linenumber" name="L58" href="#L58">58</a>      when(SERVICE_MOCK.readResource(any(UUID.<strong class="jxr_keyword">class</strong>))).thenReturn(Optional.of(resource));
-<a class="jxr_linenumber" name="L59" href="#L59">59</a>      Response response = target(ROOTPATH).request().post(jsonEntity(<span class="jxr_string">"{'resource':{'ref':'REF'}}"</span>));
-<a class="jxr_linenumber" name="L60" href="#L60">60</a>      Log.debug(<span class="jxr_string">"response={}"</span>, response);
-<a class="jxr_linenumber" name="L61" href="#L61">61</a>      assertThat(response.getLocation().toString()).contains(<span class="jxr_string">"/resources/"</span> + id);
-<a class="jxr_linenumber" name="L62" href="#L62">62</a>      assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
-<a class="jxr_linenumber" name="L63" href="#L63">63</a>    }
-<a class="jxr_linenumber" name="L64" href="#L64">64</a>  
-<a class="jxr_linenumber" name="L65" href="#L65">65</a>    <em class="jxr_comment">// @Test</em>
-<a class="jxr_linenumber" name="L66" href="#L66">66</a>    <em class="jxr_comment">// public void testPostResource() {</em>
-<a class="jxr_linenumber" name="L67" href="#L67">67</a>    <em class="jxr_comment">// // Object entity;</em>
-<a class="jxr_linenumber" name="L68" href="#L68">68</a>    <em class="jxr_comment">// // target(EndpointPaths.RESOURCES).request().post(Entity.json(entity));</em>
-<a class="jxr_linenumber" name="L69" href="#L69">69</a>    <em class="jxr_comment">// }</em>
+<a class="jxr_linenumber" name="L38" href="#L38">38</a>  <strong class="jxr_keyword">import</strong> org.junit.BeforeClass;
+<a class="jxr_linenumber" name="L39" href="#L39">39</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a class="jxr_linenumber" name="L40" href="#L40">40</a>  
+<a class="jxr_linenumber" name="L41" href="#L41">41</a>  <strong class="jxr_keyword">import</strong> com.fasterxml.jackson.databind.ObjectMapper;
+<a class="jxr_linenumber" name="L42" href="#L42">42</a>  
+<a class="jxr_linenumber" name="L43" href="#L43">43</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.Log;
+<a class="jxr_linenumber" name="L44" href="#L44">44</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.config.MockConfiguration;
+<a class="jxr_linenumber" name="L45" href="#L45">45</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
+<a class="jxr_linenumber" name="L46" href="#L46">46</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
+<a class="jxr_linenumber" name="L47" href="#L47">47</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.MockedServiceEndpointTest;
+<a class="jxr_linenumber" name="L49" href="#L49">49</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.UUIDParam;
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaResource;
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
+<a class="jxr_linenumber" name="L52" href="#L52">52</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.service.AlexandriaService;
+<a class="jxr_linenumber" name="L53" href="#L53">53</a>  
+<a class="jxr_linenumber" name="L54" href="#L54">54</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/resource/ResourcesEndpointTest.html">ResourcesEndpointTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/MockedServiceEndpointTest.html">MockedServiceEndpointTest</a> {
+<a class="jxr_linenumber" name="L55" href="#L55">55</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String ROOTPATH = EndpointPaths.RESOURCES;
+<a class="jxr_linenumber" name="L56" href="#L56">56</a>  
+<a class="jxr_linenumber" name="L57" href="#L57">57</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> ObjectMapper om = <strong class="jxr_keyword">new</strong> ObjectMapper();
+<a class="jxr_linenumber" name="L58" href="#L58">58</a>  
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>    @BeforeClass
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">void</strong> registerEndpoint() {
+<a class="jxr_linenumber" name="L61" href="#L61">61</a>      register(ResourcesEndpoint.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>    }
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>  
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>    @Test
+<a class="jxr_linenumber" name="L65" href="#L65">65</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getResourcesRefNoLongerExists() {
+<a class="jxr_linenumber" name="L66" href="#L66">66</a>      when(SERVICE_MOCK.readResource(any(UUID.<strong class="jxr_keyword">class</strong>))).thenReturn(Optional.empty());
+<a class="jxr_linenumber" name="L67" href="#L67">67</a>      Response response = target(ROOTPATH).path(UUID.randomUUID().toString()).path(<span class="jxr_string">"/ref"</span>).request().get();
+<a class="jxr_linenumber" name="L68" href="#L68">68</a>      assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
+<a class="jxr_linenumber" name="L69" href="#L69">69</a>    }
 <a class="jxr_linenumber" name="L70" href="#L70">70</a>  
-<a class="jxr_linenumber" name="L71" href="#L71">71</a>    <em class="jxr_comment">// @Test</em>
-<a class="jxr_linenumber" name="L72" href="#L72">72</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testTwoPutsWillNotProduceAnError() <strong class="jxr_keyword">throws</strong> IOException {
-<a class="jxr_linenumber" name="L73" href="#L73">73</a>      AlexandriaService service = mock(AlexandriaService.<strong class="jxr_keyword">class</strong>);
-<a class="jxr_linenumber" name="L74" href="#L74">74</a>      ResourceCreationRequestBuilder requestBuilder = <strong class="jxr_keyword">new</strong> ResourceCreationRequestBuilder();
-<a class="jxr_linenumber" name="L75" href="#L75">75</a>      LocationBuilder locationBuilder = <strong class="jxr_keyword">new</strong> LocationBuilder(<strong class="jxr_keyword">new</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/config/MockConfiguration.html">MockConfiguration</a>(), <strong class="jxr_keyword">new</strong> EndpointPathResolver());
-<a class="jxr_linenumber" name="L76" href="#L76">76</a>      ResourceEntityBuilder entityBuilder = <strong class="jxr_keyword">new</strong> ResourceEntityBuilder(locationBuilder);
-<a class="jxr_linenumber" name="L77" href="#L77">77</a>      ResourcesEndpoint re = <strong class="jxr_keyword">new</strong> ResourcesEndpoint(service, requestBuilder, locationBuilder, entityBuilder);
+<a class="jxr_linenumber" name="L71" href="#L71">71</a>    @Test
+<a class="jxr_linenumber" name="L72" href="#L72">72</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGettingANonExistingResourceGivesANotFoundError() {
+<a class="jxr_linenumber" name="L73" href="#L73">73</a>      when(SERVICE_MOCK.readResource(any(UUID.<strong class="jxr_keyword">class</strong>))).thenReturn(Optional.empty());
+<a class="jxr_linenumber" name="L74" href="#L74">74</a>      Response response = target(ROOTPATH).path(<span class="jxr_string">"c28626d4-493a-4204-83d9-e9ae17e15654"</span>).request().get();
+<a class="jxr_linenumber" name="L75" href="#L75">75</a>      Log.debug(<span class="jxr_string">"response={}"</span>, response);
+<a class="jxr_linenumber" name="L76" href="#L76">76</a>      assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
+<a class="jxr_linenumber" name="L77" href="#L77">77</a>    }
 <a class="jxr_linenumber" name="L78" href="#L78">78</a>  
-<a class="jxr_linenumber" name="L79" href="#L79">79</a>      ResourcePrototype prototype1 = deserialize(<span class="jxr_string">"{'resource':{'id':'c28626d4-493a-4204-83d9-e9ae17e15654','ref':'Referentie1'}}"</span>);
-<a class="jxr_linenumber" name="L80" href="#L80">80</a>      UUIDParam uuidparam1 = <strong class="jxr_keyword">new</strong> UUIDParam(<span class="jxr_string">"c28626d4-493a-4204-83d9-e9ae17e15654"</span>);
-<a class="jxr_linenumber" name="L81" href="#L81">81</a>      Response response1 = re.setResourceAtSpecificID(uuidparam1, prototype1);
-<a class="jxr_linenumber" name="L82" href="#L82">82</a>      assertThat(response1.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
-<a class="jxr_linenumber" name="L83" href="#L83">83</a>  
-<a class="jxr_linenumber" name="L84" href="#L84">84</a>      ResourcePrototype prototype2 = deserialize(<span class="jxr_string">"{'resource':{'id':'d1753214-493a-4204-83d9-e9ae17e15654','ref':'Referentie2'}}"</span>);
-<a class="jxr_linenumber" name="L85" href="#L85">85</a>      UUIDParam uuidparam2 = <strong class="jxr_keyword">new</strong> UUIDParam(<span class="jxr_string">"d1753214-493a-4204-83d9-e9ae17e15654"</span>);
-<a class="jxr_linenumber" name="L86" href="#L86">86</a>      Response response2 = re.setResourceAtSpecificID(uuidparam2, prototype2);
-<a class="jxr_linenumber" name="L87" href="#L87">87</a>      assertThat(response2.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
-<a class="jxr_linenumber" name="L88" href="#L88">88</a>    }
-<a class="jxr_linenumber" name="L89" href="#L89">89</a>  
-<a class="jxr_linenumber" name="L90" href="#L90">90</a>    <strong class="jxr_keyword">private</strong> ResourcePrototype deserialize(String json1) <strong class="jxr_keyword">throws</strong> IOException {
-<a class="jxr_linenumber" name="L91" href="#L91">91</a>      <strong class="jxr_keyword">return</strong> om.readValue(json1.replace(<span class="jxr_string">"'"</span>, <span class="jxr_string">"\&quot;"</span>), ResourcePrototype.<strong class="jxr_keyword">class</strong>);
-<a class="jxr_linenumber" name="L92" href="#L92">92</a>    }
-<a class="jxr_linenumber" name="L93" href="#L93">93</a>  }
+<a class="jxr_linenumber" name="L79" href="#L79">79</a>    @Test
+<a class="jxr_linenumber" name="L80" href="#L80">80</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testPost() {
+<a class="jxr_linenumber" name="L81" href="#L81">81</a>      TentativeAlexandriaProvenance provenance = mock(TentativeAlexandriaProvenance.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L82" href="#L82">82</a>      UUID id = UUID.randomUUID();
+<a class="jxr_linenumber" name="L83" href="#L83">83</a>      AlexandriaResource resource = <strong class="jxr_keyword">new</strong> AlexandriaResource(id, provenance);
+<a class="jxr_linenumber" name="L84" href="#L84">84</a>      when(SERVICE_MOCK.readResource(any(UUID.<strong class="jxr_keyword">class</strong>))).thenReturn(Optional.of(resource));
+<a class="jxr_linenumber" name="L85" href="#L85">85</a>      Response response = target(ROOTPATH).request().post(jsonEntity(<span class="jxr_string">"{'resource':{'ref':'REF'}}"</span>));
+<a class="jxr_linenumber" name="L86" href="#L86">86</a>      Log.debug(<span class="jxr_string">"response={}"</span>, response);
+<a class="jxr_linenumber" name="L87" href="#L87">87</a>      assertThat(response.getLocation().toString()).contains(<span class="jxr_string">"/resources/"</span> + id);
+<a class="jxr_linenumber" name="L88" href="#L88">88</a>      assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
+<a class="jxr_linenumber" name="L89" href="#L89">89</a>    }
+<a class="jxr_linenumber" name="L90" href="#L90">90</a>  
+<a class="jxr_linenumber" name="L91" href="#L91">91</a>    <em class="jxr_comment">// @Test</em>
+<a class="jxr_linenumber" name="L92" href="#L92">92</a>    <em class="jxr_comment">// public void testPostResource() {</em>
+<a class="jxr_linenumber" name="L93" href="#L93">93</a>    <em class="jxr_comment">// // Object entity;</em>
+<a class="jxr_linenumber" name="L94" href="#L94">94</a>    <em class="jxr_comment">// // target(EndpointPaths.RESOURCES).request().post(Entity.json(entity));</em>
+<a class="jxr_linenumber" name="L95" href="#L95">95</a>    <em class="jxr_comment">// }</em>
+<a class="jxr_linenumber" name="L96" href="#L96">96</a>  
+<a class="jxr_linenumber" name="L97" href="#L97">97</a>    <em class="jxr_comment">// @Test</em>
+<a class="jxr_linenumber" name="L98" href="#L98">98</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testTwoPutsWillNotProduceAnError() <strong class="jxr_keyword">throws</strong> IOException {
+<a class="jxr_linenumber" name="L99" href="#L99">99</a>      AlexandriaService service = mock(AlexandriaService.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L100" href="#L100">100</a>     ResourceCreationRequestBuilder requestBuilder = <strong class="jxr_keyword">new</strong> ResourceCreationRequestBuilder();
+<a class="jxr_linenumber" name="L101" href="#L101">101</a>     LocationBuilder locationBuilder = <strong class="jxr_keyword">new</strong> LocationBuilder(<strong class="jxr_keyword">new</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/config/MockConfiguration.html">MockConfiguration</a>(), <strong class="jxr_keyword">new</strong> EndpointPathResolver());
+<a class="jxr_linenumber" name="L102" href="#L102">102</a>     ResourceEntityBuilder entityBuilder = <strong class="jxr_keyword">new</strong> ResourceEntityBuilder(locationBuilder);
+<a class="jxr_linenumber" name="L103" href="#L103">103</a>     ResourcesEndpoint re = <strong class="jxr_keyword">new</strong> ResourcesEndpoint(service, requestBuilder, locationBuilder, entityBuilder);
+<a class="jxr_linenumber" name="L104" href="#L104">104</a> 
+<a class="jxr_linenumber" name="L105" href="#L105">105</a>     ResourcePrototype prototype1 = deserialize(<span class="jxr_string">"{'resource':{'id':'c28626d4-493a-4204-83d9-e9ae17e15654','ref':'Referentie1'}}"</span>);
+<a class="jxr_linenumber" name="L106" href="#L106">106</a>     UUIDParam uuidparam1 = <strong class="jxr_keyword">new</strong> UUIDParam(<span class="jxr_string">"c28626d4-493a-4204-83d9-e9ae17e15654"</span>);
+<a class="jxr_linenumber" name="L107" href="#L107">107</a>     Response response1 = re.setResourceAtSpecificID(uuidparam1, prototype1);
+<a class="jxr_linenumber" name="L108" href="#L108">108</a>     assertThat(response1.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
+<a class="jxr_linenumber" name="L109" href="#L109">109</a> 
+<a class="jxr_linenumber" name="L110" href="#L110">110</a>     ResourcePrototype prototype2 = deserialize(<span class="jxr_string">"{'resource':{'id':'d1753214-493a-4204-83d9-e9ae17e15654','ref':'Referentie2'}}"</span>);
+<a class="jxr_linenumber" name="L111" href="#L111">111</a>     UUIDParam uuidparam2 = <strong class="jxr_keyword">new</strong> UUIDParam(<span class="jxr_string">"d1753214-493a-4204-83d9-e9ae17e15654"</span>);
+<a class="jxr_linenumber" name="L112" href="#L112">112</a>     Response response2 = re.setResourceAtSpecificID(uuidparam2, prototype2);
+<a class="jxr_linenumber" name="L113" href="#L113">113</a>     assertThat(response2.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
+<a class="jxr_linenumber" name="L114" href="#L114">114</a>   }
+<a class="jxr_linenumber" name="L115" href="#L115">115</a> 
+<a class="jxr_linenumber" name="L116" href="#L116">116</a>   <strong class="jxr_keyword">private</strong> ResourcePrototype deserialize(String json1) <strong class="jxr_keyword">throws</strong> IOException {
+<a class="jxr_linenumber" name="L117" href="#L117">117</a>     <strong class="jxr_keyword">return</strong> om.readValue(json1.replace(<span class="jxr_string">"'"</span>, <span class="jxr_string">"\&quot;"</span>), ResourcePrototype.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L118" href="#L118">118</a>   }
+<a class="jxr_linenumber" name="L119" href="#L119">119</a> }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2015 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>

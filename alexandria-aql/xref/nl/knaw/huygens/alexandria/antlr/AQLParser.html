@@ -25,20 +25,20 @@
 <a class="jxr_linenumber" name="L17" href="#L17">17</a>  	<strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> PredictionContextCache _sharedContextCache =
 <a class="jxr_linenumber" name="L18" href="#L18">18</a>  		<strong class="jxr_keyword">new</strong> PredictionContextCache();
 <a class="jxr_linenumber" name="L19" href="#L19">19</a>  	<strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong>
-<a class="jxr_linenumber" name="L20" href="#L20">20</a>  		T__0=1, T__1=2, T__2=3, T__3=4, FIELDNAME=5, FUNCTION=6, STRINGPARAMETER=7, 
-<a class="jxr_linenumber" name="L21" href="#L21">21</a>  		LONGPARAMETER=8, WS=9;
+<a class="jxr_linenumber" name="L20" href="#L20">20</a>  		T__0=1, T__1=2, T__2=3, T__3=4, FIELD_NAME=5, FUNCTION=6, STRING_PARAMETER=7, 
+<a class="jxr_linenumber" name="L21" href="#L21">21</a>  		LONG_PARAMETER=8, WS=9;
 <a class="jxr_linenumber" name="L22" href="#L22">22</a>  	<strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong>
-<a class="jxr_linenumber" name="L23" href="#L23">23</a>  		RULE_root = 0, RULE_subquery = 1, RULE_parameters = 2, RULE_parameter = 3;
+<a class="jxr_linenumber" name="L23" href="#L23">23</a>  		RULE_root = 0, RULE_subQuery = 1, RULE_parameters = 2, RULE_parameter = 3;
 <a class="jxr_linenumber" name="L24" href="#L24">24</a>  	<strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String[] ruleNames = {
-<a class="jxr_linenumber" name="L25" href="#L25">25</a>  		<span class="jxr_string">"root"</span>, <span class="jxr_string">"subquery"</span>, <span class="jxr_string">"parameters"</span>, <span class="jxr_string">"parameter"</span>
+<a class="jxr_linenumber" name="L25" href="#L25">25</a>  		<span class="jxr_string">"root"</span>, <span class="jxr_string">"subQuery"</span>, <span class="jxr_string">"parameters"</span>, <span class="jxr_string">"parameter"</span>
 <a class="jxr_linenumber" name="L26" href="#L26">26</a>  	};
 <a class="jxr_linenumber" name="L27" href="#L27">27</a>  
 <a class="jxr_linenumber" name="L28" href="#L28">28</a>  	<strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String[] _LITERAL_NAMES = {
 <a class="jxr_linenumber" name="L29" href="#L29">29</a>  		<strong class="jxr_keyword">null</strong>, <span class="jxr_string">"':'"</span>, <span class="jxr_string">"'('"</span>, <span class="jxr_string">"')'"</span>, <span class="jxr_string">"','"</span>
 <a class="jxr_linenumber" name="L30" href="#L30">30</a>  	};
 <a class="jxr_linenumber" name="L31" href="#L31">31</a>  	<strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String[] _SYMBOLIC_NAMES = {
-<a class="jxr_linenumber" name="L32" href="#L32">32</a>  		<strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>, <span class="jxr_string">"FIELDNAME"</span>, <span class="jxr_string">"FUNCTION"</span>, <span class="jxr_string">"STRINGPARAMETER"</span>, 
-<a class="jxr_linenumber" name="L33" href="#L33">33</a>  		<span class="jxr_string">"LONGPARAMETER"</span>, <span class="jxr_string">"WS"</span>
+<a class="jxr_linenumber" name="L32" href="#L32">32</a>  		<strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>, <span class="jxr_string">"FIELD_NAME"</span>, <span class="jxr_string">"FUNCTION"</span>, <span class="jxr_string">"STRING_PARAMETER"</span>, 
+<a class="jxr_linenumber" name="L33" href="#L33">33</a>  		<span class="jxr_string">"LONG_PARAMETER"</span>, <span class="jxr_string">"WS"</span>
 <a class="jxr_linenumber" name="L34" href="#L34">34</a>  	};
 <a class="jxr_linenumber" name="L35" href="#L35">35</a>  	<strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> Vocabulary VOCABULARY = <strong class="jxr_keyword">new</strong> VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 <a class="jxr_linenumber" name="L36" href="#L36">36</a>  
@@ -90,11 +90,11 @@
 <a class="jxr_linenumber" name="L82" href="#L82">82</a>  		_interp = <strong class="jxr_keyword">new</strong> ParserATNSimulator(<strong class="jxr_keyword">this</strong>,_ATN,_decisionToDFA,_sharedContextCache);
 <a class="jxr_linenumber" name="L83" href="#L83">83</a>  	}
 <a class="jxr_linenumber" name="L84" href="#L84">84</a>  	<strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/antlr/AQLParser.html">RootContext</a> <strong class="jxr_keyword">extends</strong> ParserRuleContext {
-<a class="jxr_linenumber" name="L85" href="#L85">85</a>  		<strong class="jxr_keyword">public</strong> List&lt;SubqueryContext&gt; subquery() {
-<a class="jxr_linenumber" name="L86" href="#L86">86</a>  			<strong class="jxr_keyword">return</strong> getRuleContexts(SubqueryContext.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L85" href="#L85">85</a>  		<strong class="jxr_keyword">public</strong> List&lt;SubQueryContext&gt; subQuery() {
+<a class="jxr_linenumber" name="L86" href="#L86">86</a>  			<strong class="jxr_keyword">return</strong> getRuleContexts(SubQueryContext.<strong class="jxr_keyword">class</strong>);
 <a class="jxr_linenumber" name="L87" href="#L87">87</a>  		}
-<a class="jxr_linenumber" name="L88" href="#L88">88</a>  		<strong class="jxr_keyword">public</strong> <a href="../../../../../nl/knaw/huygens/alexandria/antlr/AQLParser.html">SubqueryContext</a> subquery(<strong class="jxr_keyword">int</strong> i) {
-<a class="jxr_linenumber" name="L89" href="#L89">89</a>  			<strong class="jxr_keyword">return</strong> getRuleContext(SubqueryContext.<strong class="jxr_keyword">class</strong>,i);
+<a class="jxr_linenumber" name="L88" href="#L88">88</a>  		<strong class="jxr_keyword">public</strong> <a href="../../../../../nl/knaw/huygens/alexandria/antlr/AQLParser.html">SubQueryContext</a> subQuery(<strong class="jxr_keyword">int</strong> i) {
+<a class="jxr_linenumber" name="L89" href="#L89">89</a>  			<strong class="jxr_keyword">return</strong> getRuleContext(SubQueryContext.<strong class="jxr_keyword">class</strong>,i);
 <a class="jxr_linenumber" name="L90" href="#L90">90</a>  		}
 <a class="jxr_linenumber" name="L91" href="#L91">91</a>  		<strong class="jxr_keyword">public</strong> <a href="../../../../../nl/knaw/huygens/alexandria/antlr/AQLParser.html">RootContext</a>(ParserRuleContext parent, <strong class="jxr_keyword">int</strong> invokingState) {
 <a class="jxr_linenumber" name="L92" href="#L92">92</a>  			<strong class="jxr_keyword">super</strong>(parent, invokingState);
@@ -123,15 +123,15 @@
 <a class="jxr_linenumber" name="L115" href="#L115">115</a> 			enterOuterAlt(_localctx, 1);
 <a class="jxr_linenumber" name="L116" href="#L116">116</a> 			{
 <a class="jxr_linenumber" name="L117" href="#L117">117</a> 			setState(8);
-<a class="jxr_linenumber" name="L118" href="#L118">118</a> 			subquery();
+<a class="jxr_linenumber" name="L118" href="#L118">118</a> 			subQuery();
 <a class="jxr_linenumber" name="L119" href="#L119">119</a> 			setState(12);
 <a class="jxr_linenumber" name="L120" href="#L120">120</a> 			_errHandler.sync(<strong class="jxr_keyword">this</strong>);
 <a class="jxr_linenumber" name="L121" href="#L121">121</a> 			_la = _input.LA(1);
-<a class="jxr_linenumber" name="L122" href="#L122">122</a> 			<strong class="jxr_keyword">while</strong> (_la==FIELDNAME) {
+<a class="jxr_linenumber" name="L122" href="#L122">122</a> 			<strong class="jxr_keyword">while</strong> (_la==FIELD_NAME) {
 <a class="jxr_linenumber" name="L123" href="#L123">123</a> 				{
 <a class="jxr_linenumber" name="L124" href="#L124">124</a> 				{
 <a class="jxr_linenumber" name="L125" href="#L125">125</a> 				setState(9);
-<a class="jxr_linenumber" name="L126" href="#L126">126</a> 				subquery();
+<a class="jxr_linenumber" name="L126" href="#L126">126</a> 				subQuery();
 <a class="jxr_linenumber" name="L127" href="#L127">127</a> 				}
 <a class="jxr_linenumber" name="L128" href="#L128">128</a> 				}
 <a class="jxr_linenumber" name="L129" href="#L129">129</a> 				setState(14);
@@ -151,39 +151,39 @@
 <a class="jxr_linenumber" name="L143" href="#L143">143</a> 		<strong class="jxr_keyword">return</strong> _localctx;
 <a class="jxr_linenumber" name="L144" href="#L144">144</a> 	}
 <a class="jxr_linenumber" name="L145" href="#L145">145</a> 
-<a class="jxr_linenumber" name="L146" href="#L146">146</a> 	<strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/antlr/AQLParser.html">SubqueryContext</a> <strong class="jxr_keyword">extends</strong> ParserRuleContext {
-<a class="jxr_linenumber" name="L147" href="#L147">147</a> 		<strong class="jxr_keyword">public</strong> TerminalNode FIELDNAME() { <strong class="jxr_keyword">return</strong> getToken(AQLParser.FIELDNAME, 0); }
+<a class="jxr_linenumber" name="L146" href="#L146">146</a> 	<strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/antlr/AQLParser.html">SubQueryContext</a> <strong class="jxr_keyword">extends</strong> ParserRuleContext {
+<a class="jxr_linenumber" name="L147" href="#L147">147</a> 		<strong class="jxr_keyword">public</strong> TerminalNode FIELD_NAME() { <strong class="jxr_keyword">return</strong> getToken(AQLParser.FIELD_NAME, 0); }
 <a class="jxr_linenumber" name="L148" href="#L148">148</a> 		<strong class="jxr_keyword">public</strong> TerminalNode FUNCTION() { <strong class="jxr_keyword">return</strong> getToken(AQLParser.FUNCTION, 0); }
 <a class="jxr_linenumber" name="L149" href="#L149">149</a> 		<strong class="jxr_keyword">public</strong> <a href="../../../../../nl/knaw/huygens/alexandria/antlr/AQLParser.html">ParametersContext</a> parameters() {
 <a class="jxr_linenumber" name="L150" href="#L150">150</a> 			<strong class="jxr_keyword">return</strong> getRuleContext(ParametersContext.<strong class="jxr_keyword">class</strong>,0);
 <a class="jxr_linenumber" name="L151" href="#L151">151</a> 		}
-<a class="jxr_linenumber" name="L152" href="#L152">152</a> 		<strong class="jxr_keyword">public</strong> <a href="../../../../../nl/knaw/huygens/alexandria/antlr/AQLParser.html">SubqueryContext</a>(ParserRuleContext parent, <strong class="jxr_keyword">int</strong> invokingState) {
+<a class="jxr_linenumber" name="L152" href="#L152">152</a> 		<strong class="jxr_keyword">public</strong> <a href="../../../../../nl/knaw/huygens/alexandria/antlr/AQLParser.html">SubQueryContext</a>(ParserRuleContext parent, <strong class="jxr_keyword">int</strong> invokingState) {
 <a class="jxr_linenumber" name="L153" href="#L153">153</a> 			<strong class="jxr_keyword">super</strong>(parent, invokingState);
 <a class="jxr_linenumber" name="L154" href="#L154">154</a> 		}
-<a class="jxr_linenumber" name="L155" href="#L155">155</a> 		@Override <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">int</strong> getRuleIndex() { <strong class="jxr_keyword">return</strong> RULE_subquery; }
+<a class="jxr_linenumber" name="L155" href="#L155">155</a> 		@Override <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">int</strong> getRuleIndex() { <strong class="jxr_keyword">return</strong> RULE_subQuery; }
 <a class="jxr_linenumber" name="L156" href="#L156">156</a> 		@Override
 <a class="jxr_linenumber" name="L157" href="#L157">157</a> 		<strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> enterRule(ParseTreeListener listener) {
-<a class="jxr_linenumber" name="L158" href="#L158">158</a> 			<strong class="jxr_keyword">if</strong> ( listener instanceof AQLListener ) ((AQLListener)listener).enterSubquery(<strong class="jxr_keyword">this</strong>);
+<a class="jxr_linenumber" name="L158" href="#L158">158</a> 			<strong class="jxr_keyword">if</strong> ( listener instanceof AQLListener ) ((AQLListener)listener).enterSubQuery(<strong class="jxr_keyword">this</strong>);
 <a class="jxr_linenumber" name="L159" href="#L159">159</a> 		}
 <a class="jxr_linenumber" name="L160" href="#L160">160</a> 		@Override
 <a class="jxr_linenumber" name="L161" href="#L161">161</a> 		<strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> exitRule(ParseTreeListener listener) {
-<a class="jxr_linenumber" name="L162" href="#L162">162</a> 			<strong class="jxr_keyword">if</strong> ( listener instanceof AQLListener ) ((AQLListener)listener).exitSubquery(<strong class="jxr_keyword">this</strong>);
+<a class="jxr_linenumber" name="L162" href="#L162">162</a> 			<strong class="jxr_keyword">if</strong> ( listener instanceof AQLListener ) ((AQLListener)listener).exitSubQuery(<strong class="jxr_keyword">this</strong>);
 <a class="jxr_linenumber" name="L163" href="#L163">163</a> 		}
 <a class="jxr_linenumber" name="L164" href="#L164">164</a> 		@Override
 <a class="jxr_linenumber" name="L165" href="#L165">165</a> 		<strong class="jxr_keyword">public</strong> &lt;T&gt; T accept(ParseTreeVisitor&lt;? <strong class="jxr_keyword">extends</strong> T&gt; visitor) {
-<a class="jxr_linenumber" name="L166" href="#L166">166</a> 			<strong class="jxr_keyword">if</strong> ( visitor instanceof AQLVisitor ) <strong class="jxr_keyword">return</strong> ((AQLVisitor&lt;? <strong class="jxr_keyword">extends</strong> T&gt;)visitor).visitSubquery(<strong class="jxr_keyword">this</strong>);
+<a class="jxr_linenumber" name="L166" href="#L166">166</a> 			<strong class="jxr_keyword">if</strong> ( visitor instanceof AQLVisitor ) <strong class="jxr_keyword">return</strong> ((AQLVisitor&lt;? <strong class="jxr_keyword">extends</strong> T&gt;)visitor).visitSubQuery(<strong class="jxr_keyword">this</strong>);
 <a class="jxr_linenumber" name="L167" href="#L167">167</a> 			<strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">return</strong> visitor.visitChildren(<strong class="jxr_keyword">this</strong>);
 <a class="jxr_linenumber" name="L168" href="#L168">168</a> 		}
 <a class="jxr_linenumber" name="L169" href="#L169">169</a> 	}
 <a class="jxr_linenumber" name="L170" href="#L170">170</a> 
-<a class="jxr_linenumber" name="L171" href="#L171">171</a> 	<strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../nl/knaw/huygens/alexandria/antlr/AQLParser.html">SubqueryContext</a> subquery() <strong class="jxr_keyword">throws</strong> RecognitionException {
-<a class="jxr_linenumber" name="L172" href="#L172">172</a> 		SubqueryContext _localctx = <strong class="jxr_keyword">new</strong> <a href="../../../../../nl/knaw/huygens/alexandria/antlr/AQLParser.html">SubqueryContext</a>(_ctx, getState());
-<a class="jxr_linenumber" name="L173" href="#L173">173</a> 		enterRule(_localctx, 2, RULE_subquery);
+<a class="jxr_linenumber" name="L171" href="#L171">171</a> 	<strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../nl/knaw/huygens/alexandria/antlr/AQLParser.html">SubQueryContext</a> subQuery() <strong class="jxr_keyword">throws</strong> RecognitionException {
+<a class="jxr_linenumber" name="L172" href="#L172">172</a> 		SubQueryContext _localctx = <strong class="jxr_keyword">new</strong> <a href="../../../../../nl/knaw/huygens/alexandria/antlr/AQLParser.html">SubQueryContext</a>(_ctx, getState());
+<a class="jxr_linenumber" name="L173" href="#L173">173</a> 		enterRule(_localctx, 2, RULE_subQuery);
 <a class="jxr_linenumber" name="L174" href="#L174">174</a> 		<strong class="jxr_keyword">try</strong> {
 <a class="jxr_linenumber" name="L175" href="#L175">175</a> 			enterOuterAlt(_localctx, 1);
 <a class="jxr_linenumber" name="L176" href="#L176">176</a> 			{
 <a class="jxr_linenumber" name="L177" href="#L177">177</a> 			setState(15);
-<a class="jxr_linenumber" name="L178" href="#L178">178</a> 			match(FIELDNAME);
+<a class="jxr_linenumber" name="L178" href="#L178">178</a> 			match(FIELD_NAME);
 <a class="jxr_linenumber" name="L179" href="#L179">179</a> 			setState(16);
 <a class="jxr_linenumber" name="L180" href="#L180">180</a> 			match(T__0);
 <a class="jxr_linenumber" name="L181" href="#L181">181</a> 			setState(17);
@@ -272,8 +272,8 @@
 <a class="jxr_linenumber" name="L264" href="#L264">264</a> 	}
 <a class="jxr_linenumber" name="L265" href="#L265">265</a> 
 <a class="jxr_linenumber" name="L266" href="#L266">266</a> 	<strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/antlr/AQLParser.html">ParameterContext</a> <strong class="jxr_keyword">extends</strong> ParserRuleContext {
-<a class="jxr_linenumber" name="L267" href="#L267">267</a> 		<strong class="jxr_keyword">public</strong> TerminalNode STRINGPARAMETER() { <strong class="jxr_keyword">return</strong> getToken(AQLParser.STRINGPARAMETER, 0); }
-<a class="jxr_linenumber" name="L268" href="#L268">268</a> 		<strong class="jxr_keyword">public</strong> TerminalNode LONGPARAMETER() { <strong class="jxr_keyword">return</strong> getToken(AQLParser.LONGPARAMETER, 0); }
+<a class="jxr_linenumber" name="L267" href="#L267">267</a> 		<strong class="jxr_keyword">public</strong> TerminalNode STRING_PARAMETER() { <strong class="jxr_keyword">return</strong> getToken(AQLParser.STRING_PARAMETER, 0); }
+<a class="jxr_linenumber" name="L268" href="#L268">268</a> 		<strong class="jxr_keyword">public</strong> TerminalNode LONG_PARAMETER() { <strong class="jxr_keyword">return</strong> getToken(AQLParser.LONG_PARAMETER, 0); }
 <a class="jxr_linenumber" name="L269" href="#L269">269</a> 		<strong class="jxr_keyword">public</strong> <a href="../../../../../nl/knaw/huygens/alexandria/antlr/AQLParser.html">ParameterContext</a>(ParserRuleContext parent, <strong class="jxr_keyword">int</strong> invokingState) {
 <a class="jxr_linenumber" name="L270" href="#L270">270</a> 			<strong class="jxr_keyword">super</strong>(parent, invokingState);
 <a class="jxr_linenumber" name="L271" href="#L271">271</a> 		}
@@ -302,7 +302,7 @@
 <a class="jxr_linenumber" name="L294" href="#L294">294</a> 			{
 <a class="jxr_linenumber" name="L295" href="#L295">295</a> 			setState(30);
 <a class="jxr_linenumber" name="L296" href="#L296">296</a> 			_la = _input.LA(1);
-<a class="jxr_linenumber" name="L297" href="#L297">297</a> 			<strong class="jxr_keyword">if</strong> ( !(_la==STRINGPARAMETER || _la==LONGPARAMETER) ) {
+<a class="jxr_linenumber" name="L297" href="#L297">297</a> 			<strong class="jxr_keyword">if</strong> ( !(_la==STRING_PARAMETER || _la==LONG_PARAMETER) ) {
 <a class="jxr_linenumber" name="L298" href="#L298">298</a> 			_errHandler.recoverInline(<strong class="jxr_keyword">this</strong>);
 <a class="jxr_linenumber" name="L299" href="#L299">299</a> 			} <strong class="jxr_keyword">else</strong> {
 <a class="jxr_linenumber" name="L300" href="#L300">300</a> 				consume();
