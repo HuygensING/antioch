@@ -104,7 +104,7 @@
     <div class="alert alert-info sm">
         Subresources do not have a <code>ref</code> field, as they do not refer to an external location.
         Instead, they have a <code>sub</code> field which locates this subresource relative to its parent and a
-        <code>^part_of</code> link to that parent resource.
+        <code>^partOf</code> link to that parent resource.
     </div>
 
     <h:request>When we
@@ -120,7 +120,7 @@
             "value" : "CONFIRMED",
             "since" : "{date.beforeNow}"
             },
-            "^part_of" : "https://{host}/resources/$resId",
+            "^partOf" : "https://{host}/resources/$resId",
             "^provenance" : "https://{host}/resources/$subId/provenance",
             "^annotations" : [ "https://{host}/annotations/$subAnnoId" ]
             } }
