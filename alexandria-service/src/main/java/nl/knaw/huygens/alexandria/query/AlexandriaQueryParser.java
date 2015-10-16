@@ -54,9 +54,12 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.antlr.AQLLexer;
 import nl.knaw.huygens.alexandria.antlr.AQLParser;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
-import nl.knaw.huygens.alexandria.endpoint.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.model.search.QueryField;
+import nl.knaw.huygens.alexandria.model.search.QueryFunction;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
@@ -96,6 +99,9 @@ public class AlexandriaQueryParser {
   private void setFilter(final ParsedAlexandriaQuery paq, String where) {
     final List<WhereToken> tokens = tokenize(where);
 
+    // add default stateToken unless there is a state clause in the where
+    addDefaultStateTokenWhenNeeded(tokens);
+
     // any tokens with resource.id or subresource.id need to be filtered out and lead to an annotationVFFinder
     List<WhereToken> resourceWhereTokens = filterResourceWhereTokens(tokens);
     if (!resourceWhereTokens.isEmpty()) {
@@ -106,6 +112,19 @@ public class AlexandriaQueryParser {
 
     // create a predicate for filtering the annotationVF stream based on the remaining tokens
     paq.setPredicate(createPredicate(tokens));
+  }
+
+  private void addDefaultStateTokenWhenNeeded(List<WhereToken> tokens) {
+    boolean addStateToken = tokens.stream()//
+        .noneMatch(token -> QueryField.state.equals(token.getProperty()));
+    if (addStateToken) {
+      WhereToken defaultStateToken = new WhereToken(//
+          QueryField.state, //
+          QueryFunction.eq, //
+          ImmutableList.of(AlexandriaState.CONFIRMED.name())//
+      );
+      tokens.add(defaultStateToken);
+    }
   }
 
   private List<WhereToken> filterResourceWhereTokens(List<WhereToken> tokens) {
@@ -206,7 +225,7 @@ public class AlexandriaQueryParser {
   }
 
   static Predicate<AnnotationVF> toPredicate(WhereToken whereToken) {
-    Function<AnnotationVF, Object> getter = whereToken.getProperty().getter;
+    Function<AnnotationVF, Object> getter = QueryFieldGetters.get(whereToken.getProperty());
     // eq
     if (QueryFunction.eq.equals(whereToken.getFunction())) {
       Object eqValue = whereToken.getParameters().get(0);
@@ -304,7 +323,7 @@ public class AlexandriaQueryParser {
 
   private static Ordering<AnnotationVF> ordering(SortToken token) {
     boolean ascending = token.isAscending();
-    Function<AnnotationVF, Object> function = token.getField().getter;
+    Function<AnnotationVF, Object> function = QueryFieldGetters.get(token.getField());
     return new Ordering<AnnotationVF>() {
       @SuppressWarnings("unchecked")
       @Override
@@ -358,7 +377,7 @@ public class AlexandriaQueryParser {
       paq.setReturnFields(fields);
 
       final Function<AnnotationVF, Map<String, Object>> mapper = avf -> fields.stream()//
-          .collect(toMap(Function.identity(), f -> QueryField.fromExternalName(f).getter.apply(avf)));
+          .collect(toMap(Function.identity(), f -> QueryFieldGetters.get(QueryField.fromExternalName(f)).apply(avf)));
       // TODO: cache resultmapper?
       paq.setResultMapper(mapper);
     }

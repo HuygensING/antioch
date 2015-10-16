@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.query;
+package nl.knaw.huygens.alexandria.model.search;
 
 /*
  * #%L
@@ -22,6 +22,6 @@ package nl.knaw.huygens.alexandria.query;
  * #L%
  */
 
-enum QueryFunction {
+public enum QueryFunction {
   eq, match, inSet, inRange
 }

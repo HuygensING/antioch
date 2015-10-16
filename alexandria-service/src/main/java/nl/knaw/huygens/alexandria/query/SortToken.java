@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.query;
 
+import nl.knaw.huygens.alexandria.model.search.QueryField;
+
 /*
  * #%L
  * alexandria-service

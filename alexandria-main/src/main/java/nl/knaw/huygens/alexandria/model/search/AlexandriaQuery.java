@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint.search;
+package nl.knaw.huygens.alexandria.model.search;
 
 /*
  * #%L
@@ -29,6 +29,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import nl.knaw.huygens.alexandria.endpoint.JsonWrapperObject;
 import nl.knaw.huygens.alexandria.endpoint.Prototype;
+import nl.knaw.huygens.alexandria.model.AlexandriaState;
 
 @JsonTypeName("query")
 public class AlexandriaQuery extends JsonWrapperObject implements Prototype {
@@ -43,11 +44,11 @@ public class AlexandriaQuery extends JsonWrapperObject implements Prototype {
   private String where = "";
 
   // sort: sort([-|+]field,...) - = descending, default = + = ascending
-  private String sort = "-when";
+  private String sort = "-" + QueryField.when.name();
 
   // return: return(field,...)
   @JsonProperty("return")
-  private String fields = "id";
+  private String fields = QueryField.id.name();
 
   @Min(1)
   private int pageSize = 10;
@@ -66,6 +67,10 @@ public class AlexandriaQuery extends JsonWrapperObject implements Prototype {
 
   public void setWhere(String where) {
     this.where = where;
+    String state = QueryField.state.name();
+    if (!(where.startsWith(state + ":") || where.contains(") " + state + ":"))) {
+      this.where += " " + state + ":" + QueryFunction.eq.name() + "(\"" + AlexandriaState.CONFIRMED.name() + "\")";
+    }
   }
 
   public String getSort() {

@@ -41,6 +41,7 @@ import com.google.common.collect.Lists;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.PropertyPrefix;
 import nl.knaw.huygens.alexandria.model.Identifiable;
+import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
 
 @JsonInclude(Include.NON_NULL)
 public class SearchResult implements Identifiable {
