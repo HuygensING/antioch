@@ -247,7 +247,8 @@
     <h:request>We
         <h:success>successfully</h:success>
         <h:get>/searches/$searchId/resultPages/1</h:get>
-        and find <strong>all</strong> the annotations:
+        and find all expected annotations (excluding the one that was deleted before confirmation)
+        including all their revisions:
         <h:jsonResponse>{
             "searchResultPage" : {
             "pageNumber" : 1,
