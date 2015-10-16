@@ -43,7 +43,7 @@
     <!-- Generate parse tree visitor interface and base class. -->
     <antlr4.visitor>true</antlr4.visitor>
 
-    <guice.version>3.0</guice.version>
+    <guice.version>4.0</guice.version>
     <jackson.version>2.6.3</jackson.version>
     <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
     <jdk.version>1.8</jdk.version>
