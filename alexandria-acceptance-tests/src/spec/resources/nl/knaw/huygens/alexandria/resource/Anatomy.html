@@ -1,3 +1,24 @@
+<!--
+  #%L
+  alexandria-acceptance-tests
+  =======
+  Copyright (C) 2015 Huygens ING (KNAW)
+  =======
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/gpl-3.0.html>.
+  #L%
+  -->
 <html xmlns:c="http://www.concordion.org/2007/concordion"
       xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
       xmlns:xsi="http://www.w3.org/1999/xhtml"
@@ -68,7 +89,8 @@
                 Note that annotations of a subresource (i.c. <code c:echo="#subAnnoId"></code>)
                 are <strong>not</strong> shown in the <code>^annotations</code> of the (parent) resource.
                 <small>(They can be fetched by explicitly <code>GET</code>ting the subresource,
-                or via the <a href="../todo/query">Query facility</a>.)</small>
+                    or via the <a href="../todo/query">Query facility</a>.)
+                </small>
             </div>
         </li>
         <li><code>^provenance</code> contains a link to the provenance object for this resource
@@ -78,6 +100,33 @@
             being a subresource of this resource (in this case <code c:echo="#subId"></code>).
         </li>
     </ul>
+
+    <div class="alert alert-info sm">
+        Subresources do not have a <code>ref</code> field, as they do not refer to an external location.
+        Instead, they have a <code>sub</code> field which locates this subresource relative to its parent and a
+        <code>^part_of</code> link to that parent resource.
+    </div>
+
+    <h:request>When we
+        <h:get>/resources/$subId</h:get>
+        we receive
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "subresource" : {
+            "id" : "$subId",
+            "sub" : "/some/folia/expression/0",
+            "state" : {
+            "value" : "CONFIRMED",
+            "since" : "{date.beforeNow}"
+            },
+            "^part_of" : "https://{host}/resources/$resId",
+            "^provenance" : "https://{host}/resources/$subId/provenance",
+            "^annotations" : [ "https://{host}/annotations/$subAnnoId" ]
+            } }
+        </h:jsonResponse>
+    </h:request>
+
 </div>
 
 </body>

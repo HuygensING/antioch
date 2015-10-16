@@ -1,5 +1,27 @@
 package nl.knaw.huygens.alexandria.endpoint.annotation;
 
+/*
+ * #%L
+ * alexandria-main
+ * =======
+ * Copyright (C) 2015 Huygens ING (KNAW)
+ * =======
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -17,11 +39,9 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
-import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.StatePrototype;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
@@ -39,18 +59,15 @@ public class AnnotationsEndpoint extends JSONEndpoint {
 
   private final AlexandriaService service;
   private final AnnotationEntityBuilder entityBuilder;
-  private final LocationBuilder locationBuilder;
   private final AnnotationDeprecationRequestBuilder requestBuilder;
 
   @Inject
   public AnnotationsEndpoint(AlexandriaService service, //
                              AnnotationEntityBuilder entityBuilder, //
-                             AnnotationDeprecationRequestBuilder requestBuilder, //
-                             LocationBuilder locationBuilder) {
+                             AnnotationDeprecationRequestBuilder requestBuilder) {
     this.service = service;
     this.entityBuilder = entityBuilder;
     this.requestBuilder = requestBuilder;
-    this.locationBuilder = locationBuilder;
   }
 
   static Supplier<NotFoundException> annotationNotFoundForId(Object id) {

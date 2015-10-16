@@ -1,6 +1,29 @@
 package nl.knaw.huygens.alexandria.service;
 
+/*
+ * #%L
+ * alexandria-main
+ * =======
+ * Copyright (C) 2015 Huygens ING (KNAW)
+ * =======
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import java.time.temporal.TemporalAmount;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -19,23 +42,17 @@ public interface AlexandriaService {
   // NOTE: should these service methods all be atomic?
   /**
    *
-   * @param uuid
-   * @param ref
-   * @param provenance
-   * @param alexandriaState
    * @return true if the resource was created, false if it was updated
    */
   boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance, AlexandriaState alexandriaState);
 
-  // boolean createOrUpdateAnnotation(UUID uuid, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance, AlexandriaState alexandriaState);
-
-  AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance, AlexandriaState alexandriaState);
+  AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance);
 
   Optional<AlexandriaResource> readResource(UUID uuid);
 
   Set<AlexandriaResource> readSubResources(UUID uuid);
 
-  AlexandriaAnnotationBody createAnnotationBody(UUID uuid, String type, String value, TentativeAlexandriaProvenance provenance, AlexandriaState alexandriaState);
+  AlexandriaAnnotationBody createAnnotationBody(UUID uuid, String type, String value, TentativeAlexandriaProvenance provenance);
 
   Optional<AlexandriaAnnotationBody> readAnnotationBody(UUID uuid);
 
@@ -84,5 +101,9 @@ public interface AlexandriaService {
   Optional<AlexandriaResource> findSubresourceWithSubAndParentId(String sub, UUID parentId);
 
   Optional<AlexandriaAnnotationBody> findAnnotationBodyWithTypeAndValue(String type, String value);
+
+  Map<String, Object> getMetadata();
+
+  void destroy();
 
 }

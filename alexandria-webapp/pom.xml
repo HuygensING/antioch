@@ -13,7 +13,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>alexandria-service</artifactId>
+      <artifactId>alexandria-service-tinkerpop-titan</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -89,7 +89,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <config.baseURI>https://test.alexandria.huygens.knaw.nl/</config.baseURI>
+        <config.baseURI>http://test.alexandria.huygens.knaw.nl/</config.baseURI>
         <config.storageDirectory>/data/alexandria/storage/test/</config.storageDirectory>
         <tomcat.server>tomcat.hi23</tomcat.server>
         <tomcat.manager.url>${tc23-manager}</tomcat.manager.url>

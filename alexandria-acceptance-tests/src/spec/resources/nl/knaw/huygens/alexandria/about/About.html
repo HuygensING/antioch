@@ -1,3 +1,24 @@
+<!--
+  #%L
+  alexandria-acceptance-tests
+  =======
+  Copyright (C) 2015 Huygens ING (KNAW)
+  =======
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/gpl-3.0.html>.
+  #L%
+  -->
 <html xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
       xmlns:xsi="http://www.w3.org/1999/xhtml"
       xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
@@ -17,7 +38,7 @@
         <h:jsonResponse>{
             "buildDate": "{date.anyValid}",
             "commitId": "{git.validCommitId}",
-            "scmBranch": "master",
+            "scmBranch": "{git.validBranch}",
             "startedAt": "{date.beforeNow}",
             "tentativesTTL": "PT24H",
             "version": "1.0-SNAPSHOT"
@@ -33,30 +54,44 @@
 </div>
 
 <div id="homepage" data-desc="What resources does the server provide besides REST resources?">
-    <h:request>
-        When I
-        <h:get>/</h:get>
-        using
-        <h:setHeader name="Accept">text/html</h:setHeader>
-        then I should receive
-        <h:status>200 OK</h:status>
-    </h:request>
-
-    <h:request>
-        When I
-        <h:get>/application.wadl</h:get>
-        using
-        <h:setHeader name="Accept">application/xml</h:setHeader>
-        then I should receive
-        <h:status>200 OK</h:status>
-    </h:request>
-
-    <h:request>
-        Alexandria has an empty favicon:
-        <h:get>/favicon.ico</h:get>
-        yields
-        <h:status>204 No Content</h:status>
-    </h:request>
+    <ul>
+        <li>
+            <h:request>
+                When I
+                <h:get>/</h:get>
+                using
+                <h:setHeader name="Accept">text/html</h:setHeader>
+                then I should receive
+                <h:status>200 OK</h:status>
+            </h:request>
+        </li>
+        <li>
+            <h:request>
+                When I
+                <h:get>/application.wadl</h:get>
+                using
+                <h:setHeader name="Accept">application/xml</h:setHeader>
+                then I should receive
+                <h:status>200 OK</h:status>
+            </h:request>
+        </li>
+        <li>
+            <h:request>
+                When I
+                <h:get>/favicon.ico</h:get>
+                then I should receive
+                <h:status>204 No Content</h:status>
+            </h:request>
+        </li>
+        <li>
+            <h:request>
+                When I
+                <h:get>/robots.txt</h:get>
+                then I should receive
+                <h:status>200 OK</h:status>
+            </h:request>
+        </li>
+    </ul>
 </div>
 
 </body>

@@ -1,3 +1,22 @@
+<!--
+  #%L
+  alexandria-acceptance-tests
+  =======
+  Copyright (C) 2015 Huygens ING (KNAW)
+  =======
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  You should have received a copy of the GNU General Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/gpl-3.0.html>.
+  #L%
+  -->
 <html xmlns:c="http://www.concordion.org/2007/concordion"
       xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
       xmlns:xsi="http://www.w3.org/1999/xhtml"
@@ -518,7 +537,7 @@
             },
             "totalResults" : 3,
             "totalResultPages" : 1,
-            "firstResultPage": "https://{host}/searches/$searchId/resultPages/1"
+            "^firstResultPage": "https://{host}/searches/$searchId/resultPages/1"
             } }
         </h:jsonResponse>
     </h:request>
@@ -596,7 +615,7 @@
             "where" : "who:eq(\"user-4242\") type:eq(\"Tag\") value:match(\".*early.*\")"
             },
             "totalResults" : 2,
-            "firstResultPage": "https://{host}/searches/$searchId2/resultPages/1"
+            "^firstResultPage": "https://{host}/searches/$searchId2/resultPages/1"
             } }
         </h:jsonResponse>
     </h:request>
@@ -665,7 +684,7 @@
             "where" : "who:eq(\"user-4242\") type:eq(\"Tag\") value:match(\".*early.*\") when:inRange(\"2015-07-01T00:00:00\",\"2015-07-31T23:59:59\")"
             },
             "totalResults" : 1,
-            "firstResultPage": "https://{host}/searches/$searchId3/resultPages/1"
+            "^firstResultPage": "https://{host}/searches/$searchId3/resultPages/1"
             } }
         </h:jsonResponse>
     </h:request>

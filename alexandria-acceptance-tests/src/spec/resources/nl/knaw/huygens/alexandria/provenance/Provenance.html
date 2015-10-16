@@ -1,0 +1,175 @@
+<!--
+  #%L
+  alexandria-acceptance-tests
+  =======
+  Copyright (C) 2015 Huygens ING (KNAW)
+  =======
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/gpl-3.0.html>.
+  #L%
+  -->
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+
+<title>Provenance in Alexandria</title>
+
+<body data-desc="Provenance in Alexandria">
+
+<!-- TODO: Move to 'cat' and generate -->
+<div class="dropdown">
+    <button class="btn btn-primary pull-right dropdown-toggle" type="button" data-toggle="dropdown">Test Sources
+        <span class="caret"></span></button>
+    <ul class="dropdown-menu dropdown-menu-right">
+        <li>
+            <a href="https://github.com/HuygensING/alexandria/blob/master/alexandria-acceptance-tests/src/spec/java/nl/knaw/huygens/alexandria/provenance/ProvenanceFixture.java">Fixture</a>
+        </li>
+        <li>
+            <a href="https://github.com/HuygensING/alexandria/blob/master/alexandria-acceptance-tests/src/spec/resources/nl/knaw/huygens/alexandria/provenance/Provenance.html">Specification</a>
+        </li>
+    </ul>
+</div>
+
+<div id="provenance-anatomy" data-desc="How is provenance information represented?" c:execute="clearStorage()">
+    <div>
+        <strong>Each and every Alexandria
+            <mark>resource</mark>
+            and
+            <mark>annotation</mark>
+            object has provenance information associated with it.</strong>
+
+        <p>
+            This information allows
+            <small>(= can be used to implement, but does not guarantee correctness of)</small>
+            attribution of Alexandria objects to a person or entity, as well as keeping track of when annotations have
+            become deprecated due to new revisions. A (brief) rationale for the object's existence or the reason for a
+            change can also be documented.
+        </p>
+
+        Provenance information maintained in Alexandria contains the following elements:
+
+        <dl class="dl-horizontal">
+            <dt><code>who</code></dt>
+            <dd>the user information that was passed when the object was created
+                (<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a>)
+            </dd>
+            <dt><code>why</code></dt>
+            <dd>the reason that was passed when the object was created
+                (<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a>)
+            </dd>
+            <dt><code>when</code></dt>
+            <dd>the date and time the object was created
+                (ISO-8601 representation of
+                <a href="https://docs.oracle.com/javase/8/docs/api/java/time/Instant.html">Instant</a>)
+            </dd>
+            <dt><code>^what</code></dt>
+            <dd>a link back to the object that this provenance information is about
+                (<a href="https://docs.oracle.com/javase/8/docs/api/java/net/URL.html">URL</a>)
+            </dd>
+        </dl>
+    </div>
+
+    <div class="alert alert-info sm">
+        In Nederlab scenario's, the provenance fields <code>who</code>, <code>why</code>, and <code>when</code>
+        can be set by providing overriding provenance elements at
+        <a href="../resource/Creation.html">resource creation</a> and annotation creation time, respectively.
+        <br/>
+        <small>The <code>^what</code> field is always set by Alexandria to ensure correct linking between an object and
+            its provenance.
+        </small>
+    </div>
+
+    <hr/>
+
+    <div c:execute="resourceExists(#uuid)">Given that a resource with id
+        <code c:set="#uuid">761fd88a-6e66-11e5-8b51-23caeac9ef8a</code> exists.
+    </div>
+
+    <h:request>
+        <strong>(verification)</strong> When we
+        <h:get>/resources/$uuid</h:get>
+        we observe
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "resource": {
+            "id": "$uuid",
+            "^provenance": "https://{host}/resources/$uuid/provenance"
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+    <hr/>
+
+    <h:request>
+        When we
+        <h:get>/resources/$uuid/provenance</h:get>
+        we observe
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "provenance": {
+            "who": "nederlab",
+            "why": "details warranting this object's existence",
+            "when": "{date.beforeNow}",
+            "^what": "https://{host}/resources/$uuid"
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+    <hr/>
+
+    <div class="alert alert-warning sm">
+        <strong>&#9888; Provenance details are immutable</strong>
+        <p>(so be sure to enter the correct details when creating new resources and annotations)</p>
+    </div>
+
+    This implies, for example, that:
+    <ul>
+        <li>the creator of a resource cannot be changed:
+            <h:request>
+                When we
+                <h:put>/resources/$uuid</h:put>
+                <h:jsonBody>{
+                    "resource": {
+                    "provenance": {
+                    "who": "david-lightman"
+                    } } }
+                </h:jsonBody>
+                we observe
+                <h:status>400 Bad Request</h:status>
+            </h:request>
+        </li>
+
+        <li>an explanation cannot be entered retroactively:
+            <h:request>
+                When we
+                <h:put>/resources/$uuid</h:put>
+                <h:jsonBody>{
+                    "resource": {
+                    "provenance": {
+                    "why": "forgot to supply a reason when creating the resource, so now I am hosed"
+                    } } }
+                </h:jsonBody>
+                we also observe
+                <h:status>400 Bad Request</h:status>
+            </h:request>
+        </li>
+    </ul>
+</div>
+
+</body>
+</html>

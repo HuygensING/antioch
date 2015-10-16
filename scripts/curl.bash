@@ -1,6 +1,8 @@
 # this is a collection of curl requests meant for copy-pasting into the shell, not for running as a whole
 exit -1
 
+source scripts/alexandria-functions.sh
+
 # if you get nullpointerexception in the vf code, it's likely caused by eclipse not generating the code: run mvn compile on commandline
 be=http://localhost:2015
 be=https://alexandria.huygens.knaw.nl/
@@ -185,20 +187,13 @@ for n in {0..9}; do
 done
 
 for n in {1..100}; do 
-	id=$(uuidgen)
-	curl -i -X PUT $be/resources/$id -H 'Content-type: application/json' \
-	--data-binary "{\"resource\":{
-	  \"id\":\"$id\",
-	  \"ref\":\"reference $n\"
-	}}"
-	url=$(a-annotate-resource "$id" "Tag" "Test annotation for resource $id" | a-location)
-	a-confirm $url
+  a-generate-random-resource-with-annotation
 done
 
 
 curl -i -X POST $be/searches -H 'Content-type: application/json' \
 --data-binary '{"query":{
 	"find" : "annotation",
-	"where" : "who:eq(\"nederlab\") resource.id:eq(\"d28626d4-493a-4204-83d9-e9ae17e15654\")",
+	"where" : "who:eq(\"nederlab\")",
 	"return" : "id,resource.url,subresource.url,type,value"
 }}'

@@ -1,5 +1,27 @@
 package nl.knaw.huygens.alexandria.query;
 
+/*
+ * #%L
+ * alexandria-service
+ * =======
+ * Copyright (C) 2015 Huygens ING (KNAW)
+ * =======
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
@@ -21,10 +43,10 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang3.StringUtils;
-import org.parboiled.common.ImmutableList;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 
@@ -33,6 +55,7 @@ import nl.knaw.huygens.alexandria.antlr.AQLLexer;
 import nl.knaw.huygens.alexandria.antlr.AQLParser;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
@@ -40,7 +63,8 @@ import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 
 public class AlexandriaQueryParser {
-  static final String ALLOWEDFIELDS = ", available fields: " + Joiner.on(", ").join(QueryField.ALL_EXTERNAL_NAMES);
+  static final String ALLOWED_FIELDS = ", available fields: " + Joiner.on(", ").join(QueryField.ALL_EXTERNAL_NAMES);
+  static final String ALLOWED_FUNCTIONS = ", available functions: " + Joiner.on(", ").join(QueryFunction.values());
 
   private static LocationBuilder locationBuilder;
 
@@ -100,10 +124,8 @@ public class AlexandriaQueryParser {
           ResourceVF resourceVF = optionalResource.get();
           Stream<AnnotationVF> resourceAnnotationsStream = resourceVF.getAnnotatedBy().stream();
           Stream<AnnotationVF> subresourceAnnotationsStream = resourceVF.getSubResources().stream()//
-              .flatMap(rvf -> rvf.getAnnotatedBy().stream());//
-          Stream<AnnotationVF> annotationVFStream = Stream.concat(resourceAnnotationsStream, subresourceAnnotationsStream);
-
-          return annotationVFStream;
+              .flatMap(rvf -> rvf.getAnnotatedBy().stream());
+          return Stream.concat(resourceAnnotationsStream, subresourceAnnotationsStream);
         }
         // Should return error, since no resource found with given uuid
         return ImmutableList.<AnnotationVF> of().stream();
@@ -114,18 +136,19 @@ public class AlexandriaQueryParser {
   }
 
   private Class<? extends AlexandriaVF> parseFind(final String find) {
-    if (find.equals("annotation")) {
+    switch (find) {
+    case "annotation":
       return AnnotationVF.class;
 
-    } else if (find.equals("resource")) {
+    case "resource":
       parseErrors.add("find: type 'resource' not supported yet");
       return ResourceVF.class;
 
-    } else {
+    default:
       parseErrors.add("find: unknown type '" + find + "', should be 'annotation'");
       // parseErrors.add("unknown type '" + find + "' in find, should be 'annotation' or 'resource'");
+      return null;
     }
-    return null;
   }
 
   List<WhereToken> tokenize(String whereString) {
@@ -139,7 +162,6 @@ public class AlexandriaQueryParser {
     CharStream stream = new ANTLRInputStream(whereString);
     AQLLexer lex = new AQLLexer(stream);
     lex.removeErrorListeners();
-    lex.addErrorListener(errorListener);
     CommonTokenStream tokenStream = new CommonTokenStream(lex);
     AQLParser parser = new AQLParser(tokenStream);
     parser.removeErrorListeners();
@@ -148,7 +170,9 @@ public class AlexandriaQueryParser {
     ParseTree tree = parser.root();
     Log.info("tree={}", tree.toStringTree(parser));
     if (errorListener.heardErrors()) {
-      parseErrors.addAll(errorListener.getParseErrors());
+      parseErrors.addAll(errorListener.getParseErrors().stream()//
+          .map(AlexandriaQueryParser::clarifyParseError)//
+          .collect(toList()));
       return Lists.newArrayList();
     }
 
@@ -158,14 +182,27 @@ public class AlexandriaQueryParser {
     return visitor.getWhereTokens();
   }
 
+  private static final String MISSING_FIELD_NAME = "missing FIELD_NAME";
+  private static final String MISSING_FUNCTION = "missing FUNCTION";
+
+  private static String clarifyParseError(String parseError) {
+    if (parseError.contains(MISSING_FIELD_NAME)) {
+      return parseError.replace(MISSING_FIELD_NAME, "missing or invalid field") + ALLOWED_FIELDS;
+    }
+    if (parseError.contains(MISSING_FUNCTION)) {
+      return parseError.replace(MISSING_FUNCTION, "missing or invalid function") + ALLOWED_FUNCTIONS;
+    }
+    return parseError;
+  }
+
   private static Predicate<AnnotationVF> createPredicate(List<WhereToken> tokens) {
     if (tokens.isEmpty()) {
       return alwaysTrue();
     }
-    Predicate<AnnotationVF> predicate = tokens.stream()//
+
+    return tokens.stream()//
         .map(AlexandriaQueryParser::toPredicate)//
-        .reduce(alwaysTrue(), (p, np) -> p = p.and(np));
-    return predicate;
+        .reduce(alwaysTrue(), Predicate::and);
   }
 
   static Predicate<AnnotationVF> toPredicate(WhereToken whereToken) {
@@ -173,9 +210,7 @@ public class AlexandriaQueryParser {
     // eq
     if (QueryFunction.eq.equals(whereToken.getFunction())) {
       Object eqValue = whereToken.getParameters().get(0);
-      return (AnnotationVF avf) -> {
-        return getter.apply(avf).equals(eqValue);
-      };
+      return avf -> getter.apply(avf).equals(eqValue);
     }
 
     // match
@@ -223,9 +258,16 @@ public class AlexandriaQueryParser {
   }
 
   private static Predicate<AnnotationVF> alwaysTrue() {
-    return x -> {
-      return true;
-    };
+    return x -> true;
+  }
+
+  static String getAnnotationURL(final AnnotationVF avf) {
+    return locationBuilder.locationOf(AlexandriaAnnotation.class, avf.getUuid()).toString();
+  }
+
+  static String getAnnotationId(final AnnotationVF avf) {
+    // for deprecated annotations, remove the revision from the id.
+    return avf.getUuid().replaceFirst("\\..*$", "");
   }
 
   static String getResourceURL(final AnnotationVF avf) {
@@ -280,17 +322,16 @@ public class AlexandriaQueryParser {
     List<String> sortParseErrors = sortTokenStrings.stream()//
         .map(AlexandriaQueryParser::extractExternalName)//
         .filter(externalName -> !QueryField.ALL_EXTERNAL_NAMES.contains(externalName))//
-        .map(invalidFieldName -> "sort: unknown field: " + invalidFieldName + ALLOWEDFIELDS)//
+        .map(invalidFieldName -> "sort: unknown field: " + invalidFieldName + ALLOWED_FIELDS)//
         .collect(toList());
     if (!sortParseErrors.isEmpty()) {
       parseErrors.addAll(sortParseErrors);
       return null;
     }
 
-    final List<SortToken> sortFields = sortTokenStrings.stream()//
+    return sortTokenStrings.stream()//
         .map(AlexandriaQueryParser::sortToken)//
         .collect(toList());
-    return sortFields;
   }
 
   static SortToken sortToken(final String f) {
@@ -311,7 +352,7 @@ public class AlexandriaQueryParser {
     final List<String> unknownFields = Lists.newArrayList(fields);
     unknownFields.removeAll(allowedFields);
     if (!unknownFields.isEmpty()) {
-      parseErrors.add("return: unknown field(s) " + Joiner.on(", ").join(unknownFields) + ALLOWEDFIELDS);
+      parseErrors.add("return: unknown field(s) " + Joiner.on(", ").join(unknownFields) + ALLOWED_FIELDS);
 
     } else {
       paq.setReturnFields(fields);

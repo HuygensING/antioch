@@ -1,11 +1,32 @@
 package nl.knaw.huygens.alexandria.service;
 
+/*
+ * #%L
+ * alexandria-service
+ * =======
+ * Copyright (C) 2015 Huygens ING (KNAW)
+ * =======
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
@@ -13,7 +34,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
@@ -23,7 +43,8 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
-import com.google.common.collect.Lists;
+import org.apache.commons.lang.NotImplementedException;
+
 import com.google.common.collect.Maps;
 
 import nl.knaw.huygens.Log;
@@ -47,7 +68,6 @@ import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
-import scala.NotImplementedError;
 
 public class TinkerPopService implements AlexandriaService {
   private static final TemporalAmount TENTATIVES_TTL = Duration.ofDays(1);
@@ -108,7 +128,7 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
+  public AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance) {
     AlexandriaResource subresource = new AlexandriaResource(uuid, provenance);
     subresource.setCargo(sub);
     subresource.setParentResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, parentUuid.toString()));
@@ -318,7 +338,7 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public AlexandriaAnnotationBody createAnnotationBody(UUID uuid, String type, String value, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
+  public AlexandriaAnnotationBody createAnnotationBody(UUID uuid, String type, String value, TentativeAlexandriaProvenance provenance) {
     AlexandriaAnnotationBody body = new AlexandriaAnnotationBody(uuid, type, value, provenance);
     storeAnnotationBody(body);
     return body;
@@ -326,17 +346,15 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Optional<AlexandriaAnnotationBody> readAnnotationBody(UUID uuid) {
-    throw new NotImplementedError();
+    throw new NotImplementedException();
   }
 
   @Override
   public SearchResult execute(AlexandriaQuery query) {
-    SearchResult searchResult = new SearchResult(locationBuilder);
-    searchResult.setId(UUID.randomUUID());
-    searchResult.setQuery(query);
-    List<Map<String, Object>> results = processQuery(query);
-    searchResult.setResults(results);
-    return searchResult;
+    return new SearchResult(locationBuilder)//
+        .setId(UUID.randomUUID())//
+        .setQuery(query)//
+        .setResults(processQuery(query));
   }
 
   // - other public methods -//
@@ -558,7 +576,6 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   private List<Map<String, Object>> processQuery(AlexandriaQuery query) {
-    List<Map<String, Object>> results = dummyResults();
 
     ParsedAlexandriaQuery pQuery = alexandriaQueryParser.parse(query);
 
@@ -569,7 +586,7 @@ public class TinkerPopService implements AlexandriaService {
     Stream<AnnotationVF> stream = pQuery.getAnnotationVFFinder().apply(storage);
     Log.debug("list={}", stream);
 
-    results = stream//
+    List<Map<String, Object>> results = stream//
         .filter(predicate)//
         .sorted(comparator)//
         .map(mapper)//
@@ -594,18 +611,19 @@ public class TinkerPopService implements AlexandriaService {
   // ).has("state", AlexandriaState.CONFIRMED.name()).as("a").out(AnnotationVF.HAS_BODY).as("b").toList();
   // }
 
-  private List<Map<String, Object>> dummyResults() {
-    List<Map<String, Object>> list = Lists.newArrayList();
-    int num = new Random().nextInt(100);
-    for (int i = 0; i < num; i++) {
-      String displayName = "Annotation " + i;
-      URI annotationLocation = locationBuilder.locationOf(AlexandriaAnnotation.class, UUID.randomUUID().toString());
-      Map<String, Object> map = Maps.newHashMap();
-      map.put("displayName", displayName);
-      map.put("annotation", annotationLocation);
-      list.add(map);
-    }
-    return list;
+  @Override
+  public Map<String, Object> getMetadata() {
+    Map<String, Object> metadata = Maps.newLinkedHashMap();
+    metadata.put("type", this.getClass().getCanonicalName());
+    metadata.put("storage", storage.getMetadata());
+    return metadata;
+  }
+
+  @Override
+  public void destroy() {
+    // Log.info("destroy called");
+    storage.destroy();
+    // Log.info("destroy done");
   }
 
 }

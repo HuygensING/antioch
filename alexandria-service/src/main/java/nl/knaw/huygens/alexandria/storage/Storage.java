@@ -1,22 +1,47 @@
 package nl.knaw.huygens.alexandria.storage;
 
+/*
+ * #%L
+ * alexandria-service
+ * =======
+ * Copyright (C) 2015 Huygens ING (KNAW)
+ * =======
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import static org.apache.tinkerpop.gremlin.process.traversal.P.lt;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Graph.Features.GraphFeatures;
-import org.apache.tinkerpop.gremlin.structure.Transaction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.io.IoCore;
 import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
+
+import com.google.common.collect.Maps;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
@@ -31,7 +56,6 @@ public class Storage {
   private Graph graph;
   private FramedGraph framedGraph;
 
-  private Transaction tx;
   private String dumpfile;
   private boolean supportsTransactions;
   private boolean supportsPersistence;
@@ -63,14 +87,14 @@ public class Storage {
 
   public void startTransaction() {
     if (supportsTransactions()) {
-      tx = framedGraph.tx();
+      framedGraph.tx().rollback();
     }
   }
 
   public void commitTransaction() {
     if (supportsTransactions()) {
-      tx.commit();
-      tx.close();
+      framedGraph.tx().commit();
+      // framedGraph.tx().close();
     }
     if (!supportsPersistence()) {
       saveToDisk(getDumpFile());
@@ -79,8 +103,8 @@ public class Storage {
 
   public void rollbackTransaction() {
     if (supportsTransactions()) {
-      tx.rollback();
-      tx.close();
+      framedGraph.tx().rollback();
+      // framedGraph.tx().close();
     } else {
       Log.error("rollback called, but transactions are not supported by graph {}", graph);
     }
@@ -180,6 +204,32 @@ public class Storage {
     if (clazz.getAnnotationsByType(peapod.annotations.Vertex.class).length == 0) {
       throw new RuntimeException("Class " + clazz + " has no peapod @Vertex annotation, are you sure it is the correct class?");
     }
+  }
+
+  public Map<String, Object> getMetadata() {
+    Map<String, Object> metadata = Maps.newLinkedHashMap();
+    metadata.put("features", graph.features().toString().split(System.lineSeparator()));
+    GraphTraversalSource traversal = graph.traversal();
+    metadata.put("vertices", count(traversal.V()));
+    metadata.put("edges", count(traversal.E()));
+    return metadata;
+  }
+
+  private Long count(GraphTraversal<?, ?> graphTraversal) {
+    return graphTraversal.count().next();
+  }
+
+  public void destroy() {
+    // Log.info("destroy called");
+    try {
+      Log.info("closing graph {}", graph);
+      graph.close();
+      Log.info("graph closed: {}", graph);
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
+    // Log.info("destroy done");
   }
 
 }

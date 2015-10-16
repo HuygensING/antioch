@@ -1,0 +1,218 @@
+<!--
+  #%L
+  alexandria-acceptance-tests
+  =======
+  Copyright (C) 2015 Huygens ING (KNAW)
+  =======
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/gpl-3.0.html>.
+  #L%
+  -->
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+
+<title>Searching in Alexandria</title>
+
+<body data-desc="Searching in Alexandria">
+
+<div id="query-anatomy" data-desc="Anatomy of a query" c:execute="clearStorage()">
+    <h:request>We can
+        <h:success>successfully</h:success>
+        <h:post>/searches</h:post>
+        the following body
+        <h:jsonBody>{
+            "query": {
+            "find": "annotation",
+            "where": "who:eq(\"nederlab\")",
+            "sort": "-when",
+            "return": "id,resource.url",
+            "pageSize": 10
+            } }
+        </h:jsonBody>
+    </h:request>
+    where the properties of <code>query</code> have the following semantics:
+    <dl class="dl-horizontal">
+        <dt><code>find</code></dt>
+        <dd>the Alexandria concept to look for.
+            <small>(currently <code>annotation</code> is the default as well as the only valid value)</small>
+        </dd>
+        <dt><code>where</code></dt>
+        <dd>(<strong>mandatory</strong>) used to filter records. Check the
+            <a href="https://github.com/HuygensING/alexandria/blob/master/alexandria-aql/src/main/antlr4/nl/knaw/huygens/alexandria/antlr/AQL.g4">
+                ANTLR v4 grammar file</a> for syntax, field names and functions.
+            <small>(caveat: multiple <code>where</code> clauses are treated as a conjunction, meaning ALL clauses have
+                to match)
+            </small>
+        </dd>
+        <dt><code>sort</code></dt>
+        <dd>used to sort the result-set on a field (ref. <code>where</code>).
+            Use <code>+</code> for ascending and <code>-</code> for descending order.
+            <small>(if left unspecified, <code>-when</code> is used by default)
+            </small>
+        </dd>
+        <dt><code>return</code></dt>
+        <dd>used to select which fields (ref. <code>where</code>) from the result-set are returned in the output.
+            <small>(if left unspecified, <code>id</code> is returned by default)</small>
+        </dd>
+        <dt><code>pageSize</code></dt>
+        <dd>how many results from the result-set to include in each page of results.
+            <small>(if left unspecified, 10 results per page are included by default)</small>
+        </dd>
+    </dl>
+</div>
+
+<div id="search-paging" data-desc="How are search results paged?" c:execute="setupPagingStorage(#num)">
+    Given there are <code c:set="#num">8</code> annotated resources in the database owned by user <code>nederlab</code>,
+
+    <h:request>When we
+        <h:post>/searches</h:post>
+        the following body
+        <h:jsonBody>{
+            "query": {
+            "where": "who:eq(\"nederlab\")",
+            "pageSize": 3
+            } }
+        </h:jsonBody>
+        we expect status
+        <h:status>201 Created</h:status>
+        , an
+        <h:responseBody/>
+        response body, and a
+        <h:location type="base">https://{host}/searches/</h:location>
+        <code>Location</code> header.
+    </h:request>
+
+    <div c:execute="#searchId = uuid()">In this case the generated search id (taken from the <code>Location</code>
+        header) is: <code c:echo="#searchId"></code>.
+    </div>
+
+    <hr/>
+
+    <h:request>When we
+        <h:get>/searches/$searchId</h:get>
+        we expect status
+        <h:status>200 OK</h:status>
+        and a response body containing:
+        <small>(only paging details shown for brevity)</small>
+        <h:jsonResponse>{
+            "searchResult" : {
+            "totalResults" : 8,
+            "totalResultPages" : 3,
+            "pageSize" : 3,
+            "^firstResultPage" : "https://{host}/searches/$searchId/resultPages/1"
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+    <hr/>
+
+    <h:request>
+        When we
+        <h:get>/searches/$searchId/resultPages/1</h:get>
+        we expect status
+        <h:status>200 OK</h:status>
+        and body
+        <small>(showing only details relevant to paging, actual record details withheld for brevity)</small>
+        <h:jsonResponse>{
+            "searchResultPage" : {
+            "pageNumber" : 1,
+            "records" : [
+            { "_resultNumber" : 1 },
+            { "_resultNumber" : 2 },
+            { "_resultNumber" : 3 }
+            ],
+            "^nextPage" : "https://{host}/searches/$searchId/resultPages/2"
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+    <div class="alert alert-info sm">A convenience link <code>^nextPage</code> is included on the first page.</div>
+
+    <hr/>
+
+    <h:request>
+        Now
+        <h:get>/searches/$searchId/resultPages/2</h:get>
+        results in status
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "searchResultPage" : {
+            "pageNumber" : 2,
+            "records" : [
+            { "_resultNumber" : 4 },
+            { "_resultNumber" : 5 },
+            { "_resultNumber" : 6 }
+            ],
+            "^nextPage" : "https://{host}/searches/$searchId/resultPages/3",
+            "^previousPage" : "https://{host}/searches/$searchId/resultPages/1"
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+    <div class="alert alert-info sm">Both <code>^nextPage</code> and <code>^previousPage</code> convenience links are
+        included on the middle pages.
+    </div>
+
+    <hr/>
+
+    <h:request>
+        And
+        <h:get>/searches/$searchId/resultPages/3</h:get>
+        results in status
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "searchResultPage" : {
+            "pageNumber" : 3,
+            "records" : [
+            { "_resultNumber" : 7 },
+            { "_resultNumber" : 8 }
+            ],
+            "^previousPage" : "https://{host}/searches/$searchId/resultPages/2"
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+    <div class="alert alert-info sm">The convenience link <code>^nextPage</code> is now absent, signaling this
+        is the final page.
+    </div>
+
+    <hr/>
+
+    <h:request>When we try to
+        <h:get>/searches/$searchId/resultPages/0</h:get>
+        we receive
+        <h:status>404 Not Found</h:status>
+    </h:request>
+
+    <h:request>
+        Likewise
+        <h:get>/searches/$searchId/resultPages/4</h:get>
+        results in status
+        <h:status>404 Not Found</h:status>
+        as the requested page lies beyond the maximum.
+    </h:request>
+
+    <div class="alert alert-warning sm">
+        Valid result page numbers are <code>1</code> up to and including the number of <code>totalResultPages</code>.
+    </div>
+
+</div>
+
+</body>
+</html>
