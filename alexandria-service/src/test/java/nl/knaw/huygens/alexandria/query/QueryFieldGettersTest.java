@@ -17,7 +17,7 @@ public class QueryFieldGettersTest {
     return QueryField.values();
   }
 
-  @Parameter(0)
+  @Parameter
   public QueryField queryField;
 
   @Test
