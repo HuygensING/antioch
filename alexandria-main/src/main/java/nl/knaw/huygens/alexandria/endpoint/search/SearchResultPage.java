@@ -53,11 +53,14 @@ public class SearchResultPage extends JsonWrapperObject {
   private Function<Map<String, Object>, Integer> counterFunction;
   @JsonIgnore
   private AtomicInteger counter;
+  @JsonIgnore
+  private int lastPageNumber;
 
-  public SearchResultPage(String baseURI, int pageNumber, boolean isLast, int pageSize) {
+  public SearchResultPage(String baseURI, int pageNumber, int lastPageNumber, int pageSize) {
     this.baseURI = baseURI;
     this.pageNumber = pageNumber;
-    this.isLast = isLast;
+    this.lastPageNumber = lastPageNumber;
+    this.isLast = pageNumber == lastPageNumber;
     this.counter = new AtomicInteger(pageSize * (pageNumber - 1));
     this.counterFunction = t -> counter.incrementAndGet();
   }
@@ -67,9 +70,19 @@ public class SearchResultPage extends JsonWrapperObject {
     return pageNumber > 1 ? URI.create(baseURI + (pageNumber - 1)) : null;
   }
 
+  @JsonProperty(PropertyPrefix.LINK + "firstPage")
+  public URI getFirstPage() {
+    return URI.create(baseURI + 1);
+  }
+
   @JsonProperty(PropertyPrefix.LINK + "nextPage")
   public URI getNextPage() {
     return isLast ? null : URI.create(baseURI + (pageNumber + 1));
+  }
+
+  @JsonProperty(PropertyPrefix.LINK + "lastPage")
+  public URI getLastPage() {
+    return URI.create(baseURI + (lastPageNumber));
   }
 
   public void setResults(List<Map<String, Object>> results) {
