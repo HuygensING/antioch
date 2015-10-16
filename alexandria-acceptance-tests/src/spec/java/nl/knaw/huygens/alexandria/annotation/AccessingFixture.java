@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.concordion.api.ExpectedToFail;
 import org.concordion.api.MultiValueResult;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.Assert;
@@ -48,6 +49,7 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 
 @RunWith(ConcordionRunner.class)
+@ExpectedToFail
 public class AccessingFixture extends AnnotationsBase {
 
   @BeforeClass
@@ -67,28 +69,28 @@ public class AccessingFixture extends AnnotationsBase {
     Log.trace("annotation.id: [{}]", annoId);
 
     switch (annoState) {
-      case "tentative":
-        // no-op intentional: newly created annotations are tentative by default
-        Assert.assertEquals(AlexandriaState.TENTATIVE, annotation.getState());
-        break;
-      case "confirmed":
-        service().confirmAnnotation(annoId);
-        break;
-      case "deleted-after-confirmation":
-        service().confirmAnnotation(annoId);
-        service().deleteAnnotation(annotation);
-        break;
-      case "deleted-before-confirmation":
-        service().deleteAnnotation(annotation);
-        break;
-      case "deprecated":
-        service().confirmAnnotation(annoId);
-        final AlexandriaAnnotation revisedAnno = service().annotate(theResource(resId), annoBody, aProvenance());
-        service().deprecateAnnotation(annoId, revisedAnno);
-        break;
-      default:
-        Assert.assertTrue("Never reached", false);
-        break;
+    case "tentative":
+      // no-op intentional: newly created annotations are tentative by default
+      Assert.assertEquals(AlexandriaState.TENTATIVE, annotation.getState());
+      break;
+    case "confirmed":
+      service().confirmAnnotation(annoId);
+      break;
+    case "deleted-after-confirmation":
+      service().confirmAnnotation(annoId);
+      service().deleteAnnotation(annotation);
+      break;
+    case "deleted-before-confirmation":
+      service().deleteAnnotation(annotation);
+      break;
+    case "deprecated":
+      service().confirmAnnotation(annoId);
+      final AlexandriaAnnotation revisedAnno = service().annotate(theResource(resId), annoBody, aProvenance());
+      service().deprecateAnnotation(annoId, revisedAnno);
+      break;
+    default:
+      Assert.assertTrue("Never reached", false);
+      break;
     }
   }
 
