@@ -24,6 +24,7 @@ package nl.knaw.huygens.alexandria.endpoint.about;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.Instant;
 import java.time.temporal.TemporalAmount;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -97,7 +98,7 @@ public class AboutEndpoint extends JSONEndpoint {
     data.put("buildDate", getProperty("buildDate"));
     data.put("commitId", getProperty("commitId"));
     data.put("scmBranch", getProperty("scmBranch"));
-    data.put("startedAt", System.getProperty(AlexandriaApplication.STARTTIME_PROPERTY));
+    data.put("startedAt", System.getProperty(AlexandriaApplication.STARTTIME_PROPERTY, Instant.now().toString()));
     data.put("tentativesTTL", tentativesTTL.toString());
     data.put("version", getProperty("version"));
     return Response.ok(data).build();
