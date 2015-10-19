@@ -24,6 +24,8 @@ package nl.knaw.huygens.alexandria.jersey;
 
 import static java.util.logging.Logger.getAnonymousLogger;
 
+import java.time.Instant;
+
 import javax.ws.rs.ApplicationPath;
 
 import org.glassfish.jersey.filter.LoggingFilter;
@@ -36,6 +38,8 @@ import nl.knaw.huygens.alexandria.config.ValidationConfigurationContextResolver;
 
 @ApplicationPath("/")
 public class AlexandriaApplication extends ResourceConfig {
+
+  public static final String STARTTIME_PROPERTY = "alexandria.starttime";
 
   public AlexandriaApplication() {
     Log.info("initializing AlexandriaApplication...");
@@ -55,6 +59,8 @@ public class AlexandriaApplication extends ResourceConfig {
 
     // // X-Jersey-Tracing-nnn diagnostic response headers
     // property(ServerProperties.TRACING, "ALL");
+    
+    System.setProperty(AlexandriaApplication.STARTTIME_PROPERTY, Instant.now().toString());
   }
 
 }
