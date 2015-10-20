@@ -22,7 +22,6 @@ package nl.knaw.huygens.alexandria.endpoint.search;
  * #L%
  */
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
@@ -53,8 +52,9 @@ public class SearchResultTest {
     UUID id = UUID.randomUUID();
     sr.setId(id);
     assertThat(sr.getTotalResults()).isEqualTo(11);
-    assertThat(sr.getTotalResultPages()).isEqualTo(2);
-    assertThat(sr.getFirstResultPage()).hasToString(config.getBaseURI() + EndpointPaths.SEARCHES + "/" + id + "/resultPages/1");
+    assertThat(sr.getTotalPages()).isEqualTo(2);
+    String expected = config.getBaseURI() + EndpointPaths.SEARCHES + "/" + id + "/" + SearchEndpoint.RESULTPAGES + "/1";
+    assertThat(sr.getFirstResultPage()).hasToString(expected);
   }
 
 }

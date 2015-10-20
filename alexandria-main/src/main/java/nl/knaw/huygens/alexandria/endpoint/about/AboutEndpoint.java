@@ -51,6 +51,8 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 @Api("about")
 public class AboutEndpoint extends JSONEndpoint {
 
+  private static final String STARTED_AT = System.getProperty(AlexandriaApplication.STARTTIME_PROPERTY, Instant.now().toString());
+
   private static PropertyResourceBundle propertyResourceBundle;
 
   private final TemporalAmount tentativesTTL;
@@ -98,7 +100,7 @@ public class AboutEndpoint extends JSONEndpoint {
     data.put("buildDate", getProperty("buildDate"));
     data.put("commitId", getProperty("commitId"));
     data.put("scmBranch", getProperty("scmBranch"));
-    data.put("startedAt", System.getProperty(AlexandriaApplication.STARTTIME_PROPERTY, Instant.now().toString()));
+    data.put("startedAt", STARTED_AT);
     data.put("tentativesTTL", tentativesTTL.toString());
     data.put("version", getProperty("version"));
     return Response.ok(data).build();
