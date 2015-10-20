@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.concordion.api.ExpectedToFail;
 import org.concordion.api.MultiValueResult;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.Assert;
@@ -49,7 +48,6 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 
 @RunWith(ConcordionRunner.class)
-@ExpectedToFail
 public class AccessingFixture extends AnnotationsBase {
 
   @BeforeClass

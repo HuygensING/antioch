@@ -201,6 +201,8 @@
         </li>
     </ol>
 
+    <hr/>
+
     <h:request>When we
         <h:get>/resources/$resId</h:get>
         we expect
@@ -218,6 +220,8 @@
         </h:jsonResponse>
     </h:request>
 
+    <hr/>
+
     <h:request>We
         <h:success>successfully</h:success>
         <h:post>/searches</h:post>
@@ -225,24 +229,36 @@
             "query": {
             "find": "annotation",
             "where": "who:eq(\"nederlab\")",
-            "return": "value"
+            "return": "value,url"
             } }
         </h:jsonBody>
     </h:request>
 
     <div c:execute="#searchId=uuid()">which gets id <code c:echo="#searchId"></code></div>
 
+    <br/>
+
     <h:request>We
         <h:get>/searches/$searchId</h:get>
-        and inspect the number of results
+        and inspect the number of results and the <code>where</code> clause of our query
         <h:jsonResponse>{
             "searchResult" : {
             "id" : "$searchId",
-            "totalResults" : 5,
+            "query" : {
+            "where" : "who:eq(\"nederlab\") state:eq(\"CONFIRMED\")"
+            },
+            "totalResults" : 2,
             "^firstResultPage" : "https://{host}/searches/$searchId/resultPages/1"
             } }
         </h:jsonResponse>
     </h:request>
+
+    <div class="alert alert-info sm">
+        By default, only <code>CONFIRMED</code> annotations show up in searches.
+        <small>To this end, the <code>where</code> clause is extended with <code>state:eq("CONFIRMED")</code> if
+            no particular <code>state</code> was asked for.
+        </small>
+    </div>
 
     <h:request>We
         <h:success>successfully</h:success>
@@ -253,12 +269,59 @@
             "searchResultPage" : {
             "pageNumber" : 1,
             "records" : [
-            {"value" : "the annotation value after deprecation"},
-            {"value" : "an annotation to be deprecated"},
-            {"value" : "a deleted-after-confirmation annotation"},
-            {"value" : "a confirmed annotation"},
-            {"value" : "a tentative annotation"}
+            {"value" : "a confirmed annotation", "url": "https://{host}/annotations/$confirmedId"},
+            {"value" : "the annotation value after deprecation", "url": "https://{host}/annotations/$deprecatedId"}
             ] } }
+        </h:jsonResponse>
+    </h:request>
+
+    <hr/>
+
+    <h:request>We
+        <h:success>successfully</h:success>
+        <h:post>/searches</h:post>
+        <h:jsonBody>{
+            "query": {
+            "where": "who:eq(\"nederlab\") state:inSet(\"TENTATIVE\", \"DELETED\")",
+            "return": "state,value,url"
+            } }
+        </h:jsonBody>
+    </h:request>
+
+    <div c:execute="#searchId=uuid()">which gets id <code c:echo="#searchId"></code></div>
+
+    <br/>
+
+    <h:request>We
+        <h:success>successfully</h:success>
+        <h:get>/searches/$searchId</h:get>
+        and verify the body
+        <h:jsonResponse>{
+            "searchResult": {
+            "id": "$searchId",
+            "query": {
+            "where": "who:eq(\"nederlab\") state:inSet(\"TENTATIVE\", \"DELETED\")"
+            },
+            "totalResults": 2
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+    <h:request>We
+        <h:success>successfully</h:success>
+        <h:get>/searches/$searchId/resultPages/1</h:get>
+        and verify the body
+        <h:jsonResponse>{
+            "searchResultPage": {
+            "records": [ {
+            "state": "TENTATIVE",
+            "value": "a tentative annotation",
+            "url": "https://{host}/annotations/$tentativeId"
+            }, {
+            "state": "DELETED",
+            "value": "a deleted-after-confirmation annotation",
+            "url": "https://{host}/annotations/$delAfterConfirmId"
+            } ] } }
         </h:jsonResponse>
     </h:request>
 </div>
