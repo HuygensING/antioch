@@ -111,9 +111,9 @@
         <h:jsonResponse>{
             "searchResult" : {
             "totalResults" : 8,
-            "totalResultPages" : 3,
+            "totalPages" : 3,
             "pageSize" : 3,
-            "^firstResultPage" : "https://{host}/searches/$searchId/resultPages/1"
+            "^firstPage" : "https://{host}/searches/$searchId/pages/1"
             } }
         </h:jsonResponse>
     </h:request>
@@ -122,7 +122,7 @@
 
     <h:request>
         When we
-        <h:get>/searches/$searchId/resultPages/1</h:get>
+        <h:get>/searches/$searchId/pages/1</h:get>
         we expect status
         <h:status>200 OK</h:status>
         and body
@@ -135,7 +135,7 @@
             { "_resultNumber" : 2 },
             { "_resultNumber" : 3 }
             ],
-            "^nextPage" : "https://{host}/searches/$searchId/resultPages/2"
+            "^nextPage" : "https://{host}/searches/$searchId/pages/2"
             } }
         </h:jsonResponse>
     </h:request>
@@ -146,7 +146,7 @@
 
     <h:request>
         Now
-        <h:get>/searches/$searchId/resultPages/2</h:get>
+        <h:get>/searches/$searchId/pages/2</h:get>
         results in status
         <h:status>200 OK</h:status>
         and body
@@ -158,8 +158,8 @@
             { "_resultNumber" : 5 },
             { "_resultNumber" : 6 }
             ],
-            "^nextPage" : "https://{host}/searches/$searchId/resultPages/3",
-            "^previousPage" : "https://{host}/searches/$searchId/resultPages/1"
+            "^nextPage" : "https://{host}/searches/$searchId/pages/3",
+            "^previousPage" : "https://{host}/searches/$searchId/pages/1"
             } }
         </h:jsonResponse>
     </h:request>
@@ -172,7 +172,7 @@
 
     <h:request>
         And
-        <h:get>/searches/$searchId/resultPages/3</h:get>
+        <h:get>/searches/$searchId/pages/3</h:get>
         results in status
         <h:status>200 OK</h:status>
         and body
@@ -183,7 +183,7 @@
             { "_resultNumber" : 7 },
             { "_resultNumber" : 8 }
             ],
-            "^previousPage" : "https://{host}/searches/$searchId/resultPages/2"
+            "^previousPage" : "https://{host}/searches/$searchId/pages/2"
             } }
         </h:jsonResponse>
     </h:request>
@@ -195,21 +195,21 @@
     <hr/>
 
     <h:request>When we try to
-        <h:get>/searches/$searchId/resultPages/0</h:get>
+        <h:get>/searches/$searchId/pages/0</h:get>
         we receive
         <h:status>404 Not Found</h:status>
     </h:request>
 
     <h:request>
         Likewise
-        <h:get>/searches/$searchId/resultPages/4</h:get>
+        <h:get>/searches/$searchId/pages/4</h:get>
         results in status
         <h:status>404 Not Found</h:status>
         as the requested page lies beyond the maximum.
     </h:request>
 
     <div class="alert alert-warning sm">
-        Valid result page numbers are <code>1</code> up to and including the number of <code>totalResultPages</code>.
+        Valid result page numbers are <code>1</code> up to and including the number of <code>totalPages</code>.
     </div>
 
 </div>

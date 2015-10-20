@@ -80,7 +80,7 @@ public class SearchResult implements Identifiable {
     return results.size();
   }
 
-  public int getTotalResultPages() {
+  public int getTotalPages() {
     return (int) Math.ceil(getTotalResults() / (double) query.getPageSize());
   }
 
@@ -94,14 +94,14 @@ public class SearchResult implements Identifiable {
     return this;
   }
 
-  @JsonProperty(PropertyPrefix.LINK + "firstResultPage")
+  @JsonProperty(PropertyPrefix.LINK + "firstPage")
   public URI getFirstResultPage() {
-    return getTotalResults() > 0 ? URI.create(locationBuilder.locationOf(this) + "/resultPages/1") : null;
+    return getTotalResults() > 0 ? URI.create(locationBuilder.locationOf(this) + "/" + SearchEndpoint.RESULTPAGES + "/1") : null;
   }
 
   @JsonIgnore
   public List<Map<String, Object>> getRecordsForPage(int pageNumber) {
-    if (pageNumber < 1 || pageNumber > getTotalResultPages()) {
+    if (pageNumber < 1 || pageNumber > getTotalPages()) {
       return Lists.newArrayList();
     }
     int fromIndex = (pageNumber - 1) * getPageSize();
