@@ -101,6 +101,39 @@
     </ul>
 </div>
 
+<div id="dia-406" data-desc="When can I expect a 406 Not Acceptable?" c:execute="clearStorage()">
+    <div class="alert alert-warning sm">
+        All endpoints produce <code>application/json</code> results. Setting the HTTP <code>Accept</code>
+        header to something that does not allow <code>application/json</code> will yield a HTTP 406 status code.
+    </div>
+
+    <h:request>When we explicitly forbid JSON by setting
+        <h:setHeader name="Accept">text/html</h:setHeader>
+        and try to
+        <h:get>/about</h:get>
+        we observe
+        <h:status>406 Not Acceptable</h:status>
+    </h:request>
+</div>
+
+<div id="dia-415" data-desc="When can I expect a 415 Unsupported Media Type?" c:execute="clearStorage()">
+    <div class="alert alert-warning sm">
+        All endpoints consume data in <code>application/json</code> format. Setting the HTTP <code>Content-type</code>
+        header to something other than <code>application/json</code> will yield a HTTP 415 status code.
+    </div>
+
+    <div c:execute="contentType(#type)">set content-type <code c:set="#type">text/plain</code>
+        <h:request>
+            <h:setHeader name="Content-type">text/html</h:setHeader>
+            and try to
+            <h:post>/resources</h:post>
+            <h:jsonBody>{"res": "some value"}</h:jsonBody>
+            we observe
+            <h:status>415 Unsupported Media Type</h:status>
+        </h:request>
+    </div>
+</div>
+
 <div id="use-before-confirm" data-desc="When can I expect a 409 Conflict?" c:execute="clearStorage()">
     This has to do with implementing the
     <a href="../transactions/Transactions.html">try-confirm-cancel</a> pattern.
