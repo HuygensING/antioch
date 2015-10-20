@@ -235,8 +235,14 @@
     </h:request>
 
     <div c:execute="#searchId=uuid()">which gets id <code c:echo="#searchId"></code></div>
-
     <br/>
+
+    <div class="alert alert-info sm">
+        By default, only <code>CONFIRMED</code> annotations show up in searches.
+        <small>To this end, the <code>where</code> clause is extended with <code>state:eq("CONFIRMED")</code> if
+            no particular <code>state</code> was asked for.
+        </small>
+    </div>
 
     <h:request>We
         <h:get>/searches/$searchId</h:get>
@@ -253,18 +259,10 @@
         </h:jsonResponse>
     </h:request>
 
-    <div class="alert alert-info sm">
-        By default, only <code>CONFIRMED</code> annotations show up in searches.
-        <small>To this end, the <code>where</code> clause is extended with <code>state:eq("CONFIRMED")</code> if
-            no particular <code>state</code> was asked for.
-        </small>
-    </div>
-
     <h:request>We
         <h:success>successfully</h:success>
         <h:get>/searches/$searchId/pages/1</h:get>
-        and find all expected annotations (excluding the one that was deleted before confirmation)
-        including all their revisions:
+        and find the expected annotation URLs and values:
         <h:jsonResponse>{
             "searchResultPage" : {
             "pageNumber" : 1,
