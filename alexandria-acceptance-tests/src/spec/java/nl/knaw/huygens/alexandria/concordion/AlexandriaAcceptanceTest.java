@@ -22,17 +22,14 @@ package nl.knaw.huygens.alexandria.concordion;
  * #L%
  */
 
-import static java.lang.String.format;
 import static java.util.UUID.fromString;
 import static java.util.UUID.randomUUID;
 import static nl.knaw.huygens.alexandria.model.AlexandriaState.CONFIRMED;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.UriBuilder;
@@ -64,7 +61,6 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerGraphService;
 import nl.knaw.huygens.alexandria.service.TinkerPopService;
 import nl.knaw.huygens.alexandria.storage.Storage;
-import nl.knaw.huygens.alexandria.util.UUIDParser;
 import nl.knaw.huygens.cat.RestExtension;
 import nl.knaw.huygens.cat.RestFixture;
 
@@ -187,7 +183,12 @@ public class AlexandriaAcceptanceTest extends RestFixture {
   }
 
   protected UUID hasConfirmedAnnotation(AlexandriaResource resource, AlexandriaAnnotationBody annotationBody) {
-    final UUID annotationId = service().annotate(resource, annotationBody, aProvenance()).getId();
+    return hasConfirmedAnnotation(resource, annotationBody, aProvenance());
+  }
+
+  protected UUID hasConfirmedAnnotation(AlexandriaResource resource, AlexandriaAnnotationBody annotationBody,
+                                        TentativeAlexandriaProvenance provenance) {
+    final UUID annotationId = service().annotate(resource, annotationBody, provenance).getId();
     service().confirmAnnotation(annotationId);
     return annotationId;
   }
@@ -197,31 +198,11 @@ public class AlexandriaAcceptanceTest extends RestFixture {
   }
 
   protected AlexandriaAnnotationBody anAnnotation(String type, String value) {
-    return service().createAnnotationBody(randomUUID(), type, value, aProvenance());
+    return anAnnotation(type, value, aProvenance());
   }
 
-  private Optional<UUID> parse(String idStr) {
-    return UUIDParser.fromString(idStr).get();
+  protected AlexandriaAnnotationBody anAnnotation(String type, String value, TentativeAlexandriaProvenance provenance) {
+    return service().createAnnotationBody(randomUUID(), type, value, provenance);
   }
 
-  private Supplier<String> malformedDescription(String idStr) {
-    return () -> "malformed UUID: " + idStr;
-  }
-
-  private String normalizeHostInfo(String s) {
-    return s.replaceAll(hostInfo(), "{host}");
-  }
-
-  private String hostInfo() {
-    final URI baseURI = getBaseUri();
-    return format("%s:%d", baseURI.getHost(), baseURI.getPort());
-  }
-
-  private String baseOf(String s) {
-    return s.substring(0, s.lastIndexOf('/') + 1);
-  }
-
-  private String tailOf(String s) {
-    return Iterables.getLast(Splitter.on('/').split(s));
-  }
 }
