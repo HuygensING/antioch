@@ -122,16 +122,14 @@
         header to something other than <code>application/json</code> will yield a HTTP 415 status code.
     </div>
 
-    <div c:execute="contentType(#type)">set content-type <code c:set="#type">text/plain</code>
-        <h:request>
-            <h:setHeader name="Content-type">text/html</h:setHeader>
-            and try to
-            <h:post>/resources</h:post>
-            <h:jsonBody>{"res": "some value"}</h:jsonBody>
-            we observe
-            <h:status>415 Unsupported Media Type</h:status>
-        </h:request>
-    </div>
+    <h:request>When we set
+        <h:setHeader name="Content-type">text/plain</h:setHeader>
+        and try to
+        <h:post>/resources</h:post>
+        <h:jsonBody>{"resource": {"ref": "some value"}}</h:jsonBody>
+        we observe
+        <h:status>415 Unsupported Media Type</h:status>
+    </h:request>
 </div>
 
 <div id="use-before-confirm" data-desc="When can I expect a 409 Conflict?" c:execute="clearStorage()">
