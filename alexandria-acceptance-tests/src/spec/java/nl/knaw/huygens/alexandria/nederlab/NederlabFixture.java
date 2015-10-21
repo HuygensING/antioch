@@ -28,7 +28,6 @@ import static java.util.UUID.fromString;
 import java.time.Instant;
 import java.util.UUID;
 
-import org.concordion.api.ExpectedToFail;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -42,7 +41,6 @@ import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
 @RunWith(ConcordionRunner.class)
-@ExpectedToFail
 public class NederlabFixture extends AlexandriaAcceptanceTest {
 
   @BeforeClass
@@ -63,25 +61,26 @@ public class NederlabFixture extends AlexandriaAcceptanceTest {
   }
 
   public String resourceHasAnnotation(String resId, String type, String value) {
-    return hasConfirmedAnnotation(theResource(fromString(resId)), anAnnotation(type, value)).toString();
+    final AlexandriaResource resource = theResource(fromString(resId));
+    final AlexandriaAnnotationBody annotationBody = anAnnotation(type, value);
+    return hasConfirmedAnnotation(resource, annotationBody).toString();
   }
 
   public String resourceExistsWithTagForUserAtInstant(String resId, String value, String who, String when) {
     resourceExists(resId);
-    return annotate(theResource(fromString(resId)), aTag(value), aProvenance(who, parse(when)));
+
+    final AlexandriaResource resource = theResource(fromString(resId));
+
+    final Instant whenAsInstant = ISO_DATE_TIME.parse(when, Instant::from);
+    final TentativeAlexandriaProvenance provenance = aProvenance(who, whenAsInstant);
+    final AlexandriaAnnotationBody annotationBody = anAnnotation("Tag", value, provenance);
+
+    return hasConfirmedAnnotation(resource, annotationBody, provenance).toString();
   }
 
   public String subResourceExistsWithAnnotation(String id, String parentId, String type, String value) {
     final AlexandriaResource resource = subResourceExists(id, parentId);
     return hasConfirmedAnnotation(resource, anAnnotation(type, value)).toString();
-  }
-
-  private AlexandriaAnnotationBody aTag(String value) {
-    return anAnnotation("Tag", value);
-  }
-
-  private Instant parse(String when) {
-    return ISO_DATE_TIME.parse(when, Instant::from);
   }
 
   private TentativeAlexandriaProvenance aProvenance(String who, Instant when) {

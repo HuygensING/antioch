@@ -531,7 +531,7 @@
             "id" : "$searchId",
             "query" : {
             "find" : "annotation",
-            "where" : "who:eq(\"user-4242\") type:eq(\"Tag\")",
+            "where" : "who:eq(\"user-4242\") type:eq(\"Tag\") state:eq(\"CONFIRMED\")",
             "sort" : "-when",
             "return" : "id,type,value,resource.url"
             },
@@ -543,8 +543,16 @@
     </h:request>
 
     <div class="alert alert-warning sm">
-        The <code>sort</code> field, which we left unspecified, defaults to <code>"-when"</code>
-        (= reverse timestamp order: "most recent first").
+        <ul>
+            <li>
+                The <code>sort</code> field, which we left unspecified, defaults to <code>"-when"</code>
+                (= reverse timestamp order: "most recent first").
+            </li>
+            <li>
+                The <code>state</code> of the <code>where</code> field, which we left unspecified, defaults to
+                <code>"CONFIRMED"</code>
+            </li>
+        </ul>
     </div>
 
     <h:request>We
@@ -611,9 +619,6 @@
         <small>(only selected fields shown for brevity)</small>
         <h:jsonResponse>{
             "searchResult" : {
-            "query" : {
-            "where" : "who:eq(\"user-4242\") type:eq(\"Tag\") value:match(\".*early.*\")"
-            },
             "totalResults" : 2,
             "^firstPage": "https://{host}/searches/$searchId2/pages/1"
             } }
@@ -680,9 +685,6 @@
         <small>(only selected fields shown for brevity)</small>
         <h:jsonResponse>{
             "searchResult" : {
-            "query" : {
-            "where" : "who:eq(\"user-4242\") type:eq(\"Tag\") value:match(\".*early.*\") when:inRange(\"2015-07-01T00:00:00\",\"2015-07-31T23:59:59\")"
-            },
             "totalResults" : 1,
             "^firstPage": "https://{host}/searches/$searchId3/pages/1"
             } }
