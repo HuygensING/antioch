@@ -24,11 +24,14 @@ package nl.knaw.huygens.alexandria.query;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -54,6 +57,7 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.antlr.AQLLexer;
 import nl.knaw.huygens.alexandria.antlr.AQLParser;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
@@ -224,10 +228,13 @@ public class AlexandriaQueryParser {
         .reduce(alwaysTrue(), Predicate::and);
   }
 
+  static Set<String> ALL_STATES = Arrays.stream(AlexandriaState.values()).map(AlexandriaState::name).collect(toSet());
+
   static Predicate<AnnotationVF> toPredicate(WhereToken whereToken) {
     Function<AnnotationVF, Object> getter = QueryFieldGetters.get(whereToken.getProperty());
     // eq
     if (QueryFunction.eq.equals(whereToken.getFunction())) {
+      checkForValidStateParameter(whereToken);
       Object eqValue = whereToken.getParameters().get(0);
       return avf -> getter.apply(avf).equals(eqValue);
     }
@@ -246,6 +253,7 @@ public class AlexandriaQueryParser {
 
     // inSet
     if (QueryFunction.inSet.equals(whereToken.getFunction())) {
+      checkForValidStateParameter(whereToken);
       List<Object> possibleValues = whereToken.getParameters();
       return (AnnotationVF avf) -> {
         Object propertyValue = getter.apply(avf);
@@ -274,6 +282,23 @@ public class AlexandriaQueryParser {
     }
 
     return alwaysTrue();
+  }
+
+  static final Predicate<Object> INVALID_STATEVALUE_PREDICATE = stateValue -> !(stateValue instanceof String && ALL_STATES.contains(stateValue));
+
+  private static void checkForValidStateParameter(WhereToken whereToken) {
+    if (QueryField.state.equals(whereToken.getProperty())) {
+      List<Object> invalidValues = whereToken.getParameters().stream()//
+          .filter(INVALID_STATEVALUE_PREDICATE)//
+          .collect(toList());
+      if (!invalidValues.isEmpty()) {
+        String message = ((invalidValues.size() == 1)//
+            ? invalidValues.get(0) + " is not a valid value"//
+            : Joiner.on(", ").join(invalidValues) + " are not valid values")//
+            + " for " + QueryField.state.externalName();
+        throw new BadRequestException(message);
+      }
+    }
   }
 
   private static Predicate<AnnotationVF> alwaysTrue() {

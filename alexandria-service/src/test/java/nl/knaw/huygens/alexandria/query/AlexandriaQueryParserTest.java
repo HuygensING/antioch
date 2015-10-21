@@ -45,6 +45,8 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+import nl.knaw.huygens.alexandria.exception.BadRequestException;
+import nl.knaw.huygens.alexandria.exception.ErrorEntity;
 import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.model.search.QueryField;
 import nl.knaw.huygens.alexandria.model.search.QueryFunction;
@@ -382,5 +384,41 @@ public class AlexandriaQueryParserTest {
     String annotationId = AlexandriaQueryParser.getAnnotationId(avf);
 
     assertThat(annotationId).isEqualTo(randomUUID);
+  }
+
+  @Test
+  public void testInvalidStateInStateEqThrowsBadRequestException() {
+    WhereToken whereToken = new WhereToken(QueryField.state, QueryFunction.eq, ImmutableList.of("RUBBISH"));
+    try {
+      AlexandriaQueryParser.toPredicate(whereToken);
+      fail("expected BadRequestException");
+    } catch (BadRequestException e) {
+      String responseMessage = ((ErrorEntity) e.getResponse().getEntity()).getMessage();
+      assertThat(responseMessage).isEqualTo("RUBBISH is not a valid value for state");
+    }
+  }
+
+  @Test
+  public void testOneInvalidStatesInStateInSetThrowsBadRequestException() {
+    WhereToken whereToken = new WhereToken(QueryField.state, QueryFunction.eq, ImmutableList.of("RUBBISH", "CONFIRMED", "TENTATIVE"));
+    try {
+      AlexandriaQueryParser.toPredicate(whereToken);
+      fail("expected BadRequestException");
+    } catch (BadRequestException e) {
+      String responseMessage = ((ErrorEntity) e.getResponse().getEntity()).getMessage();
+      assertThat(responseMessage).isEqualTo("RUBBISH is not a valid value for state");
+    }
+  }
+
+  @Test
+  public void testTwoInvalidStatesInStateInSetThrowsBadRequestException() {
+    WhereToken whereToken = new WhereToken(QueryField.state, QueryFunction.eq, ImmutableList.of("RUBBISH", "GARBAGE", "CONFIRMED"));
+    try {
+      AlexandriaQueryParser.toPredicate(whereToken);
+      fail("expected BadRequestException");
+    } catch (BadRequestException e) {
+      String responseMessage = ((ErrorEntity) e.getResponse().getEntity()).getMessage();
+      assertThat(responseMessage).isEqualTo("RUBBISH, GARBAGE are not valid values for state");
+    }
   }
 }
