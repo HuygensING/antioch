@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function usage {
-  echo "Usage: deploy-to.sh {test|prod} {base-url}"
+  echo "Usage: deploy-to.sh {test|acc|prod} {base-url}"
 }
 
 function divider {
