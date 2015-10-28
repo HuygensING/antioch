@@ -98,6 +98,17 @@
     </profile>
 
     <profile>
+      <id>acc</id>
+      <properties>
+        <config.baseURI>https://acc.alexandria.huygens.knaw.nl/</config.baseURI>
+        <config.storageDirectory>/data/alexandria/storage/acceptance/</config.storageDirectory>
+        <tomcat.server>tomcat.hi24</tomcat.server>
+        <tomcat.manager.url>${tc24-manager}</tomcat.manager.url>
+        <tomcat.path>/alexandria</tomcat.path>
+      </properties>
+    </profile>
+
+    <profile>
       <id>prod</id>
       <properties>
         <config.baseURI>https://alexandria.huygens.knaw.nl/</config.baseURI>
