@@ -264,7 +264,7 @@ ins {
   }
 }</pre>
             </div>
-            <div c:execute="#tentativeId=uuid()">which gets id <code c:echo="#tentativeId">b72cf45a-124d-4aff-b281-73c4098c215e</code></div>
+            <div c:execute="#tentativeId=uuid()">which gets id <code c:echo="#tentativeId">af676604-0e2d-42f8-8c63-fc2c021c2699</code></div>
             We leave this annotation in its <code>TENTATIVE</code> state.
         </li>
 
@@ -279,11 +279,11 @@ ins {
   }
 }</pre>
             </div>
-            <div c:execute="#confirmedId=uuid()">which gets id <code c:echo="#confirmedId">ed20322a-1ae6-44cb-bf35-f773243d1730</code></div>
+            <div c:execute="#confirmedId=uuid()">which gets id <code c:echo="#confirmedId">8fb9df0e-5ea8-44c7-8331-2a0ba776518e</code></div>
             <div h:request="">We
                 <span h:success="" class="success">confirm</span>
                 it
-                <code class="put">/annotations/ed20322a-1ae6-44cb-bf35-f773243d1730/state</code>
+                <code class="put">/annotations/8fb9df0e-5ea8-44c7-8331-2a0ba776518e/state</code>
                 <pre h:jsonBody="" class="json">{
   "state" : "CONFIRMED"
 }</pre>
@@ -301,11 +301,11 @@ ins {
   }
 }</pre>
             </div>
-            <div c:execute="#delBeforeConfirmId=uuid()">which gets id <code c:echo="#delBeforeConfirmId">c2fb1657-b61e-4fd7-ae3f-d26fd476e84f</code></div>
+            <div c:execute="#delBeforeConfirmId=uuid()">which gets id <code c:echo="#delBeforeConfirmId">658e26ed-c264-4a9f-99ee-dbc1431b93b8</code></div>
             <div h:request="">We then
                 <span h:success="" class="success">delete</span>
                 it via
-                <code class="delete">/annotations/c2fb1657-b61e-4fd7-ae3f-d26fd476e84f</code>
+                <code class="delete">/annotations/658e26ed-c264-4a9f-99ee-dbc1431b93b8</code>
                 before having confirmed it.
             </div>
             <div class="alert alert-warning sm">
@@ -325,11 +325,11 @@ ins {
   }
 }</pre>
             </div>
-            <div c:execute="#delAfterConfirmId=uuid()">which gets id <code c:echo="#delAfterConfirmId">8d70db34-5c6a-4593-97ad-7611f31f4a65</code></div>
+            <div c:execute="#delAfterConfirmId=uuid()">which gets id <code c:echo="#delAfterConfirmId">edc787c2-ad41-4c63-9734-429f88355ef8</code></div>
             <div h:request="">We
                 <span h:success="" class="success">confirm</span>
                 it:
-                <code class="put">/annotations/8d70db34-5c6a-4593-97ad-7611f31f4a65/state</code>
+                <code class="put">/annotations/edc787c2-ad41-4c63-9734-429f88355ef8/state</code>
                 <pre h:jsonBody="" class="json">{
   "state" : "CONFIRMED"
 }</pre>
@@ -337,7 +337,7 @@ ins {
             <div h:request="">We then
                 <span h:success="" class="success">delete</span>
                 it via
-                <code class="delete">/annotations/8d70db34-5c6a-4593-97ad-7611f31f4a65</code>
+                <code class="delete">/annotations/edc787c2-ad41-4c63-9734-429f88355ef8</code>
             </div>
         </li>
 
@@ -352,11 +352,11 @@ ins {
   }
 }</pre>
             </div>
-            <div c:execute="#deprecatedId=uuid()">which gets id <code c:echo="#deprecatedId">b09dab6e-4c87-450e-a277-3c2fc545d4d0</code></div>
+            <div c:execute="#deprecatedId=uuid()">which gets id <code c:echo="#deprecatedId">545d1bd7-65b7-4ee3-a2cc-16673cf18014</code></div>
             <div h:request="">We
                 <span h:success="" class="success">confirm</span>
                 it:
-                <code class="put">/annotations/b09dab6e-4c87-450e-a277-3c2fc545d4d0/state</code>
+                <code class="put">/annotations/545d1bd7-65b7-4ee3-a2cc-16673cf18014/state</code>
                 <pre h:jsonBody="" class="json">{
   "state" : "CONFIRMED"
 }</pre>
@@ -364,7 +364,7 @@ ins {
             <div h:request="">We
                 <span h:success="" class="success">deprecate</span>
                 it:
-                <code class="put">/annotations/b09dab6e-4c87-450e-a277-3c2fc545d4d0</code>
+                <code class="put">/annotations/545d1bd7-65b7-4ee3-a2cc-16673cf18014</code>
                 <pre h:jsonBody="" class="json">{
   "annotation" : {
     "value" : "the annotation value after deprecation"
@@ -382,7 +382,7 @@ ins {
         <pre class="json rest-success">{
   "resource" : {
     "id" : "6cf02b7a-7244-11e5-a68b-ab226ffa3019",
-    "^annotations" : [ "https://{host}/annotations/b72cf45a-124d-4aff-b281-73c4098c215e", "https://{host}/annotations/ed20322a-1ae6-44cb-bf35-f773243d1730", "https://{host}/annotations/8d70db34-5c6a-4593-97ad-7611f31f4a65", "https://{host}/annotations/b09dab6e-4c87-450e-a277-3c2fc545d4d0" ]
+    "^annotations" : [ "https://{host}/annotations/af676604-0e2d-42f8-8c63-fc2c021c2699", "https://{host}/annotations/8fb9df0e-5ea8-44c7-8331-2a0ba776518e", "https://{host}/annotations/edc787c2-ad41-4c63-9734-429f88355ef8", "https://{host}/annotations/545d1bd7-65b7-4ee3-a2cc-16673cf18014" ]
   }
 }</pre>
     </div>
@@ -399,23 +399,23 @@ ins {
 }</pre>
     </div>
 
-    <div c:execute="#searchId=uuid()">which gets id <code c:echo="#searchId">ccfd1511-da05-4726-a98c-a37cbe04c243</code></div>
+    <div c:execute="#searchId=uuid()">which gets id <code c:echo="#searchId">cebd9928-464e-40fc-b086-506ff940fc9b</code></div>
 
     <div h:request="">We
-        <code class="get">/searches/ccfd1511-da05-4726-a98c-a37cbe04c243</code>
+        <code class="get">/searches/cebd9928-464e-40fc-b086-506ff940fc9b</code>
         and inspect the number of results
         <pre class="json rest-success">{
   "searchResult" : {
-    "id" : "ccfd1511-da05-4726-a98c-a37cbe04c243",
+    "id" : "cebd9928-464e-40fc-b086-506ff940fc9b",
     "totalResults" : 5,
-    "^firstResultPage" : "https://{host}/searches/ccfd1511-da05-4726-a98c-a37cbe04c243/resultPages/1"
+    "^firstResultPage" : "https://{host}/searches/cebd9928-464e-40fc-b086-506ff940fc9b/resultPages/1"
   }
 }</pre>
     </div>
 
     <div h:request="">We
         <span h:success="" class="success">successfully</span>
-        <code class="get">/searches/ccfd1511-da05-4726-a98c-a37cbe04c243/resultPages/1</code>
+        <code class="get">/searches/cebd9928-464e-40fc-b086-506ff940fc9b/resultPages/1</code>
         and find all expected annotations (excluding the one that was deleted before confirmation)
         including all their revisions:
         <pre class="json rest-success">{
@@ -435,5 +435,5 @@ ins {
   }
 }</pre>
     </div>
-</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 862 ms on 28-Oct-2015 at 13:23:56 CET</div></div></body>
+</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 981 ms on 30-Oct-2015 at 09:32:28 CET</div></div></body>
 </html>
