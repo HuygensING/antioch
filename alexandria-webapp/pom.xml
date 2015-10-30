@@ -102,8 +102,8 @@
       <properties>
         <config.baseURI>https://acc.alexandria.huygens.knaw.nl/</config.baseURI>
         <config.storageDirectory>/data/alexandria/storage/acceptance/</config.storageDirectory>
-        <tomcat.server>tomcat.hi24</tomcat.server>
-        <tomcat.manager.url>${tc24-manager}</tomcat.manager.url>
+        <tomcat.server>tomcat.hi24alex</tomcat.server>
+        <tomcat.manager.url>${tc24alex-manager}</tomcat.manager.url>
         <tomcat.path>/alexandria</tomcat.path>
       </properties>
     </profile>
