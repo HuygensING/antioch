@@ -39,12 +39,12 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.StatePrototype;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
-import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.exception.TentativeObjectException;
@@ -77,19 +77,6 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   private static String NoAnnotationFoundWithId(Object id) {
     return "No annotation found with id " + id;
   }
-
-  // @POST
-  // @Path("{uuid}/deprecation")
-  // @Consumes(MediaType.APPLICATION_JSON)
-  // @ApiOperation(value = "make a new annotation from the payload and use it to deprecate the annotation with the
-  // given uuid")
-  // public Response deprecateAnnotation(@PathParam("uuid") UUIDParam uuidParam, AnnotationPrototype prototype) {
-  // UUID uuid = uuidParam.getValue();
-  // prototype.setState(AlexandriaState.TENTATIVE);
-  // AnnotationDeprecationRequest request = requestBuilder.ofAnnotation(uuid).build(prototype);
-  // AlexandriaAnnotation newAnnotation = request.execute(service);
-  // return Response.created(locationBuilder.locationOf(newAnnotation)).build();
-  // }
 
   private static Supplier<NotFoundException> annotationNotFoundForIdAndRevision(Object id, Integer revision) {
     return () -> new NotFoundException(NoAnnotationFoundWithId(id) + ", revision " + revision);
@@ -157,7 +144,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
       service.confirmAnnotation(annotation.getId());
       return noContent();
     }
-    throw new BadRequestException("for now, you can only set the state to CONFIRMED");
+    throw new ConflictException("Annotations can only be CONFIRMED via their /state endpoint");
   }
 
   @Path("{uuid}/annotations")
