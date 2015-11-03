@@ -160,6 +160,14 @@ public class Storage {
     graph.io(new GraphMLIo.Builder()).writer().create().writeGraph(os, graph);
   }
 
+  public void readGraph(DumpFormat format, String filename) throws IOException {
+    graph.io(format.builder).readGraph(filename);
+  }
+
+  public void writeGraph(DumpFormat format, String filename) throws IOException {
+    graph.io(format.builder).writeGraph(filename);
+  }
+
   public void loadFromDisk(final String file) {
     try {
       graph.io(IoCore.graphml()).readGraph(file);

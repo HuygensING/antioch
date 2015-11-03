@@ -39,7 +39,6 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
@@ -133,7 +132,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   @PUT
   @Path("{uuid}/state")
   @Consumes(MediaType.APPLICATION_JSON)
-  @ApiOperation(value = "update the state of the annotation (only state=CONFIRMED accepted for now)")
+  @ApiOperation(value = "update the state of the annotation (only state=CONFIRMED accepted)")
   public Response setAnnotationState(@PathParam("uuid") final UUIDParam uuidParam, @NotNull StatePrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
     AlexandriaAnnotation annotation = readExistingAnnotation(uuidParam);

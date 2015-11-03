@@ -197,3 +197,24 @@ curl -i -X POST $be/searches -H 'Content-type: application/json' \
 	"where" : "who:eq(\"nederlab\")",
 	"return" : "id,resource.url,subresource.url,type,value"
 }}'
+
+curl -i -X PUT $be/admin -H 'Content-type: application/json' \
+--data-binary '{
+  "key" : "adminkey",
+  "command" : "dump",
+  "parameters" : {
+    "format" : "kryo",
+    "filename" : "alexandria-dump.kryo"
+  }
+}}'
+
+curl -i -X PUT $be/admin -H 'Content-type: application/json' \
+--data-binary '{
+  "key" : "adminkey",
+  "command" : "dump",
+  "parameters" : {
+    "format" : "graphml",
+    "filename" : "alexandria-dump.xml"
+  }
+}}'
+
