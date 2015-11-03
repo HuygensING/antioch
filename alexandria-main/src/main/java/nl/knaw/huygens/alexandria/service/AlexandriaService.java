@@ -106,4 +106,8 @@ public interface AlexandriaService {
 
   void destroy();
 
+  void exportDb(String format, String filename);
+
+  void importDb(String format, String filename);
+
 }

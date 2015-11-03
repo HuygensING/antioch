@@ -63,6 +63,7 @@ import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.query.AlexandriaQueryParser;
 import nl.knaw.huygens.alexandria.query.ParsedAlexandriaQuery;
+import nl.knaw.huygens.alexandria.storage.DumpFormat;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
@@ -355,6 +356,26 @@ public class TinkerPopService implements AlexandriaService {
         .setId(UUID.randomUUID())//
         .setQuery(query)//
         .setResults(processQuery(query));
+  }
+
+  @Override
+  public void exportDb(String format, String filename) {
+    try {
+      storage.writeGraph(DumpFormat.valueOf(format), filename);
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public void importDb(String format, String filename) {
+    try {
+      storage.readGraph(DumpFormat.valueOf(format), filename);
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
   }
 
   // - other public methods -//
