@@ -324,5 +324,100 @@
     </h:request>
 </div>
 
+<div id="try-cheat-state-of-confirmed" data-desc="Can I manipulate a CONFIRMED annotation back to TENTATIVE?"
+     c:execute="clearStorage()">
+
+    <div c:execute="resourceExists(#resId)">
+        Assume a resource exists with uuid: <code c:set="#resId">c11d2b34-8208-11e5-8d69-dbd854dc9546</code>
+    </div>
+
+    <h:request>We
+        <h:success>successfully</h:success>
+        <h:post>/resources/$resId/annotations</h:post>
+        the body
+        <h:jsonBody>{
+            "annotation": {
+            "value": "an annotation value"
+            } }
+        </h:jsonBody>
+    </h:request>
+
+    <div c:execute="#annoId = uuid()">
+        this annotation has id: <code c:echo="#annoId"></code>
+    </div>
+
+    <h:request>We
+        <h:success>confirm</h:success>
+        by
+        <h:put>/annotations/$annoId/state</h:put>
+        the body
+        <h:jsonBody>{"state": "CONFIRMED"}</h:jsonBody>
+    </h:request>
+
+    <h:request>Now if we try to reset the state to <code>TENTATIVE</code>
+        <h:put>/annotations/$annoId/state</h:put>
+        the body
+        <h:jsonBody>{"state": "TENTATIVE"}</h:jsonBody>
+        We observe
+        <h:status>409 Conflict</h:status>
+        and the informative error message
+        <h:jsonResponse>{
+            "error" : {
+            "message" : "CONFIRMED annotations cannot change state via /state"
+            } }
+        </h:jsonResponse>
+    </h:request>
+</div>
+
+<div id="try-cheat-state-of-deleted" data-desc="Can I manipulate a DELETED annotation back to TENTATIVE?"
+     c:execute="clearStorage()">
+
+    <div c:execute="resourceExists(#resId)">
+        Assume a resource exists with uuid: <code c:set="#resId">c11d2b34-8208-11e5-8d69-dbd854dc9546</code>
+    </div>
+
+    <h:request>We
+        <h:success>successfully</h:success>
+        <h:post>/resources/$resId/annotations</h:post>
+        the body
+        <h:jsonBody>{
+            "annotation": {
+            "value": "an annotation value"
+            } }
+        </h:jsonBody>
+    </h:request>
+
+    <div c:execute="#annoId = uuid()">
+        this annotation has id: <code c:echo="#annoId"></code>
+    </div>
+
+    <h:request>We
+        <h:success>confirm</h:success>
+        it
+        <h:put>/annotations/$annoId/state</h:put>
+        the body
+        <h:jsonBody>{"state": "CONFIRMED"}</h:jsonBody>
+    </h:request>
+
+    <h:request>We
+        <h:success>delete</h:success>
+        it
+        <h:delete>/annotations/$annoId</h:delete>
+    </h:request>
+
+    <h:request>Now if we try to reset the state to <code>CONFIRMED</code>
+        <h:put>/annotations/$annoId/state</h:put>
+        the body
+        <h:jsonBody>{"state": "CONFIRMED"}</h:jsonBody>
+        We observe
+        <h:status>409 Conflict</h:status>
+        and the informative error message
+        <h:jsonResponse>{
+            "error" : {
+            "message" : "DELETED annotations cannot be set to CONFIRMED"
+            } }
+        </h:jsonResponse>
+    </h:request>
+</div>
 </body>
 </html>
