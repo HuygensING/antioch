@@ -39,12 +39,12 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.StatePrototype;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
-import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.exception.TentativeObjectException;
@@ -144,7 +144,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
       service.confirmAnnotation(annotation.getId());
       return noContent();
     }
-    throw new BadRequestException("for now, you can only set the state to CONFIRMED");
+    throw new ConflictException("Annotations can only be CONFIRMED via their /state endpoint");
   }
 
   @Path("{uuid}/annotations")

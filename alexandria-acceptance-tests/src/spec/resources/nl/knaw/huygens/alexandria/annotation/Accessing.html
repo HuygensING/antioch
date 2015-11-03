@@ -324,7 +324,7 @@
     </h:request>
 </div>
 
-<div id="try-cheat-state-of-confirmed" data-desc="Can I manipulate a CONFIRMED annotation back to TENTATIVE?"
+<div id="try-cheat-state-of-confirmed" data-desc="Can I cheat a CONFIRMED annotation back to TENTATIVE?"
      c:execute="clearStorage()">
 
     <div c:execute="resourceExists(#resId)">
@@ -363,13 +363,13 @@
         and the informative error message
         <h:jsonResponse>{
             "error" : {
-            "message" : "CONFIRMED annotations cannot change state via /state"
+            "message" : "Annotations can only be CONFIRMED via their /state endpoint"
             } }
         </h:jsonResponse>
     </h:request>
 </div>
 
-<div id="try-cheat-state-of-deleted" data-desc="Can I manipulate a DELETED annotation back to TENTATIVE?"
+<div id="try-cheat-state-of-deleted" data-desc="Can I cheat a DELETED annotation back to CONFIRMED?"
      c:execute="clearStorage()">
 
     <div c:execute="resourceExists(#resId)">
