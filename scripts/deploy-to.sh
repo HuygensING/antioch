@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 function usage {
   echo "Usage: deploy-to.sh {test|acc|prod} {base-url}"
 }
