@@ -54,9 +54,9 @@ function a-import {
     bak=/tmp/$(basename ${importfile})
     cp ${importfile} ${bak}
     gunzip ${bak}
-    importfile=${bak}
+    importfile=${bak/.gz//}
   fi
-  
+
   curl -i -X PUT ${base_url}/admin -H 'Content-type: application/json' \
   --data-binary "{
     \"key\" : \"${key}\",

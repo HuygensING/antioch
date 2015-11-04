@@ -1,5 +1,5 @@
 # usage: source alexandria-functions.sh
-# some convenienve methods for the shell
+# some convenience methods for the shell
 
 function a-annotate-resource {
 	r=$1; t=$2; v=$3
@@ -8,7 +8,7 @@ function a-annotate-resource {
 }
 
 function a-location {
-	grep "Location:"|cut -d\  -f2
+	grep "Location:"|cut -d\  -f2|sed -e "s/\r//g"
 }
 
 function a-confirm {
