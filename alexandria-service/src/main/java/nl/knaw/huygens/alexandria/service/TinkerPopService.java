@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -44,6 +45,7 @@ import java.util.stream.Stream;
 import javax.inject.Inject;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import com.google.common.collect.Maps;
 
@@ -371,11 +373,16 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public void importDb(String format, String filename) {
     try {
+      clearGraph();
       storage.readGraph(DumpFormat.valueOf(format), filename);
     } catch (IOException e) {
       e.printStackTrace();
       throw new RuntimeException(e);
     }
+  }
+
+  void clearGraph() {
+    storage.getVertexTraversal().forEachRemaining((Consumer<Vertex>) vertex -> vertex.remove());
   }
 
   // - other public methods -//

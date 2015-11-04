@@ -48,6 +48,7 @@ import com.thinkaurelius.titan.core.schema.SchemaStatus;
 import com.thinkaurelius.titan.core.schema.TitanGraphIndex;
 import com.thinkaurelius.titan.core.schema.TitanManagement;
 import com.thinkaurelius.titan.core.schema.TitanManagement.IndexBuilder;
+import com.thinkaurelius.titan.core.util.TitanCleanup;
 import com.thinkaurelius.titan.graphdb.database.management.GraphIndexStatusReport;
 import com.thinkaurelius.titan.graphdb.database.management.ManagementSystem;
 
@@ -239,5 +240,11 @@ public class TitanService extends TinkerPopService {
       titanGraph.close();
     }
     // Log.info("destroy finished");
+  }
+
+  @Override
+  void clearGraph() {
+    titanGraph.close();
+    TitanCleanup.clear(titanGraph);
   }
 }
