@@ -218,3 +218,11 @@ curl -i -X PUT $be/admin -H 'Content-type: application/json' \
   }
 }}'
 
+# generate error
+curl -i -X POST $be/searches -H 'Content-type: application/json' \
+--data-binary '{"query":{
+  "find" : "annotation",
+  "where" : "state:inSet(\"CONFIRMED\",\"UNCONFIRMED\")",
+  "return" : "id,resource.url,subresource.url,type,value"
+}}'
+
