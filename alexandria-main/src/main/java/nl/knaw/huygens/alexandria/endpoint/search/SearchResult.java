@@ -48,6 +48,8 @@ public class SearchResult implements Identifiable {
   private UUID id;
   private AlexandriaQuery query;
   private List<Map<String, Object>> results = Lists.newArrayList();
+  private Long searchDurationInMs;
+
   @JsonIgnore
   private LocationBuilder locationBuilder;
 
@@ -111,6 +113,15 @@ public class SearchResult implements Identifiable {
 
   public int getPageSize() {
     return query.getPageSize();
+  }
+
+  public Long getSearchDurationInMs() {
+    return searchDurationInMs;
+  }
+
+  public SearchResult setSearchDurationInMilliseconds(Long searchDurationInMs) {
+    this.searchDurationInMs = searchDurationInMs;
+    return this;
   }
 
 }
