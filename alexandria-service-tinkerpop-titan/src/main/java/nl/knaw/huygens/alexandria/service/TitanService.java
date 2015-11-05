@@ -87,6 +87,7 @@ public class TitanService extends TinkerPopService {
   }
 
   private static TitanGraph titanGraph;
+  private static String titanConfiguration;
 
   static class IndexInfo {
     private String name;
@@ -136,7 +137,8 @@ public class TitanService extends TinkerPopService {
   }
 
   private static Storage getStorage(AlexandriaConfiguration configuration) {
-    titanGraph = TitanFactory.open(configuration.getStorageDirectory() + "/titan.properties");
+    titanConfiguration = configuration.getStorageDirectory() + "/titan.properties";
+    titanGraph = TitanFactory.open(titanConfiguration);
     setIndexes();
     return new Storage(titanGraph);
   }
@@ -246,5 +248,6 @@ public class TitanService extends TinkerPopService {
   void clearGraph() {
     titanGraph.close();
     TitanCleanup.clear(titanGraph);
+    titanGraph = TitanFactory.open(titanConfiguration);
   }
 }
