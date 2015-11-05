@@ -87,7 +87,7 @@ public class TitanService extends TinkerPopService {
   }
 
   private static TitanGraph titanGraph;
-  private static String titanConfiguration;
+  private AlexandriaConfiguration configuration;
 
   static class IndexInfo {
     private String name;
@@ -124,21 +124,22 @@ public class TitanService extends TinkerPopService {
   @Inject
   public TitanService(LocationBuilder locationBuilder, AlexandriaConfiguration configuration) {
     super(getStorage(configuration), locationBuilder);
+    this.configuration = configuration;
   }
 
   @Override
   public Map<String, Object> getMetadata() {
     TitanManagement mgmt = titanGraph.openManagement();
     Map<String, Object> metadata = super.getMetadata();
-    @SuppressWarnings("unchecked") Map<String, Object> storageMap = (Map<String, Object>) metadata.get("storage");
+    @SuppressWarnings("unchecked")
+    Map<String, Object> storageMap = (Map<String, Object>) metadata.get("storage");
     storageMap.put("vertexIndexes", indexInfo(mgmt, Vertex.class));
     storageMap.put("edgeIndexes", indexInfo(mgmt, Edge.class));
     return metadata;
   }
 
   private static Storage getStorage(AlexandriaConfiguration configuration) {
-    titanConfiguration = configuration.getStorageDirectory() + "/titan.properties";
-    titanGraph = TitanFactory.open(titanConfiguration);
+    titanGraph = TitanFactory.open(configuration.getStorageDirectory() + "/titan.properties");
     setIndexes();
     return new Storage(titanGraph);
   }
@@ -245,9 +246,9 @@ public class TitanService extends TinkerPopService {
   }
 
   @Override
-  void clearGraph() {
+  Storage clearGraph() {
     titanGraph.close();
     TitanCleanup.clear(titanGraph);
-    titanGraph = TitanFactory.open(titanConfiguration);
+    return getStorage(configuration);
   }
 }

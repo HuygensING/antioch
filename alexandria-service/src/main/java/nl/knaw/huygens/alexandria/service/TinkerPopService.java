@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -47,6 +48,7 @@ import javax.inject.Inject;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
 
 import nl.knaw.huygens.Log;
@@ -354,10 +356,16 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public SearchResult execute(AlexandriaQuery query) {
+    Stopwatch stopwatch = Stopwatch.createStarted();
+    List<Map<String, Object>> processQuery = processQuery(query);
+    stopwatch.stop();
+    long elapsedMillis = stopwatch.elapsed(TimeUnit.MILLISECONDS);
+
     return new SearchResult(locationBuilder)//
         .setId(UUID.randomUUID())//
         .setQuery(query)//
-        .setResults(processQuery(query));
+        .setSearchDurationInMilliseconds(elapsedMillis)//
+        .setResults(processQuery);
   }
 
   @Override
@@ -373,7 +381,7 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public void importDb(String format, String filename) {
     try {
-      clearGraph();
+      storage = clearGraph();
       storage.readGraph(DumpFormat.valueOf(format), filename);
     } catch (IOException e) {
       e.printStackTrace();
@@ -381,8 +389,9 @@ public class TinkerPopService implements AlexandriaService {
     }
   }
 
-  void clearGraph() {
+  Storage clearGraph() {
     storage.getVertexTraversal().forEachRemaining((Consumer<Vertex>) vertex -> vertex.remove());
+    return storage;
   }
 
   // - other public methods -//
