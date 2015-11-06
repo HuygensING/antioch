@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>nl.knaw.huygens.alexandria</groupId>
   <artifactId>alexandria</artifactId>
@@ -42,6 +42,7 @@
     <!-- Generate parse tree visitor interface and base class. -->
     <antlr4.visitor>true</antlr4.visitor>
 
+    <guava.version>19.0-rc2</guava.version>
     <guice.version>4.0</guice.version>
     <jackson.version>2.7.0</jackson.version>
     <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
@@ -55,7 +56,8 @@
     <junitparams.version>1.0.4</junitparams.version>
     <log.version>1.1.1</log.version>
 
-    <!-- 3.2,3.3 leads to compiler error in Jenkins: java.lang.IllegalStateException: endPosTable already set -->
+    <!-- 3.2,3.3 leads to compiler error in Jenkins: java.lang.IllegalStateException: 
+      endPosTable already set -->
     <maven-compiler.version>3.1</maven-compiler.version>
 
     <mockito.version>2.0.36-beta</mockito.version>
@@ -68,6 +70,10 @@
     -->
     <swagger.version>1.5.6</swagger.version>
 
+    <visitei.version>0.4.2-SNAPSHOT</visitei.version>
+    <neo4j-tinkerpop-api-impl.version>0.3-2.3.0</neo4j-tinkerpop-api-impl.version>
+    <neo4j-gremlin.version>3.0.0.M7</neo4j-gremlin.version>
+    <peapod.version>0.2.2</peapod.version>
     <tinkerpop.groupId>org.apache.tinkerpop</tinkerpop.groupId>
     <tinkerpop.version>3.0.1-incubating</tinkerpop.version> <!-- can only be updated when titan.version is compatible with the new version -->
     <titan.version>1.0.0</titan.version>
@@ -393,7 +399,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore/>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>
