@@ -226,6 +226,10 @@ curl -i -X POST $be/searches -H 'Content-type: application/json' \
   "return" : "id,resource.url,subresource.url,type,value"
 }}'
 
+# upload text, xml tags will be transformed into annotations
+curl -i -X PUT $be/resources/$ri/text -H 'Content-type: application/json' \
+--data-binary '{"text":"<xml>some text</xml>"}'
+
 
 curl -i -H "${authheader}" -X POST $be/searches -H 'Content-type: application/json' \
 --data-binary '{"query":{
