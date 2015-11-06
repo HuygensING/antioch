@@ -17,7 +17,7 @@ function a-export {
     usage
   fi
 
-  curl -i -f -X PUT ${base_url}/admin -H 'Content-type: application/json' \
+  curl ${base_url}/admin --include --silent --show-error --fail --request PUT --header 'Content-type: application/json' \
   --data-binary "{
     \"key\" : \"${key}\",
     \"command\" : \"export\",
