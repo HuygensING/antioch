@@ -44,7 +44,6 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -169,6 +168,11 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @Path("{uuid}/annotations")
   public Class<ResourceAnnotationsEndpoint> getAnnotationsEndpoint() {
     return ResourceAnnotationsEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
+  }
+
+  @Path("{uuid}/text")
+  public Class<ResourceTextEndpoint> getResourceTextEndpoint() {
+    return ResourceTextEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }
 
   @Path("{uuid}/provenance")
