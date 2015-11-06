@@ -32,12 +32,7 @@
     <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
 
     <!-- Software versions -->
-<<<<<<< 4b1cf03885b963ba245b8576fbe9bd9faddfe7a8
     <assertj.version>3.3.0</assertj.version>
-=======
-    <assertj.version>3.2.0</assertj.version>
-    <build-helper-maven-plugin.version>1.9.1</build-helper-maven-plugin.version>
->>>>>>> pom: updated several dependency versions, propertized versions
     <classloader-leak-prevention.version>1.15.2</classloader-leak-prevention.version>
 
     <!-- Concordion Acceptance Test extensions -->
@@ -59,19 +54,12 @@
 
     <junit.version>4.12</junit.version>
     <junitparams.version>1.0.4</junitparams.version>
-<<<<<<< 4b1cf03885b963ba245b8576fbe9bd9faddfe7a8
     <log.version>1.1.1</log.version>
-=======
-    <log.version>1.1.0</log.version>
-
-    <maven-assembly.version>2.4</maven-assembly.version>
->>>>>>> pom: updated several dependency versions, propertized versions
 
     <!-- 3.2,3.3 leads to compiler error in Jenkins: java.lang.IllegalStateException: 
       endPosTable already set -->
     <maven-compiler.version>3.1</maven-compiler.version>
 
-<<<<<<< 4b1cf03885b963ba245b8576fbe9bd9faddfe7a8
     <mockito.version>2.0.36-beta</mockito.version>
     <peapod.version>0.2.2</peapod.version>
     <reflections.version>0.9.10</reflections.version>
@@ -83,52 +71,13 @@
     <swagger.version>1.5.6</swagger.version>
 
     <visitei.version>0.4.7-SNAPSHOT</visitei.version>
-=======
-    <maven-license.version>1.8</maven-license.version>
-    <maven-surefire.version>2.19</maven-surefire.version>
-    <maven-war.version>2.6</maven-war.version>
-    <maven-javadoc.version>2.10.3</maven-javadoc.version>
-    <maven-project-info-reports.version>2.8.1</maven-project-info-reports.version>
-    <maven-surefire-report.version>2.19</maven-surefire-report.version>
-    <maven-jxr.version>2.5</maven-jxr.version>
-    <maven-concordion-reporting.version>1.0.2</maven-concordion-reporting.version>
-    <maven-antrun.version>1.8</maven-antrun.version>
-    <maven-failsafe.version>2.19</maven-failsafe.version>
-    <maven-site.version>3.4</maven-site.version>
-    <maven-project-info-reports.version>2.8.1</maven-project-info-reports.version>
-    <maven-shared-jar.version>1.1</maven-shared-jar.version>
-    <tomcat7-maven.version>2.2</tomcat7-maven.version>
-    <buildnumber-maven.version>1.4</buildnumber-maven.version>
-    <build-helper-maven.version>1.9.1</build-helper-maven.version>
-    <wagon-ssh.version>2.7</wagon-ssh.version>
-
-    <mockito.version>2.0.31-beta</mockito.version>
-    <plugin.scm-publish.version>1.1</plugin.scm-publish.version>
-    <reflections.version>0.9.10</reflections.version>
-    <servlet-api.version>4.0.0-b01</servlet-api.version>
-
-    <!-- <swagger-maven-plugin.version>3.1.0</swagger-maven-plugin.version> -->
-    <swagger.version>1.5.4</swagger.version>
-
-    <visitei.version>0.4.2-SNAPSHOT</visitei.version>
->>>>>>> pom: updated several dependency versions, propertized versions
     <neo4j-tinkerpop-api-impl.version>0.3-2.3.0</neo4j-tinkerpop-api-impl.version>
     <neo4j-gremlin.version>3.0.0.M7</neo4j-gremlin.version>
     <peapod.version>0.2.2</peapod.version>
     <tinkerpop.groupId>org.apache.tinkerpop</tinkerpop.groupId>
-<<<<<<< 4b1cf03885b963ba245b8576fbe9bd9faddfe7a8
     <tinkerpop.version>3.0.1-incubating</tinkerpop.version> <!-- can only be updated when titan.version is compatible with the new version -->
     <titan.version>1.0.0</titan.version>
     <sleepycat.version>5.0.73</sleepycat.version>
-=======
-    <tinkerpop.version>3.0.2-incubating</tinkerpop.version>
-    <titan.version>1.0.0</titan.version>
-    <sleepycat.version>5.0.73</sleepycat.version>
-    <reflow-velocity-tools.version>1.1.1</reflow-velocity-tools.version>
-    <velocity.version>1.7</velocity.version>
-    <bcel-findbugs.version>6.0</bcel-findbugs.version>
-    <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
->>>>>>> pom: updated several dependency versions, propertized versions
 
     <!--  neo4j -->    
     <neo4j-gremlin.version>3.0.0.M7</neo4j-gremlin.version>
@@ -172,13 +121,7 @@
     <port>9000</port>
 
     <!-- Settings for maven-scm-publish-plugin used to publish site to GitHub -->
-<<<<<<< 4b1cf03885b963ba245b8576fbe9bd9faddfe7a8
     <scmpublish.checkinComment>Publishing Site Docs for ${project.artifactId}:${project.version}</scmpublish.checkinComment>
-=======
-    <scmpublish.checkinComment>Publishing Site Docs for
-      ${project.artifactId}:${project.version}
-    </scmpublish.checkinComment>
->>>>>>> pom: updated several dependency versions, propertized versions
     <scmpublish.pubScmUrl>scm:git:git@github.com:huygensING/alexandria.git</scmpublish.pubScmUrl>
     <scmpublish.scm.branch>gh-pages</scmpublish.scm.branch>
 

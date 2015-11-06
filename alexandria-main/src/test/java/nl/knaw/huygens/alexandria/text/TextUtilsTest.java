@@ -4,28 +4,18 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-<<<<<<< 39c96eabda13be48f8df7cfd776165e816f9f875
 import java.util.Map;
 
 import org.junit.Test;
 
 import nl.knaw.huygens.Log;
 
-=======
-
-import org.junit.Test;
-
->>>>>>> [NLA-132] parse xml to determine textnodes, textranges
 public class TextUtilsTest {
 
   @Test
   public void testParser1() {
     TextParseResult result = TextUtils.parse("<text>de <b>kat</b> krabt de <b>krullen</b> van de trap</text>");
-<<<<<<< 39c96eabda13be48f8df7cfd776165e816f9f875
     assertThat(result.isOK()).isTrue();
-=======
-    assertThat(result).isNotNull();
->>>>>>> [NLA-132] parse xml to determine textnodes, textranges
 
     List<TextNode> textNodes = result.getTextNodes();
     List<String> textNodeTexts = textNodes.stream().map(TextNode::getText).collect(toList());
@@ -61,23 +51,16 @@ public class TextUtilsTest {
     TextRange textRange2 = textRanges.get(2);
     assertThat(textRange2.getFirstNode()).isEqualTo(textNode3);
     assertThat(textRange2.getLastNode()).isEqualTo(textNode3);
-<<<<<<< 39c96eabda13be48f8df7cfd776165e816f9f875
 
     Map<Tag, TextRange> tag2TextRangeMap = result.getTag2TextRangeMap();
     assertThat(tag2TextRangeMap).isNotEmpty();
     Log.info("map={}", tag2TextRangeMap);
-=======
->>>>>>> [NLA-132] parse xml to determine textnodes, textranges
   }
 
   @Test
   public void testParsingXmlWithMilestonesLeadsToEmptyTextNodes() {
     TextParseResult result = TextUtils.parse("<text>line one<br/>line two<br/>\nline three</text>");
-<<<<<<< 39c96eabda13be48f8df7cfd776165e816f9f875
     assertThat(result.isOK()).isTrue();
-=======
-    assertThat(result).isNotNull();
->>>>>>> [NLA-132] parse xml to determine textnodes, textranges
 
     List<TextNode> textNodes = result.getTextNodes();
     List<String> textNodeTexts = textNodes.stream().map(TextNode::getText).collect(toList());
@@ -118,7 +101,6 @@ public class TextUtilsTest {
     assertThat(textRange2.isEmpty()).isTrue();
     assertThat(textRange2.getFirstNode()).isEqualTo(textNode3);
     assertThat(textRange2.getLastNode()).isEqualTo(textNode3);
-<<<<<<< 39c96eabda13be48f8df7cfd776165e816f9f875
 
     Map<Tag, TextRange> tag2TextRangeMap = result.getTag2TextRangeMap();
     Log.info("map={}", tag2TextRangeMap);
@@ -173,9 +155,6 @@ public class TextUtilsTest {
     assertThat(result.getTextNodes()).hasSize(1);
     assertThat(result.getTextNodes().get(0).getText()).isEqualTo("blabla");
     Log.info("{}", result.getTextNodes());
-
-=======
->>>>>>> [NLA-132] parse xml to determine textnodes, textranges
   }
 
 }

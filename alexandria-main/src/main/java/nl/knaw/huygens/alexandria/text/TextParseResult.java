@@ -1,7 +1,6 @@
 package nl.knaw.huygens.alexandria.text;
 
 import java.util.List;
-<<<<<<< 39c96eabda13be48f8df7cfd776165e816f9f875
 import java.util.Map;
 
 import com.google.common.collect.Lists;
@@ -13,15 +12,6 @@ public class TextParseResult {
   private List<TextRange> textRanges = Lists.newArrayList();
   private Map<Tag, TextRange> tag2textRangeMap = Maps.newHashMap();
   private String parseError = null;
-=======
-
-import com.google.common.collect.Lists;
-
-public class TextParseResult {
-
-  private List<TextNode> textNodes = Lists.newArrayList();
-  private List<TextRange> textRanges = Lists.newArrayList();
->>>>>>> [NLA-132] parse xml to determine textnodes, textranges
 
   public List<TextNode> getTextNodes() {
     return textNodes;
@@ -31,7 +21,6 @@ public class TextParseResult {
     return textRanges;
   }
 
-<<<<<<< 39c96eabda13be48f8df7cfd776165e816f9f875
   public Map<Tag, TextRange> getTag2TextRangeMap() {
     return tag2textRangeMap;
   }
@@ -52,6 +41,4 @@ public class TextParseResult {
   public boolean isOK() {
     return parseError == null;
   }
-=======
->>>>>>> [NLA-132] parse xml to determine textnodes, textranges
 }
