@@ -22,6 +22,7 @@ public class TextNode {
   public boolean isEmpty() {
     return "".equals(text);
   }
+<<<<<<< 39c96eabda13be48f8df7cfd776165e816f9f875
 
   @Override
   public String toString() {
@@ -31,4 +32,6 @@ public class TextNode {
   public void appendText(String textToAppend) {
     text = text + textToAppend;
   }
+=======
+>>>>>>> [NLA-132] parse xml to determine textnodes, textranges
 }

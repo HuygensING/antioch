@@ -14,7 +14,10 @@ public class XmlVisitor extends DelegatingVisitor<XmlContext> {
 
   private TextParseResult textParseResult = new TextParseResult();
   private Stack<TextRange> textRangeStack = new Stack<>();
+<<<<<<< 39c96eabda13be48f8df7cfd776165e816f9f875
   private boolean appendTextNode = false;
+=======
+>>>>>>> [NLA-132] parse xml to determine textnodes, textranges
 
   public XmlVisitor() {
     super(new XmlContext());
@@ -24,6 +27,7 @@ public class XmlVisitor extends DelegatingVisitor<XmlContext> {
 
   private TextHandler<XmlContext> textHandler() {
     return (text, context) -> {
+<<<<<<< 39c96eabda13be48f8df7cfd776165e816f9f875
       String textContent = text.getText();
       if (appendTextNode) {
         // append adjacent texts, since the saxparser will sometimes split up text
@@ -38,11 +42,22 @@ public class XmlVisitor extends DelegatingVisitor<XmlContext> {
         textRangeStack.stream()//
             .forEach(textRange -> textRange.setLastNode(textNode));
       }
+=======
+      TextNode textNode = addNewTextNode(text.getText());
+      textRangeStack.stream()//
+          .filter(TextRange::hasNoFirstNode)//
+          .forEach(textRange -> textRange.setFirstNode(textNode));
+      textRangeStack.stream()//
+          .forEach(textRange -> textRange.setLastNode(textNode));
+>>>>>>> [NLA-132] parse xml to determine textnodes, textranges
       return Traversal.NEXT;
     };
   }
 
+<<<<<<< 39c96eabda13be48f8df7cfd776165e816f9f875
 
+=======
+>>>>>>> [NLA-132] parse xml to determine textnodes, textranges
   private TextNode addNewTextNode(String text) {
     TextNode textNode = TextNode.of(text);
     textParseResult.getTextNodes().add(textNode);
@@ -54,7 +69,10 @@ public class XmlVisitor extends DelegatingVisitor<XmlContext> {
 
       @Override
       public Traversal enterElement(Element e, XmlContext c) {
+<<<<<<< 39c96eabda13be48f8df7cfd776165e816f9f875
         appendTextNode = false;
+=======
+>>>>>>> [NLA-132] parse xml to determine textnodes, textranges
         TextRange textRange = new TextRange();
         textRangeStack.push(textRange);
         textParseResult.getTextRanges().add(textRange);
@@ -63,15 +81,23 @@ public class XmlVisitor extends DelegatingVisitor<XmlContext> {
 
       @Override
       public Traversal leaveElement(Element e, XmlContext c) {
+<<<<<<< 39c96eabda13be48f8df7cfd776165e816f9f875
         appendTextNode = false;
+=======
+>>>>>>> [NLA-132] parse xml to determine textnodes, textranges
         TextRange textRange = textRangeStack.pop();
         if (e.hasNoChildren()) { // milestone element
           TextNode textNode = addNewTextNode("");
           textRange.setFirstNode(textNode).setLastNode(textNode);
         }
+<<<<<<< 39c96eabda13be48f8df7cfd776165e816f9f875
         Tag tag = new Tag().setName(e.getName()).setAttributes(e.getAttributes());
         Log.info("{} -> {}", tag, textRange);
         textParseResult.getTag2TextRangeMap().put(tag, textRange);
+=======
+        Log.info("E:{} -> TR:<{}>..<{}>", e.getName(), textRange.getFirstNode().getText(), textRange.getLastNode().getText());
+        // TODO! koppel aan element
+>>>>>>> [NLA-132] parse xml to determine textnodes, textranges
         return Traversal.NEXT;
       }
     };

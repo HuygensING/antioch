@@ -26,6 +26,7 @@ public class TextRange {
     return firstNode == null;
   }
 
+<<<<<<< 39c96eabda13be48f8df7cfd776165e816f9f875
   public boolean isSingle() {
     return (firstNode == lastNode);
   }
@@ -37,5 +38,9 @@ public class TextRange {
   @Override
   public String toString() {
     return "TextRange(" + firstNode + (isSingle() ? "" : " .. " + lastNode) + ")";
+=======
+  public boolean isEmpty() {
+    return (firstNode == lastNode) && firstNode.isEmpty();
+>>>>>>> [NLA-132] parse xml to determine textnodes, textranges
   }
 }
