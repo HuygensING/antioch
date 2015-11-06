@@ -4,8 +4,11 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
+
+import nl.knaw.huygens.Log;
 
 public class TextUtilsTest {
 
@@ -48,6 +51,10 @@ public class TextUtilsTest {
     TextRange textRange2 = textRanges.get(2);
     assertThat(textRange2.getFirstNode()).isEqualTo(textNode3);
     assertThat(textRange2.getLastNode()).isEqualTo(textNode3);
+
+    Map<Tag, TextRange> tag2TextRangeMap = result.getTag2TextRangeMap();
+    assertThat(tag2TextRangeMap).isNotEmpty();
+    Log.info("map={}", tag2TextRangeMap);
   }
 
   @Test
@@ -94,6 +101,38 @@ public class TextUtilsTest {
     assertThat(textRange2.isEmpty()).isTrue();
     assertThat(textRange2.getFirstNode()).isEqualTo(textNode3);
     assertThat(textRange2.getLastNode()).isEqualTo(textNode3);
+
+    Map<Tag, TextRange> tag2TextRangeMap = result.getTag2TextRangeMap();
+    assertThat(tag2TextRangeMap).isNotEmpty();
+    Log.info("map={}", tag2TextRangeMap);
+  }
+
+  @Test
+  public void testParser() {
+    TextParseResult result = TextUtils.parse("<text>\n"//
+        + "<div type=\"opener\" resp=\"WR\">\n"//
+        + "<p>Illustrissime Domine legate,</p>\n"//
+        + "</div>\n"//
+        + "<p>Commoratus est mecum aliquo tempore filius vester <persName key=\"groot.cornelius.1613-1661\" resp=\"#ed\">Cornelius</persName>"//
+        + " et quantumvis nil mihi magis fuerit semper in votis quam ipsum loco aliquo convenienti accommodandi, tamen variis de causis hoc meum"//
+        + " destinatum inpeditum est.</p>\n"//
+        + "<p>Res nostrae per Germaniam non parum immutatae et contractae sunt. Et hic in Suecia nullum licet studiose quaesitum locum, qui huic"//
+        + " eius aetati aptus esset, invenire potui.</p>\n"//
+        + "<p>Ut eapropter non improbaverim Illustritatis Vestrae consilium ipsum ad se revocandi, cum et ei illis in partibus uberior se"//
+        + " materies offerre possit ingenii juvenilis excolendi et nullibi commodius quam a vobis regi et informari queat.</p>\n"//
+        + "<p>Bona igitur gratia ipsum dimisi, non tamen sine aliquo doloris sensu, quod in praesens et meae voluntati et affectui in"//
+        + " Illustritatem Vestram omnesque illi annexos flagrantissimo satisfacere nequiverim; velim sibi persuadeat nil me unquam omissurum,"//
+        + " quod facere queat ad honoranda ejusdem merita et domus suae stabilimentum ejusque contestandi animum, quod oportunitas nunc defuerit,"//
+        + " distulisse, non omisisse.</p>\n"//
+        + "<p>De caetero optime valeat et me sibi addictissimum putet.</p>\n"//
+        + "<div type=\"closer\" resp=\"WR\">\n"//
+        + "<p>Dabantur <placeName key=\"se:stockholm.swe\" resp=\"auto\">Stocholmiae</placeName>, die III/XIII Julij Anni MDCXXXVII.</p>\n"//
+        + "<p>Illustritatis Vestrae amicissimus\n"//
+        + "<lb/><persName key=\"oxenstierna.axel.1583-1654\" resp=\"auto\">Axelius Oxenstierna</persName> mp.</p>\n"//
+        + "</div>\n"//
+        + "</text>"//
+    );
+    assertThat(result).isNotNull();
   }
 
 }
