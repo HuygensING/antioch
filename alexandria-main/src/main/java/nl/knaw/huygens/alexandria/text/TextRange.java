@@ -26,7 +26,16 @@ public class TextRange {
     return firstNode == null;
   }
 
+  public boolean isSingle() {
+    return (firstNode == lastNode);
+  }
+
   public boolean isEmpty() {
-    return (firstNode == lastNode) && firstNode.isEmpty();
+    return isSingle() && firstNode.isEmpty();
+  }
+
+  @Override
+  public String toString() {
+    return "TextRange(" + firstNode + (isSingle() ? "" : " .. " + lastNode) + ")";
   }
 }

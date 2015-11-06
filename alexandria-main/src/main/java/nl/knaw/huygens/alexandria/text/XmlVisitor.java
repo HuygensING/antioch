@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.text;
 
+import java.util.List;
 import java.util.Stack;
 
 import nl.knaw.huygens.Log;
@@ -14,6 +15,7 @@ public class XmlVisitor extends DelegatingVisitor<XmlContext> {
 
   private TextParseResult textParseResult = new TextParseResult();
   private Stack<TextRange> textRangeStack = new Stack<>();
+  private boolean appendTextNode = false;
 
   public XmlVisitor() {
     super(new XmlContext());
@@ -23,12 +25,22 @@ public class XmlVisitor extends DelegatingVisitor<XmlContext> {
 
   private TextHandler<XmlContext> textHandler() {
     return (text, context) -> {
-      TextNode textNode = addNewTextNode(text.getText());
-      textRangeStack.stream()//
-          .filter(TextRange::hasNoFirstNode)//
-          .forEach(textRange -> textRange.setFirstNode(textNode));
-      textRangeStack.stream()//
-          .forEach(textRange -> textRange.setLastNode(textNode));
+      String textContent = text.getText();
+      if (appendTextNode) {
+        // append concurrent texts, since the saxparser will sometimes split up text
+        List<TextNode> textNodes = textParseResult.getTextNodes();
+        TextNode textNode = textNodes.get(textNodes.size() - 1);
+        textNode.appendText(textContent);
+
+      } else {
+        appendTextNode = true;
+        TextNode textNode = addNewTextNode(textContent);
+        textRangeStack.stream()//
+            .filter(TextRange::hasNoFirstNode)//
+            .forEach(textRange -> textRange.setFirstNode(textNode));
+        textRangeStack.stream()//
+            .forEach(textRange -> textRange.setLastNode(textNode));
+      }
       return Traversal.NEXT;
     };
   }
@@ -44,6 +56,7 @@ public class XmlVisitor extends DelegatingVisitor<XmlContext> {
 
       @Override
       public Traversal enterElement(Element e, XmlContext c) {
+        appendTextNode = false;
         TextRange textRange = new TextRange();
         textRangeStack.push(textRange);
         textParseResult.getTextRanges().add(textRange);
@@ -52,13 +65,15 @@ public class XmlVisitor extends DelegatingVisitor<XmlContext> {
 
       @Override
       public Traversal leaveElement(Element e, XmlContext c) {
+        appendTextNode = false;
         TextRange textRange = textRangeStack.pop();
         if (e.hasNoChildren()) { // milestone element
           TextNode textNode = addNewTextNode("");
           textRange.setFirstNode(textNode).setLastNode(textNode);
         }
-        Log.info("E:{} -> TR:<{}>..<{}>", e.getName(), textRange.getFirstNode().getText(), textRange.getLastNode().getText());
-        // TODO! koppel aan element
+        Tag tag = new Tag().setName(e.getName()).setAttributes(e.getAttributes());
+        Log.info("{} -> {}", tag, textRange);
+        textParseResult.getTag2TextRangeMap().put(tag, textRange);
         return Traversal.NEXT;
       }
     };

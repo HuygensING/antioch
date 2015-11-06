@@ -70,7 +70,7 @@
     -->
     <swagger.version>1.5.6</swagger.version>
 
-    <visitei.version>0.4.2-SNAPSHOT</visitei.version>
+    <visitei.version>0.4.6-SNAPSHOT</visitei.version>
     <neo4j-tinkerpop-api-impl.version>0.3-2.3.0</neo4j-tinkerpop-api-impl.version>
     <neo4j-gremlin.version>3.0.0.M7</neo4j-gremlin.version>
     <peapod.version>0.2.2</peapod.version>

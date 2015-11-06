@@ -22,4 +22,13 @@ public class TextNode {
   public boolean isEmpty() {
     return "".equals(text);
   }
+
+  @Override
+  public String toString() {
+    return "TextNode:(\"" + text.replace("\n", "\\n").replace("\"", "\\\"") + "\")";
+  }
+
+  public void appendText(String textToAppend) {
+    text = text + textToAppend;
+  }
 }
