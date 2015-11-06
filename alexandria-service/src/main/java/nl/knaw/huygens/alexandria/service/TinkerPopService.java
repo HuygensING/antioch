@@ -691,4 +691,14 @@ public class TinkerPopService implements AlexandriaService {
     // Log.info("destroy done");
   }
 
+  @Override
+  public void setResourceText(UUID resourceUUID, String body) {
+
+  }
+
+  @Override
+  public String getResourceTextAsPlainText(UUID resourceUUID) {
+    return null;
+  }
+
 }

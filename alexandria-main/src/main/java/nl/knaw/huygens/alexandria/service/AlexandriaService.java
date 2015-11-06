@@ -110,4 +110,9 @@ public interface AlexandriaService {
 
   void importDb(String format, String filename);
 
+  // ResourceText methods
+  void setResourceText(UUID resourceUUID, String body);
+
+  String getResourceTextAsPlainText(UUID resourceUUID);
+
 }
