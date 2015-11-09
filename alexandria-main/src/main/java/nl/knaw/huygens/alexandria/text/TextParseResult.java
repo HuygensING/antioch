@@ -29,6 +29,7 @@ public class TextParseResult {
     return textNodes.get(textNodes.size() - 1);
   }
 
+<<<<<<< a7fbb603b62ef9857d0bf37de3d341146a5d06e8
   public TextParseResult setParseError(String message) {
     this.parseError = message;
     return this;
@@ -41,4 +42,6 @@ public class TextParseResult {
   public boolean isOK() {
     return parseError == null;
   }
+=======
+>>>>>>> refactoring: extract and move getLastTextNode
 }

@@ -27,13 +27,7 @@ public class XmlVisitor extends DelegatingVisitor<XmlContext> {
       String textContent = text.getText();
       if (appendTextNode) {
         // append adjacent texts, since the saxparser will sometimes split up text
-<<<<<<< a071400cb7b3e729ed003b5cca4a3383e682ce7d
         textParseResult.getLastTextNode().appendText(textContent);
-=======
-        List<TextNode> textNodes = textParseResult.getTextNodes();
-        TextNode textNode = textNodes.get(textNodes.size() - 1);
-        textNode.appendText(textContent);
->>>>>>> use correct term
 
       } else {
         appendTextNode = true;
