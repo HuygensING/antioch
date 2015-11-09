@@ -103,8 +103,12 @@ public class TextUtilsTest {
     assertThat(textRange2.getLastNode()).isEqualTo(textNode3);
 
     Map<Tag, TextRange> tag2TextRangeMap = result.getTag2TextRangeMap();
-    assertThat(tag2TextRangeMap).isNotEmpty();
     Log.info("map={}", tag2TextRangeMap);
+    assertThat(tag2TextRangeMap).isNotEmpty();
+    assertThat(tag2TextRangeMap).hasSize(3);
+    assertThat(tag2TextRangeMap).containsValues(textRange0, textRange1, textRange2);
+    List<String> tagNames = tag2TextRangeMap.keySet().stream().map(Tag::getName).collect(toList());
+    assertThat(tagNames).containsOnly("br", "text");
   }
 
   @Test
@@ -133,6 +137,7 @@ public class TextUtilsTest {
         + "</text>"//
     );
     assertThat(result).isNotNull();
+    assertThat(result.getTextNodes().get(2).getText()).isEqualTo("Illustrissime Domine legate,");
   }
 
 }
