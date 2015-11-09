@@ -1,6 +1,5 @@
 package nl.knaw.huygens.alexandria.text;
 
-import java.util.List;
 import java.util.Stack;
 
 import nl.knaw.huygens.Log;
@@ -28,9 +27,7 @@ public class XmlVisitor extends DelegatingVisitor<XmlContext> {
       String textContent = text.getText();
       if (appendTextNode) {
         // append adjacent texts, since the saxparser will sometimes split up text
-        List<TextNode> textNodes = textParseResult.getTextNodes();
-        TextNode textNode = textNodes.get(textNodes.size() - 1);
-        textNode.appendText(textContent);
+        textParseResult.getLastTextNode().appendText(textContent);
 
       } else {
         appendTextNode = true;
@@ -44,6 +41,7 @@ public class XmlVisitor extends DelegatingVisitor<XmlContext> {
       return Traversal.NEXT;
     };
   }
+
 
   private TextNode addNewTextNode(String text) {
     TextNode textNode = TextNode.of(text);
