@@ -73,6 +73,7 @@ import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
+import nl.knaw.huygens.alexandria.text.TextParseResult;
 
 public class TinkerPopService implements AlexandriaService {
   private static final TemporalAmount TENTATIVES_TTL = Duration.ofDays(1);
@@ -692,7 +693,7 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public void setResourceText(UUID resourceUUID, String body) {
+  public void setResourceText(UUID resourceUUID, TextParseResult textParseResult) {
 
   }
 
