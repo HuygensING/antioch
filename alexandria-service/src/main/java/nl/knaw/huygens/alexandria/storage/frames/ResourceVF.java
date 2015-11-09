@@ -31,7 +31,7 @@ import peapod.annotations.Out;
 import peapod.annotations.Vertex;
 
 @Vertex(Labels.RESOURCE)
-public abstract class ResourceVF extends AlexandriaVF {
+public abstract class ResourceVF extends FullAlexandriaVF {
   public static final String PART_OF = "part_of";
 
   public abstract String getCargo();

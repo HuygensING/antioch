@@ -30,7 +30,7 @@ import peapod.annotations.In;
 import peapod.annotations.Vertex;
 
 @Vertex(Labels.ANNOTATIONBODY)
-public abstract class AnnotationBodyVF extends AlexandriaVF {
+public abstract class AnnotationBodyVF extends FullAlexandriaVF {
   public abstract void setType(String type);
 
   public abstract String getType();
