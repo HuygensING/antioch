@@ -25,4 +25,8 @@ public class TextParseResult {
     return tag2textRangeMap;
   }
 
+  public TextNode getLastTextNode() {
+    return textNodes.get(textNodes.size() - 1);
+  }
+
 }
