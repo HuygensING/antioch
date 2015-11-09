@@ -112,11 +112,7 @@ public interface AlexandriaService {
   void importDb(String format, String filename);
 
   // ResourceText methods
-<<<<<<< fc1948456f4f1ed5f8b88fc4d6dfce97cb658057
   void setResourceText(UUID resourceUUID, TextParseResult parsedText);
-=======
-  void setResourceText(UUID resourceUUID, String body);
->>>>>>> [NLA-132] create endpoints for setting the xml text of a resource
 
   String getResourceTextAsPlainText(UUID resourceUUID);
 

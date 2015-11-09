@@ -701,7 +701,6 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-<<<<<<< fc1948456f4f1ed5f8b88fc4d6dfce97cb658057
   public void setResourceText(UUID resourceUUID, TextParseResult textParseResult) {
     TextNodeVF lastTextNode = null;
     storage.startTransaction();
@@ -739,10 +738,6 @@ public class TinkerPopService implements AlexandriaService {
     });
 
     storage.commitTransaction();
-=======
-  public void setResourceText(UUID resourceUUID, String body) {
-
->>>>>>> [NLA-132] create endpoints for setting the xml text of a resource
   }
 
   @Override

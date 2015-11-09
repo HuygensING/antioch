@@ -157,4 +157,11 @@ public class TextUtilsTest {
     Log.info("{}", result.getTextNodes());
   }
 
+  @Test
+  public void testIncorrectXMLSetsOKtoFalse() {
+    TextParseResult result = TextUtils.parse("<text>blabla");
+    assertThat(result.isOK()).isFalse();
+    assertThat(result.getParseError()).isEqualTo("org.xml.sax.SAXParseException; lineNumber: 1; columnNumber: 13; XML document structures must start and end within the same entity.");
+  }
+
 }
