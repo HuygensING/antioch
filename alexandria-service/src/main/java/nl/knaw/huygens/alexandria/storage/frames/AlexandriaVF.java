@@ -1,6 +1,5 @@
 package nl.knaw.huygens.alexandria.storage.frames;
 
-<<<<<<< 8d2e7b440c6ef9bda5ce000cc0f1bc1a38942168
 /*
  * #%L
  * alexandria-service
@@ -25,8 +24,6 @@ package nl.knaw.huygens.alexandria.storage.frames;
 
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 
-=======
->>>>>>> [NLA-132] start saving the parsed text to the graph
 public abstract class AlexandriaVF {
 
   public abstract String getUuid();
