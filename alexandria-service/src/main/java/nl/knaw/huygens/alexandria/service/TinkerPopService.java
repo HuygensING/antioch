@@ -33,6 +33,7 @@ import java.time.temporal.TemporalAmount;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -72,8 +73,14 @@ import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
+import nl.knaw.huygens.alexandria.storage.frames.FullAlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
+import nl.knaw.huygens.alexandria.storage.frames.TextNodeVF;
+import nl.knaw.huygens.alexandria.storage.frames.TextRangeVF;
+import nl.knaw.huygens.alexandria.text.Tag;
+import nl.knaw.huygens.alexandria.text.TextNode;
 import nl.knaw.huygens.alexandria.text.TextParseResult;
+import nl.knaw.huygens.alexandria.text.TextRange;
 
 public class TinkerPopService implements AlexandriaService {
   private static final TemporalAmount TENTATIVES_TTL = Duration.ofDays(1);
@@ -414,7 +421,7 @@ public class TinkerPopService implements AlexandriaService {
     Optional<ResourceVF> parentVF = storage.readVF(ResourceVF.class, parentId);
     rvf.setParentResource(parentVF.get());
 
-    setAlexandriaVFProperties(rvf, subResource);
+    setFullAlexandriaVFProperties(rvf, subResource);
 
     storage.commitTransaction();
   }
@@ -431,7 +438,7 @@ public class TinkerPopService implements AlexandriaService {
       avf.setUuid(uuid.toString());
     }
 
-    setAlexandriaVFProperties(avf, annotation);
+    setFullAlexandriaVFProperties(avf, annotation);
 
     storage.commitTransaction();
   }
@@ -485,7 +492,7 @@ public class TinkerPopService implements AlexandriaService {
 
     rvf.setCargo(resource.getCargo());
 
-    setAlexandriaVFProperties(rvf, resource);
+    setFullAlexandriaVFProperties(rvf, resource);
   }
 
   // - private methods -//
@@ -497,7 +504,7 @@ public class TinkerPopService implements AlexandriaService {
 
   AnnotationVF frameAnnotation(AlexandriaAnnotation newAnnotation) {
     AnnotationVF avf = storage.createVF(AnnotationVF.class);
-    setAlexandriaVFProperties(avf, newAnnotation);
+    setFullAlexandriaVFProperties(avf, newAnnotation);
     avf.setRevision(newAnnotation.getRevision());
 
     UUID bodyId = newAnnotation.getBody().getId();
@@ -556,7 +563,7 @@ public class TinkerPopService implements AlexandriaService {
 
   private AnnotationBodyVF frameAnnotationBody(AlexandriaAnnotationBody body) {
     AnnotationBodyVF abvf = storage.createVF(AnnotationBodyVF.class);
-    setAlexandriaVFProperties(abvf, body);
+    setFullAlexandriaVFProperties(abvf, body);
     abvf.setType(body.getType());
     abvf.setValue(body.getValue());
     return abvf;
@@ -568,12 +575,12 @@ public class TinkerPopService implements AlexandriaService {
     return new AlexandriaAnnotationBody(uuid, annotationBodyVF.getType(), annotationBodyVF.getValue(), provenance);
   }
 
-  private TentativeAlexandriaProvenance deframeProvenance(AlexandriaVF avf) {
+  private TentativeAlexandriaProvenance deframeProvenance(FullAlexandriaVF avf) {
     String provenanceWhen = avf.getProvenanceWhen();
     return new TentativeAlexandriaProvenance(avf.getProvenanceWho(), Instant.parse(provenanceWhen), avf.getProvenanceWhy());
   }
 
-  private void setAlexandriaVFProperties(AlexandriaVF vf, Accountable accountable) {
+  private void setFullAlexandriaVFProperties(FullAlexandriaVF vf, Accountable accountable) {
     vf.setUuid(accountable.getId().toString());
 
     vf.setState(accountable.getState().toString());
@@ -603,7 +610,7 @@ public class TinkerPopService implements AlexandriaService {
     return UUID.fromString(vf.getUuid().replaceFirst("\\..$", "")); // remove revision suffix for deprecated annotations
   }
 
-  void updateState(AlexandriaVF vf, AlexandriaState newState) {
+  void updateState(FullAlexandriaVF vf, AlexandriaState newState) {
     vf.setState(newState.name());
     vf.setStateSince(Instant.now().getEpochSecond());
   }
@@ -666,7 +673,43 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public void setResourceText(UUID resourceUUID, TextParseResult textParseResult) {
+    TextNodeVF lastTextNode = null;
+    storage.startTransaction();
+    Map<TextNode, TextNodeVF> textNodeIndex = Maps.newHashMap();
 
+    for (TextNode textNode : textParseResult.getTextNodes()) {
+      TextNodeVF textNodeVF = storage.createVF(TextNodeVF.class);
+      textNodeVF.setText(textNode.getText());
+      if (lastTextNode != null) {
+        textNodeVF.setPrevTextNode(lastTextNode);
+      }
+      lastTextNode = textNodeVF;
+      textNodeIndex.put(textNode, textNodeVF);
+    }
+
+    Map<TextRange, TextRangeVF> textRangeIndex = Maps.newHashMap();
+    for (TextRange textRange : textParseResult.getTextRanges()) {
+      TextRangeVF textRangeVF = storage.createVF(TextRangeVF.class);
+      textRangeVF.setStartTextNode(textNodeIndex.get(textRange.getFirstNode()));
+      textRangeVF.setEndTextNode(textNodeIndex.get(textRange.getLastNode()));
+      textRangeIndex.put(textRange, textRangeVF);
+    }
+
+    Set<Entry<Tag, TextRange>> tag2textRangeEntries = textParseResult.getTag2TextRangeMap().entrySet();
+    for (Entry<Tag, TextRange> entry : tag2textRangeEntries) {
+      Tag tag = entry.getKey();
+      TextRange textRange = entry.getValue();
+      String annotationValue = tag.getName();
+      for (Entry<String, String> attributeEntry : tag.getAttributes().entrySet()) {
+        String attributeKey = attributeEntry.getKey();
+        String attributeValue = attributeEntry.getValue();
+        // TODO make annotation with this key, value on tagannotation
+      }
+      // annotateTextRangeWithAnnotation(textRange,annotation);
+
+    }
+
+    storage.commitTransaction();
   }
 
   @Override

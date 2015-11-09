@@ -27,4 +27,6 @@ public class Labels {
   public static final String SUBRESOURCE = "Subresource";
   public static final String ANNOTATION = "Annotation";
   public static final String ANNOTATIONBODY = "AnnotationBody";
+  public static final String TEXTNODE = "TextNode";
+  public static final String TEXTRANGE = "TextRange";
 }

@@ -31,7 +31,7 @@ import peapod.annotations.Out;
 import peapod.annotations.Vertex;
 
 @Vertex(Labels.ANNOTATION)
-public abstract class AnnotationVF extends AlexandriaVF {
+public abstract class AnnotationVF extends FullAlexandriaVF {
   public static final String NO_VALUE = ":null";
 
   // TODO: double-check if (update of) peapod supports outgoing edges with the same label to different types of VF
