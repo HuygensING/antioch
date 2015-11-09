@@ -15,7 +15,7 @@ public class TextUtilsTest {
   @Test
   public void testParser1() {
     TextParseResult result = TextUtils.parse("<text>de <b>kat</b> krabt de <b>krullen</b> van de trap</text>");
-    assertThat(result).isNotNull();
+    assertThat(result.isOK()).isTrue();
 
     List<TextNode> textNodes = result.getTextNodes();
     List<String> textNodeTexts = textNodes.stream().map(TextNode::getText).collect(toList());
@@ -60,7 +60,7 @@ public class TextUtilsTest {
   @Test
   public void testParsingXmlWithMilestonesLeadsToEmptyTextNodes() {
     TextParseResult result = TextUtils.parse("<text>line one<br/>line two<br/>\nline three</text>");
-    assertThat(result).isNotNull();
+    assertThat(result.isOK()).isTrue();
 
     List<TextNode> textNodes = result.getTextNodes();
     List<String> textNodeTexts = textNodes.stream().map(TextNode::getText).collect(toList());
@@ -107,8 +107,8 @@ public class TextUtilsTest {
     assertThat(tag2TextRangeMap).isNotEmpty();
     assertThat(tag2TextRangeMap).hasSize(3);
     assertThat(tag2TextRangeMap).containsValues(textRange0, textRange1, textRange2);
-    List<String> tagNames = tag2TextRangeMap.keySet().stream().map(Tag::getName).collect(toList());
-    assertThat(tagNames).containsOnly("br", "text");
+    List<String> tagNames = tag2TextRangeMap.keySet().stream().map(Tag::getName).sorted().collect(toList());
+    assertThat(tagNames).containsExactly("br", "br", "text");
   }
 
   @Test
@@ -136,8 +136,15 @@ public class TextUtilsTest {
         + "</div>\n"//
         + "</text>"//
     );
-    assertThat(result).isNotNull();
+    assertThat(result.isOK()).isTrue();
     assertThat(result.getTextNodes().get(2).getText()).isEqualTo("Illustrissime Domine legate,");
+  }
+
+  @Test
+  public void testIncorrectXMLSetsOKtoFalse() {
+    TextParseResult result = TextUtils.parse("<text>blabla");
+    assertThat(result.isOK()).isFalse();
+    assertThat(result.getParseError()).isEqualTo("org.xml.sax.SAXParseException; lineNumber: 1; columnNumber: 13; XML document structures must start and end within the same entity.");
   }
 
 }

@@ -37,6 +37,7 @@ import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.text.TextParseResult;
 
 public interface AlexandriaService {
   // NOTE: should these service methods all be atomic?
@@ -111,7 +112,7 @@ public interface AlexandriaService {
   void importDb(String format, String filename);
 
   // ResourceText methods
-  void setResourceText(UUID resourceUUID, String body);
+  void setResourceText(UUID resourceUUID, TextParseResult parsedText);
 
   String getResourceTextAsPlainText(UUID resourceUUID);
 
