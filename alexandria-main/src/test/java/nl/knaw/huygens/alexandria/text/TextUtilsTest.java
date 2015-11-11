@@ -138,6 +138,7 @@ public class TextUtilsTest {
     );
     assertThat(result.isOK()).isTrue();
     assertThat(result.getTextNodes().get(2).getText()).isEqualTo("Illustrissime Domine legate,");
+    Log.info("gremlin:\n{}", GremlinGenerator.from(result));
   }
 
   @Test
@@ -145,6 +146,16 @@ public class TextUtilsTest {
     TextParseResult result = TextUtils.parse("<text>blabla");
     assertThat(result.isOK()).isFalse();
     assertThat(result.getParseError()).isEqualTo("org.xml.sax.SAXParseException; lineNumber: 1; columnNumber: 13; XML document structures must start and end within the same entity.");
+  }
+
+  @Test
+  public void testCommentsInXMLAreIgnored() {
+    TextParseResult result = TextUtils.parse("<text>blabla<!-- ignore this! --></text>");
+    assertThat(result.isOK()).isTrue();
+    assertThat(result.getTextNodes()).hasSize(1);
+    assertThat(result.getTextNodes().get(0).getText()).isEqualTo("blabla");
+    Log.info("{}", result.getTextNodes());
+
   }
 
 }
