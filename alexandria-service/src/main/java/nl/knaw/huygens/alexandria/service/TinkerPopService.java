@@ -23,6 +23,7 @@ package nl.knaw.huygens.alexandria.service;
  */
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
 import java.io.IOException;
@@ -49,6 +50,7 @@ import javax.inject.Inject;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
+import com.google.common.base.Functions;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
 
@@ -77,7 +79,6 @@ import nl.knaw.huygens.alexandria.storage.frames.FullAlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import nl.knaw.huygens.alexandria.storage.frames.TextNodeVF;
 import nl.knaw.huygens.alexandria.storage.frames.TextRangeVF;
-import nl.knaw.huygens.alexandria.text.Tag;
 import nl.knaw.huygens.alexandria.text.TextNode;
 import nl.knaw.huygens.alexandria.text.TextParseResult;
 import nl.knaw.huygens.alexandria.text.TextRange;
@@ -715,18 +716,17 @@ public class TinkerPopService implements AlexandriaService {
       textNodeIndex.put(textNode, textNodeVF);
     }
 
-    Map<TextRange, TextRangeVF> textRangeIndex = Maps.newHashMap();
-    for (TextRange textRange : textParseResult.getTextRanges()) {
+    Function<TextRange, TextRange> keyMapper = t -> t;
+    Function<TextRange, TextRangeVF> valueMapper = textRange -> {
       TextRangeVF textRangeVF = storage.createVF(TextRangeVF.class);
       textRangeVF.setStartTextNode(textNodeIndex.get(textRange.getFirstNode()));
       textRangeVF.setEndTextNode(textNodeIndex.get(textRange.getLastNode()));
-      textRangeIndex.put(textRange, textRangeVF);
-    }
+      return textRangeVF;
+    };
+    Map<TextRange, TextRangeVF> textRangeIndex = textParseResult.getTextRanges().stream()//
+        .collect(toMap(keyMapper, valueMapper));
 
-    Set<Entry<Tag, TextRange>> tag2textRangeEntries = textParseResult.getTag2TextRangeMap().entrySet();
-    for (Entry<Tag, TextRange> entry : tag2textRangeEntries) {
-      Tag tag = entry.getKey();
-      TextRange textRange = entry.getValue();
+    textParseResult.getTag2TextRangeMap().forEach((tag, textRange) -> {
       String annotationValue = tag.getName();
       for (Entry<String, String> attributeEntry : tag.getAttributes().entrySet()) {
         String attributeKey = attributeEntry.getKey();
@@ -735,7 +735,7 @@ public class TinkerPopService implements AlexandriaService {
       }
       // annotateTextRangeWithAnnotation(textRange,annotation);
 
-    }
+    });
 
     storage.commitTransaction();
   }
