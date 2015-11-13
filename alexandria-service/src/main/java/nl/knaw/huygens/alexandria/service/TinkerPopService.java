@@ -79,10 +79,7 @@ import nl.knaw.huygens.alexandria.storage.frames.FullAlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import nl.knaw.huygens.alexandria.storage.frames.TextNodeVF;
 import nl.knaw.huygens.alexandria.storage.frames.TextRangeVF;
-<<<<<<< 796ace87f59be5c75c2d2d57c004676d636f9694
-=======
 import nl.knaw.huygens.alexandria.text.Tag;
->>>>>>> [NLA-132] start saving the parsed text to the graph
 import nl.knaw.huygens.alexandria.text.TextNode;
 import nl.knaw.huygens.alexandria.text.TextParseResult;
 import nl.knaw.huygens.alexandria.text.TextRange;
@@ -719,7 +716,6 @@ public class TinkerPopService implements AlexandriaService {
       lastTextNode = textNodeVF;
       textNodeIndex.put(textNode, textNodeVF);
     }
-<<<<<<< 796ace87f59be5c75c2d2d57c004676d636f9694
 
     Function<TextRange, TextRange> keyMapper = t -> t;
     Function<TextRange, TextRangeVF> valueMapper = textRange -> {
@@ -732,21 +728,6 @@ public class TinkerPopService implements AlexandriaService {
         .collect(toMap(keyMapper, valueMapper));
 
     textParseResult.getTag2TextRangeMap().forEach((tag, textRange) -> {
-=======
-
-    Map<TextRange, TextRangeVF> textRangeIndex = Maps.newHashMap();
-    for (TextRange textRange : textParseResult.getTextRanges()) {
-      TextRangeVF textRangeVF = storage.createVF(TextRangeVF.class);
-      textRangeVF.setStartTextNode(textNodeIndex.get(textRange.getFirstNode()));
-      textRangeVF.setEndTextNode(textNodeIndex.get(textRange.getLastNode()));
-      textRangeIndex.put(textRange, textRangeVF);
-    }
-
-    Set<Entry<Tag, TextRange>> tag2textRangeEntries = textParseResult.getTag2TextRangeMap().entrySet();
-    for (Entry<Tag, TextRange> entry : tag2textRangeEntries) {
-      Tag tag = entry.getKey();
-      TextRange textRange = entry.getValue();
->>>>>>> [NLA-132] start saving the parsed text to the graph
       String annotationValue = tag.getName();
       for (Entry<String, String> attributeEntry : tag.getAttributes().entrySet()) {
         String attributeKey = attributeEntry.getKey();
@@ -755,11 +736,7 @@ public class TinkerPopService implements AlexandriaService {
       }
       // annotateTextRangeWithAnnotation(textRange,annotation);
 
-<<<<<<< 796ace87f59be5c75c2d2d57c004676d636f9694
     });
-=======
-    }
->>>>>>> [NLA-132] start saving the parsed text to the graph
 
     storage.commitTransaction();
   }
