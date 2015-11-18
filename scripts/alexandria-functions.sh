@@ -3,7 +3,7 @@
 
 function a-annotate-resource {
 	r=$1; t=$2; v=$3
-	curl -i -X POST $be/resources/$r/annotations -H 'Content-type: application/json' \
+	curl -i -X POST -H "${authheader}" $be/resources/$r/annotations -H 'Content-type: application/json' \
     --data-binary "{\"annotation\":{\"type\":\"$t\",\"value\":\"$v\"}}" 2>/dev/null
 }
 
@@ -13,13 +13,13 @@ function a-location {
 
 function a-confirm {
 	echo ">> confirming $1 :"
-	curl -i -X PUT $1/state -H 'Content-type: application/json' \
+	curl -i -X PUT -H "${authheader}" $1/state -H 'Content-type: application/json' \
     --data-binary '{"state":"CONFIRMED"}'
 }
 
 function a-find-annotations-for-resource {
 	resource_id=$1
-	url=$(curl -i -X POST $be/searches -H 'Content-type: application/json' \
+	url=$(curl -i -X POST -H "${authheader}" $be/searches -H 'Content-type: application/json' \
     --data-binary "{\"query\":{
 		\"find\" : \"annotation\",
 		\"where\" : \"who:eq(\\\"nederlab\\\") resource.id:eq(\\\"${resource_id}\\\")\",
@@ -37,7 +37,7 @@ function a-show-first-resultpage {
 
 function a-generate-random-resource-with-annotation {
   id=$(uuidgen)
-  curl -i -X PUT $be/resources/$id -H 'Content-type: application/json' \
+  curl -i -X PUT $be/resources/$id -H "${authheader}" -H 'Content-type: application/json' \
   --data-binary "{\"resource\":{
     \"id\":\"$id\",
     \"ref\":\"reference $n\"
@@ -50,6 +50,12 @@ function a-set-backend {
 	export be=$1
 	echo -n "backend set to "
 	a-show-backend
+}
+
+function a-set-authkey {
+	export authkey=$1
+	echo -n "authkey set to ${authkey}"
+	export authheader="Auth: SimpleAuth ${authkey}"
 }
 
 function a-use-localhost {

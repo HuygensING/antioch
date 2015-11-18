@@ -35,6 +35,7 @@ import org.glassfish.jersey.server.ServerProperties;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.JsonConfiguration;
 import nl.knaw.huygens.alexandria.config.ValidationConfigurationContextResolver;
+import nl.knaw.huygens.alexandria.jaxrs.AuthorizationRequestFilter;
 
 @ApplicationPath("/")
 public class AlexandriaApplication extends ResourceConfig {
@@ -50,6 +51,7 @@ public class AlexandriaApplication extends ResourceConfig {
 
     // Server-side request logging, including entities
     register(new LoggingFilter(getAnonymousLogger(), true));
+    register(AuthorizationRequestFilter.class);
 
     // Validation configuration
     register(ValidationConfigurationContextResolver.class);
