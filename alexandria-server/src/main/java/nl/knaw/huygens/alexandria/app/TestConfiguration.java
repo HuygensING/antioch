@@ -26,9 +26,9 @@ import java.net.URI;
 
 import javax.ws.rs.core.UriBuilder;
 
-import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+import nl.knaw.huygens.alexandria.config.AbstractAlexandriaConfigurationUsingAlexandriaProperties;
 
-public class TestConfiguration implements AlexandriaConfiguration {
+public class TestConfiguration extends AbstractAlexandriaConfigurationUsingAlexandriaProperties {
 
   @Override
   public URI getBaseURI() {

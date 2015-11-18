@@ -28,6 +28,7 @@ import static nl.knaw.huygens.alexandria.model.AlexandriaState.CONFIRMED;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -42,6 +43,7 @@ import org.junit.BeforeClass;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
@@ -82,7 +84,7 @@ public class AlexandriaAcceptanceTest extends RestFixture {
   @Extension
   @SuppressWarnings("unused")
   public ConcordionExtension imagesExtension = concordionExtender //
-      -> concordionExtender.withResource("/tcc.svg", new Resource("/nl/knaw/huygens/alexandria/transactions/tcc.svg"));
+  -> concordionExtender.withResource("/tcc.svg", new Resource("/nl/knaw/huygens/alexandria/transactions/tcc.svg"));
 
   @BeforeClass
   public static void setupAlexandriaAcceptanceTest() {
@@ -110,6 +112,16 @@ public class AlexandriaAcceptanceTest extends RestFixture {
       @Override
       public String toString() {
         return Objects.toStringHelper(this).add("baseURI", getBaseURI()).toString();
+      }
+
+      @Override
+      public Map<String, String> getAuthKeyIndex() {
+        return ImmutableMap.of("123456", "testuser");
+      }
+
+      @Override
+      public String getAdminKey() {
+        return "whatever";
       }
     };
   }
@@ -165,8 +177,7 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     return service().readResource(resId).get();
   }
 
-  protected String annotate(AlexandriaResource resource, AlexandriaAnnotationBody annotationBody,
-                            TentativeAlexandriaProvenance provenance) {
+  protected String annotate(AlexandriaResource resource, AlexandriaAnnotationBody annotationBody, TentativeAlexandriaProvenance provenance) {
     return idOf(service.annotate(resource, annotationBody, provenance));
   }
 
@@ -186,8 +197,7 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     return hasConfirmedAnnotation(resource, annotationBody, aProvenance());
   }
 
-  protected UUID hasConfirmedAnnotation(AlexandriaResource resource, AlexandriaAnnotationBody annotationBody,
-                                        TentativeAlexandriaProvenance provenance) {
+  protected UUID hasConfirmedAnnotation(AlexandriaResource resource, AlexandriaAnnotationBody annotationBody, TentativeAlexandriaProvenance provenance) {
     final UUID annotationId = service().annotate(resource, annotationBody, provenance).getId();
     service().confirmAnnotation(annotationId);
     return annotationId;

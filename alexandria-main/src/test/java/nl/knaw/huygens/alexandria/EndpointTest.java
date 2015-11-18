@@ -3,6 +3,7 @@ package nl.knaw.huygens.alexandria;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /*
  * #%L
@@ -35,6 +36,7 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.TestProperties;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -102,6 +104,17 @@ public abstract class EndpointTest extends JerseyTest {
       public String toString() {
         return MoreObjects.toStringHelper(this).add("baseURI", getBaseURI()).toString();
       }
+
+      @Override
+      public Map<String, String> getAuthKeyIndex() {
+        return ImmutableMap.of("123456", "testuser");
+      }
+
+      @Override
+      public String getAdminKey() {
+        return "whatever";
+      }
+
     };
   }
 

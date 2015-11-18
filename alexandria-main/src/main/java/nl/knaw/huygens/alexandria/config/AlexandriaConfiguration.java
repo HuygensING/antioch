@@ -23,11 +23,32 @@ package nl.knaw.huygens.alexandria.config;
  */
 
 import java.net.URI;
+import java.util.Map;
 
 public interface AlexandriaConfiguration {
 
+  /**
+   * 
+   * @return the URI for the (proxied) instance of this server
+   */
   URI getBaseURI();
 
+  /**
+   * 
+   * @return the directory where database and instance configuration is stored
+   */
   String getStorageDirectory();
+
+  /**
+   * 
+   * @return an index mapping authkeys to usernames
+   */
+  Map<String, String> getAuthKeyIndex();
+
+  /**
+   * 
+   * @return the adminkey to use in the AdmoinEndpoint
+   */
+  String getAdminKey();
 
 }

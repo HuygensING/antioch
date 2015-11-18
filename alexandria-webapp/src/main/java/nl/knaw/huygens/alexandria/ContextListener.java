@@ -13,6 +13,7 @@ import com.google.inject.Module;
 import com.squarespace.jersey2.guice.JerseyGuiceServletContextListener;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.config.AbstractAlexandriaConfigurationUsingAlexandriaProperties;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.config.PropertiesConfiguration;
 import nl.knaw.huygens.alexandria.service.AlexandriaServletModule;
@@ -58,7 +59,7 @@ public class ContextListener extends JerseyGuiceServletContextListener {
   }
 
   private AlexandriaConfiguration propertyBackedConfiguration() {
-    return new AlexandriaConfiguration() {
+    return new AbstractAlexandriaConfigurationUsingAlexandriaProperties() {
       private PropertiesConfiguration properties = new PropertiesConfiguration(CONFIG_FILE, true);
 
       @Override
@@ -73,7 +74,7 @@ public class ContextListener extends JerseyGuiceServletContextListener {
     };
   }
 
-  private static class CachedConfiguration implements AlexandriaConfiguration {
+  private static class CachedConfiguration extends AbstractAlexandriaConfigurationUsingAlexandriaProperties {
     private final AlexandriaConfiguration delegate;
 
     private URI cachedBaseURI;
@@ -100,6 +101,7 @@ public class ContextListener extends JerseyGuiceServletContextListener {
 
       return cachedStorageDirectory;
     }
+
   }
   // private static final PropertyResourceBundle propertyResourceBundle = readResourceBundle();
   //

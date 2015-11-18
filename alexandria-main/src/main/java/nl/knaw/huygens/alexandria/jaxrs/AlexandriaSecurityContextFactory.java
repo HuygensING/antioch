@@ -1,7 +1,5 @@
 package nl.knaw.huygens.alexandria.jaxrs;
 
-import static java.util.stream.Collectors.toMap;
-
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -9,20 +7,26 @@ import javax.ws.rs.core.SecurityContext;
 
 import org.apache.commons.lang3.StringUtils;
 
-import nl.knaw.huygens.alexandria.config.InstanceProperties;
+import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 
 public class AlexandriaSecurityContextFactory {
 
-  private static final String PREFIX = "authkey.";
   private Map<String, String> keyMap; // authkey -> username
 
   @Inject
-  public AlexandriaSecurityContextFactory(InstanceProperties config) {
-    keyMap = config.getKeys().stream()//
-        .filter(k -> k.startsWith(PREFIX))//
-        .map(k -> k.replaceFirst(PREFIX, ""))//
-        .collect(toMap(name -> config.getProperty(PREFIX + name).get(), name -> name));
+  public AlexandriaSecurityContextFactory(AlexandriaConfiguration config) {
+    keyMap = config.getAuthKeyIndex();
   }
+
+  // private static final String PREFIX = "authkey.";
+  //
+  // public Map<String, String> getAuthKeyIndex() {
+  // PropertiesConfiguration properties = null;
+  // return properties.getKeys().stream()//
+  // .filter(k -> k.startsWith(PREFIX))//
+  // .map(k -> k.replaceFirst(PREFIX, ""))//
+  // .collect(toMap(name -> properties.getProperty(PREFIX + name).get(), name -> name));
+  // }
 
   public SecurityContext createFrom(String headerString) {
     if (StringUtils.isEmpty(headerString)) {
