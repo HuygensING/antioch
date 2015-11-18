@@ -21,7 +21,7 @@ public class AlexandriaSecurityContextFactory {
     keyMap = config.getKeys().stream()//
         .filter(k -> k.startsWith(PREFIX))//
         .map(k -> k.replaceFirst(PREFIX, ""))//
-        .collect(toMap(name -> config.getProperty(PREFIX + name), name -> name));
+        .collect(toMap(name -> config.getProperty(PREFIX + name).get(), name -> name));
   }
 
   public SecurityContext createFrom(String headerString) {

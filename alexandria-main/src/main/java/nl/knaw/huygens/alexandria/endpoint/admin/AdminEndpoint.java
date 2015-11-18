@@ -29,10 +29,10 @@ public class AdminEndpoint extends JSONEndpoint {
   private static String storageDirectory;
 
   @Inject
-  public AdminEndpoint(AlexandriaConfiguration aconfig, InstanceProperties pconfig, AlexandriaService service) {
+  public AdminEndpoint(AlexandriaConfiguration aconfig, InstanceProperties properties, AlexandriaService service) {
     this.service = service;
     storageDirectory = aconfig.getStorageDirectory();
-    adminKey = pconfig.getProperty("adminkey");
+    adminKey = properties.getProperty("adminkey").get();
   }
 
   @PUT

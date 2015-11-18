@@ -1,6 +1,8 @@
 package nl.knaw.huygens.alexandria.config;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.MissingResourceException;
 import java.util.Optional;
 import java.util.PropertyResourceBundle;
@@ -39,6 +41,10 @@ public class PropertiesConfiguration {
       Log.warn("Property value for key [{}] cannot be transformed to String", key);
     }
     return value;
+  }
+
+  public List<String> getKeys() {
+    return Collections.list(propertyResourceBundle.getKeys());
   }
 
 }

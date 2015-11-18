@@ -1,61 +1,28 @@
 package nl.knaw.huygens.alexandria.config;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
-import java.util.MissingResourceException;
-import java.util.PropertyResourceBundle;
+import java.util.Optional;
 
 import javax.inject.Inject;
-import javax.ws.rs.InternalServerErrorException;
-
-import nl.knaw.huygens.Log;
 
 public class InstanceProperties {
-  private PropertyResourceBundle propertyResourceBundle;
-  private AlexandriaConfiguration config;
+  PropertiesConfiguration properties;
 
   @Inject
   public InstanceProperties(AlexandriaConfiguration config) {
-    this.config = config;
+    properties = new PropertiesConfiguration(config.getStorageDirectory() + "/alexandria.properties");
   }
 
-  public String getProperty(String key) {
-    initBundle();
-    try {
-      return propertyResourceBundle.getString(key);
-    } catch (MissingResourceException e) {
-      Log.warn("Missing expected resource: [{}] -- winging it", key);
-      return "missing";
-    } catch (ClassCastException e) {
-      Log.warn("Property value for key [{}] cannot be transformed to String -- winging it", key);
-      return "malformed";
-    }
+  public Optional<String> getProperty(String key) {
+    return properties.getProperty(key);
+  }
+
+  public String getProperty(String key, String defaultValue) {
+    return properties.getProperty(key, defaultValue);
   }
 
   public List<String> getKeys() {
-    initBundle();
-    return Collections.list(propertyResourceBundle.getKeys());
-  }
-
-  private void initBundle() {
-    if (propertyResourceBundle == null) {
-      try {
-        String path = config.getStorageDirectory() + "/alexandria.properties";
-        File propertyFile = new File(path);
-        if (propertyFile.exists() && propertyFile.canRead()) {
-          FileInputStream fileInputStream = new FileInputStream(propertyFile);
-          propertyResourceBundle = new PropertyResourceBundle(fileInputStream);
-        } else {
-          throw new InternalServerErrorException("can't read " + path);
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
-        throw new RuntimeException(e);
-      }
-    }
+    return properties.getKeys();
   }
 
 }
