@@ -25,16 +25,23 @@ package nl.knaw.huygens.alexandria.config;
 import java.util.Map;
 
 public abstract class AbstractAlexandriaConfigurationUsingAlexandriaProperties implements AlexandriaConfiguration {
-  private AlexandriaPropertiesConfiguration alexandriaPropertiesConfiguration = new AlexandriaPropertiesConfiguration(getStorageDirectory());
+  private AlexandriaPropertiesConfiguration alexandriaPropertiesConfiguration;
 
   @Override
   public Map<String, String> getAuthKeyIndex() {
-    return alexandriaPropertiesConfiguration.getAuthKeyIndex();
+    return getAlexandriaPropertiesConfiguration().getAuthKeyIndex();
   }
 
   @Override
   public String getAdminKey() {
-    return alexandriaPropertiesConfiguration.getAdminKey();
+    return getAlexandriaPropertiesConfiguration().getAdminKey();
+  }
+
+  private AlexandriaPropertiesConfiguration getAlexandriaPropertiesConfiguration() {
+    if (alexandriaPropertiesConfiguration == null) {
+      alexandriaPropertiesConfiguration = new AlexandriaPropertiesConfiguration(getStorageDirectory());
+    }
+    return alexandriaPropertiesConfiguration;
   }
 
 }
