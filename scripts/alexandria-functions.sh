@@ -83,5 +83,5 @@ function a-about {
 }
 
 function a-about-service {
-  curl $be/about/service
+  curl -H "${authheader}" $be/about/service
 }
