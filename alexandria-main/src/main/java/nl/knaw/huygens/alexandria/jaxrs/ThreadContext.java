@@ -6,6 +6,7 @@ import java.util.Map;
 import nl.knaw.huygens.Log;
 
 public class ThreadContext {
+  private static final String DEFAULT_USERNAME = "nederlab"; // TODO: remove the need for this.
   private static ThreadLocal<Map<String, Object>> threadLocalMap = new ThreadLocal<Map<String, Object>>();
   private static ThreadLocal<String> threadLocalUsername = new ThreadLocal<String>();
 
@@ -19,7 +20,7 @@ public class ThreadContext {
 
   public static String getUserName() {
     String name = threadLocalUsername.get();
-    return name != null ? name : "nederlab";
+    return name != null ? name : DEFAULT_USERNAME;
   }
 
   public static void setUserName(String username) {
