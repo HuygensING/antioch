@@ -1,33 +1,7 @@
 package nl.knaw.huygens.alexandria;
 
-/*
- * #%L
- * alexandria-webapp
- * =======
- * Copyright (C) 2015 Huygens ING (KNAW)
- * =======
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
-import java.util.MissingResourceException;
-import java.util.PropertyResourceBundle;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
@@ -40,6 +14,7 @@ import com.squarespace.jersey2.guice.JerseyGuiceServletContextListener;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+import nl.knaw.huygens.alexandria.config.PropertiesConfiguration;
 import nl.knaw.huygens.alexandria.service.AlexandriaServletModule;
 import nl.knaw.huygens.alexandria.util.Scheduler;
 
@@ -69,45 +44,6 @@ public class ContextListener extends JerseyGuiceServletContextListener {
     return ImmutableList.of(new AlexandriaServletModule(), configurationModule());
   }
 
-  private static final PropertyResourceBundle propertyResourceBundle = readResourceBundle();
-
-  private static PropertyResourceBundle readResourceBundle() {
-    try {
-      return new PropertyResourceBundle(readConfigFile());
-    } catch (IOException e) {
-      final String message = String.format("Failed to read configuration from: [%s]", CONFIG_FILE);
-      Log.error(message);
-      throw new RuntimeException(message, e);
-    }
-  }
-
-  private static InputStream readConfigFile() {
-    final InputStream resources = Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_FILE);
-
-    if (resources == null) {
-      final String message = String.format("Missing configuration file: [%s]", CONFIG_FILE);
-      Log.error(message);
-      throw new RuntimeException(message);
-    }
-
-    return resources;
-  }
-
-  private String getProperty(String key) {
-    Log.trace("getProperty: [{}]", key);
-    try {
-      final String value = propertyResourceBundle.getString(key);
-      Log.trace("+- bound to: [{}]", value);
-      return value;
-    } catch (MissingResourceException e) {
-      Log.warn("Missing expected resource: [{}] -- winging it", key);
-      return "missing";
-    } catch (ClassCastException e) {
-      Log.warn("Property value for key [{}] cannot be transformed to String -- winging it", key);
-      return "malformed";
-    }
-  }
-
   private Module configurationModule() {
     return new AbstractModule() {
       @Override
@@ -123,14 +59,16 @@ public class ContextListener extends JerseyGuiceServletContextListener {
 
   private AlexandriaConfiguration propertyBackedConfiguration() {
     return new AlexandriaConfiguration() {
+      private PropertiesConfiguration properties = new PropertiesConfiguration(CONFIG_FILE);
+
       @Override
       public URI getBaseURI() {
-        return UriBuilder.fromUri(getProperty(BASE_URI_PROP)).build();
+        return UriBuilder.fromUri(properties.getProperty(BASE_URI_PROP).get()).build();
       }
 
       @Override
       public String getStorageDirectory() {
-        return getProperty(STORAGE_DIRECTORY_PROP);
+        return properties.getProperty(STORAGE_DIRECTORY_PROP).get();
       }
     };
   }
@@ -163,4 +101,27 @@ public class ContextListener extends JerseyGuiceServletContextListener {
       return cachedStorageDirectory;
     }
   }
+  // private static final PropertyResourceBundle propertyResourceBundle = readResourceBundle();
+  //
+  // private static PropertyResourceBundle readResourceBundle() {
+  // try {
+  // return new PropertyResourceBundle(readConfigFile());
+  // } catch (IOException e) {
+  // final String message = String.format("Failed to read configuration from: [%s]", CONFIG_FILE);
+  // Log.error(message);
+  // throw new RuntimeException(message, e);
+  // }
+  // }
+  //
+  // private static InputStream readConfigFile() {
+  // final InputStream resources = Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_FILE);
+  //
+  // if (resources == null) {
+  // final String message = String.format("Missing configuration file: [%s]", CONFIG_FILE);
+  // Log.error(message);
+  // throw new RuntimeException(message);
+  // }
+  //
+  // return resources;
+  // }
 }

@@ -16,7 +16,7 @@ import javax.ws.rs.core.Response;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
-import nl.knaw.huygens.alexandria.config.PropertiesConfiguration;
+import nl.knaw.huygens.alexandria.config.InstanceProperties;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
@@ -29,7 +29,7 @@ public class AdminEndpoint extends JSONEndpoint {
   private static String storageDirectory;
 
   @Inject
-  public AdminEndpoint(AlexandriaConfiguration aconfig, PropertiesConfiguration pconfig, AlexandriaService service) {
+  public AdminEndpoint(AlexandriaConfiguration aconfig, InstanceProperties pconfig, AlexandriaService service) {
     this.service = service;
     storageDirectory = aconfig.getStorageDirectory();
     adminKey = pconfig.getProperty("adminkey");

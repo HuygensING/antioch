@@ -9,7 +9,7 @@ import javax.ws.rs.core.SecurityContext;
 
 import org.apache.commons.lang3.StringUtils;
 
-import nl.knaw.huygens.alexandria.config.PropertiesConfiguration;
+import nl.knaw.huygens.alexandria.config.InstanceProperties;
 
 public class AlexandriaSecurityContextFactory {
 
@@ -17,7 +17,7 @@ public class AlexandriaSecurityContextFactory {
   private Map<String, String> keyMap; // authkey -> username
 
   @Inject
-  public AlexandriaSecurityContextFactory(PropertiesConfiguration config) {
+  public AlexandriaSecurityContextFactory(InstanceProperties config) {
     keyMap = config.getKeys().stream()//
         .filter(k -> k.startsWith(PREFIX))//
         .map(k -> k.replaceFirst(PREFIX, ""))//
