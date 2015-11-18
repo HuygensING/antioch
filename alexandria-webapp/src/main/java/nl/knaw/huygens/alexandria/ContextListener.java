@@ -49,6 +49,26 @@ public class ContextListener extends JerseyGuiceServletContextListener {
   public static final String BASE_URI_PROP = "baseURI";
   public static final String STORAGE_DIRECTORY_PROP = "storageDirectory";
 
+  @Override
+  public void contextInitialized(ServletContextEvent servletContextEvent) {
+    Scheduler.scheduleExpiredTentativesRemoval();
+  }
+
+  @Override
+  public void contextDestroyed(ServletContextEvent sce) {
+    Log.info("contextDestroyed called");
+    getInjector()//
+        .getInstance(new AlexandriaServletModule().getTinkerPopServiceClass())//
+        .destroy();
+    super.contextDestroyed(sce);
+    Log.info("contextDestroyed done");
+  }
+
+  @Override
+  protected List<? extends Module> modules() {
+    return ImmutableList.of(new AlexandriaServletModule(), configurationModule());
+  }
+
   private static final PropertyResourceBundle propertyResourceBundle = readResourceBundle();
 
   private static PropertyResourceBundle readResourceBundle() {
@@ -71,26 +91,6 @@ public class ContextListener extends JerseyGuiceServletContextListener {
     }
 
     return resources;
-  }
-
-  @Override
-  protected List<? extends Module> modules() {
-    return ImmutableList.of(new AlexandriaServletModule(), configurationModule());
-  }
-
-  @Override
-  public void contextInitialized(ServletContextEvent servletContextEvent) {
-    Scheduler.scheduleExpiredTentativesRemoval();
-  }
-
-  @Override
-  public void contextDestroyed(ServletContextEvent sce) {
-    Log.info("contextDestroyed called");
-    getInjector()//
-        .getInstance(new AlexandriaServletModule().getTinkerPopServiceClass())//
-        .destroy();
-    super.contextDestroyed(sce);
-    Log.info("contextDestroyed done");
   }
 
   private String getProperty(String key) {
