@@ -18,7 +18,8 @@ public class ThreadContext {
   }
 
   public static String getUserName() {
-    return threadLocalUsername.get();
+    String name = threadLocalUsername.get();
+    return name != null ? name : "nederlab";
   }
 
   public static void setUserName(String username) {
