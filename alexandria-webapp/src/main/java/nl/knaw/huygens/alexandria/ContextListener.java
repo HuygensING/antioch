@@ -1,5 +1,27 @@
 package nl.knaw.huygens.alexandria;
 
+/*
+ * #%L
+ * alexandria-webapp
+ * =======
+ * Copyright (C) 2015 Huygens ING (KNAW)
+ * =======
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import java.net.URI;
 import java.util.List;
 
@@ -60,16 +82,23 @@ public class ContextListener extends JerseyGuiceServletContextListener {
 
   private AlexandriaConfiguration propertyBackedConfiguration() {
     return new AbstractAlexandriaConfigurationUsingAlexandriaProperties() {
-      private PropertiesConfiguration properties = new PropertiesConfiguration(CONFIG_FILE, true);
+      private PropertiesConfiguration properties;
 
       @Override
       public URI getBaseURI() {
-        return UriBuilder.fromUri(properties.getProperty(BASE_URI_PROP).get()).build();
+        return UriBuilder.fromUri(getProperties().getProperty(BASE_URI_PROP).get()).build();
       }
 
       @Override
       public String getStorageDirectory() {
-        return properties.getProperty(STORAGE_DIRECTORY_PROP).get();
+        return getProperties().getProperty(STORAGE_DIRECTORY_PROP).get();
+      }
+
+      private PropertiesConfiguration getProperties() {
+        if (properties == null) {
+          properties = new PropertiesConfiguration(CONFIG_FILE, true);
+        }
+        return properties;
       }
     };
   }
