@@ -24,13 +24,15 @@ package nl.knaw.huygens.alexandria.model;
 
 import java.time.Instant;
 
+import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
+
 public class TentativeAlexandriaProvenance {
   private final String who;
   private final Instant when;
   private final String why;
 
   public static TentativeAlexandriaProvenance createDefault() {
-    return new TentativeAlexandriaProvenance(AlexandriaProvenance.DEFAULT_WHO, Instant.now(), AlexandriaProvenance.DEFAULT_WHY);
+    return new TentativeAlexandriaProvenance(ThreadContext.getUserName(), Instant.now(), AlexandriaProvenance.DEFAULT_WHY);
   }
 
   public TentativeAlexandriaProvenance(String who, Instant when, String why) {

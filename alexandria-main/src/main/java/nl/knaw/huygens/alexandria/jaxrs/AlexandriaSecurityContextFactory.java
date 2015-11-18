@@ -37,6 +37,7 @@ public class AlexandriaSecurityContextFactory {
     String authkey = parts[1];
     if (keyMap.containsKey(authkey)) {
       String name = keyMap.get(authkey);
+      ThreadContext.setUserName(name);
       AlexandriaSecurityContext alexandriaSecurityContext = new AlexandriaSecurityContext()//
           .withAuthenticationScheme(parts[0])//
           .withUserPrincipal(new AlexandriaPrincipal(name));

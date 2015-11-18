@@ -15,10 +15,12 @@ import com.google.common.collect.Maps;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.config.PropertiesConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.jaxrs.Annotations.AuthorizationRequired;
+import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
 import nl.knaw.huygens.alexandria.jersey.AlexandriaApplication;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
@@ -49,6 +51,7 @@ public class AboutEndpoint extends JSONEndpoint {
   @GET
   @ApiOperation("get information about the server (version,buildDate,commitId,startedAt)")
   public Response getMetadata() {
+    Log.info("session.name=" + ThreadContext.get("name"));
     final Map<String, String> data = Maps.newLinkedHashMap();
     data.put("baseURI", baseURI.toString());
     data.put("buildDate", properties.getProperty("buildDate").get());
@@ -70,6 +73,8 @@ public class AboutEndpoint extends JSONEndpoint {
   @Path("service")
   @ApiOperation("get information about the service")
   public Response getGraphMetadata() {
+    Log.info("session.name=" + ThreadContext.get("name"));
+    Log.info("session.whatever=" + ThreadContext.get("whatever"));
     return Response.ok(service.getMetadata()).build();
   }
 

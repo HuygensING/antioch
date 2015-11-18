@@ -26,7 +26,7 @@ import java.time.Instant;
 
 public class AlexandriaProvenance {
   public static final String DEFAULT_WHY = "";
-  public static final String DEFAULT_WHO = "nederlab";
+  // public static final String DEFAULT_WHO = "nederlab";
 
   private final String who;
   private final Accountable what;

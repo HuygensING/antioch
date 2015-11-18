@@ -25,6 +25,7 @@ package nl.knaw.huygens.alexandria.endpoint;
 import java.time.Instant;
 import java.util.Optional;
 
+import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
@@ -47,7 +48,7 @@ public class ProvenancePrototype {
 
   public TentativeAlexandriaProvenance getValue() {
     return new TentativeAlexandriaProvenance(//
-        getWho().orElse(AlexandriaProvenance.DEFAULT_WHO),//
+        getWho().orElse(ThreadContext.getUserName()), //
         getWhen(),//
         getWhy().orElse(AlexandriaProvenance.DEFAULT_WHY)//
     );
