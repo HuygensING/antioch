@@ -59,7 +59,7 @@ public class ContextListener extends JerseyGuiceServletContextListener {
 
   private AlexandriaConfiguration propertyBackedConfiguration() {
     return new AlexandriaConfiguration() {
-      private PropertiesConfiguration properties = new PropertiesConfiguration(CONFIG_FILE);
+      private PropertiesConfiguration properties = new PropertiesConfiguration(CONFIG_FILE, true);
 
       @Override
       public URI getBaseURI() {

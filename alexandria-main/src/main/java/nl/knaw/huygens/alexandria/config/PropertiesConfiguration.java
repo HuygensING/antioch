@@ -1,6 +1,9 @@
 package nl.knaw.huygens.alexandria.config;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.MissingResourceException;
@@ -12,10 +15,12 @@ import nl.knaw.huygens.Log;
 public class PropertiesConfiguration {
   private PropertyResourceBundle propertyResourceBundle;
 
-  public PropertiesConfiguration(String propertiesFile) {
+  public PropertiesConfiguration(String propertiesFile, boolean isResource) {
     try {
-      propertyResourceBundle = new PropertyResourceBundle(//
-          Thread.currentThread().getContextClassLoader().getResourceAsStream(propertiesFile));
+      InputStream inputStream = isResource ? //
+          Thread.currentThread().getContextClassLoader().getResourceAsStream(propertiesFile)//
+          : new FileInputStream(new File(propertiesFile));
+      propertyResourceBundle = new PropertyResourceBundle(inputStream);
     } catch (IOException e) {
       e.printStackTrace();
       throw new RuntimeException("Couldn't read properties file " + propertiesFile + ": " + e.getMessage());

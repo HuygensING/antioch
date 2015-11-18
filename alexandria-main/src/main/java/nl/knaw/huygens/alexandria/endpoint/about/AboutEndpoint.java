@@ -38,7 +38,7 @@ public class AboutEndpoint extends JSONEndpoint {
     this.service = service;
     this.baseURI = config.getBaseURI();
     this.tentativesTTL = service.getTentativesTimeToLive();
-    this.properties = new PropertiesConfiguration(PROPERTIES_FILE);
+    this.properties = new PropertiesConfiguration(PROPERTIES_FILE, true);
   }
 
   /**

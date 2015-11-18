@@ -10,7 +10,7 @@ public class InstanceProperties {
 
   @Inject
   public InstanceProperties(AlexandriaConfiguration config) {
-    properties = new PropertiesConfiguration(config.getStorageDirectory() + "/alexandria.properties");
+    properties = new PropertiesConfiguration(config.getStorageDirectory() + "/alexandria.properties", false);
   }
 
   public Optional<String> getProperty(String key) {
