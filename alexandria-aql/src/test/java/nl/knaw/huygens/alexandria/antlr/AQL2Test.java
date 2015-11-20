@@ -145,4 +145,37 @@ public class AQL2Test {
     // assertThat(allTokens).hasSize(55);
   }
 
+  @Test
+  public void testAQLStatementWithDisctinctReturnFields() {
+    String statement = "find annotation" //
+        + " where"//
+        + " type:eq(\"Tag\")"//
+        + " and who:eq(\"nedlab\")" //
+        + " sort on -id" //
+        + " return distinct(id,who,when,type,value)";
+    CharStream stream = new ANTLRInputStream(statement);
+    AQL2Lexer lex = new AQL2Lexer(stream);
+    List<? extends Token> allTokens = lex.getAllTokens();
+    for (Token token : allTokens) {
+      Log.info("token: [{}] <<{}>>", lex.getRuleNames()[token.getType() - 1], token.getText());
+    }
+    lex.reset();
+
+    CommonTokenStream tokens = new CommonTokenStream(lex);
+    AQL2Parser parser = new AQL2Parser(tokens);
+    parser.setBuildParseTree(true);
+    ParseTree tree = parser.query();
+    Log.info("tree={}", tree.toStringTree(parser));
+    assertThat(tree.getChildCount()).isEqualTo(4); // find, where, sort, return
+
+    int numberOfSyntaxErrors = parser.getNumberOfSyntaxErrors();
+    assertThat(numberOfSyntaxErrors).isEqualTo(0); // no syntax errors
+    Log.info("numberOfSyntaxErrors={}", numberOfSyntaxErrors);
+
+    for (int i = 0; i < tree.getChildCount(); i++) {
+      Log.info("root.child={}", tree.getChild(i).getText());
+    }
+    assertThat(allTokens).hasSize(29);
+  }
+
 }

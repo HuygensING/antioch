@@ -36,7 +36,11 @@ sortClause : 'sort on' sortParameter (',' sortParameter)*;
 
 sortParameter : ( ASC_PREFIX | DESC_PREFIX )? FIELDNAME;
 
-returnClause : 'return' FIELDNAME ( ',' FIELDNAME)*;
+returnClause : 'return' ( fieldnames | distinctFieldnames );
+
+fieldnames : FIELDNAME ( ',' FIELDNAME)*;
+
+distinctFieldnames : 'distinct(' fieldnames ')';
 
 FIELDNAME : 'id' 
           | 'url' 
