@@ -46,10 +46,32 @@ function a-generate-random-resource-with-annotation {
   a-confirm $url
 }
 
+function a-set-text-for-resource-from-file {
+  id=$1
+  file=$2
+  text=$(cat ${file}|sed ':a;N;$!ba;s/\n/\\n/g'|sed -e 's/"/\\"/g') # replace newlines and quotes
+  curl -i -X PUT $be/resources/$id/text -H 'Content-type: application/json' \
+  --data-binary "{\"text\": {\"body\":\"${text}\"}}" -H "${authheader}"
+}
+
+function a-set-text-for-resource-from-xml-file {
+  id=$1
+  file=$2
+  text=$(cat ${file})
+  curl -i -X PUT $be/resources/$id/text -H 'Content-type: text/xml' \
+  --data-binary "${text}" -H "${authheader}"
+}
+
 function a-set-backend {
 	export be=$1
 	echo -n "backend set to "
 	a-show-backend
+}
+
+function a-set-resource-id {
+	export id=$1
+	echo -n "resource id set to "
+	a-show-resource-id
 }
 
 function a-set-authkey {
@@ -76,6 +98,10 @@ function a-use-production {
 
 function a-show-backend {
 	echo ${be}
+}
+
+function a-show-resource-id {
+	echo ${id}
 }
 
 function a-about {
