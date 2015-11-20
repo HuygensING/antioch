@@ -68,6 +68,10 @@ function a-set-backend {
 	a-show-backend
 }
 
+function a-show-backend {
+  echo ${be}
+}
+
 function a-set-resource-id {
 	export id=$1
 	echo -n "resource id set to "
@@ -94,10 +98,6 @@ function a-use-acceptance {
 
 function a-use-production {
 	a-set-backend https://alexandria.huygens.knaw.nl/
-}
-
-function a-show-backend {
-	echo ${be}
 }
 
 function a-show-resource-id {
