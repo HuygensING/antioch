@@ -28,13 +28,14 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.UUID;
 
-import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
-
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
+import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 
 public class ResourcePrototypeTest {
 
@@ -66,7 +67,7 @@ public class ResourcePrototypeTest {
     assertThat(rp.getRef()).isEqualTo("whatever");
     assertThat(rp.getProvenance().isPresent()).isTrue();
     assertThat(rp.getProvenance().get().getWhen()).isEqualTo(instant);
-    assertThat(rp.getProvenance().get().getValue().getWho()).isEqualTo(AlexandriaProvenance.DEFAULT_WHO);
+    assertThat(rp.getProvenance().get().getValue().getWho()).isEqualTo(ThreadContext.getUserName());
     assertThat(rp.getProvenance().get().getValue().getWhy()).isEqualTo(AlexandriaProvenance.DEFAULT_WHY);
   }
 }

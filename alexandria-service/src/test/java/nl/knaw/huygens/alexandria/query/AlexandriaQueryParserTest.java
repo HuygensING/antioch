@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -44,7 +45,11 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
-import nl.knaw.huygens.alexandria.endpoint.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.exception.BadRequestException;
+import nl.knaw.huygens.alexandria.exception.ErrorEntity;
+import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.model.search.QueryField;
+import nl.knaw.huygens.alexandria.model.search.QueryFunction;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 
@@ -368,5 +373,52 @@ public class AlexandriaQueryParserTest {
     // assertThat(parallel.test("whtvr")).isFalse();
     // assertThat(alwaysTrueCalled.get()).isEqualTo(5);
     // assertThat(alwaysFalseCalled.get()).isEqualTo(1);
+  }
+
+  @Test
+  public void testGetAnnotationIdFromDeprecatedAnnotationRemovesRevisionNumber() {
+    AnnotationVF avf = mock(AnnotationVF.class);
+    String randomUUID = UUID.randomUUID().toString();
+    when(avf.getUuid()).thenReturn(randomUUID + ".0");
+
+    String annotationId = AlexandriaQueryParser.getAnnotationId(avf);
+
+    assertThat(annotationId).isEqualTo(randomUUID);
+  }
+
+  @Test
+  public void testInvalidStateInStateEqThrowsBadRequestException() {
+    WhereToken whereToken = new WhereToken(QueryField.state, QueryFunction.eq, ImmutableList.of("RUBBISH"));
+    try {
+      AlexandriaQueryParser.toPredicate(whereToken);
+      fail("expected BadRequestException");
+    } catch (BadRequestException e) {
+      String responseMessage = ((ErrorEntity) e.getResponse().getEntity()).getMessage();
+      assertThat(responseMessage).isEqualTo("RUBBISH is not a valid value for state");
+    }
+  }
+
+  @Test
+  public void testOneInvalidStatesInStateInSetThrowsBadRequestException() {
+    WhereToken whereToken = new WhereToken(QueryField.state, QueryFunction.eq, ImmutableList.of("RUBBISH", "CONFIRMED", "TENTATIVE"));
+    try {
+      AlexandriaQueryParser.toPredicate(whereToken);
+      fail("expected BadRequestException");
+    } catch (BadRequestException e) {
+      String responseMessage = ((ErrorEntity) e.getResponse().getEntity()).getMessage();
+      assertThat(responseMessage).isEqualTo("RUBBISH is not a valid value for state");
+    }
+  }
+
+  @Test
+  public void testTwoInvalidStatesInStateInSetThrowsBadRequestException() {
+    WhereToken whereToken = new WhereToken(QueryField.state, QueryFunction.eq, ImmutableList.of("RUBBISH", "GARBAGE", "CONFIRMED"));
+    try {
+      AlexandriaQueryParser.toPredicate(whereToken);
+      fail("expected BadRequestException");
+    } catch (BadRequestException e) {
+      String responseMessage = ((ErrorEntity) e.getResponse().getEntity()).getMessage();
+      assertThat(responseMessage).isEqualTo("RUBBISH, GARBAGE are not valid values for state");
+    }
   }
 }

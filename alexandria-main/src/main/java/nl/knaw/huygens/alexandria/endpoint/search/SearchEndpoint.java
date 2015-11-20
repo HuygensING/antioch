@@ -43,6 +43,7 @@ import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
+import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 @Singleton
@@ -81,21 +82,22 @@ public class SearchEndpoint extends JSONEndpoint {
     return Response.ok(entityBuilder.build(search)).build();
   }
 
+  public static final String RESULTPAGES = "pages";
+
   @GET
-  @Path("{uuid}/resultPages/{pageNumber:[0-9]+}")
+  @Path("{uuid}/" + RESULTPAGES + "/{pageNumber:[0-9]+}")
   @ApiOperation(value = "Get the SearchResultPage with the given uuid and page number", response = SearchResultPage.class)
   public Response getResultPage(@PathParam("uuid") final UUIDParam uuid, @PathParam("pageNumber") int pageNumber) {
     SearchResult searchResult = getSearchResult(uuid);
-    int totalResultPages = searchResult.getTotalResultPages();
+    int totalResultPages = searchResult.getTotalPages();
     if (totalResultPages == 0) {
       throw new NotFoundException("no result pages found");
     }
     if (pageNumber < 1 || pageNumber > totalResultPages) {
       throw new NotFoundException("pageNumber should be between 1 and " + totalResultPages);
     }
-    String baseURI = locationBuilder.locationOf(searchResult) + "/resultPages/";
-    boolean isLast = totalResultPages == pageNumber;
-    SearchResultPage page = new SearchResultPage(baseURI, pageNumber, isLast, searchResult.getPageSize());
+    String baseURI = locationBuilder.locationOf(searchResult) + "/" + RESULTPAGES + "/";
+    SearchResultPage page = new SearchResultPage(baseURI, pageNumber, totalResultPages, searchResult.getPageSize());
     page.setResults(searchResult.getRecordsForPage(pageNumber));
     return Response.ok(page).build();
   }

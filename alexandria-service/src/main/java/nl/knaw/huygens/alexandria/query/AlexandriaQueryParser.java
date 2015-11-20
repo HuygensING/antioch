@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.query;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -24,11 +24,14 @@ package nl.knaw.huygens.alexandria.query;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -54,9 +57,13 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.antlr.AQLLexer;
 import nl.knaw.huygens.alexandria.antlr.AQLParser;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
-import nl.knaw.huygens.alexandria.endpoint.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.model.search.QueryField;
+import nl.knaw.huygens.alexandria.model.search.QueryFunction;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
@@ -64,6 +71,7 @@ import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 
 public class AlexandriaQueryParser {
   static final String ALLOWED_FIELDS = ", available fields: " + Joiner.on(", ").join(QueryField.ALL_EXTERNAL_NAMES);
+  static final String ALLOWED_FUNCTIONS = ", available functions: " + Joiner.on(", ").join(QueryFunction.values());
 
   private static LocationBuilder locationBuilder;
 
@@ -95,6 +103,9 @@ public class AlexandriaQueryParser {
   private void setFilter(final ParsedAlexandriaQuery paq, String where) {
     final List<WhereToken> tokens = tokenize(where);
 
+    // add default stateToken unless there is a state clause in the where
+    addDefaultStateTokenWhenNeeded(tokens);
+
     // any tokens with resource.id or subresource.id need to be filtered out and lead to an annotationVFFinder
     List<WhereToken> resourceWhereTokens = filterResourceWhereTokens(tokens);
     if (!resourceWhereTokens.isEmpty()) {
@@ -105,6 +116,19 @@ public class AlexandriaQueryParser {
 
     // create a predicate for filtering the annotationVF stream based on the remaining tokens
     paq.setPredicate(createPredicate(tokens));
+  }
+
+  private void addDefaultStateTokenWhenNeeded(List<WhereToken> tokens) {
+    boolean addStateToken = tokens.stream()//
+        .noneMatch(token -> QueryField.state.equals(token.getProperty()));
+    if (addStateToken) {
+      WhereToken defaultStateToken = new WhereToken(//
+          QueryField.state, //
+          QueryFunction.eq, //
+          ImmutableList.of(AlexandriaState.CONFIRMED.name())//
+      );
+      tokens.add(defaultStateToken);
+    }
   }
 
   private List<WhereToken> filterResourceWhereTokens(List<WhereToken> tokens) {
@@ -161,7 +185,6 @@ public class AlexandriaQueryParser {
     CharStream stream = new ANTLRInputStream(whereString);
     AQLLexer lex = new AQLLexer(stream);
     lex.removeErrorListeners();
-    lex.addErrorListener(errorListener);
     CommonTokenStream tokenStream = new CommonTokenStream(lex);
     AQLParser parser = new AQLParser(tokenStream);
     parser.removeErrorListeners();
@@ -170,7 +193,9 @@ public class AlexandriaQueryParser {
     ParseTree tree = parser.root();
     Log.info("tree={}", tree.toStringTree(parser));
     if (errorListener.heardErrors()) {
-      parseErrors.addAll(errorListener.getParseErrors());
+      parseErrors.addAll(errorListener.getParseErrors().stream()//
+          .map(AlexandriaQueryParser::clarifyParseError)//
+          .collect(toList()));
       return Lists.newArrayList();
     }
 
@@ -178,6 +203,19 @@ public class AlexandriaQueryParser {
     visitor.visit(tree);
     parseErrors.addAll(errorListener.getParseErrors());
     return visitor.getWhereTokens();
+  }
+
+  private static final String MISSING_FIELD_NAME = "missing FIELD_NAME";
+  private static final String MISSING_FUNCTION = "missing FUNCTION";
+
+  private static String clarifyParseError(String parseError) {
+    if (parseError.contains(MISSING_FIELD_NAME)) {
+      return parseError.replace(MISSING_FIELD_NAME, "missing or invalid field") + ALLOWED_FIELDS;
+    }
+    if (parseError.contains(MISSING_FUNCTION)) {
+      return parseError.replace(MISSING_FUNCTION, "missing or invalid function") + ALLOWED_FUNCTIONS;
+    }
+    return parseError;
   }
 
   private static Predicate<AnnotationVF> createPredicate(List<WhereToken> tokens) {
@@ -190,10 +228,13 @@ public class AlexandriaQueryParser {
         .reduce(alwaysTrue(), Predicate::and);
   }
 
+  static Set<String> ALL_STATES = Arrays.stream(AlexandriaState.values()).map(AlexandriaState::name).collect(toSet());
+
   static Predicate<AnnotationVF> toPredicate(WhereToken whereToken) {
-    Function<AnnotationVF, Object> getter = whereToken.getProperty().getter;
+    Function<AnnotationVF, Object> getter = QueryFieldGetters.get(whereToken.getProperty());
     // eq
     if (QueryFunction.eq.equals(whereToken.getFunction())) {
+      checkForValidStateParameter(whereToken);
       Object eqValue = whereToken.getParameters().get(0);
       return avf -> getter.apply(avf).equals(eqValue);
     }
@@ -212,6 +253,7 @@ public class AlexandriaQueryParser {
 
     // inSet
     if (QueryFunction.inSet.equals(whereToken.getFunction())) {
+      checkForValidStateParameter(whereToken);
       List<Object> possibleValues = whereToken.getParameters();
       return (AnnotationVF avf) -> {
         Object propertyValue = getter.apply(avf);
@@ -242,12 +284,34 @@ public class AlexandriaQueryParser {
     return alwaysTrue();
   }
 
+  static final Predicate<Object> INVALID_STATEVALUE_PREDICATE = stateValue -> !(stateValue instanceof String && ALL_STATES.contains(stateValue));
+
+  private static void checkForValidStateParameter(WhereToken whereToken) {
+    if (QueryField.state.equals(whereToken.getProperty())) {
+      List<Object> invalidValues = whereToken.getParameters().stream()//
+          .filter(INVALID_STATEVALUE_PREDICATE)//
+          .collect(toList());
+      if (!invalidValues.isEmpty()) {
+        String message = ((invalidValues.size() == 1)//
+            ? invalidValues.get(0) + " is not a valid value"//
+            : Joiner.on(", ").join(invalidValues) + " are not valid values")//
+            + " for " + QueryField.state.externalName();
+        throw new BadRequestException(message);
+      }
+    }
+  }
+
   private static Predicate<AnnotationVF> alwaysTrue() {
     return x -> true;
   }
 
   static String getAnnotationURL(final AnnotationVF avf) {
     return locationBuilder.locationOf(AlexandriaAnnotation.class, avf.getUuid()).toString();
+  }
+
+  static String getAnnotationId(final AnnotationVF avf) {
+    // for deprecated annotations, remove the revision from the id.
+    return avf.getUuid().replaceFirst("\\..*$", "");
   }
 
   static String getResourceURL(final AnnotationVF avf) {
@@ -284,7 +348,7 @@ public class AlexandriaQueryParser {
 
   private static Ordering<AnnotationVF> ordering(SortToken token) {
     boolean ascending = token.isAscending();
-    Function<AnnotationVF, Object> function = token.getField().getter;
+    Function<AnnotationVF, Object> function = QueryFieldGetters.get(token.getField());
     return new Ordering<AnnotationVF>() {
       @SuppressWarnings("unchecked")
       @Override
@@ -338,7 +402,7 @@ public class AlexandriaQueryParser {
       paq.setReturnFields(fields);
 
       final Function<AnnotationVF, Map<String, Object>> mapper = avf -> fields.stream()//
-          .collect(toMap(Function.identity(), f -> QueryField.fromExternalName(f).getter.apply(avf)));
+          .collect(toMap(Function.identity(), f -> QueryFieldGetters.get(QueryField.fromExternalName(f)).apply(avf)));
       // TODO: cache resultmapper?
       paq.setResultMapper(mapper);
     }

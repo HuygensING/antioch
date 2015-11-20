@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.service;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -44,12 +46,13 @@ import java.util.stream.Stream;
 import javax.inject.Inject;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
-import nl.knaw.huygens.alexandria.endpoint.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
@@ -61,8 +64,10 @@ import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
+import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.query.AlexandriaQueryParser;
 import nl.knaw.huygens.alexandria.query.ParsedAlexandriaQuery;
+import nl.knaw.huygens.alexandria.storage.DumpFormat;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
@@ -128,8 +133,7 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub,
-                                              TentativeAlexandriaProvenance provenance) {
+  public AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance) {
     AlexandriaResource subresource = new AlexandriaResource(uuid, provenance);
     subresource.setCargo(sub);
     subresource.setParentResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, parentUuid.toString()));
@@ -339,8 +343,7 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public AlexandriaAnnotationBody createAnnotationBody(UUID uuid, String type, String value,
-                                                       TentativeAlexandriaProvenance provenance) {
+  public AlexandriaAnnotationBody createAnnotationBody(UUID uuid, String type, String value, TentativeAlexandriaProvenance provenance) {
     AlexandriaAnnotationBody body = new AlexandriaAnnotationBody(uuid, type, value, provenance);
     storeAnnotationBody(body);
     return body;
@@ -353,12 +356,42 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public SearchResult execute(AlexandriaQuery query) {
-    SearchResult searchResult = new SearchResult(locationBuilder);
-    searchResult.setId(UUID.randomUUID());
-    searchResult.setQuery(query);
-    List<Map<String, Object>> results = processQuery(query);
-    searchResult.setResults(results);
-    return searchResult;
+    Stopwatch stopwatch = Stopwatch.createStarted();
+    List<Map<String, Object>> processQuery = processQuery(query);
+    stopwatch.stop();
+    long elapsedMillis = stopwatch.elapsed(TimeUnit.MILLISECONDS);
+
+    return new SearchResult(locationBuilder)//
+        .setId(UUID.randomUUID())//
+        .setQuery(query)//
+        .setSearchDurationInMilliseconds(elapsedMillis)//
+        .setResults(processQuery);
+  }
+
+  @Override
+  public void exportDb(String format, String filename) {
+    try {
+      storage.writeGraph(DumpFormat.valueOf(format), filename);
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public void importDb(String format, String filename) {
+    try {
+      storage = clearGraph();
+      storage.readGraph(DumpFormat.valueOf(format), filename);
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
+  }
+
+  Storage clearGraph() {
+    storage.getVertexTraversal().forEachRemaining((Consumer<Vertex>) vertex -> vertex.remove());
+    return storage;
   }
 
   // - other public methods -//
@@ -580,7 +613,6 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   private List<Map<String, Object>> processQuery(AlexandriaQuery query) {
-    List<Map<String, Object>> results;
 
     ParsedAlexandriaQuery pQuery = alexandriaQueryParser.parse(query);
 
@@ -591,7 +623,7 @@ public class TinkerPopService implements AlexandriaService {
     Stream<AnnotationVF> stream = pQuery.getAnnotationVFFinder().apply(storage);
     Log.debug("list={}", stream);
 
-    results = stream//
+    List<Map<String, Object>> results = stream//
         .filter(predicate)//
         .sorted(comparator)//
         .map(mapper)//

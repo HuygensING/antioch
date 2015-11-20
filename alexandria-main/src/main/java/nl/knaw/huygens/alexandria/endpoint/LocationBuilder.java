@@ -1,5 +1,9 @@
 package nl.knaw.huygens.alexandria.endpoint;
 
+import java.net.URI;
+import java.util.UUID;
+import java.util.function.Supplier;
+
 /*
  * #%L
  * alexandria-main
@@ -24,9 +28,6 @@ package nl.knaw.huygens.alexandria.endpoint;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
-import java.net.URI;
-import java.util.UUID;
-import java.util.function.Supplier;
 
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.model.Identifiable;
@@ -51,6 +52,17 @@ public class LocationBuilder {
   }
 
   public URI locationOf(Class<? extends Identifiable> identifiableClass, String uuid) {
+    if (uuid.contains(".")) {
+      // Special case: uuid of deprecated annotation
+      String[] parts = uuid.split("\\.");
+      return UriBuilder.fromUri(config.getBaseURI()) //
+          .path(pathOf(identifiableClass)) //
+          .path("{uuid}") //
+          .path("rev") //
+          .path("{rev}") //
+          .build(parts, true);
+
+    }
     return UriBuilder.fromUri(config.getBaseURI()) //
         .path(pathOf(identifiableClass)) //
         .path("{uuid}") //

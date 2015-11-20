@@ -23,6 +23,9 @@ package nl.knaw.huygens.alexandria.config;
  */
 
 import java.net.URI;
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 
 public class MockConfiguration implements AlexandriaConfiguration {
 
@@ -34,6 +37,16 @@ public class MockConfiguration implements AlexandriaConfiguration {
   @Override
   public String getStorageDirectory() {
     return "/tmp/neo4j-alexandria-mock";
+  }
+
+  @Override
+  public Map<String, String> getAuthKeyIndex() {
+    return ImmutableMap.of("123456", "testuser");
+  }
+
+  @Override
+  public String getAdminKey() {
+    return "whatever";
   }
 
 }

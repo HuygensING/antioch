@@ -25,7 +25,6 @@ package nl.knaw.huygens.alexandria.jersey.exceptionmappers;
 import javax.inject.Singleton;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
@@ -34,22 +33,15 @@ import nl.knaw.huygens.alexandria.exception.ErrorEntityBuilder;
 
 @Singleton
 @Provider
-public class AnyExceptionMapper implements ExceptionMapper<Exception> {
+public class WebApplicationExceptionMapper implements ExceptionMapper<WebApplicationException> {
 
   @Override
-  public Response toResponse(Exception e) {
+  public Response toResponse(WebApplicationException e) {
     Log.error("error:{}", e);
-
-    if (e instanceof WebApplicationException) {
-      Response response = ((WebApplicationException) e).getResponse();
-      return Response//
-          .status(response.getStatus())//
-          .entity(ErrorEntityBuilder.build(e.getMessage()))//
-          .build();
-    }
+    Response response = e.getResponse();
     return Response//
-        .status(Status.INTERNAL_SERVER_ERROR)//
-        .entity(ErrorEntityBuilder.build(e))//
+        .status(response.getStatus())//
+        .entity(ErrorEntityBuilder.build(e.getMessage()))//
         .build();
   }
 

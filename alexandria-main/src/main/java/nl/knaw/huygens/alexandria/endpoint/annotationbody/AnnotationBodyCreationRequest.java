@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import nl.knaw.huygens.alexandria.endpoint.CreationRequest;
+import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
@@ -45,7 +46,7 @@ public class AnnotationBodyCreationRequest implements CreationRequest<Alexandria
 
   @Override
   public AlexandriaAnnotationBody execute(AlexandriaService service) {
-    TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(AlexandriaProvenance.DEFAULT_WHO, Instant.now(), AlexandriaProvenance.DEFAULT_WHY);
+    TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(ThreadContext.getUserName(), Instant.now(), AlexandriaProvenance.DEFAULT_WHY);
     return service.createAnnotationBody(providedUUID(), providedType().orElse(""), providedValue(), provenance);
   }
 

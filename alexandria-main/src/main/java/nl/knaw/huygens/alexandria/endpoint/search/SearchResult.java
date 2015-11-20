@@ -41,12 +41,15 @@ import com.google.common.collect.Lists;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.PropertyPrefix;
 import nl.knaw.huygens.alexandria.model.Identifiable;
+import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
 
 @JsonInclude(Include.NON_NULL)
 public class SearchResult implements Identifiable {
   private UUID id;
   private AlexandriaQuery query;
   private List<Map<String, Object>> results = Lists.newArrayList();
+  private Long searchDurationInMs;
+
   @JsonIgnore
   private LocationBuilder locationBuilder;
 
@@ -55,8 +58,9 @@ public class SearchResult implements Identifiable {
     this.locationBuilder = locationBuilder;
   }
 
-  public void setId(UUID id) {
+  public SearchResult setId(UUID id) {
     this.id = id;
+    return this;
   }
 
   @Override
@@ -69,15 +73,16 @@ public class SearchResult implements Identifiable {
     return query;
   }
 
-  public void setQuery(AlexandriaQuery query) {
+  public SearchResult setQuery(AlexandriaQuery query) {
     this.query = query;
+    return this;
   }
 
   public int getTotalResults() {
     return results.size();
   }
 
-  public int getTotalResultPages() {
+  public int getTotalPages() {
     return (int) Math.ceil(getTotalResults() / (double) query.getPageSize());
   }
 
@@ -86,18 +91,19 @@ public class SearchResult implements Identifiable {
     return results;
   }
 
-  public void setResults(List<Map<String, Object>> results) {
+  public SearchResult setResults(List<Map<String, Object>> results) {
     this.results = results;
+    return this;
   }
 
-  @JsonProperty(PropertyPrefix.LINK + "firstResultPage")
+  @JsonProperty(PropertyPrefix.LINK + "firstPage")
   public URI getFirstResultPage() {
-    return getTotalResults() > 0 ? URI.create(locationBuilder.locationOf(this) + "/resultPages/1") : null;
+    return getTotalResults() > 0 ? URI.create(locationBuilder.locationOf(this) + "/" + SearchEndpoint.RESULTPAGES + "/1") : null;
   }
 
   @JsonIgnore
   public List<Map<String, Object>> getRecordsForPage(int pageNumber) {
-    if (pageNumber < 1 || pageNumber > getTotalResultPages()) {
+    if (pageNumber < 1 || pageNumber > getTotalPages()) {
       return Lists.newArrayList();
     }
     int fromIndex = (pageNumber - 1) * getPageSize();
@@ -107,6 +113,15 @@ public class SearchResult implements Identifiable {
 
   public int getPageSize() {
     return query.getPageSize();
+  }
+
+  public Long getSearchDurationInMs() {
+    return searchDurationInMs;
+  }
+
+  public SearchResult setSearchDurationInMilliseconds(Long searchDurationInMs) {
+    this.searchDurationInMs = searchDurationInMs;
+    return this;
   }
 
 }

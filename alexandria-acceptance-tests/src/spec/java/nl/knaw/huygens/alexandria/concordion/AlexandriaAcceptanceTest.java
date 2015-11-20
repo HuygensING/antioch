@@ -22,17 +22,15 @@ package nl.knaw.huygens.alexandria.concordion;
  * #L%
  */
 
-import static java.lang.String.format;
 import static java.util.UUID.fromString;
 import static java.util.UUID.randomUUID;
 import static nl.knaw.huygens.alexandria.model.AlexandriaState.CONFIRMED;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.Optional;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.UriBuilder;
@@ -45,6 +43,7 @@ import org.junit.BeforeClass;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
@@ -64,7 +63,6 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerGraphService;
 import nl.knaw.huygens.alexandria.service.TinkerPopService;
 import nl.knaw.huygens.alexandria.storage.Storage;
-import nl.knaw.huygens.alexandria.util.UUIDParser;
 import nl.knaw.huygens.cat.RestExtension;
 import nl.knaw.huygens.cat.RestFixture;
 
@@ -86,7 +84,7 @@ public class AlexandriaAcceptanceTest extends RestFixture {
   @Extension
   @SuppressWarnings("unused")
   public ConcordionExtension imagesExtension = concordionExtender //
-      -> concordionExtender.withResource("/tcc.svg", new Resource("/nl/knaw/huygens/alexandria/transactions/tcc.svg"));
+  -> concordionExtender.withResource("/tcc.svg", new Resource("/nl/knaw/huygens/alexandria/transactions/tcc.svg"));
 
   @BeforeClass
   public static void setupAlexandriaAcceptanceTest() {
@@ -114,6 +112,16 @@ public class AlexandriaAcceptanceTest extends RestFixture {
       @Override
       public String toString() {
         return Objects.toStringHelper(this).add("baseURI", getBaseURI()).toString();
+      }
+
+      @Override
+      public Map<String, String> getAuthKeyIndex() {
+        return ImmutableMap.of("123456", "testuser");
+      }
+
+      @Override
+      public String getAdminKey() {
+        return "whatever";
       }
     };
   }
@@ -169,8 +177,7 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     return service().readResource(resId).get();
   }
 
-  protected String annotate(AlexandriaResource resource, AlexandriaAnnotationBody annotationBody,
-                            TentativeAlexandriaProvenance provenance) {
+  protected String annotate(AlexandriaResource resource, AlexandriaAnnotationBody annotationBody, TentativeAlexandriaProvenance provenance) {
     return idOf(service.annotate(resource, annotationBody, provenance));
   }
 
@@ -187,7 +194,11 @@ public class AlexandriaAcceptanceTest extends RestFixture {
   }
 
   protected UUID hasConfirmedAnnotation(AlexandriaResource resource, AlexandriaAnnotationBody annotationBody) {
-    final UUID annotationId = service().annotate(resource, annotationBody, aProvenance()).getId();
+    return hasConfirmedAnnotation(resource, annotationBody, aProvenance());
+  }
+
+  protected UUID hasConfirmedAnnotation(AlexandriaResource resource, AlexandriaAnnotationBody annotationBody, TentativeAlexandriaProvenance provenance) {
+    final UUID annotationId = service().annotate(resource, annotationBody, provenance).getId();
     service().confirmAnnotation(annotationId);
     return annotationId;
   }
@@ -197,31 +208,11 @@ public class AlexandriaAcceptanceTest extends RestFixture {
   }
 
   protected AlexandriaAnnotationBody anAnnotation(String type, String value) {
-    return service().createAnnotationBody(randomUUID(), type, value, aProvenance());
+    return anAnnotation(type, value, aProvenance());
   }
 
-  private Optional<UUID> parse(String idStr) {
-    return UUIDParser.fromString(idStr).get();
+  protected AlexandriaAnnotationBody anAnnotation(String type, String value, TentativeAlexandriaProvenance provenance) {
+    return service().createAnnotationBody(randomUUID(), type, value, provenance);
   }
 
-  private Supplier<String> malformedDescription(String idStr) {
-    return () -> "malformed UUID: " + idStr;
-  }
-
-  private String normalizeHostInfo(String s) {
-    return s.replaceAll(hostInfo(), "{host}");
-  }
-
-  private String hostInfo() {
-    final URI baseURI = getBaseUri();
-    return format("%s:%d", baseURI.getHost(), baseURI.getPort());
-  }
-
-  private String baseOf(String s) {
-    return s.substring(0, s.lastIndexOf('/') + 1);
-  }
-
-  private String tailOf(String s) {
-    return Iterables.getLast(Splitter.on('/').split(s));
-  }
 }

@@ -22,12 +22,8 @@ package nl.knaw.huygens.alexandria;
  * #L%
  */
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
-import java.util.MissingResourceException;
-import java.util.PropertyResourceBundle;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
@@ -39,7 +35,9 @@ import com.google.inject.Module;
 import com.squarespace.jersey2.guice.JerseyGuiceServletContextListener;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.config.AbstractAlexandriaConfigurationUsingAlexandriaProperties;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+import nl.knaw.huygens.alexandria.config.PropertiesConfiguration;
 import nl.knaw.huygens.alexandria.service.AlexandriaServletModule;
 import nl.knaw.huygens.alexandria.util.Scheduler;
 
@@ -48,35 +46,6 @@ public class ContextListener extends JerseyGuiceServletContextListener {
   public static final String CONFIG_FILE = "config.properties";
   public static final String BASE_URI_PROP = "baseURI";
   public static final String STORAGE_DIRECTORY_PROP = "storageDirectory";
-
-  private static final PropertyResourceBundle propertyResourceBundle = readResourceBundle();
-
-  private static PropertyResourceBundle readResourceBundle() {
-    try {
-      return new PropertyResourceBundle(readConfigFile());
-    } catch (IOException e) {
-      final String message = String.format("Failed to read configuration from: [%s]", CONFIG_FILE);
-      Log.error(message);
-      throw new RuntimeException(message, e);
-    }
-  }
-
-  private static InputStream readConfigFile() {
-    final InputStream resources = Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_FILE);
-
-    if (resources == null) {
-      final String message = String.format("Missing configuration file: [%s]", CONFIG_FILE);
-      Log.error(message);
-      throw new RuntimeException(message);
-    }
-
-    return resources;
-  }
-
-  @Override
-  protected List<? extends Module> modules() {
-    return ImmutableList.of(new AlexandriaServletModule(), configurationModule());
-  }
 
   @Override
   public void contextInitialized(ServletContextEvent servletContextEvent) {
@@ -93,19 +62,9 @@ public class ContextListener extends JerseyGuiceServletContextListener {
     Log.info("contextDestroyed done");
   }
 
-  private String getProperty(String key) {
-    Log.trace("getProperty: [{}]", key);
-    try {
-      final String value = propertyResourceBundle.getString(key);
-      Log.trace("+- bound to: [{}]", value);
-      return value;
-    } catch (MissingResourceException e) {
-      Log.warn("Missing expected resource: [{}] -- winging it", key);
-      return "missing";
-    } catch (ClassCastException e) {
-      Log.warn("Property value for key [{}] cannot be transformed to String -- winging it", key);
-      return "malformed";
-    }
+  @Override
+  protected List<? extends Module> modules() {
+    return ImmutableList.of(new AlexandriaServletModule(), configurationModule());
   }
 
   private Module configurationModule() {
@@ -122,20 +81,29 @@ public class ContextListener extends JerseyGuiceServletContextListener {
   }
 
   private AlexandriaConfiguration propertyBackedConfiguration() {
-    return new AlexandriaConfiguration() {
+    return new AbstractAlexandriaConfigurationUsingAlexandriaProperties() {
+      private PropertiesConfiguration properties;
+
       @Override
       public URI getBaseURI() {
-        return UriBuilder.fromUri(getProperty(BASE_URI_PROP)).build();
+        return UriBuilder.fromUri(getProperties().getProperty(BASE_URI_PROP).get()).build();
       }
 
       @Override
       public String getStorageDirectory() {
-        return getProperty(STORAGE_DIRECTORY_PROP);
+        return getProperties().getProperty(STORAGE_DIRECTORY_PROP).get();
+      }
+
+      private PropertiesConfiguration getProperties() {
+        if (properties == null) {
+          properties = new PropertiesConfiguration(CONFIG_FILE, true);
+        }
+        return properties;
       }
     };
   }
 
-  private static class CachedConfiguration implements AlexandriaConfiguration {
+  private static class CachedConfiguration extends AbstractAlexandriaConfigurationUsingAlexandriaProperties {
     private final AlexandriaConfiguration delegate;
 
     private URI cachedBaseURI;
@@ -162,5 +130,29 @@ public class ContextListener extends JerseyGuiceServletContextListener {
 
       return cachedStorageDirectory;
     }
+
   }
+  // private static final PropertyResourceBundle propertyResourceBundle = readResourceBundle();
+  //
+  // private static PropertyResourceBundle readResourceBundle() {
+  // try {
+  // return new PropertyResourceBundle(readConfigFile());
+  // } catch (IOException e) {
+  // final String message = String.format("Failed to read configuration from: [%s]", CONFIG_FILE);
+  // Log.error(message);
+  // throw new RuntimeException(message, e);
+  // }
+  // }
+  //
+  // private static InputStream readConfigFile() {
+  // final InputStream resources = Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_FILE);
+  //
+  // if (resources == null) {
+  // final String message = String.format("Missing configuration file: [%s]", CONFIG_FILE);
+  // Log.error(message);
+  // throw new RuntimeException(message);
+  // }
+  //
+  // return resources;
+  // }
 }

@@ -34,17 +34,17 @@
     <!-- Software versions -->
     <assertj.version>3.2.0</assertj.version>
     <build-helper-maven-plugin.version>1.9.1</build-helper-maven-plugin.version>
-    <classloader-leak-prevention.version>1.14.1</classloader-leak-prevention.version>
+    <classloader-leak-prevention.version>1.15.1</classloader-leak-prevention.version>
 
     <!-- Concordion Acceptance Test extensions -->
-    <cat.version>1.3.0</cat.version>
+    <cat.version>1.3.1</cat.version>
 
     <antlr4.version>4.5.1-1</antlr4.version>
     <!-- Generate parse tree visitor interface and base class. -->
     <antlr4.visitor>true</antlr4.visitor>
 
-    <guice.version>3.0</guice.version>
-    <jackson.version>2.6.2</jackson.version>
+    <guice.version>4.0</guice.version>
+    <jackson.version>2.6.3</jackson.version>
     <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
     <jdk.version>1.8</jdk.version>
 
@@ -74,7 +74,7 @@
     <!--
     <swagger-maven-plugin.version>3.1.0</swagger-maven-plugin.version>
     -->
-    <swagger.version>1.5.3</swagger.version>
+    <swagger.version>1.5.4</swagger.version>
 
     <tinkerpop.groupId>org.apache.tinkerpop</tinkerpop.groupId>
     <tinkerpop.version>3.0.1-incubating</tinkerpop.version>

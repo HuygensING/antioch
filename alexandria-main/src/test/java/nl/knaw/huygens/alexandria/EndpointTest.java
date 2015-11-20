@@ -1,5 +1,10 @@
 package nl.knaw.huygens.alexandria;
 
+import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 /*
  * #%L
  * alexandria-main
@@ -25,26 +30,26 @@ package nl.knaw.huygens.alexandria;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.UriBuilder;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
+
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.jersey.test.JerseyTest;
+import org.glassfish.jersey.test.TestProperties;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
 import com.google.inject.servlet.ServletModule;
 import com.squarespace.jersey2.guice.BootstrapUtils;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.jersey.test.JerseyTest;
-import org.glassfish.jersey.test.TestProperties;
 
 public abstract class EndpointTest extends JerseyTest {
   private static final AlexandriaConfiguration CONFIG = testConfiguration();
@@ -99,6 +104,17 @@ public abstract class EndpointTest extends JerseyTest {
       public String toString() {
         return MoreObjects.toStringHelper(this).add("baseURI", getBaseURI()).toString();
       }
+
+      @Override
+      public Map<String, String> getAuthKeyIndex() {
+        return ImmutableMap.of("123456", "testuser");
+      }
+
+      @Override
+      public String getAdminKey() {
+        return "whatever";
+      }
+
     };
   }
 
