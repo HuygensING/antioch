@@ -68,16 +68,35 @@ function a-set-text-for-resource-from-xml-file {
   --data-binary "${text}" -H "${authheader}"
 }
 
+function a-set-text-for-resource-from-file {
+  id=$1
+  file=$2
+  text=$(cat ${file}|sed ':a;N;$!ba;s/\n/\\n/g'|sed -e 's/"/\\"/g') # replace newlines and quotes
+  curl -i -X PUT $be/resources/$id/text -H 'Content-type: application/json' \
+  --data-binary "{\"text\": {\"body\":\"${text}\"}}" -H "${authheader}"
+}
+
+function a-set-text-for-resource-from-xml-file {
+  id=$1
+  file=$2
+  text=$(cat ${file})
+  curl -i -X PUT $be/resources/$id/text -H 'Content-type: text/xml' \
+  --data-binary "${text}" -H "${authheader}"
+}
+
 function a-set-backend {
 	export be=$1
 	echo -n "backend set to "
 	a-show-backend
 }
 
+<<<<<<< 3ff2ad7ae4cf185940a7b4961ba11dfefcb4a33a
 function a-show-backend {
   echo ${be}
 }
 
+=======
+>>>>>>> add /text curl commands to alexandria-functions.sh
 function a-set-resource-id {
 	export id=$1
 	echo -n "resource id set to "
@@ -104,6 +123,10 @@ function a-use-acceptance {
 
 function a-use-production {
 	a-set-backend https://alexandria.huygens.knaw.nl/
+}
+
+function a-show-resource-id {
+	echo ${id}
 }
 
 function a-show-resource-id {
