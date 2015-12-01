@@ -20,7 +20,7 @@ function deploy {
 		divider
 		sleep 20 # wait for the server to boot
 
-		curlCmd="curl -sSf $base/about"
+		curlCmd="curl -skSf $base/about"
 		echo ${curlCmd}
 		eval ${curlCmd}
 	)
