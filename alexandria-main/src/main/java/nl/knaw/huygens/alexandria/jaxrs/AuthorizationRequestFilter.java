@@ -1,5 +1,9 @@
 package nl.knaw.huygens.alexandria.jaxrs;
 
+import static javax.ws.rs.HttpMethod.GET;
+import static javax.ws.rs.HttpMethod.HEAD;
+import static javax.ws.rs.HttpMethod.OPTIONS;
+
 import java.io.IOException;
 import java.util.Set;
 
@@ -22,7 +26,10 @@ import nl.knaw.huygens.alexandria.jaxrs.Annotations.AuthorizationRequired;
 public class AuthorizationRequestFilter implements ContainerRequestFilter {
   private static final String AUTH_HEADER = "Auth";
   private static final Class<AuthorizationRequired> ANNOTATION_CLASS = AuthorizationRequired.class;
-  private AlexandriaSecurityContextFactory securityContextFactory;
+
+  private static final Set<String> PUBLIC_METHODS = Sets.newHashSet(GET, HEAD, OPTIONS);
+
+  private final AlexandriaSecurityContextFactory securityContextFactory;
 
   @Context
   private ResourceInfo resourceInfo;
@@ -32,10 +39,10 @@ public class AuthorizationRequestFilter implements ContainerRequestFilter {
     this.securityContextFactory = securityContextFactory;
   }
 
-  Set<String> PUBLIC_METHODS = Sets.newHashSet("GET", "HEAD", "OPTIONS");
-
   @Override
   public void filter(ContainerRequestContext requestContext) throws IOException {
+    requestContext.getHeaders().forEach((key, values) -> Log.trace("RequestHeader: [{}] -> {}", key, values));
+
     boolean needsAuth = resourceInfo.getResourceMethod().getAnnotation(ANNOTATION_CLASS) != null;
     if (needsAuth || !PUBLIC_METHODS.contains(requestContext.getMethod())) {
       String headerString = requestContext.getHeaderString(AUTH_HEADER);
@@ -44,8 +51,8 @@ public class AuthorizationRequestFilter implements ContainerRequestFilter {
       if (securityContext == null || securityContext.getUserPrincipal() == null) {
         requestContext.abortWith(//
             Response.status(Response.Status.UNAUTHORIZED)//
-                .entity("User cannot access the resource.")//
-                .build());
+                    .entity("User cannot access the resource.")//
+                    .build());
       } else {
         Log.info("user={}", securityContext.getUserPrincipal().getName());
       }

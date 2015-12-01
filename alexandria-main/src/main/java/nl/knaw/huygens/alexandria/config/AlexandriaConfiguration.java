@@ -41,13 +41,13 @@ public interface AlexandriaConfiguration {
 
   /**
    * 
-   * @return an index mapping authkeys to usernames
+   * @return an index mapping authKeys to userNames
    */
   Map<String, String> getAuthKeyIndex();
 
   /**
    * 
-   * @return the adminkey to use in the AdmoinEndpoint
+   * @return the adminKey to use in the AdminEndpoint
    */
   String getAdminKey();
 
