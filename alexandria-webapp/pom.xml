@@ -89,7 +89,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <config.baseURI>http://test.alexandria.huygens.knaw.nl/</config.baseURI>
+        <config.baseURI>${alexandria-baseURI}</config.baseURI>
         <config.storageDirectory>${alexandria-storage}</config.storageDirectory>
         <tomcat.server>not-set</tomcat.server>
         <tomcat.manager.url>not-set</tomcat.manager.url>
