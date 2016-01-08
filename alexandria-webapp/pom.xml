@@ -84,10 +84,21 @@
 
   <profiles>
     <profile>
-      <id>test</id>
+      <id>dev</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+      <properties>
+        <config.baseURI>http://test.alexandria.huygens.knaw.nl/</config.baseURI>
+        <config.storageDirectory>${alexandria-storage}</config.storageDirectory>
+        <tomcat.server>not-set</tomcat.server>
+        <tomcat.manager.url>not-set</tomcat.manager.url>
+        <tomcat.path>not-set</tomcat.path>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>test</id>
       <properties>
         <config.baseURI>http://test.alexandria.huygens.knaw.nl/</config.baseURI>
         <config.storageDirectory>/data/alexandria/storage/test/</config.storageDirectory>
@@ -101,7 +112,7 @@
       <id>acc</id>
       <properties>
         <config.baseURI>https://acc.alexandria.huygens.knaw.nl/</config.baseURI>
-        <config.storageDirectory>/data/alexandria/storage/acceptance/</config.storageDirectory>
+        <config.storageDirectory>/data/alexandria/storage/acceptance</config.storageDirectory>
         <tomcat.server>tomcat.hi24alex</tomcat.server>
         <tomcat.manager.url>${tc24alex-manager}</tomcat.manager.url>
         <tomcat.path>/alexandria</tomcat.path>
@@ -112,7 +123,7 @@
       <id>prod</id>
       <properties>
         <config.baseURI>https://alexandria.huygens.knaw.nl/</config.baseURI>
-        <config.storageDirectory>/data/alexandria/storage/production/</config.storageDirectory>
+        <config.storageDirectory>/data/alexandria/storage/production</config.storageDirectory>
         <tomcat.server>tomcat.hi23</tomcat.server>
         <tomcat.manager.url>${tc23-manager}</tomcat.manager.url>
         <tomcat.path>/alexandria</tomcat.path>
