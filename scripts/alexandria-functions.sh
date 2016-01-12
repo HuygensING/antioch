@@ -36,10 +36,13 @@ function a-show-first-resultpage {
 }
 
 function a-generate-random-resource-with-annotation {
-  id=$(uuidgen)
-  a-generate-resource-with-uuid $id
-  url=$(a-annotate-resource "$id" "Tag" "Test annotation for resource $id" | a-location)
-  a-confirm $url
+  a-check-auth &&
+  (
+    id=$(uuidgen)
+    a-generate-resource-with-uuid $id
+    url=$(a-annotate-resource "$id" "Tag" "Test annotation for resource $id" | a-location)
+    a-confirm $url
+  )
 }
 
 function a-generate-resource-with-uuid {
@@ -50,7 +53,6 @@ function a-generate-resource-with-uuid {
     \"ref\":\"reference $n\"
   }}"
 }
-
 
 function a-set-text-for-resource-from-file {
   id=$1
@@ -82,6 +84,14 @@ function a-set-resource-id {
 	export id=$1
 	echo -n "resource id set to "
 	a-show-resource-id
+}
+
+function a-check-auth {
+  if [ -z  "${authkey}" ]; then
+  	echo "authSkey not set, use a-set-authkey to set"
+  	return -1
+  fi
+  return 0
 }
 
 function a-set-authkey {
