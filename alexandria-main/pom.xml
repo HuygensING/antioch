@@ -70,7 +70,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.4</version>
+        <version>${maven-jar.version}</version>
         <configuration>
           <!-- Avoid warnings about multiple logback.xml found in modules using this module's jar -->
           <excludes>

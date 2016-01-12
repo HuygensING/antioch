@@ -24,7 +24,7 @@
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j-tinkerpop-api-impl</artifactId>
-      <version>0.1-2.2</version>
+      <version>${neo4j-tinkerpop-api-impl.version}</version>
     </dependency>
   </dependencies>
 </project>
