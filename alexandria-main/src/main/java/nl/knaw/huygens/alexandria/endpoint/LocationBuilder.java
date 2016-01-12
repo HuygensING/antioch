@@ -8,7 +8,7 @@ import java.util.function.Supplier;
  * #%L
  * alexandria-main
  * =======
- * Copyright (C) 2015 Huygens ING (KNAW)
+ * Copyright (C) 2015 - 2016 Huygens ING (KNAW)
  * =======
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
