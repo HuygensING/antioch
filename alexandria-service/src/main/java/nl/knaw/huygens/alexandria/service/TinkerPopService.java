@@ -96,6 +96,9 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   // - AlexandriaService methods -//
+  // all public methods that interact with storage should start with storage.startTransaction()
+  // and end with storage.commitTransaction() for write actions
+  // and storage.rollbackTransaction() for read-only actions
 
   @Override
   public boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
@@ -158,27 +161,37 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Optional<AlexandriaResource> readResource(UUID uuid) {
-    return storage.readVF(ResourceVF.class, uuid).map(this::deframeResource);
+    storage.startTransaction();
+    Optional<AlexandriaResource> optionalResource = storage.readVF(ResourceVF.class, uuid).map(this::deframeResource);
+    storage.rollbackTransaction();
+    return optionalResource;
   }
 
   @Override
   public Optional<AlexandriaAnnotation> readAnnotation(UUID uuid) {
-    return storage.readVF(AnnotationVF.class, uuid).map(this::deframeAnnotation);
+    storage.startTransaction();
+    Optional<AlexandriaAnnotation> optionalAnnotation = storage.readVF(AnnotationVF.class, uuid).map(this::deframeAnnotation);
+    storage.rollbackTransaction();
+    return optionalAnnotation;
   }
 
   @Override
   public Optional<AlexandriaAnnotation> readAnnotation(UUID uuid, Integer revision) {
+    Optional<AlexandriaAnnotation> optionalAnnotation;
+    storage.startTransaction();
     Optional<AnnotationVF> versionedAnnotation = storage.readVF(AnnotationVF.class, uuid, revision);
     if (versionedAnnotation.isPresent()) {
-      return versionedAnnotation.map(this::deframeAnnotation);
+      optionalAnnotation = versionedAnnotation.map(this::deframeAnnotation);
     } else {
       Optional<AnnotationVF> currentAnnotation = storage.readVF(AnnotationVF.class, uuid);
       if (currentAnnotation.isPresent() && currentAnnotation.get().getRevision().equals(revision)) {
-        return currentAnnotation.map(this::deframeAnnotation);
+        optionalAnnotation = currentAnnotation.map(this::deframeAnnotation);
       } else {
-        return Optional.empty();
+        optionalAnnotation = Optional.empty();
       }
     }
+    storage.rollbackTransaction();
+    return optionalAnnotation;
   }
 
   @Override
@@ -197,10 +210,12 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Optional<AlexandriaAnnotationBody> findAnnotationBodyWithTypeAndValue(String type, String value) {
+    storage.startTransaction();
     final List<AnnotationBodyVF> results = storage.find(AnnotationBodyVF.class)//
         .has("type", type)//
         .has("value", value)//
         .toList();
+    storage.rollbackTransaction();
     if (results.isEmpty()) {
       return Optional.empty();
     }
@@ -211,9 +226,12 @@ public class TinkerPopService implements AlexandriaService {
   public Optional<AlexandriaResource> findSubresourceWithSubAndParentId(String sub, UUID parentId) {
     // TODO: find the gremlin way to do this in one:
     // in cypher: match (r:Resource{uuid:parentId})<-[:PART_OF]-(s:Resource{cargo:sub}) return s.uuid
+    storage.startTransaction();
     final List<ResourceVF> results = storage.find(ResourceVF.class)//
         .has("cargo", sub)//
         .toList();
+    storage.rollbackTransaction();
+
     if (results.isEmpty()) {
       return Optional.empty();
     }
@@ -227,8 +245,10 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Set<AlexandriaResource> readSubResources(UUID uuid) {
+    storage.startTransaction();
     ResourceVF resourcevf = storage.readVF(ResourceVF.class, uuid)//
         .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
+    storage.rollbackTransaction();
     return resourcevf.getSubResources().stream()//
         .map(this::deframeResource)//
         .collect(toSet());
@@ -338,7 +358,6 @@ public class TinkerPopService implements AlexandriaService {
       // set state
       updateState(annotationVF, AlexandriaState.DELETED);
     }
-
     storage.commitTransaction();
   }
 
@@ -370,11 +389,14 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public void exportDb(String format, String filename) {
+    storage.startTransaction();
     try {
       storage.writeGraph(DumpFormat.valueOf(format), filename);
     } catch (IOException e) {
       e.printStackTrace();
       throw new RuntimeException(e);
+    } finally {
+      storage.rollbackTransaction();
     }
   }
 
@@ -382,10 +404,13 @@ public class TinkerPopService implements AlexandriaService {
   public void importDb(String format, String filename) {
     try {
       storage = clearGraph();
+      storage.startTransaction();
       storage.readGraph(DumpFormat.valueOf(format), filename);
     } catch (IOException e) {
       e.printStackTrace();
       throw new RuntimeException(e);
+    } finally {
+      storage.commitTransaction();
     }
   }
 
@@ -613,7 +638,6 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   private List<Map<String, Object>> processQuery(AlexandriaQuery query) {
-
     ParsedAlexandriaQuery pQuery = alexandriaQueryParser.parse(query);
 
     Predicate<AnnotationVF> predicate = pQuery.getPredicate();
