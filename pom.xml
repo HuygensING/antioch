@@ -33,7 +33,6 @@
 
     <!-- Software versions -->
     <assertj.version>3.3.0</assertj.version>
-    <build-helper-maven-plugin.version>1.10</build-helper-maven-plugin.version>
     <classloader-leak-prevention.version>1.15.2</classloader-leak-prevention.version>
 
     <!-- Concordion Acceptance Test extensions -->
@@ -70,7 +69,7 @@
     <swagger.version>1.5.6</swagger.version>
 
     <tinkerpop.groupId>org.apache.tinkerpop</tinkerpop.groupId>
-    <tinkerpop.version>3.1.0-incubating</tinkerpop.version>
+    <tinkerpop.version>3.0.1-incubating</tinkerpop.version> <!-- can only be updated when titan.version is compatible with the new version -->
     <titan.version>1.0.0</titan.version>
     <sleepycat.version>5.0.73</sleepycat.version>
 
