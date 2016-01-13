@@ -40,6 +40,7 @@
             "where": "who:eq(\"nederlab\")",
             "sort": "-when",
             "return": "id,resource.url",
+            "distinct": false,
             "pageSize": 10
             } }
         </h:jsonBody>
@@ -67,6 +68,10 @@
         <dt><code>return</code></dt>
         <dd>used to select which fields (ref. <code>where</code>) from the result-set are returned in the output.
             <small>(if left unspecified, <code>id</code> is returned by default)</small>
+        </dd>
+        <dt><code>distinct</code></dt>
+        <dd>used to indicate the resulting combinations of values for the selected return fields should be unique.
+            <small>(if left unspecified, <code>distinct</code> is <code>false</code>)</small>
         </dd>
         <dt><code>pageSize</code></dt>
         <dd>how many results from the result-set to include in each page of results.
