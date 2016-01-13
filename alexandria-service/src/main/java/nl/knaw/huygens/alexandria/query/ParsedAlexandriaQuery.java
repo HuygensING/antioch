@@ -43,6 +43,8 @@ public class ParsedAlexandriaQuery {
   };
 
   private Class<? extends AlexandriaVF> vfClazz;
+  private Boolean distinct;
+
   private List<String> returnFields;
   private Predicate<AnnotationVF> predicate;
   private Comparator<AnnotationVF> comparator;
@@ -56,6 +58,14 @@ public class ParsedAlexandriaQuery {
 
   public Class<? extends AlexandriaVF> getVFClass() {
     return this.vfClazz;
+  }
+
+  public void setDistinct(Boolean distinct) {
+    this.distinct = distinct;
+  }
+
+  public Boolean isDistinct() {
+    return distinct;
   }
 
   public void setReturnFields(List<String> returnFields) {

@@ -50,6 +50,8 @@ public class AlexandriaQuery extends JsonWrapperObject implements Prototype {
   @JsonProperty("return")
   private String fields = QueryField.id.name();
 
+  private Boolean distinct = false;
+
   @Min(1)
   private int pageSize = 10;
 
@@ -87,6 +89,14 @@ public class AlexandriaQuery extends JsonWrapperObject implements Prototype {
 
   public void setFields(String fields) {
     this.fields = fields;
+  }
+
+  public Boolean isDistinct() {
+    return distinct;
+  }
+
+  public void setDistinct(Boolean distinct) {
+    this.distinct = distinct;
   }
 
   public int getPageSize() {

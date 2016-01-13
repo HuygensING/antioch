@@ -198,7 +198,7 @@ curl -i -X POST $be/searches -H 'Content-type: application/json' \
 	"return" : "id,resource.url,subresource.url,type,value"
 }}'
 
-curl -i -X PUT $be/admin -H 'Content-type: application/json' \
+curl -i -H "${authheader}" -X PUT $be/admin -H 'Content-type: application/json' \
 --data-binary '{
   "key" : "adminkey",
   "command" : "dump",
@@ -226,3 +226,20 @@ curl -i -X POST $be/searches -H 'Content-type: application/json' \
   "return" : "id,resource.url,subresource.url,type,value"
 }}'
 
+
+curl -i -H "${authheader}" -X POST $be/searches -H 'Content-type: application/json' \
+--data-binary '{"query":{
+  "find" : "annotation",
+  "where" : "state:eq(\"CONFIRMED\")",
+  "sort" : "when",
+  "return" : "who"
+}}'
+
+curl -i -H "${authheader}" -X POST $be/searches -H 'Content-type: application/json' \
+--data-binary '{"query":{
+  "find" : "annotation",
+  "where" : "state:eq(\"CONFIRMED\")",
+  "sort" : "when",
+  "distinct" : true,
+  "return" : "who"
+}}'

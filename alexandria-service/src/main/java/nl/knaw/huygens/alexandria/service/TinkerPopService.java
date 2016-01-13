@@ -647,10 +647,14 @@ public class TinkerPopService implements AlexandriaService {
     Stream<AnnotationVF> stream = pQuery.getAnnotationVFFinder().apply(storage);
     Log.debug("list={}", stream);
 
-    List<Map<String, Object>> results = stream//
+    Stream<Map<String, Object>> mapStream = stream//
         .filter(predicate)//
         .sorted(comparator)//
-        .map(mapper)//
+        .map(mapper);
+    if (pQuery.isDistinct()) {
+      mapStream = mapStream.distinct();
+    }
+    List<Map<String, Object>> results = mapStream//
         .collect(toList());
     Log.debug("results={}", results);
     return results;

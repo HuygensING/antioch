@@ -93,6 +93,8 @@ public class AlexandriaQueryParser {
 
     parseReturn(paq, query.getFields());
 
+    paq.setDistinct(query.isDistinct());
+
     if (!parseErrors.isEmpty()) {
       throw new AlexandriaQueryParseException(parseErrors);
     }
