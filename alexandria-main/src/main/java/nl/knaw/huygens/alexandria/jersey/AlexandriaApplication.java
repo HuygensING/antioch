@@ -31,16 +31,17 @@ import javax.ws.rs.ApplicationPath;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.JsonConfiguration;
 import nl.knaw.huygens.alexandria.config.ValidationConfigurationContextResolver;
+import nl.knaw.huygens.alexandria.jaxrs.AuthenticationRequestFilter;
 import nl.knaw.huygens.alexandria.jaxrs.AuthorizationRequestFilter;
 
 @ApplicationPath("/")
 public class AlexandriaApplication extends ResourceConfig {
-
-  public static final String STARTTIME_PROPERTY = "alexandria.starttime";
+  public static final String START_TIME_PROPERTY = "alexandria.startTime";
 
   public AlexandriaApplication() {
     Log.info("initializing AlexandriaApplication...");
@@ -51,7 +52,11 @@ public class AlexandriaApplication extends ResourceConfig {
 
     // Server-side request logging, including entities
     register(new LoggingFilter(getAnonymousLogger(), true));
+
+    // Authentication and Authorization
+    register(AuthenticationRequestFilter.class);
     register(AuthorizationRequestFilter.class);
+    register(RolesAllowedDynamicFeature.class);
 
     // Validation configuration
     register(ValidationConfigurationContextResolver.class);
@@ -62,7 +67,7 @@ public class AlexandriaApplication extends ResourceConfig {
     // // X-Jersey-Tracing-nnn diagnostic response headers
     // property(ServerProperties.TRACING, "ALL");
     
-    System.setProperty(AlexandriaApplication.STARTTIME_PROPERTY, Instant.now().toString());
+    System.setProperty(AlexandriaApplication.START_TIME_PROPERTY, Instant.now().toString());
   }
 
 }
