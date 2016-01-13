@@ -37,14 +37,20 @@ function a-show-first-resultpage {
 
 function a-generate-random-resource-with-annotation {
   id=$(uuidgen)
+  a-generate-resource-with-uuid $id
+  url=$(a-annotate-resource "$id" "Tag" "Test annotation for resource $id" | a-location)
+  a-confirm $url
+}
+
+function a-generate-resource-with-uuid {
+  id=$1
   curl -i -X PUT $be/resources/$id -H "${authheader}" -H 'Content-type: application/json' \
   --data-binary "{\"resource\":{
     \"id\":\"$id\",
     \"ref\":\"reference $n\"
   }}"
-  url=$(a-annotate-resource "$id" "Tag" "Test annotation for resource $id" | a-location)
-  a-confirm $url
 }
+
 
 function a-set-backend {
 	export be=$1
