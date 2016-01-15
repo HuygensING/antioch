@@ -55,7 +55,6 @@ public abstract class AbstractParam<V> {
 
   protected abstract V parse(String param) throws Throwable;
 
-  // TODO: wrap error message in a proper error object, so it can be converted to JSON
   protected String getErrorMessage(String param, Throwable e) {
     return String.format("Invalid parameter: %s (%s)", param, e.getMessage());
   }
