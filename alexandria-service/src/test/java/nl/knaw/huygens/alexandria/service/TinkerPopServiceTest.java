@@ -22,7 +22,6 @@ package nl.knaw.huygens.alexandria.service;
  * #L%
  */
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -47,10 +46,11 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
+import nl.knaw.huygens.alexandria.text.InMemoryTextService;
 
 public class TinkerPopServiceTest {
 
-  TinkerPopService service = new TinkerGraphService(new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()));
+  TinkerPopService service = new TinkerGraphService(new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()), new InMemoryTextService());
 
   @Test
   public void testReadAfterCreateIsIdentity() {

@@ -35,7 +35,7 @@ import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.TestProperties;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -102,7 +102,7 @@ public abstract class EndpointTest extends JerseyTest {
 
       @Override
       public String toString() {
-        return Objects.toStringHelper(this).add("baseURI", getBaseURI()).toString();
+        return MoreObjects.toStringHelper(this).add("baseURI", getBaseURI()).toString();
       }
 
       @Override

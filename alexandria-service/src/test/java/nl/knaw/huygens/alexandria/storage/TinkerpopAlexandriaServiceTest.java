@@ -22,7 +22,6 @@ package nl.knaw.huygens.alexandria.storage;
  * #L%
  */
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -48,10 +47,11 @@ import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.TinkerPopService;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
+import nl.knaw.huygens.alexandria.text.InMemoryTextService;
 
 public class TinkerpopAlexandriaServiceTest {
   private Storage mockStorage = mock(Storage.class);
-  private final TinkerPopService service = new TinkerPopService(mockStorage, new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()));
+  private final TinkerPopService service = new TinkerPopService(mockStorage, new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()), new InMemoryTextService());
 
   // @Test
   public void test() {

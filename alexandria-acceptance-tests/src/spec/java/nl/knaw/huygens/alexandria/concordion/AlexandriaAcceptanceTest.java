@@ -63,6 +63,8 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerGraphService;
 import nl.knaw.huygens.alexandria.service.TinkerPopService;
 import nl.knaw.huygens.alexandria.storage.Storage;
+import nl.knaw.huygens.alexandria.text.InMemoryTextService;
+import nl.knaw.huygens.alexandria.text.TextService;
 import nl.knaw.huygens.cat.RestExtension;
 import nl.knaw.huygens.cat.RestFixture;
 
@@ -73,7 +75,9 @@ public class AlexandriaAcceptanceTest extends RestFixture {
 
   private static LocationBuilder locationBuilder = new LocationBuilder(testConfiguration(), new EndpointPathResolver());
 
-  private static TinkerPopService service = new TinkerPopService(storage, locationBuilder);
+  private static TextService inMemoryTextService = new InMemoryTextService();
+
+  private static TinkerPopService service = new TinkerPopService(storage, locationBuilder, inMemoryTextService);
 
   private final AtomicInteger nextUniqueExpressionNumber = new AtomicInteger();
 

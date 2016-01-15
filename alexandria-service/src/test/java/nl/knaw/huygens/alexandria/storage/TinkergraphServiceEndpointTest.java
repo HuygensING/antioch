@@ -32,9 +32,10 @@ import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerGraphService;
+import nl.knaw.huygens.alexandria.text.InMemoryTextService;
 
 public class TinkergraphServiceEndpointTest extends EndpointTest {
-  static final AlexandriaService service = new TinkerGraphService(new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()));
+  static final AlexandriaService service = new TinkerGraphService(new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()), new InMemoryTextService());
 
   @BeforeClass
   public static void setup() {

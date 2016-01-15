@@ -171,6 +171,11 @@ public class ResourcesEndpoint extends JSONEndpoint {
     return ResourceAnnotationsEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }
 
+  @Path("{uuid}/text")
+  public Class<ResourceTextEndpoint> getResourceTextEndpoint() {
+    return ResourceTextEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
+  }
+
   @Path("{uuid}/provenance")
   public ResourceProvenanceEndpoint getProvenanceEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
     // If we let Jersey handle the lifecycle, this endpoint doesn't show up in the standard application.wadl

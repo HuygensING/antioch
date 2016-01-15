@@ -30,14 +30,15 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.storage.Storage;
+import nl.knaw.huygens.alexandria.text.TextService;
 
 @Singleton
 public class TinkerGraphService extends TinkerPopService {
   protected static final Storage STORAGE = getStorage();
 
   @Inject
-  public TinkerGraphService(LocationBuilder locationBuilder) {
-    super(STORAGE, locationBuilder);
+  public TinkerGraphService(LocationBuilder locationBuilder, TextService textService) {
+    super(STORAGE, locationBuilder, textService);
   }
 
   private static Storage getStorage() {

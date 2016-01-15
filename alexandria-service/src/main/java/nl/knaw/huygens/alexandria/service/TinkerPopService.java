@@ -73,6 +73,7 @@ import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
+import nl.knaw.huygens.alexandria.text.TextService;
 
 public class TinkerPopService implements AlexandriaService {
   private static final TemporalAmount TENTATIVES_TTL = Duration.ofDays(1);
@@ -83,11 +84,14 @@ public class TinkerPopService implements AlexandriaService {
 
   private AlexandriaQueryParser alexandriaQueryParser;
 
+  private TextService textService;
+
   @Inject
-  public TinkerPopService(Storage storage, LocationBuilder locationBuilder) {
+  public TinkerPopService(Storage storage, LocationBuilder locationBuilder, TextService textService) {
     Log.trace("{} created, locationBuilder=[{}]", getClass().getSimpleName(), locationBuilder);
     this.locationBuilder = locationBuilder;
     this.alexandriaQueryParser = new AlexandriaQueryParser(locationBuilder);
+    this.textService = textService;
     setStorage(storage);
   }
 
@@ -689,6 +693,16 @@ public class TinkerPopService implements AlexandriaService {
     // Log.info("destroy called");
     storage.destroy();
     // Log.info("destroy done");
+  }
+
+  @Override
+  public void setResourceText(UUID resourceUUID, String text) {
+    textService.set(resourceUUID, text);
+  }
+
+  @Override
+  public Optional<String> getResourceText(UUID resourceUUID) {
+    return textService.get(resourceUUID);
   }
 
 }

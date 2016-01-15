@@ -40,6 +40,8 @@ import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.jersey.AlexandriaApplication;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.AlexandriaServletModule;
+import nl.knaw.huygens.alexandria.text.FileSystemTextService;
+import nl.knaw.huygens.alexandria.text.TextService;
 import nl.knaw.huygens.alexandria.util.Scheduler;
 
 public class Server {
@@ -94,6 +96,7 @@ public class Server {
       @Override
       protected void configure() {
         bind(AlexandriaConfiguration.class).toInstance(config);
+        bind(TextService.class).toInstance(new FileSystemTextService(config.getStorageDirectory() + "/texts"));
       }
     };
     BootstrapUtils.newInjector(locator, Arrays.asList(new AlexandriaServletModule(), configModule));
