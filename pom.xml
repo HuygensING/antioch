@@ -118,6 +118,7 @@
     <scmpublish.checkinComment>Publishing Site Docs for ${project.artifactId}:${project.version}</scmpublish.checkinComment>
     <scmpublish.pubScmUrl>scm:git:git@github.com:huygensING/alexandria.git</scmpublish.pubScmUrl>
     <scmpublish.scm.branch>gh-pages</scmpublish.scm.branch>
+    <scmpublish.content>${project.build.directory}/site</scmpublish.content>
 
     <project.license.name>GNU General Public License</project.license.name>
     <project.license.url>http://www.gnu.org/licenses/gpl.txt</project.license.url>
