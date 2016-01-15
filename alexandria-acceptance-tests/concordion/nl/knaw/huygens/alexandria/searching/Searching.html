@@ -182,6 +182,7 @@ ins {
     "where" : "who:eq(\"nederlab\")",
     "sort" : "-when",
     "return" : "id,resource.url",
+    "distinct" : false,
     "pageSize" : 10
   }
 }</pre>
@@ -195,23 +196,27 @@ ins {
         <dt><code>where</code></dt>
         <dd>(<strong>mandatory</strong>) used to filter records. Check the
             <a href="https://github.com/HuygensING/alexandria/blob/master/alexandria-aql/src/main/antlr4/nl/knaw/huygens/alexandria/antlr/AQL.g4">
-                ANTLR v4 grammar file</a> for syntax, field names and functions.
+                ANTLR v4 grammar file</a> for syntax, field names and functions.<br />
             <small>(caveat: multiple <code>where</code> clauses are treated as a conjunction, meaning ALL clauses have
                 to match)
             </small>
         </dd>
         <dt><code>sort</code></dt>
         <dd>used to sort the result-set on a field (ref. <code>where</code>).
-            Use <code>+</code> for ascending and <code>-</code> for descending order.
+            Use <code>+</code> for ascending and <code>-</code> for descending order.<br />
             <small>(if left unspecified, <code>-when</code> is used by default)
             </small>
         </dd>
         <dt><code>return</code></dt>
-        <dd>used to select which fields (ref. <code>where</code>) from the result-set are returned in the output.
+        <dd>used to select which fields (ref. <code>where</code>) from the result-set are returned in the output.<br />
             <small>(if left unspecified, <code>id</code> is returned by default)</small>
         </dd>
+        <dt><code>distinct</code></dt>
+        <dd>used to indicate the resulting combinations of values for the selected return fields should be unique.<br />
+            <small>(if left unspecified, <code>distinct</code> is <code>false</code>)</small>
+        </dd>
         <dt><code>pageSize</code></dt>
-        <dd>how many results from the result-set to include in each page of results.
+        <dd>how many results from the result-set to include in each page of results.<br />
             <small>(if left unspecified, 10 results per page are included by default)</small>
         </dd>
     </dl>
@@ -237,13 +242,13 @@ ins {
     </div>
 
     <div c:execute="#searchId = uuid()">In this case the generated search id (taken from the <code>Location</code>
-        header) is: <code c:echo="#searchId">3a95b7f7-b94f-4ea4-ac89-c3ce2612abed</code>.
+        header) is: <code c:echo="#searchId">2054f6ce-7f66-4f59-bd00-abc891600e5d</code>.
     </div>
 
     <hr />
 
     <div h:request="">When we
-        <code class="get">/searches/3a95b7f7-b94f-4ea4-ac89-c3ce2612abed</code>
+        <code class="get">/searches/2054f6ce-7f66-4f59-bd00-abc891600e5d</code>
         we expect status
         <code h:status="" class="success">200 OK</code>
         and a response body containing:
@@ -251,9 +256,9 @@ ins {
         <pre class="json rest-success">{
   "searchResult" : {
     "totalResults" : 8,
-    "totalResultPages" : 3,
+    "totalPages" : 3,
     "pageSize" : 3,
-    "^firstResultPage" : "https://{host}/searches/3a95b7f7-b94f-4ea4-ac89-c3ce2612abed/resultPages/1"
+    "^firstPage" : "https://{host}/searches/2054f6ce-7f66-4f59-bd00-abc891600e5d/pages/1"
   }
 }</pre>
     </div>
@@ -262,7 +267,7 @@ ins {
 
     <div h:request="">
         When we
-        <code class="get">/searches/3a95b7f7-b94f-4ea4-ac89-c3ce2612abed/resultPages/1</code>
+        <code class="get">/searches/2054f6ce-7f66-4f59-bd00-abc891600e5d/pages/1</code>
         we expect status
         <code h:status="" class="success">200 OK</code>
         and body
@@ -277,7 +282,7 @@ ins {
     }, {
       "_resultNumber" : 3
     } ],
-    "^nextPage" : "https://{host}/searches/3a95b7f7-b94f-4ea4-ac89-c3ce2612abed/resultPages/2"
+    "^nextPage" : "https://{host}/searches/2054f6ce-7f66-4f59-bd00-abc891600e5d/pages/2"
   }
 }</pre>
     </div>
@@ -288,7 +293,7 @@ ins {
 
     <div h:request="">
         Now
-        <code class="get">/searches/3a95b7f7-b94f-4ea4-ac89-c3ce2612abed/resultPages/2</code>
+        <code class="get">/searches/2054f6ce-7f66-4f59-bd00-abc891600e5d/pages/2</code>
         results in status
         <code h:status="" class="success">200 OK</code>
         and body
@@ -302,8 +307,8 @@ ins {
     }, {
       "_resultNumber" : 6
     } ],
-    "^nextPage" : "https://{host}/searches/3a95b7f7-b94f-4ea4-ac89-c3ce2612abed/resultPages/3",
-    "^previousPage" : "https://{host}/searches/3a95b7f7-b94f-4ea4-ac89-c3ce2612abed/resultPages/1"
+    "^nextPage" : "https://{host}/searches/2054f6ce-7f66-4f59-bd00-abc891600e5d/pages/3",
+    "^previousPage" : "https://{host}/searches/2054f6ce-7f66-4f59-bd00-abc891600e5d/pages/1"
   }
 }</pre>
     </div>
@@ -316,7 +321,7 @@ ins {
 
     <div h:request="">
         And
-        <code class="get">/searches/3a95b7f7-b94f-4ea4-ac89-c3ce2612abed/resultPages/3</code>
+        <code class="get">/searches/2054f6ce-7f66-4f59-bd00-abc891600e5d/pages/3</code>
         results in status
         <code h:status="" class="success">200 OK</code>
         and body
@@ -328,7 +333,7 @@ ins {
     }, {
       "_resultNumber" : 8
     } ],
-    "^previousPage" : "https://{host}/searches/3a95b7f7-b94f-4ea4-ac89-c3ce2612abed/resultPages/2"
+    "^previousPage" : "https://{host}/searches/2054f6ce-7f66-4f59-bd00-abc891600e5d/pages/2"
   }
 }</pre>
     </div>
@@ -340,22 +345,22 @@ ins {
     <hr />
 
     <div h:request="">When we try to
-        <code class="get">/searches/3a95b7f7-b94f-4ea4-ac89-c3ce2612abed/resultPages/0</code>
+        <code class="get">/searches/2054f6ce-7f66-4f59-bd00-abc891600e5d/pages/0</code>
         we receive
         <code h:status="" class="success">404 Not Found</code>
     </div>
 
     <div h:request="">
         Likewise
-        <code class="get">/searches/3a95b7f7-b94f-4ea4-ac89-c3ce2612abed/resultPages/4</code>
+        <code class="get">/searches/2054f6ce-7f66-4f59-bd00-abc891600e5d/pages/4</code>
         results in status
         <code h:status="" class="success">404 Not Found</code>
         as the requested page lies beyond the maximum.
     </div>
 
     <div class="alert alert-warning sm">
-        Valid result page numbers are <code>1</code> up to and including the number of <code>totalResultPages</code>.
+        Valid result page numbers are <code>1</code> up to and including the number of <code>totalPages</code>.
     </div>
 
-</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 277 ms on 30-Oct-2015 at 09:42:05 CET</div></div></body>
+</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 250 ms on 15-Jan-2016 at 10:19:09 CET</div></div></body>
 </html>

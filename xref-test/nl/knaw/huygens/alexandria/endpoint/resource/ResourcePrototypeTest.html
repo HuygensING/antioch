@@ -12,7 +12,7 @@
 <a class="jxr_linenumber" name="L4" href="#L4">4</a>   <em class="jxr_comment"> * #%L</em>
 <a class="jxr_linenumber" name="L5" href="#L5">5</a>   <em class="jxr_comment"> * alexandria-main</em>
 <a class="jxr_linenumber" name="L6" href="#L6">6</a>   <em class="jxr_comment"> * =======</em>
-<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <em class="jxr_comment"> * Copyright (C) 2015 Huygens ING (KNAW)</em>
+<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <em class="jxr_comment"> * Copyright (C) 2015 - 2016 Huygens ING (KNAW)</em>
 <a class="jxr_linenumber" name="L8" href="#L8">8</a>   <em class="jxr_comment"> * =======</em>
 <a class="jxr_linenumber" name="L9" href="#L9">9</a>   <em class="jxr_comment"> * This program is free software: you can redistribute it and/or modify</em>
 <a class="jxr_linenumber" name="L10" href="#L10">10</a>  <em class="jxr_comment"> * it under the terms of the GNU General Public License as</em>
@@ -36,50 +36,51 @@
 <a class="jxr_linenumber" name="L28" href="#L28">28</a>  <strong class="jxr_keyword">import</strong> java.time.Instant;
 <a class="jxr_linenumber" name="L29" href="#L29">29</a>  <strong class="jxr_keyword">import</strong> java.util.UUID;
 <a class="jxr_linenumber" name="L30" href="#L30">30</a>  
-<a class="jxr_linenumber" name="L31" href="#L31">31</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.Log;
-<a class="jxr_linenumber" name="L32" href="#L32">32</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
-<a class="jxr_linenumber" name="L33" href="#L33">33</a>  
-<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a class="jxr_linenumber" name="L31" href="#L31">31</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a class="jxr_linenumber" name="L32" href="#L32">32</a>  
+<a class="jxr_linenumber" name="L33" href="#L33">33</a>  <strong class="jxr_keyword">import</strong> com.fasterxml.jackson.core.JsonProcessingException;
+<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <strong class="jxr_keyword">import</strong> com.fasterxml.jackson.databind.ObjectMapper;
 <a class="jxr_linenumber" name="L35" href="#L35">35</a>  
-<a class="jxr_linenumber" name="L36" href="#L36">36</a>  <strong class="jxr_keyword">import</strong> com.fasterxml.jackson.core.JsonProcessingException;
-<a class="jxr_linenumber" name="L37" href="#L37">37</a>  <strong class="jxr_keyword">import</strong> com.fasterxml.jackson.databind.ObjectMapper;
-<a class="jxr_linenumber" name="L38" href="#L38">38</a>  
-<a class="jxr_linenumber" name="L39" href="#L39">39</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/resource/ResourcePrototypeTest.html">ResourcePrototypeTest</a> {
-<a class="jxr_linenumber" name="L40" href="#L40">40</a>  
-<a class="jxr_linenumber" name="L41" href="#L41">41</a>    <strong class="jxr_keyword">private</strong> ObjectMapper om = <strong class="jxr_keyword">new</strong> ObjectMapper();
-<a class="jxr_linenumber" name="L42" href="#L42">42</a>  
-<a class="jxr_linenumber" name="L43" href="#L43">43</a>    @Test
-<a class="jxr_linenumber" name="L44" href="#L44">44</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testJsonRepresentation() <strong class="jxr_keyword">throws</strong> JsonProcessingException {
-<a class="jxr_linenumber" name="L45" href="#L45">45</a>      ResourcePrototype rp = <strong class="jxr_keyword">new</strong> ResourcePrototype();
-<a class="jxr_linenumber" name="L46" href="#L46">46</a>      String json = om.writeValueAsString(rp);
-<a class="jxr_linenumber" name="L47" href="#L47">47</a>      Log.info(<span class="jxr_string">"json={}"</span>, json);
-<a class="jxr_linenumber" name="L48" href="#L48">48</a>    }
-<a class="jxr_linenumber" name="L49" href="#L49">49</a>  
-<a class="jxr_linenumber" name="L50" href="#L50">50</a>    @Test
-<a class="jxr_linenumber" name="L51" href="#L51">51</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testResourcePrototypeFromJson() <strong class="jxr_keyword">throws</strong> IOException {
-<a class="jxr_linenumber" name="L52" href="#L52">52</a>      UUID uuid = UUID.randomUUID();
-<a class="jxr_linenumber" name="L53" href="#L53">53</a>      Instant instant = Instant.now();
-<a class="jxr_linenumber" name="L54" href="#L54">54</a>      String json = (<span class="jxr_string">"{"</span><em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L55" href="#L55">55</a>          + <span class="jxr_string">"'resource':{"</span><em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L56" href="#L56">56</a>          + <span class="jxr_string">"'id':'"</span> + uuid.toString() + <span class="jxr_string">"',"</span><em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L57" href="#L57">57</a>          + <span class="jxr_string">"'ref':'whatever',"</span><em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L58" href="#L58">58</a>          + <span class="jxr_string">"'provenance':{"</span><em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L59" href="#L59">59</a>          + <span class="jxr_string">"'when':'"</span> + instant + <span class="jxr_string">"'"</span><em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L60" href="#L60">60</a>          + <span class="jxr_string">"}"</span><em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L61" href="#L61">61</a>      + <span class="jxr_string">"}}"</span>).replace(<span class="jxr_string">"'"</span>, <span class="jxr_string">"\&quot;"</span>);
-<a class="jxr_linenumber" name="L62" href="#L62">62</a>      Log.info(<span class="jxr_string">"json={}"</span>, json);
-<a class="jxr_linenumber" name="L63" href="#L63">63</a>      ResourcePrototype rp = om.readValue(json, ResourcePrototype.<strong class="jxr_keyword">class</strong>);
-<a class="jxr_linenumber" name="L64" href="#L64">64</a>      Log.info(<span class="jxr_string">"resourcePrototype={}"</span>, rp);
-<a class="jxr_linenumber" name="L65" href="#L65">65</a>      assertThat(rp.getId().getValue()).isEqualTo(uuid);
-<a class="jxr_linenumber" name="L66" href="#L66">66</a>      assertThat(rp.getRef()).isEqualTo(<span class="jxr_string">"whatever"</span>);
-<a class="jxr_linenumber" name="L67" href="#L67">67</a>      assertThat(rp.getProvenance().isPresent()).isTrue();
-<a class="jxr_linenumber" name="L68" href="#L68">68</a>      assertThat(rp.getProvenance().get().getWhen()).isEqualTo(instant);
-<a class="jxr_linenumber" name="L69" href="#L69">69</a>      assertThat(rp.getProvenance().get().getValue().getWho()).isEqualTo(AlexandriaProvenance.DEFAULT_WHO);
-<a class="jxr_linenumber" name="L70" href="#L70">70</a>      assertThat(rp.getProvenance().get().getValue().getWhy()).isEqualTo(AlexandriaProvenance.DEFAULT_WHY);
-<a class="jxr_linenumber" name="L71" href="#L71">71</a>    }
-<a class="jxr_linenumber" name="L72" href="#L72">72</a>  }
+<a class="jxr_linenumber" name="L36" href="#L36">36</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.Log;
+<a class="jxr_linenumber" name="L37" href="#L37">37</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
+<a class="jxr_linenumber" name="L38" href="#L38">38</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
+<a class="jxr_linenumber" name="L39" href="#L39">39</a>  
+<a class="jxr_linenumber" name="L40" href="#L40">40</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/resource/ResourcePrototypeTest.html">ResourcePrototypeTest</a> {
+<a class="jxr_linenumber" name="L41" href="#L41">41</a>  
+<a class="jxr_linenumber" name="L42" href="#L42">42</a>    <strong class="jxr_keyword">private</strong> ObjectMapper om = <strong class="jxr_keyword">new</strong> ObjectMapper();
+<a class="jxr_linenumber" name="L43" href="#L43">43</a>  
+<a class="jxr_linenumber" name="L44" href="#L44">44</a>    @Test
+<a class="jxr_linenumber" name="L45" href="#L45">45</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testJsonRepresentation() <strong class="jxr_keyword">throws</strong> JsonProcessingException {
+<a class="jxr_linenumber" name="L46" href="#L46">46</a>      ResourcePrototype rp = <strong class="jxr_keyword">new</strong> ResourcePrototype();
+<a class="jxr_linenumber" name="L47" href="#L47">47</a>      String json = om.writeValueAsString(rp);
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>      Log.info(<span class="jxr_string">"json={}"</span>, json);
+<a class="jxr_linenumber" name="L49" href="#L49">49</a>    }
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>  
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>    @Test
+<a class="jxr_linenumber" name="L52" href="#L52">52</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testResourcePrototypeFromJson() <strong class="jxr_keyword">throws</strong> IOException {
+<a class="jxr_linenumber" name="L53" href="#L53">53</a>      UUID uuid = UUID.randomUUID();
+<a class="jxr_linenumber" name="L54" href="#L54">54</a>      Instant instant = Instant.now();
+<a class="jxr_linenumber" name="L55" href="#L55">55</a>      String json = (<span class="jxr_string">"{"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L56" href="#L56">56</a>          + <span class="jxr_string">"'resource':{"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L57" href="#L57">57</a>          + <span class="jxr_string">"'id':'"</span> + uuid.toString() + <span class="jxr_string">"',"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L58" href="#L58">58</a>          + <span class="jxr_string">"'ref':'whatever',"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>          + <span class="jxr_string">"'provenance':{"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>          + <span class="jxr_string">"'when':'"</span> + instant + <span class="jxr_string">"'"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L61" href="#L61">61</a>          + <span class="jxr_string">"}"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>      + <span class="jxr_string">"}}"</span>).replace(<span class="jxr_string">"'"</span>, <span class="jxr_string">"\&quot;"</span>);
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>      Log.info(<span class="jxr_string">"json={}"</span>, json);
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>      ResourcePrototype rp = om.readValue(json, ResourcePrototype.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L65" href="#L65">65</a>      Log.info(<span class="jxr_string">"resourcePrototype={}"</span>, rp);
+<a class="jxr_linenumber" name="L66" href="#L66">66</a>      assertThat(rp.getId().getValue()).isEqualTo(uuid);
+<a class="jxr_linenumber" name="L67" href="#L67">67</a>      assertThat(rp.getRef()).isEqualTo(<span class="jxr_string">"whatever"</span>);
+<a class="jxr_linenumber" name="L68" href="#L68">68</a>      assertThat(rp.getProvenance().isPresent()).isTrue();
+<a class="jxr_linenumber" name="L69" href="#L69">69</a>      assertThat(rp.getProvenance().get().getWhen()).isEqualTo(instant);
+<a class="jxr_linenumber" name="L70" href="#L70">70</a>      assertThat(rp.getProvenance().get().getValue().getWho()).isEqualTo(ThreadContext.getUserName());
+<a class="jxr_linenumber" name="L71" href="#L71">71</a>      assertThat(rp.getProvenance().get().getValue().getWhy()).isEqualTo(AlexandriaProvenance.DEFAULT_WHY);
+<a class="jxr_linenumber" name="L72" href="#L72">72</a>    }
+<a class="jxr_linenumber" name="L73" href="#L73">73</a>  }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2015 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2015&#x2013;2016 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
 </body>
 </html>
