@@ -48,6 +48,11 @@ public class ContextListener extends JerseyGuiceServletContextListener {
   public static final String STORAGE_DIRECTORY_PROP = "storageDirectory";
 
   @Override
+  protected List<? extends Module> modules() {
+    return ImmutableList.of(new AlexandriaServletModule(), configurationModule());
+  }
+
+  @Override
   public void contextInitialized(ServletContextEvent servletContextEvent) {
     Scheduler.scheduleExpiredTentativesRemoval();
   }
@@ -56,15 +61,10 @@ public class ContextListener extends JerseyGuiceServletContextListener {
   public void contextDestroyed(ServletContextEvent sce) {
     Log.info("contextDestroyed called");
     getInjector()//
-        .getInstance(new AlexandriaServletModule().getTinkerPopServiceClass())//
-        .destroy();
+                 .getInstance(new AlexandriaServletModule().getTinkerPopServiceClass())//
+                 .destroy();
     super.contextDestroyed(sce);
     Log.info("contextDestroyed done");
-  }
-
-  @Override
-  protected List<? extends Module> modules() {
-    return ImmutableList.of(new AlexandriaServletModule(), configurationModule());
   }
 
   private Module configurationModule() {
@@ -89,17 +89,18 @@ public class ContextListener extends JerseyGuiceServletContextListener {
         return UriBuilder.fromUri(getProperties().getProperty(BASE_URI_PROP).get()).build();
       }
 
-      @Override
-      public String getStorageDirectory() {
-        return getProperties().getProperty(STORAGE_DIRECTORY_PROP).get();
-      }
-
       private PropertiesConfiguration getProperties() {
         if (properties == null) {
           properties = new PropertiesConfiguration(CONFIG_FILE, true);
         }
         return properties;
       }
+
+      @Override
+      public String getStorageDirectory() {
+        return getProperties().getProperty(STORAGE_DIRECTORY_PROP).get();
+      }
+
     };
   }
 
@@ -132,27 +133,4 @@ public class ContextListener extends JerseyGuiceServletContextListener {
     }
 
   }
-  // private static final PropertyResourceBundle propertyResourceBundle = readResourceBundle();
-  //
-  // private static PropertyResourceBundle readResourceBundle() {
-  // try {
-  // return new PropertyResourceBundle(readConfigFile());
-  // } catch (IOException e) {
-  // final String message = String.format("Failed to read configuration from: [%s]", CONFIG_FILE);
-  // Log.error(message);
-  // throw new RuntimeException(message, e);
-  // }
-  // }
-  //
-  // private static InputStream readConfigFile() {
-  // final InputStream resources = Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_FILE);
-  //
-  // if (resources == null) {
-  // final String message = String.format("Missing configuration file: [%s]", CONFIG_FILE);
-  // Log.error(message);
-  // throw new RuntimeException(message);
-  // }
-  //
-  // return resources;
-  // }
 }
