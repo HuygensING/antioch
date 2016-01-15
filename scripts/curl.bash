@@ -226,7 +226,6 @@ curl -i -X POST $be/searches -H 'Content-type: application/json' \
   "return" : "id,resource.url,subresource.url,type,value"
 }}'
 
-<<<<<<< 391007ba779b5d21c96b29bea242116424d5b38c
 # upload text, xml tags will be transformed into annotations
 curl -i -X PUT $be/resources/$ri/text -H 'Content-type: application/json' \
 --data-binary '{"text":"<xml>some text</xml>"}'
@@ -248,10 +247,3 @@ curl -i -H "${authheader}" -X POST $be/searches -H 'Content-type: application/js
   "distinct" : true,
   "return" : "who"
 }}'
-=======
-
-
-# upload text, xml tags will be transformed into annotations
-curl -i -X PUT $be/resources/$ri/text -H 'Content-type: application/json' \
---data-binary '{"text":"<xml>some text</xml>"}'
->>>>>>> [NLA-132] example call for the resource text endpoint

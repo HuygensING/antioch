@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.storage.frames;
 
+<<<<<<< HEAD
 /*
  * #%L
  * alexandria-service
@@ -24,6 +25,8 @@ package nl.knaw.huygens.alexandria.storage.frames;
 
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 
+=======
+>>>>>>> 95151d3c26e591b89fea47700ce10a9b31dbf200
 public abstract class AlexandriaVF {
 
   public abstract String getUuid();
