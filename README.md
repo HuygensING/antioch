@@ -7,4 +7,4 @@ See the [generated Maven site](http://huygensING.github.io/alexandria) for docum
 	mvn scm-publish:publish-scm -Dscmpublish.dryRun=true
 
 ###### Generating the site and publishing it:
-	mvn clean verify site:site scm-publish:publish-scm
+	mvn clean verify site:site site:stage scm-publish:publish-scm
