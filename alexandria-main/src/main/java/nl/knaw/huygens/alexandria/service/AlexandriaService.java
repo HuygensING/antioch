@@ -28,6 +28,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import nl.knaw.huygens.alexandria.endpoint.resource.text.TextQuery;
+import nl.knaw.huygens.alexandria.endpoint.resource.text.TextQueryResult;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
@@ -114,5 +116,7 @@ public interface AlexandriaService {
   void setResourceText(UUID resourceUUID, String text);
 
   Optional<String> getResourceText(UUID resourceUUID);
+
+  TextQueryResult queryText(TextQuery textQuery);
 
 }

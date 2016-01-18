@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>nl.knaw.huygens.alexandria</groupId>
@@ -8,12 +9,12 @@
   <artifactId>alexandria-service-tinkerpop-titan</artifactId>
 
   <dependencies>
-      <dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>alexandria-service</artifactId>
       <version>${project.version}</version>
     </dependency>
-  
+
     <!-- titan -->
     <dependency>
       <groupId>com.thinkaurelius.titan</groupId>
@@ -29,6 +30,11 @@
       <groupId>com.sleepycat</groupId>
       <artifactId>je</artifactId>
       <version>${sleepycat.version}</version>
+    </dependency>
+    <dependency><!--  overrule the version used by titan-core -->
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis</artifactId>
+      <version>1.4.01</version>
     </dependency>
   </dependencies>
 </project>

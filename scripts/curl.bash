@@ -248,3 +248,4 @@ curl -i -H "${authheader}" -X PUT ${be}/resources/599fad4f-21ca-4488-94f7-66fba8
 
 curl -i -H "${authheader}" -H 'Content-type: application/json' -X PUT ${be}/resources/599fad4f-21ca-4488-94f7-66fba8b39aba/text  --data '{"text":{"body":"Dit is een tekst"}}}'
 
+curl -i -H "${authheader}" -X POST -H "Content-Type: application/json" http://localhost:2015/resources/b9ecb6ec-bbd3-4247-ac45-ef1cf5b36541/text/query --data '{"textQuery":{"type":"xpath","query":"//div[@type=\"opener\"]/p"}}'

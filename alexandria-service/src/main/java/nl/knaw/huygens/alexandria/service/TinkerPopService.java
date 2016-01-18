@@ -53,6 +53,8 @@ import com.google.common.collect.Maps;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+import nl.knaw.huygens.alexandria.endpoint.resource.text.TextQuery;
+import nl.knaw.huygens.alexandria.endpoint.resource.text.TextQueryResult;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
@@ -703,6 +705,11 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public Optional<String> getResourceText(UUID resourceUUID) {
     return textService.get(resourceUUID);
+  }
+
+  @Override
+  public TextQueryResult queryText(TextQuery textQuery) {
+    return textService.executeQuery(textQuery);
   }
 
 }
