@@ -39,6 +39,8 @@ import nl.knaw.huygens.alexandria.config.AbstractAlexandriaConfigurationUsingAle
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.config.PropertiesConfiguration;
 import nl.knaw.huygens.alexandria.service.AlexandriaServletModule;
+import nl.knaw.huygens.alexandria.text.FileSystemTextService;
+import nl.knaw.huygens.alexandria.text.TextService;
 import nl.knaw.huygens.alexandria.util.Scheduler;
 
 @WebListener
@@ -61,8 +63,8 @@ public class ContextListener extends JerseyGuiceServletContextListener {
   public void contextDestroyed(ServletContextEvent sce) {
     Log.info("contextDestroyed called");
     getInjector()//
-                 .getInstance(new AlexandriaServletModule().getTinkerPopServiceClass())//
-                 .destroy();
+        .getInstance(new AlexandriaServletModule().getTinkerPopServiceClass())//
+        .destroy();
     super.contextDestroyed(sce);
     Log.info("contextDestroyed done");
   }
@@ -71,7 +73,10 @@ public class ContextListener extends JerseyGuiceServletContextListener {
     return new AbstractModule() {
       @Override
       protected void configure() {
-        bind(AlexandriaConfiguration.class).toInstance(cache(propertyBackedConfiguration()));
+        AlexandriaConfiguration configuration = cache(propertyBackedConfiguration());
+        bind(AlexandriaConfiguration.class).toInstance(configuration);
+        FileSystemTextService fsTextService = new FileSystemTextService(configuration.getStorageDirectory() + "/texts");
+        bind(TextService.class).toInstance(fsTextService);
       }
     };
   }
