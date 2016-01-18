@@ -138,6 +138,7 @@ public class AlexandriaAcceptanceTest extends RestFixture {
         bind(TinkerPopService.class).to(TinkerGraphService.class);
         bind(AlexandriaService.class).toInstance(service);
         bind(AlexandriaConfiguration.class).toInstance(CONFIG);
+        bind(TextService.class).toInstance(new InMemoryTextService());
         bind(AnnotationEntityBuilder.class).in(Scopes.SINGLETON);
         bind(EndpointPathResolver.class).in(Scopes.SINGLETON);
         bind(ResourceEntityBuilder.class).in(Scopes.SINGLETON);
