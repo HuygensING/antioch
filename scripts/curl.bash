@@ -243,3 +243,8 @@ curl -i -H "${authheader}" -X POST $be/searches -H 'Content-type: application/js
   "distinct" : true,
   "return" : "who"
 }}'
+
+curl -i -H "${authheader}" -X PUT ${be}/resources/599fad4f-21ca-4488-94f7-66fba8b39aba/text -H 'Content-type: text/xml' --data '<xml>hoera!</xml>'
+
+curl -i -H "${authheader}" -H 'Content-type: application/json' -X PUT ${be}/resources/599fad4f-21ca-4488-94f7-66fba8b39aba/text  --data '{"text":{"body":"Dit is een tekst"}}}'
+
