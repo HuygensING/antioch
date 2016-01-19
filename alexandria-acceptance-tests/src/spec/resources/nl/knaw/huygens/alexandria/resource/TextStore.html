@@ -46,11 +46,11 @@
         When I <h:put>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166/text</h:put> the body:
         <h:jsonBody>{
             "text": {
-                "body": "<text><p>paragraph 1</p><p>pârágràph 2</p></text>"
+                "body": "&lt;text&gt;&lt;p&gt;paragraph 1&lt;/p&gt;&lt;p&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;"
             }
         }</h:jsonBody>
         Then I should receive <h:status>200 Ok</h:status>
-        and the response body is <h:responseBody><text><p>paragraph 1</p><p>pârágràph 2</p></text></h:responseBody>.
+        and the response body is <h:responseBody>&lt;text&gt;&lt;p&gt;paragraph 1&lt;/p>&lt;p&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;</h:responseBody>.
     </h:request>
 
     <h:request>
@@ -58,7 +58,7 @@
         response body:
         <h:jsonResponse>{
             "text": {
-                "body": "<text><p>paragraph 1</p><p>pârágràph 2</p></text>"
+                "body": "&lt;text&gt;&lt;p&gt;paragraph 1&lt;/p&gt;&lt;p&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;"
             }
         }</h:jsonResponse>
     </h:request>
