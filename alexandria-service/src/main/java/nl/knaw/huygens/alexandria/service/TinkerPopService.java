@@ -26,6 +26,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.Duration;
 import java.time.Instant;
@@ -695,14 +696,24 @@ public class TinkerPopService implements AlexandriaService {
     // Log.info("destroy done");
   }
 
+  // @Override
+  // public void setResourceText(UUID resourceUUID, String text) {
+  // textService.set(resourceUUID, text);
+  // }
+  //
+  // @Override
+  // public Optional<String> getResourceText(UUID resourceUUID) {
+  // return textService.get(resourceUUID);
+  // }
+
   @Override
-  public void setResourceText(UUID resourceUUID, String text) {
-    textService.set(resourceUUID, text);
+  public Optional<InputStream> getResourceTextAsStream(UUID resourceUUID) {
+    return textService.getAsStream(resourceUUID);
   }
 
   @Override
-  public Optional<String> getResourceText(UUID resourceUUID) {
-    return textService.get(resourceUUID);
+  public void setResourceTextFromStream(UUID resourceUUID, InputStream inputStream) {
+    textService.setFromStream(resourceUUID, inputStream);
   }
 
 }

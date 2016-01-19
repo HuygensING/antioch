@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.service;
 
+import java.io.InputStream;
+
 /*
  * #%L
  * alexandria-main
@@ -111,8 +113,12 @@ public interface AlexandriaService {
   void importDb(String format, String filename);
 
   // ResourceText methods
-  void setResourceText(UUID resourceUUID, String text);
+  // void setResourceText(UUID resourceUUID, String text);
+  //
+  // Optional<String> getResourceText(UUID resourceUUID);
 
-  Optional<String> getResourceText(UUID resourceUUID);
+  void setResourceTextFromStream(UUID resourceUUID, InputStream inputStream);
+
+  Optional<InputStream> getResourceTextAsStream(UUID resourceUUID);
 
 }

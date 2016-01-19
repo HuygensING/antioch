@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,6 +14,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+
+import org.apache.commons.io.IOUtils;
 
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
@@ -41,14 +45,14 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @Produces(MediaType.TEXT_XML)
   @ApiOperation("get text as xml")
   public Response getXMLText() {
-    return getText();
+    return getTextResponse();
   }
 
   @GET
   @Produces(MediaType.TEXT_PLAIN)
   @ApiOperation("get text as plain text")
   public Response getPlainText() {
-    return getText();
+    return getTextResponse();
   }
 
   @PUT
@@ -56,7 +60,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @ApiOperation("set text from text protoype")
   public Response setTextWithPrototype(@NotNull @Valid TextPrototype prototype) {
     String body = prototype.getBody();
-    service.setResourceText(resourceUUID, body);
+    service.setResourceTextFromStream(resourceUUID, IOUtils.toInputStream(body));
     return Response.ok(body).build();
   }
 
@@ -64,17 +68,35 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @Consumes(MediaType.TEXT_XML)
   @ApiOperation("set text from xml")
   public Response setTextFromXml(@NotNull @Valid String xml) {
-    service.setResourceText(resourceUUID, xml);
+    service.setResourceTextFromStream(resourceUUID, IOUtils.toInputStream(xml));
     return Response.ok(xml).build();
   }
 
-  private Response getText() {
-    Optional<String> text = service.getResourceText(resourceUUID);//
-    if (text.isPresent()) {
-      return Response.ok(text.get()).build();
+  @PUT
+  @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+  @ApiOperation("set text from stream")
+  public Response setTextFromXml(InputStream inputStream) {
+    service.setResourceTextFromStream(resourceUUID, inputStream);
+    return Response.ok().build();
+  }
+
+  private Response getTextResponse() {
+    Optional<InputStream> textStream = service.getResourceTextAsStream(resourceUUID);//
+    if (textStream.isPresent()) {
+      StreamingOutput stream = output -> {
+        IOUtils.copy(textStream.get(), output);
+      };
+      return Response.ok(stream).build();
     }
     return Response.status(javax.ws.rs.core.Response.Status.NOT_FOUND).entity("no text found").build();
   }
+  // private Response getTextResponse() {
+  // Optional<String> text = service.getResourceText(resourceUUID);//
+  // if (text.isPresent()) {
+  // return Response.ok(text.get()).build();
+  // }
+  // return Response.status(javax.ws.rs.core.Response.Status.NOT_FOUND).entity("no text found").build();
+  // }
 
   // // TODO: why does this throw a java.lang.IllegalStateException: Illegal attempt to call getOutputStream() after getWriter() has
   // // already been called. ?
