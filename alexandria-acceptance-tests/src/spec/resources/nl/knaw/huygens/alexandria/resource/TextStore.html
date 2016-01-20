@@ -49,18 +49,17 @@
                 "body": "&lt;text&gt;&lt;p&gt;paragraph 1&lt;/p&gt;&lt;p&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;"
             }
         }</h:jsonBody>
-        Then I should receive <h:status>200 Ok</h:status>
+        Then I should receive <h:status>200 OK</h:status>
         and the response body is <h:responseBody>&lt;text&gt;&lt;p&gt;paragraph 1&lt;/p>&lt;p&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;</h:responseBody>.
     </h:request>
-
+    <br/>
     <h:request>
-        Thereafter, <h:get>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166/text</h:get> yields
-        response body:
-        <h:jsonResponse>{
-            "text": {
-                "body": "&lt;text&gt;&lt;p&gt;paragraph 1&lt;/p&gt;&lt;p&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;"
-            }
-        }</h:jsonResponse>
+        Thereafter,
+        <h:get>/resources/c6b96360-c0c9-11e4-b947-6bc57448d166/text</h:get>
+        using
+        <h:setHeader name="Accept">application/xml</h:setHeader>
+        yields response body:
+        <code h:responseBody="">&lt;text&gt;&lt;p&gt;paragraph 1&lt;/p&gt;&lt;p&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;</code>
     </h:request>
 </div>
 
