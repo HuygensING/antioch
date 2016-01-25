@@ -539,6 +539,7 @@ public class TinkerPopService implements AlexandriaService {
     TentativeAlexandriaProvenance provenance = deframeProvenance(rvf);
     UUID uuid = getUUID(rvf);
     AlexandriaResource resource = new AlexandriaResource(uuid, provenance);
+    resource.setHasText(rvf.getHasText());
     resource.setCargo(rvf.getCargo());
     resource.setState(AlexandriaState.valueOf(rvf.getState()));
     resource.setStateSince(Instant.ofEpochSecond(rvf.getStateSince()));
@@ -714,6 +715,10 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public void setResourceTextFromStream(UUID resourceUUID, InputStream inputStream) {
     textService.setFromStream(resourceUUID, inputStream);
+    storage.startTransaction();
+    ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
+    resourceVF.setHasText(true);
+    storage.commitTransaction();
   }
 
 }
