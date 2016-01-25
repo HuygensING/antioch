@@ -34,10 +34,15 @@ import nl.knaw.huygens.alexandria.endpoint.AbstractAccountablePrototype;
 @JsonTypeName("annotation")
 @ApiModel("annotation")
 public class AnnotationPrototype extends AbstractAccountablePrototype {
+  private String locator;
   private String type;
 
   @NotNull
   private String value;
+
+  public Optional<String> getLocator() {
+    return Optional.ofNullable(locator);
+  }
 
   public Optional<String> getType() {
     return Optional.ofNullable(type);

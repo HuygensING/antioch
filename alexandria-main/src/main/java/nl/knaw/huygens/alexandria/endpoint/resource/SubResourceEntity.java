@@ -56,6 +56,10 @@ public class SubResourceEntity extends AbstractAnnotatableEntity {
     return subResource.getCargo();
   }
 
+  public Boolean hasText() {
+    return subResource.hasText();
+  }
+
   @JsonProperty(PropertyPrefix.LINK + "partOf")
   public String getParentResource() {
     return locationBuilder.locationOf(subResource.getParentResourcePointer().get()).toString();

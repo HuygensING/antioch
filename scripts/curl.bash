@@ -248,3 +248,24 @@ curl -i -H "${authheader}" -X PUT ${be}/resources/599fad4f-21ca-4488-94f7-66fba8
 
 curl -i -H "${authheader}" -H 'Content-type: application/json' -X PUT ${be}/resources/599fad4f-21ca-4488-94f7-66fba8b39aba/text  --data '{"text":{"body":"Dit is een tekst"}}}'
 
+curl -i -H "${authheader}" -X POST $be/resources/$ri/annotations -H 'Content-type: application/json' \
+--data-binary '{"annotation":{
+  "locator" : "id:p-12",
+  "type":"cwg:a-lang",
+  "value":"nl",
+  "provenance":{
+    "who":"cwg-",
+    "why":"interesting"
+  }
+}}'
+
+curl -i -H "${authheader}" -X POST $be/annotations/$ai/annotations -H 'Content-type: application/json' \
+--data-binary '{"annotation":{
+  "locator" : "id:p-12",
+  "type":"cwg:a-lang",
+  "value":"expecting badrequest",
+  "provenance":{
+    "who":"cwg-",
+    "why":"interesting"
+  }
+}}'

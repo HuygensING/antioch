@@ -66,6 +66,7 @@ function a-set-authkey {
 
 function a-use-localhost {
 	a-set-backend http://localhost:2015
+	a-set-authkey YHJZHjpke8JYjm5y
 }
 
 function a-use-test {
@@ -91,3 +92,5 @@ function a-about {
 function a-about-service {
   curl -H "${authheader}" $be/about/service
 }
+
+a-use-localhost
