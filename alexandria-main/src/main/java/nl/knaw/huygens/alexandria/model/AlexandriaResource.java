@@ -33,7 +33,6 @@ public class AlexandriaResource extends AbstractAnnotatable {
   private String cargo; // ref for resource, sub for subresource
   private Optional<IdentifiablePointer<AlexandriaResource>> parentResourcePointer = Optional.empty(); // only used in subresources
   private Collection<IdentifiablePointer<AlexandriaResource>> subResourcePointers = Lists.newArrayList();
-//  private Collection<IdentifiablePointer<AlexandriaLocator>> locatorPointers = Lists.newArrayList();
   private boolean hasText = false;
 
   public AlexandriaResource(UUID id, TentativeAlexandriaProvenance provenance) {
