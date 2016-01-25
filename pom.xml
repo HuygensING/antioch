@@ -55,7 +55,7 @@
     <junit.version>4.12</junit.version>
     <junitparams.version>1.0.4</junitparams.version>
     <log.version>1.1.1</log.version>
-    <visitei.version>0.4.8</visitei.version>
+    <visitei.version>0.6</visitei.version>
     
     <!-- 3.2,3.3 leads to compiler error in Jenkins: java.lang.IllegalStateException: endPosTable already set -->
     <maven-compiler.version>3.1</maven-compiler.version>
