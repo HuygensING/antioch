@@ -24,11 +24,14 @@ package nl.knaw.huygens.alexandria.model;
 
 import java.util.UUID;
 
+import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
+
 public class AlexandriaAnnotation extends AbstractAnnotatable {
 
   private final AlexandriaAnnotationBody body;
   private IdentifiablePointer<?> annotatedPointer;
   private Integer rev = 0;
+  private AlexandriaTextLocator locator;
 
   public AlexandriaAnnotation(UUID id, AlexandriaAnnotationBody body, TentativeAlexandriaProvenance provenance) {
     super(id, provenance);
@@ -53,6 +56,14 @@ public class AlexandriaAnnotation extends AbstractAnnotatable {
 
   public void setRevision(Integer rev) {
     this.rev = rev;
+  }
+
+  public AlexandriaTextLocator getLocator() {
+    return locator;
+  }
+
+  public void setLocator(AlexandriaTextLocator locator) {
+    this.locator = locator;
   }
 
 }

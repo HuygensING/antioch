@@ -45,6 +45,10 @@ public abstract class AnnotationVF extends AlexandriaVF {
 
   public abstract Integer getRevision();
 
+  public abstract void setLocator(String locatorString);
+
+  public abstract String getLocator();
+
   @Out
   @Edge(HAS_BODY)
   public abstract AnnotationBodyVF getBody();
@@ -124,4 +128,5 @@ public abstract class AnnotationVF extends AlexandriaVF {
     }
     return annotation;
   }
+
 }
