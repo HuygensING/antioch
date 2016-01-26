@@ -75,6 +75,9 @@ import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import nl.knaw.huygens.alexandria.text.TextService;
+import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
+import nl.knaw.huygens.alexandria.textlocator.TextLocatorFactory;
+import nl.knaw.huygens.alexandria.textlocator.TextLocatorParseException;
 
 public class TinkerPopService implements AlexandriaService {
   private static final TemporalAmount TENTATIVES_TTL = Duration.ofDays(1);
@@ -129,6 +132,13 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public AlexandriaAnnotation annotate(AlexandriaResource resource, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
     AlexandriaAnnotation newAnnotation = createAnnotation(annotationbody, provenance);
+    annotateResourceWithAnnotation(resource, newAnnotation);
+    return newAnnotation;
+  }
+
+  @Override
+  public AlexandriaAnnotation annotate(AlexandriaResource resource, AlexandriaTextLocator textLocator, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
+    AlexandriaAnnotation newAnnotation = createAnnotation(textLocator, annotationbody, provenance);
     annotateResourceWithAnnotation(resource, newAnnotation);
     return newAnnotation;
   }
@@ -521,14 +531,23 @@ public class TinkerPopService implements AlexandriaService {
 
   private AlexandriaAnnotation createAnnotation(AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
     UUID id = UUID.randomUUID();
-    return new AlexandriaAnnotation(id, annotationbody, provenance);
+    AlexandriaAnnotation alexandriaAnnotation = new AlexandriaAnnotation(id, annotationbody, provenance);
+    return alexandriaAnnotation;
+  }
+
+  private AlexandriaAnnotation createAnnotation(AlexandriaTextLocator textLocator, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
+    AlexandriaAnnotation alexandriaAnnotation = createAnnotation(annotationbody, provenance);
+    alexandriaAnnotation.setLocator(textLocator);
+    return alexandriaAnnotation;
   }
 
   AnnotationVF frameAnnotation(AlexandriaAnnotation newAnnotation) {
     AnnotationVF avf = storage.createVF(AnnotationVF.class);
     setAlexandriaVFProperties(avf, newAnnotation);
     avf.setRevision(newAnnotation.getRevision());
-
+    if (newAnnotation.getLocator() != null) {
+      avf.setLocator(newAnnotation.getLocator().toString());
+    }
     UUID bodyId = newAnnotation.getBody().getId();
     AnnotationBodyVF bodyVF = storage.readVF(AnnotationBodyVF.class, bodyId).get();
     avf.setBody(bodyVF);
@@ -561,6 +580,13 @@ public class TinkerPopService implements AlexandriaService {
     UUID uuid = getUUID(annotationVF);
     AlexandriaAnnotationBody body = deframeAnnotationBody(annotationVF.getBody());
     AlexandriaAnnotation annotation = new AlexandriaAnnotation(uuid, body, provenance);
+    if (annotationVF.getLocator() != null) {
+      try {
+        annotation.setLocator(TextLocatorFactory.fromString(annotationVF.getLocator()));
+      } catch (TextLocatorParseException e) {
+        e.printStackTrace();
+      }
+    }
     annotation.setState(AlexandriaState.valueOf(annotationVF.getState()));
     annotation.setStateSince(Instant.ofEpochSecond(annotationVF.getStateSince()));
     if (annotationVF.getRevision() == null) { // update old data

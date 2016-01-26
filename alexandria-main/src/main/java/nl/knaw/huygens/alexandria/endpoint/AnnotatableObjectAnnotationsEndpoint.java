@@ -30,6 +30,7 @@ import java.util.UUID;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -46,6 +47,8 @@ import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.textlocator.TextLocatorFactory;
+import nl.knaw.huygens.alexandria.textlocator.TextLocatorParseException;
 
 public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint {
 
@@ -54,9 +57,9 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   protected final AnnotationCreationRequestBuilder requestBuilder;
   protected final UUID uuid;
 
-  protected AnnotatableObjectAnnotationsEndpoint(AlexandriaService service,        //
-      AnnotationCreationRequestBuilder requestBuilder,        //
-      LocationBuilder locationBuilder,        //
+  protected AnnotatableObjectAnnotationsEndpoint(AlexandriaService service, //
+      AnnotationCreationRequestBuilder requestBuilder, //
+      LocationBuilder locationBuilder, //
       final UUIDParam uuidParam) {
     Log.trace("resourceService=[{}], uuidParam=[{}]", service, uuidParam);
     this.service = service;
@@ -88,10 +91,23 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation("add annotation")
   public Response addAnnotation(@NotNull @Valid AnnotationPrototype prototype) {
+    validateLocator(prototype);
     prototype.setState(AlexandriaState.TENTATIVE);
     AnnotationCreationRequest request = getAnnotationCreationRequestBuilder().build(prototype);
     AlexandriaAnnotation annotation = request.execute(service);
     return Response.created(locationBuilder.locationOf(annotation)).build();
+  }
+
+  private void validateLocator(AnnotationPrototype prototype) {
+    if (prototype.getLocator().isPresent()) {
+      String locatorString = prototype.getLocator().get();
+      try {
+        TextLocatorFactory.fromString(locatorString);
+      } catch (TextLocatorParseException e) {
+        throw new BadRequestException(e.getMessage());
+      }
+    }
+
   }
 
 }

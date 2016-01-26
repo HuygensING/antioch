@@ -39,6 +39,7 @@ import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
 
 public interface AlexandriaService {
   // NOTE: should these service methods all be atomic?
@@ -59,6 +60,8 @@ public interface AlexandriaService {
   Optional<AlexandriaAnnotationBody> readAnnotationBody(UUID uuid);
 
   AlexandriaAnnotation annotate(AlexandriaResource resource, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance);
+
+  AlexandriaAnnotation annotate(AlexandriaResource resource, AlexandriaTextLocator textLocator, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance);
 
   AlexandriaAnnotation annotate(AlexandriaAnnotation annotation, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance);
 
