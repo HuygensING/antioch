@@ -70,7 +70,7 @@ public class AnnotationCreationRequest implements CreationRequest<AlexandriaAnno
         String textLocatorString = prototype.getLocator().get();
         AlexandriaTextLocator textLocator;
         try {
-          textLocator = TextLocatorFactory.fromString(textLocatorString);
+          textLocator = new TextLocatorFactory(service).fromString(textLocatorString);
           return service.annotate(resource.get(), textLocator, body, provenance);
         } catch (TextLocatorParseException e) {
           throw new BadRequestException(e.getMessage());

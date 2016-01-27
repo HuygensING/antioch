@@ -45,8 +45,10 @@ import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntity;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorFactory;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorParseException;
 
@@ -100,9 +102,20 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
 
   private void validateLocator(AnnotationPrototype prototype) {
     if (prototype.getLocator().isPresent()) {
+      if (!(getAnnotatableObject() instanceof AlexandriaResource)) {
+        throw new BadRequestException("locators are only allowed on resource annotations");
+      }
+
+      AlexandriaResource resource = (AlexandriaResource) getAnnotatableObject();
+      if (!resource.hasText()) {
+        throw new BadRequestException("The resource has no attached text to use the locator on.");
+      }
+
       String locatorString = prototype.getLocator().get();
       try {
-        TextLocatorFactory.fromString(locatorString);
+        TextLocatorFactory textLocatorFactory = new TextLocatorFactory(service);
+        AlexandriaTextLocator locator = textLocatorFactory.fromString(locatorString);
+        textLocatorFactory.validate(locator, resource);
       } catch (TextLocatorParseException e) {
         throw new BadRequestException(e.getMessage());
       }
