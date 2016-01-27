@@ -60,7 +60,7 @@
     <!-- 3.2,3.3 leads to compiler error in Jenkins: java.lang.IllegalStateException: endPosTable already set -->
     <maven-compiler.version>3.1</maven-compiler.version>
 
-    <mockito.version>2.0.36-beta</mockito.version>
+    <mockito.version>2.0.41-beta</mockito.version>
     <peapod.version>0.2.2</peapod.version>
     <reflections.version>0.9.10</reflections.version>
     <servlet-api.version>4.0.0-b01</servlet-api.version>
@@ -77,7 +77,7 @@
 
     <!--  neo4j -->    
     <neo4j-gremlin.version>3.0.0.M7</neo4j-gremlin.version>
-    <neo4j-tinkerpop-api-impl.version>0.3-2.3.0</neo4j-tinkerpop-api-impl.version>
+    <neo4j-tinkerpop-api-impl.version>0.3-2.3.2</neo4j-tinkerpop-api-impl.version>
 
     <!-- maven plugins -->
     <bcel-findbugs.version>6.0</bcel-findbugs.version>
