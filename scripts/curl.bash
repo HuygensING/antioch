@@ -250,8 +250,8 @@ curl -i -H "${authheader}" -H 'Content-type: application/json' -X PUT ${be}/reso
 
 curl -i -H "${authheader}" -X POST $be/resources/$ri/annotations -H 'Content-type: application/json' \
 --data-binary '{"annotation":{
-  "locator" : "id:p-12",
-  "type":"cwg:a-lang",
+  "locator" : "id:p0",
+  "type":"lang",
   "value":"nl",
   "provenance":{
     "who":"cwg-",
@@ -269,3 +269,13 @@ curl -i -H "${authheader}" -X POST $be/annotations/$ai/annotations -H 'Content-t
     "why":"interesting"
   }
 }}'
+
+## locator annotation limitationa:
+
+#- on resource -> annotation with locator on annotation gives badrequest
+#- on resource -> annotation with locator on resource without text gives badrequest
+#- on resource -> annotation with invalid locator on resource with text gives badrequest
+#- on resource -> annotation with locator on resource without text gives badrequest
+#- on resource -> annotation with id locator on resource with text but ☺gives badrequest
+
+

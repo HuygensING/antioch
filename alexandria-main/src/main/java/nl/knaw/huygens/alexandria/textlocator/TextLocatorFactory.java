@@ -41,9 +41,9 @@ public class TextLocatorFactory {
       try {
         xml = IOUtils.toString(textStream.get());
         QueryableDocument qDocument = QueryableDocument.createFromXml(xml, true);
-        Boolean idExists = qDocument.evaluateXPathToBoolean("boolean(//*[xml:id=\"" + id + "\"])");
+        Boolean idExists = qDocument.evaluateXPathToBoolean("boolean(//*[@xml:id=\"" + id + "\"])");
         if (!idExists) {
-          throw new BadRequestException("The text of the resource does not have an element with id '" + id + "'");
+          throw new BadRequestException("The text of the resource has no element with xml:id=\"" + id + "\"");
         }
 
       } catch (IOException | XPathExpressionException e) {
