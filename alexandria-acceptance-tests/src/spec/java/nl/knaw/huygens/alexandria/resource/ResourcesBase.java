@@ -26,10 +26,12 @@ import org.junit.BeforeClass;
 
 import nl.knaw.huygens.alexandria.concordion.AlexandriaAcceptanceTest;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
+import nl.knaw.huygens.alexandria.jersey.exceptionmappers.WebApplicationExceptionMapper;
 
 public class ResourcesBase extends AlexandriaAcceptanceTest {
   @BeforeClass
   public static void registerEndpoint() {
     register(ResourcesEndpoint.class);
+    register(WebApplicationExceptionMapper.class);
   }
 }

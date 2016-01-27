@@ -40,22 +40,25 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.commons.io.IOUtils;
 
 import io.swagger.annotations.ApiOperation;
-
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
+import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class ResourceTextEndpoint extends JSONEndpoint {
   private final AlexandriaService service;
   private final UUID resourceId;
+  private final AlexandriaResource resource;
 
   @Inject
   public ResourceTextEndpoint(AlexandriaService service, //
-                              ResourceValidatorFactory validatorFactory, //
-                              @PathParam("uuid") final UUIDParam uuidParam) {
+      ResourceValidatorFactory validatorFactory, //
+      @PathParam("uuid") final UUIDParam uuidParam) {
     this.service = service;
-    this.resourceId = validatorFactory.validateExistingResource(uuidParam).notTentative().getId();
+    this.resource = validatorFactory.validateExistingResource(uuidParam).notTentative();
+    this.resourceId = resource.getId();
   }
 
   @GET
@@ -76,6 +79,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation("set text from text protoype")
   public Response setTextWithPrototype(@NotNull @Valid TextPrototype prototype) {
+    verifyResourceHasNoText();
     String body = prototype.getBody();
     service.setResourceTextFromStream(resourceId, streamIn(body));
     return noContent();
@@ -85,6 +89,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @Consumes(MediaType.TEXT_XML)
   @ApiOperation("set text from xml")
   public Response setTextFromXml(@NotNull @Valid String xml) {
+    verifyResourceHasNoText();
     service.setResourceTextFromStream(resourceId, streamIn(xml));
     return noContent();
   }
@@ -93,8 +98,15 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @Consumes(MediaType.APPLICATION_OCTET_STREAM)
   @ApiOperation("set text from stream")
   public Response setTextFromXml(InputStream inputStream) {
+    verifyResourceHasNoText();
     service.setResourceTextFromStream(resourceId, inputStream);
     return noContent();
+  }
+
+  private void verifyResourceHasNoText() {
+    if (resource.hasText()) {
+      throw new ConflictException("This resource already has a text, which cannot be replaced.");
+    }
   }
 
   private Response getTextResponse() {
