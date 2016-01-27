@@ -37,9 +37,8 @@ public class TextLocatorFactory {
       ByIdTextLocator byId = (ByIdTextLocator) locator;
       String id = byId.getId();
       Optional<InputStream> textStream = service.getResourceTextAsStream(resource.getId());//
-      String xml;
       try {
-        xml = IOUtils.toString(textStream.get());
+        String xml = IOUtils.toString(textStream.get());
         QueryableDocument qDocument = QueryableDocument.createFromXml(xml, true);
         Boolean idExists = qDocument.evaluateXPathToBoolean("boolean(//*[@xml:id=\"" + id + "\"])");
         if (!idExists) {
