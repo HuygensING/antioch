@@ -29,7 +29,7 @@
 
 <body data-desc="ResourceText annotations">
 
-<div id="annotate-text" data-desc="How do I annotate part of my resource text">
+<div id="annotate-text" data-desc="How do I annotate a part of my resource text?">
     <h:request>
         Given I have
         <h:success>successfully</h:success>
@@ -49,7 +49,15 @@
                 "body": "&lt;text&gt;&lt;p xml:id=\"p0\"&gt;paragraph 1&lt;/p&gt;&lt;p&gt;paragraph 2&lt;/p&gt;&lt;/text&gt;"
             }
         }</h:jsonBody>
-        Then I should receive <h:status>200 OK</h:status>
+        Then I should receive:
+        <ul>
+            <li>status <h:status>200 OK</h:status></li>
+            <!-- <li>status <h:status>204 No Content</h:status></li>
+            <li>an
+                <h:responseBody/>
+                response body
+            </li> -->
+        </ul>
     </h:request>
 
     <h:request>
@@ -79,6 +87,102 @@
         </ul>
     </h:request>
 </div>
+
+<div id="invalid-locator-prefix" data-desc="What happens when I use an invalid locator prefix?">
+    Currently, the only locator prefix implemented is "id", for locating by xml:id.
+    <h:request>
+        When I 
+        <h:post>/resources/599fad4f-21ca-4488-94f7-66fba8b39aba/annotations</h:post>
+        the following body:
+        <h:jsonBody>{ "annotation": {
+            "locator": "illegalPrefix:something.or.other",
+            "type": "note",
+            "value": "does this work?"
+            } }
+        </h:jsonBody>
+        then I should receive:
+        <ul>
+            <li>status
+                <h:status>400 Bad Request</h:status>
+            </li>
+            <li>and body
+                <h:jsonResponse>{
+                  "error" : {
+                     "message" : "The locator prefix 'illegalPrefix' is not a valid prefix. Valid prefix: 'id'."
+                  }}
+                </h:jsonResponse>
+            </li>
+        </ul>
+    </h:request>
+</div>
+    
+<div id="invalid-locator-id" data-desc="What happens when the locator is not valid for the resource text?">
+    The locator given in the annotation body should map to exactly one element in the resource text: 
+    <h:request>
+        When I 
+        <h:post>/resources/599fad4f-21ca-4488-94f7-66fba8b39aba/annotations</h:post>
+        the following body:
+        <h:jsonBody>{ "annotation": {
+            "locator": "id:p100",
+            "type": "something",
+            "value": "something"
+            } }
+        </h:jsonBody>
+        then I should receive:
+        <ul>
+            <li>status
+                <h:status>400 Bad Request</h:status>
+            </li>
+            <li>and body
+                <h:jsonResponse>{
+								  "error" : {
+								     "message" : "The resource text has no element with xml:id=\"p100\""
+								  }}
+                </h:jsonResponse>
+            </li>
+        </ul>
+    </h:request>
+</div>
+
+<div id="locator-on-resource-without-text" data-desc="What happens when I use a locator annotation on a resource without a text?">
+    <h:request>
+        Given I have
+        <h:success>successfully</h:success>
+        <h:put>/resources/00000000-0000-0000-0000-000000000000</h:put>
+        the following body:
+        <h:jsonBody>{ "resource": {
+            "id": "00000000-0000-0000-0000-000000000000",
+            "ref": "Something"
+            } }
+        </h:jsonBody>
+    </h:request>
+
+    <h:request>
+        When I 
+        <h:post>/resources/00000000-0000-0000-0000-000000000000/annotations</h:post>
+        the following body:
+        <h:jsonBody>{ "annotation": {
+            "locator": "id:p1",
+            "type": "something",
+            "value": "something"
+            } }
+        </h:jsonBody>
+        then I should receive:
+        <ul>
+            <li>status
+                <h:status>400 Bad Request</h:status>
+            </li>
+            <li>and body
+                <h:jsonResponse>{
+                  "error" : {
+                     "message" : "The resource has no attached text to use the locator on."
+                  }}
+                </h:jsonResponse>
+            </li>
+        </ul>
+    </h:request>
+</div>
+
 
 </body>
 </html>

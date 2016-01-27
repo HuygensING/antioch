@@ -29,7 +29,7 @@ public class TextLocatorFactory {
     if (ByIdTextLocator.PREFIX.equals(prefix)) {
       return new ByIdTextLocator().withId(parts[1]);
     }
-    throw new TextLocatorParseException("locator prefix '" + prefix + "' not recognized");
+    throw new TextLocatorParseException("The locator prefix '" + prefix + "' is not a valid prefix. Valid prefix: 'id'.");
   }
 
   public void validate(AlexandriaTextLocator locator, AlexandriaResource resource) {
@@ -42,7 +42,7 @@ public class TextLocatorFactory {
         QueryableDocument qDocument = QueryableDocument.createFromXml(xml, true);
         Boolean idExists = qDocument.evaluateXPathToBoolean("boolean(//*[@xml:id=\"" + id + "\"])");
         if (!idExists) {
-          throw new BadRequestException("The text of the resource has no element with xml:id=\"" + id + "\"");
+          throw new BadRequestException("The resource text has no element with xml:id=\"" + id + "\"");
         }
 
       } catch (IOException | XPathExpressionException e) {

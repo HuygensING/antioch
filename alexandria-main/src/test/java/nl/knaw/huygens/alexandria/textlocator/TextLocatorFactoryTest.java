@@ -28,7 +28,7 @@ public class TextLocatorFactoryTest {
       AlexandriaTextLocator locator = textLocatorFactory.fromString("xid:12b");
       fail();
     } catch (TextLocatorParseException e) {
-      assertThat(e.getMessage()).isEqualTo("locator prefix 'xid' not recognized");
+      assertThat(e.getMessage()).isEqualTo("The locator prefix 'xid' is not a valid prefix. Valid prefix: 'id'.");
     }
   }
 
