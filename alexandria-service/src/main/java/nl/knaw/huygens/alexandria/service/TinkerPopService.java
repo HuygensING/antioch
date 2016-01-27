@@ -582,7 +582,7 @@ public class TinkerPopService implements AlexandriaService {
     AlexandriaAnnotation annotation = new AlexandriaAnnotation(uuid, body, provenance);
     if (annotationVF.getLocator() != null) {
       try {
-        annotation.setLocator(TextLocatorFactory.fromString(annotationVF.getLocator()));
+        annotation.setLocator(new TextLocatorFactory(this).fromString(annotationVF.getLocator()));
       } catch (TextLocatorParseException e) {
         e.printStackTrace();
       }

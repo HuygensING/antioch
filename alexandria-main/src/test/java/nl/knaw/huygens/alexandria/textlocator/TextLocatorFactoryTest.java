@@ -4,12 +4,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
+import org.mockito.Mockito;
+
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class TextLocatorFactoryTest {
 
+  private AlexandriaService service = Mockito.mock(AlexandriaService.class);
+  private TextLocatorFactory textLocatorFactory = new TextLocatorFactory(service);
+
   @Test
   public void testInPrefixReturnsByIdTextLocator() throws TextLocatorParseException {
-    AlexandriaTextLocator locator = TextLocatorFactory.fromString("id:12b");
+    AlexandriaTextLocator locator = textLocatorFactory.fromString("id:12b");
     assertThat(locator).isInstanceOf(ByIdTextLocator.class);
     ByIdTextLocator byIdLocator = (ByIdTextLocator) locator;
     assertThat(byIdLocator.getId()).isEqualTo("12b");
@@ -19,7 +25,7 @@ public class TextLocatorFactoryTest {
   public void testUnknownPrefixThrowsException() {
     try {
       @SuppressWarnings("unused")
-      AlexandriaTextLocator locator = TextLocatorFactory.fromString("xid:12b");
+      AlexandriaTextLocator locator = textLocatorFactory.fromString("xid:12b");
       fail();
     } catch (TextLocatorParseException e) {
       assertThat(e.getMessage()).isEqualTo("locator prefix 'xid' not recognized");
