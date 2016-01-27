@@ -28,6 +28,8 @@ import java.net.URI;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -39,7 +41,8 @@ import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 
 @JsonTypeName("resource")
-@JsonPropertyOrder({ "id", "ref" })
+@JsonPropertyOrder({ "id", "ref", "hasText" })
+@JsonInclude(Include.NON_NULL)
 @ApiModel("resource")
 public class ResourceEntity extends AbstractAnnotatableEntity {
 
@@ -61,6 +64,15 @@ public class ResourceEntity extends AbstractAnnotatableEntity {
 
   public String getRef() {
     return resource.getCargo();
+  }
+
+  public Boolean hasText() {
+    return resource.hasText();
+  }
+
+  @JsonProperty(PropertyPrefix.LINK + "text")
+  public URI getText() {
+    return hasText() ? URI.create(locationBuilder.locationOf(resource) + "/text") : null;
   }
 
   @JsonProperty(PropertyPrefix.LINK + "subresources")

@@ -23,6 +23,8 @@ package nl.knaw.huygens.alexandria.endpoint.annotation;
  */
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -34,9 +36,11 @@ import nl.knaw.huygens.alexandria.endpoint.resource.PropertyPrefix;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
+import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
 
 @JsonTypeName("annotation")
 @JsonPropertyOrder({ "id", "revision", "state", "type", "value" })
+@JsonInclude(Include.NON_NULL)
 @ApiModel("annotation")
 public class AnnotationEntity extends AbstractAnnotatableEntity {
 
@@ -54,6 +58,14 @@ public class AnnotationEntity extends AbstractAnnotatableEntity {
   public final AnnotationEntity withLocationBuilder(LocationBuilder locationBuilder) {
     this.locationBuilder = locationBuilder;
     return this;
+  }
+
+  public String getLocator() {
+    AlexandriaTextLocator locator = annotation.getLocator();
+    if (locator != null) {
+      return locator.toString();
+    }
+    return null;
   }
 
   public String getType() {

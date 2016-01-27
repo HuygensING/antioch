@@ -33,6 +33,7 @@ public class AlexandriaResource extends AbstractAnnotatable {
   private String cargo; // ref for resource, sub for subresource
   private Optional<IdentifiablePointer<AlexandriaResource>> parentResourcePointer = Optional.empty(); // only used in subresources
   private Collection<IdentifiablePointer<AlexandriaResource>> subResourcePointers = Lists.newArrayList();
+  private boolean hasText = false;
 
   public AlexandriaResource(UUID id, TentativeAlexandriaProvenance provenance) {
     super(id, provenance);
@@ -64,6 +65,16 @@ public class AlexandriaResource extends AbstractAnnotatable {
 
   public boolean isSubResource() {
     return parentResourcePointer.isPresent();
+  }
+
+  public boolean hasText() {
+    return hasText;
+  }
+
+  public void setHasText(Boolean _hasText) {
+    if (_hasText != null) {
+      hasText = _hasText;
+    }
   }
 
 }
