@@ -40,25 +40,22 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.commons.io.IOUtils;
 
 import io.swagger.annotations.ApiOperation;
+
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
-import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class ResourceTextEndpoint extends JSONEndpoint {
-  private AlexandriaService service;
-  private AlexandriaResource resource;
-  private UUID resourceUUID;
+  private final AlexandriaService service;
+  private final UUID resourceId;
 
   @Inject
-  public ResourceTextEndpoint(AlexandriaService service, @PathParam("uuid") final UUIDParam uuidParam) {
+  public ResourceTextEndpoint(AlexandriaService service, //
+                              ResourceValidatorFactory validatorFactory, //
+                              @PathParam("uuid") final UUIDParam uuidParam) {
     this.service = service;
-    resourceUUID = uuidParam.getValue();
-    resource = service.readResource(resourceUUID).orElseThrow(ResourcesEndpoint.resourceNotFoundForId(resourceUUID));
-    if (resource.isTentative()) {
-      throw ResourcesEndpoint.resourceIsTentativeException(resourceUUID);
-    }
+    this.resourceId = validatorFactory.validateExistingResource(uuidParam).notTentative().getId();
   }
 
   @GET
@@ -80,7 +77,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @ApiOperation("set text from text protoype")
   public Response setTextWithPrototype(@NotNull @Valid TextPrototype prototype) {
     String body = prototype.getBody();
-    service.setResourceTextFromStream(resourceUUID, IOUtils.toInputStream(body));
+    service.setResourceTextFromStream(resourceId, streamIn(body));
     return noContent();
   }
 
@@ -88,43 +85,31 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @Consumes(MediaType.TEXT_XML)
   @ApiOperation("set text from xml")
   public Response setTextFromXml(@NotNull @Valid String xml) {
-    service.setResourceTextFromStream(resourceUUID, IOUtils.toInputStream(xml));
-    return ok(xml);
+    service.setResourceTextFromStream(resourceId, streamIn(xml));
+    return noContent();
   }
 
   @PUT
   @Consumes(MediaType.APPLICATION_OCTET_STREAM)
   @ApiOperation("set text from stream")
   public Response setTextFromXml(InputStream inputStream) {
-    service.setResourceTextFromStream(resourceUUID, inputStream);
-    return ok();
+    service.setResourceTextFromStream(resourceId, inputStream);
+    return noContent();
   }
 
   private Response getTextResponse() {
-    return ok(stream(resourceTextAsStream()));
+    return ok(streamOut(resourceTextAsStream()));
   }
 
   private InputStream resourceTextAsStream() {
-    return service.getResourceTextAsStream(resourceUUID).orElseThrow(() -> new NotFoundException("no text found"));
+    return service.getResourceTextAsStream(resourceId).orElseThrow(() -> new NotFoundException("no text found"));
   }
 
-  private StreamingOutput stream(InputStream is) {
+  private InputStream streamIn(String body) {
+    return IOUtils.toInputStream(body);
+  }
+
+  private StreamingOutput streamOut(InputStream is) {
     return output -> IOUtils.copy(is, output);
   }
-
-  // private Response getTextResponse() {
-  // Optional<String> text = service.getResourceText(resourceUUID);//
-  // if (text.isPresent()) {
-  // return Response.ok(text.get()).build();
-  // }
-  // return Response.status(javax.ws.rs.core.Response.Status.NOT_FOUND).entity("no text found").build();
-  // }
-
-  // // TODO: why does this throw a java.lang.IllegalStateException: Illegal attempt to call getOutputStream() after getWriter() has
-  // // already been called. ?
-  // private Response getText() {
-  // String text = service.getResourceText(resourceUUID)//
-  // .orElseThrow(() -> new NotFoundException("no text found"));
-  // return Response.ok(text).build();
-  // }
 }

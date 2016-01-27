@@ -39,7 +39,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.ApiOperation;
-import nl.knaw.huygens.Log;
+
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
@@ -50,32 +50,28 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 public class SubResourcesEndpoint extends JSONEndpoint {
 
   private final AlexandriaService service;
-  private final UUID parentUuid;
-  private final ResourceCreationRequestBuilder requestBuilder;
   private final LocationBuilder locationBuilder;
+  private final ResourceCreationRequestBuilder requestBuilder;
+  private final UUID parentId;
 
   @Inject
-  public SubResourcesEndpoint(AlexandriaService service, ResourceCreationRequestBuilder requestBuilder, LocationBuilder locationBuilder, @PathParam("uuid") final UUIDParam uuidParam) {
-    this.locationBuilder = locationBuilder;
-    Log.trace("resourceService=[{}], uuidParam=[{}]", service, uuidParam);
+  public SubResourcesEndpoint(AlexandriaService service, //
+                              LocationBuilder locationBuilder, //
+                              ResourceCreationRequestBuilder requestBuilder, //
+                              ResourceValidatorFactory validatorFactory, //
+                              @PathParam("uuid") final UUIDParam uuidParam) {
     this.service = service;
+    this.locationBuilder = locationBuilder;
     this.requestBuilder = requestBuilder;
-    this.parentUuid = uuidParam.getValue();
-    AlexandriaResource resource = service.readResource(parentUuid)//
-        .orElseThrow(ResourcesEndpoint.resourceNotFoundForId(parentUuid));
-    if (resource.isTentative()) {
-      throw ResourcesEndpoint.resourceIsTentativeException(parentUuid);
-    }
+    this.parentId = validatorFactory.validateExistingResource(uuidParam).notTentative().getId();
   }
 
   @GET
   @ApiOperation(value = "get subresources", response = ResourceEntity.class)
   public Response get() {
-    final Set<AlexandriaResource> subresources = service.readSubResources(parentUuid);
-    final Set<SubResourceEntity> outgoing = subresources.stream()//
-        .map(sr -> SubResourceEntity.of(sr).withLocationBuilder(locationBuilder))//
-        .collect(toSet());
-    return Response.ok(outgoing).build();
+    final Set<AlexandriaResource> subresources = service.readSubResources(parentId);
+    final Set<SubResourceEntity> outgoing = subresources.stream().map(this::toEntity).collect(toSet());
+    return ok(outgoing);
   }
 
   @POST
@@ -83,14 +79,18 @@ public class SubResourcesEndpoint extends JSONEndpoint {
   @ApiOperation("add subresource")
   public Response addSubResource(@NotNull @Valid SubResourcePrototype prototype) {
     prototype.setState(AlexandriaState.TENTATIVE);
-    SubResourceCreationRequest request = requestBuilder.build(parentUuid, prototype);
+    SubResourceCreationRequest request = requestBuilder.build(parentId, prototype);
     AlexandriaResource resource = request.execute(service);
     URI subresourceLocation = locationBuilder.locationOf(resource);
     if (request.newResourceWasCreated()) {
-      return Response.created(subresourceLocation).build();
+      return created(subresourceLocation);
     } else {
       return Response.noContent().header("Location", subresourceLocation).build();
     }
+  }
+
+  private SubResourceEntity toEntity(AlexandriaResource alexandriaResource) {
+    return SubResourceEntity.of(alexandriaResource).withLocationBuilder(locationBuilder);
   }
 
 }

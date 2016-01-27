@@ -50,7 +50,7 @@
             }
         }</h:jsonBody>
         Then I should receive <h:status>204 No Content</h:status>
-        and the response body is <h:responseBody/>.
+        and the response body is <h:responseBody/>
     </h:request>
     <br/>
     <h:request>
@@ -68,8 +68,8 @@
         <h:requestBody>&lt;text&gt;&lt;p&gt;other text&lt;/p&gt;&lt;/text&gt;</h:requestBody>
         using
         <h:setHeader name="Content-Type">text/xml</h:setHeader>
-        Then I should receive <h:status>200 OK</h:status>
-        and the response body is <h:responseBody>&lt;text&gt;&lt;p&gt;other text&lt;/p&gt;&lt;/text&gt;</h:responseBody>.
+        Then I should receive <h:status>204 No Content</h:status>
+        and the response body is <h:responseBody/>
     </h:request>
     <br/>
     <h:request>
@@ -87,8 +87,8 @@
         <h:requestBody>&lt;text&gt;&lt;p&gt;different text&lt;/p&gt;&lt;/text&gt;</h:requestBody>
         using
         <h:setHeader name="Content-Type">application/octet-stream</h:setHeader>
-        Then I should receive <h:status>200 OK</h:status>
-        and the response body is empty<h:responseBody/>.
+        Then I should receive <h:status>204 No Content</h:status>
+        and the response body is <h:responseBody/>
     </h:request>
     <br/>
     <h:request>
