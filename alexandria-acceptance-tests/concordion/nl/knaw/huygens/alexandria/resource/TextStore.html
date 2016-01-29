@@ -169,74 +169,126 @@ ins {
 
 
 
-<div class="container"><div class="jumbotron"><h1>Resource Texts</h1></div><div class="row"><div class="col-md-3"><ul class="nav nav-pills nav-stacked"><li class="active"><a href="#store-resource-text" data-toggle="tab">How do I store/retrieve a text for my resource?</a></li></ul></div><div class="col-md-9"><div class="tab-content"><div id="store-resource-text" c:execute="clearStorage()" class="tab-pane fade active in"><div class="panel panel-default"><div class="panel-heading"><strong>How do I store/retrieve a text for my resource?</strong></div><div class="panel-body">
+
+
+
+
+
+
+<div class="container"><div class="jumbotron"><h1>Resource Texts</h1></div><div class="row"><div class="col-md-3"><ul class="nav nav-pills nav-stacked"><li class="active"><a href="#store-resource-text1" data-toggle="tab">How do I store/retrieve a text for my resource?</a></li><li><a href="#store-resource-text2" data-toggle="tab">How do I store/retrieve a text for my resource? (alternative 1)</a></li><li><a href="#store-resource-text3" data-toggle="tab">How do I store/retrieve a text for my resource? (alternative 2)</a></li><li><a href="#overwrite-resource-text" data-toggle="tab">What if I upload a text to a resource that already has a text?</a></li></ul></div><div class="col-md-9"><div class="tab-content"><div id="store-resource-text1" c:execute="clearStorage()" class="tab-pane fade active in"><div class="panel panel-default"><div class="panel-heading"><strong>How do I store/retrieve a text for my resource?</strong></div><div class="panel-body">
     <div h:request="">
         Given that I have <span h:success="" class="success">successfully</span>
-        <code class="put">/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</code> the body:
+        <code class="put">/resources/11111111-1111-1111-1111-111111111111</code> the body:
         <pre h:jsonBody="" class="json">{
   "resource" : {
-    "id" : "c6b96360-c0c9-11e4-b947-6bc57448d166",
+    "id" : "11111111-1111-1111-1111-111111111111",
+    "ref" : "grotius-3160-v1"
+  }
+}</pre>
+    </div>
+
+    <div h:request="">
+        When I <code class="put">/resources/11111111-1111-1111-1111-111111111111/text</code> the body:
+        <pre h:jsonBody="" class="json">{
+  "text" : {
+    "body" : "&lt;text&gt;&lt;p&gt;paragraph 1&lt;/p&gt;&lt;p&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;"
+  }
+}</pre>
+        using
+        <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>
+        Then I should receive <code h:status="" class="success">204 No Content</code>
+        and the response body is <code h:responseBody="" class="empty success"> </code>
+    </div>
+    <br />
+    <div h:request="">
+        Thereafter,
+        <code class="get">/resources/11111111-1111-1111-1111-111111111111/text</code>
+        using
+        <code name="Accept" h:setHeader="" class="set-header">text/xml</code>
+        yields response body:
+        <code h:responseBody="" class="success">&lt;text&gt;&lt;p&gt;paragraph 1&lt;/p&gt;&lt;p&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;</code>
+    </div>
+</div></div></div><div id="store-resource-text2" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>How do I store/retrieve a text for my resource? (alternative 1)</strong></div><div class="panel-body">
+    <div h:request="">
+        Given that I have <span h:success="" class="success">successfully</span>
+        <code class="put">/resources/22222222-2222-2222-2222-222222222222</code> the body:
+        <pre h:jsonBody="" class="json">{
+  "resource" : {
+    "id" : "22222222-2222-2222-2222-222222222222",
     "ref" : "grotius-3160-v2"
   }
 }</pre>
     </div>
 
     <div h:request="">
-        When I <code class="put">/resources/c6b96360-c0c9-11e4-b947-6bc57448d166/text</code> the body:
-        <pre h:jsonBody="" class="json">{
-  "text" : {
-    "body" : "&lt;text&gt;&lt;p&gt;paragraph 1&lt;/p&gt;&lt;p&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;"
-  }
-}</pre>
-        Then I should receive <code h:status="" class="success">200 OK</code>
-        and the response body is <code h:responseBody="" class="success">&lt;text&gt;&lt;p&gt;paragraph 1&lt;/p&gt;&lt;p&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;</code>.
-    </div>
-    <br />
-    <div h:request="">
-        Thereafter,
-        <code class="get">/resources/c6b96360-c0c9-11e4-b947-6bc57448d166/text</code>
-        using
-        <code name="Accept" h:setHeader="" class="set-header">text/xml</code>
-        yields response body:
-        <code h:responseBody="" class="success">&lt;text&gt;&lt;p&gt;paragraph 1&lt;/p&gt;&lt;p&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;</code>
-    </div>
-    
-    There are 2 other ways to set the resource body:
-    <div h:request="">
-        When I <code class="put">/resources/c6b96360-c0c9-11e4-b947-6bc57448d166/text</code> the body:
+        When I <code class="put">/resources/22222222-2222-2222-2222-222222222222/text</code> the body:
         <pre h:requestBody="">&lt;text&gt;&lt;p&gt;other text&lt;/p&gt;&lt;/text&gt;</pre>
         using
         <code name="Content-Type" h:setHeader="" class="set-header">text/xml</code>
-        Then I should receive <code h:status="" class="success">200 OK</code>
-        and the response body is <code h:responseBody="" class="success">&lt;text&gt;&lt;p&gt;other text&lt;/p&gt;&lt;/text&gt;</code>.
+        Then I should receive <code h:status="" class="success">204 No Content</code>
+        and the response body is <code h:responseBody="" class="empty success"> </code>
     </div>
     <br />
     <div h:request="">
         Thereafter,
-        <code class="get">/resources/c6b96360-c0c9-11e4-b947-6bc57448d166/text</code>
+        <code class="get">/resources/22222222-2222-2222-2222-222222222222/text</code>
         using
         <code name="Accept" h:setHeader="" class="set-header">text/xml</code>
         yields response body:
         <code h:responseBody="" class="success">&lt;text&gt;&lt;p&gt;other text&lt;/p&gt;&lt;/text&gt;</code>
     </div>
-    <br />
-  
+</div></div></div><div id="store-resource-text3" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>How do I store/retrieve a text for my resource? (alternative 2)</strong></div><div class="panel-body">
     <div h:request="">
-        When I <code class="put">/resources/c6b96360-c0c9-11e4-b947-6bc57448d166/text</code> the body:
+        Given that I have <span h:success="" class="success">successfully</span>
+        <code class="put">/resources/33333333-3333-3333-3333-333333333333</code> the body:
+        <pre h:jsonBody="" class="json">{
+  "resource" : {
+    "id" : "33333333-3333-3333-3333-333333333333",
+    "ref" : "grotius-3160-v3"
+  }
+}</pre>
+    </div>
+
+    <div h:request="">
+        When I <code class="put">/resources/33333333-3333-3333-3333-333333333333/text</code> the body:
         <pre h:requestBody="">&lt;text&gt;&lt;p&gt;different text&lt;/p&gt;&lt;/text&gt;</pre>
         using
         <code name="Content-Type" h:setHeader="" class="set-header">application/octet-stream</code>
-        Then I should receive <code h:status="" class="success">200 OK</code>
-        and the response body is empty<code h:responseBody="" class="empty success"> </code>.
+        Then I should receive <code h:status="" class="success">204 No Content</code>
+        and the response body is <code h:responseBody="" class="empty success"> </code>
     </div>
     <br />
     <div h:request="">
         Thereafter,
-        <code class="get">/resources/c6b96360-c0c9-11e4-b947-6bc57448d166/text</code>
+        <code class="get">/resources/33333333-3333-3333-3333-333333333333/text</code>
         using
         <code name="Accept" h:setHeader="" class="set-header">text/xml</code>
         yields response body:
         <code h:responseBody="" class="success">&lt;text&gt;&lt;p&gt;different text&lt;/p&gt;&lt;/text&gt;</code>
     </div>
-</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 544 ms on 26-Jan-2016 at 12:28:02 CET</div></div></body>
+</div></div></div><div id="overwrite-resource-text" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>What if I upload a text to a resource that already has a text?</strong></div><div class="panel-body">
+    <div h:request="">
+        Given the resource I made earlier,
+        when I <code class="put">/resources/33333333-3333-3333-3333-333333333333/text</code> the body:
+        <pre h:jsonBody="" class="json">{
+  "text" : {
+    "body" : "&lt;text&gt;&lt;p&gt;paragraph 1&lt;/p&gt;&lt;p&gt;paragraph 2&lt;/p&gt;&lt;p&gt;paragraph 3&lt;/p&gt;&lt;/text&gt;"
+  }
+}</pre>
+        Then I should receive
+        <ul>
+            <li>status
+                <code h:status="" class="success">409 Conflict</code>
+            </li>
+            <li>and body
+                <pre class="json rest-success">{
+  "error" : {
+    "message" : "This resource already has a text, which cannot be replaced."
+  }
+}</pre>
+            </li>
+        </ul>
+
+    </div>
+</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 404 ms on 29-Jan-2016 at 14:39:07 CET</div></div></body>
 </html>

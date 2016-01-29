@@ -21,4 +21,5 @@ nl.knaw.huygens.alexandria.service
 nl.knaw.huygens.alexandria.storage
 nl.knaw.huygens.alexandria.storage.frames
 nl.knaw.huygens.alexandria.text
+nl.knaw.huygens.alexandria.textlocator
 nl.knaw.huygens.alexandria.util
