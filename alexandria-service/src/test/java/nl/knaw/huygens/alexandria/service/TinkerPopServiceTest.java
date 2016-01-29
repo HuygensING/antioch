@@ -29,6 +29,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.tinkerpop.gremlin.structure.Element;
@@ -188,4 +189,26 @@ public class TinkerPopServiceTest {
   // Map<String, Object> propertyMap = traversal.propertyMap().next();
   // }
 
+  @Test
+  public void testReturnExistingSubresourceIfSubPlusParentIdMatches() {
+    // given
+    UUID resourceId = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
+    AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
+    service.createOrUpdateResource(resource);
+    UUID subUuid = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    String sub = "sub";
+    service.createSubResource(subUuid, resourceId, sub, provenance);
+    Optional<AlexandriaResource> oResource = service.findSubresourceWithSubAndParentId(sub, resourceId);
+    assertThat(oResource).isPresent();
+    assertThat(oResource.get().getId()).isEqualTo(subUuid);
+
+    UUID resourceId1 = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    AlexandriaResource resource1 = new AlexandriaResource(resourceId1, provenance);
+    service.createOrUpdateResource(resource1);
+
+    Optional<AlexandriaResource> oResource1 = service.findSubresourceWithSubAndParentId(sub, resourceId1);
+    assertThat(oResource1.isPresent()).isFalse();
+
+  }
 }

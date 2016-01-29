@@ -242,20 +242,16 @@ public class TinkerPopService implements AlexandriaService {
     // TODO: find the gremlin way to do this in one:
     // in cypher: match (r:Resource{uuid:parentId})<-[:PART_OF]-(s:Resource{cargo:sub}) return s.uuid
     storage.startTransaction();
-    final List<ResourceVF> results = storage.find(ResourceVF.class)//
+    Optional<AlexandriaResource> result = storage.find(ResourceVF.class)//
         .has("cargo", sub)//
-        .toList();
-    storage.rollbackTransaction();
-
-    if (results.isEmpty()) {
-      return Optional.empty();
-    }
-
-    results.stream()//
+        .toList()//
+        .stream()//
         .filter(r -> r.getParentResource() != null//
             && r.getParentResource().getUuid().equals(parentId.toString()))//
-        .collect(toList());
-    return Optional.of(deframeResource(results.get(0)));
+        .map(this::deframeResource)//
+        .findFirst();
+    storage.rollbackTransaction();
+    return result;
   }
 
   @Override

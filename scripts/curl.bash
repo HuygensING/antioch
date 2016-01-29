@@ -30,7 +30,7 @@ curl -i -X PUT $be/resources/$ri -H 'Content-type: application/json' \
   "ref":"whatEver"
 }}'
 
-curl -i -X POST $be/resources/$ri/subresources -H 'Content-type: application/json' \
+curl -i -H "${authheader}" -X POST $be/resources/$ri/subresources -H 'Content-type: application/json' \
 --data-binary '{"subresource":{
   "sub":"title"
 }}'
@@ -258,7 +258,6 @@ curl -i -H "${authheader}" -X POST $be/resources/$ri/annotations -H 'Content-typ
     "why":"interesting"
   }
 }}'
-
 curl -i -H "${authheader}" -X POST $be/annotations/$ai/annotations -H 'Content-type: application/json' \
 --data-binary '{"annotation":{
   "locator" : "id:p-12",
