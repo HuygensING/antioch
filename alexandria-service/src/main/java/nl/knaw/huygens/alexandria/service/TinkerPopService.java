@@ -386,16 +386,19 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public SearchResult execute(AlexandriaQuery query) {
+    storage.startTransaction();
     Stopwatch stopwatch = Stopwatch.createStarted();
     List<Map<String, Object>> processQuery = processQuery(query);
     stopwatch.stop();
     long elapsedMillis = stopwatch.elapsed(TimeUnit.MILLISECONDS);
 
-    return new SearchResult(locationBuilder)//
+    SearchResult result = new SearchResult(locationBuilder)//
         .setId(UUID.randomUUID())//
         .setQuery(query)//
         .setSearchDurationInMilliseconds(elapsedMillis)//
         .setResults(processQuery);
+    storage.commitTransaction();
+    return result;
   }
 
   @Override
@@ -499,11 +502,15 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   public void dumpToGraphSON(OutputStream os) throws IOException {
+    storage.startTransaction();
     storage.dumpToGraphSON(os);
+    storage.rollbackTransaction();
   }
 
   public void dumpToGraphML(OutputStream os) throws IOException {
+    storage.startTransaction();
     storage.dumpToGraphML(os);
+    storage.rollbackTransaction();
   }
 
   // - package methods -//
@@ -706,9 +713,11 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Map<String, Object> getMetadata() {
+    storage.startTransaction();
     Map<String, Object> metadata = Maps.newLinkedHashMap();
     metadata.put("type", this.getClass().getCanonicalName());
     metadata.put("storage", storage.getMetadata());
+    storage.rollbackTransaction();
     return metadata;
   }
 
