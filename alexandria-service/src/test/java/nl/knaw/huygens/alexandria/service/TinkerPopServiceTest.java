@@ -214,4 +214,38 @@ public class TinkerPopServiceTest {
     Optional<AlexandriaResource> oResource1 = service.findSubresourceWithSubAndParentId(sub, resourceId1);
     assertThat(oResource1.isPresent()).isFalse();
   }
+
+  @Test
+  public void testDeletingAnAnnotationWithStateDeletedDoesNotFail() {
+    // given
+    UUID resourceId = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
+    AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
+    service.createOrUpdateResource(resource);
+
+    UUID annotationBodyId = UUID.fromString("22222222-2222-2222-2222-222222222222");
+    TentativeAlexandriaProvenance provenance1 = new TentativeAlexandriaProvenance("who1", Instant.now(), "why1");
+    AlexandriaAnnotationBody body1 = service.createAnnotationBody(annotationBodyId, "type", "value", provenance1);
+
+    UUID annotationId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    TentativeAlexandriaProvenance provenance2 = new TentativeAlexandriaProvenance("who2", Instant.now(), "why2");
+    AlexandriaAnnotation annotation = new AlexandriaAnnotation(annotationId, body1, provenance2);
+
+    service.annotateResourceWithAnnotation(resource, annotation);
+    annotation = service.readAnnotation(annotationId).get();
+    assertThat(annotation.getState()).isEqualTo(AlexandriaState.TENTATIVE);
+
+    service.confirmAnnotation(annotationId);
+    annotation = service.readAnnotation(annotationId).get();
+    assertThat(annotation.getState()).isEqualTo(AlexandriaState.CONFIRMED);
+
+    service.deleteAnnotation(annotation);
+    annotation = service.readAnnotation(annotationId).get();
+    assertThat(annotation.getState()).isEqualTo(AlexandriaState.DELETED);
+
+    service.deleteAnnotation(annotation);
+    annotation = service.readAnnotation(annotationId).get();
+    assertThat(annotation.getState()).isEqualTo(AlexandriaState.DELETED);
+  }
+
 }
