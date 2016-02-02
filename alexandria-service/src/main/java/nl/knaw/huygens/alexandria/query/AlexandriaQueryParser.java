@@ -320,8 +320,17 @@ public class AlexandriaQueryParser {
     return id2url(avf.getResourceId());
   }
 
+  static String getResourceRef(final AnnotationVF avf) {
+    return avf.getResource().getCargo();
+  }
+
   static String getSubResourceURL(final AnnotationVF avf) {
     return id2url(avf.getSubResourceId());
+  }
+
+  static String getSubResourceSub(final AnnotationVF avf) {
+    ResourceVF subResource = avf.getSubResource();
+    return (subResource != null) ? subResource.getCargo() : ":null";
   }
 
   private static String id2url(String resourceId) {

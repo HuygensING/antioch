@@ -97,6 +97,15 @@ public abstract class AnnotationVF extends AlexandriaVF {
     return getBody().getValue();
   }
 
+  public ResourceVF getResource() {
+    ResourceVF annotatedResource = getFirstAnnotatedResource();
+    if (annotatedResource != null) {
+      ResourceVF parentResource = annotatedResource.getParentResource();
+      return parentResource == null ? annotatedResource : parentResource;
+    }
+    return null;
+  }
+
   public String getResourceId() {
     ResourceVF annotatedResource = getFirstAnnotatedResource();
     if (annotatedResource != null) {
@@ -112,6 +121,14 @@ public abstract class AnnotationVF extends AlexandriaVF {
       return annotatedResource.getUuid();
     }
     return NO_VALUE;
+  }
+
+  public ResourceVF getSubResource() {
+    ResourceVF annotatedResource = getFirstAnnotatedResource();
+    if (annotatedResource != null && annotatedResource.isSubresource()) {
+      return annotatedResource;
+    }
+    return null;
   }
 
   private ResourceVF getFirstAnnotatedResource() {
