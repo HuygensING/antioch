@@ -196,19 +196,56 @@ public class TinkerPopServiceTest {
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
     AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
     service.createOrUpdateResource(resource);
+
     UUID subUuid = UUID.fromString("00000000-0000-0000-0000-000000000001");
     String sub = "sub";
     service.createSubResource(subUuid, resourceId, sub, provenance);
+
     Optional<AlexandriaResource> oResource = service.findSubresourceWithSubAndParentId(sub, resourceId);
     assertThat(oResource).isPresent();
     assertThat(oResource.get().getId()).isEqualTo(subUuid);
 
+    // now, create a new resource
     UUID resourceId1 = UUID.fromString("11111111-1111-1111-1111-111111111111");
     AlexandriaResource resource1 = new AlexandriaResource(resourceId1, provenance);
     service.createOrUpdateResource(resource1);
 
+    // I should be able to make a subresource on this new resource with the same value for sub
     Optional<AlexandriaResource> oResource1 = service.findSubresourceWithSubAndParentId(sub, resourceId1);
     assertThat(oResource1.isPresent()).isFalse();
-
   }
+
+  @Test
+  public void testDeletingAnAnnotationWithStateDeletedDoesNotFail() {
+    // given
+    UUID resourceId = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
+    AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
+    service.createOrUpdateResource(resource);
+
+    UUID annotationBodyId = UUID.fromString("22222222-2222-2222-2222-222222222222");
+    TentativeAlexandriaProvenance provenance1 = new TentativeAlexandriaProvenance("who1", Instant.now(), "why1");
+    AlexandriaAnnotationBody body1 = service.createAnnotationBody(annotationBodyId, "type", "value", provenance1);
+
+    UUID annotationId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    TentativeAlexandriaProvenance provenance2 = new TentativeAlexandriaProvenance("who2", Instant.now(), "why2");
+    AlexandriaAnnotation annotation = new AlexandriaAnnotation(annotationId, body1, provenance2);
+
+    service.annotateResourceWithAnnotation(resource, annotation);
+    annotation = service.readAnnotation(annotationId).get();
+    assertThat(annotation.getState()).isEqualTo(AlexandriaState.TENTATIVE);
+
+    service.confirmAnnotation(annotationId);
+    annotation = service.readAnnotation(annotationId).get();
+    assertThat(annotation.getState()).isEqualTo(AlexandriaState.CONFIRMED);
+
+    service.deleteAnnotation(annotation);
+    annotation = service.readAnnotation(annotationId).get();
+    assertThat(annotation.getState()).isEqualTo(AlexandriaState.DELETED);
+
+    service.deleteAnnotation(annotation);
+    annotation = service.readAnnotation(annotationId).get();
+    assertThat(annotation.getState()).isEqualTo(AlexandriaState.DELETED);
+  }
+
 }
