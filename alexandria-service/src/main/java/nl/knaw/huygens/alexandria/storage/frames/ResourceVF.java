@@ -38,6 +38,10 @@ public abstract class ResourceVF extends AlexandriaVF {
 
   public abstract void setCargo(String cargo);
 
+  public abstract Boolean getHasText();
+
+  public abstract void setHasText(Boolean hasText);
+
   @In
   @Edge(AnnotationVF.ANNOTATES_RESOURCE)
   public abstract List<AnnotationVF> getAnnotatedBy();

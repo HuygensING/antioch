@@ -1,8 +1,8 @@
-package nl.knaw.huygens.alexandria.annotation;
+package nl.knaw.huygens.alexandria.text;
 
 /*
  * #%L
- * alexandria-acceptance-tests
+ * alexandria-service
  * =======
  * Copyright (C) 2015 - 2016 Huygens ING (KNAW)
  * =======
@@ -22,18 +22,16 @@ package nl.knaw.huygens.alexandria.annotation;
  * #L%
  */
 
-import org.junit.BeforeClass;
+import java.io.InputStream;
+import java.util.Optional;
+import java.util.UUID;
 
-import nl.knaw.huygens.alexandria.concordion.AlexandriaAcceptanceTest;
-import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
-import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
-import nl.knaw.huygens.alexandria.jersey.exceptionmappers.WebApplicationExceptionMapper;
+public interface TextService {
+  // void set(UUID resourceUUID, String text);
 
-public class AnnotationsBase extends AlexandriaAcceptanceTest {
-  @BeforeClass
-  public static void registerEndpoint() {
-    register(AnnotationsEndpoint.class);
-    register(ResourcesEndpoint.class);
-    register(WebApplicationExceptionMapper.class);
-  }
+  void setFromStream(UUID resourceUUID, InputStream stream);
+
+  // Optional<String> get(UUID resourceUUID);
+
+  Optional<InputStream> getAsStream(UUID resourceUUID);
 }

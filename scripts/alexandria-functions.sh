@@ -8,7 +8,7 @@ function a-annotate-resource {
 }
 
 function a-location {
-	grep "Location:"|cut -d\  -f2|sed -e "s/\r//g"
+	grep "Location:"|cut -d\  -f2|sed -e "s/\r//g"|sed -e "s/https:\/\/acc.alexandria.huygens.knaw.nl/http:\/\/tc24alex.huygens.knaw.nl\/alexandria/g"
 }
 
 function a-confirm {
@@ -22,7 +22,7 @@ function a-find-annotations-for-resource {
 	url=$(curl -i -X POST -H "${authheader}" $be/searches -H 'Content-type: application/json' \
     --data-binary "{\"query\":{
 		\"find\" : \"annotation\",
-		\"where\" : \"who:eq(\\\"nederlab\\\") resource.id:eq(\\\"${resource_id}\\\")\",
+		\"where\" : \"resource.id:eq(\\\"${resource_id}\\\")\",
 		\"sort\" : \"-when\",
 		\"return\" : \"id,when,who,type,value,resource.id,resource.url,subresource.id,subresource.url\",
 		\"pageSize\" : 100
@@ -32,7 +32,7 @@ function a-find-annotations-for-resource {
 }
 
 function a-show-first-resultpage {
-	a-location | while read l; do curl -i ${l}/resultPages/1;done
+	a-location | while read l; do curl -i ${l}/pages/1;done
 }
 
 function a-generate-random-resource-with-annotation {
@@ -40,6 +40,14 @@ function a-generate-random-resource-with-annotation {
   a-generate-resource-with-uuid $id
   url=$(a-annotate-resource "$id" "Tag" "Test annotation for resource $id" | a-location)
   a-confirm $url
+}
+
+function a-test {
+  id=$(uuidgen)
+  a-generate-resource-with-uuid $id
+  url=$(a-annotate-resource "$id" "Tag" "Test annotation for resource $id" | a-location)
+  a-confirm $url
+  a-delete $url	
 }
 
 function a-generate-resource-with-uuid {
@@ -51,6 +59,9 @@ function a-generate-resource-with-uuid {
   }}"
 }
 
+function a-delete {
+	curl -i -X DELETE -H "${authheader}" $1
+}
 
 function a-set-backend {
 	export be=$1
@@ -66,6 +77,7 @@ function a-set-authkey {
 
 function a-use-localhost {
 	a-set-backend http://localhost:2015
+	a-set-authkey YHJZHjpke8JYjm5y
 }
 
 function a-use-test {
@@ -73,7 +85,8 @@ function a-use-test {
 }
 
 function a-use-acceptance {
-	a-set-backend https://acc.alexandria.huygens.knaw.nl/
+	a-set-backend http://tc24alex.huygens.knaw.nl/alexandria
+	a-set-authkey YHJZHjpke8JYjm5y
 }
 
 function a-use-production {
@@ -91,3 +104,6 @@ function a-about {
 function a-about-service {
   curl -H "${authheader}" $be/about/service
 }
+
+a-use-localhost
+

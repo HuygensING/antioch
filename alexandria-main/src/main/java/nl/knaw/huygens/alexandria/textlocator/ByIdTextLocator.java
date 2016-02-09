@@ -1,8 +1,8 @@
-package nl.knaw.huygens.alexandria.annotation;
+package nl.knaw.huygens.alexandria.textlocator;
 
 /*
  * #%L
- * alexandria-acceptance-tests
+ * alexandria-main
  * =======
  * Copyright (C) 2015 - 2016 Huygens ING (KNAW)
  * =======
@@ -22,18 +22,25 @@ package nl.knaw.huygens.alexandria.annotation;
  * #L%
  */
 
-import org.junit.BeforeClass;
+public class ByIdTextLocator implements AlexandriaTextLocator {
+  static final String PREFIX = "id";
+  String id;
 
-import nl.knaw.huygens.alexandria.concordion.AlexandriaAcceptanceTest;
-import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
-import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
-import nl.knaw.huygens.alexandria.jersey.exceptionmappers.WebApplicationExceptionMapper;
+  public String getId() {
+    return id;
+  }
 
-public class AnnotationsBase extends AlexandriaAcceptanceTest {
-  @BeforeClass
-  public static void registerEndpoint() {
-    register(AnnotationsEndpoint.class);
-    register(ResourcesEndpoint.class);
-    register(WebApplicationExceptionMapper.class);
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public AlexandriaTextLocator withId(String id) {
+    setId(id);
+    return this;
+  }
+
+  @Override
+  public String toString() {
+    return PREFIX + ":" + id;
   }
 }

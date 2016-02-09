@@ -56,6 +56,7 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.storage.Storage;
+import nl.knaw.huygens.alexandria.text.TextService;
 
 @Singleton
 public class TitanService extends TinkerPopService {
@@ -122,8 +123,8 @@ public class TitanService extends TinkerPopService {
   }
 
   @Inject
-  public TitanService(LocationBuilder locationBuilder, AlexandriaConfiguration configuration) {
-    super(getStorage(configuration), locationBuilder);
+  public TitanService(LocationBuilder locationBuilder, AlexandriaConfiguration configuration, TextService textService) {
+    super(getStorage(configuration), locationBuilder, textService);
     this.configuration = configuration;
   }
 

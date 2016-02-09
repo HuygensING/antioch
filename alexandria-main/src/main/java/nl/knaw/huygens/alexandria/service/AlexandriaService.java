@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.service;
 
+import java.io.InputStream;
+
 /*
  * #%L
  * alexandria-main
@@ -37,6 +39,7 @@ import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
 
 public interface AlexandriaService {
   // NOTE: should these service methods all be atomic?
@@ -57,6 +60,8 @@ public interface AlexandriaService {
   Optional<AlexandriaAnnotationBody> readAnnotationBody(UUID uuid);
 
   AlexandriaAnnotation annotate(AlexandriaResource resource, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance);
+
+  AlexandriaAnnotation annotate(AlexandriaResource resource, AlexandriaTextLocator textLocator, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance);
 
   AlexandriaAnnotation annotate(AlexandriaAnnotation annotation, AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance);
 
@@ -109,5 +114,14 @@ public interface AlexandriaService {
   void exportDb(String format, String filename);
 
   void importDb(String format, String filename);
+
+  // ResourceText methods
+  // void setResourceText(UUID resourceUUID, String text);
+  //
+  // Optional<String> getResourceText(UUID resourceUUID);
+
+  void setResourceTextFromStream(UUID resourceUUID, InputStream inputStream);
+
+  Optional<InputStream> getResourceTextAsStream(UUID resourceUUID);
 
 }

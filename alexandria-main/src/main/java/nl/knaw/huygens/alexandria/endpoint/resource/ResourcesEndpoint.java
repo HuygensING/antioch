@@ -23,9 +23,7 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
  */
 
 import static nl.knaw.huygens.alexandria.endpoint.EndpointPaths.RESOURCES;
-
-import java.util.UUID;
-import java.util.function.Supplier;
+import static nl.knaw.huygens.alexandria.endpoint.resource.ResourceValidatorFactory.resourceNotFoundForId;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -38,7 +36,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -52,8 +49,6 @@ import nl.knaw.huygens.alexandria.endpoint.StatePrototype;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
-import nl.knaw.huygens.alexandria.exception.NotFoundException;
-import nl.knaw.huygens.alexandria.exception.TentativeObjectException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -63,7 +58,7 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 @Api(RESOURCES)
 public class ResourcesEndpoint extends JSONEndpoint {
 
-  private final AlexandriaService alexandriaService;
+  private final AlexandriaService service;
   private final ResourceEntityBuilder entityBuilder;
   private final ResourceCreationRequestBuilder requestBuilder;
   private final LocationBuilder locationBuilder;
@@ -73,19 +68,11 @@ public class ResourcesEndpoint extends JSONEndpoint {
                            ResourceCreationRequestBuilder requestBuilder, //
                            LocationBuilder locationBuilder, //
                            ResourceEntityBuilder entityBuilder) {
+    this.service = service;
     this.locationBuilder = locationBuilder;
-    this.alexandriaService = service;
     this.entityBuilder = entityBuilder;
     this.requestBuilder = requestBuilder;
-    Log.trace("Resources created, alexandriaService=[{}]", service);
-  }
-
-  public static Supplier<NotFoundException> resourceNotFoundForId(Object id) {
-    return () -> new NotFoundException("No resource found with id " + id);
-  }
-
-  public static WebApplicationException resourceIsTentativeException(UUID uuid) {
-    return new TentativeObjectException("resource " + uuid + " is tentative, please confirm first");
+    Log.trace("Resources created, service=[{}]", service);
   }
 
   @GET
@@ -103,7 +90,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
     protoType.setState(AlexandriaState.TENTATIVE);
     final ResourceCreationRequest request = requestBuilder.build(protoType);
-    AlexandriaResource resource = request.execute(alexandriaService);
+    AlexandriaResource resource = request.execute(service);
 
     if (request.wasExecutedAsIs()) {
       return noContent();
@@ -123,7 +110,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
       if (!resource.isActive()) {
         throw new ConflictException(resource.getState() + " resources cannot be set to CONFIRMED");
       }
-      alexandriaService.confirmResource(resource.getId());
+      service.confirmResource(resource.getId());
       return noContent();
     }
     throw new BadRequestException("for now, you can only set the state to CONFIRMED");
@@ -139,14 +126,14 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @Path("{uuid}")
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation(value = "update/create the resource with the given uuid")
-  public Response setResourceAtSpecificID(@PathParam("uuid") final UUIDParam uuid, @NotNull @Valid @MatchesPathId
-  ResourcePrototype protoType) {
+  public Response setResourceAtSpecificID(@PathParam("uuid") final UUIDParam uuid, //
+                                          @NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
 
     protoType.setState(AlexandriaState.CONFIRMED);
     protoType.setId(uuid); // in case the prototype has no id, get it from the Path
     final ResourceCreationRequest request = requestBuilder.build(protoType);
-    AlexandriaResource resource = request.execute(alexandriaService);
+    AlexandriaResource resource = request.execute(service);
 
     if (request.newResourceWasCreated()) {
       return created(resource);
@@ -171,11 +158,16 @@ public class ResourcesEndpoint extends JSONEndpoint {
     return ResourceAnnotationsEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }
 
+  @Path("{uuid}/text")
+  public Class<ResourceTextEndpoint> getResourceTextEndpoint() {
+    return ResourceTextEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
+  }
+
   @Path("{uuid}/provenance")
   public ResourceProvenanceEndpoint getProvenanceEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
     // If we let Jersey handle the lifecycle, this endpoint doesn't show up in the standard application.wadl
     // TODO: make the combination subresource as class/application.wadl work swagger seems to have the same problem
-    return new ResourceProvenanceEndpoint(alexandriaService, uuidParam, locationBuilder);
+    return new ResourceProvenanceEndpoint(service, uuidParam, locationBuilder);
   }
 
   private Response created(AlexandriaResource resource) {
@@ -187,6 +179,6 @@ public class ResourcesEndpoint extends JSONEndpoint {
   }
 
   private AlexandriaResource readExistingResource(UUIDParam id) {
-    return alexandriaService.readResource(id.getValue()).orElseThrow(resourceNotFoundForId(id));
+    return service.readResource(id.getValue()).orElseThrow(resourceNotFoundForId(id));
   }
 }

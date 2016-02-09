@@ -68,9 +68,9 @@ public class ResourceAnnotationsEndpoint extends AnnotatableObjectAnnotationsEnd
   @Override
   protected AbstractAnnotatable getAnnotatableObject() {
     AlexandriaResource resource = service.readResource(uuid)//
-        .orElseThrow(ResourcesEndpoint.resourceNotFoundForId(uuid));
+        .orElseThrow(ResourceValidatorFactory.resourceNotFoundForId(uuid));
     if (resource.isTentative()) {
-      throw ResourcesEndpoint.resourceIsTentativeException(uuid);
+      throw ResourceValidatorFactory.resourceIsTentativeException(uuid);
     }
     return resource;
   }

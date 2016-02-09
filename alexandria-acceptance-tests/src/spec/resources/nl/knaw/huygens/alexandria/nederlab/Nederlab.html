@@ -519,7 +519,7 @@
         with the Location header pointing to the results of our query.
     </h:request>
 
-    <div c:execute="#searchId = uuid()"></div>
+    <div c:execute="#searchId = uuid()">&#160;</div>
 
     <h:request>We follow the Location header and
         <h:get>/searches/$searchId</h:get>
@@ -609,7 +609,7 @@
         with the Location header pointing to the results of our query.
     </h:request>
 
-    <div c:execute="#searchId2 = uuid()"></div>
+    <div c:execute="#searchId2 = uuid()">&#160;</div>
 
     <h:request>We follow the Location header and
         <h:get>/searches/$searchId2</h:get>
@@ -675,7 +675,7 @@
         with the Location header pointing to the results of our query.
     </h:request>
 
-    <div c:execute="#searchId3 = uuid()"></div>
+    <div c:execute="#searchId3 = uuid()">&#160;</div>
 
     <h:request>We follow the Location header and
         <h:get>/searches/$searchId3</h:get>
@@ -703,6 +703,184 @@
             "value": "An early user comment.",
             "resource.url": "https://{host}/resources/00000002-3f4e-11e5-91d3-bfea30e2969c",
             "_resultNumber": 1
+            } ] } }
+        </h:jsonResponse>
+    </h:request>
+</div>
+
+<div id="show-distinct-resource-id-for-user" data-desc="How can I show the distinct ids of resources annotated by a specific user?" c:execute="clearStorage()">
+    Given the following annotated resources (for brevity, all annotations are considered to be of type 'Tag')
+    in order of creation timestamp
+    <table class="table"
+           c:execute="resourceExistsWithTagForUserAtInstant(#resId, #value, #who, #when)">
+        <thead>
+        <tr>
+            <th c:set="#resId">Resource Id</th>
+            <th c:set="#value">Annotation value</th>
+            <th c:set="#who">Owner</th>
+            <th c:set="#when">Created at</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>A very early user comment.</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-06-06T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>A slightly later user comment.</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-06-07T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000002-3f4e-11e5-91d3-bfea30e2969c</code></td>
+            <td><code>An early user comment.</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-07-07T07:07:07+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
+            <td><code>Something entirely unrelated.</code></td>
+            <td><code>peer-1337</code></td>
+            <td><code>2015-08-08T08:08:08+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>A more recent user comment.</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="alert alert-info sm">
+        We show how to find the resource.ids of all annotations of type
+        <mark><strong>Tag</strong></mark>
+        for user with id
+        <mark><strong>user-4242</strong></mark>
+    </div>
+
+    <h:request>
+        We
+        <h:post>/searches</h:post>
+        the body
+        <h:jsonBody>{
+            "query": {
+            "find": "annotation",
+            "where": "who:eq(\"user-4242\") type:eq(\"Tag\")",
+            "return": "resource.id"
+            } }
+        </h:jsonBody>
+        and observe status
+        <h:status>201 Created</h:status>
+        with the Location header pointing to the results of our query.
+    </h:request>
+
+    <div c:execute="#searchId = uuid()">&#160;</div>
+
+    <h:request>We follow the Location header and
+        <h:get>/searches/$searchId</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "searchResult" : {
+            "id" : "$searchId",
+            "query" : {
+            "find" : "annotation",
+            "where" : "who:eq(\"user-4242\") type:eq(\"Tag\") state:eq(\"CONFIRMED\")",
+            "sort" : "-when",
+            "return" : "resource.id"
+            },
+            "totalResults" : 4,
+            "totalPages" : 1,
+            "^firstPage": "https://{host}/searches/$searchId/pages/1"
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+    <div class="alert alert-warning sm">
+        <ul>
+            <li>
+                The <code>sort</code> field, which we left unspecified, defaults to <code>"-when"</code>
+                (= reverse timestamp order: "most recent first").
+            </li>
+            <li>
+                The <code>state</code> of the <code>where</code> field, which we left unspecified, defaults to
+                <code>"CONFIRMED"</code>
+            </li>
+        </ul>
+    </div>
+
+    <h:request>We
+        <h:get>/searches/$searchId/pages/1</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{ "searchResultPage": {
+            "pageNumber": 1,
+            "records": [
+            {
+            "resource.id": "00000003-5b7f-11e5-898c-237ee1c6d1d4",
+            "_resultNumber": 1
+            },
+            {
+            "resource.id": "00000002-3f4e-11e5-91d3-bfea30e2969c",
+            "_resultNumber": 2
+            },
+            {
+            "resource.id": "00000001-5ba6-11e5-9054-ab0dd746f7f7",
+            "_resultNumber": 3
+            },
+            {
+            "resource.id": "00000001-5ba6-11e5-9054-ab0dd746f7f7",
+            "_resultNumber": 4
+            } ] } }
+        </h:jsonResponse>
+    </h:request>
+    
+    Notice that the resource.id <code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code> is returned twice, since this resource has been annotated twice by the user.
+    
+    <h:request>
+        To make sure each resource.id is returned only once, we add the <code>distinct</code> parameter, we
+        <h:post>/searches</h:post>
+        the body
+        <h:jsonBody>{
+            "query": {
+            "find": "annotation",
+            "where": "who:eq(\"user-4242\") type:eq(\"Tag\")",
+            "distinct" : true,
+            "return": "resource.id"
+            } }
+        </h:jsonBody>
+        and observe status
+        <h:status>201 Created</h:status>
+        with the Location header pointing to the results of our query.
+    </h:request>
+
+    <div c:execute="#searchId = uuid()">&#160;</div>
+    
+    <h:request>We now can get
+        <h:get>/searches/$searchId/pages/1</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{ "searchResultPage": {
+            "pageNumber": 1,
+            "records": [
+            {
+            "resource.id": "00000003-5b7f-11e5-898c-237ee1c6d1d4",
+            "_resultNumber": 1
+            },
+            {
+            "resource.id": "00000002-3f4e-11e5-91d3-bfea30e2969c",
+            "_resultNumber": 2
+            },
+            {
+            "resource.id": "00000001-5ba6-11e5-9054-ab0dd746f7f7",
+            "_resultNumber": 3
             } ] } }
         </h:jsonResponse>
     </h:request>

@@ -22,18 +22,9 @@ package nl.knaw.huygens.alexandria.annotation;
  * #L%
  */
 
-import org.junit.BeforeClass;
+import org.concordion.integration.junit4.ConcordionRunner;
+import org.junit.runner.RunWith;
 
-import nl.knaw.huygens.alexandria.concordion.AlexandriaAcceptanceTest;
-import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
-import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
-import nl.knaw.huygens.alexandria.jersey.exceptionmappers.WebApplicationExceptionMapper;
-
-public class AnnotationsBase extends AlexandriaAcceptanceTest {
-  @BeforeClass
-  public static void registerEndpoint() {
-    register(AnnotationsEndpoint.class);
-    register(ResourcesEndpoint.class);
-    register(WebApplicationExceptionMapper.class);
-  }
+@RunWith(ConcordionRunner.class)
+public class ResourceTextAnnotationFixture extends AnnotationsBase {
 }

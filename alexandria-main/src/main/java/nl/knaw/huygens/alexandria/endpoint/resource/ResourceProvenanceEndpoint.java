@@ -42,7 +42,7 @@ public class ResourceProvenanceEndpoint extends AccountableProvenanceEndpoint {
 
   @Override
   protected Accountable getAccountable() {
-    return service.readResource(uuid).orElseThrow(ResourcesEndpoint.resourceNotFoundForId(uuid));
+    return service.readResource(uuid).orElseThrow(ResourceValidatorFactory.resourceNotFoundForId(uuid));
   }
 
 }

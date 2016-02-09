@@ -1,8 +1,8 @@
-package nl.knaw.huygens.alexandria.annotation;
+package nl.knaw.huygens.alexandria.endpoint.resource;
 
 /*
  * #%L
- * alexandria-acceptance-tests
+ * alexandria-main
  * =======
  * Copyright (C) 2015 - 2016 Huygens ING (KNAW)
  * =======
@@ -22,18 +22,21 @@ package nl.knaw.huygens.alexandria.annotation;
  * #L%
  */
 
-import org.junit.BeforeClass;
+import javax.validation.constraints.NotNull;
 
-import nl.knaw.huygens.alexandria.concordion.AlexandriaAcceptanceTest;
-import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
-import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
-import nl.knaw.huygens.alexandria.jersey.exceptionmappers.WebApplicationExceptionMapper;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
-public class AnnotationsBase extends AlexandriaAcceptanceTest {
-  @BeforeClass
-  public static void registerEndpoint() {
-    register(AnnotationsEndpoint.class);
-    register(ResourcesEndpoint.class);
-    register(WebApplicationExceptionMapper.class);
+import nl.knaw.huygens.alexandria.endpoint.JsonWrapperObject;
+import nl.knaw.huygens.alexandria.endpoint.Prototype;
+
+@JsonTypeName("text")
+public class TextPrototype extends JsonWrapperObject implements Prototype {
+
+  @NotNull(message = "{nl.knaw.huygens.alexandria.endpoint.resource.TextProtoType.ref.NotNull.message}")
+  private String body;
+
+  public String getBody() {
+    return body;
   }
+
 }
