@@ -229,6 +229,7 @@
         <thead>
         <tr>
             <th c:set="#subId">Subresource Id</th>
+            <th>Subresource Sub</th>
             <th c:set="#type">Annotation type</th>
             <th c:set="#value">Annotation value</th>
         </tr>
@@ -236,11 +237,13 @@
         <tbody>
         <tr>
             <td><code>3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c</code></td>
+            <td><code>/some/folia/expression/0</code></td>
             <td><code>subres1-type</code></td>
             <td><code>subres1-value</code></td>
         </tr>
         <tr>
             <td><code>3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85</code></td>
+            <td><code>/some/folia/expression/1</code></td>
             <td><code>subres2-type</code></td>
             <td><code>subres2-value</code></td>
         </tr>
@@ -255,7 +258,7 @@
         <h:jsonBody>{ "query": {
             "find": "annotation",
             "where": "who:eq(\"nederlab\") resource.id:eq(\"13e53670-3f3f-11e5-96ef-dff0c5cf4b9b\")",
-            "return": "id,resource.url,subresource.url,type,value"
+            "return": "id,resource.url,subresource.url,subresource.sub,type,value"
             } }
         </h:jsonBody>
     </h:request>
@@ -268,7 +271,7 @@
         <h:get>/searches/$searchId/pages/1</h:get>
         and observe
         <h:status>200 OK</h:status>
-        and the relevant, resource and subresource <code>url</code>s in the body
+        and the relevant resource and subresource <code>url</code>s in the body
         <h:jsonResponse>{ "searchResultPage": {
             "records": [
             {
@@ -280,13 +283,15 @@
             "type": "subres1-type",
             "value": "subres1-value",
             "resource.url": "https://{host}/resources/13e53670-3f3f-11e5-96ef-dff0c5cf4b9b",
-            "subresource.url": "https://{host}/resources/3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c"
+            "subresource.url": "https://{host}/resources/3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c",
+            "subresource.sub": "/some/folia/expression/0"
             },
             {
             "type": "subres2-type",
             "value": "subres2-value",
             "resource.url": "https://{host}/resources/13e53670-3f3f-11e5-96ef-dff0c5cf4b9b",
-            "subresource.url": "https://{host}/resources/3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85"
+            "subresource.url": "https://{host}/resources/3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85",
+            "subresource.sub": "/some/folia/expression/1"
             }
             ] } }
         </h:jsonResponse>

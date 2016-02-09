@@ -37,7 +37,7 @@ public class TestConfiguration extends AbstractAlexandriaConfigurationUsingAlexa
 
   @Override
   public String getStorageDirectory() {
-    return "c:/data/alexandria";
+    return "e:/data/alexandria";
   }
 
 }
