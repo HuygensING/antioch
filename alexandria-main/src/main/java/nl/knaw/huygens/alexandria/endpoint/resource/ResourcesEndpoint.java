@@ -62,6 +62,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   private final ResourceEntityBuilder entityBuilder;
   private final ResourceCreationRequestBuilder requestBuilder;
   private final LocationBuilder locationBuilder;
+  protected static final String BASELAYERDEFINITION = "baselayerdefinition";
 
   @Inject
   public ResourcesEndpoint(AlexandriaService service, //
@@ -117,7 +118,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   }
 
   @PUT
-  @Path("{uuid}/baselayerdefinition")
+  @Path("{uuid}/" + BASELAYERDEFINITION)
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation(value = "Set the baselayer definition")
   public Response setBaseLayerDefinition(@PathParam("uuid") final UUIDParam uuidParam, @NotNull BaseLayerDefinitionPrototype protoType) {
@@ -131,7 +132,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   }
 
   @GET
-  @Path("{uuid}/baselayerdefinition")
+  @Path("{uuid}/" + BASELAYERDEFINITION)
   @ApiOperation(value = "Get the baselayer definition")
   public Response getBaseLayerDefinition(@PathParam("uuid") final UUIDParam uuidParam) {
     AlexandriaResource resource = readExistingResource(uuidParam);
