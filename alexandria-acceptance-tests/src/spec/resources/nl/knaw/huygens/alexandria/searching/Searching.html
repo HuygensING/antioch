@@ -147,7 +147,10 @@
         </h:jsonResponse>
     </h:request>
 
-    <div class="alert alert-info sm">A convenience link <code>^nextPage</code> is included on the first page.</div>
+    <div class="alert alert-info sm">
+        Convenience links <code>^firstPage</code> and <code>^lastPage</code> are included on all pages.
+        Convenience links <code>^nextPage</code> and <code>^previousPage</code> are included where appropriate.
+    </div>
 
     <hr/>
 
@@ -173,10 +176,6 @@
         </h:jsonResponse>
     </h:request>
 
-    <div class="alert alert-info sm">Both <code>^nextPage</code> and <code>^previousPage</code> convenience links are
-        included on the middle pages.
-    </div>
-
     <hr/>
 
     <h:request>
@@ -198,10 +197,6 @@
             } }
         </h:jsonResponse>
     </h:request>
-
-    <div class="alert alert-info sm">The convenience link <code>^nextPage</code> is now absent, signaling this
-        is the final page.
-    </div>
 
     <hr/>
 
