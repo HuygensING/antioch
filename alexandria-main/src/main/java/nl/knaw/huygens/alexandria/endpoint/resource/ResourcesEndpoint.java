@@ -41,7 +41,6 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -49,6 +48,7 @@ import nl.knaw.huygens.alexandria.endpoint.StatePrototype;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
+import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -65,9 +65,9 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   @Inject
   public ResourcesEndpoint(AlexandriaService service, //
-                           ResourceCreationRequestBuilder requestBuilder, //
-                           LocationBuilder locationBuilder, //
-                           ResourceEntityBuilder entityBuilder) {
+      ResourceCreationRequestBuilder requestBuilder, //
+      LocationBuilder locationBuilder, //
+      ResourceEntityBuilder entityBuilder) {
     this.service = service;
     this.locationBuilder = locationBuilder;
     this.entityBuilder = entityBuilder;
@@ -116,6 +116,31 @@ public class ResourcesEndpoint extends JSONEndpoint {
     throw new BadRequestException("for now, you can only set the state to CONFIRMED");
   }
 
+  @PUT
+  @Path("{uuid}/baselayerdefinition")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @ApiOperation(value = "Set the baselayer definition")
+  public Response setBaseLayerDefinition(@PathParam("uuid") final UUIDParam uuidParam, @NotNull BaseLayerDefinitionPrototype protoType) {
+    Log.trace("protoType=[{}]", protoType);
+    AlexandriaResource resource = readExistingResource(uuidParam);
+    if (resource.hasDirectBaseLayerDefinition()) {
+      throw new ConflictException("This resource already has a baselayer definition");
+    }
+    service.setBaseLayerDefinition(uuidParam.getValue(), protoType.getBaseElementDefinitions());
+    return noContent();
+  }
+
+  @GET
+  @Path("{uuid}/baselayerdefinition")
+  @ApiOperation(value = "Get the baselayer definition")
+  public Response getBaseLayerDefinition(@PathParam("uuid") final UUIDParam uuidParam) {
+    AlexandriaResource resource = readExistingResource(uuidParam);
+    if (!resource.hasDirectBaseLayerDefinition()) {
+      throw new NotFoundException("This resource has no baselayer definition"); // TODO: alternatively, throw redirected to ancestor baselayer definition (if any)
+    }
+    return ok(resource.getBaseLayerDefinition());
+  }
+
   @DELETE
   @Path("{uuid}")
   public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
@@ -127,7 +152,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation(value = "update/create the resource with the given uuid")
   public Response setResourceAtSpecificID(@PathParam("uuid") final UUIDParam uuid, //
-                                          @NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
+      @NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
 
     protoType.setState(AlexandriaState.CONFIRMED);

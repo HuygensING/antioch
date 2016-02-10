@@ -278,3 +278,13 @@ curl -i -H "${authheader}" -X POST $be/annotations/$ai/annotations -H 'Content-t
 #- on resource -> annotation with id locator on resource with text but ☺gives badrequest
 
 
+
+curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
+--data-binary '{"baseLayerDefinition":{
+  "baseElementDefinitions" : [
+     { "name": "p", "baseAttributes": [ "id" ] },
+     { "name": "div", "baseAttributes" : [ "id", "by" ] }
+  ]}
+}'
+
+curl -i -H "${authheader}" $be/resources/$ri/baselayerdefinition

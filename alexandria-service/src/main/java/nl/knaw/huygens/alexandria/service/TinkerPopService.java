@@ -47,11 +47,15 @@ import java.util.stream.Stream;
 import javax.inject.Inject;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
 
+import net.sf.kdgcommons.lang.StringUtil;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
@@ -63,6 +67,8 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.model.BaseLayerDefinition.BaseElementDefinition;
 import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
@@ -390,6 +396,22 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
+  public void setBaseLayerDefinition(UUID resourceUUID, List<BaseElementDefinition> baseElements) {
+    storage.startTransaction();
+    ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
+    String json;
+    try {
+      json = new ObjectMapper().writeValueAsString(baseElements);
+      resourceVF.setBaseLayerDefinition(json);
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+      storage.rollbackTransaction();
+      throw new RuntimeException(e);
+    }
+    storage.commitTransaction();
+  }
+
+  @Override
   public SearchResult execute(AlexandriaQuery query) {
     storage.startTransaction();
     Stopwatch stopwatch = Stopwatch.createStarted();
@@ -459,10 +481,10 @@ public class TinkerPopService implements AlexandriaService {
       storage.readGraph(DumpFormat.valueOf(format), filename);
     } catch (IOException e) {
       e.printStackTrace();
+      storage.rollbackTransaction();
       throw new RuntimeException(e);
-    } finally {
-      storage.commitTransaction();
     }
+    storage.commitTransaction();
   }
 
   // - other public methods -//
@@ -607,6 +629,8 @@ public class TinkerPopService implements AlexandriaService {
     resource.setCargo(rvf.getCargo());
     resource.setState(AlexandriaState.valueOf(rvf.getState()));
     resource.setStateSince(Instant.ofEpochSecond(rvf.getStateSince()));
+    setOptionalBaseLayerDefinition(rvf, resource);
+    
     for (AnnotationVF annotationVF : rvf.getAnnotatedBy()) {
       AlexandriaAnnotation annotation = deframeAnnotation(annotationVF);
       resource.addAnnotation(annotation);
@@ -618,6 +642,22 @@ public class TinkerPopService implements AlexandriaService {
     rvf.getSubResources().stream()//
         .forEach(vf -> resource.addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
     return resource;
+  }
+
+  private void setOptionalBaseLayerDefinition(ResourceVF rvf, AlexandriaResource resource) {
+    String baseLayerDefinitionJson = rvf.getBaseLayerDefinition();
+    if (StringUtils.isNotEmpty(baseLayerDefinitionJson)) {
+      try {
+        BaseLayerDefinition bld = new BaseLayerDefinition();
+        List<BaseElementDefinition> baseElementDefinitions = new ObjectMapper().readValue(baseLayerDefinitionJson, List.class);
+        bld.setBaseElementDefinitions(baseElementDefinitions);
+        resource.setBaseLayerDefinition(bld);
+      } catch (IOException e) {
+        e.printStackTrace();
+        storage.rollbackTransaction();
+        throw new RuntimeException(e);
+      }
+    }
   }
 
   private AlexandriaAnnotation deframeAnnotation(AnnotationVF annotationVF) {

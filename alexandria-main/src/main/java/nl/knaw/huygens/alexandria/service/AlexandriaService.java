@@ -25,6 +25,7 @@ import java.io.InputStream;
  */
 
 import java.time.temporal.TemporalAmount;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -36,6 +37,7 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.model.BaseLayerDefinition.BaseElementDefinition;
 import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
@@ -123,5 +125,7 @@ public interface AlexandriaService {
   void setResourceTextFromStream(UUID resourceUUID, InputStream inputStream);
 
   Optional<InputStream> getResourceTextAsStream(UUID resourceUUID);
+
+  void setBaseLayerDefinition(UUID value, List<BaseElementDefinition> baseElements);
 
 }
