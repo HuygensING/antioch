@@ -25,6 +25,8 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
 import static nl.knaw.huygens.alexandria.endpoint.EndpointPaths.RESOURCES;
 import static nl.knaw.huygens.alexandria.endpoint.resource.ResourceValidatorFactory.resourceNotFoundForId;
 
+import java.net.URI;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.Valid;
@@ -128,7 +130,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
       throw new ConflictException("This resource already has a baselayer definition");
     }
     service.setBaseLayerDefinition(uuidParam.getValue(), protoType.getBaseElementDefinitions());
-    return noContent();
+    return created(URI.create(locationBuilder.locationOf(resource) + "/" + BASELAYERDEFINITION));
   }
 
   @GET
