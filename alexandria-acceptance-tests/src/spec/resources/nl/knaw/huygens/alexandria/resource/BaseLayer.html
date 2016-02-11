@@ -25,9 +25,9 @@
       xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
                           http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
 
-<title>Base Layer Definition</title>
+<title>Base Layer</title>
 
-<body data-desc="Base Layer Definition">
+<body data-desc="Base Layer">
 
 <div id="set-baselayer-1" c:execute="clearStorage()"
      data-desc="How do I define the base layer for a resource?">
@@ -46,11 +46,11 @@
 
     <h:request>
         When I
-        <h:put>/resources/11111111-1111-1111-1111-111111111111/baselayerdefinition</h:put>
+        <h:put>/resources/11111111-1111-1111-1111-111111111111/baselayer</h:put>
         the body:
         <h:jsonBody>{
-            "baseLayerDefinition": {
-            "baseElementDefinitions": [
+            "baseLayer": {
+            "baseElements": [
             {"name" : "div", "baseAttributes" : ["id"] },
             {"name" : "p" }
             ] } }
@@ -75,7 +75,7 @@
              <small>(only relevant fields shown for brevity)</small>
                 <h:jsonResponse>{
                 "resource" : {
-                "^baseLayerDefinition": "https://{host}/resources/11111111-1111-1111-1111-111111111111/baselayerdefinition"
+                "^baseLayer": "https://{host}/resources/11111111-1111-1111-1111-111111111111/baselayer"
                 } }
                 </h:jsonResponse>
             </li>
@@ -84,7 +84,7 @@
     <br/>
     <h:request>
         If I then
-        <h:get>/resources/11111111-1111-1111-1111-111111111111/baselayerdefinition</h:get>
+        <h:get>/resources/11111111-1111-1111-1111-111111111111/baselayer</h:get>
         Then I should receive
         <ul>
             <li>status
@@ -92,7 +92,7 @@
             </li>
             <li>and body
                 <h:jsonResponse>{
-            "baseElementDefinitions": [
+            "baseElements": [
             {"name" : "div", "baseAttributes" : ["id"] },
             {"name" : "p" }
             ] }

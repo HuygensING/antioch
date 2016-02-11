@@ -62,7 +62,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   private final ResourceEntityBuilder entityBuilder;
   private final ResourceCreationRequestBuilder requestBuilder;
   private final LocationBuilder locationBuilder;
-  protected static final String BASELAYERDEFINITION = "baselayerdefinition";
+  protected static final String BASELAYER = "baselayer";
 
   @Inject
   public ResourcesEndpoint(AlexandriaService service, //
@@ -118,28 +118,28 @@ public class ResourcesEndpoint extends JSONEndpoint {
   }
 
   @PUT
-  @Path("{uuid}/" + BASELAYERDEFINITION)
+  @Path("{uuid}/" + BASELAYER)
   @Consumes(MediaType.APPLICATION_JSON)
-  @ApiOperation(value = "Set the baselayer definition")
-  public Response setBaseLayerDefinition(@PathParam("uuid") final UUIDParam uuidParam, @NotNull BaseLayerDefinitionPrototype protoType) {
+  @ApiOperation(value = "Set the baselayer")
+  public Response setBaseLayer(@PathParam("uuid") final UUIDParam uuidParam, @NotNull BaseLayerPrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
     AlexandriaResource resource = readExistingResource(uuidParam);
-    if (resource.hasDirectBaseLayerDefinition()) {
-      throw new ConflictException("This resource already has a baselayer definition");
+    if (resource.hasDirectBaseLayer()) {
+      throw new ConflictException("This resource already has a baselayer");
     }
-    service.setBaseLayerDefinition(uuidParam.getValue(), protoType.getBaseElementDefinitions());
+    service.setBaseLayer(uuidParam.getValue(), protoType.getBaseElements());
     return noContent();
   }
 
   @GET
-  @Path("{uuid}/" + BASELAYERDEFINITION)
-  @ApiOperation(value = "Get the baselayer definition")
-  public Response getBaseLayerDefinition(@PathParam("uuid") final UUIDParam uuidParam) {
+  @Path("{uuid}/" + BASELAYER)
+  @ApiOperation(value = "Get the baselayer")
+  public Response getBaseLayer(@PathParam("uuid") final UUIDParam uuidParam) {
     AlexandriaResource resource = readExistingResource(uuidParam);
-    if (!resource.hasDirectBaseLayerDefinition()) {
-      throw new NotFoundException("This resource has no baselayer definition"); // TODO: alternatively, throw redirected to ancestor baselayer definition (if any)
+    if (!resource.hasDirectBaseLayer()) {
+      throw new NotFoundException("This resource has no baselayer"); // TODO: alternatively, throw redirected to ancestor baselayer (if any)
     }
-    return ok(resource.getBaseLayerDefinition());
+    return ok(resource.getBaseLayer());
   }
 
   @DELETE
