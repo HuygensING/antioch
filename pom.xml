@@ -58,7 +58,7 @@
     <visitei.version>0.6.1</visitei.version>
     
     <!-- 3.2,3.3 leads to compiler error in Jenkins: java.lang.IllegalStateException: endPosTable already set -->
-    <maven-compiler.version>3.1</maven-compiler.version>
+    <maven-compiler.version>3.5.1</maven-compiler.version>
 
     <mockito.version>2.0.41-beta</mockito.version>
     <peapod.version>0.2.2</peapod.version>
