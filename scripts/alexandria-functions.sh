@@ -59,6 +59,13 @@ function a-generate-resource-with-uuid {
   }}"
 }
 
+function a-generate-confirmed-subresource-with-title {
+  suburi=$(curl -i -H "${authheader}" -X POST $be/resources/$ri/subresources -H 'Content-type: application/json' \
+    --data-binary '{"subresource":{ "sub":"$1" }}' | a-location )
+  a-confirm ${suburi}
+  echo ${suburi}
+}
+
 function a-delete {
 	curl -i -X DELETE -H "${authheader}" $1
 }
