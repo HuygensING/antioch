@@ -28,13 +28,13 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  */
 
 import nl.knaw.huygens.alexandria.endpoint.AbstractAccountablePrototype;
-import nl.knaw.huygens.alexandria.model.BaseLayer.BaseElement;
+import nl.knaw.huygens.alexandria.model.BaseLayerDefinition.BaseElementDefinition;
 
-@JsonTypeName("baseLayer")
-public class BaseLayerPrototype extends AbstractAccountablePrototype {
-  private List<BaseElement> baseElements = new ArrayList<>();
+@JsonTypeName("baseLayerDefinition")
+public class BaseLayerDefinitionPrototype extends AbstractAccountablePrototype {
+  private List<BaseElementDefinition> baseElements = new ArrayList<>();
 
-  public List<BaseElement> getBaseElements() {
+  public List<BaseElementDefinition> getBaseElementDefinitions() {
     return baseElements;
   }
 

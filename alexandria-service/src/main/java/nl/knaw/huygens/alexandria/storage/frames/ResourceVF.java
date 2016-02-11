@@ -42,9 +42,9 @@ public abstract class ResourceVF extends AlexandriaVF {
 
   public abstract void setHasText(Boolean hasText);
 
-  public abstract void setBaseLayer(String json);
+  public abstract void setBaseLayerDefinition(String json);
 
-  public abstract String getBaseLayer();
+  public abstract String getBaseLayerDefinition();
 
   @In
   @Edge(AnnotationVF.ANNOTATES_RESOURCE)

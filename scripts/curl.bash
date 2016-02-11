@@ -279,12 +279,12 @@ curl -i -H "${authheader}" -X POST $be/annotations/$ai/annotations -H 'Content-t
 
 
 
-curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayer -H 'Content-type: application/json' \
---data-binary '{"baseLayer":{
-  "baseElements" : [
+curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
+--data-binary '{"baseLayerDefinition":{
+  "baseElementDefinitions" : [
      { "name": "p", "baseAttributes": [ "id" ] },
      { "name": "div", "baseAttributes" : [ "id", "by" ] }
   ]}
 }'
 
-curl -i -H "${authheader}" $be/resources/$ri/baselayer
+curl -i -H "${authheader}" $be/resources/$ri/baselayerdefinition

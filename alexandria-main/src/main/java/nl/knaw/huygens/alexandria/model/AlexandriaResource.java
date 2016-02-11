@@ -34,7 +34,7 @@ public class AlexandriaResource extends AbstractAnnotatable {
   private Optional<IdentifiablePointer<AlexandriaResource>> parentResourcePointer = Optional.empty(); // only used in subresources
   private Collection<IdentifiablePointer<AlexandriaResource>> subResourcePointers = Lists.newArrayList();
   private boolean hasText = false;
-  private BaseLayer baseLayer = null;
+  private BaseLayerDefinition baseLayerDefinition = null;
 
   public AlexandriaResource(UUID id, TentativeAlexandriaProvenance provenance) {
     super(id, provenance);
@@ -78,15 +78,15 @@ public class AlexandriaResource extends AbstractAnnotatable {
     }
   }
 
-  public boolean hasDirectBaseLayer() {
-    return baseLayer != null;
+  public boolean hasDirectBaseLayerDefinition() {
+    return baseLayerDefinition != null;
   }
 
-  public BaseLayer getBaseLayer() {
-    return baseLayer;
+  public BaseLayerDefinition getBaseLayerDefinition() {
+    return baseLayerDefinition;
   }
 
-  public void setBaseLayer(BaseLayer baseLayer) {
-    this.baseLayer = baseLayer;
+  public void setBaseLayerDefinition(BaseLayerDefinition baseLayerDefinition) {
+    this.baseLayerDefinition = baseLayerDefinition;
   }
 }

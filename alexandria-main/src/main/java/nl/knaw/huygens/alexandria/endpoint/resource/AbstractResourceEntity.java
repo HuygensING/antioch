@@ -25,9 +25,9 @@ public abstract class AbstractResourceEntity extends AbstractAnnotatableEntity {
     return hasText() ? URI.create(locationBuilder.locationOf(getResource()) + "/text") : null;
   }
 
-  @JsonProperty(PropertyPrefix.LINK + "baseLayer")
-  public URI getBaseLayer() {
-    return getResource().hasDirectBaseLayer() ? URI.create(locationBuilder.locationOf(getResource()) + "/" + ResourcesEndpoint.BASELAYER) : null;
+  @JsonProperty(PropertyPrefix.LINK + "baseLayerDefinition")
+  public URI getBaseLayerDefinition() {
+    return getResource().hasDirectBaseLayerDefinition() ? URI.create(locationBuilder.locationOf(getResource()) + "/" + ResourcesEndpoint.BASELAYERDEFINITION) : null;
   }
 
   @JsonProperty(PropertyPrefix.LINK + "subresources")

@@ -67,8 +67,8 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.model.BaseLayer;
-import nl.knaw.huygens.alexandria.model.BaseLayer.BaseElement;
+import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.model.BaseLayerDefinition.BaseElementDefinition;
 import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
@@ -396,13 +396,13 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public void setBaseLayer(UUID resourceUUID, List<BaseElement> baseElements) {
+  public void setBaseLayerDefinition(UUID resourceUUID, List<BaseElementDefinition> baseElements) {
     storage.startTransaction();
     ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
     String json;
     try {
       json = new ObjectMapper().writeValueAsString(baseElements);
-      resourceVF.setBaseLayer(json);
+      resourceVF.setBaseLayerDefinition(json);
     } catch (JsonProcessingException e) {
       e.printStackTrace();
       storage.rollbackTransaction();
@@ -629,7 +629,7 @@ public class TinkerPopService implements AlexandriaService {
     resource.setCargo(rvf.getCargo());
     resource.setState(AlexandriaState.valueOf(rvf.getState()));
     resource.setStateSince(Instant.ofEpochSecond(rvf.getStateSince()));
-    setOptionalBaseLayer(rvf, resource);
+    setOptionalBaseLayerDefinition(rvf, resource);
     
     for (AnnotationVF annotationVF : rvf.getAnnotatedBy()) {
       AlexandriaAnnotation annotation = deframeAnnotation(annotationVF);
@@ -644,14 +644,14 @@ public class TinkerPopService implements AlexandriaService {
     return resource;
   }
 
-  private void setOptionalBaseLayer(ResourceVF rvf, AlexandriaResource resource) {
-    String baseLayerJson = rvf.getBaseLayer();
-    if (StringUtils.isNotEmpty(baseLayerJson)) {
+  private void setOptionalBaseLayerDefinition(ResourceVF rvf, AlexandriaResource resource) {
+    String baseLayerDefinitionJson = rvf.getBaseLayerDefinition();
+    if (StringUtils.isNotEmpty(baseLayerDefinitionJson)) {
       try {
-        BaseLayer bld = new BaseLayer();
-        List<BaseElement> baseElements = new ObjectMapper().readValue(baseLayerJson, List.class);
-        bld.setBaseElements(baseElements);
-        resource.setBaseLayer(bld);
+        BaseLayerDefinition bld = new BaseLayerDefinition();
+        List<BaseElementDefinition> baseElementDefinitions = new ObjectMapper().readValue(baseLayerDefinitionJson, List.class);
+        bld.setBaseElementDefinitions(baseElementDefinitions);
+        resource.setBaseLayerDefinition(bld);
       } catch (IOException e) {
         e.printStackTrace();
         storage.rollbackTransaction();
