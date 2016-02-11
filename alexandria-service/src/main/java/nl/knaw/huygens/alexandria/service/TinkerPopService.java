@@ -655,9 +655,8 @@ public class TinkerPopService implements AlexandriaService {
     String baseLayerDefinitionJson = rvf.getBaseLayerDefinition();
     if (StringUtils.isNotEmpty(baseLayerDefinitionJson)) {
       try {
-        BaseLayerDefinition bld = new BaseLayerDefinition();
         List<BaseElementDefinition> baseElementDefinitions = new ObjectMapper().readValue(baseLayerDefinitionJson, List.class);
-        bld.setBaseElementDefinitions(baseElementDefinitions);
+        BaseLayerDefinition bld = BaseLayerDefinition.withBaseElements(baseElementDefinitions);
         resource.setBaseLayerDefinition(bld);
       } catch (IOException e) {
         e.printStackTrace();
