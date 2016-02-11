@@ -630,7 +630,7 @@ public class TinkerPopService implements AlexandriaService {
     resource.setState(AlexandriaState.valueOf(rvf.getState()));
     resource.setStateSince(Instant.ofEpochSecond(rvf.getStateSince()));
     setOptionalBaseLayerDefinition(rvf, resource);
-    
+
     for (AnnotationVF annotationVF : rvf.getAnnotatedBy()) {
       AlexandriaAnnotation annotation = deframeAnnotation(annotationVF);
       resource.addAnnotation(annotation);
@@ -638,6 +638,13 @@ public class TinkerPopService implements AlexandriaService {
     ResourceVF parentResource = rvf.getParentResource();
     if (parentResource != null) {
       resource.setParentResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, parentResource.getUuid()));
+      ResourceVF ancestorResource = parentResource;
+      while (ancestorResource != null && StringUtils.isEmpty(ancestorResource.getBaseLayerDefinition())) {
+        ancestorResource = ancestorResource.getParentResource();
+      }
+      if (ancestorResource != null) {
+        resource.setFirstAncestorResourceWithBaseLayerDefinitionPointer(new IdentifiablePointer<>(AlexandriaResource.class, ancestorResource.getUuid()));
+      }
     }
     rvf.getSubResources().stream()//
         .forEach(vf -> resource.addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));

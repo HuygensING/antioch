@@ -32,6 +32,7 @@ public class AlexandriaResource extends AbstractAnnotatable {
 
   private String cargo; // ref for resource, sub for subresource
   private Optional<IdentifiablePointer<AlexandriaResource>> parentResourcePointer = Optional.empty(); // only used in subresources
+  private Optional<IdentifiablePointer<AlexandriaResource>> firstParentResourceWithBaseLayerDefinitionPointer = Optional.empty(); // only used in subresources
   private Collection<IdentifiablePointer<AlexandriaResource>> subResourcePointers = Lists.newArrayList();
   private boolean hasText = false;
   private BaseLayerDefinition baseLayerDefinition = null;
@@ -88,5 +89,13 @@ public class AlexandriaResource extends AbstractAnnotatable {
 
   public void setBaseLayerDefinition(BaseLayerDefinition baseLayerDefinition) {
     this.baseLayerDefinition = baseLayerDefinition;
+  }
+
+  public Optional<IdentifiablePointer<AlexandriaResource>> getFirstAncestorResourceWithBaseLayerDefinitionPointer() {
+    return this.firstParentResourceWithBaseLayerDefinitionPointer;
+  }
+
+  public void setFirstAncestorResourceWithBaseLayerDefinitionPointer(IdentifiablePointer<AlexandriaResource> parentResourcePointer) {
+    this.firstParentResourceWithBaseLayerDefinitionPointer = Optional.of(parentResourcePointer);
   }
 }
