@@ -126,7 +126,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   public Response setBaseLayerDefinition(@PathParam("uuid") final UUIDParam uuidParam, @NotNull BaseLayerDefinitionPrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
     AlexandriaResource resource = readExistingResource(uuidParam);
-    if (resource.hasDirectBaseLayerDefinition()) {
+    if (resource.getDirectBaseLayerDefinition().isPresent()) {
       throw new ConflictException("This resource already has a baselayer definition");
     }
     service.setBaseLayerDefinition(uuidParam.getValue(), protoType.getBaseElementDefinitions());
@@ -138,10 +138,10 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @ApiOperation(value = "Get the baselayer definition")
   public Response getBaseLayerDefinition(@PathParam("uuid") final UUIDParam uuidParam) {
     AlexandriaResource resource = readExistingResource(uuidParam);
-    if (!resource.hasDirectBaseLayerDefinition()) {
+    if (!resource.getDirectBaseLayerDefinition().isPresent()) {
       throw new NotFoundException("This resource has no baselayer definition"); // TODO: alternatively, throw redirected to ancestor baselayer definition (if any)
     }
-    return ok(resource.getBaseLayerDefinition());
+    return ok(resource.getDirectBaseLayerDefinition().get());
   }
 
   @DELETE

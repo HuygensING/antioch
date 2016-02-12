@@ -687,7 +687,7 @@ public class TinkerPopService implements AlexandriaService {
     if (StringUtils.isNotEmpty(baseLayerDefinitionJson)) {
       try {
         BaseLayerDefinition bld = deserializeBaseLayerDefinition(baseLayerDefinitionJson);
-        resource.setBaseLayerDefinition(bld);
+        resource.setDirectBaseLayerDefinition(bld);
       } catch (IOException e) {
         e.printStackTrace();
         storage.rollbackTransaction();

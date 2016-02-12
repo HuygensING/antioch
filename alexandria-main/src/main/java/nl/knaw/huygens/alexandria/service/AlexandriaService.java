@@ -127,8 +127,8 @@ public interface AlexandriaService {
 
   Optional<InputStream> getResourceTextAsStream(UUID resourceUUID);
 
-  void setBaseLayerDefinition(UUID value, List<BaseElementDefinition> baseElements);
+  void setBaseLayerDefinition(UUID resourceUUID, List<BaseElementDefinition> baseElements);
 
-  Optional<BaseLayerDefinition> getBaseLayerDefinitionForResource(UUID uuid);
+  Optional<BaseLayerDefinition> getBaseLayerDefinitionForResource(UUID resourceUUID);
 
 }

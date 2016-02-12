@@ -29,7 +29,7 @@ public abstract class AbstractResourceEntity extends AbstractAnnotatableEntity {
 
   @JsonProperty(PropertyPrefix.LINK + "baseLayerDefinition")
   public URI getBaseLayerDefinition() {
-    if (getResource().hasDirectBaseLayerDefinition()) {
+    if (getResource().getDirectBaseLayerDefinition().isPresent()) {
       URI resourceURI = locationBuilder.locationOf(getResource());
       return baseLayerDefinitionURI(resourceURI);
     }
