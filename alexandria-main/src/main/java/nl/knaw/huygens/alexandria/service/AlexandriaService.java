@@ -37,6 +37,7 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
 import nl.knaw.huygens.alexandria.model.BaseLayerDefinition.BaseElementDefinition;
 import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
@@ -127,5 +128,7 @@ public interface AlexandriaService {
   Optional<InputStream> getResourceTextAsStream(UUID resourceUUID);
 
   void setBaseLayerDefinition(UUID value, List<BaseElementDefinition> baseElements);
+
+  Optional<BaseLayerDefinition> getBaseLayerDefinitionForResource(UUID uuid);
 
 }

@@ -50,7 +50,9 @@ import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
@@ -412,6 +414,35 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
+  public Optional<BaseLayerDefinition> getBaseLayerDefinitionForResource(UUID resourceUUID) {
+    Optional<BaseLayerDefinition> optDef = Optional.empty();
+    storage.startTransaction();
+    ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
+    while (resourceVF != null && StringUtils.isEmpty(resourceVF.getBaseLayerDefinition())) {
+      resourceVF = resourceVF.getParentResource();
+    }
+    String json = resourceVF.getBaseLayerDefinition();
+    storage.rollbackTransaction();
+    if (StringUtils.isNotEmpty(json)) {
+      BaseLayerDefinition bld;
+      try {
+        bld = deserializeBaseLayerDefinition(json);
+      } catch (IOException e) {
+        e.printStackTrace();
+        throw new RuntimeException(e);
+      }
+      optDef = Optional.ofNullable(bld);
+    }
+    return optDef;
+  }
+
+  private BaseLayerDefinition deserializeBaseLayerDefinition(String json) throws JsonParseException, JsonMappingException, IOException {
+    List<BaseElementDefinition> baseElementDefinitions = new ObjectMapper().readValue(json, List.class);
+    BaseLayerDefinition bld = BaseLayerDefinition.withBaseElements(baseElementDefinitions);
+    return bld;
+  }
+
+  @Override
   public SearchResult execute(AlexandriaQuery query) {
     storage.startTransaction();
     Stopwatch stopwatch = Stopwatch.createStarted();
@@ -655,8 +686,7 @@ public class TinkerPopService implements AlexandriaService {
     String baseLayerDefinitionJson = rvf.getBaseLayerDefinition();
     if (StringUtils.isNotEmpty(baseLayerDefinitionJson)) {
       try {
-        List<BaseElementDefinition> baseElementDefinitions = new ObjectMapper().readValue(baseLayerDefinitionJson, List.class);
-        BaseLayerDefinition bld = BaseLayerDefinition.withBaseElements(baseElementDefinitions);
+        BaseLayerDefinition bld = deserializeBaseLayerDefinition(baseLayerDefinitionJson);
         resource.setBaseLayerDefinition(bld);
       } catch (IOException e) {
         e.printStackTrace();
