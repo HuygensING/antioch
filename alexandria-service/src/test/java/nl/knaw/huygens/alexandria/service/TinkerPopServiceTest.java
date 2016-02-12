@@ -142,23 +142,23 @@ public class TinkerPopServiceTest {
   @Test
   public void testDeprecateAnnotation() {
     // given
-    UUID resourceId = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    UUID resourceId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
     AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
     service.createOrUpdateResource(resource);
 
-    UUID annotationBodyId = UUID.fromString("22222222-2222-2222-2222-222222222222");
+    UUID annotationBodyId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance1 = new TentativeAlexandriaProvenance("who1", Instant.now(), "why1");
     AlexandriaAnnotationBody body1 = service.createAnnotationBody(annotationBodyId, "type", "value", provenance1);
 
-    UUID annotationId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    UUID annotationId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance2 = new TentativeAlexandriaProvenance("who2", Instant.now(), "why2");
     AlexandriaAnnotation annotation = new AlexandriaAnnotation(annotationId, body1, provenance2);
     service.annotateResourceWithAnnotation(resource, annotation);
     service.confirmAnnotation(annotationId);
     assertThat(annotation.getRevision()).isEqualTo(0);
 
-    UUID annotationBodyId2 = UUID.fromString("22222222-2222-2222-2222-222222222223");
+    UUID annotationBodyId2 = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance3 = new TentativeAlexandriaProvenance("who3", Instant.now(), "why3");
     AlexandriaAnnotationBody body2 = service.createAnnotationBody(annotationBodyId2, "type", "updated value", provenance3);
     TentativeAlexandriaProvenance provenance4 = new TentativeAlexandriaProvenance("who4", Instant.now(), "why4");
@@ -196,12 +196,12 @@ public class TinkerPopServiceTest {
   @Test
   public void testReturnExistingSubresourceIfSubPlusParentIdMatches() {
     // given
-    UUID resourceId = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    UUID resourceId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
     AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
     service.createOrUpdateResource(resource);
 
-    UUID subUuid = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    UUID subUuid = UUID.randomUUID();
     String sub = "sub";
     service.createSubResource(subUuid, resourceId, sub, provenance);
 
@@ -210,7 +210,7 @@ public class TinkerPopServiceTest {
     assertThat(oResource.get().getId()).isEqualTo(subUuid);
 
     // now, create a new resource
-    UUID resourceId1 = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    UUID resourceId1 = UUID.randomUUID();
     AlexandriaResource resource1 = new AlexandriaResource(resourceId1, provenance);
     service.createOrUpdateResource(resource1);
 
@@ -222,16 +222,16 @@ public class TinkerPopServiceTest {
   @Test
   public void testDeletingAnAnnotationWithStateDeletedDoesNotFail() {
     // given
-    UUID resourceId = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    UUID resourceId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
     AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
     service.createOrUpdateResource(resource);
 
-    UUID annotationBodyId = UUID.fromString("22222222-2222-2222-2222-222222222222");
+    UUID annotationBodyId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance1 = new TentativeAlexandriaProvenance("who1", Instant.now(), "why1");
     AlexandriaAnnotationBody body1 = service.createAnnotationBody(annotationBodyId, "type", "value", provenance1);
 
-    UUID annotationId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    UUID annotationId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance2 = new TentativeAlexandriaProvenance("who2", Instant.now(), "why2");
     AlexandriaAnnotation annotation = new AlexandriaAnnotation(annotationId, body1, provenance2);
 
@@ -255,7 +255,7 @@ public class TinkerPopServiceTest {
   @Test
   public void testGetBaseLayerDefinitionForResourceReturnsTheFirstDefinitionUpTheResourceChain() {
     // given
-    UUID resourceId = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    UUID resourceId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
     AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
     service.createOrUpdateResource(resource);
@@ -264,11 +264,11 @@ public class TinkerPopServiceTest {
     baseElements.add(BaseElementDefinition.withName("div"));
     service.setBaseLayerDefinition(resourceId, baseElements);
 
-    UUID subUuid1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    UUID subUuid1 = UUID.randomUUID();
     String sub = "sub1";
     service.createSubResource(subUuid1, resourceId, sub, provenance);
 
-    UUID subUuid2 = UUID.fromString("00000000-0000-0000-0000-000000000002");
+    UUID subUuid2 = UUID.randomUUID();
     service.createSubResource(subUuid2, subUuid1, "sub2", provenance);
 
     Optional<BaseLayerDefinition> optDef = service.getBaseLayerDefinitionForResource(subUuid2);
@@ -280,25 +280,24 @@ public class TinkerPopServiceTest {
     assertThat(returnedBaseElementDefinitions.get(0)).isEqualTo(baseElements.get(0));
     assertThat(returnedBaseElementDefinitions.get(1)).isEqualTo(baseElements.get(1));
   }
-  
+
   @Test
   public void testGetBaseLayerDefinitionForResourceReturnsNullOptionalsWhenNoDefinitionPresentUpTheResourceChain() {
     // given
-    UUID resourceId = UUID.fromString("99999999-9999-9999-9999-999999999999");
+    UUID resourceId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
     AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
     service.createOrUpdateResource(resource);
 
-    UUID subUuid1 = UUID.fromString("99999999-9999-9999-9999-999999999991");
+    UUID subUuid1 = UUID.randomUUID();
     String sub = "sub1";
     service.createSubResource(subUuid1, resourceId, sub, provenance);
 
-    UUID subUuid2 = UUID.fromString("99999999-9999-9999-9999-999999999992");
+    UUID subUuid2 = UUID.randomUUID();
     service.createSubResource(subUuid2, subUuid1, "sub2", provenance);
 
     Optional<BaseLayerDefinition> optDef = service.getBaseLayerDefinitionForResource(subUuid2);
     assertThat(optDef.isPresent()).isFalse();
   }
-
 
 }
