@@ -29,6 +29,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -46,6 +48,8 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.model.BaseLayerDefinition.BaseElementDefinition;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.text.InMemoryTextService;
 
@@ -246,6 +250,35 @@ public class TinkerPopServiceTest {
     service.deleteAnnotation(annotation);
     annotation = service.readAnnotation(annotationId).get();
     assertThat(annotation.getState()).isEqualTo(AlexandriaState.DELETED);
+  }
+
+  @Test
+  public void testGetBaseLayerDefinitionForResourceReturnsTheFirstDefinitionUpTheResourceChain() {
+    // given
+    UUID resourceId = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
+    AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
+    service.createOrUpdateResource(resource);
+    List<BaseElementDefinition> baseElements = new ArrayList<>();
+    baseElements.add(BaseElementDefinition.withName("text"));
+    baseElements.add(BaseElementDefinition.withName("div"));
+    service.setBaseLayerDefinition(resourceId, baseElements);
+
+    UUID subUuid1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    String sub = "sub1";
+    service.createSubResource(subUuid1, resourceId, sub, provenance);
+
+    UUID subUuid2 = UUID.fromString("00000000-0000-0000-0000-000000000002");
+    service.createSubResource(subUuid2, subUuid1, "sub2", provenance);
+
+    Optional<BaseLayerDefinition> optDef = service.getBaseLayerDefinitionForResource(subUuid2);
+    assertThat(optDef).isPresent();
+    List<BaseElementDefinition> returnedBaseElementDefinitions = optDef.get().getBaseElementDefinitions();
+    assertThat(returnedBaseElementDefinitions).hasSameSizeAs(baseElements);
+    Log.info("base    ={}", baseElements);
+    Log.info("returned={}", returnedBaseElementDefinitions);
+    assertThat(returnedBaseElementDefinitions.get(0)).isEqualTo(baseElements.get(0));
+    assertThat(returnedBaseElementDefinitions.get(1)).isEqualTo(baseElements.get(1));
   }
 
 }

@@ -52,12 +52,12 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
 
-import net.sf.kdgcommons.lang.StringUtil;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
@@ -437,7 +437,7 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   private BaseLayerDefinition deserializeBaseLayerDefinition(String json) throws JsonParseException, JsonMappingException, IOException {
-    List<BaseElementDefinition> baseElementDefinitions = new ObjectMapper().readValue(json, List.class);
+    List<BaseElementDefinition> baseElementDefinitions = new ObjectMapper().readValue(json, new TypeReference<List<BaseElementDefinition>>() {});
     BaseLayerDefinition bld = BaseLayerDefinition.withBaseElements(baseElementDefinitions);
     return bld;
   }
