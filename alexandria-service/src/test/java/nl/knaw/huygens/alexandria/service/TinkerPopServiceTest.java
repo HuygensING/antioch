@@ -275,8 +275,6 @@ public class TinkerPopServiceTest {
     assertThat(optDef).isPresent();
     List<BaseElementDefinition> returnedBaseElementDefinitions = optDef.get().getBaseElementDefinitions();
     assertThat(returnedBaseElementDefinitions).hasSameSizeAs(baseElements);
-    Log.info("base    ={}", baseElements);
-    Log.info("returned={}", returnedBaseElementDefinitions);
     assertThat(returnedBaseElementDefinitions.get(0)).isEqualTo(baseElements.get(0));
     assertThat(returnedBaseElementDefinitions.get(1)).isEqualTo(baseElements.get(1));
   }
