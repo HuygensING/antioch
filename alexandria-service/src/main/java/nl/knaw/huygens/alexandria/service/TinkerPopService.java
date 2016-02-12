@@ -418,26 +418,30 @@ public class TinkerPopService implements AlexandriaService {
     Optional<BaseLayerDefinition> optDef = Optional.empty();
     storage.startTransaction();
     ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
-    while (resourceVF != null && StringUtils.isEmpty(resourceVF.getBaseLayerDefinition())) {
+    while (resourceVF != null //
+        && StringUtils.isEmpty(resourceVF.getBaseLayerDefinition())) {
       resourceVF = resourceVF.getParentResource();
     }
-    String json = resourceVF.getBaseLayerDefinition();
-    storage.rollbackTransaction();
-    if (StringUtils.isNotEmpty(json)) {
-      BaseLayerDefinition bld;
-      try {
-        bld = deserializeBaseLayerDefinition(json);
-      } catch (IOException e) {
-        e.printStackTrace();
-        throw new RuntimeException(e);
+    if (resourceVF != null) {
+      String json = resourceVF.getBaseLayerDefinition();
+      storage.rollbackTransaction();
+      if (StringUtils.isNotEmpty(json)) {
+        BaseLayerDefinition bld;
+        try {
+          bld = deserializeBaseLayerDefinition(json);
+        } catch (IOException e) {
+          e.printStackTrace();
+          throw new RuntimeException(e);
+        }
+        optDef = Optional.ofNullable(bld);
       }
-      optDef = Optional.ofNullable(bld);
     }
     return optDef;
   }
 
   private BaseLayerDefinition deserializeBaseLayerDefinition(String json) throws JsonParseException, JsonMappingException, IOException {
-    List<BaseElementDefinition> baseElementDefinitions = new ObjectMapper().readValue(json, new TypeReference<List<BaseElementDefinition>>() {});
+    List<BaseElementDefinition> baseElementDefinitions = new ObjectMapper().readValue(json, new TypeReference<List<BaseElementDefinition>>() {
+    });
     BaseLayerDefinition bld = BaseLayerDefinition.withBaseElements(baseElementDefinitions);
     return bld;
   }

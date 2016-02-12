@@ -280,5 +280,25 @@ public class TinkerPopServiceTest {
     assertThat(returnedBaseElementDefinitions.get(0)).isEqualTo(baseElements.get(0));
     assertThat(returnedBaseElementDefinitions.get(1)).isEqualTo(baseElements.get(1));
   }
+  
+  @Test
+  public void testGetBaseLayerDefinitionForResourceReturnsNullOptionalsWhenNoDefinitionPresentUpTheResourceChain() {
+    // given
+    UUID resourceId = UUID.fromString("99999999-9999-9999-9999-999999999999");
+    TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
+    AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
+    service.createOrUpdateResource(resource);
+
+    UUID subUuid1 = UUID.fromString("99999999-9999-9999-9999-999999999991");
+    String sub = "sub1";
+    service.createSubResource(subUuid1, resourceId, sub, provenance);
+
+    UUID subUuid2 = UUID.fromString("99999999-9999-9999-9999-999999999992");
+    service.createSubResource(subUuid2, subUuid1, "sub2", provenance);
+
+    Optional<BaseLayerDefinition> optDef = service.getBaseLayerDefinitionForResource(subUuid2);
+    assertThat(optDef.isPresent()).isFalse();
+  }
+
 
 }
