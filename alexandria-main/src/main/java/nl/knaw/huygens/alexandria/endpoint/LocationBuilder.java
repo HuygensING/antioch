@@ -43,37 +43,46 @@ public class LocationBuilder {
     this.resolver = resolver;
   }
 
-  public URI locationOf(Identifiable identifiable) {
-    return locationOf(identifiable.getClass(), identifiable.getId());
+  public URI locationOf(Identifiable identifiable, String... subPaths) {
+    return locationOf(identifiable.getClass(), identifiable.getId(), subPaths);
   }
 
-  public URI locationOf(Class<? extends Identifiable> identifiableClass, UUID uuid) {
-    return locationOf(identifiableClass, uuid.toString());
+  public URI locationOf(Class<? extends Identifiable> identifiableClass, UUID uuid, String... subPaths) {
+    return locationOf(identifiableClass, uuid.toString(), subPaths);
   }
 
-  public URI locationOf(Class<? extends Identifiable> identifiableClass, String uuid) {
+  public URI locationOf(IdentifiablePointer<? extends Identifiable> identifiablePointer, String... subPaths) {
+    return locationOf(identifiablePointer.getIdentifiableClass(), identifiablePointer.getIdentifier(), subPaths);
+  }
+
+  public URI locationOf(Class<? extends Identifiable> identifiableClass, String uuid, String... subPaths) {
     if (uuid.contains(".")) {
       // Special case: uuid of deprecated annotation
       String[] parts = uuid.split("\\.");
-      return UriBuilder.fromUri(config.getBaseURI()) //
+      UriBuilder uriBuilder = UriBuilder.fromUri(config.getBaseURI()) //
           .path(pathOf(identifiableClass)) //
           .path("{uuid}") //
           .path("rev") //
-          .path("{rev}") //
+          .path("{rev}");
+      for (String subPath : subPaths) {
+        uriBuilder = uriBuilder.path(subPath);
+      }
+      return uriBuilder //
           .build(parts, true);
 
     }
-    return UriBuilder.fromUri(config.getBaseURI()) //
+    UriBuilder uriBuilder = UriBuilder.fromUri(config.getBaseURI()) //
         .path(pathOf(identifiableClass)) //
-        .path("{uuid}") //
-        .build(uuid);
+        .path("{uuid}");
+    for (String subPath : subPaths) {
+      uriBuilder = uriBuilder.path(subPath);
+    }
+    return uriBuilder.build(uuid);
   }
 
-  public URI locationOf(IdentifiablePointer<? extends Identifiable> identifiablePointer) {
-    return locationOf(identifiablePointer.getIdentifiableClass(), identifiablePointer.getIdentifier());
-  }
+  // -- private methods --//
 
-  private String pathOf(Class<? extends Identifiable> identifiableClass) {
+  private String pathOf(Class<? extends Identifiable> identifiableClass, String... subPaths) {
     return resolver.pathOf(identifiableClass).orElseThrow(unknownIdentifiableClass(identifiableClass));
   }
 

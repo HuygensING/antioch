@@ -96,7 +96,7 @@ public class SearchEndpoint extends JSONEndpoint {
     if (pageNumber < 1 || pageNumber > totalResultPages) {
       throw new NotFoundException("pageNumber should be between 1 and " + totalResultPages);
     }
-    String baseURI = locationBuilder.locationOf(searchResult) + "/" + RESULTPAGES + "/";
+    String baseURI = locationBuilder.locationOf(searchResult, RESULTPAGES) + "/";
     SearchResultPage page = new SearchResultPage(baseURI, pageNumber, totalResultPages, searchResult.getPageSize());
     page.setResults(searchResult.getRecordsForPage(pageNumber));
     return Response.ok(page).build();

@@ -98,7 +98,7 @@ public class SearchResult implements Identifiable {
 
   @JsonProperty(PropertyPrefix.LINK + "firstPage")
   public URI getFirstResultPage() {
-    return getTotalResults() > 0 ? URI.create(locationBuilder.locationOf(this) + "/" + SearchEndpoint.RESULTPAGES + "/1") : null;
+    return getTotalResults() > 0 ? locationBuilder.locationOf(this,SearchEndpoint.RESULTPAGES , "1") : null;
   }
 
   @JsonIgnore

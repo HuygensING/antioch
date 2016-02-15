@@ -130,7 +130,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
       throw new ConflictException("This resource already has a baselayer definition");
     }
     service.setBaseLayerDefinition(uuidParam.getValue(), protoType.getBaseElementDefinitions());
-    return created(URI.create(locationBuilder.locationOf(resource) + "/" + BASELAYERDEFINITION));
+    return created(locationBuilder.locationOf(resource, BASELAYERDEFINITION));
   }
 
   @GET

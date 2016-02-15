@@ -24,26 +24,20 @@ public abstract class AbstractResourceEntity extends AbstractAnnotatableEntity {
 
   @JsonProperty(PropertyPrefix.LINK + "text")
   public URI getText() {
-    return hasText() ? URI.create(locationBuilder.locationOf(getResource()) + "/text") : null;
+    return hasText() ? locationBuilder.locationOf(getResource(), "text") : null;
   }
 
   @JsonProperty(PropertyPrefix.LINK + "baseLayerDefinition")
   public URI getBaseLayerDefinition() {
     if (getResource().getDirectBaseLayerDefinition().isPresent()) {
-      URI resourceURI = locationBuilder.locationOf(getResource());
-      return baseLayerDefinitionURI(resourceURI);
+      return locationBuilder.locationOf(getResource(), ResourcesEndpoint.BASELAYERDEFINITION);
     }
 
     Optional<IdentifiablePointer<AlexandriaResource>> firstAncestorResourceWithBaseLayerDefinitionPointer = getResource().getFirstAncestorResourceWithBaseLayerDefinitionPointer();
     if (firstAncestorResourceWithBaseLayerDefinitionPointer.isPresent()) {
-      URI ancestorURI = locationBuilder.locationOf(firstAncestorResourceWithBaseLayerDefinitionPointer.get());
-      return baseLayerDefinitionURI(ancestorURI);
+      return locationBuilder.locationOf(firstAncestorResourceWithBaseLayerDefinitionPointer.get(), ResourcesEndpoint.BASELAYERDEFINITION);
     }
     return null;
-  }
-
-  private URI baseLayerDefinitionURI(URI resourceURI) {
-    return URI.create(resourceURI + "/" + ResourcesEndpoint.BASELAYERDEFINITION);
   }
 
   @JsonProperty(PropertyPrefix.LINK + "subresources")

@@ -60,7 +60,7 @@ public abstract class AbstractAnnotatableEntity extends JsonWrapperObject implem
 
   @JsonProperty(PropertyPrefix.LINK + "provenance")
   public URI getProvenance() {
-    return URI.create(locationBuilder.locationOf(getAnnotatable()) + "/provenance");
+    return locationBuilder.locationOf(getAnnotatable(), "provenance");
   }
 
   public UUID getId() {

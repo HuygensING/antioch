@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint.annotation;
 
+import java.net.URI;
+
 /*
  * #%L
  * alexandria-main
@@ -88,17 +90,19 @@ public class AnnotationEntity extends AbstractAnnotatableEntity {
 
   @JsonProperty(PropertyPrefix.LINK + "deprecates")
   public String getDeprecates() {
-    return annotation.getRevision() > 0 ? locationBuilder.locationOf(annotation).toString() + AnnotationsEndpoint.REVPATH + (annotation.getRevision() - 1) : "";
+    return annotation.getRevision() > 0//
+        ? locationBuilder.locationOf(annotation, AnnotationsEndpoint.REVPATH, String.valueOf(annotation.getRevision() - 1)).toString()//
+        : "";
   }
 
   @JsonProperty(PropertyPrefix.LINK + "versioned_self")
-  public String getVersionURL() {
-    return locationBuilder.locationOf(annotation).toString() + AnnotationsEndpoint.REVPATH + (annotation.getRevision());
+  public URI getVersionURL() {
+    return locationBuilder.locationOf(annotation, AnnotationsEndpoint.REVPATH, String.valueOf(annotation.getRevision()));
   }
 
   @JsonProperty(PropertyPrefix.LINK + "current_version")
-  public String getCurrentVersionURL() {
-    return locationBuilder.locationOf(annotation).toString();
+  public URI getCurrentVersionURL() {
+    return locationBuilder.locationOf(annotation);
   }
 
   @Override
