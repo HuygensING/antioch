@@ -56,7 +56,7 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.text.TextUtil;
 
 public class ResourceTextEndpoint extends JSONEndpoint {
-  private static final BaseLayerDefinition WITH_BASE_ELEMENTS = BaseLayerDefinition.withBaseElements(BaseElementDefinition.withName("text"),
+  private static final BaseLayerDefinition DEFAULT_BASELAYER_DEFINITION = BaseLayerDefinition.withBaseElements(BaseElementDefinition.withName("text"),
       BaseElementDefinition.withName("p").withAttributes("xml:id"));
   private final AlexandriaService service;
   private final UUID resourceId;
@@ -94,7 +94,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   public Response setTextFromXml(@NotNull @Valid String xml) {
     verifyResourceHasNoText();
     Pair<BaseLayerDefinition, UUID> pair = service.getBaseLayerDefinitionForResource(resourceId)//
-        .orElse(Pair.of(WITH_BASE_ELEMENTS, resourceId));
+        .orElse(Pair.of(DEFAULT_BASELAYER_DEFINITION, resourceId));
     // .orElseThrow(() -> new ConflictException("No base layer defined for this resource."));
     String baseLayer = TextUtil.extractBaseLayer(xml, pair.getLeft());
     service.setResourceTextFromStream(resourceId, streamIn(baseLayer));
