@@ -16,10 +16,11 @@ import nl.knaw.huygens.tei.handlers.XmlTextHandler;
 
 public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<XmlContext>, ElementHandler<XmlContext> {
   List<AnnotationData> annotationData = new ArrayList<>();
-  private UUID baselayerDefiningResourceId;
   static List<String> annotationActions = new ArrayList<>();
 
-  public static List<String> getAnnotationActions() {
+  static ElementTally elementTally = new ElementTally();
+
+  public List<String> getAnnotationActions() {
     return annotationActions;
   }
 
@@ -35,6 +36,7 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
 
   @Override
   public Traversal enterElement(Element element, XmlContext context) {
+    elementTally.tally(element);
     context.openLayer();
     return Traversal.NEXT;
   }
@@ -66,6 +68,7 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
 
     @Override
     public Traversal enterElement(Element element, XmlContext context) {
+      elementTally.tally(element);
       Element base = new Element(element.getName());
       element.getAttributes().forEach((key, value) -> {
         if (baseAttributes.contains(key)) {
@@ -87,6 +90,7 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
   }
 
   public String getBaseLayerData() {
+    elementTally.logReport();
     return getContext().getResult();
   }
 
