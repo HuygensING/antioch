@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
+import java.io.IOException;
+
 /*
  * #%L
  * alexandria-main
@@ -37,6 +39,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 
 import io.swagger.annotations.ApiOperation;
@@ -45,9 +48,13 @@ import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.model.BaseLayerDefinition.BaseElementDefinition;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.text.TextUtil;
 
 public class ResourceTextEndpoint extends JSONEndpoint {
+  private static final BaseLayerDefinition DEFAULT_BASELAYER_DEFINITION = BaseLayerDefinition.withBaseElements(BaseElementDefinition.withName("text"),BaseElementDefinition.withName("p").withAttributes("xml:id"));
   private final AlexandriaService service;
   private final UUID resourceId;
   private final AlexandriaResource resource;
@@ -76,31 +83,37 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   }
 
   @PUT
-  @Consumes(MediaType.APPLICATION_JSON)
-  @ApiOperation("set text from text protoype")
-  public Response setTextWithPrototype(@NotNull @Valid TextPrototype prototype) {
-    verifyResourceHasNoText();
-    String body = prototype.getBody();
-    service.setResourceTextFromStream(resourceId, streamIn(body));
-    return noContent();
-  }
-
-  @PUT
   @Consumes(MediaType.TEXT_XML)
   @ApiOperation("set text from xml")
   public Response setTextFromXml(@NotNull @Valid String xml) {
     verifyResourceHasNoText();
-    service.setResourceTextFromStream(resourceId, streamIn(xml));
+    BaseLayerDefinition baseLayerDefinition = service.getBaseLayerDefinitionForResource(resourceId)//
+        .orElse(DEFAULT_BASELAYER_DEFINITION);
+    // .orElseThrow(() -> new ConflictException("No base layer defined for this resource."));
+    String baseLayer = TextUtil.extractBaseLayer(xml, baseLayerDefinition);
+    service.setResourceTextFromStream(resourceId, streamIn(baseLayer));
     return noContent();
+  }
+
+  @PUT
+  @Consumes(MediaType.APPLICATION_JSON)
+  @ApiOperation("set text from text protoype")
+  public Response setTextWithPrototype(@NotNull @Valid TextPrototype prototype) {
+    String body = prototype.getBody();
+    return setTextFromXml(body);
   }
 
   @PUT
   @Consumes(MediaType.APPLICATION_OCTET_STREAM)
   @ApiOperation("set text from stream")
-  public Response setTextFromXml(InputStream inputStream) {
-    verifyResourceHasNoText();
-    service.setResourceTextFromStream(resourceId, inputStream);
-    return noContent();
+  public Response setTextFromXmlStream(InputStream inputStream) {
+    try {
+      String xml = IOUtils.toString(inputStream, Charsets.UTF_8);
+      return setTextFromXml(xml);
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
   }
 
   private void verifyResourceHasNoText() {
