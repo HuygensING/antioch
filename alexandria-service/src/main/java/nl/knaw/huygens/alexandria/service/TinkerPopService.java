@@ -32,6 +32,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -48,7 +49,9 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.javatuples.Tuple;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -414,8 +417,8 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public Optional<BaseLayerDefinition> getBaseLayerDefinitionForResource(UUID resourceUUID) {
-    Optional<BaseLayerDefinition> optDef = Optional.empty();
+  public Optional<Pair<BaseLayerDefinition, UUID>> getBaseLayerDefinitionForResource(UUID resourceUUID) {
+    Optional<Pair<BaseLayerDefinition, UUID>> optDef = Optional.empty();
     storage.startTransaction();
     ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
     while (resourceVF != null //
@@ -433,7 +436,7 @@ public class TinkerPopService implements AlexandriaService {
           e.printStackTrace();
           throw new RuntimeException(e);
         }
-        optDef = Optional.ofNullable(bld);
+        optDef = Optional.ofNullable(Pair.of(bld, UUID.fromString(resourceVF.getUuid())));
       }
     }
     return optDef;

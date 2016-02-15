@@ -51,11 +51,13 @@
         }</h:jsonBody>
         Then I should receive:
         <ul>
-            <li>status <h:status>204 No Content</h:status></li>
-            <li>an
-                <h:responseBody/>
-                response body
-            </li>
+        <li><h:status>200 OK</h:status></li>
+        <li>and the response body is
+        <h:jsonResponse>{
+           "resourceTextUploadResult" : {
+           "^baseLayerDefinition" : "https://{host}/resources/599fad4f-21ca-4488-94f7-66fba8b39aba/baselayerdefinition"
+        } }
+        </h:jsonResponse></li>
         </ul>
     </h:request>
 

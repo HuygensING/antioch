@@ -13,6 +13,6 @@ public class TextUtil {
       Log.info("annotation:{}", s);
     });
 
-    return visitor.getBaseLayer();
+    return visitor.getBaseLayerData();
   }
 }

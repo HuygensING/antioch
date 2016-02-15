@@ -41,9 +41,11 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
+import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
@@ -54,16 +56,20 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.text.TextUtil;
 
 public class ResourceTextEndpoint extends JSONEndpoint {
-  private static final BaseLayerDefinition DEFAULT_BASELAYER_DEFINITION = BaseLayerDefinition.withBaseElements(BaseElementDefinition.withName("text"),BaseElementDefinition.withName("p").withAttributes("xml:id"));
+  private static final BaseLayerDefinition WITH_BASE_ELEMENTS = BaseLayerDefinition.withBaseElements(BaseElementDefinition.withName("text"),
+      BaseElementDefinition.withName("p").withAttributes("xml:id"));
   private final AlexandriaService service;
   private final UUID resourceId;
   private final AlexandriaResource resource;
+  private LocationBuilder locationBuilder;
 
   @Inject
   public ResourceTextEndpoint(AlexandriaService service, //
       ResourceValidatorFactory validatorFactory, //
+      LocationBuilder locationBuilder, //
       @PathParam("uuid") final UUIDParam uuidParam) {
     this.service = service;
+    this.locationBuilder = locationBuilder;
     this.resource = validatorFactory.validateExistingResource(uuidParam).notTentative();
     this.resourceId = resource.getId();
   }
@@ -87,12 +93,13 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @ApiOperation("set text from xml")
   public Response setTextFromXml(@NotNull @Valid String xml) {
     verifyResourceHasNoText();
-    BaseLayerDefinition baseLayerDefinition = service.getBaseLayerDefinitionForResource(resourceId)//
-        .orElse(DEFAULT_BASELAYER_DEFINITION);
+    Pair<BaseLayerDefinition, UUID> pair = service.getBaseLayerDefinitionForResource(resourceId)//
+        .orElse(Pair.of(WITH_BASE_ELEMENTS, resourceId));
     // .orElseThrow(() -> new ConflictException("No base layer defined for this resource."));
-    String baseLayer = TextUtil.extractBaseLayer(xml, baseLayerDefinition);
+    String baseLayer = TextUtil.extractBaseLayer(xml, pair.getLeft());
     service.setResourceTextFromStream(resourceId, streamIn(baseLayer));
-    return noContent();
+    ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity.of(pair.getRight()).withLocationBuilder(locationBuilder);
+    return ok(resourceTextUploadEntity);
   }
 
   @PUT

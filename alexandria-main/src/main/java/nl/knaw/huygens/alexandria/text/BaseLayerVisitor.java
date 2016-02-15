@@ -2,6 +2,7 @@ package nl.knaw.huygens.alexandria.text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
 import nl.knaw.huygens.tei.Comment;
@@ -14,9 +15,8 @@ import nl.knaw.huygens.tei.export.ExportVisitor;
 import nl.knaw.huygens.tei.handlers.XmlTextHandler;
 
 public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<XmlContext>, ElementHandler<XmlContext> {
-
   List<AnnotationData> annotationData = new ArrayList<>();
-
+  private UUID baselayerDefiningResourceId;
   static List<String> annotationActions = new ArrayList<>();
 
   public static List<String> getAnnotationActions() {
@@ -84,10 +84,9 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
       context.addCloseTag(element);
       return Traversal.NEXT;
     }
-
   }
 
-  public String getBaseLayer() {
+  public String getBaseLayerData() {
     return getContext().getResult();
   }
 
