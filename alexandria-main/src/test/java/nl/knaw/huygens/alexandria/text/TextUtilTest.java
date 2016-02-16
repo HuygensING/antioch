@@ -11,8 +11,24 @@ public class TextUtilTest {
   @Test
   public void testBaseLayerExtraction() {
     // given
-    String xml = "<text><div xml:id='div-1' lang='nl'><p xml:id='p01' rend='red'>paragraph with <b><i rend='yes'>text</i></b></p><p>wa</p></div></text>".replace("'", "\"");
-    String expected = "<text><div xml:id='div-1'><p xml:id='p01'>paragraph with text</p><p>wa</p></div></text>".replace("'", "\"");
+    String xml = ("<text>"//
+        + "<div xml:id='div-1' lang='nl'>"//
+        + "<p xml:id='p01' rend='red'>paragraph with <b><i rend='yes'>text</i></b></p>"//
+        + "<p>two</p>"//
+        + "</div>"//
+        + "<div xml:id='div-2' lang='nl'>"//
+        + "<p>three</p>"//
+        + "</div>"//
+        + "</text>").replace("'", "\"");
+    String expected = ("<text>"//
+        + "<div xml:id='div-1'>"//
+        + "<p xml:id='p01'>paragraph with text</p>"//
+        + "<p>two</p>"//
+        + "</div>"//
+        + "<div xml:id='div-2'>"//
+        + "<p>three</p>"//
+        + "</div>"//
+        + "</text>").replace("'", "\"");
     BaseLayerDefinition def = BaseLayerDefinition//
         .withBaseElements(//
             BaseElementDefinition.withName("text"), //
@@ -22,7 +38,7 @@ public class TextUtilTest {
 
     // when
     String baseLayer = TextUtil.extractBaseLayer(xml, def);
-    
+
     // then expect
     assertThat(baseLayer).isEqualTo(expected);
   }

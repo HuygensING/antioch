@@ -94,8 +94,8 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   public Response setTextFromXml(@NotNull @Valid String xml) {
     verifyResourceHasNoText();
     Pair<BaseLayerDefinition, UUID> pair = service.getBaseLayerDefinitionForResource(resourceId)//
-        .orElse(Pair.of(DEFAULT_BASELAYER_DEFINITION, resourceId));
-    // .orElseThrow(() -> new ConflictException("No base layer defined for this resource."));
+        // .orElse(Pair.of(DEFAULT_BASELAYER_DEFINITION, resourceId));
+        .orElseThrow(() -> new ConflictException("No base layer defined for this resource."));
     String baseLayer = TextUtil.extractBaseLayer(xml, pair.getLeft());
     service.setResourceTextFromStream(resourceId, streamIn(baseLayer));
     ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity.of(pair.getRight()).withLocationBuilder(locationBuilder);
