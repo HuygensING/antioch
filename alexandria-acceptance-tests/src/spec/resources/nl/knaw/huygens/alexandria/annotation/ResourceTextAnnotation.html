@@ -43,6 +43,24 @@
     </h:request>
 
     <h:request>
+     And I have 
+     <h:success>successfully</h:success>
+     <h:put>/resources/599fad4f-21ca-4488-94f7-66fba8b39aba/baselayerdefinition</h:put>
+     the body:
+     <h:jsonBody>{
+         "baseLayerDefinition": {
+         "baseElementDefinitions": [
+         {"name" : "text" },
+         {"name" : "p", "baseAttributes" : ["xml:id"] }
+         ] } }
+     </h:jsonBody>
+     using
+     <h:setHeader name="Content-Type">application/json</h:setHeader>,
+     to set the base layer definition:
+    </h:request>
+    <br/>
+    
+    <h:request>
         When I <h:put>/resources/599fad4f-21ca-4488-94f7-66fba8b39aba/text</h:put> the body:
         <h:jsonBody>{
             "text": {
