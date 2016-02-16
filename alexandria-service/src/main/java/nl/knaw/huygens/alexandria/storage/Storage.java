@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -60,6 +61,8 @@ public class Storage {
   private boolean supportsTransactions;
   private boolean supportsPersistence;
 
+  private boolean transactionOpen = false;
+
   public Storage(final Graph graph) {
     setGraph(graph);
   }
@@ -86,12 +89,19 @@ public class Storage {
   // framedGraph methods
 
   public void startTransaction() {
+    if (transactionOpen) {
+      throw new RuntimeException("We are already inside an open transaction!");
+    }
     if (supportsTransactions()) {
       framedGraph.tx().rollback();
     }
+    transactionOpen = true;
   }
 
   public void commitTransaction() {
+    if (!transactionOpen) {
+      throw new RuntimeException("We are not in an open transaction!");
+    }
     if (supportsTransactions()) {
       framedGraph.tx().commit();
       // framedGraph.tx().close();
@@ -99,28 +109,36 @@ public class Storage {
     if (!supportsPersistence()) {
       saveToDisk(getDumpFile());
     }
+    transactionOpen = false;
   }
 
   public void rollbackTransaction() {
+    if (!transactionOpen) {
+      throw new RuntimeException("We are not in an open transaction!");
+    }
     if (supportsTransactions()) {
       framedGraph.tx().rollback();
       // framedGraph.tx().close();
     } else {
       Log.error("rollback called, but transactions are not supported by graph {}", graph);
     }
+    transactionOpen = false;
   }
 
   public boolean existsVF(final Class<? extends AlexandriaVF> vfClass, final UUID uuid) {
+    assertInTransaction();
     assertClass(vfClass);
     return find(vfClass, uuid).tryNext().isPresent();
   }
 
   public <A extends AlexandriaVF> A createVF(final Class<A> vfClass) {
+    assertInTransaction();
     assertClass(vfClass);
     return framedGraph.addVertex(vfClass);
   }
 
   public <A extends AlexandriaVF> Optional<A> readVF(final Class<A> vfClass, final UUID uuid) {
+    assertInTransaction();
     assertClass(vfClass);
     return firstOrEmpty(find(vfClass, uuid).toList());
   }
@@ -131,16 +149,19 @@ public class Storage {
   }
 
   public <A extends AlexandriaVF> FramedGraphTraversal<Object, A> find(Class<A> vfClass) {
+    assertInTransaction();
     return framedGraph.V(vfClass);
   }
 
   public GraphTraversal<Vertex, Vertex> getVertexTraversal(Object... vertexIds) {
+    assertInTransaction();
     return graph.traversal().V(vertexIds);
   }
 
   // graph methods
 
   public void removeExpiredTentatives(final Long threshold) {
+    assertInTransaction();
     getVertexTraversal()//
         .has("state", AlexandriaState.TENTATIVE.name())//
         .has("stateSince", lt(threshold))//
@@ -148,6 +169,7 @@ public class Storage {
   }
 
   public void removeVertexWithId(final String annotationBodyId) {
+    assertInTransaction();
     getVertexTraversal()//
         .has(IDENTIFIER_PROPERTY, annotationBodyId).next().remove();
   }
@@ -215,6 +237,7 @@ public class Storage {
   }
 
   public Map<String, Object> getMetadata() {
+    assertInTransaction();
     Map<String, Object> metadata = Maps.newLinkedHashMap();
     metadata.put("features", graph.features().toString().split(System.lineSeparator()));
     GraphTraversalSource traversal = graph.traversal();
@@ -238,6 +261,50 @@ public class Storage {
       throw new RuntimeException(e);
     }
     // Log.info("destroy done");
+  }
+
+  public <T extends Object> T runInTransaction(Supplier<T> supplier) {
+    boolean inOpenTransaction = transactionOpen;
+    if (!inOpenTransaction) {
+      startTransaction();
+    }
+    try {
+      T result = supplier.get();
+      if (!inOpenTransaction) {
+        commitTransaction();
+      }
+      return result;
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      rollbackTransaction();
+      throw e;
+    }
+  }
+
+  public void runInTransaction(Runnable runner) {
+    boolean inOpenTransaction = transactionOpen;
+    if (!inOpenTransaction) {
+      startTransaction();
+    }
+    try {
+      runner.run();
+      if (!inOpenTransaction) {
+        commitTransaction();
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      rollbackTransaction();
+      throw e;
+    }
+  }
+
+  private void assertInTransaction() {
+    if (!transactionOpen) {
+      // if ((supportsTransactions() && !graph.tx().isOpen()) || (!supportsTransactions() && !transactionOpen)) {
+      throw new RuntimeException("We should be in open transaction at this point, use runInTransaction()!");
+    }
   }
 
 }
