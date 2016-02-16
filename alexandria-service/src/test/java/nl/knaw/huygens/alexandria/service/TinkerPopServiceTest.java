@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.service;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -59,7 +59,6 @@ public class TinkerPopServiceTest {
 
   TinkerPopService service = new TinkerGraphService(new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()), new InMemoryTextService());
 
-  @Ignore
   @Test
   public void testReadAfterCreateIsIdentity() {
     UUID id = UUID.randomUUID();
@@ -145,7 +144,6 @@ public class TinkerPopServiceTest {
     assertThat(u).isNotNull();
   }
 
-  @Ignore
   @Test
   public void testDeprecateAnnotation() {
     // given
@@ -201,7 +199,6 @@ public class TinkerPopServiceTest {
   // Map<String, Object> propertyMap = traversal.propertyMap().next();
   // }
 
-  @Ignore
   @Test
   public void testReturnExistingSubresourceIfSubPlusParentIdMatches() {
     // given
@@ -228,7 +225,6 @@ public class TinkerPopServiceTest {
     assertThat(oResource1.isPresent()).isFalse();
   }
 
-  @Ignore
   @Test
   public void testDeletingAnAnnotationWithStateDeletedDoesNotFail() {
     // given
@@ -262,7 +258,6 @@ public class TinkerPopServiceTest {
     assertThat(annotation.getState()).isEqualTo(AlexandriaState.DELETED);
   }
 
-  @Ignore
   @Test
   public void testGetBaseLayerDefinitionForResourceReturnsTheFirstDefinitionUpTheResourceChain() {
     // given
@@ -290,7 +285,6 @@ public class TinkerPopServiceTest {
     assertThat(returnedBaseElementDefinitions.get(1)).isEqualTo(baseElements.get(1));
   }
 
-  @Ignore
   @Test
   public void testGetBaseLayerDefinitionForResourceReturnsNullOptionalsWhenNoDefinitionPresentUpTheResourceChain() {
     // given

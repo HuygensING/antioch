@@ -604,18 +604,20 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   void createOrUpdateResource(AlexandriaResource resource) {
-    final ResourceVF rvf;
     final UUID uuid = resource.getId();
-    if (storage.existsVF(ResourceVF.class, uuid)) {
-      rvf = storage.readVF(ResourceVF.class, uuid).get();
-    } else {
-      rvf = storage.createVF(ResourceVF.class);
-      rvf.setUuid(uuid.toString());
-    }
+    storage.runInTransaction(() -> {
+      final ResourceVF rvf;
+      if (storage.existsVF(ResourceVF.class, uuid)) {
+        rvf = storage.readVF(ResourceVF.class, uuid).get();
+      } else {
+        rvf = storage.createVF(ResourceVF.class);
+        rvf.setUuid(uuid.toString());
+      }
 
-    rvf.setCargo(resource.getCargo());
+      rvf.setCargo(resource.getCargo());
 
-    setAlexandriaVFProperties(rvf, resource);
+      setAlexandriaVFProperties(rvf, resource);
+    });
   }
 
   void updateState(AlexandriaVF vf, AlexandriaState newState) {
