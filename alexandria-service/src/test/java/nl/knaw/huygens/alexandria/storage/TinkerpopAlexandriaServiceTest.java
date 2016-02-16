@@ -29,10 +29,13 @@ import static org.mockito.Mockito.when;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
@@ -50,10 +53,15 @@ import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.text.InMemoryTextService;
 
 public class TinkerpopAlexandriaServiceTest {
-  private Storage mockStorage = mock(Storage.class);
+  private static Storage mockStorage = mock(Storage.class);
   private final TinkerPopService service = new TinkerPopService(mockStorage, new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()), new InMemoryTextService());
 
-  // @Test
+  static {
+    when(mockStorage.runInTransaction(Mockito.any(Supplier.class))).thenCallRealMethod();//
+  }
+
+  @Ignore
+  @Test
   public void test() {
     Graph g = TinkerGraph.open();
     Log.info("graph features: {}", g.features());
@@ -65,7 +73,8 @@ public class TinkerpopAlexandriaServiceTest {
     assertThat(created).isTrue();
   }
 
-  // @Test
+  @Ignore
+  @Test
   // TODO: fix test
   public void testDereferenceWithExistingAnnotation() {
     UUID id = UUID.randomUUID();
@@ -73,6 +82,7 @@ public class TinkerpopAlexandriaServiceTest {
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
     AnnotationVF annotationVF = mock(AnnotationVF.class);
     when(annotationVF.getUuid()).thenReturn(id.toString());
+    when(annotationVF.getProvenanceWhen()).thenReturn(Instant.now().toString());
     when(mockStorage.readVF(AnnotationVF.class, id)).thenReturn(Optional.of(annotationVF));
     IdentifiablePointer<AlexandriaAnnotation> ap = new IdentifiablePointer<>(AlexandriaAnnotation.class, id.toString());
 
@@ -92,7 +102,8 @@ public class TinkerpopAlexandriaServiceTest {
     assertThat(optional.isPresent()).isFalse();
   }
 
-  // @Test
+  @Ignore
+  @Test
   // TODO: fix test
   public void testDereferenceWithExistingResource() {
     UUID id = UUID.randomUUID();
