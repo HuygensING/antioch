@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.service;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -199,18 +199,20 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public Optional<AlexandriaAnnotation> readAnnotation(UUID uuid, Integer revision) {
     Optional<AlexandriaAnnotation> optionalAnnotation = storage.runInTransaction(() -> {
+
+      Optional<AlexandriaAnnotation> result = Optional.empty();
       Optional<AnnotationVF> versionedAnnotation = storage.readVF(AnnotationVF.class, uuid, revision);
       if (versionedAnnotation.isPresent()) {
-        return versionedAnnotation.map(this::deframeAnnotation);
+        result = versionedAnnotation.map(this::deframeAnnotation);
 
       } else {
         Optional<AnnotationVF> currentAnnotation = storage.readVF(AnnotationVF.class, uuid);
         if (currentAnnotation.isPresent() && currentAnnotation.get().getRevision().equals(revision)) {
-          return currentAnnotation.map(this::deframeAnnotation);
-        } else {
-          return Optional.empty();
+          result = currentAnnotation.map(this::deframeAnnotation);
         }
       }
+      return result;
+
     });
     return optionalAnnotation;
   }
