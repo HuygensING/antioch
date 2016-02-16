@@ -22,7 +22,6 @@ package nl.knaw.huygens.alexandria.storage;
  * #L%
  */
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -34,6 +33,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -145,7 +145,8 @@ public class EndpointsTest extends TinkergraphServiceEndpointTest {
     Log.debug("response.location={}", annotateResponse.getLocation());
   }
 
-  // @Test
+  @Ignore
+  @Test
   public void testTwoPutsWillNotProduceAnError() throws IOException {
     AlexandriaService service = mock(AlexandriaService.class);
     ResourceCreationRequestBuilder requestBuilder = new ResourceCreationRequestBuilder();
