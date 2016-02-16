@@ -1,7 +1,5 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
-import java.io.IOException;
-
 /*
  * #%L
  * alexandria-main
@@ -12,20 +10,22 @@ import java.io.IOException;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -44,6 +44,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import io.swagger.annotations.ApiOperation;
+
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
@@ -51,13 +52,10 @@ import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
-import nl.knaw.huygens.alexandria.model.BaseLayerDefinition.BaseElementDefinition;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.text.TextUtil;
 
 public class ResourceTextEndpoint extends JSONEndpoint {
-  private static final BaseLayerDefinition DEFAULT_BASELAYER_DEFINITION = BaseLayerDefinition.withBaseElements(BaseElementDefinition.withName("text"),
-      BaseElementDefinition.withName("p").withAttributes("xml:id"));
   private final AlexandriaService service;
   private final UUID resourceId;
   private final AlexandriaResource resource;
@@ -65,9 +63,9 @@ public class ResourceTextEndpoint extends JSONEndpoint {
 
   @Inject
   public ResourceTextEndpoint(AlexandriaService service, //
-      ResourceValidatorFactory validatorFactory, //
-      LocationBuilder locationBuilder, //
-      @PathParam("uuid") final UUIDParam uuidParam) {
+                              ResourceValidatorFactory validatorFactory, //
+                              LocationBuilder locationBuilder, //
+                              @PathParam("uuid") final UUIDParam uuidParam) {
     this.service = service;
     this.locationBuilder = locationBuilder;
     this.resource = validatorFactory.validateExistingResource(uuidParam).notTentative();
@@ -93,12 +91,12 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @ApiOperation("set text from xml")
   public Response setTextFromXml(@NotNull @Valid String xml) {
     verifyResourceHasNoText();
-    Pair<BaseLayerDefinition, UUID> pair = service.getBaseLayerDefinitionForResource(resourceId)//
-        // .orElse(Pair.of(DEFAULT_BASELAYER_DEFINITION, resourceId));
-        .orElseThrow(() -> new ConflictException("No base layer defined for this resource."));
+    Pair<BaseLayerDefinition, UUID> pair = service.getBaseLayerDefinitionForResource(resourceId)
+                                                  .orElseThrow(noBaseLayerDefined());
     String baseLayer = TextUtil.extractBaseLayer(xml, pair.getLeft());
     service.setResourceTextFromStream(resourceId, streamIn(baseLayer));
-    ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity.of(pair.getRight()).withLocationBuilder(locationBuilder);
+    ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity.of(pair.getRight())
+                                                                                .withLocationBuilder(locationBuilder);
     return ok(resourceTextUploadEntity);
   }
 
@@ -121,6 +119,10 @@ public class ResourceTextEndpoint extends JSONEndpoint {
       e.printStackTrace();
       throw new RuntimeException(e);
     }
+  }
+
+  private Supplier<ConflictException> noBaseLayerDefined() {
+    return () -> new ConflictException(String.format("No base layer defined for resource: %s", resourceId));
   }
 
   private void verifyResourceHasNoText() {
