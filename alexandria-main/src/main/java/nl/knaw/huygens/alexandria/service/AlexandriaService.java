@@ -31,8 +31,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
@@ -126,6 +124,6 @@ public interface AlexandriaService {
 
   void setBaseLayerDefinition(UUID resourceUUID, List<BaseElementDefinition> baseElements);
 
-  Optional<Pair<BaseLayerDefinition, UUID>> getBaseLayerDefinitionForResource(UUID resourceUUID);
+  Optional<BaseLayerDefinition> getBaseLayerDefinitionForResource(UUID resourceUUID);
 
 }

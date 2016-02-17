@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
-import nl.knaw.huygens.alexandria.model.BaseLayerDefinition.BaseElementDefinition;
+import java.util.UUID;
 
 public class BaseLayerDefinition {
   List<BaseElementDefinition> baseElementDefinitions = new ArrayList<>();
+  UUID baseLayerDefiningResourceId;
 
   private BaseLayerDefinition() {
   }
@@ -33,6 +33,14 @@ public class BaseLayerDefinition {
 
   public List<BaseElementDefinition> getBaseElementDefinitions() {
     return baseElementDefinitions;
+  }
+
+  public UUID getBaseLayerDefiningResourceId() {
+    return baseLayerDefiningResourceId;
+  }
+
+  public void setBaseLayerDefiningResourceId(UUID baseLayerDefiningResourceId) {
+    this.baseLayerDefiningResourceId = baseLayerDefiningResourceId;
   }
 
   public static class BaseElementDefinition {

@@ -41,7 +41,6 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
@@ -91,11 +90,11 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @ApiOperation("set text from xml")
   public Response setTextFromXml(@NotNull @Valid String xml) {
     verifyResourceHasNoText();
-    Pair<BaseLayerDefinition, UUID> pair = service.getBaseLayerDefinitionForResource(resourceId)
+    BaseLayerDefinition bld = service.getBaseLayerDefinitionForResource(resourceId)
                                                   .orElseThrow(noBaseLayerDefined());
-    BaseLayerData baseLayerData = TextUtil.extractBaseLayerData(xml, pair.getLeft());
+    BaseLayerData baseLayerData = TextUtil.extractBaseLayerData(xml, bld);
     service.setResourceTextFromStream(resourceId, streamIn(baseLayerData.getBaseLayer()));
-    ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity.of(pair.getRight(), baseLayerData.getAnnotationActions())
+    ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity.of(bld.getBaseLayerDefiningResourceId(), baseLayerData.getAnnotationActions())
                                                                                 .withLocationBuilder(locationBuilder);
     return ok(resourceTextUploadEntity);
   }

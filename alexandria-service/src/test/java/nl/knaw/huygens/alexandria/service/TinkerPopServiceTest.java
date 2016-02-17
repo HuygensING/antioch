@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
@@ -277,9 +276,9 @@ public class TinkerPopServiceTest {
     UUID subUuid2 = UUID.randomUUID();
     service.createSubResource(subUuid2, subUuid1, "sub2", provenance);
 
-    Optional<Pair<BaseLayerDefinition, UUID>> optDef = service.getBaseLayerDefinitionForResource(subUuid2);
+    Optional<BaseLayerDefinition> optDef = service.getBaseLayerDefinitionForResource(subUuid2);
     assertThat(optDef).isPresent();
-    List<BaseElementDefinition> returnedBaseElementDefinitions = optDef.get().getLeft().getBaseElementDefinitions();
+    List<BaseElementDefinition> returnedBaseElementDefinitions = optDef.get().getBaseElementDefinitions();
     assertThat(returnedBaseElementDefinitions).hasSameSizeAs(baseElements);
     assertThat(returnedBaseElementDefinitions.get(0)).isEqualTo(baseElements.get(0));
     assertThat(returnedBaseElementDefinitions.get(1)).isEqualTo(baseElements.get(1));
@@ -300,7 +299,7 @@ public class TinkerPopServiceTest {
     UUID subUuid2 = UUID.randomUUID();
     service.createSubResource(subUuid2, subUuid1, "sub2", provenance);
 
-    Optional<Pair<BaseLayerDefinition, UUID>> optDef = service.getBaseLayerDefinitionForResource(subUuid2);
+    Optional<BaseLayerDefinition> optDef = service.getBaseLayerDefinitionForResource(subUuid2);
     assertThat(optDef.isPresent()).isFalse();
   }
 

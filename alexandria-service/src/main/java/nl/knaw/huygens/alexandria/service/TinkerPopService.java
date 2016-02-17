@@ -47,7 +47,6 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.tinkerpop.gremlin.structure.Element;
 import org.jooq.lambda.Unchecked;
 
@@ -403,9 +402,9 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public Optional<Pair<BaseLayerDefinition, UUID>> getBaseLayerDefinitionForResource(UUID resourceUUID) {
+  public Optional<BaseLayerDefinition> getBaseLayerDefinitionForResource(UUID resourceUUID) {
     return storage.runInTransaction(() -> {
-      Optional<Pair<BaseLayerDefinition, UUID>> optDef = Optional.empty();
+      Optional<BaseLayerDefinition> optDef = Optional.empty();
 
       ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
       while (resourceVF != null //
@@ -423,7 +422,8 @@ public class TinkerPopService implements AlexandriaService {
             e.printStackTrace();
             throw new RuntimeException(e);
           }
-          optDef = Optional.of(Pair.of(bld, UUID.fromString(resourceVF.getUuid())));
+          bld.setBaseLayerDefiningResourceId(UUID.fromString(resourceVF.getUuid()));
+          optDef = Optional.of(bld);
         }
       }
       return optDef;
