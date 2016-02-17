@@ -241,5 +241,40 @@
     </h:request>
 </div>
 
+<div id="text-without-baselayer-definition" c:execute="clearStorage()"
+     data-desc="What happens if no base layer is defined?">
+    <h:request>
+        Given that I have
+        <h:success>successfully</h:success>
+        <h:put>/resources/99999999-9999-9999-9999-999999999999</h:put>
+        the body:
+        <h:jsonBody>{
+            "resource": {
+            "id": "99999999-9999-9999-9999-999999999999",
+            "ref": "grotius-3161-v2"
+            } }
+        </h:jsonBody>
+    </h:request>
+    <br/>
+
+    <h:request>
+        When I then
+        <h:put>/resources/99999999-9999-9999-9999-999999999999/text</h:put>
+        the body:
+        <h:requestBody>&lt;text&gt;&lt;p&gt;the quick brown fox jumped the lazy dog's back&lt;/p&gt;&lt;/text&gt;</h:requestBody>
+        using
+        <h:setHeader name="Content-Type">application/octet-stream</h:setHeader>,
+        <br/>
+        Then I will receive
+        <h:status>409 Conflict</h:status>
+        and the response body is
+        <h:jsonResponse>{
+				  "error" : {
+				    "message" : "No base layer defined for resource: 99999999-9999-9999-9999-999999999999"
+				  } }
+        </h:jsonResponse>
+    </h:request>
+</div>
+
 </body>
 </html>
