@@ -145,12 +145,14 @@ public class Storage {
   }
 
   public <A extends AlexandriaVF> Optional<A> readVF(final Class<A> vfClass, final UUID uuid, final Integer revision) {
+    assertInTransaction();
     assertClass(vfClass);
     return firstOrEmpty(find(vfClass, uuid, revision).toList());
   }
 
   public <A extends AlexandriaVF> FramedGraphTraversal<Object, A> find(Class<A> vfClass) {
     assertInTransaction();
+    assertClass(vfClass);
     return framedGraph.V(vfClass);
   }
 
@@ -295,16 +297,16 @@ public class Storage {
   private void assertClass(final Class<? extends AlexandriaVF> clazz) {
     Preconditions.checkState(//
         clazz.getAnnotationsByType(peapod.annotations.Vertex.class).length > 0, //
-        "Class " + clazz + " has no peapod @Vertex annotation, are you sure it is the correct class?"//
+        "Class " + clazz + " has no peapod @Vertex annotation, are you sure it's the correct class?"//
     );
   }
 
   private void assertTransactionIsClosed() {
-    Preconditions.checkState(!transactionOpen, "We are already inside an open transaction!");
+    Preconditions.checkState(!transactionOpen, "We're already inside an open transaction!");
   }
 
   private void assertTransactionIsOpen() {
-    Preconditions.checkState(transactionOpen, "We are not in an open transaction!");
+    Preconditions.checkState(transactionOpen, "We're not in an open transaction!");
   }
 
 }
