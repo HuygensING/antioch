@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.storage;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -88,7 +88,7 @@ public class Storage {
 
   // framedGraph methods
 
-  public void startTransaction() {
+  private void startTransaction() {
     if (transactionOpen) {
       throw new RuntimeException("We are already inside an open transaction!");
     }
@@ -98,7 +98,7 @@ public class Storage {
     transactionOpen = true;
   }
 
-  public void commitTransaction() {
+  private void commitTransaction() {
     if (!transactionOpen) {
       throw new RuntimeException("We are not in an open transaction!");
     }
@@ -112,7 +112,7 @@ public class Storage {
     transactionOpen = false;
   }
 
-  public void rollbackTransaction() {
+  private void rollbackTransaction() {
     if (!transactionOpen) {
       throw new RuntimeException("We are not in an open transaction!");
     }

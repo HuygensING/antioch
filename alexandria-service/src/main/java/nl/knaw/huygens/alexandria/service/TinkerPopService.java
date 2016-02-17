@@ -49,6 +49,7 @@ import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.tinkerpop.gremlin.structure.Element;
+import org.jooq.lambda.Unchecked;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -106,9 +107,7 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   // - AlexandriaService methods -//
-  // all public methods that interact with storage should start with storage.startTransaction()
-  // and end with storage.commitTransaction() for write actions
-  // and storage.rollbackTransaction() for read-only actions
+  // use storage.runInTransaction for transactions
 
   @Override
   public boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
@@ -251,7 +250,7 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public Set<AlexandriaResource> readSubResources(UUID uuid) {
     ResourceVF resourcevf = storage.runInTransaction(() -> storage.readVF(ResourceVF.class, uuid))//
-                                   .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
+        .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
     return resourcevf.getSubResources().stream()//
         .map(this::deframeResource)//
         .collect(toSet());
@@ -266,7 +265,7 @@ public class TinkerPopService implements AlexandriaService {
   private AnnotationVF deprecateAnnotationVF(UUID annotationId, AlexandriaAnnotation updatedAnnotation) {
     // check if there's an annotation with the given id
     AnnotationVF oldAnnotationVF = storage.readVF(AnnotationVF.class, annotationId)//
-                                          .orElseThrow(annotationNotFound(annotationId));
+        .orElseThrow(annotationNotFound(annotationId));
     if (oldAnnotationVF.isTentative()) {
       throw incorrectStateException(annotationId, "tentative");
     } else if (oldAnnotationVF.isDeleted()) {
@@ -405,32 +404,30 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Optional<Pair<BaseLayerDefinition, UUID>> getBaseLayerDefinitionForResource(UUID resourceUUID) {
-    Optional<Pair<BaseLayerDefinition, UUID>> optDef = Optional.empty();
-    storage.startTransaction();
-    ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
-    while (resourceVF != null //
-        && StringUtils.isEmpty(resourceVF.getBaseLayerDefinition())) {
-      resourceVF = resourceVF.getParentResource();
-    }
+    return storage.runInTransaction(() -> {
+      Optional<Pair<BaseLayerDefinition, UUID>> optDef = Optional.empty();
 
-    if (resourceVF == null) {
-      storage.rollbackTransaction();
-      return optDef;
-    }
-
-    String json = resourceVF.getBaseLayerDefinition();
-    storage.rollbackTransaction();
-    if (StringUtils.isNotEmpty(json)) {
-      BaseLayerDefinition bld;
-      try {
-        bld = deserializeBaseLayerDefinition(json);
-      } catch (IOException e) {
-        e.printStackTrace();
-        throw new RuntimeException(e);
+      ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
+      while (resourceVF != null //
+          && StringUtils.isEmpty(resourceVF.getBaseLayerDefinition())) {
+        resourceVF = resourceVF.getParentResource();
       }
-      optDef = Optional.of(Pair.of(bld, UUID.fromString(resourceVF.getUuid())));
-    }
-    return optDef;
+
+      if (resourceVF != null) {
+        String json = resourceVF.getBaseLayerDefinition();
+        if (StringUtils.isNotEmpty(json)) {
+          BaseLayerDefinition bld;
+          try {
+            bld = deserializeBaseLayerDefinition(json);
+          } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+          }
+          optDef = Optional.of(Pair.of(bld, UUID.fromString(resourceVF.getUuid())));
+        }
+      }
+      return optDef;
+    });
   }
 
   private BaseLayerDefinition deserializeBaseLayerDefinition(String json) throws IOException {
@@ -489,29 +486,14 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public void exportDb(String format, String filename) {
-    storage.startTransaction();
-    try {
-      storage.writeGraph(DumpFormat.valueOf(format), filename);
-    } catch (IOException e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
-    } finally {
-      storage.rollbackTransaction();
-    }
+    storage.runInTransaction(Unchecked.runnable(() -> storage.writeGraph(DumpFormat.valueOf(format), filename)));
   }
 
   @Override
   public void importDb(String format, String filename) {
-    try {
-      storage = clearGraph();
-      storage.startTransaction();
-      storage.readGraph(DumpFormat.valueOf(format), filename);
-    } catch (IOException e) {
-      e.printStackTrace();
-      storage.rollbackTransaction();
-      throw new RuntimeException(e);
-    }
-    storage.commitTransaction();
+    storage = clearGraph();
+    // storage.startTransaction();
+    storage.runInTransaction(Unchecked.runnable(() -> storage.readGraph(DumpFormat.valueOf(format), filename)));
   }
 
   // - other public methods -//
@@ -573,15 +555,11 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   public void dumpToGraphSON(OutputStream os) throws IOException {
-    storage.startTransaction();
-    storage.dumpToGraphSON(os);
-    storage.rollbackTransaction();
+    storage.runInTransaction(Unchecked.runnable(() -> storage.dumpToGraphSON(os)));
   }
 
   public void dumpToGraphML(OutputStream os) throws IOException {
-    storage.startTransaction();
-    storage.dumpToGraphML(os);
-    storage.rollbackTransaction();
+    storage.runInTransaction(Unchecked.runnable(() -> storage.dumpToGraphML(os)));
   }
 
   // - package methods -//

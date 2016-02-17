@@ -51,6 +51,12 @@
       <version>${xml-apis.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.jooq</groupId>
+      <artifactId>jool</artifactId>
+      <version>${jool.version}</version>
+    </dependency>
+
     <!-- Test dependencies -->
     <dependency>
       <groupId>${project.groupId}</groupId>
