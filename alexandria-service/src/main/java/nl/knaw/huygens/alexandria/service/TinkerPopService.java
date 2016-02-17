@@ -198,23 +198,20 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Optional<AlexandriaAnnotation> readAnnotation(UUID uuid, Integer revision) {
-    Optional<AlexandriaAnnotation> optionalAnnotation = storage.runInTransaction(() -> {
-
-      Optional<AlexandriaAnnotation> result = Optional.empty();
+    return storage.runInTransaction(() -> {
       Optional<AnnotationVF> versionedAnnotation = storage.readVF(AnnotationVF.class, uuid, revision);
       if (versionedAnnotation.isPresent()) {
-        result = versionedAnnotation.map(this::deframeAnnotation);
+        return versionedAnnotation.map(this::deframeAnnotation);
 
       } else {
         Optional<AnnotationVF> currentAnnotation = storage.readVF(AnnotationVF.class, uuid);
         if (currentAnnotation.isPresent() && currentAnnotation.get().getRevision().equals(revision)) {
-          result = currentAnnotation.map(this::deframeAnnotation);
+          return currentAnnotation.map(this::deframeAnnotation);
+        } else {
+          return Optional.empty();
         }
       }
-      return result;
-
     });
-    return optionalAnnotation;
   }
 
   @Override
