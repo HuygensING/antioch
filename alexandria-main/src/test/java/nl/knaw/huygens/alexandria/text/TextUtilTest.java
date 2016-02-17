@@ -37,7 +37,7 @@ public class TextUtilTest {
     );
 
     // when
-    String baseLayer = TextUtil.extractBaseLayer(xml, def);
+    String baseLayer = TextUtil.extractBaseLayerData(xml, def).getBaseLayer();
 
     // then expect
     assertThat(baseLayer).isEqualTo(expected);

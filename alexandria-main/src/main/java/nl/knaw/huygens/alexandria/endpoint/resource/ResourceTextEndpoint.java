@@ -44,7 +44,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import io.swagger.annotations.ApiOperation;
-
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
@@ -53,6 +52,7 @@ import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.text.BaseLayerData;
 import nl.knaw.huygens.alexandria.text.TextUtil;
 
 public class ResourceTextEndpoint extends JSONEndpoint {
@@ -93,9 +93,9 @@ public class ResourceTextEndpoint extends JSONEndpoint {
     verifyResourceHasNoText();
     Pair<BaseLayerDefinition, UUID> pair = service.getBaseLayerDefinitionForResource(resourceId)
                                                   .orElseThrow(noBaseLayerDefined());
-    String baseLayer = TextUtil.extractBaseLayer(xml, pair.getLeft());
-    service.setResourceTextFromStream(resourceId, streamIn(baseLayer));
-    ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity.of(pair.getRight())
+    BaseLayerData baseLayerData = TextUtil.extractBaseLayerData(xml, pair.getLeft());
+    service.setResourceTextFromStream(resourceId, streamIn(baseLayerData.getBaseLayer()));
+    ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity.of(pair.getRight(), baseLayerData.getAnnotationActions())
                                                                                 .withLocationBuilder(locationBuilder);
     return ok(resourceTextUploadEntity);
   }

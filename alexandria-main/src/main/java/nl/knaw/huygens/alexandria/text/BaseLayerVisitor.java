@@ -21,9 +21,7 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
   private static final String XML_ID = "xml:id";
   List<AnnotationData> annotationData = new ArrayList<>();
   static List<String> annotationActions = new ArrayList<>();
-
   static ElementTally elementTally = new ElementTally();
-
   static Stack<Element> baseElementStack = new Stack<>();
 
   public List<String> getAnnotationActions() {
@@ -41,6 +39,7 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     });
   }
 
+  // non-base elements
   @Override
   public Traversal enterElement(Element element, XmlContext context) {
     elementTally.tally(element);
@@ -115,9 +114,9 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     }
   }
 
-  public String getBaseLayerData() {
+  public BaseLayerData getBaseLayerData() {
     elementTally.logReport();
-    return getContext().getResult();
+    return BaseLayerData.withBaseLayer(getContext().getResult()).withAnnotationDryRun(getAnnotationActions());
   }
 
   public static String xpath(Element element) {

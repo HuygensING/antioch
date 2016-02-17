@@ -1,6 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -19,15 +20,27 @@ import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 @JsonInclude(Include.NON_NULL)
 @ApiModel("ResourceTextUploadresult")
 public class ResourceTextUploadEntity extends JsonWrapperObject implements Entity {
-
   @JsonIgnore
   protected LocationBuilder locationBuilder;
 
   @JsonIgnore
   private UUID baseLayerDefiningResourceId;
 
-  private ResourceTextUploadEntity(UUID baseLayerDefiningResourceId) {
+  private List<String> annotationActions;
+
+  @JsonProperty(PropertyPrefix.LINK + "baseLayerDefinition")
+  public URI getBaseLayerDefinitionURI() {
+    return locationBuilder.locationOf(AlexandriaResource.class, baseLayerDefiningResourceId, ResourcesEndpoint.BASELAYERDEFINITION);
+  }
+
+  @JsonProperty("dryrun")
+  public List<String> getAnnotationActions() {
+    return annotationActions;
+  }
+
+  private ResourceTextUploadEntity(UUID baseLayerDefiningResourceId, List<String> annotationActions) {
     this.baseLayerDefiningResourceId = baseLayerDefiningResourceId;
+    this.annotationActions = annotationActions;
   }
 
   public final ResourceTextUploadEntity withLocationBuilder(LocationBuilder locationBuilder) {
@@ -35,13 +48,8 @@ public class ResourceTextUploadEntity extends JsonWrapperObject implements Entit
     return this;
   }
 
-  public static ResourceTextUploadEntity of(UUID baseLayerDefiningResourceId) {
-    return new ResourceTextUploadEntity(baseLayerDefiningResourceId);
-  }
-
-  @JsonProperty(PropertyPrefix.LINK + "baseLayerDefinition")
-  public URI getBaseLayerDefinitionURI() {
-    return locationBuilder.locationOf(AlexandriaResource.class, baseLayerDefiningResourceId, ResourcesEndpoint.BASELAYERDEFINITION);
+  public static ResourceTextUploadEntity of(UUID baseLayerDefiningResourceId, List<String> annotationActions) {
+    return new ResourceTextUploadEntity(baseLayerDefiningResourceId, annotationActions);
   }
 
 }
