@@ -112,7 +112,7 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
-    Boolean newlyCreated = storage.runInTransaction(() -> {
+    return storage.runInTransaction(() -> {
       AlexandriaResource resource;
       boolean result;
 
@@ -129,7 +129,6 @@ public class TinkerPopService implements AlexandriaService {
       createOrUpdateResource(resource);
       return result;
     });
-    return newlyCreated;
   }
 
   private Optional<AlexandriaResource> getOptionalResource(UUID uuid) {
@@ -183,17 +182,12 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Optional<AlexandriaResource> readResource(UUID uuid) {
-    Optional<AlexandriaResource> optionalResource = storage.runInTransaction(//
-        () -> getOptionalResource(uuid));
-    return optionalResource;
+    return storage.runInTransaction(() -> getOptionalResource(uuid));
   }
 
   @Override
   public Optional<AlexandriaAnnotation> readAnnotation(UUID uuid) {
-    Optional<AlexandriaAnnotation> optionalAnnotation = storage.runInTransaction(//
-        () -> storage.readVF(AnnotationVF.class, uuid).map(this::deframeAnnotation)//
-    );
-    return optionalAnnotation;
+    return storage.runInTransaction(() -> storage.readVF(AnnotationVF.class, uuid).map(this::deframeAnnotation));
   }
 
   @Override
@@ -256,7 +250,8 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Set<AlexandriaResource> readSubResources(UUID uuid) {
-    ResourceVF resourcevf = storage.runInTransaction(() -> storage.readVF(ResourceVF.class, uuid)).orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
+    ResourceVF resourcevf = storage.runInTransaction(() -> storage.readVF(ResourceVF.class, uuid))//
+                                   .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
     return resourcevf.getSubResources().stream()//
         .map(this::deframeResource)//
         .collect(toSet());
@@ -271,13 +266,11 @@ public class TinkerPopService implements AlexandriaService {
   private AnnotationVF deprecateAnnotationVF(UUID annotationId, AlexandriaAnnotation updatedAnnotation) {
     // check if there's an annotation with the given id
     AnnotationVF oldAnnotationVF = storage.readVF(AnnotationVF.class, annotationId)//
-        .orElseThrow(annotationNotFound(annotationId));
+                                          .orElseThrow(annotationNotFound(annotationId));
     if (oldAnnotationVF.isTentative()) {
       throw incorrectStateException(annotationId, "tentative");
-
     } else if (oldAnnotationVF.isDeleted()) {
       throwBadRequest(annotationId, "deleted");
-
     } else if (oldAnnotationVF.isDeprecated()) {
       throwBadRequest(annotationId, "already deprecated");
     }
@@ -332,8 +325,7 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public void confirmAnnotation(UUID uuid) {
     storage.runInTransaction(() -> {
-      AnnotationVF annotationVF = storage.readVF(AnnotationVF.class, uuid)//
-          .orElseThrow(annotationNotFound(uuid));
+      AnnotationVF annotationVF = storage.readVF(AnnotationVF.class, uuid).orElseThrow(annotationNotFound(uuid));
       updateState(annotationVF, AlexandriaState.CONFIRMED);
       updateState(annotationVF.getBody(), AlexandriaState.CONFIRMED);
       AnnotationVF deprecatedAnnotation = annotationVF.getDeprecatedAnnotation();
@@ -455,12 +447,11 @@ public class TinkerPopService implements AlexandriaService {
       stopwatch.stop();
       long elapsedMillis = stopwatch.elapsed(TimeUnit.MILLISECONDS);
 
-      SearchResult result = new SearchResult(locationBuilder)//
+      return new SearchResult(locationBuilder)//
           .setId(UUID.randomUUID())//
           .setQuery(query)//
           .setSearchDurationInMilliseconds(elapsedMillis)//
           .setResults(processQuery);
-      return result;
     });
   }
 
@@ -569,9 +560,7 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   public void storeAnnotationBody(AlexandriaAnnotationBody body) {
-    storage.runInTransaction(() -> {
-      frameAnnotationBody(body);
-    });
+    storage.runInTransaction(() -> frameAnnotationBody(body));
   }
 
   private void annotateAnnotationWithAnnotation(AlexandriaAnnotation annotation, AlexandriaAnnotation newAnnotation) {
