@@ -42,6 +42,7 @@ import org.apache.tinkerpop.gremlin.structure.io.IoCore;
 import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
 import nl.knaw.huygens.Log;
@@ -89,9 +90,7 @@ public class Storage {
   // framedGraph methods
 
   private void startTransaction() {
-    if (transactionOpen) {
-      throw new RuntimeException("We are already inside an open transaction!");
-    }
+    assertTransactionIsClosed();
     if (supportsTransactions()) {
       framedGraph.tx().rollback();
     }
@@ -99,9 +98,7 @@ public class Storage {
   }
 
   private void commitTransaction() {
-    if (!transactionOpen) {
-      throw new RuntimeException("We are not in an open transaction!");
-    }
+    assertTransactionIsOpen();
     if (supportsTransactions()) {
       framedGraph.tx().commit();
       // framedGraph.tx().close();
@@ -113,9 +110,7 @@ public class Storage {
   }
 
   private void rollbackTransaction() {
-    if (!transactionOpen) {
-      throw new RuntimeException("We are not in an open transaction!");
-    }
+    assertTransactionIsOpen();
     if (supportsTransactions()) {
       framedGraph.tx().rollback();
       // framedGraph.tx().close();
@@ -230,12 +225,6 @@ public class Storage {
     return results.isEmpty() ? Optional.empty() : Optional.ofNullable(results.get(0));
   }
 
-  private void assertClass(final Class<? extends AlexandriaVF> clazz) {
-    if (clazz.getAnnotationsByType(peapod.annotations.Vertex.class).length == 0) {
-      throw new RuntimeException("Class " + clazz + " has no peapod @Vertex annotation, are you sure it is the correct class?");
-    }
-  }
-
   public Map<String, Object> getMetadata() {
     assertInTransaction();
     Map<String, Object> metadata = Maps.newLinkedHashMap();
@@ -301,10 +290,22 @@ public class Storage {
   }
 
   private void assertInTransaction() {
-    if (!transactionOpen) {
-      // if ((supportsTransactions() && !graph.tx().isOpen()) || (!supportsTransactions() && !transactionOpen)) {
-      throw new RuntimeException("We should be in open transaction at this point, use runInTransaction()!");
-    }
+    Preconditions.checkState(transactionOpen, "We should be in open transaction at this point, use runInTransaction()!");
+  }
+
+  private void assertClass(final Class<? extends AlexandriaVF> clazz) {
+    Preconditions.checkState(//
+        clazz.getAnnotationsByType(peapod.annotations.Vertex.class).length > 0, //
+        "Class " + clazz + " has no peapod @Vertex annotation, are you sure it is the correct class?"//
+    );
+  }
+
+  private void assertTransactionIsClosed() {
+    Preconditions.checkState(!transactionOpen, "We are already inside an open transaction!");
+  }
+
+  private void assertTransactionIsOpen() {
+    Preconditions.checkState(transactionOpen, "We are not in an open transaction!");
   }
 
 }
