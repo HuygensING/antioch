@@ -89,35 +89,41 @@ public class Storage {
 
   // framedGraph methods
 
-  private void startTransaction() {
-    assertTransactionIsClosed();
-    if (supportsTransactions()) {
-      framedGraph.tx().rollback();
+  public <T extends Object> T runInTransaction(Supplier<T> supplier) {
+    boolean inOpenTransaction = transactionOpen;
+    if (!inOpenTransaction) {
+      startTransaction();
     }
-    transactionOpen = true;
+    try {
+      T result = supplier.get();
+      if (!inOpenTransaction) {
+        commitTransaction();
+      }
+      return result;
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      rollbackTransaction();
+      throw e;
+    }
   }
 
-  private void commitTransaction() {
-    assertTransactionIsOpen();
-    if (supportsTransactions()) {
-      framedGraph.tx().commit();
-      // framedGraph.tx().close();
+  public void runInTransaction(Runnable runner) {
+    boolean inOpenTransaction = transactionOpen;
+    if (!inOpenTransaction) {
+      startTransaction();
     }
-    if (!supportsPersistence()) {
-      saveToDisk(getDumpFile());
-    }
-    transactionOpen = false;
-  }
+    try {
+      runner.run();
+      if (!inOpenTransaction) {
+        commitTransaction();
+      }
 
-  private void rollbackTransaction() {
-    assertTransactionIsOpen();
-    if (supportsTransactions()) {
-      framedGraph.tx().rollback();
-      // framedGraph.tx().close();
-    } else {
-      Log.error("rollback called, but transactions are not supported by graph {}", graph);
+    } catch (Exception e) {
+      e.printStackTrace();
+      rollbackTransaction();
+      throw e;
     }
-    transactionOpen = false;
   }
 
   public boolean existsVF(final Class<? extends AlexandriaVF> vfClass, final UUID uuid) {
@@ -169,6 +175,16 @@ public class Storage {
         .has(IDENTIFIER_PROPERTY, annotationBodyId).next().remove();
   }
 
+  public Map<String, Object> getMetadata() {
+    assertInTransaction();
+    Map<String, Object> metadata = Maps.newLinkedHashMap();
+    metadata.put("features", graph.features().toString().split(System.lineSeparator()));
+    GraphTraversalSource traversal = graph.traversal();
+    metadata.put("vertices", count(traversal.V()));
+    metadata.put("edges", count(traversal.E()));
+    return metadata;
+  }
+
   public void dumpToGraphSON(final OutputStream os) throws IOException {
     graph.io(new GraphSONIo.Builder()).writer().create().writeGraph(os, graph);
   }
@@ -207,6 +223,18 @@ public class Storage {
     this.dumpfile = dumpfile;
   }
 
+  public void destroy() {
+    // Log.info("destroy called");
+    try {
+      Log.info("closing graph {}", graph);
+      graph.close();
+      Log.info("graph closed: {}", graph);
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
+    // Log.info("destroy done");
+  }
   // - private methods - //
 
   private <A extends AlexandriaVF> FramedGraphTraversal<Object, A> find(final Class<A> vfClass, final UUID uuid) {
@@ -225,68 +253,39 @@ public class Storage {
     return results.isEmpty() ? Optional.empty() : Optional.ofNullable(results.get(0));
   }
 
-  public Map<String, Object> getMetadata() {
-    assertInTransaction();
-    Map<String, Object> metadata = Maps.newLinkedHashMap();
-    metadata.put("features", graph.features().toString().split(System.lineSeparator()));
-    GraphTraversalSource traversal = graph.traversal();
-    metadata.put("vertices", count(traversal.V()));
-    metadata.put("edges", count(traversal.E()));
-    return metadata;
-  }
-
   private Long count(GraphTraversal<?, ?> graphTraversal) {
     return graphTraversal.count().next();
   }
 
-  public void destroy() {
-    // Log.info("destroy called");
-    try {
-      Log.info("closing graph {}", graph);
-      graph.close();
-      Log.info("graph closed: {}", graph);
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
+  private void startTransaction() {
+    assertTransactionIsClosed();
+    if (supportsTransactions()) {
+      framedGraph.tx().rollback();
     }
-    // Log.info("destroy done");
+    transactionOpen = true;
   }
 
-  public <T extends Object> T runInTransaction(Supplier<T> supplier) {
-    boolean inOpenTransaction = transactionOpen;
-    if (!inOpenTransaction) {
-      startTransaction();
+  private void commitTransaction() {
+    assertTransactionIsOpen();
+    if (supportsTransactions()) {
+      framedGraph.tx().commit();
+      // framedGraph.tx().close();
     }
-    try {
-      T result = supplier.get();
-      if (!inOpenTransaction) {
-        commitTransaction();
-      }
-      return result;
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      rollbackTransaction();
-      throw e;
+    if (!supportsPersistence()) {
+      saveToDisk(getDumpFile());
     }
+    transactionOpen = false;
   }
 
-  public void runInTransaction(Runnable runner) {
-    boolean inOpenTransaction = transactionOpen;
-    if (!inOpenTransaction) {
-      startTransaction();
+  private void rollbackTransaction() {
+    assertTransactionIsOpen();
+    if (supportsTransactions()) {
+      framedGraph.tx().rollback();
+      // framedGraph.tx().close();
+    } else {
+      Log.error("rollback called, but transactions are not supported by graph {}", graph);
     }
-    try {
-      runner.run();
-      if (!inOpenTransaction) {
-        commitTransaction();
-      }
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      rollbackTransaction();
-      throw e;
-    }
+    transactionOpen = false;
   }
 
   private void assertInTransaction() {
