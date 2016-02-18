@@ -19,14 +19,14 @@ import nl.knaw.huygens.tei.handlers.XmlTextHandler;
 
 public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<XmlContext>, ElementHandler<XmlContext>, ProcessingInstructionHandler<XmlContext> {
   private static final String XML_ID = "xml:id";
-  List<AnnotationData> annotationData = new ArrayList<>();
-  static List<String> annotationActions = new ArrayList<>();
+  static List<AnnotationData> annotationData = new ArrayList<>();
+  // static List<String> annotationActions = new ArrayList<>();
   static ElementTally elementTally = new ElementTally();
   static Stack<Element> baseElementStack = new Stack<>();
 
-  public List<String> getAnnotationActions() {
-    return annotationActions;
-  }
+  // public List<String> getAnnotationActions() {
+  // return annotationActions;
+  // }
 
   public BaseLayerVisitor(BaseLayerDefinition baseLayerDefinition) {
     super();
@@ -51,12 +51,22 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
   public Traversal leaveElement(Element element, XmlContext context) {
     String annotatedBaseText = context.closeLayer();
     context.addLiteral(annotatedBaseText);
-    annotationActions.add("element annotation on '" + annotatedBaseText + "':element=" + element.getName() + element.getAttributes());
-    // AnnotationData aData = new AnnotationData();
-    // aData.setAnnotatedBaseText(annotatedBaseText);
-    // aData.setLevel(XmlAnnotationLevel.element);
-    // aData.setType(element.getName());
-    // aData.setValue(element);
+    // String attributeAnnotationActions = element.getAttributes().entrySet().stream()//
+    // .map(kv -> " attribute annotation '" + kv.getKey() + "'='" + kv.getValue() + "'")//
+    // .collect(Collectors.joining(", and ", ", with ", ""));
+    //
+    // annotationActions.add(MessageFormat.format(//
+    // "adding element annotation on ''{0}'' in base element '{}' element={1}", //
+    // annotatedBaseText, //
+    // xpath(baseElementStack.peek()), element.getName(), //
+    // attributeAnnotationActions)//
+    // );
+    annotationData.add(new AnnotationData()//
+        .setAnnotatedBaseText(annotatedBaseText)//
+        .setLevel(XmlAnnotationLevel.element)//
+        .setType(element.getName())//
+        .setValue(element)//
+        .setXPath(xpath(baseElementStack.peek())));
     return Traversal.NEXT;
   }
 
@@ -87,8 +97,13 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
         if (baseAttributes.contains(key)) {
           base.setAttribute(key, value);
         } else {
-          // TODO: annotation
-          annotationActions.add("attribute annotation on '" + element.getName() + "':" + key + "=" + value);
+          annotationData.add(new AnnotationData()//
+              .setAnnotatedBaseText("")//
+              .setLevel(XmlAnnotationLevel.attribute)//
+              .setType(key)//
+              .setValue(value)//
+              .setXPath(xpath(base)));
+          // annotationActions.add("adding attribute annotation on '" + xpath(base) + "' : " + key + "=" + value);
         }
       });
       if (!baseElementStack.isEmpty()) {
@@ -116,7 +131,9 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
 
   public BaseLayerData getBaseLayerData() {
     elementTally.logReport();
-    return BaseLayerData.withBaseLayer(getContext().getResult()).withAnnotationDryRun(getAnnotationActions());
+    return BaseLayerData//
+        .withBaseLayer(getContext().getResult())//
+        .withAnnotationData(annotationData);
   }
 
   public static String xpath(Element element) {

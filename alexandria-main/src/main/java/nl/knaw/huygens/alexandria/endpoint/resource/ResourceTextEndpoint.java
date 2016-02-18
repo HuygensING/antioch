@@ -94,7 +94,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
                                                   .orElseThrow(noBaseLayerDefined());
     BaseLayerData baseLayerData = TextUtil.extractBaseLayerData(xml, bld);
     service.setResourceTextFromStream(resourceId, streamIn(baseLayerData.getBaseLayer()));
-    ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity.of(bld.getBaseLayerDefiningResourceId(), baseLayerData.getAnnotationActions())
+    ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity.of(bld.getBaseLayerDefiningResourceId(), baseLayerData.getAnnotationData())
                                                                                 .withLocationBuilder(locationBuilder);
     return ok(resourceTextUploadEntity);
   }

@@ -5,6 +5,7 @@ import java.util.List;
 public class BaseLayerData {
   private String baseLayer = "";
   private List<String> annotationActions;
+  private List<AnnotationData> annotationData;
 
   public static BaseLayerData withBaseLayer(String baseLayer) {
     BaseLayerData bld = new BaseLayerData();
@@ -24,4 +25,14 @@ public class BaseLayerData {
   public List<String> getAnnotationActions() {
     return annotationActions;
   }
+
+  public BaseLayerData withAnnotationData(List<AnnotationData> annotationData) {
+    this.annotationData = annotationData;
+    return this;
+  }
+
+  public List<AnnotationData> getAnnotationData() {
+    return annotationData;
+  }
+
 }

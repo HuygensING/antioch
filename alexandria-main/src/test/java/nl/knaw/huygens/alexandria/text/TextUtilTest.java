@@ -1,9 +1,11 @@
 package nl.knaw.huygens.alexandria.text;
 
+import static java.util.stream.Collectors.joining;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
+import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
 import nl.knaw.huygens.alexandria.model.BaseLayerDefinition.BaseElementDefinition;
 
@@ -37,7 +39,9 @@ public class TextUtilTest {
     );
 
     // when
-    String baseLayer = TextUtil.extractBaseLayerData(xml, def).getBaseLayer();
+    BaseLayerData baseLayerData = TextUtil.extractBaseLayerData(xml, def);
+    Log.info("AnnotationData =\n{}", baseLayerData.getAnnotationData().stream().map(AnnotationData::toVerbose).collect(joining("\n")));
+    String baseLayer = baseLayerData.getBaseLayer();
 
     // then expect
     assertThat(baseLayer).isEqualTo(expected);

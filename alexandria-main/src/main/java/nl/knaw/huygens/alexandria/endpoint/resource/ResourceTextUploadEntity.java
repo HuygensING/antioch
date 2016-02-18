@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
+import static java.util.stream.Collectors.toList;
+
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
@@ -15,6 +17,7 @@ import nl.knaw.huygens.alexandria.endpoint.Entity;
 import nl.knaw.huygens.alexandria.endpoint.JsonWrapperObject;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.text.AnnotationData;
 
 @JsonTypeName("resourceTextUploadResult")
 @JsonInclude(Include.NON_NULL)
@@ -38,9 +41,9 @@ public class ResourceTextUploadEntity extends JsonWrapperObject implements Entit
     return annotationActions;
   }
 
-  private ResourceTextUploadEntity(UUID baseLayerDefiningResourceId, List<String> annotationActions) {
+  private ResourceTextUploadEntity(UUID baseLayerDefiningResourceId, List<AnnotationData> annotationData) {
     this.baseLayerDefiningResourceId = baseLayerDefiningResourceId;
-    this.annotationActions = annotationActions;
+    this.annotationActions = annotationData.stream().map(AnnotationData::toVerbose).collect(toList());
   }
 
   public final ResourceTextUploadEntity withLocationBuilder(LocationBuilder locationBuilder) {
@@ -48,8 +51,8 @@ public class ResourceTextUploadEntity extends JsonWrapperObject implements Entit
     return this;
   }
 
-  public static ResourceTextUploadEntity of(UUID baseLayerDefiningResourceId, List<String> annotationActions) {
-    return new ResourceTextUploadEntity(baseLayerDefiningResourceId, annotationActions);
+  public static ResourceTextUploadEntity of(UUID baseLayerDefiningResourceId, List<AnnotationData> annotationData) {
+    return new ResourceTextUploadEntity(baseLayerDefiningResourceId, annotationData);
   }
 
 }
