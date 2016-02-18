@@ -1,8 +1,11 @@
 package nl.knaw.huygens.alexandria.text;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicLong;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
@@ -19,17 +22,15 @@ import nl.knaw.huygens.tei.handlers.XmlTextHandler;
 
 public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<XmlContext>, ElementHandler<XmlContext>, ProcessingInstructionHandler<XmlContext> {
   private static final String XML_ID = "xml:id";
-  static List<AnnotationData> annotationData = new ArrayList<>();
-  // static List<String> annotationActions = new ArrayList<>();
-  static ElementTally elementTally = new ElementTally();
-  static Stack<Element> baseElementStack = new Stack<>();
+  private static List<AnnotationData> annotationData = new ArrayList<>();
+  private static ElementTally elementTally = new ElementTally();
+  private static Stack<Element> baseElementStack = new Stack<>();
+  private static List<String> baseElementIds;
+  private static final Map<String, AtomicLong> counters = new HashMap<>();
 
-  // public List<String> getAnnotationActions() {
-  // return annotationActions;
-  // }
-
-  public BaseLayerVisitor(BaseLayerDefinition baseLayerDefinition) {
+  public BaseLayerVisitor(BaseLayerDefinition baseLayerDefinition, List<String> baseElementIds) {
     super();
+    this.baseElementIds = baseElementIds;
     setCommentHandler(this);
     setTextHandler(new XmlTextHandler<>());
     setDefaultElementHandler(this);
@@ -37,6 +38,7 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     baseLayerDefinition.getBaseElementDefinitions().forEach(bed -> {
       addElementHandler(new BaseElementHandler(bed.getBaseAttributes()), bed.getName());
     });
+    counters.clear();
   }
 
   // non-base elements
@@ -51,16 +53,6 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
   public Traversal leaveElement(Element element, XmlContext context) {
     String annotatedBaseText = context.closeLayer();
     context.addLiteral(annotatedBaseText);
-    // String attributeAnnotationActions = element.getAttributes().entrySet().stream()//
-    // .map(kv -> " attribute annotation '" + kv.getKey() + "'='" + kv.getValue() + "'")//
-    // .collect(Collectors.joining(", and ", ", with ", ""));
-    //
-    // annotationActions.add(MessageFormat.format(//
-    // "adding element annotation on ''{0}'' in base element '{}' element={1}", //
-    // annotatedBaseText, //
-    // xpath(baseElementStack.peek()), element.getName(), //
-    // attributeAnnotationActions)//
-    // );
     annotationData.add(new AnnotationData()//
         .setAnnotatedBaseText(annotatedBaseText)//
         .setLevel(XmlAnnotationLevel.element)//
@@ -87,6 +79,9 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
 
     public BaseElementHandler(List<String> baseAttributes) {
       this.baseAttributes = baseAttributes;
+      if (!baseAttributes.contains(XML_ID)) {
+        baseAttributes.add(XML_ID);
+      }
     }
 
     @Override
@@ -103,9 +98,11 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
               .setType(key)//
               .setValue(value)//
               .setXPath(xpath(base)));
-          // annotationActions.add("adding attribute annotation on '" + xpath(base) + "' : " + key + "=" + value);
         }
       });
+      if (!base.hasAttribute(XML_ID)) {
+        addId(base);
+      }
       if (!baseElementStack.isEmpty()) {
         base.setParent(baseElementStack.peek());
       }
@@ -114,6 +111,16 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
       context.addOpenTag(base);
       context.openLayer();
       return Traversal.NEXT;
+    }
+
+    private void addId(Element baseElement) {
+      String name = baseElement.getName();
+      String id;
+      counters.putIfAbsent(name, new AtomicLong(0));
+      do {
+        id = name + counters.get(name).incrementAndGet();
+      } while (baseElementIds.contains(id));
+      baseElement.setAttribute(XML_ID, id);
     }
 
     @Override

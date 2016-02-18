@@ -15,20 +15,20 @@ public class TextUtilTest {
     // given
     String xml = ("<text>"//
         + "<div xml:id='div-1' lang='nl'>"//
-        + "<p xml:id='p01' rend='red'>paragraph with <b><i rend='yes'>text</i></b></p>"//
+        + "<p xml:id='p1' rend='red'>paragraph with <b><i rend='yes'>text</i></b></p>"//
         + "<p>two</p>"//
         + "</div>"//
         + "<div xml:id='div-2' lang='nl'>"//
         + "<p>three</p>"//
         + "</div>"//
         + "</text>").replace("'", "\"");
-    String expected = ("<text>"//
+    String expected = ("<text xml:id='text1'>"//
         + "<div xml:id='div-1'>"//
-        + "<p xml:id='p01'>paragraph with text</p>"//
-        + "<p>two</p>"//
+        + "<p xml:id='p1'>paragraph with text</p>"//
+        + "<p xml:id='p2'>two</p>"//
         + "</div>"//
         + "<div xml:id='div-2'>"//
-        + "<p>three</p>"//
+        + "<p xml:id='p3'>three</p>"//
         + "</div>"//
         + "</text>").replace("'", "\"");
     BaseLayerDefinition def = BaseLayerDefinition//
