@@ -44,6 +44,30 @@ public class TextUtilTest {
     String baseLayer = baseLayerData.getBaseLayer();
 
     // then expect
+    assertThat(baseLayerData.validationFailed()).isFalse();
     assertThat(baseLayer).isEqualTo(expected);
   }
+
+  @Test
+  public void testBaseLayerExtractionFailsOnRootElementNotInBaseLayerDefinition() {
+    // given
+    String xml = ("<text>"//
+        + "<div xml:id='div-1' lang='nl'>"//
+        + "<p xml:id='p1' rend='red'>paragraph with <b><i rend='yes'>text</i></b></p>"//
+        + "</div>"//
+        + "</text>").replace("'", "\"");
+    BaseLayerDefinition def = BaseLayerDefinition//
+        .withBaseElements(//
+            BaseElementDefinition.withName("div").withAttributes("xml:id"), //
+            BaseElementDefinition.withName("p").withAttributes("xml:id") //
+    );
+
+    // when
+    BaseLayerData baseLayerData = TextUtil.extractBaseLayerData(xml, def);
+
+    // then expect
+    assertThat(baseLayerData.validationFailed()).isTrue();
+    assertThat(baseLayerData.getValidationErrors()).contains("Validation error: root element <text> is not in the base layer definition.");
+  }
+
 }

@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
+import static java.util.stream.Collectors.joining;
+
 /*
  * #%L
  * alexandria-main
@@ -46,6 +48,7 @@ import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
+import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
@@ -62,9 +65,9 @@ public class ResourceTextEndpoint extends JSONEndpoint {
 
   @Inject
   public ResourceTextEndpoint(AlexandriaService service, //
-                              ResourceValidatorFactory validatorFactory, //
-                              LocationBuilder locationBuilder, //
-                              @PathParam("uuid") final UUIDParam uuidParam) {
+      ResourceValidatorFactory validatorFactory, //
+      LocationBuilder locationBuilder, //
+      @PathParam("uuid") final UUIDParam uuidParam) {
     this.service = service;
     this.locationBuilder = locationBuilder;
     this.resource = validatorFactory.validateExistingResource(uuidParam).notTentative();
@@ -90,12 +93,13 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @ApiOperation("set text from xml")
   public Response setTextFromXml(@NotNull @Valid String xml) {
     verifyResourceHasNoText();
-    BaseLayerDefinition bld = service.getBaseLayerDefinitionForResource(resourceId)
-                                                  .orElseThrow(noBaseLayerDefined());
+    BaseLayerDefinition bld = service.getBaseLayerDefinitionForResource(resourceId).orElseThrow(noBaseLayerDefined());
     BaseLayerData baseLayerData = TextUtil.extractBaseLayerData(xml, bld);
+    if (baseLayerData.validationFailed()) {
+      throw new BadRequestException(baseLayerData.getValidationErrors().stream().collect(joining("\n")));
+    }
     service.setResourceTextFromStream(resourceId, streamIn(baseLayerData.getBaseLayer()));
-    ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity.of(bld.getBaseLayerDefiningResourceId(), baseLayerData.getAnnotationData())
-                                                                                .withLocationBuilder(locationBuilder);
+    ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity.of(bld.getBaseLayerDefiningResourceId(), baseLayerData.getAnnotationData()).withLocationBuilder(locationBuilder);
     return ok(resourceTextUploadEntity);
   }
 

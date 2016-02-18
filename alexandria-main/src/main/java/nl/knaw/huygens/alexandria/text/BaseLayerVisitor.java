@@ -27,6 +27,7 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
   private static Stack<Element> baseElementStack = new Stack<>();
   private static List<String> baseElementIds;
   private static final Map<String, AtomicLong> counters = new HashMap<>();
+  private static final List<String> validationErrors = new ArrayList<>();
 
   public BaseLayerVisitor(BaseLayerDefinition baseLayerDefinition, List<String> baseElementIds) {
     super();
@@ -39,12 +40,17 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
       addElementHandler(new BaseElementHandler(bed.getBaseAttributes()), bed.getName());
     });
     counters.clear();
+    validationErrors.clear();
   }
 
   // non-base elements
   @Override
   public Traversal enterElement(Element element, XmlContext context) {
     elementTally.tally(element);
+    if (element.getParent() == null) {
+      validationErrors.add("Validation error: root element <" + element.getName() + "> is not in the base layer definition.");
+      baseElementStack.push(new Element(""));
+    }
     context.openLayer();
     return Traversal.NEXT;
   }
@@ -140,6 +146,7 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     elementTally.logReport();
     return BaseLayerData//
         .withBaseLayer(getContext().getResult())//
+        .withValidationErrors(validationErrors)//
         .withAnnotationData(annotationData);
   }
 

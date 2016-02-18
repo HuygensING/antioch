@@ -1,11 +1,13 @@
 package nl.knaw.huygens.alexandria.text;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BaseLayerData {
   private String baseLayer = "";
   private List<String> annotationActions;
   private List<AnnotationData> annotationData;
+  private List<String> validationErrors = new ArrayList<>();
 
   public static BaseLayerData withBaseLayer(String baseLayer) {
     BaseLayerData bld = new BaseLayerData();
@@ -33,6 +35,19 @@ public class BaseLayerData {
 
   public List<AnnotationData> getAnnotationData() {
     return annotationData;
+  }
+
+  public BaseLayerData withValidationErrors(List<String> validationerrors) {
+    this.validationErrors = validationerrors;
+    return this;
+  }
+
+  public List<String> getValidationErrors() {
+    return validationErrors;
+  }
+
+  public Boolean validationFailed() {
+    return !validationErrors.isEmpty();
   }
 
 }
