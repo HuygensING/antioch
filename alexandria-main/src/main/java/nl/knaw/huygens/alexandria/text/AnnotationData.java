@@ -60,12 +60,17 @@ public class AnnotationData {
   public String toVerbose() {
     if (getLevel().equals(XmlAnnotationLevel.element)) {
       Element element = (Element) value;
+      String prefix = ", with ";
       String attributeAnnotationActions = element.getAttributes().entrySet().stream()//
-          .map(kv -> " attribute annotation '" + kv.getKey() + "'='" + kv.getValue() + "'")//
-          .collect(Collectors.joining(", and ", ", with ", ""));
+          .map(kv -> "attribute annotation '" + kv.getKey() + "'='" + kv.getValue() + "'")//
+          .collect(Collectors.joining(", and ", prefix, ""));
+
+      if (attributeAnnotationActions.equals(prefix)) {
+        attributeAnnotationActions = "";
+      }
 
       return (MessageFormat.format(//
-          "adding element annotation on text ''{0}'', in base element with xpath ''{1}'' element={2}", //
+          "adding element annotation on text ''{0}'', in base element with xpath ''{1}'' element={2}{3}", //
           annotatedBaseText, //
           xpath, //
           type, //
