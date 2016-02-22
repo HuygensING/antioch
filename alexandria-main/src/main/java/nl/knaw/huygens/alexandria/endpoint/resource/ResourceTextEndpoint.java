@@ -92,13 +92,18 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @Consumes(MediaType.TEXT_XML)
   @ApiOperation("set text from xml")
   public Response setTextFromXml(@NotNull @Valid String xml) {
-    verifyResourceHasNoText();
+    assertResourceHasNoText();
     BaseLayerDefinition bld = service.getBaseLayerDefinitionForResource(resourceId).orElseThrow(noBaseLayerDefined());
     BaseLayerData baseLayerData = TextUtil.extractBaseLayerData(xml, bld);
     if (baseLayerData.validationFailed()) {
       throw new BadRequestException(baseLayerData.getValidationErrors().stream().collect(joining("\n")));
     }
     service.setResourceTextFromStream(resourceId, streamIn(baseLayerData.getBaseLayer()));
+    baseLayerData.getAnnotationData().forEach(annotationData -> {
+      // annotationData.ge
+      // service.annotate(resource, textLocator, annotationbody, provenance)
+
+    });
     ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity.of(bld.getBaseLayerDefiningResourceId(), baseLayerData.getAnnotationData()).withLocationBuilder(locationBuilder);
     return ok(resourceTextUploadEntity);
   }
@@ -128,7 +133,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
     return () -> new ConflictException(String.format("No base layer defined for resource: %s", resourceId));
   }
 
-  private void verifyResourceHasNoText() {
+  private void assertResourceHasNoText() {
     if (resource.hasText()) {
       throw new ConflictException("This resource already has a text, which cannot be replaced.");
     }

@@ -280,11 +280,73 @@ curl -i -H "${authheader}" -X POST $be/annotations/$ai/annotations -H 'Content-t
 
 
 curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
---data-binary '{"baseLayerDefinition":{
-  "baseElementDefinitions" : [
-     { "name": "p", "baseAttributes": [ "id" ] },
-     { "name": "div", "baseAttributes" : [ "id", "by" ] }
-  ]}
+--data-binary '{
+  "baseLayerDefinition": {
+    "baseElementDefinitions": [ {
+      "name": "body"
+    }, {
+      "name": "div",
+      "baseAttributes": [ "type" ]
+    }, {
+      "name": "p"
+    }, {
+      "name": "sub"
+    }, {
+      "name": "sup"
+    } ]
+  }
 }'
 
 curl -i -H "${authheader}" $be/resources/$ri/baselayerdefinition
+
+function a-dry-run {
+  ri=$(uuidgen)
+  a-generate-resource-with-uuid $ri
+  curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
+	--data-binary '{
+	  "baseLayerDefinition": {
+	    "baseElementDefinitions": [ {
+	      "name": "body"
+	    }, {
+	      "name": "div",
+	      "baseAttributes": [ "type" ]
+	    }, {
+	      "name": "p"
+	    }, {
+	      "name": "sub"
+	    }, {
+	      "name": "sup"
+	    } ]
+	  }
+	}'
+	echo
+  echo ">> result uploading text:"
+  curl --silent --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:text/xml' --data "$*"|jq "."
+	echo
+  echo ">> extracted baselayer:"
+  curl ${be}/resources/${ri}/text
+}
+
+a-dry-run "<body></body>"
+
+a-dry-run '<body><p>Hello world!</p></body>'
+
+a-dry-run '<body id="body1">
+  <p id="p1">Hello world!</p>
+</body>'
+
+a-dry-run '<body id="body1" lang="en">
+  <p id="p1" lang="en">Hello world!</p>
+</body>'
+
+a-dry-run '<body id="body1"><p id="p1"><hi rend="i">Hello <lb/> M<sup id="sup1">r</sup>. <persName>Jones</persName>!</hi></p></body>'
+
+a-dry-run '<body xml:id="body1">
+  <p xml:id="p1">Hello world!</p>
+</body>'
+
+a-dry-run '<body xml:id="body1" lang="en">
+  <p xml:id="p1" lang="en">Hello world!</p>
+</body>'
+
+a-dry-run '<body xml:id="body1"><p xml:id="p1"><hi rend="i">Hello <lb/> M<sup xml:id="sup1">r</sup>. <persName>Jones</persName>!</hi></p></body>'

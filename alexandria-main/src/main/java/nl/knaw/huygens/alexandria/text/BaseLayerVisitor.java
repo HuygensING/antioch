@@ -41,6 +41,8 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     });
     counters.clear();
     validationErrors.clear();
+    annotationData.clear();
+    elementTally = new ElementTally();
   }
 
   // non-base elements
