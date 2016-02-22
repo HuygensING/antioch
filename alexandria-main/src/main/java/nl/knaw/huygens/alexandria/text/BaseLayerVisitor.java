@@ -25,13 +25,15 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
   private static List<AnnotationData> annotationData = new ArrayList<>();
   private static ElementTally elementTally = new ElementTally();
   private static Stack<Element> baseElementStack = new Stack<>();
+  private static Stack<Integer> baseElementStartStack = new Stack<>();
+  private static Stack<Integer> annotatedTextStartStack = new Stack<>();
   private static List<String> baseElementIds;
   private static final Map<String, AtomicLong> counters = new HashMap<>();
   private static final List<String> validationErrors = new ArrayList<>();
 
   public BaseLayerVisitor(BaseLayerDefinition baseLayerDefinition, List<String> baseElementIds) {
     super();
-    this.baseElementIds = baseElementIds;
+    BaseLayerVisitor.baseElementIds = baseElementIds;
     setCommentHandler(this);
     setTextHandler(new XmlTextHandler<>());
     setDefaultElementHandler(this);
@@ -52,6 +54,14 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     if (element.getParent() == null) {
       validationErrors.add("Validation error: root element <" + element.getName() + "> is not in the base layer definition.");
       baseElementStack.push(new Element(""));
+      annotatedTextStartStack.push(0);
+    } else {
+      String result = context.getResult();
+      int start = result.length();
+      if (!annotatedTextStartStack.isEmpty()) {
+        start += annotatedTextStartStack.peek();
+      }
+      annotatedTextStartStack.push(start);
     }
     context.openLayer();
     return Traversal.NEXT;
@@ -61,13 +71,24 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
   public Traversal leaveElement(Element element, XmlContext context) {
     String annotatedBaseText = context.closeLayer();
     context.addLiteral(annotatedBaseText);
+    String xpath = substringXPath(annotatedBaseText);
     annotationData.add(new AnnotationData()//
         .setAnnotatedBaseText(annotatedBaseText)//
         .setLevel(XmlAnnotationLevel.element)//
         .setType(element.getName())//
         .setValue(element)//
-        .setXPath(xpath(baseElementStack.peek())));
+        .setXPath(xpath));
     return Traversal.NEXT;
+  }
+
+  private String substringXPath(String annotatedBaseText) {
+    Integer parentBaseElementOffset = baseElementStartStack.isEmpty() ? 0 : baseElementStartStack.peek();
+    Integer annotatedTextStart = annotatedTextStartStack.pop();
+    int start = annotatedTextStart - parentBaseElementOffset + 1;
+    int length = annotatedBaseText.length();
+    Log.info("offset: (start={},length={})", start, length);
+    String xpath = "substring(" + xpath(baseElementStack.peek()) + "," + start + "," + length + ")";
+    return xpath;
   }
 
   @Override
@@ -117,7 +138,8 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
       logXPath(base);
       baseElementStack.push(base);
       context.addOpenTag(base);
-      context.openLayer();
+      baseElementStartStack.push(context.getResult().length());
+      // context.openLayer();
       return Traversal.NEXT;
     }
 
@@ -133,8 +155,9 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
 
     @Override
     public Traversal leaveElement(Element element, XmlContext context) {
-      context.addLiteral(context.closeLayer());
+      // context.addLiteral(context.closeLayer());
       context.addCloseTag(element);
+      baseElementStartStack.pop();
       baseElementStack.pop();
       return Traversal.NEXT;
     }

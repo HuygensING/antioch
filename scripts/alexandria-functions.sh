@@ -1,6 +1,12 @@
 # usage: source alexandria-functions.sh
 # some convenience methods for the shell
 
+function a-log {
+	echo
+	echo ">> $*"
+	echo
+}
+
 function a-annotate-resource {
   r=$1; t=$2; v=$3
   curl -i -X POST --header "${authheader}" $be/resources/$r/annotations --header 'Content-type: application/json' \
@@ -12,7 +18,7 @@ function a-location {
 }
 
 function a-confirm {
-  echo ">> confirming $1 :"
+  a-log "confirming $1 :"
   curl -i -X PUT --header "${authheader}" $1/state --header 'Content-type: application/json' \
     --data-binary '{"state":"CONFIRMED"}'
 }
@@ -67,7 +73,7 @@ function a-generate-confirmed-subresource-with-title {
 }
 
 function a-set-default-baselayer-definition {
-  echo "Setting default baselayer definition for ${be}/resources/$ri"
+  a-log "Setting default baselayer definition for ${be}/resources/$ri"
   curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
      --data-binary '{"baseLayerDefinition":{
        "baseElementDefinitions" : [
@@ -79,7 +85,7 @@ function a-set-default-baselayer-definition {
 }
 
 function a-set-text-from-file {
-  echo "Setting resource text for ${be}/resources/$ri"
+  a-log "Setting resource text for ${be}/resources/$ri"
   curl -i --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:application/octet-stream' --data @"$*"
 }
 
@@ -122,7 +128,7 @@ function a-use-production {
 }
 
 function a-show-backend {
-  echo ${be}
+  a-log ${be}
 }
 
 function a-about {
@@ -153,11 +159,9 @@ function a-dry-run {
 	    } ]
 	  }
 	}'
-	echo
-  echo ">> result uploading text:"
-  curl --silent --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:text/xml' --data "$*"|jq "."
-	echo
-  echo ">> extracted baselayer:"
+  a-log "result uploading text:"
+  curl --silent --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:text/xml' --data "$*" | jq "."
+  a-log "extracted baselayer:"
   curl ${be}/resources/${ri}/text
 }
 

@@ -46,6 +46,7 @@ public class TextUtilTest {
     // then expect
     assertThat(baseLayerData.validationFailed()).isFalse();
     assertThat(baseLayer).isEqualTo(expected);
+    Log.info(expected);
   }
 
   @Test

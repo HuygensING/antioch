@@ -70,7 +70,7 @@ public class AnnotationData {
       }
 
       return (MessageFormat.format(//
-          "adding element annotation on text ''{0}'', in base element with xpath ''{1}'' element={2}{3}", //
+          "adding element annotation on text ''{0}'', on xpath ''{1}'' element={2}{3}", //
           annotatedBaseText, //
           xpath, //
           type, //
