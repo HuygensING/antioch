@@ -133,5 +133,33 @@ function a-about-service {
   curl --header "${authheader}" $be/about/service
 }
 
+function a-dry-run {
+  ri=$(uuidgen)
+  a-generate-resource-with-uuid $ri
+  curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
+	--data-binary '{
+	  "baseLayerDefinition": {
+	    "baseElementDefinitions": [ {
+	      "name": "body"
+	    }, {
+	      "name": "div",
+	      "baseAttributes": [ "type" ]
+	    }, {
+	      "name": "p"
+	    }, {
+	      "name": "sub"
+	    }, {
+	      "name": "sup"
+	    } ]
+	  }
+	}'
+	echo
+  echo ">> result uploading text:"
+  curl --silent --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:text/xml' --data "$*"|jq "."
+	echo
+  echo ">> extracted baselayer:"
+  curl ${be}/resources/${ri}/text
+}
+
 a-use-localhost
 

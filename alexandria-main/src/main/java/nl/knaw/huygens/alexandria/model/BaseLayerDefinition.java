@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class BaseLayerDefinition {
   List<BaseElementDefinition> baseElementDefinitions = new ArrayList<>();
   UUID baseLayerDefiningResourceId;
@@ -35,6 +37,7 @@ public class BaseLayerDefinition {
     return baseElementDefinitions;
   }
 
+  @JsonIgnore
   public UUID getBaseLayerDefiningResourceId() {
     return baseLayerDefiningResourceId;
   }
