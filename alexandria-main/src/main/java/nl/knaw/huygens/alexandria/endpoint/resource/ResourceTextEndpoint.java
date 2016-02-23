@@ -26,6 +26,10 @@ import static java.util.stream.Collectors.joining;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -51,11 +55,19 @@ import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
+import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.text.BaseLayerData;
 import nl.knaw.huygens.alexandria.text.TextUtil;
+import nl.knaw.huygens.alexandria.text.XmlAnnotationLevel;
+import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
+import nl.knaw.huygens.alexandria.textlocator.ByXPathTextLocator;
+import nl.knaw.huygens.tei.Element;
 
 public class ResourceTextEndpoint extends JSONEndpoint {
   private final AlexandriaService service;
@@ -99,12 +111,38 @@ public class ResourceTextEndpoint extends JSONEndpoint {
       throw new BadRequestException(baseLayerData.getValidationErrors().stream().collect(joining("\n")));
     }
     service.setResourceTextFromStream(resourceId, streamIn(baseLayerData.getBaseLayer()));
-    baseLayerData.getAnnotationData().forEach(annotationData -> {
-      // annotationData.ge
-      // service.annotate(resource, textLocator, annotationbody, provenance)
 
+    List<URI> generatedAnnotations = new ArrayList<>();
+    baseLayerData.getAnnotationData().forEach(annotationData -> {
+      AlexandriaTextLocator textLocator = new ByXPathTextLocator().withXPath(annotationData.getXPath());
+      TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(ThreadContext.getUserName(), Instant.now(), "initial text import");
+      String type = annotationData.getType();
+      String value = annotationData.getValue().toString();
+      if (annotationData.getLevel().equals(XmlAnnotationLevel.element)) {
+        value = type;
+        type = "xml-element";
+      } else {
+        type = "xml-attribute:" + type;
+      }
+      AlexandriaAnnotationBody annotationbody = service.createAnnotationBody(UUID.randomUUID(), type, value, provenance);
+      AlexandriaAnnotation annotation = service.annotate(resource, textLocator, annotationbody, provenance);
+      service.confirmAnnotation(annotation.getId());
+      generatedAnnotations.add(locationBuilder.locationOf(annotation));
+      if (annotationData.getLevel().equals(XmlAnnotationLevel.element)) {
+        Element element = (Element) annotationData.getValue();
+        element.getAttributes().forEach((key, attributeValue) -> {
+          AlexandriaAnnotationBody subannotationbody = service.createAnnotationBody(UUID.randomUUID(), "xml-attribute:" + key, attributeValue, provenance);
+          AlexandriaAnnotation subAnnotation = service.annotate(annotation, subannotationbody, provenance);
+          service.confirmAnnotation(subAnnotation.getId());
+          generatedAnnotations.add(locationBuilder.locationOf(subAnnotation));
+        });
+      }
     });
-    ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity.of(bld.getBaseLayerDefiningResourceId(), baseLayerData.getAnnotationData()).withLocationBuilder(locationBuilder);
+
+    ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity//
+        .of(bld.getBaseLayerDefiningResourceId(), baseLayerData.getAnnotationData())//
+        .withGeneratedAnnotations(generatedAnnotations)//
+        .withLocationBuilder(locationBuilder);
     return ok(resourceTextUploadEntity);
   }
 

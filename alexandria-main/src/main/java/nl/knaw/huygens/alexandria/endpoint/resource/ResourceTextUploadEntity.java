@@ -31,6 +31,9 @@ public class ResourceTextUploadEntity extends JsonWrapperObject implements Entit
 
   private List<String> annotationActions;
 
+  @JsonProperty(PropertyPrefix.LINK + "generatedAnnotations")
+  private List<URI> generatedAnnotations;
+
   @JsonProperty(PropertyPrefix.LINK + "baseLayerDefinition")
   public URI getBaseLayerDefinitionURI() {
     return locationBuilder.locationOf(AlexandriaResource.class, baseLayerDefiningResourceId, ResourcesEndpoint.BASELAYERDEFINITION);
@@ -53,6 +56,11 @@ public class ResourceTextUploadEntity extends JsonWrapperObject implements Entit
 
   public static ResourceTextUploadEntity of(UUID baseLayerDefiningResourceId, List<AnnotationData> annotationData) {
     return new ResourceTextUploadEntity(baseLayerDefiningResourceId, annotationData);
+  }
+
+  public ResourceTextUploadEntity withGeneratedAnnotations(List<URI> generatedAnnotations) {
+    this.generatedAnnotations = generatedAnnotations;
+    return this;
   }
 
 }
