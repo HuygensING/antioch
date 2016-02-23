@@ -109,7 +109,7 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     public BaseElementHandler(List<String> baseAttributes) {
       this.baseAttributes = baseAttributes;
       if (!baseAttributes.contains(XML_ID)) {
-        baseAttributes.add(XML_ID);
+        baseAttributes.add(0, XML_ID);
       }
     }
 
@@ -117,10 +117,15 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     public Traversal enterElement(Element element, XmlContext context) {
       elementTally.tally(element);
       Element base = new Element(element.getName());
+
+      // use attribute order as defined in baselayer definition
+      baseAttributes.stream()//
+          .filter((attribute) -> element.hasAttribute(attribute))//
+          .forEach(key -> {
+            base.setAttribute(key, element.getAttribute(key));
+          });
       element.getAttributes().forEach((key, value) -> {
-        if (baseAttributes.contains(key)) {
-          base.setAttribute(key, value);
-        } else {
+        if (!baseAttributes.contains(key)) {
           annotationData.add(new AnnotationData()//
               .setAnnotatedBaseText("")//
               .setLevel(XmlAnnotationLevel.attribute)//

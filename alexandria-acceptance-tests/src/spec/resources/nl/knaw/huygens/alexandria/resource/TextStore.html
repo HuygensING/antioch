@@ -53,7 +53,7 @@
          "baseLayerDefinition": {
          "baseElements": [
          {"name" : "text" },
-         {"name" : "p", "baseAttributes" : ["xml:id"] }
+         {"name" : "p", "baseAttributes" : ["auth","lang"] }
          ] } }
      </h:jsonBody>
      using
@@ -68,7 +68,7 @@
         the body:
         <h:jsonBody>{
             "text": {
-            "body": "&lt;text&gt;&lt;p xml:id=\&quot;p1\&quot;&gt;paragraph 1&lt;/p&gt;&lt;p&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;"
+            "body": "&lt;text&gt;&lt;p xml:id=\&quot;p1\&quot; lang=\&quot;en\&quot; auth=\&quot;me\&quot;&gt;paragraph 1&lt;/p&gt;&lt;p&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;"
             } }
         </h:jsonBody>
         using
@@ -89,8 +89,9 @@
         using
         <h:setHeader name="Accept">text/xml</h:setHeader>
         yields response body:<br/>
-        <h:responseBody>&lt;text xml:id="text1"&gt;&lt;p xml:id="p1"&gt;paragraph 1&lt;/p&gt;&lt;p xml:id="p2"&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;</h:responseBody><br/>
-        Notice that base layer elements have been given a unique xml:id if they didn't have one already.
+        <h:responseBody>&lt;text xml:id="text1"&gt;&lt;p xml:id="p1" auth="me" lang="en"&gt;paragraph 1&lt;/p&gt;&lt;p xml:id="p2"&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;</h:responseBody><br/>
+        Notice that base layer elements have been given a unique xml:id if they didn't have one already.<br/>
+        Notice also that the attribute order on &lt;p&gt; is the one defined in the base layer definition.<br/>
     </h:request>
 </div>
 
@@ -118,7 +119,7 @@
          "baseLayerDefinition": {
          "baseElements": [
          {"name" : "text" },
-         {"name" : "p", "baseAttributes" : ["xml:id"] }
+         {"name" : "p" }
          ] } }
      </h:jsonBody>
      using
@@ -179,7 +180,7 @@
          "baseLayerDefinition": {
          "baseElements": [
          {"name" : "text" },
-         {"name" : "p", "baseAttributes" : ["xml:id"] }
+         {"name" : "p" }
          ] } }
      </h:jsonBody>
      using
