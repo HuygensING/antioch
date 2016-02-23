@@ -431,9 +431,9 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   private BaseLayerDefinition deserializeBaseLayerDefinition(String json) throws IOException {
-    List<BaseElementDefinition> baseElementDefinitions = new ObjectMapper().readValue(json, new TypeReference<List<BaseElementDefinition>>() {
+    List<BaseElementDefinition> baseElements = new ObjectMapper().readValue(json, new TypeReference<List<BaseElementDefinition>>() {
     });
-    return BaseLayerDefinition.withBaseElements(baseElementDefinitions);
+    return BaseLayerDefinition.withBaseElements(baseElements);
   }
 
   @Override

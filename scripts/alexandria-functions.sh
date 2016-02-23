@@ -76,7 +76,7 @@ function a-set-default-baselayer-definition {
   a-log "Setting default baselayer definition for ${be}/resources/$ri"
   curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
      --data-binary '{"baseLayerDefinition":{
-       "baseElementDefinitions" : [
+       "baseElements" : [
           { "name": "text", "baseAttributes": [ "id" ] },
           { "name": "p", "baseAttributes": [ "id" ] },
           { "name": "div", "baseAttributes" : [ "id", "by" ] }
@@ -111,7 +111,6 @@ function a-set-authkey {
 
 function a-use-localhost {
   a-set-backend http://localhost:2015
-  a-set-authkey YHJZHjpke8JYjm5y
 }
 
 function a-use-test {
@@ -120,7 +119,6 @@ function a-use-test {
 
 function a-use-acceptance {
   a-set-backend http://tc24alex.huygens.knaw.nl/alexandria
-  a-set-authkey YHJZHjpke8JYjm5y
 }
 
 function a-use-production {
@@ -145,7 +143,7 @@ function a-dry-run {
   curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
 	--data-binary '{
 	  "baseLayerDefinition": {
-	    "baseElementDefinitions": [ {
+	    "baseElements": [ {
 	      "name": "body"
 	    }, {
 	      "name": "div",
@@ -165,5 +163,5 @@ function a-dry-run {
   curl ${be}/resources/${ri}/text
 }
 
+a-set-authkey YHJZHjpke8JYjm5y
 a-use-localhost
-
