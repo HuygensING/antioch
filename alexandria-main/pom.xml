@@ -33,11 +33,6 @@
       <version>${guava.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.jaxrs</groupId>
-      <artifactId>jackson-jaxrs-json-provider</artifactId>
-      <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
       <groupId>com.squarespace.jersey2-guice</groupId>
       <artifactId>jersey2-guice</artifactId>
       <version>${jersey2-guice.version}</version>

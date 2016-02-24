@@ -37,6 +37,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.config.PropertiesConfiguration;
@@ -44,7 +45,7 @@ import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 @Singleton
-@Path("about")
+@Path(EndpointPaths.ABOUT)
 public class AboutEndpoint extends JSONEndpoint {
   private static final String PROPERTIES_FILE = "about.properties";
 
