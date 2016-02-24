@@ -18,6 +18,5 @@ public class AlexandriaClientTest {
     AboutEntity about = client.getAbout();
     Log.info("about={}", about);
     assertThat(about).isNotNull();
-
   }
 }
