@@ -20,6 +20,7 @@
     <module>alexandria-webapp</module>
     <module>alexandria-test</module>
     <module>alexandria-aql</module>
+    <module>alexandria-java-client</module>
   </modules>
 
   <properties>
