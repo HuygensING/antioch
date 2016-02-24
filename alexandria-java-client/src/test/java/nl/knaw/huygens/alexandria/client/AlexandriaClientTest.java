@@ -7,7 +7,7 @@ import java.net.URI;
 import org.junit.Test;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.model.AboutEntity;
+import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 
 public class AlexandriaClientTest {
   URI testURI = URI.create("http://test.alexandria.huygens.knaw.nl/");

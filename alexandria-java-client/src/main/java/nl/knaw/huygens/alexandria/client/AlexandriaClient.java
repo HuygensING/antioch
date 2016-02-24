@@ -9,7 +9,7 @@ import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.jackson.JacksonFeature;
 
-import nl.knaw.huygens.alexandria.model.AboutEntity;
+import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 
 public class AlexandriaClient {
   private WebTarget rootTarget;

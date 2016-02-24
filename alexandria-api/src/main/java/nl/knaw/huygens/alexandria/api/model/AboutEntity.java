@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.model;
+package nl.knaw.huygens.alexandria.api.model;
 
 import java.net.URI;
 
