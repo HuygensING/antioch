@@ -157,4 +157,8 @@ public class TextImportTask implements Runnable {
 
   }
 
+  public boolean isExpired() {
+    return Instant.now().isAfter(status.getExpires());
+  }
+
 }
