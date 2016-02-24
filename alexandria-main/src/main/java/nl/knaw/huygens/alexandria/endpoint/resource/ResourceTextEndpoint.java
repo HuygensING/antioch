@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
+import static java.util.stream.Collectors.toList;
+
 /*
  * #%L
  * alexandria-main
@@ -24,6 +26,7 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -101,6 +104,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   }
 
   private void startTextProcessing(String xml, BaseLayerDefinition bld) {
+    removeExpiredTasks();
     TextImportTask task = new TextImportTask(service, locationBuilder, bld, xml, resource);
     tasks.put(resource.getId(), task);
     new Thread(task).start();
@@ -130,6 +134,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @GET
   @Path("status")
   public Response getTextImportStatus() {
+    removeExpiredTasks();
     if (tasks.containsKey(resourceId)) {
       TextImportTask textImportTask = tasks.get(resourceId);
       return Response.ok().entity(textImportTask.getStatus()).build();
@@ -158,4 +163,12 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   private StreamingOutput streamOut(InputStream is) {
     return output -> IOUtils.copy(is, output);
   }
+
+  private void removeExpiredTasks() {
+    List<UUID> expiredEntries = tasks.keySet().stream()//
+        .filter(uuid -> tasks.get(uuid).isExpired())//
+        .collect(toList());
+    expiredEntries.forEach(key -> tasks.remove(key));
+  }
+
 }
