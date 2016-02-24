@@ -21,7 +21,7 @@
     <module>alexandria-test</module>
     <module>alexandria-aql</module>
     <module>alexandria-java-client</module>
-    <module>alexandria-model</module>
+    <module>alexandria-api</module>
   </modules>
 
   <properties>

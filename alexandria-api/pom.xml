@@ -6,7 +6,7 @@
     <artifactId>alexandria</artifactId>
     <version>1.1-SNAPSHOT</version>
   </parent>
-  <artifactId>alexandria-model</artifactId>
+  <artifactId>alexandria-api</artifactId>
 
   <dependencies>
     <dependency>

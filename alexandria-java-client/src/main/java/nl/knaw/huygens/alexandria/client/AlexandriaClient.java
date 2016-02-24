@@ -23,4 +23,5 @@ public class AlexandriaClient {
     Response response = rootTarget.path("about").request().get();
     return response.readEntity(AboutEntity.class);
   }
+
 }
