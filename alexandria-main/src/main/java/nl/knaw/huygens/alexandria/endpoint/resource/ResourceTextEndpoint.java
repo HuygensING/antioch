@@ -1,7 +1,5 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
-import static java.util.stream.Collectors.joining;
-
 /*
  * #%L
  * alexandria-main
@@ -26,10 +24,7 @@ import static java.util.stream.Collectors.joining;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -39,6 +34,7 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -48,32 +44,24 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 
+import com.google.common.collect.Maps;
+
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
-import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
-import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
-import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
-import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
-import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.alexandria.text.BaseLayerData;
-import nl.knaw.huygens.alexandria.text.TextUtil;
-import nl.knaw.huygens.alexandria.text.XmlAnnotationLevel;
-import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
-import nl.knaw.huygens.alexandria.textlocator.ByXPathTextLocator;
-import nl.knaw.huygens.tei.Element;
 
 public class ResourceTextEndpoint extends JSONEndpoint {
   private final AlexandriaService service;
   private final UUID resourceId;
   private final AlexandriaResource resource;
   private LocationBuilder locationBuilder;
+  private static Map<UUID, TextImportTask> tasks = Maps.newHashMap();
 
   @Inject
   public ResourceTextEndpoint(AlexandriaService service, //
@@ -106,44 +94,16 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   public Response setTextFromXml(@NotNull @Valid String xml) {
     assertResourceHasNoText();
     BaseLayerDefinition bld = service.getBaseLayerDefinitionForResource(resourceId).orElseThrow(noBaseLayerDefined());
-    BaseLayerData baseLayerData = TextUtil.extractBaseLayerData(xml, bld);
-    if (baseLayerData.validationFailed()) {
-      throw new BadRequestException(baseLayerData.getValidationErrors().stream().collect(joining("\n")));
-    }
-    service.setResourceTextFromStream(resourceId, streamIn(baseLayerData.getBaseLayer()));
+    startTextProcessing(xml, bld);
+    return Response.accepted()//
+        .location(locationBuilder.locationOf(resource, "text", "status"))//
+        .build();
+  }
 
-    List<URI> generatedAnnotations = new ArrayList<>();
-    baseLayerData.getAnnotationData().forEach(annotationData -> {
-      AlexandriaTextLocator textLocator = new ByXPathTextLocator().withXPath(annotationData.getXPath());
-      TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(ThreadContext.getUserName(), Instant.now(), "initial text import");
-      String type = annotationData.getType();
-      String value = annotationData.getValue().toString();
-      if (annotationData.getLevel().equals(XmlAnnotationLevel.element)) {
-        value = type;
-        type = "xml-element";
-      } else {
-        type = "xml-attribute:" + type;
-      }
-      AlexandriaAnnotationBody annotationbody = service.createAnnotationBody(UUID.randomUUID(), type, value, provenance);
-      AlexandriaAnnotation annotation = service.annotate(resource, textLocator, annotationbody, provenance);
-      service.confirmAnnotation(annotation.getId());
-      generatedAnnotations.add(locationBuilder.locationOf(annotation));
-      if (annotationData.getLevel().equals(XmlAnnotationLevel.element)) {
-        Element element = (Element) annotationData.getValue();
-        element.getAttributes().forEach((key, attributeValue) -> {
-          AlexandriaAnnotationBody subannotationbody = service.createAnnotationBody(UUID.randomUUID(), "xml-attribute:" + key, attributeValue, provenance);
-          AlexandriaAnnotation subAnnotation = service.annotate(annotation, subannotationbody, provenance);
-          service.confirmAnnotation(subAnnotation.getId());
-          generatedAnnotations.add(locationBuilder.locationOf(subAnnotation));
-        });
-      }
-    });
-
-    ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity//
-        .of(bld.getBaseLayerDefiningResourceId(), baseLayerData.getAnnotationData())//
-        .withGeneratedAnnotations(generatedAnnotations)//
-        .withLocationBuilder(locationBuilder);
-    return ok(resourceTextUploadEntity);
+  private void startTextProcessing(String xml, BaseLayerDefinition bld) {
+    TextImportTask task = new TextImportTask(service, locationBuilder, bld, xml, resource);
+    tasks.put(resource.getId(), task);
+    new Thread(task).start();
   }
 
   @PUT
@@ -167,6 +127,16 @@ public class ResourceTextEndpoint extends JSONEndpoint {
     }
   }
 
+  @GET
+  @Path("status")
+  public Response getTextImportStatus() {
+    if (tasks.containsKey(resourceId)) {
+      TextImportTask textImportTask = tasks.get(resourceId);
+      return Response.ok().entity(textImportTask.getStatus()).build();
+    }
+    throw new NotFoundException();
+  }
+
   private Supplier<ConflictException> noBaseLayerDefined() {
     return () -> new ConflictException(String.format("No base layer defined for resource: %s", resourceId));
   }
@@ -183,10 +153,6 @@ public class ResourceTextEndpoint extends JSONEndpoint {
 
   private InputStream resourceTextAsStream() {
     return service.getResourceTextAsStream(resourceId).orElseThrow(() -> new NotFoundException("no text found"));
-  }
-
-  private InputStream streamIn(String body) {
-    return IOUtils.toInputStream(body);
   }
 
   private StreamingOutput streamOut(InputStream is) {

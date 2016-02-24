@@ -188,9 +188,11 @@ function a-dry-run-from-file {
 	  }
 	}'
   a-log "result uploading text:"
-  curl --silent --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:application/octet-stream' --data @"$*"| jq "."
+  location=$(curl -i --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:application/octet-stream' --data @"$*" |a-location)
+  curl --silent ${location} | jq "."
   a-log "extracted baselayer:"
   curl ${be}/resources/${ri}/text
+  curl --silent ${location} | jq "."
 }
 
 

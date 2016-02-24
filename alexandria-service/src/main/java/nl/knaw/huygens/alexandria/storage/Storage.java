@@ -109,13 +109,13 @@ public class Storage {
   }
 
   public void runInTransaction(Runnable runner) {
-    boolean inOpenTransaction = transactionOpen;
-    if (!inOpenTransaction) {
+    boolean startedInOpenTransaction = transactionOpen;
+    if (!startedInOpenTransaction) {
       startTransaction();
     }
     try {
       runner.run();
-      if (!inOpenTransaction) {
+      if (!startedInOpenTransaction) {
         commitTransaction();
       }
 
