@@ -31,7 +31,7 @@ public class AlexandriaClient {
   public RestResult<AboutEntity> getAbout() {
     RestRequester<AboutEntity> requester = RestRequester.withResponseSupplier(() -> rootTarget.path(EndpointPaths.ABOUT).request().get());
     return requester//
-        .onOK((response) -> {
+        .onStatus(Status.OK, (response) -> {
           RestResult<AboutEntity> result = new RestResult<>();
           AboutEntity cargo = response.readEntity(AboutEntity.class);
           result.setCargo(cargo);
@@ -54,7 +54,7 @@ public class AlexandriaClient {
         .post(entity);
     RestRequester<UUID> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onCreated((response) -> {
+        .onStatus(Status.CREATED, (response) -> {
           RestResult<UUID> result = new RestResult<>();
           if (response.getStatusInfo().getStatusCode() == Status.CREATED.getStatusCode()) {
             String location = response.getHeaderString("Location");
