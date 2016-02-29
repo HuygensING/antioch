@@ -2,7 +2,6 @@ package nl.knaw.huygens.alexandria.client;
 
 import java.net.URI;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.ws.rs.client.Client;
@@ -28,6 +27,11 @@ public class AlexandriaClient {
     rootTarget = client.target(alexandriaURI);
   }
 
+  public void setAuthKey(String authKey) {
+    authHeader = "SimpleAuth " + authKey;
+    Log.info("authheader=[{}]", authHeader);
+  }
+
   public RestResult<AboutEntity> getAbout() {
     RestRequester<AboutEntity> requester = RestRequester.withResponseSupplier(() -> rootTarget.path(EndpointPaths.ABOUT).request().get());
     return requester//
@@ -38,11 +42,6 @@ public class AlexandriaClient {
           return result;
         })//
         .getResult();
-  }
-
-  public void setAuthKey(String authKey) {
-    authHeader = "SimpleAuth " + authKey;
-    Log.info("authheader=[{}]", authHeader);
   }
 
   public RestResult<UUID> addResource(ResourcePrototype resource) {
@@ -66,18 +65,6 @@ public class AlexandriaClient {
           return result;
         })//
         .getResult();
-  }
-
-  public <T extends Object> RestResult<T> process(Supplier<Response> responseSupplier, Function<Response, RestResult<T>> responseMapper) {
-    RestResult<T> result = new RestResult<>();
-    try {
-      Response response = responseSupplier.get();
-      result = responseMapper.apply(response);
-    } catch (Exception e) {
-      e.printStackTrace();
-      result.setFail(true);
-    }
-    return result;
   }
 
 }
