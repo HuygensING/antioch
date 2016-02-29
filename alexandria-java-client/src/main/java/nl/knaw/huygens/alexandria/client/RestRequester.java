@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.client;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -7,11 +8,9 @@ import java.util.function.Supplier;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import com.google.common.collect.Maps;
-
 public class RestRequester<T> {
   private Supplier<Response> responseSupplier;
-  Map<Status, Function<Response, RestResult<T>>> statusMappers = Maps.newHashMap();
+  Map<Status, Function<Response, RestResult<T>>> statusMappers = new HashMap<>();
 
   public static <T extends Object> RestRequester<T> withResponseSupplier(Supplier<Response> responseSupplier) {
     RestRequester<T> requester = new RestRequester<>();
