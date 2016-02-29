@@ -9,9 +9,11 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.jackson.JacksonFeature;
 
+import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 
@@ -24,23 +26,38 @@ public class AlexandriaClient {
     rootTarget = client.target(alexandriaURI);
   }
 
-  public AboutEntity getAbout() {
+  public RestResult<AboutEntity> getAbout() {
     Response response = rootTarget.path(EndpointPaths.ABOUT).request().get();
-    return response.readEntity(AboutEntity.class);
+    RestResult<AboutEntity> result = new RestResult<>();
+    if (response.getStatusInfo().getStatusCode() == Status.OK.getStatusCode()) {
+      AboutEntity cargo = response.readEntity(AboutEntity.class);
+      result.setCargo(cargo);
+    } else {
+      result.setFail(true);
+    }
+    return result;
   }
 
   public void setAuthKey(String authKey) {
     authHeader = "SimpleAuth " + authKey;
+    Log.info("authheader=[{}]", authHeader);
   }
 
-  public UUID addResource(ResourcePrototype resource) {
+  public RestResult<UUID> addResource(ResourcePrototype resource) {
     Entity<ResourcePrototype> entity = Entity.entity(resource, MediaType.APPLICATION_JSON);
     Response response = rootTarget.path(EndpointPaths.RESOURCES).request()//
         .header("Auth", authHeader)//
         .post(entity);
 
-    String location = response.getHeaderString("Location");
-    return UUID.fromString(location.replaceFirst(".*/", ""));
+    RestResult<UUID> result = new RestResult<>();
+    if (response.getStatusInfo().getStatusCode() == Status.CREATED.getStatusCode()) {
+      String location = response.getHeaderString("Location");
+      UUID uuid = UUID.fromString(location.replaceFirst(".*/", ""));
+      result.setCargo(uuid);
+    } else {
+      result.setFail(true);
+    }
+    return result;
   }
 
 }

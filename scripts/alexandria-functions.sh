@@ -138,7 +138,7 @@ function a-about {
 }
 
 function a-about-service {
-  curl --header "${
+  curl --header "${authheader}" $be/about/service
 }
 
 function a-dry-run {
