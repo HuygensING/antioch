@@ -10,6 +10,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>nl.knaw.huygens</groupId>
+      <artifactId>log</artifactId>
+      <version>${log.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <version>${commons-lang3.version}</version>

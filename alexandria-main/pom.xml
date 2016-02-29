@@ -14,11 +14,6 @@
       <artifactId>alexandria-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>nl.knaw.huygens</groupId>
-      <artifactId>log</artifactId>
-      <version>${log.version}</version>
-    </dependency>
 
     <!-- VisiTEI -->
     <dependency>
