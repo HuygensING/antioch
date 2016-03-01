@@ -14,7 +14,7 @@ function a-annotate-resource {
 }
 
 function a-location {
-  grep "Location:"|cut -d\  -f2|sed -e "s/\r//g"|sed -e "s/https:\/\/acc.alexandria.huygens.knaw.nl/http:\/\/tc24alex.huygens.knaw.nl\/alexandria/g"
+  grep "Location:"|cut -d\  -f2|tr -d '\r' |sed -e "s/https:\/\/acc.alexandria.huygens.knaw.nl/http:\/\/tc24alex.huygens.knaw.nl\/alexandria/g"
 }
 
 function a-confirm {
