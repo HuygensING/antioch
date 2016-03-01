@@ -24,7 +24,7 @@ package nl.knaw.huygens.alexandria.concordion;
 
 import static java.util.UUID.fromString;
 import static java.util.UUID.randomUUID;
-import static nl.knaw.huygens.alexandria.model.AlexandriaState.CONFIRMED;
+import static nl.knaw.huygens.alexandria.api.model.AlexandriaState.CONFIRMED;
 
 import java.net.URI;
 import java.time.Instant;

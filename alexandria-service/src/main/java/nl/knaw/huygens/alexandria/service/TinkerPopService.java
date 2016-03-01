@@ -57,6 +57,7 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
@@ -66,7 +67,6 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
 import nl.knaw.huygens.alexandria.model.BaseLayerDefinition.BaseElementDefinition;
 import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
@@ -431,9 +431,9 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   private BaseLayerDefinition deserializeBaseLayerDefinition(String json) throws IOException {
-    List<BaseElementDefinition> baseElementDefinitions = new ObjectMapper().readValue(json, new TypeReference<List<BaseElementDefinition>>() {
+    List<BaseElementDefinition> baseElements = new ObjectMapper().readValue(json, new TypeReference<List<BaseElementDefinition>>() {
     });
-    return BaseLayerDefinition.withBaseElements(baseElementDefinitions);
+    return BaseLayerDefinition.withBaseElements(baseElements);
   }
 
   @Override

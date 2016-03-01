@@ -29,6 +29,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import io.swagger.annotations.ApiModel;
+import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;

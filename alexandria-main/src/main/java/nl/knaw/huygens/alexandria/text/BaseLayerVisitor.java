@@ -22,6 +22,7 @@ import nl.knaw.huygens.tei.handlers.XmlTextHandler;
 
 public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<XmlContext>, ElementHandler<XmlContext>, ProcessingInstructionHandler<XmlContext> {
   private static final String XML_ID = "xml:id";
+  private static final String XMLID_MARKER = "-";
   private static List<AnnotationData> annotationData = new ArrayList<>();
   private static ElementTally elementTally = new ElementTally();
   private static Stack<Element> baseElementStack = new Stack<>();
@@ -109,7 +110,7 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     public BaseElementHandler(List<String> baseAttributes) {
       this.baseAttributes = baseAttributes;
       if (!baseAttributes.contains(XML_ID)) {
-        baseAttributes.add(XML_ID);
+        baseAttributes.add(0, XML_ID);
       }
     }
 
@@ -117,10 +118,15 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     public Traversal enterElement(Element element, XmlContext context) {
       elementTally.tally(element);
       Element base = new Element(element.getName());
+
+      // use attribute order as defined in baselayer definition
+      baseAttributes.stream()//
+          .filter((attribute) -> element.hasAttribute(attribute))//
+          .forEach(key -> {
+            base.setAttribute(key, element.getAttribute(key));
+          });
       element.getAttributes().forEach((key, value) -> {
-        if (baseAttributes.contains(key)) {
-          base.setAttribute(key, value);
-        } else {
+        if (!baseAttributes.contains(key)) {
           annotationData.add(new AnnotationData()//
               .setAnnotatedBaseText("")//
               .setLevel(XmlAnnotationLevel.attribute)//
@@ -148,7 +154,7 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
       String id;
       counters.putIfAbsent(name, new AtomicLong(0));
       do {
-        id = name + counters.get(name).incrementAndGet();
+        id = name + XMLID_MARKER + counters.get(name).incrementAndGet();
       } while (baseElementIds.contains(id));
       baseElement.setAttribute(XML_ID, id);
     }

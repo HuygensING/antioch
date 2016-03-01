@@ -7,34 +7,36 @@ import java.util.Objects;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class BaseLayerDefinition {
-  List<BaseElementDefinition> baseElementDefinitions = new ArrayList<>();
+  List<BaseElementDefinition> baseElements = new ArrayList<>();
   UUID baseLayerDefiningResourceId;
 
   private BaseLayerDefinition() {
   }
 
-  public static BaseLayerDefinition withBaseElements(final BaseElementDefinition... baseElementDefinitions) {
-    return BaseLayerDefinition.withBaseElements(Arrays.asList(baseElementDefinitions));
+  public static BaseLayerDefinition withBaseElements(final BaseElementDefinition... baseElements) {
+    return BaseLayerDefinition.withBaseElements(Arrays.asList(baseElements));
   }
 
-  public static BaseLayerDefinition withBaseElements(final List<BaseElementDefinition> baseElementDefinitions) {
+  public static BaseLayerDefinition withBaseElements(final List<BaseElementDefinition> baseElements) {
     final BaseLayerDefinition baseLayerDefinition = new BaseLayerDefinition();
-    baseLayerDefinition.setBaseElementDefinitions(baseElementDefinitions);
+    baseLayerDefinition.setBaseElementDefinitions(baseElements);
     return baseLayerDefinition;
   }
 
-  public void setBaseElementDefinitions(final List<BaseElementDefinition> baseElementDefinitions) {
-    this.baseElementDefinitions = baseElementDefinitions;
+  public void setBaseElementDefinitions(final List<BaseElementDefinition> baseElements) {
+    this.baseElements = baseElements;
   }
 
   public void addBaseElementDefinition(final BaseElementDefinition definition) {
-    baseElementDefinitions.add(definition);
+    baseElements.add(definition);
   }
 
+  @JsonProperty("baseElements")
   public List<BaseElementDefinition> getBaseElementDefinitions() {
-    return baseElementDefinitions;
+    return baseElements;
   }
 
   @JsonIgnore

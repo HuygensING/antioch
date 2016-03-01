@@ -14,7 +14,7 @@ function a-annotate-resource {
 }
 
 function a-location {
-  grep "Location:"|cut -d\  -f2|sed -e "s/\r//g"|sed -e "s/https:\/\/acc.alexandria.huygens.knaw.nl/http:\/\/tc24alex.huygens.knaw.nl\/alexandria/g"
+  grep "Location:"|cut -d\  -f2|tr -d '\r' |sed -e "s/https:\/\/acc.alexandria.huygens.knaw.nl/http:\/\/tc24alex.huygens.knaw.nl\/alexandria/g"
 }
 
 function a-confirm {
@@ -76,7 +76,7 @@ function a-set-default-baselayer-definition {
   a-log "Setting default baselayer definition for ${be}/resources/$ri"
   curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
      --data-binary '{"baseLayerDefinition":{
-       "baseElementDefinitions" : [
+       "baseElements" : [
           { "name": "text", "baseAttributes": [ "id" ] },
           { "name": "p", "baseAttributes": [ "id" ] },
           { "name": "div", "baseAttributes" : [ "id", "by" ] }
@@ -111,20 +111,22 @@ function a-set-authkey {
 
 function a-use-localhost {
   a-set-backend http://localhost:2015
-  a-set-authkey YHJZHjpke8JYjm5y
+  a-set-authkey ${ALEXANDRIA_AUTHKEY_LOCAL}
 }
 
 function a-use-test {
   a-set-backend http://test.alexandria.huygens.knaw.nl/
+  a-set-authkey ${ALEXANDRIA_AUTHKEY_TEST}
 }
 
 function a-use-acceptance {
   a-set-backend http://tc24alex.huygens.knaw.nl/alexandria
-  a-set-authkey YHJZHjpke8JYjm5y
+  a-set-authkey ${ALEXANDRIA_AUTHKEY_ACC}
 }
 
 function a-use-production {
   a-set-backend https://alexandria.huygens.knaw.nl/
+  a-set-authkey ${ALEXANDRIA_AUTHKEY_PROD}
 }
 
 function a-show-backend {
@@ -145,7 +147,7 @@ function a-dry-run {
   curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
 	--data-binary '{
 	  "baseLayerDefinition": {
-	    "baseElementDefinitions": [ {
+	    "baseElements": [ {
 	      "name": "body"
 	    }, {
 	      "name": "div",
@@ -197,4 +199,3 @@ function a-dry-run-from-file {
 
 
 a-use-localhost
-

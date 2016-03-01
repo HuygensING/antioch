@@ -1,0 +1,51 @@
+{
+  "baseLayerDefinition": {
+    "baseElements": [ {
+      "name": "add",
+      "baseAttributes": [ "place" ]
+    }, {
+      "name": "body"
+    }, {
+      "name": "cell",
+      "baseAttributes": [ "cols", "role" ]
+    }, {
+      "name": "del",
+      "baseAttributes": [ "rend" ]
+    }, {
+      "name": "div",
+      "baseAttributes": [ "type" ]
+    }, {
+      "name": "figDesc"
+    }, {
+      "name": "figure",
+      "baseAttributes": [ "rend" ]
+    }, {
+      "name": "graphic",
+      "baseAttributes": [ "height", "scale", "url", "width" ]
+    }, {
+      "name": "head"
+    }, {
+      "name": "item"
+    }, {
+      "name": "l",
+      "baseAttributes": [ "n", "rend" ]
+    }, {
+      "name": "label"
+    }, {
+      "name": "lg",
+      "baseAttributes": [ "type" ]
+    }, {
+      "name": "list"
+    }, {
+      "name": "p"
+    }, {
+      "name": "row"
+    }, {
+      "name": "sub"
+    }, {
+      "name": "sup"
+    }, {
+      "name": "table"
+    } ]
+  }
+}

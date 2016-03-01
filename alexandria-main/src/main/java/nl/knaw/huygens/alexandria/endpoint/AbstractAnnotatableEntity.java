@@ -33,7 +33,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.endpoint.resource.PropertyPrefix;
+import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
+import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 

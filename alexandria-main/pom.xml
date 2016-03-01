@@ -10,9 +10,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>nl.knaw.huygens</groupId>
-      <artifactId>log</artifactId>
-      <version>${log.version}</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>alexandria-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- VisiTEI -->
@@ -26,11 +26,6 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>${guava.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.jaxrs</groupId>
-      <artifactId>jackson-jaxrs-json-provider</artifactId>
-      <version>${jackson.version}</version>
     </dependency>
     <dependency>
       <groupId>com.squarespace.jersey2-guice</groupId>
@@ -59,6 +54,10 @@
         <exclusion>
           <groupId>com.fasterxml.jackson.core</groupId>
           <artifactId>jackson-annotations</artifactId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jackson-jaxrs-base</artifactId>
+          <groupId>com.fasterxml.jackson.jaxrs</groupId>
         </exclusion>
       </exclusions>
     </dependency>

@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint;
+package nl.knaw.huygens.alexandria.api.model;
 
 /*
  * #%L
@@ -22,10 +22,11 @@ package nl.knaw.huygens.alexandria.endpoint;
  * #L%
  */
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-
-@JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
-public abstract class JsonWrapperObject {
+/**
+ * prefixes for property labels to indicate the type of variable
+ *
+ */
+public class PropertyPrefix {
+  public static final String LINK = "^";
+  public static final String TRANSIENT = "!";
 }

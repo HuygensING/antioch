@@ -24,6 +24,8 @@ package nl.knaw.huygens.alexandria.model;
 
 import java.time.Instant;
 
+import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+
 public interface Accountable extends Identifiable {
   AlexandriaProvenance getProvenance();
 

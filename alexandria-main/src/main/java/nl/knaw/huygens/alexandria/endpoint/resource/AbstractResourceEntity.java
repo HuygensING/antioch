@@ -8,6 +8,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
 import nl.knaw.huygens.alexandria.endpoint.AbstractAnnotatableEntity;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.IdentifiablePointer;

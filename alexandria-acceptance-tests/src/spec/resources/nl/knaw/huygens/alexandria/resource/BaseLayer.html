@@ -50,7 +50,7 @@
         the body:
         <h:jsonBody>{
             "baseLayerDefinition": {
-            "baseElementDefinitions": [
+            "baseElements": [
             {"name" : "div", "baseAttributes" : ["id"] },
             {"name" : "p" }
             ] } }
@@ -94,7 +94,7 @@
             </li>
             <li>and body
                 <h:jsonResponse>{
-            "baseElementDefinitions": [
+            "baseElements": [
             {"name" : "div", "baseAttributes" : ["id"] },
             {"name" : "p" }
             ] }
@@ -166,9 +166,9 @@
         the body:
         <h:jsonBody>{
             "baseLayerDefinition": {
-            "baseElementDefinitions": [
-            {"name" : "div", "baseAttributes" : ["xml:id","ref"] },
-            {"name" : "p", "baseAttributes" : ["xml:id"] }
+            "baseElements": [
+            {"name" : "div", "baseAttributes" : ["ref"] },
+            {"name" : "p" }
             ] } }
         </h:jsonBody>
         using

@@ -34,7 +34,7 @@ import nl.knaw.huygens.alexandria.model.BaseLayerDefinition.BaseElementDefinitio
 public class BaseLayerDefinitionPrototype extends AbstractAccountablePrototype {
   private List<BaseElementDefinition> baseElements = new ArrayList<>();
 
-  public List<BaseElementDefinition> getBaseElementDefinitions() {
+  public List<BaseElementDefinition> getBaseElements() {
     return baseElements;
   }
 

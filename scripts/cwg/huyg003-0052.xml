@@ -1,0 +1,42 @@
+<body lang="fr">
+<div type="letter">
+<p lang="fr" n="p1" r="1.348">Le quarré <formula>A</formula>, <formula>B</formula>, <formula>C</formula>, <formula>D</formula>, est suposé l'vne des faces du Cube simple, et <formula>E</formula>, <formula>B</formula>, <formula>F</formula>, <formula>G</formula>, le quarré double, du quarré <formula>ABCD</formula>, sur <formula>EB</formula> soit faict le triangle jsocelle <formula>EBH</formula>, de la hauteur du quart double <formula>EBFG</formula>, le costé <formula>BH</formula>, comme celuy <formula>EH</formula>, son esgal, sera le costé du Cube quadruple <formula>B</formula>, <formula>I</formula>, <formula>K</formula>, <formula>L</formula>, et sy l'on cherche le milieu proportionnel d'entre <formula>AB</formula>, Costé du Cube simple, et <formula>BI</formula>, costé du quadruple, l'on trouuera <formula>BH</formula>, pour le Costé du Cube double <formula>BN</formula>, <formula>OP</formula>, pour preuue dequoy, le milieu proportionnel d'entre <formula>PB</formula>, Costé du Cube doublé, et <formula>BQ</formula> costé de l'octuple <formula>BQST</formula>, donnera <formula>BL</formula>, mesme costé du quadruple, ainsy voila les Costés des 4 Cubes continuelz en proportion double, ou l'on verra 2 lignes proportionnelles entre 2 lignes en proportion double, Comme jl est demande. Car entre <formula>AB</formula> et <formula>BQ</formula>, qui sont en proportion double, <formula>BN</formula> et <formula>BL</formula>, sont proportionnelles.</p>
+<space/>
+<p lang="fr" n="p2" r="1.525">Il est facile de faire voir par nombres que ces quatres lignes en la figure proposée ne sont pas proportionnelles comme on le pretend. scauoir est <formula>AB/BN, ∙∥∙ BL/BQ</formula></p>
+<p lang="?" n="p3">Car soit posec la ligne <formula>AB........2</formula></p>
+<p lang="fr" n="p4" r="1.152">Et la ligne <formula>BQ................4</formula></p>
+<p lang="fr" n="p5" r="1.216">Le quarré de <formula>AB</formula> sera 4</p>
+<p lang="fr" n="p6" r="1.241">Son double quarré sera le quarré de <formula>EB....8</formula></p>
+<p lang="fr" n="p7" r="1.260">Dont le Costé scauoir est <formula>EB</formula> sera....√♃ 8</p>
+<p lang="fr" n="p8" r="1.223">Donc <formula>BH</formula> vel <formula>BL</formula>, qui est le Costé du Cube quadruple suiuant l'opinion de celuy qui fait ceste proposition sera..............√♃ 10</p>
+<pb n="96"/>
+<p n="p9"><figure><graphic url="huyg003oeuv01ill64.gif"/></figure></p>
+<pb n="97"/>
+<p lang="fr" n="p10" r="1.282">Et selon le mesme la moyenne proportionnel entre <formula>AB</formula> et <formula>BL</formula> qui est le costé du Cube double sera <formula>BN</formula> et..............√♃♃♃ 40</p>
+<p lang="fr" n="p11" r="1.228">Et selon le mesme la moyenne proportionnelle entre <formula>BN</formula> et <formula>BQ</formula> qui deuroit estre esgal a <formula>BL</formula> a son aduis sera.............√♃♃♃ 10240</p>
+<p lang="?" n="p12">Donc</p>
+<p lang="fr" n="p13" r="1.589">Costés des Cubes......2:√♃♃40:√♃10:4</p>
+<p lang="?" n="p14">Cubes en raison double....8:16:32:64</p>
+<p lang="fr" n="p15" r="1.541">Cequi est faux. Car sy cela estoit il s'ensuiuroit que le rectangle des extremes de ses quatre proportionnelles seroit esgal au rectangle des moyennes.</p>
+<p lang="?" n="p16">Donc....8 ∙∥∙ √♃♃ 4000</p>
+<p lang="?" n="p17">oubien √♃♃ 4096 ∙∥∙ √♃♃ 4000</p>
+<p lang="fr" n="p18" r="1.454">Il s'ensuiuroit encores que ces costes ou racines seroient esgalles</p>
+<p lang="fr" n="p19" r="1.307">scauoir est √ oe 16 ∙∥∙ √♃♃ 40</p>
+<p lang="nl" n="p20" r="1.383">oubien √♃♃ oe 65536 ∙∥∙ √♃♃ oe 64000</p>
+<p lang="fr" n="p21" r="1.178">comme aussy √ oe 32 ∙∥∙ √♃ 10</p>
+<p lang="nl" n="p22" r="1.383">oubien √ oe 1024 ∙∥∙ √ oe 1000</p>
+<p lang="fr" n="p23" r="1.477">Depuis il s'ensuiuroit que ces deux racines seroient esgalles</p>
+<p lang="fr" n="p24" r="1.279">scauoir est √♃ 10 ∙∥∙ √♃♃♃ 10240</p>
+<p lang="?" n="p25">oubien √♃♃♃ 1000 ∙∥∙ √♃♃♃ 10240</p>
+<p lang="fr" n="p26" r="1.333">Cequi paroist tres faux.</p>
+<p lang="fr" n="p27" r="1.570">Enfin sy par le moyen de ses quatre costés ou racines qui sont ces quatre lignes proportionnelles vous faictes des Cubes vous aurez</p>
+<p lang="fr" n="p28" r="1.591">Costes des Cubes...2:√♃♃ 40:√♃ 10:4</p>
+<p lang="?" n="p29">Cubes......8:√♃♃ 64000:√♃ 1000:64</p>
+<p lang="fr" n="p30" r="1.330">Dou il s'ensuiuroient que</p>
+<p lang="?" n="p31">16 ∙∥∙ √♃♃ 64000</p>
+<p lang="?" n="p32">oubien √♃♃ 65536 ∙∥∙ √♃♃ 64000</p>
+<p lang="fr" n="p33" r="1.259">comme aussy 32 ∙∥∙ √♃ 1000</p>
+<p lang="?" n="p34">oubien √♃ 1024 ∙∥∙ √♃ 1000</p>
+<p lang="fr" n="p35" r="1.390">Ce qui paroist tres euidamment faux.</p>
+</div>
+</body>

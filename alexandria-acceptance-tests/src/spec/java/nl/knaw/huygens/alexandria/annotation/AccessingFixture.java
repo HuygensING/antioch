@@ -41,11 +41,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchEndpoint;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
-import nl.knaw.huygens.alexandria.model.AlexandriaState;
 
 @RunWith(ConcordionRunner.class)
 public class AccessingFixture extends AnnotationsBase {

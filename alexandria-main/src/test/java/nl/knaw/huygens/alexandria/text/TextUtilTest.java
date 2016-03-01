@@ -22,13 +22,13 @@ public class TextUtilTest {
         + "<p>three</p>"//
         + "</div>"//
         + "</text>").replace("'", "\"");
-    String expected = ("<text xml:id='text1'>"//
+    String expected = ("<text xml:id='text-1'>"//
         + "<div xml:id='div-1'>"//
         + "<p xml:id='p1'>paragraph with text</p>"//
-        + "<p xml:id='p2'>two</p>"//
+        + "<p xml:id='p-1'>two</p>"//
         + "</div>"//
         + "<div xml:id='div-2'>"//
-        + "<p xml:id='p3'>three</p>"//
+        + "<p xml:id='p-2'>three</p>"//
         + "</div>"//
         + "</text>").replace("'", "\"");
     BaseLayerDefinition def = BaseLayerDefinition//
@@ -80,10 +80,10 @@ public class TextUtilTest {
         + "<p>par 2</p>"//
         + "</div>"//
         + "</text>").replace("'", "\"");
-    String expected = ("<text xml:id='text1'>"//
+    String expected = ("<text xml:id='text-1'>"//
         + "<div xml:id='div-1'>"//
         + "<p xml:id='p1'>par 1</p>"//
-        + "<p xml:id='p2'>par 2</p>"//
+        + "<p xml:id='p-1'>par 2</p>"//
         + "</div>"//
         + "</text>").replace("'", "\"");
     BaseLayerDefinition def = BaseLayerDefinition//

@@ -41,12 +41,12 @@ import com.google.common.collect.ImmutableMap;
 
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntity;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorFactory;

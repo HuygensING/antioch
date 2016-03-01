@@ -28,6 +28,8 @@ import java.util.UUID;
 
 import com.google.common.collect.ImmutableSet;
 
+import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+
 public abstract class AbstractAccountable implements Accountable {
   private final UUID id;
   private final AlexandriaProvenance provenance;
