@@ -11,13 +11,13 @@ function cwg-upload {
   curl -i -H "${authheader}" -X PUT $root/baselayerdefinition -H 'Content-type: application/json' --data @"cwg-bld.json"
   curl $root/baselayerdefinition
 
-  a-log "add Hugo Grotius resources"
+  a-log "add Hugo Grotius resource"
   cwg-create-subresource $root "groo001: Hugo Grotius corpus"
   groo001=$suburi
-  a-log "add Constantijn Huygens resources"
+  a-log "add Constantijn Huygens resource"
   cwg-create-subresource $root "huyg001: Constantijn Huygens corpus"
   huyg001=$suburi
-  a-log "add Christiaan Huygens resources"
+  a-log "add Christiaan Huygens resource"
   cwg-create-subresource $root "huyg003: Christiaan Huygens corpus"
   huyg003=$suburi
 
@@ -51,7 +51,7 @@ function cwg-create-root-resource {
 # usage: cwg-create-subresource resource title
 function cwg-create-subresource {
   suburi=$(curl -i -s --header "${authheader}" -X POST "$1/subresources" \
-    --header 'Content-type: application/json' --data-binary "{\"subresource\":{ \"sub\":\"$2\" }}" 2>/dev/null | cwg-location)
+    --header 'Content-type: application/json' --data-binary "{\"subresource\":{ \"sub\":\"$2\" }}" 2>/dev/null | a-location)
   a-confirm ${suburi}
 }
 
@@ -66,8 +66,4 @@ function cwg-add-letter {
   curl $suburi
   cwg-set-text-from-file $suburi "$2.xml"
   curl $suburi/text
-}
-
-function cwg-location {
-  grep "Location:"|cut -d\  -f2|tr -d '\r'|sed -e "s/https:\/\/acc.alexandria.huygens.knaw.nl/http:\/\/tc24alex.huygens.knaw.nl\/alexandria/g"
 }
