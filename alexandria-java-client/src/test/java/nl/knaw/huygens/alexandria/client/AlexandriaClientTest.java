@@ -33,6 +33,12 @@ public class AlexandriaClientTest {
     UUID resourceUuid = result.get();
     Log.info("resourceUUID = {}", resourceUuid);
     assertThat(resourceUuid).isNotNull();
+
+    // retrieve the resource
+    RestResult<ResourceEntity> result2 = client.getResource(resourceUuid);
+    assertThat(result2.hasFailed()).isFalse();
+    ResourceEntity resourceEntity = result2.get();
+    assertThat(resourceEntity).isNotNull();
   }
 
   @Test

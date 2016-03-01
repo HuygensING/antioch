@@ -67,4 +67,16 @@ public class AlexandriaClient {
         .getResult();
   }
 
+  public RestResult<ResourceEntity> getResource(UUID uuid) {
+    RestRequester<ResourceEntity> requester = RestRequester.withResponseSupplier(() -> rootTarget.path(EndpointPaths.RESOURCES).path(uuid.toString()).request().get());
+    return requester//
+        .onStatus(Status.OK, (response) -> {
+          RestResult<ResourceEntity> result = new RestResult<>();
+          ResourceEntity cargo = response.readEntity(ResourceEntity.class);
+          result.setCargo(cargo);
+          return result;
+        })//
+        .getResult();
+  }
+
 }

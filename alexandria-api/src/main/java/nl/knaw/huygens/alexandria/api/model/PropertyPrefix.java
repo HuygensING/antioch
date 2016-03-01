@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.model;
+package nl.knaw.huygens.alexandria.api.model;
 
 /*
  * #%L
@@ -22,6 +22,11 @@ package nl.knaw.huygens.alexandria.model;
  * #L%
  */
 
-public enum AlexandriaState {
-  TENTATIVE, CONFIRMED, DELETED, DEPRECATED
+/**
+ * prefixes for property labels to indicate the type of variable
+ *
+ */
+public class PropertyPrefix {
+  public static final String LINK = "^";
+  public static final String TRANSIENT = "!";
 }

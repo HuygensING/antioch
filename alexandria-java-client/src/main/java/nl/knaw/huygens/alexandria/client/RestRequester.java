@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response.Status;
 public class RestRequester<T> {
   private Supplier<Response> responseSupplier;
   Map<Status, Function<Response, RestResult<T>>> statusMappers = new HashMap<>();
+  private Function<Response, RestResult<T>> defaultMapper = (response) -> RestResult.failingResult(response);
 
   public static <T extends Object> RestRequester<T> withResponseSupplier(Supplier<Response> responseSupplier) {
     RestRequester<T> requester = new RestRequester<>();
@@ -20,6 +21,11 @@ public class RestRequester<T> {
 
   public RestRequester<T> onStatus(Status status, Function<Response, RestResult<T>> mapper) {
     statusMappers.put(status, mapper);
+    return this;
+  }
+
+  public RestRequester<T> onOtherStatus(Function<Response, RestResult<T>> defaultMapper) {
+    this.defaultMapper = defaultMapper;
     return this;
   }
 
@@ -33,7 +39,7 @@ public class RestRequester<T> {
         return statusMappers.get(status).apply(response);
 
       } else {
-        return RestResult.failingResult(response);
+        return defaultMapper.apply(response);
       }
 
     } catch (Exception e) {
@@ -44,3 +50,5 @@ public class RestRequester<T> {
     return result;
   }
 }
+
+
