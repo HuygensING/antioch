@@ -26,7 +26,8 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import nl.knaw.huygens.alexandria.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 
 public abstract class AbstractAccountablePrototype extends JsonWrapperObject implements Prototype {
   private UUIDParam id;

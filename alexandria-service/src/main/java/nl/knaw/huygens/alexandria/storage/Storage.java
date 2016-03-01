@@ -46,7 +46,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import peapod.FramedGraph;

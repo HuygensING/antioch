@@ -20,6 +20,8 @@
     <module>alexandria-webapp</module>
     <module>alexandria-test</module>
     <module>alexandria-aql</module>
+    <module>alexandria-java-client</module>
+    <module>alexandria-api</module>
   </modules>
 
   <properties>
@@ -42,6 +44,7 @@
     <!-- Generate parse tree visitor interface and base class. -->
     <antlr4.visitor>true</antlr4.visitor>
 
+    <commons-lang3.version>3.4</commons-lang3.version>
     <guava.version>19.0</guava.version>
     <guice.version>4.0</guice.version>
     <jackson.version>2.7.1</jackson.version>

@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>nl.knaw.huygens.alexandria</groupId>
@@ -10,9 +10,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>nl.knaw.huygens</groupId>
-      <artifactId>log</artifactId>
-      <version>${log.version}</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>alexandria-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- VisiTEI -->
@@ -26,11 +26,6 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>${guava.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.jaxrs</groupId>
-      <artifactId>jackson-jaxrs-json-provider</artifactId>
-      <version>${jackson.version}</version>
     </dependency>
     <dependency>
       <groupId>com.squarespace.jersey2-guice</groupId>
@@ -60,6 +55,10 @@
           <groupId>com.fasterxml.jackson.core</groupId>
           <artifactId>jackson-annotations</artifactId>
         </exclusion>
+        <exclusion>
+          <artifactId>jackson-jaxrs-base</artifactId>
+          <groupId>com.fasterxml.jackson.jaxrs</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -84,7 +83,8 @@
         <artifactId>maven-jar-plugin</artifactId>
         <version>${maven-jar.version}</version>
         <configuration>
-          <!-- Avoid warnings about multiple logback.xml found in modules using this module's jar -->
+          <!-- Avoid warnings about multiple logback.xml found in modules 
+            using this module's jar -->
           <excludes>
             <exclude>**/logback.xml</exclude>
           </excludes>

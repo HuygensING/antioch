@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.endpoint.about;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -29,8 +29,6 @@ import static nl.knaw.huygens.alexandria.jersey.AlexandriaApplication.START_TIME
 import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -39,13 +37,15 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.config.PropertiesConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 @Singleton
-@Path("about")
+@Path(EndpointPaths.ABOUT)
 public class AboutEndpoint extends JSONEndpoint {
   private static final String PROPERTIES_FILE = "about.properties";
 
@@ -66,20 +66,20 @@ public class AboutEndpoint extends JSONEndpoint {
 
   @GET
   public Response getMetadata() {
-    final Map<String, String> data = new LinkedHashMap<>();
-    data.put("baseURI", baseURI.toString());
-    data.put("buildDate", properties.getProperty("buildDate").get());
-    data.put("commitId", properties.getProperty("commitId").get());
-    data.put("scmBranch", properties.getProperty("scmBranch").get());
-    data.put("startedAt", STARTED_AT);
-    data.put("tentativesTTL", tentativesTTL.toString());
-    data.put("version", properties.getProperty("version").get());
-    return Response.ok(data).build();
+    AboutEntity about = new AboutEntity()//
+        .setBaseURI(baseURI)//
+        .setBuildDate(properties.getProperty("buildDate").get())//
+        .setCommitId(properties.getProperty("commitId").get())//
+        .setScmBranch(properties.getProperty("scmBranch").get())//
+        .setStartedAt(STARTED_AT)//
+        .setTentativesTTL(tentativesTTL.toString())//
+        .setVersion(properties.getProperty("version").get());
+    return Response.ok(about).build();
   }
 
   @GET
   @Path("service")
-  @RolesAllowed({CERTIFIED, JANITOR})
+  @RolesAllowed({ CERTIFIED, JANITOR })
   public Response getGraphMetadata() {
     return Response.ok(service.getMetadata()).build();
   }
