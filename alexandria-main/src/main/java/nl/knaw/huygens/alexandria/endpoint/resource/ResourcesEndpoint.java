@@ -107,7 +107,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
     if (resource.getDirectBaseLayerDefinition().isPresent()) {
       throw new ConflictException("This resource already has a baselayer definition");
     }
-    service.setBaseLayerDefinition(uuidParam.getValue(), protoType.getBaseElementDefinitions());
+    service.setBaseLayerDefinition(uuidParam.getValue(), protoType.getBaseElements());
     return created(locationBuilder.locationOf(resource, BASELAYERDEFINITION));
   }
 

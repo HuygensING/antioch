@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class BaseLayerDefinition {
   List<BaseElementDefinition> baseElements = new ArrayList<>();
@@ -33,6 +34,7 @@ public class BaseLayerDefinition {
     baseElements.add(definition);
   }
 
+  @JsonProperty("baseElements")
   public List<BaseElementDefinition> getBaseElementDefinitions() {
     return baseElements;
   }
