@@ -22,6 +22,7 @@ import nl.knaw.huygens.tei.handlers.XmlTextHandler;
 
 public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<XmlContext>, ElementHandler<XmlContext>, ProcessingInstructionHandler<XmlContext> {
   private static final String XML_ID = "xml:id";
+  private static final String XMLID_MARKER = "-";
   private static List<AnnotationData> annotationData = new ArrayList<>();
   private static ElementTally elementTally = new ElementTally();
   private static Stack<Element> baseElementStack = new Stack<>();
@@ -153,7 +154,7 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
       String id;
       counters.putIfAbsent(name, new AtomicLong(0));
       do {
-        id = name + counters.get(name).incrementAndGet();
+        id = name + XMLID_MARKER + counters.get(name).incrementAndGet();
       } while (baseElementIds.contains(id));
       baseElement.setAttribute(XML_ID, id);
     }
