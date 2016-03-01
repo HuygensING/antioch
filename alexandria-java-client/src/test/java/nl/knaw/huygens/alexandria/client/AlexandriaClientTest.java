@@ -5,11 +5,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.net.URI;
 import java.util.UUID;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 
+@Ignore
 public class AlexandriaClientTest {
   private static final String AUTHKEY = System.getProperty("ALEXANDRIA_AUTHKEY_TEST", "YHJZHjpke8JYjm5y");
   URI testURI = URI.create("http://test.alexandria.huygens.knaw.nl/");
