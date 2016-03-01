@@ -44,6 +44,23 @@ public class AlexandriaClient {
         .getResult();
   }
 
+  public RestResult<Void> setResource(UUID resourceId, ResourcePrototype resource) {
+    Entity<ResourcePrototype> entity = Entity.entity(resource, MediaType.APPLICATION_JSON);
+    Supplier<Response> responseSupplier = () -> rootTarget//
+        .path(EndpointPaths.RESOURCES)//
+        .path(resourceId.toString())//
+        .request()//
+        .header("Auth", authHeader)//
+        .put(entity);
+    RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
+
+    return requester//
+        .onStatus(Status.CREATED, (response) -> {
+          return new RestResult<>();
+        })//
+        .getResult();
+  }
+
   public RestResult<UUID> addResource(ResourcePrototype resource) {
     Entity<ResourcePrototype> entity = Entity.entity(resource, MediaType.APPLICATION_JSON);
     Supplier<Response> responseSupplier = () -> rootTarget//
@@ -55,13 +72,9 @@ public class AlexandriaClient {
     return requester//
         .onStatus(Status.CREATED, (response) -> {
           RestResult<UUID> result = new RestResult<>();
-          if (response.getStatusInfo().getStatusCode() == Status.CREATED.getStatusCode()) {
-            String location = response.getHeaderString("Location");
-            UUID uuid = UUID.fromString(location.replaceFirst(".*/", ""));
-            result.setCargo(uuid);
-          } else {
-            result.setFail(true);
-          }
+          String location = response.getHeaderString("Location");
+          UUID uuid = UUID.fromString(location.replaceFirst(".*/", ""));
+          result.setCargo(uuid);
           return result;
         })//
         .getResult();

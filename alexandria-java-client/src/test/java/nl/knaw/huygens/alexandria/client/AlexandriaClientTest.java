@@ -16,7 +16,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.squarespace.jersey2.guice.BootstrapUtils;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.jersey.AlexandriaApplication;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -27,12 +26,11 @@ import nl.knaw.huygens.alexandria.text.InMemoryTextService;
 import nl.knaw.huygens.alexandria.text.TextService;
 
 public abstract class AlexandriaClientTest {
-  protected static final String AUTHKEY = "AUTHKEY";
-  // URI testURI = URI.create("http://test.alexandria.huygens.knaw.nl/");
-  static URI testURI = URI.create("http://localhost:2016/");
-  AlexandriaClient client = new AlexandriaClient(testURI);
-  private static HttpServer server;
-  private static AlexandriaConfiguration config = new AlexandriaConfiguration() {
+  static final String AUTHKEY = "AUTHKEY";
+
+  private static URI testURI = URI.create("http://localhost:2016/");
+  private static HttpServer testServer;
+  private static AlexandriaConfiguration testConfig = new AlexandriaConfiguration() {
     @Override
     public String getStorageDirectory() {
       return System.getProperty("java.io.tmpdir");
@@ -54,30 +52,28 @@ public abstract class AlexandriaClientTest {
     }
   };
 
+  AlexandriaClient client = new AlexandriaClient(testURI);
+
   @BeforeClass
   public static void startTestServer() {
-    ServiceLocator locator = createServiceLocator();
-    // init service
-    AlexandriaService service = locator.getService(AlexandriaService.class);
-    Log.info("AlexandriaService {} initialized", service);
-    ResourceConfig config = new AlexandriaApplication();
+    final ServiceLocator locator = createServiceLocator();
+    final AlexandriaService service = locator.getService(AlexandriaService.class);
+    final ResourceConfig resourceConfig = new AlexandriaApplication();
     ((TinkerPopService) service).setStorage(new Storage(TinkerGraph.open()));
-    Log.info("Starting grizzly at {} ...", testURI);
-    server = GrizzlyHttpServerFactory.createHttpServer(testURI, config, locator);
-    service.destroy();
+    testServer = GrizzlyHttpServerFactory.createHttpServer(testURI, resourceConfig, locator);
   }
 
   @AfterClass
   public static void stopTestServer() {
-    server.shutdown();
+    testServer.shutdown();
   }
 
   private static ServiceLocator createServiceLocator() {
-    ServiceLocator locator = BootstrapUtils.newServiceLocator();
-    AbstractModule configModule = new AbstractModule() {
+    final ServiceLocator locator = BootstrapUtils.newServiceLocator();
+    final AbstractModule configModule = new AbstractModule() {
       @Override
       protected void configure() {
-        bind(AlexandriaConfiguration.class).toInstance(config);
+        bind(AlexandriaConfiguration.class).toInstance(testConfig);
         bind(TextService.class).toInstance(new InMemoryTextService());
       }
     };
