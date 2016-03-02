@@ -13,7 +13,7 @@ public class ResourceTest extends AlexandriaClientTest {
   @Test
   public void testAddResourceReturnsValidUUID() {
     client.setAuthKey(AUTHKEY);
-    client.setAutoCommit(false);
+    client.setAutoConfirm(false);
     String resourceRef = "corpus";
     ResourcePrototype resource = new ResourcePrototype(resourceRef);
     RestResult<UUID> result = client.addResource(resource);

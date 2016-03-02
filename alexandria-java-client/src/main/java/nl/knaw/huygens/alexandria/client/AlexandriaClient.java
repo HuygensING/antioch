@@ -28,7 +28,7 @@ public class AlexandriaClient {
   private String authHeader = "";
   private Client client;
   private URI alexandriaURI;
-  private boolean autoCommit = true;
+  private boolean autoConfirm = true;
 
   public AlexandriaClient(URI alexandriaURI) {
     this.alexandriaURI = alexandriaURI;
@@ -48,8 +48,8 @@ public class AlexandriaClient {
     Log.info("authheader=[{}]", authHeader);
   }
 
-  public void setAutoCommit(boolean autoCommit) {
-    this.autoCommit = autoCommit;
+  public void setAutoConfirm(boolean autoConfirm) {
+    this.autoConfirm = autoConfirm;
   }
 
   public RestResult<AboutEntity> getAbout() {
@@ -98,7 +98,7 @@ public class AlexandriaClient {
           return result;
         })//
         .getResult();
-    if (autoCommit && !addResult.hasFailed()) {
+    if (autoConfirm && !addResult.hasFailed()) {
       confirmResource(addResult.get());
     }
 
