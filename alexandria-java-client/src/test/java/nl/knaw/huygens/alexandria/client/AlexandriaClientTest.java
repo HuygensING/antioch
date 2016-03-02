@@ -1,16 +1,20 @@
 package nl.knaw.huygens.alexandria.client;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.assertj.core.api.JUnitSoftAssertions;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
@@ -54,6 +58,9 @@ public abstract class AlexandriaClientTest {
 
   AlexandriaClient client = new AlexandriaClient(testURI);
 
+  @Rule
+  public final JUnitSoftAssertions softly = new JUnitSoftAssertions();
+
   @BeforeClass
   public static void startTestServer() {
     final ServiceLocator locator = createServiceLocator();
@@ -66,6 +73,13 @@ public abstract class AlexandriaClientTest {
   @AfterClass
   public static void stopTestServer() {
     testServer.shutdown();
+  }
+
+  void assertRequestSucceeded(RestResult<?> result) {
+    assertThat(result.hasFailed())//
+        .as("Request went OK")//
+        .withFailMessage("request failed: %s", result.getFailureCause().orElse("something you whould never see"))//
+        .isFalse();
   }
 
   private static ServiceLocator createServiceLocator() {

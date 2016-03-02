@@ -16,30 +16,30 @@ public class ResourceTest extends AlexandriaClientTest {
     String resourceRef = "corpus";
     ResourcePrototype resource = new ResourcePrototype(resourceRef);
     RestResult<UUID> result = client.addResource(resource);
-    assertThat(result.hasFailed()).isFalse();
+    assertRequestSucceeded(result);
     UUID resourceUuid = result.get();
     Log.info("resourceUUID = {}", resourceUuid);
     assertThat(resourceUuid).isNotNull();
 
     // retrieve the resource
     RestResult<ResourceEntity> result2 = client.getResource(resourceUuid);
-    assertThat(result2.hasFailed()).isFalse();
+    assertRequestSucceeded(result2);
     ResourceEntity resourceEntity = result2.get();
-    assertThat(resourceEntity).isNotNull();
-    assertThat(resourceEntity.getRef()).isEqualTo(resourceRef);
-    assertThat(resourceEntity.getState().getValue()).isEqualTo(AlexandriaState.TENTATIVE);
+    softly.assertThat(resourceEntity).isNotNull();
+    softly.assertThat(resourceEntity.getRef()).isEqualTo(resourceRef);
+    softly.assertThat(resourceEntity.getState().getValue()).isEqualTo(AlexandriaState.TENTATIVE);
 
     // confirm the resource
     RestResult<Void> result3 = client.confirmResource(resourceUuid);
-    assertThat(result3.hasFailed()).isFalse();
+    assertRequestSucceeded(result3);
 
     // retrieve the resource again
     RestResult<ResourceEntity> result4 = client.getResource(resourceUuid);
-    assertThat(result4.hasFailed()).isFalse();
+    assertRequestSucceeded(result4);
     ResourceEntity resourceEntity2 = result4.get();
-    assertThat(resourceEntity2).isNotNull();
-    assertThat(resourceEntity2.getRef()).isEqualTo(resourceRef);
-    assertThat(resourceEntity2.getState().getValue()).isEqualTo(AlexandriaState.CONFIRMED);
+    softly.assertThat(resourceEntity2).isNotNull();
+    softly.assertThat(resourceEntity2.getRef()).isEqualTo(resourceRef);
+    softly.assertThat(resourceEntity2.getState().getValue()).isEqualTo(AlexandriaState.CONFIRMED);
   }
 
   @Test
@@ -47,7 +47,7 @@ public class ResourceTest extends AlexandriaClientTest {
     client.setAuthKey(AUTHKEY);
     ResourcePrototype resource = new ResourcePrototype("corpus2").withProvenance(new ProvenancePrototype().setWho("test").setWhy("because test"));
     RestResult<UUID> result = client.addResource(resource);
-    assertThat(result.hasFailed()).isFalse();
+    assertRequestSucceeded(result);
     UUID resourceUuid = result.get();
     Log.info("resourceUUID = {}", resourceUuid);
     assertThat(resourceUuid).isNotNull();
@@ -60,15 +60,15 @@ public class ResourceTest extends AlexandriaClientTest {
     ResourcePrototype resource = new ResourcePrototype(ref).withProvenance(new ProvenancePrototype().setWho("test3").setWhy("because test3"));
     UUID resourceId = UUID.fromString("11111111-1111-1111-1111-111111111111");
     RestResult<Void> result = client.setResource(resourceId, resource);
-    assertThat(result.hasFailed()).isFalse();
+    assertRequestSucceeded(result);
 
     // retrieve the resource
     RestResult<ResourceEntity> result2 = client.getResource(resourceId);
-    assertThat(result2.hasFailed()).isFalse();
+    assertRequestSucceeded(result2);
     ResourceEntity resourceEntity = result2.get();
-    assertThat(resourceEntity).isNotNull();
-    assertThat(resourceEntity.getRef()).isEqualTo(ref);
-    assertThat(resourceEntity.getState().getValue()).isEqualTo(AlexandriaState.CONFIRMED);
+    softly.assertThat(resourceEntity).as("entity != null").isNotNull();
+    softly.assertThat(resourceEntity.getRef()).as("ref").isEqualTo(ref);
+    softly.assertThat(resourceEntity.getState().getValue()).as("state").isEqualTo(AlexandriaState.CONFIRMED);
   }
 
 }

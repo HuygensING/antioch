@@ -72,4 +72,18 @@ public class RestResult<T> {
     return Optional.ofNullable(errorMessage);
   }
 
+  public Optional<String> getFailureCause() {
+    String cause = null;
+    if (response != null) {
+      cause = "Unexpected return status: " + response.getStatus() + " " + response.getStatusInfo().toString();
+
+    } else if (errorMessage != null) {
+      cause = errorMessage;
+
+    } else if (exception != null) {
+      cause = exception.getMessage();
+    }
+    return Optional.ofNullable(cause);
+  }
+
 }

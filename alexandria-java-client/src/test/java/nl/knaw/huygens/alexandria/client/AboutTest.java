@@ -11,10 +11,10 @@ public class AboutTest extends AlexandriaClientTest {
   @Test
   public void testGetAboutReturnsValidAboutEntity() {
     RestResult<AboutEntity> result = client.getAbout();
-    assertThat(result.hasFailed()).isFalse();
+    assertRequestSucceeded(result);
     AboutEntity about = result.get();
     Log.info("about={}", about);
-    assertThat(about).isNotNull();
+    assertThat(about).as("about not null").isNotNull();
   }
 
 }
