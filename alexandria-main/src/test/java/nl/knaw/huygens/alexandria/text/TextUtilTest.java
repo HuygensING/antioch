@@ -6,8 +6,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.model.BaseElementDefinition;
 import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
-import nl.knaw.huygens.alexandria.model.BaseLayerDefinition.BaseElementDefinition;
 
 public class TextUtilTest {
   @Test

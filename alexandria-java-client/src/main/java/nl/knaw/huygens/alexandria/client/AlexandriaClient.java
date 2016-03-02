@@ -21,7 +21,9 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinitionPrototype;
 import nl.knaw.huygens.alexandria.api.model.StatePrototype;
+import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
 
 public class AlexandriaClient {
   private WebTarget rootTarget;
@@ -129,6 +131,41 @@ public class AlexandriaClient {
     RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
         .onStatus(Status.NO_CONTENT, (response) -> new RestResult<>())//
+        .getResult();
+  }
+
+  public RestResult<URI> setBaseLayerDefinition(UUID resourceUuid, BaseLayerDefinitionPrototype baselayerDefinition) {
+    Entity<BaseLayerDefinitionPrototype> entity = Entity.entity(baselayerDefinition, APPLICATION_JSON);
+    Supplier<Response> responseSupplier = () -> rootTarget.path(EndpointPaths.RESOURCES)//
+        .path(resourceUuid.toString())//
+        .path(EndpointPaths.BASELAYERDEFINITION)//
+        .request()//
+        .header(HEADER_AUTH, authHeader)//
+        .put(entity);
+    RestRequester<URI> requester = RestRequester.withResponseSupplier(responseSupplier);
+    return requester//
+        .onStatus(Status.CREATED, (response) -> {
+          RestResult<URI> result = new RestResult<>();
+          String location = response.getHeaderString("Location");
+          URI uri = URI.create(location);
+          result.setCargo(uri);
+          return result;
+        })//
+        .getResult();
+  }
+
+  public RestResult<BaseLayerDefinition> getBaseLayerDefinition(UUID uuid) {
+    RestRequester<BaseLayerDefinition> requester = RestRequester.withResponseSupplier(() -> rootTarget.path(EndpointPaths.RESOURCES)//
+        .path(uuid.toString())//
+        .path(EndpointPaths.BASELAYERDEFINITION)//
+        .request().get());
+    return requester//
+        .onStatus(Status.OK, (response) -> {
+          RestResult<BaseLayerDefinition> result = new RestResult<>();
+          BaseLayerDefinition cargo = response.readEntity(BaseLayerDefinition.class);
+          result.setCargo(cargo);
+          return result;
+        })//
         .getResult();
   }
 

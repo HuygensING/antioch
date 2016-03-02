@@ -76,6 +76,7 @@ public abstract class AlexandriaClientTest {
   }
 
   void assertRequestSucceeded(RestResult<?> result) {
+    assertThat(result).isNotNull();
     assertThat(result.hasFailed())//
         .as("Request went OK")//
         .withFailMessage("request failed: %s", result.getFailureCause().orElse("something you whould never see"))//

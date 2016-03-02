@@ -76,6 +76,7 @@ function a-set-default-baselayer-definition {
   a-log "Setting default baselayer definition for ${be}/resources/$ri"
   curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
      --data-binary '{"baseLayerDefinition":{
+     	 "subresourceElements": ["note"],
        "baseElements" : [
           { "name": "text", "baseAttributes": [ "id" ] },
           { "name": "p", "baseAttributes": [ "id" ] },
@@ -147,6 +148,7 @@ function a-dry-run {
   curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
 	--data-binary '{
 	  "baseLayerDefinition": {
+	  	"subresourceElements": ["note"],
 	    "baseElements": [ {
 	      "name": "body"
 	    }, {

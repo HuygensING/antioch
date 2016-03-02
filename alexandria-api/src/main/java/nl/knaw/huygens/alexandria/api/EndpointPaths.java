@@ -28,6 +28,7 @@ public final class EndpointPaths {
   public static final String RESOURCES = "resources";
   public static final String SEARCHES = "searches";
   public static final String ABOUT = "about";
+  public static final String BASELAYERDEFINITION = "baselayerdefinition";
 
   private EndpointPaths() {
     throw new AssertionError("Paths shall not be instantiated");
