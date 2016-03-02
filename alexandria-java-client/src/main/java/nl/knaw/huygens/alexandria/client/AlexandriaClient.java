@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.client;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
 
 import java.net.URI;
@@ -10,10 +11,10 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.jackson.JacksonFeature;
 
 import nl.knaw.huygens.Log;
@@ -25,9 +26,19 @@ import nl.knaw.huygens.alexandria.api.model.StatePrototype;
 public class AlexandriaClient {
   private WebTarget rootTarget;
   private String authHeader = "";
+  private Client client;
+  private URI alexandriaURI;
 
   public AlexandriaClient(URI alexandriaURI) {
-    Client client = ClientBuilder.newClient().register(JacksonFeature.class);
+    this.alexandriaURI = alexandriaURI;
+    client = ClientBuilder.newClient().register(JacksonFeature.class);
+    client.property(ClientProperties.CONNECT_TIMEOUT, 60000);
+    client.property(ClientProperties.READ_TIMEOUT, 60000);
+    rootTarget = client.target(alexandriaURI);
+  }
+
+  public void setProperty(String jerseyClientProperty, Object value) {
+    client.property(jerseyClientProperty, value);
     rootTarget = client.target(alexandriaURI);
   }
 
@@ -49,7 +60,7 @@ public class AlexandriaClient {
   }
 
   public RestResult<Void> setResource(UUID resourceId, ResourcePrototype resource) {
-    Entity<ResourcePrototype> entity = Entity.entity(resource, MediaType.APPLICATION_JSON);
+    Entity<ResourcePrototype> entity = Entity.entity(resource, APPLICATION_JSON);
     Supplier<Response> responseSupplier = () -> rootTarget//
         .path(EndpointPaths.RESOURCES)//
         .path(resourceId.toString())//
@@ -66,7 +77,7 @@ public class AlexandriaClient {
   }
 
   public RestResult<UUID> addResource(ResourcePrototype resource) {
-    Entity<ResourcePrototype> entity = Entity.entity(resource, MediaType.APPLICATION_JSON);
+    Entity<ResourcePrototype> entity = Entity.entity(resource, APPLICATION_JSON);
     Supplier<Response> responseSupplier = () -> rootTarget//
         .path(EndpointPaths.RESOURCES)//
         .request()//
@@ -98,7 +109,7 @@ public class AlexandriaClient {
 
   public RestResult<Void> confirmResource(UUID resourceUuid) {
     StatePrototype state = new StatePrototype().setState(AlexandriaState.CONFIRMED);
-    Entity<StatePrototype> confirmation = Entity.entity(state, MediaType.APPLICATION_JSON);
+    Entity<StatePrototype> confirmation = Entity.entity(state, APPLICATION_JSON);
     Supplier<Response> responseSupplier = () -> rootTarget.path(EndpointPaths.RESOURCES)//
         .path(resourceUuid.toString())//
         .path("state")//

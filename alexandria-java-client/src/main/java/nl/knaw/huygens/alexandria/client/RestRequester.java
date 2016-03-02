@@ -5,10 +5,14 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import nl.knaw.huygens.Log;
+
 public class RestRequester<T> {
+  private int retries = 5;
   private Supplier<Response> responseSupplier;
   Map<Status, Function<Response, RestResult<T>>> statusMappers = new HashMap<>();
   private Function<Response, RestResult<T>> defaultMapper = (response) -> RestResult.failingResult(response);
@@ -31,24 +35,40 @@ public class RestRequester<T> {
 
   public RestResult<T> getResult() {
     RestResult<T> result = new RestResult<>();
-    try {
-      Response response = responseSupplier.get();
-      Status status = Status.fromStatusCode(response.getStatus());
+    int attempt = 0;
+    Response response = null;
+    while (response == null && attempt < retries) {
+      attempt++;
+      Log.info("attempt {}", attempt);
+      try {
+        response = responseSupplier.get();
 
-      if (statusMappers.containsKey(status)) {
-        return statusMappers.get(status).apply(response);
+      } catch (ProcessingException pe) {
+        pe.printStackTrace();
 
-      } else {
-        return defaultMapper.apply(response);
+      } catch (Exception e) {
+        e.printStackTrace();
+        result.setFail(true);
+        return result;
       }
-
-    } catch (Exception e) {
-      e.printStackTrace();
+    }
+    if (response == null) {
       result.setFail(true);
+      return result;
     }
 
-    return result;
+    Status status = Status.fromStatusCode(response.getStatus());
+
+    if (statusMappers.containsKey(status)) {
+      return statusMappers.get(status).apply(response);
+
+    } else {
+      return defaultMapper.apply(response);
+    }
+
+  }
+
+  public void setRetries(int retries) {
+    this.retries = retries;
   }
 }
-
-
