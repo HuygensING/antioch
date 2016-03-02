@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.model;
+package nl.knaw.huygens.alexandria.api.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,8 +7,6 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import nl.knaw.huygens.alexandria.api.model.BaseElementDefinition;
 
 public class BaseLayerDefinition {
   List<BaseElementDefinition> baseElements = new ArrayList<>();

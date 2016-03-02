@@ -1,6 +1,6 @@
 package nl.knaw.huygens.alexandria.text;
 
-import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
 import nl.knaw.huygens.tei.Document;
 
 public class TextUtil {

@@ -21,9 +21,9 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
 import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinitionPrototype;
 import nl.knaw.huygens.alexandria.api.model.StatePrototype;
-import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
 
 public class AlexandriaClient {
   private WebTarget rootTarget;

@@ -3,7 +3,7 @@ package nl.knaw.huygens.alexandria.text;
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
 import nl.knaw.huygens.tei.Comment;
 import nl.knaw.huygens.tei.CommentHandler;
 import nl.knaw.huygens.tei.Element;

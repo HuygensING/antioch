@@ -8,7 +8,7 @@ import java.util.Stack;
 import java.util.concurrent.atomic.AtomicLong;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
 import nl.knaw.huygens.tei.Comment;
 import nl.knaw.huygens.tei.CommentHandler;
 import nl.knaw.huygens.tei.Element;
