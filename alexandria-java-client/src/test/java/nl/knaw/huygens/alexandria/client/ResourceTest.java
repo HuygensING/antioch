@@ -13,21 +13,22 @@ public class ResourceTest extends AlexandriaClientTest {
   @Test
   public void testAddResourceReturnsValidUUID() {
     client.setAuthKey(AUTHKEY);
+    client.setAutoCommit(false);
     String resourceRef = "corpus";
     ResourcePrototype resource = new ResourcePrototype(resourceRef);
     RestResult<UUID> result = client.addResource(resource);
     assertRequestSucceeded(result);
     UUID resourceUuid = result.get();
     Log.info("resourceUUID = {}", resourceUuid);
-    assertThat(resourceUuid).isNotNull();
+    softly.assertThat(resourceUuid).isNotNull();
 
     // retrieve the resource
     RestResult<ResourceEntity> result2 = client.getResource(resourceUuid);
     assertRequestSucceeded(result2);
     ResourceEntity resourceEntity = result2.get();
     softly.assertThat(resourceEntity).isNotNull();
-    softly.assertThat(resourceEntity.getRef()).isEqualTo(resourceRef);
-    softly.assertThat(resourceEntity.getState().getValue()).isEqualTo(AlexandriaState.TENTATIVE);
+    softly.assertThat(resourceEntity.getRef()).as("ref").isEqualTo(resourceRef);
+    softly.assertThat(resourceEntity.getState().getValue()).as("state").isEqualTo(AlexandriaState.TENTATIVE);
 
     // confirm the resource
     RestResult<Void> result3 = client.confirmResource(resourceUuid);
@@ -38,8 +39,8 @@ public class ResourceTest extends AlexandriaClientTest {
     assertRequestSucceeded(result4);
     ResourceEntity resourceEntity2 = result4.get();
     softly.assertThat(resourceEntity2).isNotNull();
-    softly.assertThat(resourceEntity2.getRef()).isEqualTo(resourceRef);
-    softly.assertThat(resourceEntity2.getState().getValue()).isEqualTo(AlexandriaState.CONFIRMED);
+    softly.assertThat(resourceEntity2.getRef()).as("ref").isEqualTo(resourceRef);
+    softly.assertThat(resourceEntity2.getState().getValue()).as("state").isEqualTo(AlexandriaState.CONFIRMED);
   }
 
   @Test

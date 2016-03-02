@@ -28,6 +28,7 @@ public class AlexandriaClient {
   private String authHeader = "";
   private Client client;
   private URI alexandriaURI;
+  private boolean autoCommit = true;
 
   public AlexandriaClient(URI alexandriaURI) {
     this.alexandriaURI = alexandriaURI;
@@ -45,6 +46,10 @@ public class AlexandriaClient {
   public void setAuthKey(String authKey) {
     authHeader = "SimpleAuth " + authKey;
     Log.info("authheader=[{}]", authHeader);
+  }
+
+  public void setAutoCommit(boolean autoCommit) {
+    this.autoCommit = autoCommit;
   }
 
   public RestResult<AboutEntity> getAbout() {
@@ -84,7 +89,7 @@ public class AlexandriaClient {
         .header(HEADER_AUTH, authHeader)//
         .post(entity);
     RestRequester<UUID> requester = RestRequester.withResponseSupplier(responseSupplier);
-    return requester//
+    RestResult<UUID> addResult = requester//
         .onStatus(Status.CREATED, (response) -> {
           RestResult<UUID> result = new RestResult<>();
           String location = response.getHeaderString("Location");
@@ -93,6 +98,11 @@ public class AlexandriaClient {
           return result;
         })//
         .getResult();
+    if (autoCommit && !addResult.hasFailed()) {
+      confirmResource(addResult.get());
+    }
+
+    return addResult;
   }
 
   public RestResult<ResourceEntity> getResource(UUID uuid) {
