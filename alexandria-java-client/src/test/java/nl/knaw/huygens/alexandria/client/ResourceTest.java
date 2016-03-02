@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.junit.Test;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 
 public class ResourceTest extends AlexandriaClientTest {
   @Test
@@ -26,6 +27,19 @@ public class ResourceTest extends AlexandriaClientTest {
     ResourceEntity resourceEntity = result2.get();
     assertThat(resourceEntity).isNotNull();
     assertThat(resourceEntity.getRef()).isEqualTo(resourceRef);
+    assertThat(resourceEntity.getState().getValue()).isEqualTo(AlexandriaState.TENTATIVE);
+
+    // confirm the resource
+    RestResult<Void> result3 = client.confirmResource(resourceUuid);
+    assertThat(result3.hasFailed()).isFalse();
+
+    // retrieve the resource again
+    RestResult<ResourceEntity> result4 = client.getResource(resourceUuid);
+    assertThat(result4.hasFailed()).isFalse();
+    ResourceEntity resourceEntity2 = result4.get();
+    assertThat(resourceEntity2).isNotNull();
+    assertThat(resourceEntity2.getRef()).isEqualTo(resourceRef);
+    assertThat(resourceEntity2.getState().getValue()).isEqualTo(AlexandriaState.CONFIRMED);
   }
 
   @Test
@@ -40,7 +54,7 @@ public class ResourceTest extends AlexandriaClientTest {
   }
 
   @Test
-  public void testAddResourceWithProvidedUUID() {
+  public void testSetResourceWithProvidedUUID() {
     client.setAuthKey(AUTHKEY);
     String ref = "resource3";
     ResourcePrototype resource = new ResourcePrototype(ref).withProvenance(new ProvenancePrototype().setWho("test3").setWhy("because test3"));
@@ -54,6 +68,7 @@ public class ResourceTest extends AlexandriaClientTest {
     ResourceEntity resourceEntity = result2.get();
     assertThat(resourceEntity).isNotNull();
     assertThat(resourceEntity.getRef()).isEqualTo(ref);
+    assertThat(resourceEntity.getState().getValue()).isEqualTo(AlexandriaState.CONFIRMED);
   }
 
 }

@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.client;
 
+import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
+
 import java.net.URI;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -17,6 +19,8 @@ import org.glassfish.jersey.jackson.JacksonFeature;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
+import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.StatePrototype;
 
 public class AlexandriaClient {
   private WebTarget rootTarget;
@@ -50,7 +54,7 @@ public class AlexandriaClient {
         .path(EndpointPaths.RESOURCES)//
         .path(resourceId.toString())//
         .request()//
-        .header("Auth", authHeader)//
+        .header(HEADER_AUTH, authHeader)//
         .put(entity);
     RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
 
@@ -66,7 +70,7 @@ public class AlexandriaClient {
     Supplier<Response> responseSupplier = () -> rootTarget//
         .path(EndpointPaths.RESOURCES)//
         .request()//
-        .header("Auth", authHeader)//
+        .header(HEADER_AUTH, authHeader)//
         .post(entity);
     RestRequester<UUID> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
@@ -89,6 +93,21 @@ public class AlexandriaClient {
           result.setCargo(cargo);
           return result;
         })//
+        .getResult();
+  }
+
+  public RestResult<Void> confirmResource(UUID resourceUuid) {
+    StatePrototype state = new StatePrototype().setState(AlexandriaState.CONFIRMED);
+    Entity<StatePrototype> confirmation = Entity.entity(state, MediaType.APPLICATION_JSON);
+    Supplier<Response> responseSupplier = () -> rootTarget.path(EndpointPaths.RESOURCES)//
+        .path(resourceUuid.toString())//
+        .path("state")//
+        .request()//
+        .header(HEADER_AUTH, authHeader)//
+        .put(confirmation);
+    RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
+    return requester//
+        .onStatus(Status.NO_CONTENT, (response) -> new RestResult<>())//
         .getResult();
   }
 
