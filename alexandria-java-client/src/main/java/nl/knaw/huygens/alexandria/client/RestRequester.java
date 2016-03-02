@@ -9,8 +9,6 @@ import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import nl.knaw.huygens.Log;
-
 public class RestRequester<T> {
   private int retries = 5;
   private Supplier<Response> responseSupplier;
@@ -34,12 +32,10 @@ public class RestRequester<T> {
   }
 
   public RestResult<T> getResult() {
-    RestResult<T> result = new RestResult<>();
     int attempt = 0;
     Response response = null;
     while (response == null && attempt < retries) {
       attempt++;
-      Log.info("attempt {}", attempt);
       try {
         response = responseSupplier.get();
 
@@ -48,13 +44,11 @@ public class RestRequester<T> {
 
       } catch (Exception e) {
         e.printStackTrace();
-        result.setFail(true);
-        return result;
+        return RestResult.failingResult(e);
       }
     }
     if (response == null) {
-      result.setFail(true);
-      return result;
+      return RestResult.failingResult("No response from server after " + retries + " attempts.");
     }
 
     Status status = Status.fromStatusCode(response.getStatus());
