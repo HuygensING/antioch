@@ -1,7 +1,6 @@
 package nl.knaw.huygens.alexandria.text;
 
 import static java.util.stream.Collectors.joining;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
@@ -14,7 +13,7 @@ public class TextUtilTest extends AlexandriaTest {
   @Test
   public void testBaseLayerExtraction() {
     // given
-    String xml = fixQuotes("<text>"//
+    String xml = singleQuotesToDouble("<text>"//
         + "<div xml:id='div-1' lang='nl'>"//
         + "<p xml:id='p1' rend='red'>paragraph with <b><i rend='yes'>text</i></b></p>"//
         + "<p>two</p>"//
@@ -23,7 +22,7 @@ public class TextUtilTest extends AlexandriaTest {
         + "<p>three</p>"//
         + "</div>"//
         + "</text>");
-    String expected = fixQuotes("<text xml:id='text-1'>"//
+    String expected = singleQuotesToDouble("<text xml:id='text-1'>"//
         + "<div xml:id='div-1'>"//
         + "<p xml:id='p1'>paragraph with text</p>"//
         + "<p xml:id='p-1'>two</p>"//
@@ -45,15 +44,15 @@ public class TextUtilTest extends AlexandriaTest {
     String baseLayer = baseLayerData.getBaseLayer();
 
     // then expect
-    assertThat(baseLayerData.validationFailed()).isFalse();
-    assertThat(baseLayer).isEqualTo(expected);
+    softly.assertThat(baseLayerData.validationFailed()).isFalse();
+    softly.assertThat(baseLayer).isEqualTo(expected);
     Log.info(expected);
   }
 
   @Test
   public void testBaseLayerExtractionFailsOnRootElementNotInBaseLayerDefinition() {
     // given
-    String xml = fixQuotes("<text>"//
+    String xml = singleQuotesToDouble("<text>"//
         + "<div xml:id='div-1' lang='nl'>"//
         + "<p xml:id='p1' rend='red'>paragraph with <b><i rend='yes'>text</i></b></p>"//
         + "</div>"//
@@ -68,20 +67,20 @@ public class TextUtilTest extends AlexandriaTest {
     BaseLayerData baseLayerData = TextUtil.extractBaseLayerData(xml, def);
 
     // then expect
-    assertThat(baseLayerData.validationFailed()).isTrue();
-    assertThat(baseLayerData.getValidationErrors()).contains("Validation error: root element <text> is not in the base layer definition.");
+    softly.assertThat(baseLayerData.validationFailed()).isTrue();
+    softly.assertThat(baseLayerData.getValidationErrors()).contains("Validation error: root element <text> is not in the base layer definition.");
   }
 
   @Test
   public void testBaseLayerExtractionAddsMissingXmlIdsToBaseElements() {
     // given
-    String xml = fixQuotes("<text>"//
+    String xml = singleQuotesToDouble("<text>"//
         + "<div xml:id='div-1'>"//
         + "<p xml:id='p1'>par <num>1</num></p>"//
         + "<p>par 2</p>"//
         + "</div>"//
         + "</text>");
-    String expected = fixQuotes("<text xml:id='text-1'>"//
+    String expected = singleQuotesToDouble("<text xml:id='text-1'>"//
         + "<div xml:id='div-1'>"//
         + "<p xml:id='p1'>par 1</p>"//
         + "<p xml:id='p-1'>par 2</p>"//
@@ -98,8 +97,8 @@ public class TextUtilTest extends AlexandriaTest {
     BaseLayerData baseLayerData = TextUtil.extractBaseLayerData(xml, def);
 
     // then expect
-    assertThat(baseLayerData.validationFailed()).isFalse();
-    assertThat(baseLayerData.getBaseLayer()).isEqualTo(expected);
+    softly.assertThat(baseLayerData.validationFailed()).isFalse();
+    softly.assertThat(baseLayerData.getBaseLayer()).isEqualTo(expected);
   }
 
 }

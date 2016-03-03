@@ -53,7 +53,7 @@ public class ResourcePrototypeTest extends AlexandriaTest {
   public void testResourcePrototypeFromJson() throws IOException {
     UUID uuid = UUID.randomUUID();
     Instant instant = Instant.now();
-    String json = fixQuotes("{"//
+    String json = singleQuotesToDouble("{"//
         + "'resource':{"//
         + "'id':'" + uuid.toString() + "',"//
         + "'ref':'whatever',"//
