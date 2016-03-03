@@ -75,7 +75,7 @@ public abstract class AlexandriaClientTest extends AlexandriaTest {
     assertThat(result).isNotNull();
     assertThat(result.hasFailed())//
         .as("Request went OK")//
-        .withFailMessage("request failed: %s", result.getFailureCause().orElse("something you whould never see"))//
+        .withFailMessage("request failed: %s", result.getFailureCause().orElse("something you should never see"))//
         .isFalse();
   }
 
