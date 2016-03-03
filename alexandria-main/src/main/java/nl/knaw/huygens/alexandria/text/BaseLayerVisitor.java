@@ -1,11 +1,8 @@
 package nl.knaw.huygens.alexandria.text;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
-import java.util.concurrent.atomic.AtomicLong;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
@@ -36,7 +33,6 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     setDefaultElementHandler(this);
     setProcessingInstructionHandler(this);
     baseLayerDefinition.getBaseElementDefinitions().forEach(bed -> addElementHandler(new BaseElementHandler(bed.getBaseAttributes()), bed.getName()));
-    counters.clear();
     validationErrors.clear();
     annotationData.clear();
     elementTally = new ElementTally();
