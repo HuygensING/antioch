@@ -12,6 +12,7 @@
   <modules>
     <module>alexandria-main</module>
     <module>alexandria-acceptance-tests</module>
+    <module>alexandria-performance-tests</module>
     <module>alexandria-service</module>
     <module>alexandria-service-tinkerpop-tinkergraph</module>
     <module>alexandria-service-tinkerpop-titan</module>
@@ -60,7 +61,7 @@
     <junitparams.version>1.0.4</junitparams.version>
     <log.version>1.1.1</log.version>
     <visitei.version>0.6.1</visitei.version>
-    
+
     <!-- 3.2,3.3 leads to compiler error in Jenkins: java.lang.IllegalStateException: endPosTable already set -->
     <maven-compiler.version>3.5.1</maven-compiler.version>
 
@@ -79,10 +80,10 @@
     <titan.version>1.0.0</titan.version>
     <sleepycat.version>5.0.73</sleepycat.version>
 
-    <!--  neo4j -->    
+    <!--  neo4j -->
     <neo4j-gremlin.version>3.0.0.M7</neo4j-gremlin.version>
     <neo4j-tinkerpop-api-impl.version>0.3-2.3.2</neo4j-tinkerpop-api-impl.version>
-    
+
     <xml-apis.version>1.4.01</xml-apis.version><!-- > 1.4.01 fails some acceptance tests due to missing class -->
 
     <!-- maven plugins -->
@@ -109,7 +110,7 @@
     <tomcat7-maven.version>2.2</tomcat7-maven.version>
     <velocity.version>1.7</velocity.version>
     <wagon-ssh.version>2.7</wagon-ssh.version>
-    
+
     <!-- Concordion settings (move to acceptance-test module?) -->
     <concordion.reportDir>${project.build.directory}/concordion-reports</concordion.reportDir>
     <integration.testOutputDir>${project.build.directory}/integration-test-classes</integration.testOutputDir>
@@ -311,7 +312,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-scm-publish-plugin</artifactId>
         <version>${plugin.scm-publish.version}</version>
-        <!-- this plugin configuration should apply to POMs which inherit 
+        <!-- this plugin configuration should apply to POMs which inherit
           from this one -->
         <inherited>true</inherited>
       </plugin>
@@ -382,7 +383,7 @@
 
     <pluginManagement>
       <plugins>
-        <!--This plugin's configuration is used to store Eclipse m2e settings 
+        <!--This plugin's configuration is used to store Eclipse m2e settings
           only. It has no influence on the Maven build itself. -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
