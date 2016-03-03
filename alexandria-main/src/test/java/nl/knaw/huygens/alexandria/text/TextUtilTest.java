@@ -8,12 +8,13 @@ import org.junit.Test;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.BaseElementDefinition;
 import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 
-public class TextUtilTest {
+public class TextUtilTest extends AlexandriaTest {
   @Test
   public void testBaseLayerExtraction() {
     // given
-    String xml = ("<text>"//
+    String xml = fixQuotes("<text>"//
         + "<div xml:id='div-1' lang='nl'>"//
         + "<p xml:id='p1' rend='red'>paragraph with <b><i rend='yes'>text</i></b></p>"//
         + "<p>two</p>"//
@@ -21,8 +22,8 @@ public class TextUtilTest {
         + "<div xml:id='div-2' lang='nl'>"//
         + "<p>three</p>"//
         + "</div>"//
-        + "</text>").replace("'", "\"");
-    String expected = ("<text xml:id='text-1'>"//
+        + "</text>");
+    String expected = fixQuotes("<text xml:id='text-1'>"//
         + "<div xml:id='div-1'>"//
         + "<p xml:id='p1'>paragraph with text</p>"//
         + "<p xml:id='p-1'>two</p>"//
@@ -30,7 +31,7 @@ public class TextUtilTest {
         + "<div xml:id='div-2'>"//
         + "<p xml:id='p-2'>three</p>"//
         + "</div>"//
-        + "</text>").replace("'", "\"");
+        + "</text>");
     BaseLayerDefinition def = BaseLayerDefinition//
         .withBaseElements(//
             BaseElementDefinition.withName("text"), //
@@ -52,11 +53,11 @@ public class TextUtilTest {
   @Test
   public void testBaseLayerExtractionFailsOnRootElementNotInBaseLayerDefinition() {
     // given
-    String xml = ("<text>"//
+    String xml = fixQuotes("<text>"//
         + "<div xml:id='div-1' lang='nl'>"//
         + "<p xml:id='p1' rend='red'>paragraph with <b><i rend='yes'>text</i></b></p>"//
         + "</div>"//
-        + "</text>").replace("'", "\"");
+        + "</text>");
     BaseLayerDefinition def = BaseLayerDefinition//
         .withBaseElements(//
             BaseElementDefinition.withName("div").withAttributes("xml:id"), //
@@ -74,18 +75,18 @@ public class TextUtilTest {
   @Test
   public void testBaseLayerExtractionAddsMissingXmlIdsToBaseElements() {
     // given
-    String xml = ("<text>"//
+    String xml = fixQuotes("<text>"//
         + "<div xml:id='div-1'>"//
         + "<p xml:id='p1'>par <num>1</num></p>"//
         + "<p>par 2</p>"//
         + "</div>"//
-        + "</text>").replace("'", "\"");
-    String expected = ("<text xml:id='text-1'>"//
+        + "</text>");
+    String expected = fixQuotes("<text xml:id='text-1'>"//
         + "<div xml:id='div-1'>"//
         + "<p xml:id='p1'>par 1</p>"//
         + "<p xml:id='p-1'>par 2</p>"//
         + "</div>"//
-        + "</text>").replace("'", "\"");
+        + "</text>");
     BaseLayerDefinition def = BaseLayerDefinition//
         .withBaseElements(//
             BaseElementDefinition.withName("text"), //

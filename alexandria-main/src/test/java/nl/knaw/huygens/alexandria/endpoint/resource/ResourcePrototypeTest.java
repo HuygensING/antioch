@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -36,8 +36,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
+import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 
-public class ResourcePrototypeTest {
+public class ResourcePrototypeTest extends AlexandriaTest {
 
   private ObjectMapper om = new ObjectMapper();
 
@@ -52,14 +53,14 @@ public class ResourcePrototypeTest {
   public void testResourcePrototypeFromJson() throws IOException {
     UUID uuid = UUID.randomUUID();
     Instant instant = Instant.now();
-    String json = ("{"//
+    String json = fixQuotes("{"//
         + "'resource':{"//
         + "'id':'" + uuid.toString() + "',"//
         + "'ref':'whatever',"//
         + "'provenance':{"//
         + "'when':'" + instant + "'"//
         + "}"//
-    + "}}").replace("'", "\"");
+        + "}}");
     Log.info("json={}", json);
     ResourcePrototype rp = om.readValue(json, ResourcePrototype.class);
     Log.info("resourcePrototype={}", rp);

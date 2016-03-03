@@ -166,6 +166,6 @@ public class EndpointsTest extends TinkergraphServiceEndpointTest {
   }
 
   private ResourcePrototype deserialize(String json1) throws IOException {
-    return om.readValue(json1.replace("'", "\""), ResourcePrototype.class);
+    return om.readValue(fixQuotes(json1), ResourcePrototype.class);
   }
 }

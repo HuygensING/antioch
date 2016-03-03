@@ -7,14 +7,12 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
-import org.assertj.core.api.JUnitSoftAssertions;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
@@ -26,10 +24,11 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.AlexandriaServletModule;
 import nl.knaw.huygens.alexandria.service.TinkerPopService;
 import nl.knaw.huygens.alexandria.storage.Storage;
+import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 import nl.knaw.huygens.alexandria.text.InMemoryTextService;
 import nl.knaw.huygens.alexandria.text.TextService;
 
-public abstract class AlexandriaClientTest {
+public abstract class AlexandriaClientTest extends AlexandriaTest {
   static final String AUTHKEY = "AUTHKEY";
 
   private static URI testURI = URI.create("http://localhost:2016/");
@@ -57,9 +56,6 @@ public abstract class AlexandriaClientTest {
   };
 
   AlexandriaClient client = new AlexandriaClient(testURI);
-
-  @Rule
-  public final JUnitSoftAssertions softly = new JUnitSoftAssertions();
 
   @BeforeClass
   public static void startTestServer() {

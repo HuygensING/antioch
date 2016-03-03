@@ -3,7 +3,6 @@ package nl.knaw.huygens.alexandria.text;
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
 import nl.knaw.huygens.tei.Comment;
 import nl.knaw.huygens.tei.CommentHandler;
 import nl.knaw.huygens.tei.Element;
@@ -19,14 +18,14 @@ public class BaseLayerIdVisitor extends ExportVisitor implements CommentHandler<
   private static final String XML_ID = "xml:id";
   private static List<String> baseElementIds = new ArrayList<>();
 
-  public BaseLayerIdVisitor(BaseLayerDefinition baseLayerDefinition) {
+  public BaseLayerIdVisitor(List<String> baseElementNames) {
     super();
     setCommentHandler(this);
     setTextHandler(new XmlTextHandler<>());
     setDefaultElementHandler(this);
     setProcessingInstructionHandler(this);
-    baseLayerDefinition.getBaseElementDefinitions().forEach(bed -> {
-      addElementHandler(new BaseElementHandler(), bed.getName());
+    baseElementNames.forEach(elementName -> {
+      addElementHandler(new BaseElementHandler(), elementName);
     });
     baseElementIds.clear();
   }

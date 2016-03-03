@@ -1,6 +1,5 @@
 package nl.knaw.huygens.alexandria.client;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
 
 import java.net.URI;
@@ -67,7 +66,7 @@ public class AlexandriaClient {
   }
 
   public RestResult<Void> setResource(UUID resourceId, ResourcePrototype resource) {
-    Entity<ResourcePrototype> entity = Entity.entity(resource, APPLICATION_JSON);
+    Entity<ResourcePrototype> entity = Entity.json(resource);
     Supplier<Response> responseSupplier = () -> rootTarget//
         .path(EndpointPaths.RESOURCES)//
         .path(resourceId.toString())//
@@ -84,7 +83,7 @@ public class AlexandriaClient {
   }
 
   public RestResult<UUID> addResource(ResourcePrototype resource) {
-    Entity<ResourcePrototype> entity = Entity.entity(resource, APPLICATION_JSON);
+    Entity<ResourcePrototype> entity = Entity.json(resource);
     Supplier<Response> responseSupplier = () -> rootTarget//
         .path(EndpointPaths.RESOURCES)//
         .request()//
@@ -121,7 +120,7 @@ public class AlexandriaClient {
 
   public RestResult<Void> confirmResource(UUID resourceUuid) {
     StatePrototype state = new StatePrototype().setState(AlexandriaState.CONFIRMED);
-    Entity<StatePrototype> confirmation = Entity.entity(state, APPLICATION_JSON);
+    Entity<StatePrototype> confirmation = Entity.json(state);
     Supplier<Response> responseSupplier = () -> rootTarget.path(EndpointPaths.RESOURCES)//
         .path(resourceUuid.toString())//
         .path("state")//
@@ -135,7 +134,7 @@ public class AlexandriaClient {
   }
 
   public RestResult<URI> setBaseLayerDefinition(UUID resourceUuid, BaseLayerDefinitionPrototype baselayerDefinition) {
-    Entity<BaseLayerDefinitionPrototype> entity = Entity.entity(baselayerDefinition, APPLICATION_JSON);
+    Entity<BaseLayerDefinitionPrototype> entity = Entity.json(baselayerDefinition);
     Supplier<Response> responseSupplier = () -> rootTarget.path(EndpointPaths.RESOURCES)//
         .path(resourceUuid.toString())//
         .path(EndpointPaths.BASELAYERDEFINITION)//

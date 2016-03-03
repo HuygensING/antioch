@@ -22,19 +22,16 @@ import nl.knaw.huygens.tei.handlers.XmlTextHandler;
 
 public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<XmlContext>, ElementHandler<XmlContext>, ProcessingInstructionHandler<XmlContext> {
   private static final String XML_ID = "xml:id";
-  private static final String XMLID_MARKER = "-";
   private static List<AnnotationData> annotationData = new ArrayList<>();
   private static ElementTally elementTally = new ElementTally();
   private static Stack<Element> baseElementStack = new Stack<>();
   private static Stack<Integer> baseElementStartStack = new Stack<>();
   private static Stack<Integer> annotatedTextStartStack = new Stack<>();
-  private static List<String> baseElementIds;
   private static final Map<String, AtomicLong> counters = new HashMap<>();
   private static final List<String> validationErrors = new ArrayList<>();
 
-  public BaseLayerVisitor(BaseLayerDefinition baseLayerDefinition, List<String> baseElementIds) {
+  public BaseLayerVisitor(BaseLayerDefinition baseLayerDefinition) {
     super();
-    BaseLayerVisitor.baseElementIds = baseElementIds;
     setCommentHandler(this);
     setTextHandler(new XmlTextHandler<>());
     setDefaultElementHandler(this);
@@ -135,9 +132,6 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
               .setXPath(xpath(base)));
         }
       });
-      if (!base.hasAttribute(XML_ID)) {
-        addId(base);
-      }
       if (!baseElementStack.isEmpty()) {
         base.setParent(baseElementStack.peek());
       }
@@ -147,16 +141,6 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
       baseElementStartStack.push(context.getResult().length());
       // context.openLayer();
       return Traversal.NEXT;
-    }
-
-    private void addId(Element baseElement) {
-      String name = baseElement.getName();
-      String id;
-      counters.putIfAbsent(name, new AtomicLong(0));
-      do {
-        id = name + XMLID_MARKER + counters.get(name).incrementAndGet();
-      } while (baseElementIds.contains(id));
-      baseElement.setAttribute(XML_ID, id);
     }
 
     @Override
