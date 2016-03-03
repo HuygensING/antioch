@@ -27,7 +27,7 @@ public class AddMissingBaseLayerIdVisitor extends ExportVisitor {
     setTextHandler(new XmlTextHandler<>());
     setDefaultElementHandler(new RenderElementHandler());
     setProcessingInstructionHandler(new DefaultProcessingInstructionHandler<>());
-    String[] elementNames = baseElementNames.toArray(new String[] {});
+    String[] elementNames = baseElementNames.toArray(new String[baseElementNames.size()]);
     addElementHandler(new BaseElementHandler(), elementNames);
     counters.clear();
   }

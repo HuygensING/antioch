@@ -44,9 +44,7 @@ public class ElementTally {
   public void logReport() {
     getElementNames().forEach(e -> {
       Log.info("<{}> : {}", e, getElementCount(e));
-      getAttributeNames(e).forEach(a -> {
-        Log.info("  {} : {}", a, getElementAttributeCount(e, a));
-      });
+      getAttributeNames(e).forEach(a -> Log.info("  {} : {}", a, getElementAttributeCount(e, a)));
     });
   }
 

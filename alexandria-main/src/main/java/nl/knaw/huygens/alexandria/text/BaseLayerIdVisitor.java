@@ -24,7 +24,7 @@ public class BaseLayerIdVisitor extends ExportVisitor implements CommentHandler<
     setTextHandler(new XmlTextHandler<>());
     setDefaultElementHandler(this);
     setProcessingInstructionHandler(this);
-    String[] elementNames = baseElementNames.toArray(new String[] {});
+    String[] elementNames = baseElementNames.toArray(new String[baseElementNames.size()]);
     addElementHandler(new BaseElementHandler(), elementNames);
     baseElementIds.clear();
   }

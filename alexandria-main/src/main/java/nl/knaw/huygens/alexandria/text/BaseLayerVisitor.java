@@ -27,7 +27,6 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
   private static Stack<Element> baseElementStack = new Stack<>();
   private static Stack<Integer> baseElementStartStack = new Stack<>();
   private static Stack<Integer> annotatedTextStartStack = new Stack<>();
-  private static final Map<String, AtomicLong> counters = new HashMap<>();
   private static final List<String> validationErrors = new ArrayList<>();
 
   public BaseLayerVisitor(BaseLayerDefinition baseLayerDefinition) {
@@ -36,9 +35,7 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     setTextHandler(new XmlTextHandler<>());
     setDefaultElementHandler(this);
     setProcessingInstructionHandler(this);
-    baseLayerDefinition.getBaseElementDefinitions().forEach(bed -> {
-      addElementHandler(new BaseElementHandler(bed.getBaseAttributes()), bed.getName());
-    });
+    baseLayerDefinition.getBaseElementDefinitions().forEach(bed -> addElementHandler(new BaseElementHandler(bed.getBaseAttributes()), bed.getName()));
     counters.clear();
     validationErrors.clear();
     annotationData.clear();
@@ -85,8 +82,7 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     int start = annotatedTextStart - parentBaseElementOffset + 1;
     int length = annotatedBaseText.length();
     Log.info("offset: (start={},length={})", start, length);
-    String xpath = "substring(" + xpath(baseElementStack.peek()) + "," + start + "," + length + ")";
-    return xpath;
+    return "substring(" + xpath(baseElementStack.peek()) + "," + start + "," + length + ")";
   }
 
   @Override
@@ -118,10 +114,8 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
 
       // use attribute order as defined in baselayer definition
       baseAttributes.stream()//
-          .filter((attribute) -> element.hasAttribute(attribute))//
-          .forEach(key -> {
-            base.setAttribute(key, element.getAttribute(key));
-          });
+          .filter(element::hasAttribute)//
+          .forEach(key -> base.setAttribute(key, element.getAttribute(key)));
       element.getAttributes().forEach((key, value) -> {
         if (!baseAttributes.contains(key)) {
           annotationData.add(new AnnotationData()//

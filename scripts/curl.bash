@@ -11,7 +11,7 @@ be=http://test.alexandria.huygens.knaw.nl/
 uuid1="11111111-1111-1111-1111-111111111111"
 uuid2="22222222-2222-2222-2222-222222222222"
 
-curl -i -X PUT $be/resources/c28626d4-493a-4204-83d9-e9ae17e15654 -H 'Content-type: application/json' \
+curl -i -X PUT ${be}/resources/c28626d4-493a-4204-83d9-e9ae17e15654 -H 'Content-type: application/json' \
 --data-binary '{"resource":{
   "id":"c28626d4-493a-4204-83d9-e9ae17e15654",
   "ref":"whatever",
@@ -24,13 +24,13 @@ curl -i -X PUT $be/resources/c28626d4-493a-4204-83d9-e9ae17e15654 -H 'Content-ty
 
 ri=d28626d4-493a-4204-83d9-e9ae17e15654
 
-curl -i -X PUT $be/resources/$ri -H 'Content-type: application/json' \
+curl -i -X PUT ${be}/resources/${ri} -H 'Content-type: application/json' \
 --data-binary '{"resource":{
   "id":"d28626d4-493a-4204-83d9-e9ae17e15654",
   "ref":"whatEver"
 }}'
 
-curl -i -H "${authheader}" -X POST $be/resources/$ri/subresources -H 'Content-type: application/json' \
+curl -i -H "${authheader}" -X POST ${be}/resources/${ri}/subresources -H 'Content-type: application/json' \
 --data-binary '{"subresource":{
   "sub":"title"
 }}'

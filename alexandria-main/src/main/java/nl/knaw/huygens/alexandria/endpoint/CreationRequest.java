@@ -26,6 +26,6 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public interface CreationRequest<T> {
 
-  public T execute(AlexandriaService service);
+  T execute(AlexandriaService service);
 
 }
