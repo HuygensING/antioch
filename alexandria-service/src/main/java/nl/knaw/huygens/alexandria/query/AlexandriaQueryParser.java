@@ -286,7 +286,7 @@ public class AlexandriaQueryParser {
     return alwaysTrue();
   }
 
-  static final Predicate<Object> INVALID_STATEVALUE_PREDICATE = stateValue -> !(stateValue instanceof String && ALL_STATES.contains(stateValue));
+  static final Predicate<Object> INVALID_STATEVALUE_PREDICATE = stateValue -> !(stateValue instanceof String && ALL_STATES.contains((String) stateValue));
 
   private static void checkForValidStateParameter(WhereToken whereToken) {
     if (QueryField.state.equals(whereToken.getProperty())) {

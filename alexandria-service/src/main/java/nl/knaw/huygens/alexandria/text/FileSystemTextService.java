@@ -95,7 +95,7 @@ public class FileSystemTextService implements TextService {
       return Optional.empty();
     }
     try {
-      return Optional.ofNullable(FileUtils.openInputStream(textFile));
+      return Optional.of(FileUtils.openInputStream(textFile));
     } catch (IOException e) {
       e.printStackTrace();
       throw new RuntimeException(e);
@@ -118,8 +118,7 @@ public class FileSystemTextService implements TextService {
 
   private File textFile(UUID uuid) {
     String fileName = uuid + ".txt";
-    File textFile = new File(textDir, fileName);
-    return textFile;
+    return new File(textDir, fileName);
   }
 
 }

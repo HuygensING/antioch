@@ -66,7 +66,7 @@ public class TinkerpopAlexandriaServiceTest {
     Graph g = TinkerGraph.open();
     Log.info("graph features: {}", g.features());
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.ofEpochSecond(1000000), "why");
-    UUID uuid = new UUID(1l, 1l);
+    UUID uuid = new UUID(1L, 1L);
     String ref = "ref";
     AlexandriaState state = AlexandriaState.CONFIRMED;
     boolean created = service.createOrUpdateResource(uuid, ref, provenance, state);

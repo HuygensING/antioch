@@ -76,9 +76,7 @@ public class AlexandriaClient {
     RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
 
     return requester//
-        .onStatus(Status.CREATED, (response) -> {
-          return new RestResult<>();
-        })//
+        .onStatus(Status.CREATED, (response) -> new RestResult<>())//
         .getResult();
   }
 

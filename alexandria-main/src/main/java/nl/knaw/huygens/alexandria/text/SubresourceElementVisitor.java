@@ -22,7 +22,7 @@ public class SubresourceElementVisitor extends ExportVisitor {
     setTextHandler(new XmlTextHandler<>());
     setDefaultElementHandler(new RenderElementHandler());
     setProcessingInstructionHandler(new DefaultProcessingInstructionHandler<>());
-    String[] elementNames = subresourceElements.toArray(new String[] {});
+    String[] elementNames = subresourceElements.toArray(new String[subresourceElements.size()]);
     addElementHandler(new SubResourceElementHandler(), elementNames);
     subresourceTexts.clear();
   }
