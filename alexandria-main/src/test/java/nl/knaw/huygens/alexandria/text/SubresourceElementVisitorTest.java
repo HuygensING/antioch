@@ -16,8 +16,8 @@ public class SubresourceElementVisitorTest extends AlexandriaVisitorTest {
         + "<p xml:id='p-2'>bar<comment n='2'>most likely by <persName>someone else</persName></comment></p>"//
         + "</text>");
     String expectedBase = singleQuotesToDouble("<text xml:id='text-1'>"//
-        + "<p xml:id='p-1'>foo</p>"//
-        + "<p xml:id='p-2'>bar</p>"//
+        + "<p xml:id='p-1'>foo<alexandria:subtextplaceholder xml:id='alexandria:subtext-1'/></p>"//
+        + "<p xml:id='p-2'>bar<alexandria:subtextplaceholder xml:id='alexandria:subtext-2'/></p>"//
         + "</text>");
     String expectedSubText1 = singleQuotesToDouble("<note n='1'>probably by <persName>someone</persName></note>");
     String expectedSubText2 = singleQuotesToDouble("<comment n='2'>most likely by <persName>someone else</persName></comment>");
@@ -29,7 +29,9 @@ public class SubresourceElementVisitorTest extends AlexandriaVisitorTest {
 
     // expect
     softly.assertThat(subresourceVisitor.getBaseText()).isEqualTo(expectedBase);
-    softly.assertThat(subresourceVisitor.getSubresourceTexts()).containsExactly(expectedSubText1, expectedSubText2);
+    softly.assertThat(subresourceVisitor.getSubresourceTexts()).hasSize(2);
+    softly.assertThat(subresourceVisitor.getSubresourceTexts()).containsEntry("alexandria:subtext-1", expectedSubText1);
+    softly.assertThat(subresourceVisitor.getSubresourceTexts()).containsEntry("alexandria:subtext-2", expectedSubText2);
   }
 
   @Test
@@ -42,7 +44,7 @@ public class SubresourceElementVisitorTest extends AlexandriaVisitorTest {
         + "</note></p>"//
         + "</text>");
     String expectedBase = singleQuotesToDouble("<text xml:id='text-1'>"//
-        + "<p xml:id='p-1'>foo</p>"//
+        + "<p xml:id='p-1'>foo<alexandria:subtextplaceholder xml:id='alexandria:subtext-1'/></p>"//
         + "</text>");
     String expectedSubText = singleQuotesToDouble("<note n='1'>"//
         + "probably by <persName>someone</persName>"//
@@ -56,7 +58,8 @@ public class SubresourceElementVisitorTest extends AlexandriaVisitorTest {
 
     // expect
     softly.assertThat(subresourceVisitor.getBaseText()).isEqualTo(expectedBase);
-    softly.assertThat(subresourceVisitor.getSubresourceTexts()).containsExactly(expectedSubText);
+    softly.assertThat(subresourceVisitor.getSubresourceTexts()).hasSize(1);
+    softly.assertThat(subresourceVisitor.getSubresourceTexts()).containsEntry("alexandria:subtext-1", expectedSubText);
   }
 
 }

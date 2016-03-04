@@ -18,7 +18,6 @@ import nl.knaw.huygens.tei.export.ExportVisitor;
 import nl.knaw.huygens.tei.handlers.XmlTextHandler;
 
 public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<XmlContext>, ElementHandler<XmlContext>, ProcessingInstructionHandler<XmlContext> {
-  private static final String XML_ID = "xml:id";
   private static List<AnnotationData> annotationData = new ArrayList<>();
   private static ElementTally elementTally = new ElementTally();
   private static Stack<Element> baseElementStack = new Stack<>();
@@ -75,11 +74,12 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
   private String substringXPath(String annotatedBaseText) {
     Integer parentBaseElementOffset = baseElementStartStack.isEmpty() ? 0 : baseElementStartStack.peek();
     Integer annotatedTextStart = annotatedTextStartStack.pop();
+    Element parent = baseElementStack.peek();
     int start = annotatedTextStart - parentBaseElementOffset + 1;
     int length = annotatedBaseText.length();
-    Log.info("offset: (start={},length={})", start, length);
-    return "substring(" + xpath(baseElementStack.peek()) + "," + start + "," + length + ")";
+    return TextUtil.substringXPath(parent, start, length);
   }
+
 
   @Override
   public Traversal visitComment(Comment comment, XmlContext context) {
@@ -98,8 +98,8 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
 
     public BaseElementHandler(List<String> baseAttributes) {
       this.baseAttributes = baseAttributes;
-      if (!baseAttributes.contains(XML_ID)) {
-        baseAttributes.add(0, XML_ID);
+      if (!baseAttributes.contains(TextUtil.XML_ID)) {
+        baseAttributes.add(0, TextUtil.XML_ID);
       }
     }
 
@@ -119,7 +119,7 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
               .setLevel(XmlAnnotationLevel.attribute)//
               .setType(key)//
               .setValue(value)//
-              .setXPath(xpath(base)));
+              .setXPath(TextUtil.xpath(base)));
         }
       });
       if (!baseElementStack.isEmpty()) {
@@ -143,7 +143,7 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     }
 
     private void logXPath(Element element) {
-      Log.info("xpath={}", xpath(element));
+      Log.info("xpath={}", TextUtil.xpath(element));
     }
   }
 
@@ -155,19 +155,5 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
         .withAnnotationData(annotationData);
   }
 
-  public static String xpath(Element element) {
-    String xpath = "";
-    if (element.hasAttribute(XML_ID)) {
-      xpath = "//" + element.getName() + "[@xml:id='" + element.getAttribute(XML_ID) + "']";
-    } else {
-      Element parent = element.getParent();
-      if (parent == null) {
-        xpath = "/" + element.getName();
-      } else {
-        xpath = xpath(parent) + "/" + element.getName();
-      }
-    }
-    return xpath;
-  }
 
 }

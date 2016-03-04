@@ -16,7 +16,6 @@ import nl.knaw.huygens.tei.handlers.RenderElementHandler;
 import nl.knaw.huygens.tei.handlers.XmlTextHandler;
 
 public class AddMissingBaseLayerIdVisitor extends ExportVisitor {
-  private static final String XML_ID = "xml:id";
   private static final String XMLID_MARKER = "-";
   private static List<String> exisitingBaseElementIds;
   private static final Map<String, AtomicLong> counters = new HashMap<>();
@@ -35,7 +34,7 @@ public class AddMissingBaseLayerIdVisitor extends ExportVisitor {
   static class BaseElementHandler implements ElementHandler<XmlContext> {
     @Override
     public Traversal enterElement(Element element, XmlContext context) {
-      if (!element.hasAttribute(XML_ID)) {
+      if (!element.hasAttribute(TextUtil.XML_ID)) {
         addId(element);
       }
       context.addOpenTag(element);
@@ -49,7 +48,7 @@ public class AddMissingBaseLayerIdVisitor extends ExportVisitor {
       do {
         id = name + XMLID_MARKER + counters.get(name).incrementAndGet();
       } while (exisitingBaseElementIds.contains(id));
-      baseElement.setAttribute(XML_ID, id);
+      baseElement.setAttribute(TextUtil.XML_ID, id);
     }
 
     @Override
