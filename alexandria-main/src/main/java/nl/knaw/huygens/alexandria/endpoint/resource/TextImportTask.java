@@ -19,16 +19,17 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer;
 import com.google.common.collect.Lists;
 
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.api.model.Entity;
 import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
-import nl.knaw.huygens.alexandria.endpoint.Entity;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.text.BaseLayerData;
@@ -57,7 +58,7 @@ public class TextImportTask implements Runnable {
     this.resource = resource;
     this.resourceId = resource.getId();
     this.status = new Status();
-    status.setBaseLayerDefinitionURI(locationBuilder.locationOf(resource, ResourcesEndpoint.BASELAYERDEFINITION));
+    status.setBaseLayerDefinitionURI(locationBuilder.locationOf(resource, EndpointPaths.BASELAYERDEFINITION));
   }
 
   public Status getStatus() {
