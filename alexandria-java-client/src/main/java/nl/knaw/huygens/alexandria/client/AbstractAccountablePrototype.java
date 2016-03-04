@@ -9,6 +9,7 @@ import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 public abstract class AbstractAccountablePrototype<T> extends JsonWrapperObject {
   private ProvenancePrototype provenance;
 
+  @SuppressWarnings("unchecked")
   public T withProvenance(ProvenancePrototype provenance) {
     this.provenance = provenance;
     return (T) this;

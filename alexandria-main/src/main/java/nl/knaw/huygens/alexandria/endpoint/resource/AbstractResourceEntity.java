@@ -8,6 +8,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
 import nl.knaw.huygens.alexandria.endpoint.AbstractAnnotatableEntity;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
@@ -31,12 +32,12 @@ public abstract class AbstractResourceEntity extends AbstractAnnotatableEntity {
   @JsonProperty(PropertyPrefix.LINK + "baseLayerDefinition")
   public URI getBaseLayerDefinition() {
     if (getResource().getDirectBaseLayerDefinition().isPresent()) {
-      return locationBuilder.locationOf(getResource(), ResourcesEndpoint.BASELAYERDEFINITION);
+      return locationBuilder.locationOf(getResource(), EndpointPaths.BASELAYERDEFINITION);
     }
 
     Optional<IdentifiablePointer<AlexandriaResource>> firstAncestorResourceWithBaseLayerDefinitionPointer = getResource().getFirstAncestorResourceWithBaseLayerDefinitionPointer();
     if (firstAncestorResourceWithBaseLayerDefinitionPointer.isPresent()) {
-      return locationBuilder.locationOf(firstAncestorResourceWithBaseLayerDefinitionPointer.get(), ResourcesEndpoint.BASELAYERDEFINITION);
+      return locationBuilder.locationOf(firstAncestorResourceWithBaseLayerDefinitionPointer.get(), EndpointPaths.BASELAYERDEFINITION);
     }
     return null;
   }

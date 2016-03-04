@@ -1,5 +1,6 @@
 {
   "baseLayerDefinition": {
+    "subresourceElements" : [ "note" ],
     "baseElements": [ {
       "name": "add",
       "baseAttributes": [ "place" ]

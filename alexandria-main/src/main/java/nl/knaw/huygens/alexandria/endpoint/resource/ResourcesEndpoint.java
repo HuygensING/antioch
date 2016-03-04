@@ -3,8 +3,6 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
 import static nl.knaw.huygens.alexandria.api.EndpointPaths.RESOURCES;
 import static nl.knaw.huygens.alexandria.endpoint.resource.ResourceValidatorFactory.resourceNotFoundForId;
 
-import java.net.URI;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.Valid;
@@ -22,10 +20,12 @@ import javax.ws.rs.core.Response;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinitionPrototype;
+import nl.knaw.huygens.alexandria.api.model.StatePrototype;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
-import nl.knaw.huygens.alexandria.endpoint.StatePrototype;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
@@ -42,7 +42,6 @@ public class ResourcesEndpoint extends JSONEndpoint {
   private final ResourceEntityBuilder entityBuilder;
   private final ResourceCreationRequestBuilder requestBuilder;
   private final LocationBuilder locationBuilder;
-  protected static final String BASELAYERDEFINITION = "baselayerdefinition";
 
   @Inject
   public ResourcesEndpoint(AlexandriaService service, //
@@ -98,7 +97,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   }
 
   @PUT
-  @Path("{uuid}/" + BASELAYERDEFINITION)
+  @Path("{uuid}/" + EndpointPaths.BASELAYERDEFINITION)
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation(value = "Set the baselayer definition")
   public Response setBaseLayerDefinition(@PathParam("uuid") final UUIDParam uuidParam, @NotNull BaseLayerDefinitionPrototype protoType) {
@@ -107,12 +106,12 @@ public class ResourcesEndpoint extends JSONEndpoint {
     if (resource.getDirectBaseLayerDefinition().isPresent()) {
       throw new ConflictException("This resource already has a baselayer definition");
     }
-    service.setBaseLayerDefinition(uuidParam.getValue(), protoType.getBaseElements());
-    return created(locationBuilder.locationOf(resource, BASELAYERDEFINITION));
+    service.setBaseLayerDefinition(uuidParam.getValue(), protoType);
+    return created(locationBuilder.locationOf(resource, EndpointPaths.BASELAYERDEFINITION));
   }
 
   @GET
-  @Path("{uuid}/" + BASELAYERDEFINITION)
+  @Path("{uuid}/" + EndpointPaths.BASELAYERDEFINITION)
   @ApiOperation(value = "Get the baselayer definition")
   public Response getBaseLayerDefinition(@PathParam("uuid") final UUIDParam uuidParam) {
     AlexandriaResource resource = readExistingResource(uuidParam);

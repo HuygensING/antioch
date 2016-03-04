@@ -5,13 +5,15 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 public class RestRequester<T> {
+  private int retries = 5;
   private Supplier<Response> responseSupplier;
   Map<Status, Function<Response, RestResult<T>>> statusMappers = new HashMap<>();
-  private Function<Response, RestResult<T>> defaultMapper = (response) -> RestResult.failingResult(response);
+  private Function<Response, RestResult<T>> defaultMapper = RestResult::failingResult;
 
   public static <T extends Object> RestRequester<T> withResponseSupplier(Supplier<Response> responseSupplier) {
     RestRequester<T> requester = new RestRequester<>();
@@ -30,25 +32,37 @@ public class RestRequester<T> {
   }
 
   public RestResult<T> getResult() {
-    RestResult<T> result = new RestResult<>();
-    try {
-      Response response = responseSupplier.get();
-      Status status = Status.fromStatusCode(response.getStatus());
+    int attempt = 0;
+    Response response = null;
+    while (response == null && attempt < retries) {
+      attempt++;
+      try {
+        response = responseSupplier.get();
 
-      if (statusMappers.containsKey(status)) {
-        return statusMappers.get(status).apply(response);
+      } catch (ProcessingException pe) {
+        pe.printStackTrace();
 
-      } else {
-        return defaultMapper.apply(response);
+      } catch (Exception e) {
+        e.printStackTrace();
+        return RestResult.failingResult(e);
       }
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      result.setFail(true);
+    }
+    if (response == null) {
+      return RestResult.failingResult("No response from server after " + retries + " attempts.");
     }
 
-    return result;
+    Status status = Status.fromStatusCode(response.getStatus());
+
+    if (statusMappers.containsKey(status)) {
+      return statusMappers.get(status).apply(response);
+
+    } else {
+      return defaultMapper.apply(response);
+    }
+
+  }
+
+  public void setRetries(int retries) {
+    this.retries = retries;
   }
 }
-
-

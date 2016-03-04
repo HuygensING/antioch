@@ -58,6 +58,8 @@ import com.google.common.collect.Maps;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinitionPrototype;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
@@ -67,8 +69,6 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
-import nl.knaw.huygens.alexandria.model.BaseLayerDefinition.BaseElementDefinition;
 import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
@@ -387,12 +387,12 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public void setBaseLayerDefinition(UUID resourceUUID, List<BaseElementDefinition> baseElements) {
+  public void setBaseLayerDefinition(UUID resourceUUID, BaseLayerDefinitionPrototype bldPrototype) {
     storage.runInTransaction(() -> {
       ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
       String json;
       try {
-        json = new ObjectMapper().writeValueAsString(baseElements);
+        json = new ObjectMapper().writeValueAsString(bldPrototype);
         resourceVF.setBaseLayerDefinition(json);
       } catch (JsonProcessingException e) {
         e.printStackTrace();
@@ -431,9 +431,9 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   private BaseLayerDefinition deserializeBaseLayerDefinition(String json) throws IOException {
-    List<BaseElementDefinition> baseElements = new ObjectMapper().readValue(json, new TypeReference<List<BaseElementDefinition>>() {
+    BaseLayerDefinitionPrototype prototype = new ObjectMapper().readValue(json, new TypeReference<BaseLayerDefinitionPrototype>() {
     });
-    return BaseLayerDefinition.withBaseElements(baseElements);
+    return BaseLayerDefinition.withBaseElements(prototype.getBaseElements()).setSubresourceElements(prototype.getSubresourceElements());
   }
 
   @Override

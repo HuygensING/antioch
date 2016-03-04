@@ -42,9 +42,7 @@ public class GraphDbDumpEndpoint extends JSONEndpoint {
   @GET
   @Path("graphson")
   public Response dumpGraphDbAsJSON() {
-    StreamingOutput stream = os -> {
-      service.dumpToGraphSON(os);
-    };
+    StreamingOutput stream = os -> service.dumpToGraphSON(os);
     return Response.ok(stream).build();
   }
 
@@ -52,9 +50,7 @@ public class GraphDbDumpEndpoint extends JSONEndpoint {
   @Path("graphml")
   @Produces(MediaType.APPLICATION_XML)
   public Response dumpGraphDbAsGraphML() {
-    StreamingOutput stream = os -> {
-      service.dumpToGraphML(os);
-    };
+    StreamingOutput stream = os -> service.dumpToGraphML(os);
     return Response.ok(stream).build();
   }
 }

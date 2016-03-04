@@ -13,9 +13,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import io.swagger.annotations.ApiModel;
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.Entity;
 import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
-import nl.knaw.huygens.alexandria.endpoint.Entity;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.text.AnnotationData;
@@ -37,7 +38,7 @@ public class ResourceTextUploadEntity extends JsonWrapperObject implements Entit
 
   @JsonProperty(PropertyPrefix.LINK + "baseLayerDefinition")
   public URI getBaseLayerDefinitionURI() {
-    return locationBuilder.locationOf(AlexandriaResource.class, baseLayerDefiningResourceId, ResourcesEndpoint.BASELAYERDEFINITION);
+    return locationBuilder.locationOf(AlexandriaResource.class, baseLayerDefiningResourceId, EndpointPaths.BASELAYERDEFINITION);
   }
 
   @JsonProperty("dryrun")

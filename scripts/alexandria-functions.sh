@@ -9,7 +9,7 @@ function a-log {
 
 function a-annotate-resource {
   r=$1; t=$2; v=$3
-  curl -i -X POST --header "${authheader}" $be/resources/$r/annotations --header 'Content-type: application/json' \
+  curl -i -X POST --header "${authheader}" ${be}/resources/${r}/annotations --header 'Content-type: application/json' \
     --data-binary "{\"annotation\":{\"type\":\"$t\",\"value\":\"$v\"}}" 2>/dev/null
 }
 
@@ -25,7 +25,7 @@ function a-confirm {
 
 function a-find-annotations-for-resource {
   resource_id=$1
-  url=$(curl -i -X POST --header "${authheader}" $be/searches --header 'Content-type: application/json' \
+  url=$(curl -i -X POST --header "${authheader}" ${be}/searches --header 'Content-type: application/json' \
     --data-binary "{\"query\":{
     \"find\" : \"annotation\",
     \"where\" : \"resource.id:eq(\\\"${resource_id}\\\")\",
@@ -76,6 +76,7 @@ function a-set-default-baselayer-definition {
   a-log "Setting default baselayer definition for ${be}/resources/$ri"
   curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
      --data-binary '{"baseLayerDefinition":{
+     	 "subresourceElements": ["note"],
        "baseElements" : [
           { "name": "text", "baseAttributes": [ "id" ] },
           { "name": "p", "baseAttributes": [ "id" ] },
@@ -147,6 +148,7 @@ function a-dry-run {
   curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
 	--data-binary '{
 	  "baseLayerDefinition": {
+	  	"subresourceElements": ["note"],
 	    "baseElements": [ {
 	      "name": "body"
 	    }, {

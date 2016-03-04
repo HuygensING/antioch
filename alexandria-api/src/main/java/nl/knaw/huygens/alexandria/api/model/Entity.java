@@ -1,9 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint.resource;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonTypeName;
+package nl.knaw.huygens.alexandria.api.model;
 
 /*
  * #%L
@@ -27,15 +22,10 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  * #L%
  */
 
-import nl.knaw.huygens.alexandria.endpoint.AbstractAccountablePrototype;
-import nl.knaw.huygens.alexandria.model.BaseLayerDefinition.BaseElementDefinition;
+/**
+ * used as output for the GET methods on the endpoints
+ */
 
-@JsonTypeName("baseLayerDefinition")
-public class BaseLayerDefinitionPrototype extends AbstractAccountablePrototype {
-  private List<BaseElementDefinition> baseElements = new ArrayList<>();
-
-  public List<BaseElementDefinition> getBaseElements() {
-    return baseElements;
-  }
+public interface Entity {
 
 }

@@ -3,7 +3,6 @@ package nl.knaw.huygens.alexandria.text;
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
 import nl.knaw.huygens.tei.Comment;
 import nl.knaw.huygens.tei.CommentHandler;
 import nl.knaw.huygens.tei.Element;
@@ -16,18 +15,16 @@ import nl.knaw.huygens.tei.export.ExportVisitor;
 import nl.knaw.huygens.tei.handlers.XmlTextHandler;
 
 public class BaseLayerIdVisitor extends ExportVisitor implements CommentHandler<XmlContext>, ElementHandler<XmlContext>, ProcessingInstructionHandler<XmlContext> {
-  private static final String XML_ID = "xml:id";
   private static List<String> baseElementIds = new ArrayList<>();
 
-  public BaseLayerIdVisitor(BaseLayerDefinition baseLayerDefinition) {
+  public BaseLayerIdVisitor(List<String> baseElementNames) {
     super();
     setCommentHandler(this);
     setTextHandler(new XmlTextHandler<>());
     setDefaultElementHandler(this);
     setProcessingInstructionHandler(this);
-    baseLayerDefinition.getBaseElementDefinitions().forEach(bed -> {
-      addElementHandler(new BaseElementHandler(), bed.getName());
-    });
+    String[] elementNames = baseElementNames.toArray(new String[baseElementNames.size()]);
+    addElementHandler(new BaseElementHandler(), elementNames);
     baseElementIds.clear();
   }
 
@@ -55,8 +52,8 @@ public class BaseLayerIdVisitor extends ExportVisitor implements CommentHandler<
   static class BaseElementHandler implements ElementHandler<XmlContext> {
     @Override
     public Traversal enterElement(Element element, XmlContext context) {
-      if (element.hasAttribute(XML_ID)) {
-        baseElementIds.add(element.getAttribute(XML_ID));
+      if (element.hasAttribute(TextUtil.XML_ID)) {
+        baseElementIds.add(element.getAttribute(TextUtil.XML_ID));
       }
       return Traversal.NEXT;
     }

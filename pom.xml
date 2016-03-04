@@ -47,7 +47,7 @@
     <commons-lang3.version>3.4</commons-lang3.version>
     <guava.version>19.0</guava.version>
     <guice.version>4.0</guice.version>
-    <jackson.version>2.7.1</jackson.version>
+    <jackson.version>2.7.2</jackson.version>
     <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
     <jdk.version>1.8</jdk.version>
 
@@ -55,7 +55,7 @@
     <jersey.version>2.17</jersey.version>
     <jersey2-guice.version>0.10</jersey2-guice.version>
 
-    <jool.version>0.9.9</jool.version>
+    <jool.version>0.9.10</jool.version>
     <junit.version>4.12</junit.version>
     <junitparams.version>1.0.4</junitparams.version>
     <log.version>1.1.1</log.version>
@@ -64,7 +64,7 @@
     <!-- 3.2,3.3 leads to compiler error in Jenkins: java.lang.IllegalStateException: endPosTable already set -->
     <maven-compiler.version>3.5.1</maven-compiler.version>
 
-    <mockito.version>2.0.41-beta</mockito.version>
+    <mockito.version>2.0.43-beta</mockito.version>
     <peapod.version>0.2.2</peapod.version>
     <reflections.version>0.9.10</reflections.version>
     <servlet-api.version>4.0.0-b01</servlet-api.version>
@@ -100,7 +100,7 @@
     <maven-license.version>1.8</maven-license.version>
     <maven-project-info-reports.version>2.8.1</maven-project-info-reports.version>
     <maven-shared-jar.version>1.2</maven-shared-jar.version>
-    <maven-site.version>3.4</maven-site.version>
+    <maven-site.version>3.5</maven-site.version>
     <maven-surefire.version>2.18.1</maven-surefire.version>
     <maven-surefire-report.version>2.19.1</maven-surefire-report.version>
     <maven-war.version>2.6</maven-war.version>

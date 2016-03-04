@@ -1,6 +1,6 @@
-package nl.knaw.huygens.alexandria.endpoint;
+package nl.knaw.huygens.alexandria.api.model;
 
-import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class StatePrototype {
   private AlexandriaState state;
@@ -9,10 +9,12 @@ public class StatePrototype {
     return state;
   }
 
-  public void setState(AlexandriaState state) {
+  public StatePrototype setState(AlexandriaState state) {
     this.state = state;
+    return this;
   }
 
+  @JsonIgnore
   public boolean isConfirmed() {
     return AlexandriaState.CONFIRMED.equals(state);
   }

@@ -29,7 +29,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,14 +42,15 @@ import org.junit.Test;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.BaseElementDefinition;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinitionPrototype;
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
-import nl.knaw.huygens.alexandria.model.BaseLayerDefinition.BaseElementDefinition;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.text.InMemoryTextService;
 
@@ -264,10 +264,10 @@ public class TinkerPopServiceTest {
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
     AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
     service.createOrUpdateResource(resource);
-    List<BaseElementDefinition> baseElements = new ArrayList<>();
-    baseElements.add(BaseElementDefinition.withName("text"));
-    baseElements.add(BaseElementDefinition.withName("div"));
-    service.setBaseLayerDefinition(resourceId, baseElements);
+    BaseElementDefinition bedText = BaseElementDefinition.withName("text");
+    BaseElementDefinition bedDiv = BaseElementDefinition.withName("div");
+    BaseLayerDefinitionPrototype prototype = new BaseLayerDefinitionPrototype().setBaseElements(bedText, bedDiv);
+    service.setBaseLayerDefinition(resourceId, prototype);
 
     UUID subUuid1 = UUID.randomUUID();
     String sub = "sub1";
@@ -279,9 +279,7 @@ public class TinkerPopServiceTest {
     Optional<BaseLayerDefinition> optDef = service.getBaseLayerDefinitionForResource(subUuid2);
     assertThat(optDef).isPresent();
     List<BaseElementDefinition> returnedBaseElementDefinitions = optDef.get().getBaseElementDefinitions();
-    assertThat(returnedBaseElementDefinitions).hasSameSizeAs(baseElements);
-    assertThat(returnedBaseElementDefinitions.get(0)).isEqualTo(baseElements.get(0));
-    assertThat(returnedBaseElementDefinitions.get(1)).isEqualTo(baseElements.get(1));
+    assertThat(returnedBaseElementDefinitions).containsExactly(bedText, bedDiv);
   }
 
   @Test

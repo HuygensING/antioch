@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import jersey.repackaged.com.google.common.collect.Lists;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
 
 public class AlexandriaResource extends AbstractAnnotatable {
 

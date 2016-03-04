@@ -61,7 +61,7 @@ public class AboutEndpointTest extends MockedServiceEndpointTest {
 
   @SuppressWarnings("unchecked")
   private Map<String, Object> responseEntityAsMap(Response response) {
-    final Map result = response.readEntity(Map.class);
+    final Map<String, Object> result = response.readEntity(Map.class);
     Log.info("result={}", result);
     return result;
   }

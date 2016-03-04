@@ -50,13 +50,13 @@ import org.apache.commons.io.IOUtils;
 import com.google.common.collect.Maps;
 
 import io.swagger.annotations.ApiOperation;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class ResourceTextEndpoint extends JSONEndpoint {

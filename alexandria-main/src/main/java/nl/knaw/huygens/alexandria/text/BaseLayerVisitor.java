@@ -5,10 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.concurrent.atomic.AtomicLong;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
 import nl.knaw.huygens.tei.Comment;
 import nl.knaw.huygens.tei.CommentHandler;
 import nl.knaw.huygens.tei.Element;
@@ -21,30 +20,25 @@ import nl.knaw.huygens.tei.export.ExportVisitor;
 import nl.knaw.huygens.tei.handlers.XmlTextHandler;
 
 public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<XmlContext>, ElementHandler<XmlContext>, ProcessingInstructionHandler<XmlContext> {
-  private static final String XML_ID = "xml:id";
-  private static final String XMLID_MARKER = "-";
   private static List<AnnotationData> annotationData = new ArrayList<>();
   private static ElementTally elementTally = new ElementTally();
   private static Stack<Element> baseElementStack = new Stack<>();
   private static Stack<Integer> baseElementStartStack = new Stack<>();
   private static Stack<Integer> annotatedTextStartStack = new Stack<>();
-  private static List<String> baseElementIds;
-  private static final Map<String, AtomicLong> counters = new HashMap<>();
   private static final List<String> validationErrors = new ArrayList<>();
+  private static Map<String, String> subresourceXPathMap = new HashMap<>();
 
-  public BaseLayerVisitor(BaseLayerDefinition baseLayerDefinition, List<String> baseElementIds) {
+  public BaseLayerVisitor(BaseLayerDefinition baseLayerDefinition) {
     super();
-    BaseLayerVisitor.baseElementIds = baseElementIds;
     setCommentHandler(this);
     setTextHandler(new XmlTextHandler<>());
     setDefaultElementHandler(this);
     setProcessingInstructionHandler(this);
-    baseLayerDefinition.getBaseElementDefinitions().forEach(bed -> {
-      addElementHandler(new BaseElementHandler(bed.getBaseAttributes()), bed.getName());
-    });
-    counters.clear();
+    baseLayerDefinition.getBaseElementDefinitions().forEach(bed -> addElementHandler(new BaseElementHandler(bed.getBaseAttributes()), bed.getName()));
+    addElementHandler(new SubTextPlaceholderHandler(), TextUtil.SUBTEXTPLACEHOLDER);
     validationErrors.clear();
     annotationData.clear();
+    subresourceXPathMap.clear();
     elementTally = new ElementTally();
   }
 
@@ -57,15 +51,18 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
       baseElementStack.push(new Element(""));
       annotatedTextStartStack.push(0);
     } else {
-      String result = context.getResult();
-      int start = result.length();
-      if (!annotatedTextStartStack.isEmpty()) {
-        start += annotatedTextStartStack.peek();
-      }
-      annotatedTextStartStack.push(start);
+      pushCurrentOffset(context);
     }
     context.openLayer();
     return Traversal.NEXT;
+  }
+
+  private static void pushCurrentOffset(XmlContext context) {
+    int start = context.getResult().length();
+    if (!annotatedTextStartStack.isEmpty()) {
+      start += annotatedTextStartStack.peek();
+    }
+    annotatedTextStartStack.push(start);
   }
 
   @Override
@@ -82,14 +79,17 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     return Traversal.NEXT;
   }
 
-  private String substringXPath(String annotatedBaseText) {
-    Integer parentBaseElementOffset = baseElementStartStack.isEmpty() ? 0 : baseElementStartStack.peek();
-    Integer annotatedTextStart = annotatedTextStartStack.pop();
-    int start = annotatedTextStart - parentBaseElementOffset + 1;
+  private static String substringXPath(String annotatedBaseText) {
     int length = annotatedBaseText.length();
-    Log.info("offset: (start={},length={})", start, length);
-    String xpath = "substring(" + xpath(baseElementStack.peek()) + "," + start + "," + length + ")";
-    return xpath;
+    Integer parentBaseElementOffset = baseElementStartStack.isEmpty() ? 0 : baseElementStartStack.peek();
+    Integer annotatedTextStart = popLastOffset();
+    Element parent = baseElementStack.peek();
+    int start = annotatedTextStart - parentBaseElementOffset + 1;
+    return TextUtil.substringXPath(parent, start, length);
+  }
+
+  private static Integer popLastOffset() {
+    return annotatedTextStartStack.pop();
   }
 
   @Override
@@ -109,8 +109,8 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
 
     public BaseElementHandler(List<String> baseAttributes) {
       this.baseAttributes = baseAttributes;
-      if (!baseAttributes.contains(XML_ID)) {
-        baseAttributes.add(0, XML_ID);
+      if (!baseAttributes.contains(TextUtil.XML_ID)) {
+        baseAttributes.add(0, TextUtil.XML_ID);
       }
     }
 
@@ -121,10 +121,8 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
 
       // use attribute order as defined in baselayer definition
       baseAttributes.stream()//
-          .filter((attribute) -> element.hasAttribute(attribute))//
-          .forEach(key -> {
-            base.setAttribute(key, element.getAttribute(key));
-          });
+          .filter(element::hasAttribute)//
+          .forEach(key -> base.setAttribute(key, element.getAttribute(key)));
       element.getAttributes().forEach((key, value) -> {
         if (!baseAttributes.contains(key)) {
           annotationData.add(new AnnotationData()//
@@ -132,12 +130,9 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
               .setLevel(XmlAnnotationLevel.attribute)//
               .setType(key)//
               .setValue(value)//
-              .setXPath(xpath(base)));
+              .setXPath(TextUtil.xpath(base)));
         }
       });
-      if (!base.hasAttribute(XML_ID)) {
-        addId(base);
-      }
       if (!baseElementStack.isEmpty()) {
         base.setParent(baseElementStack.peek());
       }
@@ -145,23 +140,11 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
       baseElementStack.push(base);
       context.addOpenTag(base);
       baseElementStartStack.push(context.getResult().length());
-      // context.openLayer();
       return Traversal.NEXT;
-    }
-
-    private void addId(Element baseElement) {
-      String name = baseElement.getName();
-      String id;
-      counters.putIfAbsent(name, new AtomicLong(0));
-      do {
-        id = name + XMLID_MARKER + counters.get(name).incrementAndGet();
-      } while (baseElementIds.contains(id));
-      baseElement.setAttribute(XML_ID, id);
     }
 
     @Override
     public Traversal leaveElement(Element element, XmlContext context) {
-      // context.addLiteral(context.closeLayer());
       context.addCloseTag(element);
       baseElementStartStack.pop();
       baseElementStack.pop();
@@ -169,7 +152,22 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     }
 
     private void logXPath(Element element) {
-      Log.info("xpath={}", xpath(element));
+      Log.info("xpath={}", TextUtil.xpath(element));
+    }
+  }
+
+  static class SubTextPlaceholderHandler implements ElementHandler<XmlContext> {
+    @Override
+    public Traversal enterElement(Element element, XmlContext context) {
+      pushCurrentOffset(context);
+      String substringXPath = substringXPath("");
+      subresourceXPathMap.put(element.getAttribute(TextUtil.XML_ID), substringXPath);
+      return Traversal.NEXT;
+    }
+
+    @Override
+    public Traversal leaveElement(Element element, XmlContext context) {
+      return Traversal.NEXT;
     }
   }
 
@@ -181,19 +179,8 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
         .withAnnotationData(annotationData);
   }
 
-  public static String xpath(Element element) {
-    String xpath = "";
-    if (element.hasAttribute(XML_ID)) {
-      xpath = "//" + element.getName() + "[@xml:id='" + element.getAttribute(XML_ID) + "']";
-    } else {
-      Element parent = element.getParent();
-      if (parent == null) {
-        xpath = "/" + element.getName();
-      } else {
-        xpath = xpath(parent) + "/" + element.getName();
-      }
-    }
-    return xpath;
+  public Map<String, String> getSubresourceXPathMap() {
+    return subresourceXPathMap;
   }
 
 }

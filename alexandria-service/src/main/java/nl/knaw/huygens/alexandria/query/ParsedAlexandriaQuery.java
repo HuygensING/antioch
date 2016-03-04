@@ -38,8 +38,7 @@ public class ParsedAlexandriaQuery {
   // this is just a container class for the results of processing the AlexandriaQuery parameters
   private static final Function<Storage, Stream<AnnotationVF>> DEFAULT_ANNOTATIONVF_FINDER = storage -> {
     Iterable<AnnotationVF> iterable = () -> storage.find(AnnotationVF.class);
-    Stream<AnnotationVF> stream = StreamSupport.stream(iterable.spliterator(), false);
-    return stream;
+    return StreamSupport.stream(iterable.spliterator(), false);
   };
 
   private Class<? extends AlexandriaVF> vfClazz;
