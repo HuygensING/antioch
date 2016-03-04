@@ -16,8 +16,8 @@ public class SubresourceElementVisitorTest extends AlexandriaVisitorTest {
         + "<p xml:id='p-2'>bar<comment n='2'>most likely by <persName>someone else</persName></comment></p>"//
         + "</text>");
     String expectedBase = singleQuotesToDouble("<text xml:id='text-1'>"//
-        + "<p xml:id='p-1'>foo<alexandria:subtextplaceholder xml:id='alexandria:subtext-1'/></p>"//
-        + "<p xml:id='p-2'>bar<alexandria:subtextplaceholder xml:id='alexandria:subtext-2'/></p>"//
+        + "<p xml:id='p-1'>foo<alexandria_subtextplaceholder xml:id='alexandria:subtext-1'/></p>"//
+        + "<p xml:id='p-2'>bar<alexandria_subtextplaceholder xml:id='alexandria:subtext-2'/></p>"//
         + "</text>");
     String expectedSubText1 = singleQuotesToDouble("<note n='1'>probably by <persName>someone</persName></note>");
     String expectedSubText2 = singleQuotesToDouble("<comment n='2'>most likely by <persName>someone else</persName></comment>");
@@ -44,7 +44,7 @@ public class SubresourceElementVisitorTest extends AlexandriaVisitorTest {
         + "</note></p>"//
         + "</text>");
     String expectedBase = singleQuotesToDouble("<text xml:id='text-1'>"//
-        + "<p xml:id='p-1'>foo<alexandria:subtextplaceholder xml:id='alexandria:subtext-1'/></p>"//
+        + "<p xml:id='p-1'>foo<alexandria_subtextplaceholder xml:id='alexandria:subtext-1'/></p>"//
         + "</text>");
     String expectedSubText = singleQuotesToDouble("<note n='1'>"//
         + "probably by <persName>someone</persName>"//
