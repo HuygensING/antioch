@@ -1,18 +1,12 @@
 package nl.knaw.huygens.alexandria.textlocator;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
-import javax.xml.xpath.XPathExpressionException;
-
-import org.apache.commons.io.IOUtils;
 
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.tei.QueryableDocument;
 
 public class TextLocatorFactory {
 
@@ -28,26 +22,25 @@ public class TextLocatorFactory {
     String prefix = parts[0];
     if (ByIdTextLocator.PREFIX.equals(prefix)) {
       return new ByIdTextLocator().withId(parts[1]);
+    } else if (ByOffsetTextLocator.PREFIX.equals(prefix)) {
+      String[] startAndLength = parts[1].split(",");
+      Long start = Long.valueOf(startAndLength[0]);
+      Long length = Long.valueOf(startAndLength[1]);
+      return new ByOffsetTextLocator(start, length);
     }
     throw new TextLocatorParseException("The locator prefix '" + prefix + "' is not a valid prefix. Valid prefix: 'id'.");
   }
 
   public void validate(AlexandriaTextLocator locator, AlexandriaResource resource) {
-    if (locator instanceof ByIdTextLocator) {
-      ByIdTextLocator byId = (ByIdTextLocator) locator;
-      String id = byId.getId();
-      Optional<InputStream> textStream = service.getResourceTextAsStream(resource.getId());//
-      try {
-        String xml = IOUtils.toString(textStream.get());
-        QueryableDocument qDocument = QueryableDocument.createFromXml(xml, true);
-        Boolean idExists = qDocument.evaluateXPathToBoolean("boolean(//*[@xml:id=\"" + id + "\"])");
-        if (!idExists) {
-          throw new BadRequestException("The resource text has no element with xml:id=\"" + id + "\"");
-        }
+    InputStream textStream = service.getResourceTextAsStream(resource.getId())//
+        .orElseThrow(() -> new BadRequestException("The resource has no text attached."));
 
-      } catch (IOException | XPathExpressionException e) {
-        throw new RuntimeException(e);
-      }
+    try {
+      locator.validate(textStream);
+    } catch (TextLocatorValidationException tlve) {
+      throw new BadRequestException(tlve.getMessage());
     }
   }
+
+
 }
