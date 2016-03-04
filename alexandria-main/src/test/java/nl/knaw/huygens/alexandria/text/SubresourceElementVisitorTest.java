@@ -19,8 +19,8 @@ public class SubresourceElementVisitorTest extends AlexandriaVisitorTest {
         + "<p xml:id='p-1'>foo<alexandria_subtextplaceholder xml:id='alexandria:subtext-1'/></p>"//
         + "<p xml:id='p-2'>bar<alexandria_subtextplaceholder xml:id='alexandria:subtext-2'/></p>"//
         + "</text>");
-    String expectedSubText1 = singleQuotesToDouble("<note n='1'>probably by <persName>someone</persName></note>");
-    String expectedSubText2 = singleQuotesToDouble("<comment n='2'>most likely by <persName>someone else</persName></comment>");
+    String expectedSubText1 = singleQuotesToDouble("<text n='1' subtext_type='note'>probably by <persName>someone</persName></text>");
+    String expectedSubText2 = singleQuotesToDouble("<text n='2' subtext_type='comment'>most likely by <persName>someone else</persName></text>");
     List<String> subresourceElements = ImmutableList.of("note", "comment");
     SubresourceElementVisitor subresourceVisitor = new SubresourceElementVisitor(subresourceElements);
 
@@ -46,10 +46,10 @@ public class SubresourceElementVisitorTest extends AlexandriaVisitorTest {
     String expectedBase = singleQuotesToDouble("<text xml:id='text-1'>"//
         + "<p xml:id='p-1'>foo<alexandria_subtextplaceholder xml:id='alexandria:subtext-1'/></p>"//
         + "</text>");
-    String expectedSubText = singleQuotesToDouble("<note n='1'>"//
+    String expectedSubText = singleQuotesToDouble("<text n='1' subtext_type='note'>"//
         + "probably by <persName>someone</persName>"//
         + "<note n='2'>most likely by <persName>someone else</persName></note>"//
-        + "</note>");
+        + "</text>");
     List<String> subresourceElements = ImmutableList.of("note");
     SubresourceElementVisitor subresourceVisitor = new SubresourceElementVisitor(subresourceElements);
 

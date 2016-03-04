@@ -3,6 +3,8 @@ package nl.knaw.huygens.alexandria.text;
 import static java.util.stream.Collectors.toList;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.BaseElementDefinition;
@@ -31,8 +33,12 @@ public class TextUtil {
     document.accept(addIdVisitor);
     String xmlWithIds = addIdVisitor.getContext().getResult();
 
+    return extractSubResourceTexts(def, xmlWithIds);
+  }
+
+  private static BaseLayerData extractSubResourceTexts(BaseLayerDefinition def, String xml) {
     // extract base layer + nearest layer of subresource xml
-    Document documentWithIds = Document.createFromXml(xmlWithIds, true);
+    Document documentWithIds = Document.createFromXml(xml, true);
     SubresourceElementVisitor subresourceVisitor = new SubresourceElementVisitor(def.getSubresourceElements());
     documentWithIds.accept(subresourceVisitor);
     String baseText = subresourceVisitor.getBaseText();
@@ -40,9 +46,17 @@ public class TextUtil {
     Document baseDocument = Document.createFromXml(baseText, true);
     BaseLayerVisitor blVisitor = new BaseLayerVisitor(def);
     baseDocument.accept(blVisitor);
-    // visitor.getAnnotationActions().forEach(s -> {
-    // Log.info("annotation:{}", s);
-    // });
+    Map<String, String> subresourceXPathMap = blVisitor.getSubresourceXPathMap();
+    for (Entry<String, String> entry : subresourceVisitor.getSubresourceTexts().entrySet()) {
+      String id = entry.getKey();
+      String text = entry.getValue();
+      // subresourceVisitor.getSubresourceTexts().forEach((id, text) -> {
+      String xpath = subresourceXPathMap.get(id);
+      BaseLayerData subLayerData = extractSubResourceTexts(def, text);
+      Log.info("subLayerData={}", subLayerData);
+      Log.info("make subresource with sub=\"xpath:{}\" and text={}", xpath, subLayerData.getBaseLayer());
+      // });
+    }
 
     return blVisitor.getBaseLayerData();
   }
