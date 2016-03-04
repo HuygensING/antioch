@@ -4,6 +4,8 @@ import static java.util.stream.Collectors.joining;
 
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableList;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.BaseElementDefinition;
 import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
@@ -99,6 +101,36 @@ public class TextUtilTest extends AlexandriaTest {
     // then expect
     softly.assertThat(baseLayerData.validationFailed()).isFalse();
     softly.assertThat(baseLayerData.getBaseLayer()).isEqualTo(expected);
+  }
+
+  @Test
+  public void testBaseLayerExtractionWithNestedSubResourceTexts() {
+    // given
+    String xml = singleQuotesToDouble("<text>"//
+        + "<div>"//
+        + "<p>Lorem Ipsum Dolor Etc.<note>Damned<note>Is this really necessary?</note> interesting, please continue</note></p>"//
+        + "</div>"//
+        + "</text>");
+    String expected = singleQuotesToDouble("<text xml:id='text-1'>"//
+        + "<div xml:id='div-1'>"//
+        + "<p xml:id='p-1'>Lorem Ipsum Dolor Etc.</p>"//
+        + "</div>"//
+        + "</text>");
+    BaseLayerDefinition def = BaseLayerDefinition.withBaseElements(//
+        BaseElementDefinition.withName("text"), //
+        BaseElementDefinition.withName("div").withAttributes("xml:id"), //
+        BaseElementDefinition.withName("p").withAttributes("xml:id") //
+    ).setSubresourceElements(ImmutableList.of("note"));
+
+    // when
+    BaseLayerData baseLayerData = TextUtil.extractBaseLayerData(xml, def);
+    Log.info("AnnotationData =\n{}", baseLayerData.getAnnotationData().stream().map(AnnotationData::toVerbose).collect(joining("\n")));
+    String baseLayer = baseLayerData.getBaseLayer();
+
+    // then expect
+    softly.assertThat(baseLayerData.validationFailed()).isFalse();
+    softly.assertThat(baseLayer).isEqualTo(expected);
+    Log.info(expected);
   }
 
 }

@@ -19,11 +19,12 @@ public class SubresourceElementVisitor extends ExportVisitor {
   private static Map<String, String> subresourceTexts = new HashMap<>();
   public static boolean inSubresourceText = false;
   static AtomicInteger subtextCounter = new AtomicInteger(1);
+  public static String rootElementName = "xml";
 
   public SubresourceElementVisitor(List<String> subresourceElements) {
     setCommentHandler(new DefaultCommentHandler<>());
     setTextHandler(new XmlTextHandler<>());
-    setDefaultElementHandler(new RenderElementHandler());
+    setDefaultElementHandler(new RootRememberingElementHandler());
     setProcessingInstructionHandler(new DefaultProcessingInstructionHandler<>());
     String[] elementNames = subresourceElements.toArray(new String[subresourceElements.size()]);
     addElementHandler(new SubResourceElementHandler(), elementNames);
@@ -39,6 +40,16 @@ public class SubresourceElementVisitor extends ExportVisitor {
     return subresourceTexts;
   }
 
+  static class RootRememberingElementHandler extends RenderElementHandler {
+    @Override
+    public Traversal enterElement(Element element, XmlContext context) {
+      if (element.getParent() == null) {
+        rootElementName = element.getName();
+      }
+      return super.enterElement(element, context);
+    }
+  }
+
   static class SubResourceElementHandler implements ElementHandler<XmlContext> {
     private Element subresourceElement;
 
@@ -48,21 +59,29 @@ public class SubresourceElementVisitor extends ExportVisitor {
         context.openLayer();
         inSubresourceText = true;
         subresourceElement = element;
+        Element subtextroot = Element.copyOf(element);
+        subtextroot.setName(rootElementName);
+        subtextroot.setAttribute("subtext_type", element.getName());
+        context.addOpenTag(subtextroot);
+
+      } else {
+        context.addOpenTag(element);
       }
-      context.addOpenTag(element);
       return Traversal.NEXT;
     }
 
     @Override
     public Traversal leaveElement(Element element, XmlContext context) {
-      context.addCloseTag(element);
       if (element.equals(subresourceElement)) {
+        context.addCloseTag(rootElementName);
         String subtextId = TextUtil.SUBTEXTID_PREFIX + subtextCounter.getAndIncrement();
         subresourceTexts.put(subtextId, context.closeLayer());
         Element placeHolder = new Element(TextUtil.SUBTEXTPLACEHOLDER).withAttribute(TextUtil.XML_ID, subtextId);
         context.addEmptyElementTag(placeHolder);
         subresourceElement = null;
         inSubresourceText = false;
+      } else {
+        context.addCloseTag(element);
       }
       return Traversal.NEXT;
     }
