@@ -15,7 +15,6 @@ import nl.knaw.huygens.tei.export.ExportVisitor;
 import nl.knaw.huygens.tei.handlers.XmlTextHandler;
 
 public class BaseLayerIdVisitor extends ExportVisitor implements CommentHandler<XmlContext>, ElementHandler<XmlContext>, ProcessingInstructionHandler<XmlContext> {
-  private static final String XML_ID = "xml:id";
   private static List<String> baseElementIds = new ArrayList<>();
 
   public BaseLayerIdVisitor(List<String> baseElementNames) {
@@ -53,8 +52,8 @@ public class BaseLayerIdVisitor extends ExportVisitor implements CommentHandler<
   static class BaseElementHandler implements ElementHandler<XmlContext> {
     @Override
     public Traversal enterElement(Element element, XmlContext context) {
-      if (element.hasAttribute(XML_ID)) {
-        baseElementIds.add(element.getAttribute(XML_ID));
+      if (element.hasAttribute(TextUtil.XML_ID)) {
+        baseElementIds.add(element.getAttribute(TextUtil.XML_ID));
       }
       return Traversal.NEXT;
     }
