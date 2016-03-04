@@ -3,9 +3,9 @@
 <opener>
 <p lang="fr" n="p1" r="1.256">Obseruationes Lugdunenses die <date>2 Aprilis 1665</date>.</p>
 </opener>
-<p lang="la" n="p2" r="1.145">Die 2<sub>a</sub> Aprilis visus est in meridiano lugdunensi ad eleuationem Poli 45 gr. 46′ nouus Cometa haud procul ab ea stella 3<sup>ae</sup> magnitudinis quae est in ore Pegasi à qua distabat tribus circiter gradibus borealior scilicet et occidentalior existens,
+<p lang="la" n="p2" r="1.145">Die 2<sub>a</sub> Aprilis visus est in meridiano lugdunensi ad eleuationem Poli 45 gr. 46′ nouus Cometa<note n="3">Cette comète a été observée depuis le 27 mars 1665; elle passa par son périhélie le 24 avril. Les éléments ont été calculés par Halley d'après les observations de Hevelius dans son ‘Astronomiae Cometicae Synopsis’. Voir les Philosophical Transactions de 1705.</note> haud procul ab ea stella 3<sup>ae</sup> magnitudinis<note n="4"><hi rend="i">ε</hi> de Pégase.</note> quae est in ore Pegasi à qua distabat tribus circiter gradibus borealior scilicet et occidentalior existens,
 <pb n="312"/>
-erat in linea recta cum Lucida Aquilae, et Lucida Caudae Delphin: Jtem in linea recta cum Lucida, quae est in cauda Cygni et quae media est in eiusdem ala inferiore; Jtem Linea recta cum ea Lucidiore, quae est in Ancone Superioris alae, et quae in Ancone inferioris vt exhibet</p>
+erat in linea recta cum Lucida Aquilae<note n="5"><hi rend="i">α</hi> de l'Aigle.</note>, et Lucida Caudae Delphin<note n="6"><hi rend="i">ε</hi> du Dauphin.</note>: Jtem in linea recta cum Lucida, quae est in cauda Cygni<note n="7"><hi rend="i">α</hi> du Cygne.</note> et quae media est in eiusdem ala inferiore<note n="8"><hi rend="i">ζ</hi> du Cygne.</note>; Jtem Linea recta cum ea Lucidiore, quae est in Ancone Superioris alae<note n="9"><hi rend="i">δ</hi> du Cygne.</note>, et quae in Ancone inferioris<note n="10"><hi rend="i">ε</hi> du Cygne.</note> vt exhibet</p>
 <p n="p3"><figure><graphic url="huyg003oeuv05ill28.gif"/></figure></p>
 <p lang="it" n="p4" r="1.111"><table>
 <row>
@@ -19,7 +19,7 @@ erat in linea recta cum Lucida Aquilae, et Lucida Caudae Delphin: Jtem in linea 
 <cell>14-50′</cell>
 </row>
 <row>
-<cell cols="2">Lucidae Aquilae Eleuatio</cell>
+<cell cols="2">Lucidae Aquilae<note n="11"><hi rend="i">α</hi> de l'Aigle.</note> Eleuatio</cell>
 <cell>32-20′</cell>
 </row>
 <row>
@@ -53,7 +53,7 @@ erat in linea recta cum Lucida Aquilae, et Lucida Caudae Delphin: Jtem in linea 
 <cell>14-12′</cell>
 </row>
 <row>
-<cell cols="2">Eleuatio oris Pegasi</cell>
+<cell cols="2">Eleuatio oris Pegasi<note n="12"><hi rend="i">ε</hi> de Pégase.</note></cell>
 <cell>14-45′</cell>
 </row>
 <row>
@@ -69,7 +69,7 @@ erat in linea recta cum Lucida Aquilae, et Lucida Caudae Delphin: Jtem in linea 
 <pb n="313"/>
 <p lang="?" n="p5"><table>
 <row>
-<cell>Eleuatio Lucidae <persName>Aquilae</persName></cell>
+<cell>Eleuatio Lucidae <persName>Aquilae</persName><note n="13"><hi rend="i">α</hi> de l'Aigle.</note></cell>
 <cell>29-55′</cell>
 </row>
 <row>
