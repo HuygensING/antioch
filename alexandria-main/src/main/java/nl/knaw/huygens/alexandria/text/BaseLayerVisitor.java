@@ -1,7 +1,9 @@
 package nl.knaw.huygens.alexandria.text;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import nl.knaw.huygens.Log;
@@ -24,6 +26,7 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
   private static Stack<Integer> baseElementStartStack = new Stack<>();
   private static Stack<Integer> annotatedTextStartStack = new Stack<>();
   private static final List<String> validationErrors = new ArrayList<>();
+  private static Map<String, String> subresourceXPathMap = new HashMap<>();
 
   public BaseLayerVisitor(BaseLayerDefinition baseLayerDefinition) {
     super();
@@ -32,8 +35,10 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     setDefaultElementHandler(this);
     setProcessingInstructionHandler(this);
     baseLayerDefinition.getBaseElementDefinitions().forEach(bed -> addElementHandler(new BaseElementHandler(bed.getBaseAttributes()), bed.getName()));
+    addElementHandler(new SubTextPlaceholderHandler(), TextUtil.SUBTEXTPLACEHOLDER);
     validationErrors.clear();
     annotationData.clear();
+    subresourceXPathMap.clear();
     elementTally = new ElementTally();
   }
 
@@ -46,15 +51,18 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
       baseElementStack.push(new Element(""));
       annotatedTextStartStack.push(0);
     } else {
-      String result = context.getResult();
-      int start = result.length();
-      if (!annotatedTextStartStack.isEmpty()) {
-        start += annotatedTextStartStack.peek();
-      }
-      annotatedTextStartStack.push(start);
+      pushCurrentOffset(context);
     }
     context.openLayer();
     return Traversal.NEXT;
+  }
+
+  private static void pushCurrentOffset(XmlContext context) {
+    int start = context.getResult().length();
+    if (!annotatedTextStartStack.isEmpty()) {
+      start += annotatedTextStartStack.peek();
+    }
+    annotatedTextStartStack.push(start);
   }
 
   @Override
@@ -71,15 +79,18 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     return Traversal.NEXT;
   }
 
-  private String substringXPath(String annotatedBaseText) {
+  private static String substringXPath(String annotatedBaseText) {
+    int length = annotatedBaseText.length();
     Integer parentBaseElementOffset = baseElementStartStack.isEmpty() ? 0 : baseElementStartStack.peek();
-    Integer annotatedTextStart = annotatedTextStartStack.pop();
+    Integer annotatedTextStart = popLastOffset();
     Element parent = baseElementStack.peek();
     int start = annotatedTextStart - parentBaseElementOffset + 1;
-    int length = annotatedBaseText.length();
     return TextUtil.substringXPath(parent, start, length);
   }
 
+  private static Integer popLastOffset() {
+    return annotatedTextStartStack.pop();
+  }
 
   @Override
   public Traversal visitComment(Comment comment, XmlContext context) {
@@ -129,13 +140,11 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
       baseElementStack.push(base);
       context.addOpenTag(base);
       baseElementStartStack.push(context.getResult().length());
-      // context.openLayer();
       return Traversal.NEXT;
     }
 
     @Override
     public Traversal leaveElement(Element element, XmlContext context) {
-      // context.addLiteral(context.closeLayer());
       context.addCloseTag(element);
       baseElementStartStack.pop();
       baseElementStack.pop();
@@ -147,6 +156,21 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     }
   }
 
+  static class SubTextPlaceholderHandler implements ElementHandler<XmlContext> {
+    @Override
+    public Traversal enterElement(Element element, XmlContext context) {
+      pushCurrentOffset(context);
+      String substringXPath = substringXPath("");
+      subresourceXPathMap.put(element.getAttribute(TextUtil.XML_ID), substringXPath);
+      return Traversal.NEXT;
+    }
+
+    @Override
+    public Traversal leaveElement(Element element, XmlContext context) {
+      return Traversal.NEXT;
+    }
+  }
+
   public BaseLayerData getBaseLayerData() {
     elementTally.logReport();
     return BaseLayerData//
@@ -155,5 +179,8 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
         .withAnnotationData(annotationData);
   }
 
+  public Map<String, String> getSubresourceXPathMap() {
+    return subresourceXPathMap;
+  }
 
 }

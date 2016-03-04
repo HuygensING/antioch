@@ -12,7 +12,7 @@ import nl.knaw.huygens.tei.Element;
 
 public class TextUtil {
   static final String XML_ID = "xml:id";
-  static final String SUBTEXTPLACEHOLDER = "alexandria:subtextplaceholder";
+  static final String SUBTEXTPLACEHOLDER = "alexandria_subtextplaceholder";
 
   public static BaseLayerData extractBaseLayerData(String xml, BaseLayerDefinition def) {
     Document document = Document.createFromXml(xml, true);
