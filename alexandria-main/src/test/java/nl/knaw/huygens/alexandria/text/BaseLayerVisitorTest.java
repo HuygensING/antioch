@@ -11,12 +11,13 @@ public class BaseLayerVisitorTest extends AlexandriaVisitorTest {
   @Test
   public void testVisitorForXmlWithSubtextPlaceholders() {
     String xml = singleQuotesToDouble("<text xml:id='text-1'>"//
-        + "<p xml:id='p-1'>foo<alexandria_subtextplaceholder xml:id='alexandria:subtext-1'/></p>"//
-        + "<p xml:id='p-2'>babar<alexandria_subtextplaceholder xml:id='alexandria:subtext-2'/></p>"//
+        + "<p xml:id='p-1'>123<alexandria_subtextplaceholder xml:id='alexandria:subtext-1'/></p>"//
+        + "<p xml:id='p-2'>4567<alexandria_subtextplaceholder xml:id='alexandria:subtext-2'/> 9012345ô</p>"//
+        + "<alexandria_subtextplaceholder xml:id='alexandria:subtext-3'/>"//
         + "</text>");
     String expectedBase = singleQuotesToDouble("<text xml:id='text-1'>"//
-        + "<p xml:id='p-1'>foo</p>"//
-        + "<p xml:id='p-2'>babar</p>"//
+        + "<p xml:id='p-1'>123</p>"//
+        + "<p xml:id='p-2'>4567 9012345ô</p>"//
         + "</text>");
 
     BaseLayerDefinition definition = BaseLayerDefinition.withBaseElements(//
@@ -33,7 +34,9 @@ public class BaseLayerVisitorTest extends AlexandriaVisitorTest {
     softly.assertThat(baseLayerData).isNotNull();
 
     Map<String, String> subresourceXPathMap = visitor.getSubresourceXPathMap();
-    softly.assertThat(subresourceXPathMap).containsEntry("alexandria:subtext-1", "substring(//p[@xml:id='p-1'],4,0)");
-    softly.assertThat(subresourceXPathMap).containsEntry("alexandria:subtext-2", "substring(//p[@xml:id='p-2'],6,0)");
+    softly.assertThat(subresourceXPathMap).as("subresourceXPathMap.size").hasSize(3);
+    softly.assertThat(subresourceXPathMap).as("subresourceXPathMap[0]").containsEntry("alexandria:subtext-1", "substring(/,4,0)");
+    softly.assertThat(subresourceXPathMap).as("subresourceXPathMap[1]").containsEntry("alexandria:subtext-2", "substring(/,8,0)");
+    softly.assertThat(subresourceXPathMap).as("subresourceXPathMap[2]").containsEntry("alexandria:subtext-3", "substring(/,17,0)");
   }
 }
