@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.google.common.collect.Lists;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.BaseElementDefinition;
 import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
@@ -47,7 +49,8 @@ public class TextUtil {
     BaseLayerVisitor blVisitor = new BaseLayerVisitor(def);
     baseDocument.accept(blVisitor);
     Map<String, String> subresourceXPathMap = blVisitor.getSubresourceXPathMap();
-    for (Entry<String, String> entry : subresourceVisitor.getSubresourceTexts().entrySet()) {
+    List<Entry<String, String>> entrySet = Lists.newArrayList(subresourceVisitor.getSubresourceTexts().entrySet());
+    for (Entry<String, String> entry : entrySet) {
       String id = entry.getKey();
       String text = entry.getValue();
       String xpath = subresourceXPathMap.get(id);
