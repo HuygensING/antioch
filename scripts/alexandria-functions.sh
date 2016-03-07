@@ -175,7 +175,8 @@ function a-dry-run-from-file {
   curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
 	--data-binary '{
 	  "baseLayerDefinition": {
-	    "baseElementDefinitions": [ {
+	  	"subresourceElements": ["note"],
+	    "baseElements": [ {
 	      "name": "body"
 	    }, {
 	      "name": "div",
