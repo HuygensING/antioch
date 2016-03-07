@@ -1,18 +1,15 @@
 package nl.knaw.huygens.alexandria.textlocator;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
-import javax.xml.xpath.XPathExpressionException;
-
-import org.apache.commons.io.IOUtils;
 
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.tei.QueryableDocument;
 
 public class TextLocatorFactory {
 
@@ -56,30 +53,4 @@ public class TextLocatorFactory {
     }
   }
 
-//  public void validate(AlexandriaTextLocator locator, AlexandriaResource resource) {
-//    Optional<InputStream> textStream = service.getResourceTextAsStream(resource.getId());//
-//    try {
-//      String xml = IOUtils.toString(textStream.get());
-//      QueryableDocument qDocument = QueryableDocument.createFromXml(xml, true);
-//      if (locator instanceof ByIdTextLocator) {
-//        ByIdTextLocator byId = (ByIdTextLocator) locator;
-//        String id = byId.getId();
-//        Boolean idExists = qDocument.evaluateXPathToBoolean("boolean(//*[@xml:id=\"" + id + "\"])");
-//        if (!idExists) {
-//          throw new BadRequestException("The resource text has no element with xml:id=\"" + id + "\"");
-//        }
-//
-//      } else if (locator instanceof ByXPathTextLocator) {
-//        ByXPathTextLocator byId = (ByXPathTextLocator) locator;
-//        String xpath = byId.getXPath();
-//        String result = qDocument.evaluateXPathToString(xpath);
-//        // if (StringUtils.isEmpty(result)) {
-//        // throw new BadRequestException("The xpath " + xpath + "is not valid for the resource text.");
-//        // }
-//      }
-//    } catch (IOException | XPathExpressionException e) {
-//      throw new RuntimeException(e);
-//    }
-
-  }
 }
