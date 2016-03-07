@@ -1,92 +1,75 @@
 package nl.knaw.huygens.alexandria.text;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Stack;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
 import nl.knaw.huygens.tei.Comment;
 import nl.knaw.huygens.tei.CommentHandler;
+import nl.knaw.huygens.tei.DelegatingVisitor;
 import nl.knaw.huygens.tei.Element;
 import nl.knaw.huygens.tei.ElementHandler;
 import nl.knaw.huygens.tei.ProcessingInstruction;
 import nl.knaw.huygens.tei.ProcessingInstructionHandler;
+import nl.knaw.huygens.tei.Text;
 import nl.knaw.huygens.tei.Traversal;
-import nl.knaw.huygens.tei.XmlContext;
-import nl.knaw.huygens.tei.export.ExportVisitor;
 import nl.knaw.huygens.tei.handlers.XmlTextHandler;
 
-public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<XmlContext>, ElementHandler<XmlContext>, ProcessingInstructionHandler<XmlContext> {
-  private static List<AnnotationData> annotationData = new ArrayList<>();
-  private static ElementTally elementTally = new ElementTally();
-  private static final List<String> validationErrors = new ArrayList<>();
-  private static Map<String, String> subresourceXPathMap = new HashMap<>();
-  private static Long textOffset = 1L;
-  private static Stack<Long> textOffsetStack = new Stack<>();
+public class BaseLayerVisitor extends DelegatingVisitor<BLVContext> implements CommentHandler<BLVContext>, ElementHandler<BLVContext>, ProcessingInstructionHandler<BLVContext> {
+  private String id = "";
 
-  public BaseLayerVisitor(BaseLayerDefinition baseLayerDefinition) {
-    super();
+  public BaseLayerVisitor(BLVContext blContext, BaseLayerDefinition baseLayerDefinition, String id) {
+    super(blContext);
+    this.id = id;
     setCommentHandler(this);
     setTextHandler(new OffsetXmlTextHandler());
     setDefaultElementHandler(this);
     setProcessingInstructionHandler(this);
     baseLayerDefinition.getBaseElementDefinitions().forEach(bed -> addElementHandler(new BaseElementHandler(bed.getBaseAttributes()), bed.getName()));
     addElementHandler(new SubTextPlaceholderHandler(), TextUtil.SUBTEXTPLACEHOLDER);
-    validationErrors.clear();
-    annotationData.clear();
-    subresourceXPathMap.clear();
-    elementTally = new ElementTally();
-    textOffset = 1L;
   }
 
   // non-base elements
   @Override
-  public Traversal enterElement(Element element, XmlContext context) {
-    elementTally.tally(element);
+  public Traversal enterElement(Element element, BLVContext context) {
+    context.getElementTally().tally(element);
     if (element.getParent() == null) {
-      validationErrors.add("Validation error: root element <" + element.getName() + "> is not in the base layer definition.");
+      context.getValidationErrors().add("Validation error: root element <" + element.getName() + "> is not in the base layer definition.");
     }
-    textOffsetStack.push(textOffset);
+    context.getTextOffsetStack().push(context.getTextOffset());
     context.openLayer();
     return Traversal.NEXT;
   }
 
   @Override
-  public Traversal leaveElement(Element element, XmlContext context) {
+  public Traversal leaveElement(Element element, BLVContext context) {
     String annotatedBaseText = context.closeLayer();
     context.addLiteral(annotatedBaseText);
-    String xpath = substringOffsetXPath(textOffsetStack.pop());
+    String xpath = context.substringOffsetXPath(context.getTextOffsetStack().pop());
     Log.info("xpath={}", xpath);
-    annotationData.add(new AnnotationData()//
-        .setAnnotatedBaseText(annotatedBaseText)//
-        .setLevel(XmlAnnotationLevel.element)//
-        .setType(element.getName())//
-        .setValue(element)//
-        .setXPath(xpath));
+    context.getAnnotationData()
+        .add(new AnnotationData()//
+            .setAnnotatedBaseText(annotatedBaseText)//
+            .setLevel(XmlAnnotationLevel.element)//
+            .setType(element.getName())//
+            .setValue(element)//
+            .setXPath(xpath));
     return Traversal.NEXT;
   }
 
-  private static String substringOffsetXPath(Long start) {
-    long length = textOffset - start;
-    return "substring(/," + start + "," + length + ")";
-  }
-
   @Override
-  public Traversal visitComment(Comment comment, XmlContext context) {
+  public Traversal visitComment(Comment comment, BLVContext context) {
     Log.warn("unprocessed comment: {}", comment.getComment());
     return Traversal.NEXT;
   }
 
   @Override
-  public Traversal visitProcessingInstruction(ProcessingInstruction processingInstruction, XmlContext context) {
+  public Traversal visitProcessingInstruction(ProcessingInstruction processingInstruction, BLVContext context) {
     Log.warn("unprocessed processing instruction: {}", processingInstruction);
     return Traversal.NEXT;
   }
 
-  static class BaseElementHandler implements ElementHandler<XmlContext> {
+  static class BaseElementHandler implements ElementHandler<BLVContext> {
     private List<String> baseAttributes;
 
     public BaseElementHandler(List<String> baseAttributes) {
@@ -97,8 +80,8 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     }
 
     @Override
-    public Traversal enterElement(Element element, XmlContext context) {
-      elementTally.tally(element);
+    public Traversal enterElement(Element element, BLVContext context) {
+      context.getElementTally().tally(element);
       Element base = new Element(element.getName());
 
       // use attribute order as defined in baselayer definition
@@ -107,12 +90,13 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
           .forEach(key -> base.setAttribute(key, element.getAttribute(key)));
       element.getAttributes().forEach((key, value) -> {
         if (!baseAttributes.contains(key)) {
-          annotationData.add(new AnnotationData()//
-              .setAnnotatedBaseText("")//
-              .setLevel(XmlAnnotationLevel.attribute)//
-              .setType(key)//
-              .setValue(value)//
-              .setXPath(TextUtil.xpath(base)));
+          context.getAnnotationData()
+              .add(new AnnotationData()//
+                  .setAnnotatedBaseText("")//
+                  .setLevel(XmlAnnotationLevel.attribute)//
+                  .setType(key)//
+                  .setValue(value)//
+                  .setXPath(TextUtil.xpath(base)));
         }
       });
       logXPath(base);
@@ -121,7 +105,7 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     }
 
     @Override
-    public Traversal leaveElement(Element element, XmlContext context) {
+    public Traversal leaveElement(Element element, BLVContext context) {
       context.addCloseTag(element);
       return Traversal.NEXT;
     }
@@ -131,38 +115,38 @@ public class BaseLayerVisitor extends ExportVisitor implements CommentHandler<Xm
     }
   }
 
-  static class SubTextPlaceholderHandler implements ElementHandler<XmlContext> {
+  static class SubTextPlaceholderHandler implements ElementHandler<BLVContext> {
     @Override
-    public Traversal enterElement(Element element, XmlContext context) {
-      String substringXPath = substringOffsetXPath(textOffset);
-      subresourceXPathMap.put(element.getAttribute(TextUtil.XML_ID), substringXPath);
+    public Traversal enterElement(Element element, BLVContext context) {
+      String substringXPath = context.substringOffsetXPath(context.getTextOffset());
+      context.getSubresourceXPathMap().put(element.getAttribute(TextUtil.XML_ID), substringXPath);
       return Traversal.NEXT;
     }
 
     @Override
-    public Traversal leaveElement(Element element, XmlContext context) {
+    public Traversal leaveElement(Element element, BLVContext context) {
       return Traversal.NEXT;
     }
   }
 
-  static class OffsetXmlTextHandler extends XmlTextHandler<XmlContext> {
+  static class OffsetXmlTextHandler extends XmlTextHandler<BLVContext> {
     @Override
-    protected String filterText(String text) {
-      textOffset += text.length();
-      return super.filterText(text);
+    public Traversal visitText(Text text, BLVContext context) {
+      String content = filterText(text.getText());
+      context.addLiteral(content);
+      context.addToTextOffset(content.length());
+      return Traversal.NEXT;
     }
+
   }
 
   public BaseLayerData getBaseLayerData() {
-    elementTally.logReport();
+    getContext().getElementTally().logReport();
     return BaseLayerData//
         .withBaseLayer(getContext().getResult())//
-        .withValidationErrors(validationErrors)//
-        .withAnnotationData(annotationData);
-  }
-
-  public Map<String, String> getSubresourceXPathMap() {
-    return subresourceXPathMap;
+        .withValidationErrors(getContext().getValidationErrors())//
+        .withId(id)//
+        .withAnnotationData(getContext().getAnnotationData());
   }
 
 }

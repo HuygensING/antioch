@@ -1,6 +1,7 @@
 package nl.knaw.huygens.alexandria.text;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -22,16 +23,18 @@ public class SubresourceElementVisitorTest extends AlexandriaVisitorTest {
     String expectedSubText1 = singleQuotesToDouble("<text n='1' subtext_type='note'>probably by <persName>someone</persName></text>");
     String expectedSubText2 = singleQuotesToDouble("<text n='2' subtext_type='comment'>most likely by <persName>someone else</persName></text>");
     List<String> subresourceElements = ImmutableList.of("note", "comment");
-    SubresourceElementVisitor subresourceVisitor = new SubresourceElementVisitor(subresourceElements);
+    SEVContext context = new SEVContext();
+    SubresourceElementVisitor subresourceVisitor = new SubresourceElementVisitor(context, subresourceElements);
 
     // when
     visitXml(xml, subresourceVisitor);
 
     // expect
-    softly.assertThat(subresourceVisitor.getBaseText()).isEqualTo(expectedBase);
-    softly.assertThat(subresourceVisitor.getSubresourceTexts()).hasSize(2);
-    softly.assertThat(subresourceVisitor.getSubresourceTexts()).containsEntry("alexandria:subtext-1", expectedSubText1);
-    softly.assertThat(subresourceVisitor.getSubresourceTexts()).containsEntry("alexandria:subtext-2", expectedSubText2);
+    softly.assertThat(context.getBaseText()).isEqualTo(expectedBase);
+    Map<String, String> subresourceTexts = context.getSubresourceTexts();
+    softly.assertThat(subresourceTexts).hasSize(2);
+    softly.assertThat(subresourceTexts).containsEntry("alexandria:subtext-1", expectedSubText1);
+    softly.assertThat(subresourceTexts).containsEntry("alexandria:subtext-2", expectedSubText2);
   }
 
   @Test
@@ -51,15 +54,17 @@ public class SubresourceElementVisitorTest extends AlexandriaVisitorTest {
         + "<note n='2'>most likely by <persName>someone else</persName></note>"//
         + "</text>");
     List<String> subresourceElements = ImmutableList.of("note");
-    SubresourceElementVisitor subresourceVisitor = new SubresourceElementVisitor(subresourceElements);
+    SEVContext context = new SEVContext();
+    SubresourceElementVisitor subresourceVisitor = new SubresourceElementVisitor(context, subresourceElements);
 
     // when
     visitXml(xml, subresourceVisitor);
 
     // expect
-    softly.assertThat(subresourceVisitor.getBaseText()).isEqualTo(expectedBase);
-    softly.assertThat(subresourceVisitor.getSubresourceTexts()).hasSize(1);
-    softly.assertThat(subresourceVisitor.getSubresourceTexts()).containsEntry("alexandria:subtext-1", expectedSubText);
+    softly.assertThat(context.getBaseText()).isEqualTo(expectedBase);
+    Map<String, String> subresourceTexts = context.getSubresourceTexts();
+    softly.assertThat(subresourceTexts).hasSize(1);
+    softly.assertThat(subresourceTexts).containsEntry("alexandria:subtext-1", expectedSubText);
   }
 
 }

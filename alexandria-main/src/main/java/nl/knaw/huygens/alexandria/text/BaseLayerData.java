@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BaseLayerData {
+  private String id = "";
   private String baseLayer = "";
   private List<String> annotationActions;
   private List<AnnotationData> annotationData;
   private List<String> validationErrors = new ArrayList<>();
+  private List<BaseLayerData> subLayerData = new ArrayList<>();
 
   public static BaseLayerData withBaseLayer(String baseLayer) {
     BaseLayerData bld = new BaseLayerData();
@@ -20,6 +22,21 @@ public class BaseLayerData {
     return this;
   }
 
+  public BaseLayerData withAnnotationData(List<AnnotationData> annotationData) {
+    this.annotationData = annotationData;
+    return this;
+  }
+
+  public BaseLayerData withValidationErrors(List<String> validationerrors) {
+    this.validationErrors = validationerrors;
+    return this;
+  }
+
+  public BaseLayerData withId(String id) {
+    this.id = id;
+    return this;
+  }
+
   public String getBaseLayer() {
     return baseLayer;
   }
@@ -28,18 +45,12 @@ public class BaseLayerData {
     return annotationActions;
   }
 
-  public BaseLayerData withAnnotationData(List<AnnotationData> annotationData) {
-    this.annotationData = annotationData;
-    return this;
-  }
-
   public List<AnnotationData> getAnnotationData() {
     return annotationData;
   }
 
-  public BaseLayerData withValidationErrors(List<String> validationerrors) {
-    this.validationErrors = validationerrors;
-    return this;
+  public List<BaseLayerData> getSubLayerData() {
+    return subLayerData;
   }
 
   public List<String> getValidationErrors() {
@@ -48,6 +59,10 @@ public class BaseLayerData {
 
   public Boolean validationFailed() {
     return !validationErrors.isEmpty();
+  }
+
+  public String getId() {
+    return id;
   }
 
 }

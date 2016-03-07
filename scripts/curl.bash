@@ -323,3 +323,5 @@ a-dry-run '<body xml:id="body1" lang="en">
 </body>'
 
 a-dry-run '<body xml:id="body1"><p xml:id="p1"><hi rend="i">Hello <lb/> M<sup xml:id="sup1">r</sup>. <persName>Jones</persName>!</hi></p></body>'
+
+a-dry-run '<body xml:id="body1"><p xml:id="p1"><hi rend="i">Hello<note who="me">WTF?<note who="boss">language!</note></note> <lb/> M<sup xml:id="sup1">r</sup>. <persName>Jones</persName>!</hi></p></body>'

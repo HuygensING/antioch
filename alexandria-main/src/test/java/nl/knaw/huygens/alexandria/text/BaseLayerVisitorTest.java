@@ -24,7 +24,8 @@ public class BaseLayerVisitorTest extends AlexandriaVisitorTest {
         BaseElementDefinition.withName("text"), //
         BaseElementDefinition.withName("p")//
     );
-    BaseLayerVisitor visitor = new BaseLayerVisitor(definition);
+    BLVContext context = new BLVContext();
+    BaseLayerVisitor visitor = new BaseLayerVisitor(context, definition, "");
 
     visitXml(xml, visitor);
 
@@ -33,7 +34,7 @@ public class BaseLayerVisitorTest extends AlexandriaVisitorTest {
     BaseLayerData baseLayerData = visitor.getBaseLayerData();
     softly.assertThat(baseLayerData).isNotNull();
 
-    Map<String, String> subresourceXPathMap = visitor.getSubresourceXPathMap();
+    Map<String, String> subresourceXPathMap = context.getSubresourceXPathMap();
     softly.assertThat(subresourceXPathMap).as("subresourceXPathMap.size").hasSize(3);
     softly.assertThat(subresourceXPathMap).as("subresourceXPathMap[0]").containsEntry("alexandria:subtext-1", "substring(/,4,0)");
     softly.assertThat(subresourceXPathMap).as("subresourceXPathMap[1]").containsEntry("alexandria:subtext-2", "substring(/,8,0)");
