@@ -131,6 +131,7 @@ public class TextUtilTest extends AlexandriaTest {
     softly.assertThat(baseLayerData.validationFailed()).isFalse();
     softly.assertThat(baseLayer).isEqualTo(expected);
     Log.info(expected);
+    baseLayerData.getAnnotationData().forEach(a -> Log.info(">> {}", a.toVerbose()));
   }
 
 }
