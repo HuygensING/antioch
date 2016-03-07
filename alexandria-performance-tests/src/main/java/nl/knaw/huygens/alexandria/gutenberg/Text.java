@@ -60,7 +60,7 @@ public class Text {
 
   private static final Pattern HEADER_FOOTER = Pattern.compile("\\*\\*\\* ((START)|(END)) OF THIS PROJECT GUTENBERG EBOOK([^\\*])*\\*\\*\\*[\\r\\n]");
 
-  private final String id;
+  public final String id;
   public final URI resource;
   public final String language;
   public final String creator;

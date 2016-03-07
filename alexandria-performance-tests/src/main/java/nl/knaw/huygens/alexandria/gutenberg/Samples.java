@@ -22,7 +22,6 @@ package nl.knaw.huygens.alexandria.gutenberg;
  * #L%
  */
 
-import au.com.bytecode.opencsv.CSVWriter;
 import nl.knaw.huygens.alexandria.stanfordnlp.Pipeline;
 
 import javax.json.Json;
@@ -32,17 +31,15 @@ import javax.json.JsonReader;
 import javax.json.JsonValue;
 import javax.json.JsonWriter;
 import javax.xml.XMLConstants;
+import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +47,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.LogManager;
 
 import static nl.knaw.huygens.alexandria.gutenberg.Text.TEI_NS_URI;
@@ -61,13 +61,17 @@ public class Samples {
 
   private final File textsFile;
   private final File catalogueFile;
+  private final File teiFiles;
+  private final XMLOutputFactory xmlOutputFactory;
 
   public Samples(File dir) {
-    if (!dir.isDirectory() && !dir.mkdirs()) {
-      throw new IllegalArgumentException(String.format("Cannot create directory %s", dir));
-    }
+
+    existingDirectory(dir);
     this.catalogueFile = new File(dir, "catalogue.tar.bz2");
     this.textsFile = new File(dir, "texts.json");
+    this.teiFiles = existingDirectory(new File(dir, "tei"));
+
+    this.xmlOutputFactory = XMLOutputFactory.newFactory();
   }
 
   public List<Text> texts() throws IOException {
@@ -95,13 +99,31 @@ public class Samples {
     }
   }
 
+  public File tei(Pipeline nlp, Text text) throws IOException, XMLStreamException {
+    final File teiFile = new File(teiFiles, String.format("%s.xml", text.id));
+    if (teiFile.isFile() && teiFile.length() > 0) {
+      return teiFile;
+    }
+
+    try (BufferedOutputStream teiStream = new BufferedOutputStream(new FileOutputStream(teiFile))) {
+      final XMLStreamWriter xmlStream = xmlOutputFactory.createXMLStreamWriter(teiStream);
+      try {
+        writeTei(text, nlp, xmlStream);
+      } finally {
+        xmlStream.close();
+      }
+    }
+
+    return teiFile;
+  }
+
   protected boolean textsUpToDate() {
     return textsFile.isFile() &&
       catalogueFile.isFile() &&
       (textsFile.lastModified() >= catalogueFile.lastModified());
   }
 
-  protected static void writeTei(Text text, XMLStreamWriter xml) throws XMLStreamException, IOException {
+  protected static void writeTei(Text text, Pipeline nlp, XMLStreamWriter xml) throws XMLStreamException, IOException {
     xml.writeStartDocument();
     xml.writeStartElement("", "TEI", TEI_NS_URI);
     xml.writeDefaultNamespace(TEI_NS_URI);
@@ -116,13 +138,20 @@ public class Samples {
     xml.writeStartElement("text");
     xml.writeStartElement("body");
     xml.writeStartElement("div");
-    new Pipeline().writeAnnotated(xml, Text.body(text.contents()));
+    nlp.writeAnnotated(xml, Text.body(text.contents()));
     xml.writeEndElement();
     xml.writeEndElement();
     xml.writeEndElement();
 
     xml.writeEndElement();
     xml.writeEndDocument();
+  }
+
+  private static File existingDirectory(File dir) {
+    if (dir.isDirectory() || dir.mkdirs()) {
+      return dir;
+    }
+    throw new IllegalArgumentException(dir.toString());
   }
 
   public static void main(String[] args) {
@@ -137,11 +166,7 @@ public class Samples {
 
       final Samples samples = Optional.ofNullable(argDeque.poll())
         .map(File::new).map(Samples::new)
-        .orElseThrow(() -> new IllegalArgumentException(Arrays.toString(args)));
-
-      final File out = Optional.ofNullable(argDeque.poll())
-        .map(File::new)
-        .orElse(null);
+        .orElseThrow(() -> new IllegalArgumentException("Please specify a working directory"));
 
       final List<Text> texts = samples.texts();
       Collections.sort(texts, Comparator
@@ -152,30 +177,18 @@ public class Samples {
         .thenComparing((Text txt) -> txt.resource.toString())
       );
 
-      final Writer outWriter = out == null
-        ? new PrintWriter(System.out)
-        : Files.newBufferedWriter(out.toPath(), StandardCharsets.UTF_8);
+      final int procs = Runtime.getRuntime().availableProcessors();
+      final ExecutorService threads = Executors.newFixedThreadPool((int) Math.ceil(procs / 2.0d));
 
-      try (final CSVWriter csv = new CSVWriter(outWriter)) {
-        csv.writeNext(new String[] {
-          "Language",
-          "Downloads",
-          "Creator",
-          "Title",
-          "URL"
-        });
-        for (Text text : texts) {
-          csv.writeNext(new String[] {
-            text.language,
-            Integer.toString(text.downloads),
-            text.creator,
-            text.title,
-            text.resource.toString()
-          });
-        }
-      }
+      final Pipeline nlp = new Pipeline();
+      texts.stream()
+        .filter(text -> "en".equals(text.language)).skip(50).limit(10)
+        .forEach(text -> threads.submit(() -> samples.tei(nlp, text)));
 
+      threads.shutdown();
+      threads.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
       System.exit(0);
+
     } catch (Throwable t) {
       t.printStackTrace();
       System.exit(1);

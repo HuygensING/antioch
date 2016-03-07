@@ -35,6 +35,7 @@ import edu.stanford.nlp.util.CoreMap;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.util.Properties;
+import java.util.concurrent.Future;
 
 import static nl.knaw.huygens.alexandria.gutenberg.Text.TEI_NS_URI;
 
