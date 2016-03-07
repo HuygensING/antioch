@@ -50,12 +50,10 @@ public class TextUtil {
     for (Entry<String, String> entry : subresourceVisitor.getSubresourceTexts().entrySet()) {
       String id = entry.getKey();
       String text = entry.getValue();
-      // subresourceVisitor.getSubresourceTexts().forEach((id, text) -> {
       String xpath = subresourceXPathMap.get(id);
       BaseLayerData subLayerData = extractSubResourceTexts(def, text);
       Log.info("subLayerData={}", subLayerData);
       Log.info("make subresource with sub=\"xpath:{}\" and text={}", xpath, subLayerData.getBaseLayer());
-      // });
     }
 
     return blVisitor.getBaseLayerData();
