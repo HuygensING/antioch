@@ -23,6 +23,7 @@ package nl.knaw.huygens.alexandria.gutenberg;
  */
 
 import au.com.bytecode.opencsv.CSVWriter;
+import nl.knaw.huygens.alexandria.stanfordnlp.Pipeline;
 
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
@@ -30,12 +31,17 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonValue;
 import javax.json.JsonWriter;
+import javax.xml.XMLConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -44,8 +50,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.LogManager;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static nl.knaw.huygens.alexandria.gutenberg.Text.TEI_NS_URI;
 
 /**
  * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
@@ -94,8 +101,38 @@ public class Samples {
       (textsFile.lastModified() >= catalogueFile.lastModified());
   }
 
+  protected static void writeTei(Text text, XMLStreamWriter xml) throws XMLStreamException, IOException {
+    xml.writeStartDocument();
+    xml.writeStartElement("", "TEI", TEI_NS_URI);
+    xml.writeDefaultNamespace(TEI_NS_URI);
+    xml.writeNamespace("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
+    xml.writeAttribute(
+      "xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "schemaLocation",
+      TEI_NS_URI + " http://www.tei-c.org/release/xml/tei/custom/schema/xsd/tei_all.xsd"
+    );
+
+    text.writeTeiHeader(xml);
+
+    xml.writeStartElement("text");
+    xml.writeStartElement("body");
+    xml.writeStartElement("div");
+    new Pipeline().writeAnnotated(xml, Text.body(text.contents()));
+    xml.writeEndElement();
+    xml.writeEndElement();
+    xml.writeEndElement();
+
+    xml.writeEndElement();
+    xml.writeEndDocument();
+  }
+
   public static void main(String[] args) {
     try {
+      if (System.getProperty("java.util.logging.config.file") == null) {
+        try (InputStream logConfig = Samples.class.getResourceAsStream("/logging.properties")) {
+          LogManager.getLogManager().readConfiguration(logConfig);
+        }
+      }
+
       final ArrayDeque<String> argDeque = new ArrayDeque<>(Arrays.asList(args));
 
       final Samples samples = Optional.ofNullable(argDeque.poll())
@@ -117,7 +154,7 @@ public class Samples {
 
       final Writer outWriter = out == null
         ? new PrintWriter(System.out)
-        : Files.newBufferedWriter(out.toPath(), UTF_8);
+        : Files.newBufferedWriter(out.toPath(), StandardCharsets.UTF_8);
 
       try (final CSVWriter csv = new CSVWriter(outWriter)) {
         csv.writeNext(new String[] {
@@ -136,7 +173,6 @@ public class Samples {
             text.resource.toString()
           });
         }
-
       }
 
       System.exit(0);

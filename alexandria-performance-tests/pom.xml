@@ -8,11 +8,25 @@
   </parent>
   <artifactId>alexandria-performance-tests</artifactId>
 
+  <properties>
+    <slf4j.version>1.7.12</slf4j.version>
+  </properties>
+
   <dependencies>
     <dependency>
-      <groupId>nl.knaw.huygens</groupId>
-      <artifactId>log</artifactId>
-      <version>1.1.1</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>${slf4j.version}</version>
     </dependency>
     <dependency>
       <groupId>org.glassfish</groupId>
