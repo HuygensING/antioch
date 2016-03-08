@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.query;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -26,6 +26,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -111,7 +112,10 @@ public class AlexandriaQueryParser {
     // any tokens with resource.id or subresource.id need to be filtered out and lead to an annotationVFFinder
     List<WhereToken> resourceWhereTokens = filterResourceWhereTokens(tokens);
     if (!resourceWhereTokens.isEmpty()) {
-      paq.setAnnotationVFFinder(createAnnotationVFFinder(resourceWhereTokens));
+      Function<Storage, Stream<AnnotationVF>> annotationVFFinder = createAnnotationVFFinder(resourceWhereTokens);
+      if (annotationVFFinder != null) {
+        paq.setAnnotationVFFinder(annotationVFFinder);
+      }
     }
 
     tokens.removeAll(resourceWhereTokens);
@@ -154,6 +158,27 @@ public class AlexandriaQueryParser {
         }
         // Should return error, since no resource found with given uuid
         return ImmutableList.<AnnotationVF> of().stream();
+      };
+
+    } else if (resourceWhereToken.getFunction().equals(QueryFunction.inSet)) {
+      List<UUID> uuidSet = resourceWhereToken.getParameters().stream()//
+          .map(String.class::cast)//
+          .map(UUID::fromString)//
+          .collect(toList());
+      return storage -> {
+        List<AnnotationVF> annotationList = new ArrayList<>();
+        uuidSet.stream().forEach(uuid -> {
+          Optional<ResourceVF> optionalResource = storage.readVF(ResourceVF.class, uuid);
+          if (optionalResource.isPresent()) {
+            ResourceVF resourceVF = optionalResource.get();
+            annotationList.addAll(resourceVF.getAnnotatedBy());
+            annotationList.addAll(resourceVF.getSubResources().stream()//
+                .map(ResourceVF::getAnnotatedBy)//
+                .flatMap(l -> l.stream())//
+                .collect(toList()));
+          }
+        });
+        return annotationList.stream();
       };
 
     }
@@ -286,7 +311,7 @@ public class AlexandriaQueryParser {
     return alwaysTrue();
   }
 
-  static final Predicate<Object> INVALID_STATEVALUE_PREDICATE = stateValue -> !(stateValue instanceof String && ALL_STATES.contains((String) stateValue));
+  static final Predicate<Object> INVALID_STATEVALUE_PREDICATE = stateValue -> !(stateValue instanceof String && ALL_STATES.contains(stateValue));
 
   private static void checkForValidStateParameter(WhereToken whereToken) {
     if (QueryField.state.equals(whereToken.getProperty())) {

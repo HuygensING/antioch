@@ -99,8 +99,6 @@ public class ResourceTextEndpoint extends JSONEndpoint {
       throw new BadRequestException(baseLayerData.getValidationErrors().stream().collect(joining("\n")));
     }
     service.setResourceTextFromStream(resourceId, streamIn(baseLayerData.getBaseLayer()));
-    // baseLayerData.getAnnotationData().forEach(annotationData -> {
-    // });
     ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity.of(bld.getBaseLayerDefiningResourceId(), baseLayerData).withLocationBuilder(locationBuilder);
     return ok(resourceTextUploadEntity);
   }

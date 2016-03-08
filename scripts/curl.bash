@@ -325,3 +325,15 @@ a-dry-run '<body xml:id="body1" lang="en">
 a-dry-run '<body xml:id="body1"><p xml:id="p1"><hi rend="i">Hello <lb/> M<sup xml:id="sup1">r</sup>. <persName>Jones</persName>!</hi></p></body>'
 
 a-dry-run '<body xml:id="body1"><p xml:id="p1"><hi rend="i">Hello<note who="me">WTF?<note who="boss">language!</note></note> <lb/> M<sup xml:id="sup1">r</sup>. <persName>Jones</persName>!</hi></p></body>'
+
+
+
+curl -i -H "${authheader}" -X POST $be/searches -H 'Content-type: application/json' \
+--data-binary '{"query" : {
+      "find" : "annotation",
+      "where" : "state:eq(\"CONFIRMED\") who:eq(\"nederlab\") resource.id:inSet(\"e023002c-011b-11e4-b0ff-51bcbd7c379f\", \"e0a2bd62-011b-11e4-b0ff-51bcbd7c379f\")",
+      "sort" : "-when",
+      "distinct" : true,
+      "pageSize" : 100,
+      "return" : "id,value,resource.id,subresource.id"
+    }}'
