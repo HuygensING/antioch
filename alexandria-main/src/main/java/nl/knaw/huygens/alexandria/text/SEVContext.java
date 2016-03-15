@@ -32,7 +32,6 @@ public class SEVContext extends XmlContext {
   private Map<String, String> subresourceTexts = new HashMap<>();
   private boolean inSubresourceText = false;
   private AtomicInteger subtextCounter = new AtomicInteger(1);
-  private String rootElementName = "xml";
 
   public AtomicInteger getSubtextCounter() {
     return subtextCounter;
@@ -46,20 +45,12 @@ public class SEVContext extends XmlContext {
     return inSubresourceText;
   }
 
-  public String getRootElementName() {
-    return rootElementName;
-  }
-
   public void setSubresourceTexts(Map<String, String> subresourceTexts) {
     this.subresourceTexts = subresourceTexts;
   }
 
   public Map<String, String> getSubresourceTexts() {
     return subresourceTexts;
-  }
-
-  public void setRootElementName(String name) {
-    this.rootElementName = name;
   }
 
   public boolean inSubresourceText() {
