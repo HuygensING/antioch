@@ -34,11 +34,11 @@
 <a class="jxr_linenumber" name="L26" href="#L26">26</a>  
 <a class="jxr_linenumber" name="L27" href="#L27">27</a>  <strong class="jxr_keyword">import</strong> com.fasterxml.jackson.annotation.JsonTypeName;
 <a class="jxr_linenumber" name="L28" href="#L28">28</a>  
-<a class="jxr_linenumber" name="L29" href="#L29">29</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.JsonWrapperObject;
-<a class="jxr_linenumber" name="L30" href="#L30">30</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.Prototype;
+<a class="jxr_linenumber" name="L29" href="#L29">29</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
+<a class="jxr_linenumber" name="L30" href="#L30">30</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.api.model.Prototype;
 <a class="jxr_linenumber" name="L31" href="#L31">31</a>  
 <a class="jxr_linenumber" name="L32" href="#L32">32</a>  @JsonTypeName(<span class="jxr_string">"text"</span>)
-<a class="jxr_linenumber" name="L33" href="#L33">33</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/resource/TextPrototype.html">TextPrototype</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/JsonWrapperObject.html">JsonWrapperObject</a> <strong class="jxr_keyword">implements</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/Prototype.html">Prototype</a> {
+<a class="jxr_linenumber" name="L33" href="#L33">33</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/resource/TextPrototype.html">TextPrototype</a> <strong class="jxr_keyword">extends</strong> JsonWrapperObject <strong class="jxr_keyword">implements</strong> Prototype {
 <a class="jxr_linenumber" name="L34" href="#L34">34</a>  
 <a class="jxr_linenumber" name="L35" href="#L35">35</a>    @NotNull(message = <span class="jxr_string">"{nl.knaw.huygens.alexandria.endpoint.resource.TextProtoType.ref.NotNull.message}"</span>)
 <a class="jxr_linenumber" name="L36" href="#L36">36</a>    <strong class="jxr_keyword">private</strong> String body;

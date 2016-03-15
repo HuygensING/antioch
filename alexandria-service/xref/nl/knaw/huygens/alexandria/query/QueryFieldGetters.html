@@ -52,12 +52,14 @@
 <a class="jxr_linenumber" name="L44" href="#L44">44</a>        .put(QueryField.subresource_id, AnnotationVF::getSubResourceId) <em class="jxr_comment">//</em>
 <a class="jxr_linenumber" name="L45" href="#L45">45</a>        .put(QueryField.resource_url, AlexandriaQueryParser::getResourceURL) <em class="jxr_comment">//</em>
 <a class="jxr_linenumber" name="L46" href="#L46">46</a>        .put(QueryField.subresource_url, AlexandriaQueryParser::getSubResourceURL)<em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L47" href="#L47">47</a>        .build();
-<a class="jxr_linenumber" name="L48" href="#L48">48</a>  
-<a class="jxr_linenumber" name="L49" href="#L49">49</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> Function&lt;AnnotationVF, Object&gt; get(QueryField queryField) {
-<a class="jxr_linenumber" name="L50" href="#L50">50</a>      <strong class="jxr_keyword">return</strong> getterMap.get(queryField);
-<a class="jxr_linenumber" name="L51" href="#L51">51</a>    }
-<a class="jxr_linenumber" name="L52" href="#L52">52</a>  }
+<a class="jxr_linenumber" name="L47" href="#L47">47</a>        .put(QueryField.resource_ref, AlexandriaQueryParser::getResourceRef) <em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>        .put(QueryField.subresource_sub, AlexandriaQueryParser::getSubResourceSub)<em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L49" href="#L49">49</a>        .build();
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>  
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> Function&lt;AnnotationVF, Object&gt; get(QueryField queryField) {
+<a class="jxr_linenumber" name="L52" href="#L52">52</a>      <strong class="jxr_keyword">return</strong> getterMap.get(queryField);
+<a class="jxr_linenumber" name="L53" href="#L53">53</a>    }
+<a class="jxr_linenumber" name="L54" href="#L54">54</a>  }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2015&#x2013;2016 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>

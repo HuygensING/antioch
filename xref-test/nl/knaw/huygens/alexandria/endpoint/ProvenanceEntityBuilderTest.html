@@ -39,41 +39,42 @@
 <a class="jxr_linenumber" name="L31" href="#L31">31</a>  <strong class="jxr_keyword">import</strong> java.util.UUID;
 <a class="jxr_linenumber" name="L32" href="#L32">32</a>  
 <a class="jxr_linenumber" name="L33" href="#L33">33</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.Log;
-<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
-<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
-<a class="jxr_linenumber" name="L36" href="#L36">36</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaResource;
-<a class="jxr_linenumber" name="L37" href="#L37">37</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
-<a class="jxr_linenumber" name="L38" href="#L38">38</a>  
-<a class="jxr_linenumber" name="L39" href="#L39">39</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
-<a class="jxr_linenumber" name="L40" href="#L40">40</a>  
-<a class="jxr_linenumber" name="L41" href="#L41">41</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/ProvenanceEntityBuilderTest.html">ProvenanceEntityBuilderTest</a> {
-<a class="jxr_linenumber" name="L42" href="#L42">42</a>    @Test
-<a class="jxr_linenumber" name="L43" href="#L43">43</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> test_provenance_entity_creation_from_builder() {
-<a class="jxr_linenumber" name="L44" href="#L44">44</a>      UUID id = UUID.randomUUID();
-<a class="jxr_linenumber" name="L45" href="#L45">45</a>      String who = <span class="jxr_string">"who"</span>;
-<a class="jxr_linenumber" name="L46" href="#L46">46</a>      Instant when = Instant.now();
-<a class="jxr_linenumber" name="L47" href="#L47">47</a>      String why = <span class="jxr_string">"why"</span>;
-<a class="jxr_linenumber" name="L48" href="#L48">48</a>      String baseURI = <span class="jxr_string">"http://alexandria.ax"</span>;
-<a class="jxr_linenumber" name="L49" href="#L49">49</a>  
-<a class="jxr_linenumber" name="L50" href="#L50">50</a>      TentativeAlexandriaProvenance tprovenance = <strong class="jxr_keyword">new</strong> TentativeAlexandriaProvenance(who, when, why);
-<a class="jxr_linenumber" name="L51" href="#L51">51</a>      AlexandriaResource resource = <strong class="jxr_keyword">new</strong> AlexandriaResource(id, tprovenance);
-<a class="jxr_linenumber" name="L52" href="#L52">52</a>      AlexandriaProvenance provenance = resource.getProvenance();
-<a class="jxr_linenumber" name="L53" href="#L53">53</a>      AlexandriaConfiguration config = mock(AlexandriaConfiguration.<strong class="jxr_keyword">class</strong>);
-<a class="jxr_linenumber" name="L54" href="#L54">54</a>      when(config.getBaseURI()).thenReturn(URI.create(baseURI));
-<a class="jxr_linenumber" name="L55" href="#L55">55</a>      LocationBuilder locationBuilder = <strong class="jxr_keyword">new</strong> LocationBuilder(config, <strong class="jxr_keyword">new</strong> EndpointPathResolver());
-<a class="jxr_linenumber" name="L56" href="#L56">56</a>      ProvenanceEntityBuilder builder = <strong class="jxr_keyword">new</strong> ProvenanceEntityBuilder(locationBuilder);
-<a class="jxr_linenumber" name="L57" href="#L57">57</a>      ProvenanceEntity entity = builder.build(provenance);
-<a class="jxr_linenumber" name="L58" href="#L58">58</a>  
-<a class="jxr_linenumber" name="L59" href="#L59">59</a>      String expectedLocation = baseURI + <span class="jxr_string">"/"</span> + EndpointPaths.RESOURCES + <span class="jxr_string">"/"</span> + id;
-<a class="jxr_linenumber" name="L60" href="#L60">60</a>      URI what = entity.getWhat();
-<a class="jxr_linenumber" name="L61" href="#L61">61</a>      Log.info(<span class="jxr_string">"entity={}"</span>, entity);
-<a class="jxr_linenumber" name="L62" href="#L62">62</a>      Log.info(<span class="jxr_string">"what={}"</span>, what);
-<a class="jxr_linenumber" name="L63" href="#L63">63</a>      assertThat(what.toString()).isEqualTo(expectedLocation);
-<a class="jxr_linenumber" name="L64" href="#L64">64</a>      assertThat(entity.getWhen()).isEqualTo(when.toString());
-<a class="jxr_linenumber" name="L65" href="#L65">65</a>      assertThat(entity.getWhy()).isEqualTo(why);
-<a class="jxr_linenumber" name="L66" href="#L66">66</a>    }
-<a class="jxr_linenumber" name="L67" href="#L67">67</a>  
-<a class="jxr_linenumber" name="L68" href="#L68">68</a>  }
+<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.api.EndpointPaths;
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+<a class="jxr_linenumber" name="L36" href="#L36">36</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
+<a class="jxr_linenumber" name="L37" href="#L37">37</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaResource;
+<a class="jxr_linenumber" name="L38" href="#L38">38</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
+<a class="jxr_linenumber" name="L39" href="#L39">39</a>  
+<a class="jxr_linenumber" name="L40" href="#L40">40</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a class="jxr_linenumber" name="L41" href="#L41">41</a>  
+<a class="jxr_linenumber" name="L42" href="#L42">42</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/endpoint/ProvenanceEntityBuilderTest.html">ProvenanceEntityBuilderTest</a> {
+<a class="jxr_linenumber" name="L43" href="#L43">43</a>    @Test
+<a class="jxr_linenumber" name="L44" href="#L44">44</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> test_provenance_entity_creation_from_builder() {
+<a class="jxr_linenumber" name="L45" href="#L45">45</a>      UUID id = UUID.randomUUID();
+<a class="jxr_linenumber" name="L46" href="#L46">46</a>      String who = <span class="jxr_string">"who"</span>;
+<a class="jxr_linenumber" name="L47" href="#L47">47</a>      Instant when = Instant.now();
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>      String why = <span class="jxr_string">"why"</span>;
+<a class="jxr_linenumber" name="L49" href="#L49">49</a>      String baseURI = <span class="jxr_string">"http://alexandria.ax"</span>;
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>  
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>      TentativeAlexandriaProvenance tprovenance = <strong class="jxr_keyword">new</strong> TentativeAlexandriaProvenance(who, when, why);
+<a class="jxr_linenumber" name="L52" href="#L52">52</a>      AlexandriaResource resource = <strong class="jxr_keyword">new</strong> AlexandriaResource(id, tprovenance);
+<a class="jxr_linenumber" name="L53" href="#L53">53</a>      AlexandriaProvenance provenance = resource.getProvenance();
+<a class="jxr_linenumber" name="L54" href="#L54">54</a>      AlexandriaConfiguration config = mock(AlexandriaConfiguration.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L55" href="#L55">55</a>      when(config.getBaseURI()).thenReturn(URI.create(baseURI));
+<a class="jxr_linenumber" name="L56" href="#L56">56</a>      LocationBuilder locationBuilder = <strong class="jxr_keyword">new</strong> LocationBuilder(config, <strong class="jxr_keyword">new</strong> EndpointPathResolver());
+<a class="jxr_linenumber" name="L57" href="#L57">57</a>      ProvenanceEntityBuilder builder = <strong class="jxr_keyword">new</strong> ProvenanceEntityBuilder(locationBuilder);
+<a class="jxr_linenumber" name="L58" href="#L58">58</a>      ProvenanceEntity entity = builder.build(provenance);
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>  
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>      String expectedLocation = baseURI + <span class="jxr_string">"/"</span> + EndpointPaths.RESOURCES + <span class="jxr_string">"/"</span> + id;
+<a class="jxr_linenumber" name="L61" href="#L61">61</a>      URI what = entity.getWhat();
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>      Log.info(<span class="jxr_string">"entity={}"</span>, entity);
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>      Log.info(<span class="jxr_string">"what={}"</span>, what);
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>      assertThat(what.toString()).isEqualTo(expectedLocation);
+<a class="jxr_linenumber" name="L65" href="#L65">65</a>      assertThat(entity.getWhen()).isEqualTo(when.toString());
+<a class="jxr_linenumber" name="L66" href="#L66">66</a>      assertThat(entity.getWhy()).isEqualTo(why);
+<a class="jxr_linenumber" name="L67" href="#L67">67</a>    }
+<a class="jxr_linenumber" name="L68" href="#L68">68</a>  
+<a class="jxr_linenumber" name="L69" href="#L69">69</a>  }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2015&#x2013;2016 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>

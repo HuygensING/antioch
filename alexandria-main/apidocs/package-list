@@ -14,5 +14,6 @@ nl.knaw.huygens.alexandria.jersey.exceptionmappers
 nl.knaw.huygens.alexandria.model
 nl.knaw.huygens.alexandria.model.search
 nl.knaw.huygens.alexandria.service
+nl.knaw.huygens.alexandria.text
 nl.knaw.huygens.alexandria.textlocator
 nl.knaw.huygens.alexandria.util

@@ -46,8 +46,8 @@
 <a class="jxr_linenumber" name="L38" href="#L38">38</a>  <strong class="jxr_keyword">import</strong> com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 <a class="jxr_linenumber" name="L39" href="#L39">39</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Lists;
 <a class="jxr_linenumber" name="L40" href="#L40">40</a>  
-<a class="jxr_linenumber" name="L41" href="#L41">41</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
-<a class="jxr_linenumber" name="L42" href="#L42">42</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.resource.PropertyPrefix;
+<a class="jxr_linenumber" name="L41" href="#L41">41</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
+<a class="jxr_linenumber" name="L42" href="#L42">42</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 <a class="jxr_linenumber" name="L43" href="#L43">43</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.Identifiable;
 <a class="jxr_linenumber" name="L44" href="#L44">44</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
 <a class="jxr_linenumber" name="L45" href="#L45">45</a>  
@@ -106,7 +106,7 @@
 <a class="jxr_linenumber" name="L98" href="#L98">98</a>  
 <a class="jxr_linenumber" name="L99" href="#L99">99</a>    @JsonProperty(PropertyPrefix.LINK + <span class="jxr_string">"firstPage"</span>)
 <a class="jxr_linenumber" name="L100" href="#L100">100</a>   <strong class="jxr_keyword">public</strong> URI getFirstResultPage() {
-<a class="jxr_linenumber" name="L101" href="#L101">101</a>     <strong class="jxr_keyword">return</strong> getTotalResults() &gt; 0 ? URI.create(locationBuilder.locationOf(<strong class="jxr_keyword">this</strong>) + <span class="jxr_string">"/"</span> + SearchEndpoint.RESULTPAGES + <span class="jxr_string">"/1"</span>) : <strong class="jxr_keyword">null</strong>;
+<a class="jxr_linenumber" name="L101" href="#L101">101</a>     <strong class="jxr_keyword">return</strong> getTotalResults() &gt; 0 ? locationBuilder.locationOf(<strong class="jxr_keyword">this</strong>,SearchEndpoint.RESULTPAGES , <span class="jxr_string">"1"</span>) : <strong class="jxr_keyword">null</strong>;
 <a class="jxr_linenumber" name="L102" href="#L102">102</a>   }
 <a class="jxr_linenumber" name="L103" href="#L103">103</a> 
 <a class="jxr_linenumber" name="L104" href="#L104">104</a>   @JsonIgnore

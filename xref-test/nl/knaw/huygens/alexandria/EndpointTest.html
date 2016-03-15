@@ -93,7 +93,7 @@
 <a class="jxr_linenumber" name="L85" href="#L85">85</a>    }
 <a class="jxr_linenumber" name="L86" href="#L86">86</a>  
 <a class="jxr_linenumber" name="L87" href="#L87">87</a>    <strong class="jxr_keyword">protected</strong> Entity&lt;String&gt; jsonEntity(String string) {
-<a class="jxr_linenumber" name="L88" href="#L88">88</a>      <strong class="jxr_keyword">return</strong> Entity.json(string.replace(<span class="jxr_string">"'"</span>, <span class="jxr_string">"\&quot;"</span>));
+<a class="jxr_linenumber" name="L88" href="#L88">88</a>      <strong class="jxr_keyword">return</strong> Entity.json(fixQuotes(string));
 <a class="jxr_linenumber" name="L89" href="#L89">89</a>    }
 <a class="jxr_linenumber" name="L90" href="#L90">90</a>  
 <a class="jxr_linenumber" name="L91" href="#L91">91</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> AlexandriaConfiguration testConfiguration() {
@@ -145,7 +145,11 @@
 <a class="jxr_linenumber" name="L137" href="#L137">137</a> 
 <a class="jxr_linenumber" name="L138" href="#L138">138</a>   }
 <a class="jxr_linenumber" name="L139" href="#L139">139</a> 
-<a class="jxr_linenumber" name="L140" href="#L140">140</a> }
+<a class="jxr_linenumber" name="L140" href="#L140">140</a>   <strong class="jxr_keyword">protected</strong> String fixQuotes(String stringWithSingleQuotes) {
+<a class="jxr_linenumber" name="L141" href="#L141">141</a>     <strong class="jxr_keyword">return</strong> stringWithSingleQuotes.replace(<span class="jxr_string">"'"</span>, <span class="jxr_string">"\&quot;"</span>);
+<a class="jxr_linenumber" name="L142" href="#L142">142</a>   }
+<a class="jxr_linenumber" name="L143" href="#L143">143</a> 
+<a class="jxr_linenumber" name="L144" href="#L144">144</a> }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2015&#x2013;2016 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>

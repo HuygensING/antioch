@@ -30,7 +30,7 @@
 <a class="jxr_linenumber" name="L22" href="#L22">22</a>  <em class="jxr_comment"> * #L%</em>
 <a class="jxr_linenumber" name="L23" href="#L23">23</a>  <em class="jxr_comment"> */</em>
 <a class="jxr_linenumber" name="L24" href="#L24">24</a>  
-<a class="jxr_linenumber" name="L25" href="#L25">25</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> nl.knaw.huygens.alexandria.endpoint.EndpointPaths.SEARCHES;
+<a class="jxr_linenumber" name="L25" href="#L25">25</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> nl.knaw.huygens.alexandria.api.EndpointPaths.SEARCHES;
 <a class="jxr_linenumber" name="L26" href="#L26">26</a>  
 <a class="jxr_linenumber" name="L27" href="#L27">27</a>  <strong class="jxr_keyword">import</strong> javax.inject.Inject;
 <a class="jxr_linenumber" name="L28" href="#L28">28</a>  <strong class="jxr_keyword">import</strong> javax.inject.Singleton;
@@ -104,7 +104,7 @@
 <a class="jxr_linenumber" name="L96" href="#L96">96</a>      <strong class="jxr_keyword">if</strong> (pageNumber &lt; 1 || pageNumber &gt; totalResultPages) {
 <a class="jxr_linenumber" name="L97" href="#L97">97</a>        <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/exception/NotFoundException.html">NotFoundException</a>(<span class="jxr_string">"pageNumber should be between 1 and "</span> + totalResultPages);
 <a class="jxr_linenumber" name="L98" href="#L98">98</a>      }
-<a class="jxr_linenumber" name="L99" href="#L99">99</a>      String baseURI = locationBuilder.locationOf(searchResult) + <span class="jxr_string">"/"</span> + RESULTPAGES + <span class="jxr_string">"/"</span>;
+<a class="jxr_linenumber" name="L99" href="#L99">99</a>      String baseURI = locationBuilder.locationOf(searchResult, RESULTPAGES) + <span class="jxr_string">"/"</span>;
 <a class="jxr_linenumber" name="L100" href="#L100">100</a>     <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/search/SearchResultPage.html">SearchResultPage</a> page = <strong class="jxr_keyword">new</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/search/SearchResultPage.html">SearchResultPage</a>(baseURI, pageNumber, totalResultPages, searchResult.getPageSize());
 <a class="jxr_linenumber" name="L101" href="#L101">101</a>     page.setResults(searchResult.getRecordsForPage(pageNumber));
 <a class="jxr_linenumber" name="L102" href="#L102">102</a>     <strong class="jxr_keyword">return</strong> Response.ok(page).build();

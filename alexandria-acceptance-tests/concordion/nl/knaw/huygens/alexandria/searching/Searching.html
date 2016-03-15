@@ -242,13 +242,13 @@ ins {
     </div>
 
     <div c:execute="#searchId = uuid()">In this case the generated search id (taken from the <code>Location</code>
-        header) is: <code c:echo="#searchId">b3b8a08c-0004-4c69-a088-2b1bd707b3a8</code>.
+        header) is: <code c:echo="#searchId">658badd8-cc73-4ab4-8ca6-13af3e1ad343</code>.
     </div>
 
     <hr />
 
     <div h:request="">When we
-        <code class="get">/searches/b3b8a08c-0004-4c69-a088-2b1bd707b3a8</code>
+        <code class="get">/searches/658badd8-cc73-4ab4-8ca6-13af3e1ad343</code>
         we expect status
         <code h:status="" class="success">200 OK</code>
         and a response body containing:
@@ -258,7 +258,7 @@ ins {
     "totalResults" : 8,
     "totalPages" : 3,
     "pageSize" : 3,
-    "^firstPage" : "https://{host}/searches/b3b8a08c-0004-4c69-a088-2b1bd707b3a8/pages/1"
+    "^firstPage" : "https://{host}/searches/658badd8-cc73-4ab4-8ca6-13af3e1ad343/pages/1"
   }
 }</pre>
     </div>
@@ -267,7 +267,7 @@ ins {
 
     <div h:request="">
         When we
-        <code class="get">/searches/b3b8a08c-0004-4c69-a088-2b1bd707b3a8/pages/1</code>
+        <code class="get">/searches/658badd8-cc73-4ab4-8ca6-13af3e1ad343/pages/1</code>
         we expect status
         <code h:status="" class="success">200 OK</code>
         and body
@@ -282,18 +282,23 @@ ins {
     }, {
       "_resultNumber" : 3
     } ],
-    "^nextPage" : "https://{host}/searches/b3b8a08c-0004-4c69-a088-2b1bd707b3a8/pages/2"
+    "^firstPage" : "https://{host}/searches/658badd8-cc73-4ab4-8ca6-13af3e1ad343/pages/1",
+    "^nextPage" : "https://{host}/searches/658badd8-cc73-4ab4-8ca6-13af3e1ad343/pages/2",
+    "^lastPage" : "https://{host}/searches/658badd8-cc73-4ab4-8ca6-13af3e1ad343/pages/3"
   }
 }</pre>
     </div>
 
-    <div class="alert alert-info sm">A convenience link <code>^nextPage</code> is included on the first page.</div>
+    <div class="alert alert-info sm">
+        Convenience links <code>^firstPage</code> and <code>^lastPage</code> are included on all pages.
+        Convenience links <code>^nextPage</code> and <code>^previousPage</code> are included where appropriate.
+    </div>
 
     <hr />
 
     <div h:request="">
         Now
-        <code class="get">/searches/b3b8a08c-0004-4c69-a088-2b1bd707b3a8/pages/2</code>
+        <code class="get">/searches/658badd8-cc73-4ab4-8ca6-13af3e1ad343/pages/2</code>
         results in status
         <code h:status="" class="success">200 OK</code>
         and body
@@ -307,21 +312,19 @@ ins {
     }, {
       "_resultNumber" : 6
     } ],
-    "^nextPage" : "https://{host}/searches/b3b8a08c-0004-4c69-a088-2b1bd707b3a8/pages/3",
-    "^previousPage" : "https://{host}/searches/b3b8a08c-0004-4c69-a088-2b1bd707b3a8/pages/1"
+    "^firstPage" : "https://{host}/searches/658badd8-cc73-4ab4-8ca6-13af3e1ad343/pages/1",
+    "^nextPage" : "https://{host}/searches/658badd8-cc73-4ab4-8ca6-13af3e1ad343/pages/3",
+    "^previousPage" : "https://{host}/searches/658badd8-cc73-4ab4-8ca6-13af3e1ad343/pages/1",
+    "^lastPage" : "https://{host}/searches/658badd8-cc73-4ab4-8ca6-13af3e1ad343/pages/3"
   }
 }</pre>
-    </div>
-
-    <div class="alert alert-info sm">Both <code>^nextPage</code> and <code>^previousPage</code> convenience links are
-        included on the middle pages.
     </div>
 
     <hr />
 
     <div h:request="">
         And
-        <code class="get">/searches/b3b8a08c-0004-4c69-a088-2b1bd707b3a8/pages/3</code>
+        <code class="get">/searches/658badd8-cc73-4ab4-8ca6-13af3e1ad343/pages/3</code>
         results in status
         <code h:status="" class="success">200 OK</code>
         and body
@@ -333,26 +336,24 @@ ins {
     }, {
       "_resultNumber" : 8
     } ],
-    "^previousPage" : "https://{host}/searches/b3b8a08c-0004-4c69-a088-2b1bd707b3a8/pages/2"
+    "^firstPage" : "https://{host}/searches/658badd8-cc73-4ab4-8ca6-13af3e1ad343/pages/1",
+    "^previousPage" : "https://{host}/searches/658badd8-cc73-4ab4-8ca6-13af3e1ad343/pages/2",
+    "^lastPage" : "https://{host}/searches/658badd8-cc73-4ab4-8ca6-13af3e1ad343/pages/3"
   }
 }</pre>
-    </div>
-
-    <div class="alert alert-info sm">The convenience link <code>^nextPage</code> is now absent, signaling this
-        is the final page.
     </div>
 
     <hr />
 
     <div h:request="">When we try to
-        <code class="get">/searches/b3b8a08c-0004-4c69-a088-2b1bd707b3a8/pages/0</code>
+        <code class="get">/searches/658badd8-cc73-4ab4-8ca6-13af3e1ad343/pages/0</code>
         we receive
         <code h:status="" class="success">404 Not Found</code>
     </div>
 
     <div h:request="">
         Likewise
-        <code class="get">/searches/b3b8a08c-0004-4c69-a088-2b1bd707b3a8/pages/4</code>
+        <code class="get">/searches/658badd8-cc73-4ab4-8ca6-13af3e1ad343/pages/4</code>
         results in status
         <code h:status="" class="success">404 Not Found</code>
         as the requested page lies beyond the maximum.
@@ -362,5 +363,5 @@ ins {
         Valid result page numbers are <code>1</code> up to and including the number of <code>totalPages</code>.
     </div>
 
-</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 183 ms on 09-Feb-2016 at 14:20:26 CET</div></div></body>
+</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 297 ms on 15-Mar-2016 at 11:54:28 CET</div></div></body>
 </html>

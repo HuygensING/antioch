@@ -45,10 +45,10 @@
 <a class="jxr_linenumber" name="L37" href="#L37">37</a>  <strong class="jxr_keyword">import</strong> org.apache.commons.lang3.StringUtils;
 <a class="jxr_linenumber" name="L38" href="#L38">38</a>  
 <a class="jxr_linenumber" name="L39" href="#L39">39</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.Log;
-<a class="jxr_linenumber" name="L40" href="#L40">40</a>  
-<a class="jxr_linenumber" name="L41" href="#L41">41</a>  @Priority(Priorities.AUTHENTICATION)
-<a class="jxr_linenumber" name="L42" href="#L42">42</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/jaxrs/AuthenticationRequestFilter.html">AuthenticationRequestFilter</a> <strong class="jxr_keyword">implements</strong> ContainerRequestFilter {
-<a class="jxr_linenumber" name="L43" href="#L43">43</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String AUTH_HEADER = <span class="jxr_string">"Auth"</span>;
+<a class="jxr_linenumber" name="L40" href="#L40">40</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.api.ApiConstants;
+<a class="jxr_linenumber" name="L41" href="#L41">41</a>  
+<a class="jxr_linenumber" name="L42" href="#L42">42</a>  @Priority(Priorities.AUTHENTICATION)
+<a class="jxr_linenumber" name="L43" href="#L43">43</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/jaxrs/AuthenticationRequestFilter.html">AuthenticationRequestFilter</a> <strong class="jxr_keyword">implements</strong> ContainerRequestFilter {
 <a class="jxr_linenumber" name="L44" href="#L44">44</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String CLIENT_CERT_COMMON_NAME = <span class="jxr_string">"x-ssl-client-s-dn-cn"</span>;
 <a class="jxr_linenumber" name="L45" href="#L45">45</a>  
 <a class="jxr_linenumber" name="L46" href="#L46">46</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../nl/knaw/huygens/alexandria/jaxrs/AlexandriaSecurityContextFactory.html">AlexandriaSecurityContextFactory</a> securityContextFactory;
@@ -66,7 +66,7 @@
 <a class="jxr_linenumber" name="L58" href="#L58">58</a>      <strong class="jxr_keyword">final</strong> URI requestURI = uriInfo.getRequestUri();
 <a class="jxr_linenumber" name="L59" href="#L59">59</a>  
 <a class="jxr_linenumber" name="L60" href="#L60">60</a>      <strong class="jxr_keyword">final</strong> String certName = requestContext.getHeaderString(CLIENT_CERT_COMMON_NAME);
-<a class="jxr_linenumber" name="L61" href="#L61">61</a>      <strong class="jxr_keyword">final</strong> String authHeader = requestContext.getHeaderString(AUTH_HEADER);
+<a class="jxr_linenumber" name="L61" href="#L61">61</a>      <strong class="jxr_keyword">final</strong> String authHeader = requestContext.getHeaderString(ApiConstants.HEADER_AUTH);
 <a class="jxr_linenumber" name="L62" href="#L62">62</a>      Log.trace(<span class="jxr_string">"certName: [{}], authHeader: [{}]"</span>, certName, authHeader);
 <a class="jxr_linenumber" name="L63" href="#L63">63</a>  
 <a class="jxr_linenumber" name="L64" href="#L64">64</a>      <em class="jxr_comment">// Try and prefer authentication methods in order: Certificate &gt; Auth Header &gt; Anonymous</em>

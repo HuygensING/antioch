@@ -1,6 +1,9 @@
 nl.knaw.huygens.alexandria
 nl.knaw.huygens.alexandria.antlr
+nl.knaw.huygens.alexandria.api
+nl.knaw.huygens.alexandria.api.model
 nl.knaw.huygens.alexandria.app
+nl.knaw.huygens.alexandria.client
 nl.knaw.huygens.alexandria.config
 nl.knaw.huygens.alexandria.endpoint
 nl.knaw.huygens.alexandria.endpoint.about
@@ -20,6 +23,7 @@ nl.knaw.huygens.alexandria.query
 nl.knaw.huygens.alexandria.service
 nl.knaw.huygens.alexandria.storage
 nl.knaw.huygens.alexandria.storage.frames
+nl.knaw.huygens.alexandria.test
 nl.knaw.huygens.alexandria.text
 nl.knaw.huygens.alexandria.textlocator
 nl.knaw.huygens.alexandria.util
