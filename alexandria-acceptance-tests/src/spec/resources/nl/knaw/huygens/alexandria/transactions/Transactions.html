@@ -100,7 +100,7 @@
         Then I will get status
         <h:status>409 Conflict</h:status>
         and a response body containing:
-        <h:jsonResponse>{"error":{"message": "resource $uuid is tentative, please confirm first"}}
+        <h:jsonResponse>{"error":{"message": "This resource has state TENTATIVE; it needs to be CONFIRMED first."}}
         </h:jsonResponse>
     </h:request>
 

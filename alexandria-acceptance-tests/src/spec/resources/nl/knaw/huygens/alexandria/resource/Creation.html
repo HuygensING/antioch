@@ -217,5 +217,64 @@
     </h:request>
 </div>
 
+<div id="update-tentative" data-desc="What happens when I try to update a tentative resource?"
+     c:execute="clearStorage()">
+    <ul>
+      <li>
+        <h:request>
+            When I
+            <h:post>/resources</h:post>
+            the body:
+            <h:jsonBody>{
+                "resource": {
+                "ref": "http://www.example.com/titles/path/to/title/resource"
+                } }
+            </h:jsonBody>
+            then I should receive:
+            <ul>
+                <li>status
+                    <h:status>201 Created</h:status>
+                </li>
+                <li> a Location header starting with
+                    <h:location type="base">https://{host}/resources/</h:location>
+                    and ending in a
+                    <h:location type="uuid">well-formed UUID</h:location>
+                </li>
+                <li>an
+                    <h:responseBody/>
+                    response body
+                </li>
+            </ul>
+          </h:request>
+
+	        <div c:execute="#uuid = uuid()">In this case we got uuid <strong c:echo="#uuid"></strong> as the uuid
+	            for the resource we just created.
+	        </div>
+        </li>
+        <li>
+           <h:request>
+             When I try to
+             <h:put>/resources/$uuid</h:put>
+             the body:
+             <h:jsonBody> {
+                 "resource": {
+                 "ref": "some other ref"
+                  } }
+             </h:jsonBody>
+			       Then I should receive
+			       <h:status>409 Conflict</h:status>
+			       and the response body contains:
+			       <h:jsonResponse>
+			         {
+			           "error" : {
+			             "message" : "This resource has state TENTATIVE; only CONFIRMED resources can be updated."
+			           }
+			         }
+			       </h:jsonResponse>
+           </h:request>
+        </li>
+     </ul>
+</div>
+
 </body>
 </html>
