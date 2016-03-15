@@ -10,18 +10,17 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -36,14 +35,15 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
-import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.MockedServiceEndpointTest;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
@@ -88,13 +88,14 @@ public class ResourcesEndpointTest extends MockedServiceEndpointTest {
     assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
   }
 
-  // @Test
+  // @Ignore @Test
   // public void testPostResource() {
   // // Object entity;
   // // target(EndpointPaths.RESOURCES).request().post(Entity.json(entity));
   // }
 
-  // @Test
+  @Ignore
+  @Test
   public void testTwoPutsWillNotProduceAnError() throws IOException {
     AlexandriaService service = mock(AlexandriaService.class);
     ResourceCreationRequestBuilder requestBuilder = new ResourceCreationRequestBuilder();
@@ -114,6 +115,6 @@ public class ResourcesEndpointTest extends MockedServiceEndpointTest {
   }
 
   private ResourcePrototype deserialize(String json1) throws IOException {
-    return om.readValue(json1.replace("'", "\""), ResourcePrototype.class);
+    return om.readValue(fixQuotes(json1), ResourcePrototype.class);
   }
 }

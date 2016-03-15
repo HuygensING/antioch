@@ -59,7 +59,7 @@ public class LocationBuilderTest {
 
     URI locationOf = lb.locationOf(AlexandriaAnnotation.class, deprecatedId);
 
-    assertThat(locationOf.toString()).isEqualTo("http://alexandria.eg/annotations/" + randomUUID + AnnotationsEndpoint.REVPATH + "0");
+    assertThat(locationOf.toString()).isEqualTo("http://alexandria.eg/annotations/" + randomUUID + "/" + AnnotationsEndpoint.REVPATH + "/0");
   }
 
   @Test

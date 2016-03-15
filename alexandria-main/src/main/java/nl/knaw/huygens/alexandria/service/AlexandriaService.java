@@ -12,12 +12,12 @@ import java.io.InputStream;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -30,12 +30,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinitionPrototype;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
@@ -115,13 +117,12 @@ public interface AlexandriaService {
 
   void importDb(String format, String filename);
 
-  // ResourceText methods
-  // void setResourceText(UUID resourceUUID, String text);
-  //
-  // Optional<String> getResourceText(UUID resourceUUID);
-
   void setResourceTextFromStream(UUID resourceUUID, InputStream inputStream);
 
   Optional<InputStream> getResourceTextAsStream(UUID resourceUUID);
+
+  void setBaseLayerDefinition(UUID resourceUUID, BaseLayerDefinitionPrototype baseLayerDefinition);
+
+  Optional<BaseLayerDefinition> getBaseLayerDefinitionForResource(UUID resourceUUID);
 
 }

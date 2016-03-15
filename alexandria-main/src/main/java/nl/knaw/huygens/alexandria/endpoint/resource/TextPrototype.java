@@ -26,8 +26,8 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-import nl.knaw.huygens.alexandria.endpoint.JsonWrapperObject;
-import nl.knaw.huygens.alexandria.endpoint.Prototype;
+import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
+import nl.knaw.huygens.alexandria.api.model.Prototype;
 
 @JsonTypeName("text")
 public class TextPrototype extends JsonWrapperObject implements Prototype {

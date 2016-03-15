@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.service;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -29,6 +29,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,16 +37,20 @@ import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.BaseElementDefinition;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinitionPrototype;
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.text.InMemoryTextService;
 
@@ -93,7 +98,8 @@ public class TinkerPopServiceTest {
   // }
   // }
 
-  // @Test
+  @Ignore
+  @Test
   public void testDeleteTentativeAnnotationWithUniqueBodyRemovesAnnotationAndBody() {
     // TODO
     // TinkerPopService s = new TestStorage();
@@ -101,14 +107,16 @@ public class TinkerPopServiceTest {
     service.deleteAnnotation(annotation);
   }
 
-  // @Test
+  @Ignore
+  @Test
   public void testDeleteTentativeAnnotationWithSharedBodyRemovesAnnotationAndLeavesBody() {
     // TODO
     AlexandriaAnnotation annotation = mock(AlexandriaAnnotation.class);
     service.deleteAnnotation(annotation);
   }
 
-  // @Test
+  @Ignore
+  @Test
   public void testDeleteConfirmedAnnotationSetsStateToDeleted() {
     // TODO
     AlexandriaAnnotation annotation = mock(AlexandriaAnnotation.class);
@@ -138,23 +146,23 @@ public class TinkerPopServiceTest {
   @Test
   public void testDeprecateAnnotation() {
     // given
-    UUID resourceId = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    UUID resourceId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
     AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
     service.createOrUpdateResource(resource);
 
-    UUID annotationBodyId = UUID.fromString("22222222-2222-2222-2222-222222222222");
+    UUID annotationBodyId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance1 = new TentativeAlexandriaProvenance("who1", Instant.now(), "why1");
     AlexandriaAnnotationBody body1 = service.createAnnotationBody(annotationBodyId, "type", "value", provenance1);
 
-    UUID annotationId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    UUID annotationId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance2 = new TentativeAlexandriaProvenance("who2", Instant.now(), "why2");
     AlexandriaAnnotation annotation = new AlexandriaAnnotation(annotationId, body1, provenance2);
     service.annotateResourceWithAnnotation(resource, annotation);
     service.confirmAnnotation(annotationId);
     assertThat(annotation.getRevision()).isEqualTo(0);
 
-    UUID annotationBodyId2 = UUID.fromString("22222222-2222-2222-2222-222222222223");
+    UUID annotationBodyId2 = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance3 = new TentativeAlexandriaProvenance("who3", Instant.now(), "why3");
     AlexandriaAnnotationBody body2 = service.createAnnotationBody(annotationBodyId2, "type", "updated value", provenance3);
     TentativeAlexandriaProvenance provenance4 = new TentativeAlexandriaProvenance("who4", Instant.now(), "why4");
@@ -181,6 +189,7 @@ public class TinkerPopServiceTest {
     Log.info("graph={}", os.toString());
   }
 
+  // @Ignore
   // @Test
   // public void testTraversal() {
   // GraphTraversal<Vertex, Vertex> traversal = graph.traversal().V();
@@ -192,12 +201,12 @@ public class TinkerPopServiceTest {
   @Test
   public void testReturnExistingSubresourceIfSubPlusParentIdMatches() {
     // given
-    UUID resourceId = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    UUID resourceId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
     AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
     service.createOrUpdateResource(resource);
 
-    UUID subUuid = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    UUID subUuid = UUID.randomUUID();
     String sub = "sub";
     service.createSubResource(subUuid, resourceId, sub, provenance);
 
@@ -206,7 +215,7 @@ public class TinkerPopServiceTest {
     assertThat(oResource.get().getId()).isEqualTo(subUuid);
 
     // now, create a new resource
-    UUID resourceId1 = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    UUID resourceId1 = UUID.randomUUID();
     AlexandriaResource resource1 = new AlexandriaResource(resourceId1, provenance);
     service.createOrUpdateResource(resource1);
 
@@ -218,16 +227,16 @@ public class TinkerPopServiceTest {
   @Test
   public void testDeletingAnAnnotationWithStateDeletedDoesNotFail() {
     // given
-    UUID resourceId = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    UUID resourceId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
     AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
     service.createOrUpdateResource(resource);
 
-    UUID annotationBodyId = UUID.fromString("22222222-2222-2222-2222-222222222222");
+    UUID annotationBodyId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance1 = new TentativeAlexandriaProvenance("who1", Instant.now(), "why1");
     AlexandriaAnnotationBody body1 = service.createAnnotationBody(annotationBodyId, "type", "value", provenance1);
 
-    UUID annotationId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    UUID annotationId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance2 = new TentativeAlexandriaProvenance("who2", Instant.now(), "why2");
     AlexandriaAnnotation annotation = new AlexandriaAnnotation(annotationId, body1, provenance2);
 
@@ -246,6 +255,50 @@ public class TinkerPopServiceTest {
     service.deleteAnnotation(annotation);
     annotation = service.readAnnotation(annotationId).get();
     assertThat(annotation.getState()).isEqualTo(AlexandriaState.DELETED);
+  }
+
+  @Test
+  public void testGetBaseLayerDefinitionForResourceReturnsTheFirstDefinitionUpTheResourceChain() {
+    // given
+    UUID resourceId = UUID.randomUUID();
+    TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
+    AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
+    service.createOrUpdateResource(resource);
+    BaseElementDefinition bedText = BaseElementDefinition.withName("text");
+    BaseElementDefinition bedDiv = BaseElementDefinition.withName("div");
+    BaseLayerDefinitionPrototype prototype = new BaseLayerDefinitionPrototype().setBaseElements(bedText, bedDiv);
+    service.setBaseLayerDefinition(resourceId, prototype);
+
+    UUID subUuid1 = UUID.randomUUID();
+    String sub = "sub1";
+    service.createSubResource(subUuid1, resourceId, sub, provenance);
+
+    UUID subUuid2 = UUID.randomUUID();
+    service.createSubResource(subUuid2, subUuid1, "sub2", provenance);
+
+    Optional<BaseLayerDefinition> optDef = service.getBaseLayerDefinitionForResource(subUuid2);
+    assertThat(optDef).isPresent();
+    List<BaseElementDefinition> returnedBaseElementDefinitions = optDef.get().getBaseElementDefinitions();
+    assertThat(returnedBaseElementDefinitions).containsExactly(bedText, bedDiv);
+  }
+
+  @Test
+  public void testGetBaseLayerDefinitionForResourceReturnsNullOptionalsWhenNoDefinitionPresentUpTheResourceChain() {
+    // given
+    UUID resourceId = UUID.randomUUID();
+    TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
+    AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
+    service.createOrUpdateResource(resource);
+
+    UUID subUuid1 = UUID.randomUUID();
+    String sub = "sub1";
+    service.createSubResource(subUuid1, resourceId, sub, provenance);
+
+    UUID subUuid2 = UUID.randomUUID();
+    service.createSubResource(subUuid2, subUuid1, "sub2", provenance);
+
+    Optional<BaseLayerDefinition> optDef = service.getBaseLayerDefinitionForResource(subUuid2);
+    assertThat(optDef.isPresent()).isFalse();
   }
 
 }

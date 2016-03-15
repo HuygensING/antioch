@@ -43,6 +43,24 @@
     </h:request>
 
     <h:request>
+     And I have 
+     <h:success>successfully</h:success>
+     <h:put>/resources/599fad4f-21ca-4488-94f7-66fba8b39aba/baselayerdefinition</h:put>
+     the body:
+     <h:jsonBody>{
+         "baseLayerDefinition": {
+         "baseElements": [
+         {"name" : "text" },
+         {"name" : "p", "baseAttributes" : ["xml:id"] }
+         ] } }
+     </h:jsonBody>
+     using
+     <h:setHeader name="Content-Type">application/json</h:setHeader>,
+     to set the base layer definition:
+    </h:request>
+    <br/>
+    
+    <h:request>
         When I <h:put>/resources/599fad4f-21ca-4488-94f7-66fba8b39aba/text</h:put> the body:
         <h:jsonBody>{
             "text": {
@@ -51,11 +69,13 @@
         }</h:jsonBody>
         Then I should receive:
         <ul>
-            <li>status <h:status>204 No Content</h:status></li>
-            <li>an
-                <h:responseBody/>
-                response body
-            </li>
+        <li><h:status>200 OK</h:status></li>
+        <li>and the response body is
+        <h:jsonResponse>{
+           "resourceTextUploadResult" : {
+           "^baseLayerDefinition" : "https://{host}/resources/599fad4f-21ca-4488-94f7-66fba8b39aba/baselayerdefinition"
+        } }
+        </h:jsonResponse></li>
         </ul>
     </h:request>
 
@@ -107,7 +127,7 @@
             <li>and body
                 <h:jsonResponse>{
                   "error" : {
-                     "message" : "The locator prefix 'illegalPrefix' is not a valid prefix. Valid prefix: 'id'."
+                     "message" : "The locator prefix 'illegalPrefix' is not a valid prefix. Valid prefixes: [offset, id]."
                   }}
                 </h:jsonResponse>
             </li>

@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint;
+package nl.knaw.huygens.alexandria.api.model;
 
 /*
  * #%L
@@ -22,10 +22,6 @@ package nl.knaw.huygens.alexandria.endpoint;
  * #L%
  */
 
-/**
- * used as output for the GET methods on the endpoints
- */
-
-public interface Entity {
-
+public enum AlexandriaState {
+  TENTATIVE, CONFIRMED, DELETED, DEPRECATED
 }

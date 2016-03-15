@@ -140,12 +140,17 @@
             { "_resultNumber" : 2 },
             { "_resultNumber" : 3 }
             ],
-            "^nextPage" : "https://{host}/searches/$searchId/pages/2"
+            "^firstPage" : "https://{host}/searches/$searchId/pages/1",
+            "^nextPage" : "https://{host}/searches/$searchId/pages/2",
+            "^lastPage" : "https://{host}/searches/$searchId/pages/3"
             } }
         </h:jsonResponse>
     </h:request>
 
-    <div class="alert alert-info sm">A convenience link <code>^nextPage</code> is included on the first page.</div>
+    <div class="alert alert-info sm">
+        Convenience links <code>^firstPage</code> and <code>^lastPage</code> are included on all pages.
+        Convenience links <code>^nextPage</code> and <code>^previousPage</code> are included where appropriate.
+    </div>
 
     <hr/>
 
@@ -163,15 +168,13 @@
             { "_resultNumber" : 5 },
             { "_resultNumber" : 6 }
             ],
+            "^firstPage" : "https://{host}/searches/$searchId/pages/1",
             "^nextPage" : "https://{host}/searches/$searchId/pages/3",
-            "^previousPage" : "https://{host}/searches/$searchId/pages/1"
+            "^previousPage" : "https://{host}/searches/$searchId/pages/1",
+            "^lastPage" : "https://{host}/searches/$searchId/pages/3"
             } }
         </h:jsonResponse>
     </h:request>
-
-    <div class="alert alert-info sm">Both <code>^nextPage</code> and <code>^previousPage</code> convenience links are
-        included on the middle pages.
-    </div>
 
     <hr/>
 
@@ -188,14 +191,12 @@
             { "_resultNumber" : 7 },
             { "_resultNumber" : 8 }
             ],
-            "^previousPage" : "https://{host}/searches/$searchId/pages/2"
+            "^firstPage" : "https://{host}/searches/$searchId/pages/1",
+            "^previousPage" : "https://{host}/searches/$searchId/pages/2",
+            "^lastPage" : "https://{host}/searches/$searchId/pages/3"
             } }
         </h:jsonResponse>
     </h:request>
-
-    <div class="alert alert-info sm">The convenience link <code>^nextPage</code> is now absent, signaling this
-        is the final page.
-    </div>
 
     <hr/>
 

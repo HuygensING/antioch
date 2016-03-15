@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.jaxrs;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -37,10 +37,10 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.commons.lang3.StringUtils;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.ApiConstants;
 
 @Priority(Priorities.AUTHENTICATION)
 public class AuthenticationRequestFilter implements ContainerRequestFilter {
-  private static final String AUTH_HEADER = "Auth";
   private static final String CLIENT_CERT_COMMON_NAME = "x-ssl-client-s-dn-cn";
 
   private final AlexandriaSecurityContextFactory securityContextFactory;
@@ -58,7 +58,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
     final URI requestURI = uriInfo.getRequestUri();
 
     final String certName = requestContext.getHeaderString(CLIENT_CERT_COMMON_NAME);
-    final String authHeader = requestContext.getHeaderString(AUTH_HEADER);
+    final String authHeader = requestContext.getHeaderString(ApiConstants.HEADER_AUTH);
     Log.trace("certName: [{}], authHeader: [{}]", certName, authHeader);
 
     // Try and prefer authentication methods in order: Certificate > Auth Header > Anonymous

@@ -1,8 +1,8 @@
-package nl.knaw.huygens.alexandria.endpoint;
+package nl.knaw.huygens.alexandria.resource;
 
 /*
  * #%L
- * alexandria-main
+ * alexandria-acceptance-tests
  * =======
  * Copyright (C) 2015 - 2016 Huygens ING (KNAW)
  * =======
@@ -22,20 +22,9 @@ package nl.knaw.huygens.alexandria.endpoint;
  * #L%
  */
 
-import nl.knaw.huygens.alexandria.model.AlexandriaState;
+import org.concordion.integration.junit4.ConcordionRunner;
+import org.junit.runner.RunWith;
 
-public class StatePrototype {
-  private AlexandriaState state;
-
-  public AlexandriaState getState() {
-    return state;
-  }
-
-  public void setState(AlexandriaState state) {
-    this.state = state;
-  }
-
-  public boolean isConfirmed() {
-    return AlexandriaState.CONFIRMED.equals(state);
-  }
+@RunWith(ConcordionRunner.class)
+public class BaseLayerFixture extends ResourcesBase {
 }

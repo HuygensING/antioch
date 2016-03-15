@@ -40,21 +40,21 @@ import javax.ws.rs.core.Response;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.endpoint.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.StatePrototype;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
-import nl.knaw.huygens.alexandria.endpoint.StatePrototype;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.exception.TentativeObjectException;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
-import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 @Path(EndpointPaths.ANNOTATIONS)
 @Api("annotations")
 public class AnnotationsEndpoint extends JSONEndpoint {
-  public final static String REVPATH = "/rev/";
+  public final static String REVPATH = "rev";
 
   private final AlexandriaService service;
   private final AnnotationEntityBuilder entityBuilder;
@@ -95,7 +95,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   // Sub-resource delegation
 
   @GET
-  @Path("{uuid}" + REVPATH + "{revision}")
+  @Path("{uuid}/" + REVPATH + "/{revision}")
   @ApiOperation(value = "get the given revision of the annotation", response = AnnotationEntity.class)
   public Response readVersionedAnnotation(@PathParam("uuid") UUIDParam uuidParam, //
                                           @PathParam("revision") Integer revision) {

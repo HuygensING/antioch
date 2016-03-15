@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.query;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -52,8 +52,9 @@ import nl.knaw.huygens.alexandria.model.search.QueryField;
 import nl.knaw.huygens.alexandria.model.search.QueryFunction;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
+import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 
-public class AlexandriaQueryParserTest {
+public class AlexandriaQueryParserTest extends AlexandriaTest {
   private AlexandriaQueryParser alexandriaQueryParser = new AlexandriaQueryParser(new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()));
 
   @Test
@@ -80,10 +81,10 @@ public class AlexandriaQueryParserTest {
 
     } catch (AlexandriaQueryParseException e) {
       Log.info("error message: {}", e.getMessage());
-      assertThat(e.getMessage()).contains("huey");
-      assertThat(e.getMessage()).contains("dewey");
-      assertThat(e.getMessage()).contains("louie");
-      assertThat(e.getMessage()).doesNotContain("unknown field: id");
+      softly.assertThat(e.getMessage()).contains("huey");
+      softly.assertThat(e.getMessage()).contains("dewey");
+      softly.assertThat(e.getMessage()).contains("louie");
+      softly.assertThat(e.getMessage()).doesNotContain("unknown field: id");
     }
   }
 
@@ -97,10 +98,10 @@ public class AlexandriaQueryParserTest {
 
     } catch (AlexandriaQueryParseException e) {
       Log.info("error message: {}", e.getMessage());
-      assertThat(e.getMessage()).contains("huey");
-      assertThat(e.getMessage()).contains("dewey");
-      assertThat(e.getMessage()).contains("louie");
-      assertThat(e.getMessage()).doesNotContain("unknown field: id");
+      softly.assertThat(e.getMessage()).contains("huey");
+      softly.assertThat(e.getMessage()).contains("dewey");
+      softly.assertThat(e.getMessage()).contains("louie");
+      softly.assertThat(e.getMessage()).doesNotContain("unknown field: id");
     }
   }
 
@@ -116,22 +117,22 @@ public class AlexandriaQueryParserTest {
   @Test
   public void testGenerateSortTokenFromString1() {
     SortToken st1 = AlexandriaQueryParser.sortToken("id");
-    assertThat(st1.isAscending()).isTrue();
-    assertThat(st1.getField()).isEqualTo(QueryField.id);
+    softly.assertThat(st1.isAscending()).isTrue();
+    softly.assertThat(st1.getField()).isEqualTo(QueryField.id);
   }
 
   @Test
   public void testGenerateSortTokenFromString2() {
     SortToken st1 = AlexandriaQueryParser.sortToken("+when");
-    assertThat(st1.isAscending()).isTrue();
-    assertThat(st1.getField()).isEqualTo(QueryField.when);
+    softly.assertThat(st1.isAscending()).isTrue();
+    softly.assertThat(st1.getField()).isEqualTo(QueryField.when);
   }
 
   @Test
   public void testGenerateSortTokenFromString3() {
     SortToken st1 = AlexandriaQueryParser.sortToken("-type");
-    assertThat(st1.isAscending()).isFalse();
-    assertThat(st1.getField()).isEqualTo(QueryField.type);
+    softly.assertThat(st1.isAscending()).isFalse();
+    softly.assertThat(st1.getField()).isEqualTo(QueryField.type);
   }
 
   @Test
@@ -145,24 +146,24 @@ public class AlexandriaQueryParserTest {
     assertThat(tokens).hasSize(4);
 
     WhereToken typeToken = tokens.get(0);
-    assertThat(typeToken.getProperty()).isEqualTo(QueryField.type);
-    assertThat(typeToken.getFunction()).isEqualTo(QueryFunction.eq);
-    assertThat(typeToken.getParameters()).containsExactly("Tag");
+    softly.assertThat(typeToken.getProperty()).isEqualTo(QueryField.type);
+    softly.assertThat(typeToken.getFunction()).isEqualTo(QueryFunction.eq);
+    softly.assertThat(typeToken.getParameters()).containsExactly("Tag");
 
     WhereToken whoToken = tokens.get(1);
-    assertThat(whoToken.getProperty()).isEqualTo(QueryField.who);
-    assertThat(whoToken.getFunction()).isEqualTo(QueryFunction.eq);
-    assertThat(whoToken.getParameters()).containsExactly("nederlab");
+    softly.assertThat(whoToken.getProperty()).isEqualTo(QueryField.who);
+    softly.assertThat(whoToken.getFunction()).isEqualTo(QueryFunction.eq);
+    softly.assertThat(whoToken.getParameters()).containsExactly("nederlab");
 
     WhereToken stateToken = tokens.get(2);
-    assertThat(stateToken.getProperty()).isEqualTo(QueryField.state);
-    assertThat(stateToken.getFunction()).isEqualTo(QueryFunction.eq);
-    assertThat(stateToken.getParameters()).containsExactly("CONFIRMED");
+    softly.assertThat(stateToken.getProperty()).isEqualTo(QueryField.state);
+    softly.assertThat(stateToken.getFunction()).isEqualTo(QueryFunction.eq);
+    softly.assertThat(stateToken.getParameters()).containsExactly("CONFIRMED");
 
     WhereToken resourceToken = tokens.get(3);
-    assertThat(resourceToken.getProperty()).isEqualTo(QueryField.resource_id);
-    assertThat(resourceToken.getFunction()).isEqualTo(QueryFunction.inSet);
-    assertThat(resourceToken.getParameters()).containsExactly("11111-111-111-11-111", "11111-111-111-11-112");
+    softly.assertThat(resourceToken.getProperty()).isEqualTo(QueryField.resource_id);
+    softly.assertThat(resourceToken.getFunction()).isEqualTo(QueryFunction.inSet);
+    softly.assertThat(resourceToken.getParameters()).containsExactly("11111-111-111-11-111", "11111-111-111-11-112");
   }
 
   @Test
@@ -171,8 +172,8 @@ public class AlexandriaQueryParserTest {
     List<WhereToken> tokens = alexandriaQueryParser.tokenize(where);
     List<String> parseErrors = alexandriaQueryParser.parseErrors;
     Log.info("errors:{}", parseErrors);
-    assertThat(parseErrors).isNotEmpty();
-    assertThat(tokens).isEmpty();
+    softly.assertThat(parseErrors).isNotEmpty();
+    softly.assertThat(tokens).isEmpty();
   }
 
   @Test
@@ -181,7 +182,7 @@ public class AlexandriaQueryParserTest {
     List<WhereToken> tokens = alexandriaQueryParser.tokenize(where);
     List<String> parseErrors = alexandriaQueryParser.parseErrors;
     Log.info("errors:{}", parseErrors);
-    assertThat(parseErrors).isNotEmpty();
+    softly.assertThat(parseErrors).isNotEmpty();
     assertThat(tokens).isEmpty();
   }
 
@@ -226,8 +227,8 @@ public class AlexandriaQueryParserTest {
 
     Predicate<AnnotationVF> predicate = AlexandriaQueryParser.toPredicate(whereToken);
 
-    assertThat(predicate.test(passingAnnotationVF)).isTrue();
-    assertThat(predicate.test(failingAnnotationVF)).isFalse();
+    softly.assertThat(predicate.test(passingAnnotationVF)).isTrue();
+    softly.assertThat(predicate.test(failingAnnotationVF)).isFalse();
   }
 
   @Test
@@ -243,9 +244,9 @@ public class AlexandriaQueryParserTest {
 
     Predicate<AnnotationVF> predicate = AlexandriaQueryParser.toPredicate(whereToken);
 
-    assertThat(predicate.test(passingAnnotationVF)).isTrue();
-    assertThat(predicate.test(passingAnnotationVF2)).isTrue();
-    assertThat(predicate.test(failingAnnotationVF)).isFalse();
+    softly.assertThat(predicate.test(passingAnnotationVF)).isTrue();
+    softly.assertThat(predicate.test(passingAnnotationVF2)).isTrue();
+    softly.assertThat(predicate.test(failingAnnotationVF)).isFalse();
   }
 
   @Test //
@@ -361,9 +362,9 @@ public class AlexandriaQueryParserTest {
     Predicate<Object> combination = list.stream()//
         .reduce(alwaysTrue, (p, np) -> p = p.and(np));
 
-    assertThat(combination.test("whtvr")).isFalse();
-    assertThat(alwaysTrueCalled.get()).isEqualTo(3);
-    assertThat(alwaysFalseCalled.get()).isEqualTo(1);
+    softly.assertThat(combination.test("whtvr")).isFalse();
+    softly.assertThat(alwaysTrueCalled.get()).isEqualTo(3);
+    softly.assertThat(alwaysFalseCalled.get()).isEqualTo(1);
 
     // alwaysTrueCalled = new AtomicInteger(0);
     // alwaysFalseCalled = new AtomicInteger(0);

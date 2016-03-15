@@ -1,28 +1,6 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
-/*
- * #%L
- * alexandria-main
- * =======
- * Copyright (C) 2015 - 2016 Huygens ING (KNAW)
- * =======
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
-
-import static nl.knaw.huygens.alexandria.endpoint.EndpointPaths.RESOURCES;
+import static nl.knaw.huygens.alexandria.api.EndpointPaths.RESOURCES;
 import static nl.knaw.huygens.alexandria.endpoint.resource.ResourceValidatorFactory.resourceNotFoundForId;
 
 import javax.inject.Inject;
@@ -41,16 +19,18 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinitionPrototype;
+import nl.knaw.huygens.alexandria.api.model.StatePrototype;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
-import nl.knaw.huygens.alexandria.endpoint.StatePrototype;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
+import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 @Singleton
@@ -65,9 +45,9 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   @Inject
   public ResourcesEndpoint(AlexandriaService service, //
-                           ResourceCreationRequestBuilder requestBuilder, //
-                           LocationBuilder locationBuilder, //
-                           ResourceEntityBuilder entityBuilder) {
+      ResourceCreationRequestBuilder requestBuilder, //
+      LocationBuilder locationBuilder, //
+      ResourceEntityBuilder entityBuilder) {
     this.service = service;
     this.locationBuilder = locationBuilder;
     this.entityBuilder = entityBuilder;
@@ -116,6 +96,31 @@ public class ResourcesEndpoint extends JSONEndpoint {
     throw new BadRequestException("for now, you can only set the state to CONFIRMED");
   }
 
+  @PUT
+  @Path("{uuid}/" + EndpointPaths.BASELAYERDEFINITION)
+  @Consumes(MediaType.APPLICATION_JSON)
+  @ApiOperation(value = "Set the baselayer definition")
+  public Response setBaseLayerDefinition(@PathParam("uuid") final UUIDParam uuidParam, @NotNull BaseLayerDefinitionPrototype protoType) {
+    Log.trace("protoType=[{}]", protoType);
+    AlexandriaResource resource = readExistingResource(uuidParam);
+    if (resource.getDirectBaseLayerDefinition().isPresent()) {
+      throw new ConflictException("This resource already has a baselayer definition");
+    }
+    service.setBaseLayerDefinition(uuidParam.getValue(), protoType);
+    return created(locationBuilder.locationOf(resource, EndpointPaths.BASELAYERDEFINITION));
+  }
+
+  @GET
+  @Path("{uuid}/" + EndpointPaths.BASELAYERDEFINITION)
+  @ApiOperation(value = "Get the baselayer definition")
+  public Response getBaseLayerDefinition(@PathParam("uuid") final UUIDParam uuidParam) {
+    AlexandriaResource resource = readExistingResource(uuidParam);
+    if (!resource.getDirectBaseLayerDefinition().isPresent()) {
+      throw new NotFoundException("This resource has no baselayer definition"); // TODO: alternatively, throw redirected to ancestor baselayer definition (if any)
+    }
+    return ok(resource.getDirectBaseLayerDefinition().get());
+  }
+
   @DELETE
   @Path("{uuid}")
   public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
@@ -127,7 +132,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation(value = "update/create the resource with the given uuid")
   public Response setResourceAtSpecificID(@PathParam("uuid") final UUIDParam uuid, //
-                                          @NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
+      @NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
 
     protoType.setState(AlexandriaState.CONFIRMED);

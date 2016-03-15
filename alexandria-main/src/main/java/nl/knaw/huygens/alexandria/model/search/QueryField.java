@@ -40,12 +40,14 @@ public enum QueryField {
   state, //
   resource_id, //
   subresource_id, //
+  resource_ref, //
+  subresource_sub, //
   resource_url, //
   subresource_url;
 
   public static final ImmutableList<QueryField> RESOURCE_FIELDS = ImmutableList.of(//
-      resource_id, resource_url, //
-      subresource_id, subresource_url//
+      resource_id, resource_url, resource_ref, //
+      subresource_id, subresource_url, subresource_sub//
   );
 
   public static final List<String> ALL_EXTERNAL_NAMES = Arrays.stream(values())//

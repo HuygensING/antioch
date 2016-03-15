@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.storage;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -41,10 +42,11 @@ import org.apache.tinkerpop.gremlin.structure.io.IoCore;
 import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import peapod.FramedGraph;
@@ -59,6 +61,8 @@ public class Storage {
   private String dumpfile;
   private boolean supportsTransactions;
   private boolean supportsPersistence;
+
+  private boolean transactionOpen = false;
 
   public Storage(final Graph graph) {
     setGraph(graph);
@@ -85,62 +89,82 @@ public class Storage {
 
   // framedGraph methods
 
-  public void startTransaction() {
-    if (supportsTransactions()) {
-      framedGraph.tx().rollback();
+  public <T extends Object> T runInTransaction(Supplier<T> supplier) {
+    boolean inOpenTransaction = transactionOpen;
+    if (!inOpenTransaction) {
+      startTransaction();
+    }
+    try {
+      T result = supplier.get();
+      if (!inOpenTransaction) {
+        commitTransaction();
+      }
+      return result;
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      rollbackTransaction();
+      throw e;
     }
   }
 
-  public void commitTransaction() {
-    if (supportsTransactions()) {
-      framedGraph.tx().commit();
-      // framedGraph.tx().close();
+  public void runInTransaction(Runnable runner) {
+    boolean inOpenTransaction = transactionOpen;
+    if (!inOpenTransaction) {
+      startTransaction();
     }
-    if (!supportsPersistence()) {
-      saveToDisk(getDumpFile());
-    }
-  }
+    try {
+      runner.run();
+      if (!inOpenTransaction) {
+        commitTransaction();
+      }
 
-  public void rollbackTransaction() {
-    if (supportsTransactions()) {
-      framedGraph.tx().rollback();
-      // framedGraph.tx().close();
-    } else {
-      Log.error("rollback called, but transactions are not supported by graph {}", graph);
+    } catch (Exception e) {
+      e.printStackTrace();
+      rollbackTransaction();
+      throw e;
     }
   }
 
   public boolean existsVF(final Class<? extends AlexandriaVF> vfClass, final UUID uuid) {
+    assertInTransaction();
     assertClass(vfClass);
     return find(vfClass, uuid).tryNext().isPresent();
   }
 
   public <A extends AlexandriaVF> A createVF(final Class<A> vfClass) {
+    assertInTransaction();
     assertClass(vfClass);
     return framedGraph.addVertex(vfClass);
   }
 
   public <A extends AlexandriaVF> Optional<A> readVF(final Class<A> vfClass, final UUID uuid) {
+    assertInTransaction();
     assertClass(vfClass);
     return firstOrEmpty(find(vfClass, uuid).toList());
   }
 
   public <A extends AlexandriaVF> Optional<A> readVF(final Class<A> vfClass, final UUID uuid, final Integer revision) {
+    assertInTransaction();
     assertClass(vfClass);
     return firstOrEmpty(find(vfClass, uuid, revision).toList());
   }
 
   public <A extends AlexandriaVF> FramedGraphTraversal<Object, A> find(Class<A> vfClass) {
+    assertInTransaction();
+    assertClass(vfClass);
     return framedGraph.V(vfClass);
   }
 
   public GraphTraversal<Vertex, Vertex> getVertexTraversal(Object... vertexIds) {
+    assertInTransaction();
     return graph.traversal().V(vertexIds);
   }
 
   // graph methods
 
   public void removeExpiredTentatives(final Long threshold) {
+    assertInTransaction();
     getVertexTraversal()//
         .has("state", AlexandriaState.TENTATIVE.name())//
         .has("stateSince", lt(threshold))//
@@ -148,8 +172,19 @@ public class Storage {
   }
 
   public void removeVertexWithId(final String annotationBodyId) {
+    assertInTransaction();
     getVertexTraversal()//
         .has(IDENTIFIER_PROPERTY, annotationBodyId).next().remove();
+  }
+
+  public Map<String, Object> getMetadata() {
+    assertInTransaction();
+    Map<String, Object> metadata = Maps.newLinkedHashMap();
+    metadata.put("features", graph.features().toString().split(System.lineSeparator()));
+    GraphTraversalSource traversal = graph.traversal();
+    metadata.put("vertices", count(traversal.V()));
+    metadata.put("edges", count(traversal.E()));
+    return metadata;
   }
 
   public void dumpToGraphSON(final OutputStream os) throws IOException {
@@ -190,6 +225,18 @@ public class Storage {
     this.dumpfile = dumpfile;
   }
 
+  public void destroy() {
+    // Log.info("destroy called");
+    try {
+      Log.info("closing graph {}", graph);
+      graph.close();
+      Log.info("graph closed: {}", graph);
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
+    // Log.info("destroy done");
+  }
   // - private methods - //
 
   private <A extends AlexandriaVF> FramedGraphTraversal<Object, A> find(final Class<A> vfClass, final UUID uuid) {
@@ -208,36 +255,58 @@ public class Storage {
     return results.isEmpty() ? Optional.empty() : Optional.ofNullable(results.get(0));
   }
 
-  private void assertClass(final Class<? extends AlexandriaVF> clazz) {
-    if (clazz.getAnnotationsByType(peapod.annotations.Vertex.class).length == 0) {
-      throw new RuntimeException("Class " + clazz + " has no peapod @Vertex annotation, are you sure it is the correct class?");
-    }
-  }
-
-  public Map<String, Object> getMetadata() {
-    Map<String, Object> metadata = Maps.newLinkedHashMap();
-    metadata.put("features", graph.features().toString().split(System.lineSeparator()));
-    GraphTraversalSource traversal = graph.traversal();
-    metadata.put("vertices", count(traversal.V()));
-    metadata.put("edges", count(traversal.E()));
-    return metadata;
-  }
-
   private Long count(GraphTraversal<?, ?> graphTraversal) {
     return graphTraversal.count().next();
   }
 
-  public void destroy() {
-    // Log.info("destroy called");
-    try {
-      Log.info("closing graph {}", graph);
-      graph.close();
-      Log.info("graph closed: {}", graph);
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
+  private void startTransaction() {
+    assertTransactionIsClosed();
+    if (supportsTransactions()) {
+      framedGraph.tx().rollback();
     }
-    // Log.info("destroy done");
+    transactionOpen = true;
+  }
+
+  private void commitTransaction() {
+    assertTransactionIsOpen();
+    if (supportsTransactions()) {
+      framedGraph.tx().commit();
+      // framedGraph.tx().close();
+    }
+    if (!supportsPersistence()) {
+      saveToDisk(getDumpFile());
+    }
+    transactionOpen = false;
+  }
+
+  private void rollbackTransaction() {
+    assertTransactionIsOpen();
+    if (supportsTransactions()) {
+      framedGraph.tx().rollback();
+      // framedGraph.tx().close();
+    } else {
+      Log.error("rollback called, but transactions are not supported by graph {}", graph);
+    }
+    transactionOpen = false;
+  }
+
+  private void assertInTransaction() {
+    Preconditions.checkState(transactionOpen, "We should be in open transaction at this point, use runInTransaction()!");
+  }
+
+  private void assertClass(final Class<? extends AlexandriaVF> clazz) {
+    Preconditions.checkState(//
+        clazz.getAnnotationsByType(peapod.annotations.Vertex.class).length > 0, //
+        "Class " + clazz + " has no peapod @Vertex annotation, are you sure it's the correct class?"//
+    );
+  }
+
+  private void assertTransactionIsClosed() {
+    Preconditions.checkState(!transactionOpen, "We're already inside an open transaction!");
+  }
+
+  private void assertTransactionIsOpen() {
+    Preconditions.checkState(transactionOpen, "We're not in an open transaction!");
   }
 
 }

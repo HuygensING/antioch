@@ -27,7 +27,9 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.net.URI;
 
-import nl.knaw.huygens.alexandria.endpoint.resource.PropertyPrefix;
+import nl.knaw.huygens.alexandria.api.model.Entity;
+import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
+import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

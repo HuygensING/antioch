@@ -22,6 +22,10 @@ package nl.knaw.huygens.alexandria.textlocator;
  * #L%
  */
 
+import java.io.InputStream;
+
 public interface AlexandriaTextLocator {
+
+  void validate(InputStream textStream) throws TextLocatorValidationException;
 
 }

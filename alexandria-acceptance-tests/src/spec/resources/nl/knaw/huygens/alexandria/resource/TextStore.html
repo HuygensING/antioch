@@ -43,6 +43,25 @@
             } }
         </h:jsonBody>
     </h:request>
+    
+    <h:request>
+     And I have 
+     <h:success>successfully</h:success>
+     <h:put>/resources/11111111-1111-1111-1111-111111111111/baselayerdefinition</h:put>
+     the body:
+     <h:jsonBody>{
+         "baseLayerDefinition": {
+         "subresourceElements": ["note"],
+         "baseElements": [
+         {"name" : "text" },
+         {"name" : "p", "baseAttributes" : ["auth","lang"] }
+         ] } }
+     </h:jsonBody>
+     using
+     <h:setHeader name="Content-Type">application/json</h:setHeader>,
+     to set the base layer definition:
+    </h:request>
+    <br/>
 
     <h:request>
         When I
@@ -50,15 +69,19 @@
         the body:
         <h:jsonBody>{
             "text": {
-            "body": "&lt;text&gt;&lt;p&gt;paragraph 1&lt;/p&gt;&lt;p&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;"
+            "body": "&lt;text&gt;&lt;p xml:id=\&quot;p-1\&quot; lang=\&quot;en\&quot; auth=\&quot;me\&quot;&gt;paragraph 1&lt;/p&gt;&lt;p&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;"
             } }
         </h:jsonBody>
         using
         <h:setHeader name="Content-Type">application/json</h:setHeader>
         Then I should receive
-        <h:status>204 No Content</h:status>
+        <h:status>200 OK</h:status>
         and the response body is
-        <h:responseBody/>
+        <h:jsonResponse>{
+           "resourceTextUploadResult" : {
+           "^baseLayerDefinition" : "https://{host}/resources/11111111-1111-1111-1111-111111111111/baselayerdefinition"
+        } }
+        </h:jsonResponse>
     </h:request>
     <br/>
     <h:request>
@@ -66,8 +89,10 @@
         <h:get>/resources/11111111-1111-1111-1111-111111111111/text</h:get>
         using
         <h:setHeader name="Accept">text/xml</h:setHeader>
-        yields response body:
-        <h:responseBody>&lt;text&gt;&lt;p&gt;paragraph 1&lt;/p&gt;&lt;p&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;</h:responseBody>
+        yields response body:<br/>
+        <h:responseBody>&lt;text xml:id="text-1"&gt;&lt;p xml:id="p-1" auth="me" lang="en"&gt;paragraph 1&lt;/p&gt;&lt;p xml:id="p-2"&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;</h:responseBody><br/>
+        Notice that base layer elements have been given a unique xml:id if they didn't have one already.<br/>
+        Notice also that the attribute order on &lt;p&gt; is the one defined in the base layer definition.<br/>
     </h:request>
 </div>
 
@@ -87,6 +112,24 @@
     </h:request>
 
     <h:request>
+     And I have 
+     <h:success>successfully</h:success>
+     <h:put>/resources/22222222-2222-2222-2222-222222222222/baselayerdefinition</h:put>
+     the body:
+     <h:jsonBody>{
+         "baseLayerDefinition": {
+         "baseElements": [
+         {"name" : "text" },
+         {"name" : "p" }
+         ] } }
+     </h:jsonBody>
+     using
+     <h:setHeader name="Content-Type">application/json</h:setHeader>,
+     to set the base layer definition:
+    </h:request>
+    <br/>
+
+    <h:request>
         When I
         <h:put>/resources/22222222-2222-2222-2222-222222222222/text</h:put>
         the body:
@@ -94,9 +137,13 @@
         using
         <h:setHeader name="Content-Type">text/xml</h:setHeader>
         Then I should receive
-        <h:status>204 No Content</h:status>
+        <h:status>200 OK</h:status>
         and the response body is
-        <h:responseBody/>
+        <h:jsonResponse>{
+           "resourceTextUploadResult" : {
+           "^baseLayerDefinition" : "https://{host}/resources/22222222-2222-2222-2222-222222222222/baselayerdefinition"
+        } }
+        </h:jsonResponse>
     </h:request>
     <br/>
     <h:request>
@@ -104,8 +151,9 @@
         <h:get>/resources/22222222-2222-2222-2222-222222222222/text</h:get>
         using
         <h:setHeader name="Accept">text/xml</h:setHeader>
-        yields response body:
-        <h:responseBody>&lt;text&gt;&lt;p&gt;other text&lt;/p&gt;&lt;/text&gt;</h:responseBody>
+        yields response body:<br/>
+        <h:responseBody>&lt;text xml:id="text-1"&gt;&lt;p xml:id="p-1"&gt;other text&lt;/p&gt;&lt;/text&gt;</h:responseBody><br/>
+        Notice that base layer elements have been given a unique xml:id if they didn't have one already.
     </h:request>
 </div>
 
@@ -125,6 +173,24 @@
     </h:request>
 
     <h:request>
+     And I have 
+     <h:success>successfully</h:success>
+     <h:put>/resources/33333333-3333-3333-3333-333333333333/baselayerdefinition</h:put>
+     the body:
+     <h:jsonBody>{
+         "baseLayerDefinition": {
+         "baseElements": [
+         {"name" : "text" },
+         {"name" : "p" }
+         ] } }
+     </h:jsonBody>
+     using
+     <h:setHeader name="Content-Type">application/json</h:setHeader>,
+     to set the base layer definition:
+    </h:request>
+    <br/>
+
+    <h:request>
         When I
         <h:put>/resources/33333333-3333-3333-3333-333333333333/text</h:put>
         the body:
@@ -132,9 +198,13 @@
         using
         <h:setHeader name="Content-Type">application/octet-stream</h:setHeader>
         Then I should receive
-        <h:status>204 No Content</h:status>
+        <h:status>200 OK</h:status>
         and the response body is
-        <h:responseBody/>
+        <h:jsonResponse>{
+           "resourceTextUploadResult" : {
+           "^baseLayerDefinition" : "https://{host}/resources/33333333-3333-3333-3333-333333333333/baselayerdefinition"
+        } }
+        </h:jsonResponse>
     </h:request>
     <br/>
     <h:request>
@@ -142,8 +212,9 @@
         <h:get>/resources/33333333-3333-3333-3333-333333333333/text</h:get>
         using
         <h:setHeader name="Accept">text/xml</h:setHeader>
-        yields response body:
-        <h:responseBody>&lt;text&gt;&lt;p&gt;different text&lt;/p&gt;&lt;/text&gt;</h:responseBody>
+        yields response body:<br/>
+        <h:responseBody>&lt;text xml:id="text-1"&gt;&lt;p xml:id="p-1"&gt;different text&lt;/p&gt;&lt;/text&gt;</h:responseBody><br/>
+        Notice that base layer elements have been given a unique xml:id if they didn't have one already.
     </h:request>
 </div>
 
@@ -172,6 +243,41 @@
             </li>
         </ul>
 
+    </h:request>
+</div>
+
+<div id="text-without-baselayer-definition" c:execute="clearStorage()"
+     data-desc="What happens if no base layer is defined?">
+    <h:request>
+        Given that I have
+        <h:success>successfully</h:success>
+        <h:put>/resources/99999999-9999-9999-9999-999999999999</h:put>
+        the body:
+        <h:jsonBody>{
+            "resource": {
+            "id": "99999999-9999-9999-9999-999999999999",
+            "ref": "grotius-3161-v2"
+            } }
+        </h:jsonBody>
+    </h:request>
+    <br/>
+
+    <h:request>
+        When I then
+        <h:put>/resources/99999999-9999-9999-9999-999999999999/text</h:put>
+        the body:
+        <h:requestBody>&lt;text&gt;&lt;p&gt;the quick brown fox jumped the lazy dog's back&lt;/p&gt;&lt;/text&gt;</h:requestBody>
+        using
+        <h:setHeader name="Content-Type">application/octet-stream</h:setHeader>,
+        <br/>
+        Then I will receive
+        <h:status>409 Conflict</h:status>
+        and the response body is
+        <h:jsonResponse>{
+				  "error" : {
+				    "message" : "No base layer defined for resource: 99999999-9999-9999-9999-999999999999"
+				  } }
+        </h:jsonResponse>
     </h:request>
 </div>
 

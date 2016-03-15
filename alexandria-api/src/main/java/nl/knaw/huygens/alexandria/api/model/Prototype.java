@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint;
+package nl.knaw.huygens.alexandria.api.model;
 
 /*
  * #%L
@@ -22,10 +22,9 @@ package nl.knaw.huygens.alexandria.endpoint;
  * #L%
  */
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+/**
+ * used as input for the POST/PUT methods on the endpoints
+ */
+public interface Prototype {
 
-@JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
-public abstract class JsonWrapperObject {
 }

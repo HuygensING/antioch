@@ -22,21 +22,30 @@ package nl.knaw.huygens.alexandria.textlocator;
  * #L%
  */
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
-import javax.xml.xpath.XPathExpressionException;
-
-import org.apache.commons.io.IOUtils;
 
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.tei.QueryableDocument;
 
 public class TextLocatorFactory {
+
+  static Map<String, Function<String, ? extends AlexandriaTextLocator>> prefix2locator = new HashMap<>();
+
+  static {
+    prefix2locator.put(ByIdTextLocator.PREFIX, (string) -> new ByIdTextLocator().withId(string));
+    prefix2locator.put(ByOffsetTextLocator.PREFIX, (string) -> {
+      String[] startAndLength = string.split(",");
+      Long start = Long.valueOf(startAndLength[0]);
+      Long length = Long.valueOf(startAndLength[1]);
+      return new ByOffsetTextLocator(start, length);
+    });
+  }
 
   private AlexandriaService service;
 
@@ -48,28 +57,23 @@ public class TextLocatorFactory {
   public AlexandriaTextLocator fromString(String locatorString) throws TextLocatorParseException {
     String[] parts = locatorString.split(":", 2);
     String prefix = parts[0];
-    if (ByIdTextLocator.PREFIX.equals(prefix)) {
-      return new ByIdTextLocator().withId(parts[1]);
+    if (prefix2locator.containsKey(prefix)) {
+      return prefix2locator.get(prefix).apply(parts[1]);
     }
-    throw new TextLocatorParseException("The locator prefix '" + prefix + "' is not a valid prefix. Valid prefix: 'id'.");
+    throw new TextLocatorParseException("The locator prefix '" + prefix + "' is not a valid prefix. Valid prefixes: "
+      + prefix2locator
+      .keySet() + ".");
   }
 
   public void validate(AlexandriaTextLocator locator, AlexandriaResource resource) {
-    if (locator instanceof ByIdTextLocator) {
-      ByIdTextLocator byId = (ByIdTextLocator) locator;
-      String id = byId.getId();
-      Optional<InputStream> textStream = service.getResourceTextAsStream(resource.getId());//
-      try {
-        String xml = IOUtils.toString(textStream.get());
-        QueryableDocument qDocument = QueryableDocument.createFromXml(xml, true);
-        Boolean idExists = qDocument.evaluateXPathToBoolean("boolean(//*[@xml:id=\"" + id + "\"])");
-        if (!idExists) {
-          throw new BadRequestException("The resource text has no element with xml:id=\"" + id + "\"");
-        }
+    InputStream textStream = service.getResourceTextAsStream(resource.getId())//
+                                    .orElseThrow(() -> new BadRequestException("The resource has no text attached."));
 
-      } catch (IOException | XPathExpressionException e) {
-        throw new RuntimeException(e);
-      }
+    try {
+      locator.validate(textStream);
+    } catch (TextLocatorValidationException tlve) {
+      throw new BadRequestException(tlve.getMessage());
     }
   }
+
 }

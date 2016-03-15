@@ -44,6 +44,8 @@ public class QueryFieldGetters {
       .put(QueryField.subresource_id, AnnotationVF::getSubResourceId) //
       .put(QueryField.resource_url, AlexandriaQueryParser::getResourceURL) //
       .put(QueryField.subresource_url, AlexandriaQueryParser::getSubResourceURL)//
+      .put(QueryField.resource_ref, AlexandriaQueryParser::getResourceRef) //
+      .put(QueryField.subresource_sub, AlexandriaQueryParser::getSubResourceSub)//
       .build();
 
   public static Function<AnnotationVF, Object> get(QueryField queryField) {

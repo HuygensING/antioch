@@ -11,7 +11,7 @@ be=http://test.alexandria.huygens.knaw.nl/
 uuid1="11111111-1111-1111-1111-111111111111"
 uuid2="22222222-2222-2222-2222-222222222222"
 
-curl -i -X PUT $be/resources/c28626d4-493a-4204-83d9-e9ae17e15654 -H 'Content-type: application/json' \
+curl -i -X PUT ${be}/resources/c28626d4-493a-4204-83d9-e9ae17e15654 -H 'Content-type: application/json' \
 --data-binary '{"resource":{
   "id":"c28626d4-493a-4204-83d9-e9ae17e15654",
   "ref":"whatever",
@@ -24,13 +24,13 @@ curl -i -X PUT $be/resources/c28626d4-493a-4204-83d9-e9ae17e15654 -H 'Content-ty
 
 ri=d28626d4-493a-4204-83d9-e9ae17e15654
 
-curl -i -X PUT $be/resources/$ri -H 'Content-type: application/json' \
+curl -i -X PUT ${be}/resources/${ri} -H 'Content-type: application/json' \
 --data-binary '{"resource":{
   "id":"d28626d4-493a-4204-83d9-e9ae17e15654",
   "ref":"whatEver"
 }}'
 
-curl -i -H "${authheader}" -X POST $be/resources/$ri/subresources -H 'Content-type: application/json' \
+curl -i -H "${authheader}" -X POST ${be}/resources/${ri}/subresources -H 'Content-type: application/json' \
 --data-binary '{"subresource":{
   "sub":"title"
 }}'
@@ -278,3 +278,62 @@ curl -i -H "${authheader}" -X POST $be/annotations/$ai/annotations -H 'Content-t
 #- on resource -> annotation with id locator on resource with text but ☺gives badrequest
 
 
+
+curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
+--data-binary '{
+  "baseLayerDefinition": {
+  	"subresourceElements": ["note"],
+    "baseElements": [ {
+      "name": "body"
+    }, {
+      "name": "div",
+      "baseAttributes": [ "type" ]
+    }, {
+      "name": "p"
+    }, {
+      "name": "sub"
+    }, {
+      "name": "sup"
+    } ]
+  }
+}'
+
+curl -i -H "${authheader}" $be/resources/$ri/baselayerdefinition
+
+a-dry-run "<body></body>"
+
+a-dry-run '<body><p>Hello world!</p></body>'
+
+a-dry-run '<body id="body1">
+  <p id="p1">Hello world!</p>
+</body>'
+
+a-dry-run '<body id="body1" lang="en">
+  <p id="p1" lang="en">Hello world!</p>
+</body>'
+
+a-dry-run '<body id="body1"><p id="p1"><hi rend="i">Hello <lb/> M<sup id="sup1">r</sup>. <persName>Jones</persName>!</hi></p></body>'
+
+a-dry-run '<body xml:id="body1">
+  <p xml:id="p1">Hello world!</p>
+</body>'
+
+a-dry-run '<body xml:id="body1" lang="en">
+  <p xml:id="p1" lang="en">Hello world!</p>
+</body>'
+
+a-dry-run '<body xml:id="body1"><p xml:id="p1"><hi rend="i">Hello <lb/> M<sup xml:id="sup1">r</sup>. <persName>Jones</persName>!</hi></p></body>'
+
+a-dry-run '<body xml:id="body1"><p xml:id="p1"><hi rend="i">Hello<note who="me">WTF?<note who="boss">language!</note></note> <lb/> M<sup xml:id="sup1">r</sup>. <persName>Jones</persName>!</hi></p></body>'
+
+
+
+curl -i -H "${authheader}" -X POST $be/searches -H 'Content-type: application/json' \
+--data-binary '{"query" : {
+      "find" : "annotation",
+      "where" : "state:eq(\"CONFIRMED\") who:eq(\"nederlab\") resource.id:inSet(\"e023002c-011b-11e4-b0ff-51bcbd7c379f\", \"e0a2bd62-011b-11e4-b0ff-51bcbd7c379f\")",
+      "sort" : "-when",
+      "distinct" : true,
+      "pageSize" : 100,
+      "return" : "id,value,resource.id,subresource.id"
+    }}'

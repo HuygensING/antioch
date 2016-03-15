@@ -27,6 +27,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.List;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.validation.Constraint;
@@ -74,12 +75,12 @@ public @interface MatchesPathId {
       return prototypeId == null || value(uriId()).equals(value(prototypeId));
     }
 
-    private String value(PathSegment segment) {
-      return segment.getPath();
+    private UUID value(PathSegment segment) {
+      return UUID.fromString(segment.getPath());
     }
 
-    private String value(UUIDParam uuid) {
-      return String.valueOf(uuid.getValue());
+    private UUID value(UUIDParam uuid) {
+      return uuid.getValue();
     }
 
     private PathSegment uriId() {

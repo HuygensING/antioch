@@ -23,18 +23,21 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
  */
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import io.swagger.annotations.ApiModel;
-import nl.knaw.huygens.alexandria.endpoint.AbstractAnnotatableEntity;
+import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 
 @JsonTypeName("subresource")
+@JsonInclude(Include.NON_NULL)
 @ApiModel("subresource")
-public class SubResourceEntity extends AbstractAnnotatableEntity {
+public class SubResourceEntity extends AbstractResourceEntity {
 
   @JsonIgnore
   private final AlexandriaResource subResource;
@@ -54,10 +57,6 @@ public class SubResourceEntity extends AbstractAnnotatableEntity {
 
   public String getSub() {
     return subResource.getCargo();
-  }
-
-  public Boolean hasText() {
-    return subResource.hasText();
   }
 
   @JsonProperty(PropertyPrefix.LINK + "partOf")

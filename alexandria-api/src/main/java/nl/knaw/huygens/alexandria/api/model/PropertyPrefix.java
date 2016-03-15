@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint;
+package nl.knaw.huygens.alexandria.api.model;
 
 /*
  * #%L
@@ -22,14 +22,11 @@ package nl.knaw.huygens.alexandria.endpoint;
  * #L%
  */
 
-public final class EndpointPaths {
-  public static final String ANNOTATIONS = "annotations";
-  public static final String ANNOTATIONBODIES = "annotationbodies";
-  public static final String RESOURCES = "resources";
-  public static final String SEARCHES = "searches";
-
-  private EndpointPaths() {
-    throw new AssertionError("Paths shall not be instantiated");
-  }
-
+/**
+ * prefixes for property labels to indicate the type of variable
+ *
+ */
+public class PropertyPrefix {
+  public static final String LINK = "^";
+  public static final String TRANSIENT = "!";
 }

@@ -36,10 +36,10 @@ public class SearchResultCache {
       .build();
 
   public static void add(SearchResult searchResult) {
-    cache.put(searchResult.getId(), Optional.ofNullable(searchResult));
+    cache.put(searchResult.getId(), Optional.of(searchResult));
   }
 
-  static final Callable<Optional<SearchResult>> EMPTY_WHEN_MISSING = () -> Optional.empty();
+  static final Callable<Optional<SearchResult>> EMPTY_WHEN_MISSING = Optional::empty;
 
   public static Optional<SearchResult> get(UUID id) {
     Optional<SearchResult> oSearchResult = Optional.empty();

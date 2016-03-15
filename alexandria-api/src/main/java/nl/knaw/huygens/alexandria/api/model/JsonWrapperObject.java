@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.model;
+package nl.knaw.huygens.alexandria.api.model;
 
 /*
  * #%L
@@ -22,6 +22,10 @@ package nl.knaw.huygens.alexandria.model;
  * #L%
  */
 
-public enum AlexandriaState {
-  TENTATIVE, CONFIRMED, DELETED, DEPRECATED
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
+@JsonTypeInfo(use = Id.NAME, include = As.WRAPPER_OBJECT)
+public abstract class JsonWrapperObject {
 }

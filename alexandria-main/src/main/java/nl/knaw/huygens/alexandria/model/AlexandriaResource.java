@@ -27,12 +27,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 import jersey.repackaged.com.google.common.collect.Lists;
+import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
 
 public class AlexandriaResource extends AbstractAnnotatable {
 
   private String cargo; // ref for resource, sub for subresource
   private Optional<IdentifiablePointer<AlexandriaResource>> parentResourcePointer = Optional.empty(); // only used in subresources
+  private Optional<IdentifiablePointer<AlexandriaResource>> firstParentResourceWithBaseLayerDefinitionPointer = Optional.empty(); // only used in subresources
   private Collection<IdentifiablePointer<AlexandriaResource>> subResourcePointers = Lists.newArrayList();
+  private Optional<BaseLayerDefinition> directBaseLayerDefinition = Optional.empty();
   private boolean hasText = false;
 
   public AlexandriaResource(UUID id, TentativeAlexandriaProvenance provenance) {
@@ -77,4 +80,19 @@ public class AlexandriaResource extends AbstractAnnotatable {
     }
   }
 
+  public Optional<BaseLayerDefinition> getDirectBaseLayerDefinition() {
+    return directBaseLayerDefinition;
+  }
+
+  public void setDirectBaseLayerDefinition(BaseLayerDefinition baseLayerDefinition) {
+    this.directBaseLayerDefinition = Optional.of(baseLayerDefinition);
+  }
+
+  public Optional<IdentifiablePointer<AlexandriaResource>> getFirstAncestorResourceWithBaseLayerDefinitionPointer() {
+    return this.firstParentResourceWithBaseLayerDefinitionPointer;
+  }
+
+  public void setFirstAncestorResourceWithBaseLayerDefinitionPointer(IdentifiablePointer<AlexandriaResource> parentResourcePointer) {
+    this.firstParentResourceWithBaseLayerDefinitionPointer = Optional.of(parentResourcePointer);
+  }
 }

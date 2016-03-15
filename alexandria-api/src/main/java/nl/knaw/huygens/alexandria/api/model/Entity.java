@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint;
+package nl.knaw.huygens.alexandria.api.model;
 
 /*
  * #%L
@@ -23,8 +23,9 @@ package nl.knaw.huygens.alexandria.endpoint;
  */
 
 /**
- * used as input for the POST/PUT methods on the endpoints
+ * used as output for the GET methods on the endpoints
  */
-public interface Prototype {
+
+public interface Entity {
 
 }
