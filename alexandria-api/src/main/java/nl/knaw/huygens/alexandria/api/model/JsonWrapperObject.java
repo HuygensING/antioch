@@ -2,7 +2,7 @@ package nl.knaw.huygens.alexandria.api.model;
 
 /*
  * #%L
- * alexandria-main
+ * alexandria-api
  * =======
  * Copyright (C) 2015 - 2016 Huygens ING (KNAW)
  * =======
