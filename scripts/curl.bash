@@ -331,7 +331,7 @@ a-dry-run '<body xml:id="body1"><p xml:id="p1"><hi rend="i">Hello<note who="me">
 curl -i -H "${authheader}" -X POST $be/searches -H 'Content-type: application/json' \
 --data-binary '{"query" : {
       "find" : "annotation",
-      "where" : "state:eq(\"CONFIRMED\") who:eq(\"nederlab\") resource.id:inSet(\"e023002c-011b-11e4-b0ff-51bcbd7c379f\", \"e0a2bd62-011b-11e4-b0ff-51bcbd7c379f\")",
+      "where" : "state:eq(\"CONFIRMED\") resource.id:inSet(\"73c04232-f5f4-4d69-88ea-5ba4a669b72d\",\"c88423cc-3c4d-472e-ac99-2c67eabf02dc\")",
       "sort" : "-when",
       "distinct" : true,
       "pageSize" : 100,
