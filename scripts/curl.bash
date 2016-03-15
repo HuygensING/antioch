@@ -337,3 +337,15 @@ curl -i -H "${authheader}" -X POST $be/searches -H 'Content-type: application/js
       "pageSize" : 100,
       "return" : "id,value,resource.id,subresource.id"
     }}'
+
+
+// Meertens bug report
+curl -i -H "${authheader}" -X POST $be/searches -H 'Content-type: application/json' \
+--data-binary '{"query" : {
+"find" : "annotation",
+"where" : "state:eq(\"CONFIRMED\") who:eq(\"gebruikertje_meertens.knaw.nl\") resource.id:inSet(\"e023002c-011b-11e4-b0ff-51bcbd7c379f\",\"e0a2bd62-011b-11e4-b0ff-51bcbd7c379f\")",
+"sort" : "-when",
+"distinct" : true,
+"pageSize" : 100,
+"return" : "id,value,resource.id,subresource.id"
+}}'
