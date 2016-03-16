@@ -97,15 +97,6 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   public Response setTextFromXml(@NotNull @Valid String xml) {
     assertResourceHasNoText();
     BaseLayerDefinition bld = service.getBaseLayerDefinitionForResource(resourceId).orElseThrow(noBaseLayerDefined());
-    
-    //BaseLayerData baseLayerData = TextUtil.extractBaseLayerData(xml, bld);
-    //if (baseLayerData.validationFailed()) {
-    //  throw new BadRequestException(baseLayerData.getValidationErrors().stream().collect(joining("\n")));
-    //}
-    //service.setResourceTextFromStream(resourceId, streamIn(baseLayerData.getBaseLayer()));
-    //ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity.of(bld.getBaseLayerDefiningResourceId(), baseLayerData).withLocationBuilder(locationBuilder);
-    //return ok(resourceTextUploadEntity);
-    
     startTextProcessing(xml, bld);
     return Response.accepted()//
         .location(locationBuilder.locationOf(resource, "text", "status"))//

@@ -67,12 +67,14 @@ public class TextImportTask implements Runnable {
 
   @Override
   public void run() {
+
     BaseLayerData baseLayerData = TextUtil.extractBaseLayerData(xml, bld);
     if (baseLayerData.validationFailed()) {
       throw new BadRequestException(baseLayerData.getValidationErrors().stream().collect(joining("\n")));
     }
     service.setResourceTextFromStream(resourceId, streamIn(baseLayerData.getBaseLayer()));
     status.setBaseLayerURI(locationBuilder.locationOf(resource, "text"));
+    // ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity.of(bld.getBaseLayerDefiningResourceId(), baseLayerData).withLocationBuilder(locationBuilder);
 
     baseLayerData.getAnnotationData().forEach(annotationData -> {
       AlexandriaTextLocator textLocator = new ByXPathTextLocator().withXPath(annotationData.getXPath());
