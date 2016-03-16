@@ -75,16 +75,17 @@ public class BaseLayerVisitor extends DelegatingVisitor<BLVContext> implements C
     context.addLiteral(annotatedBaseText);
     if (isRootElement(element) && isSubResourceElement(element)) {
       context.addCloseTag(element);
+    } else {
+      String xpath = context.substringOffsetXPath(context.getTextOffsetStack().pop());
+      Log.info("xpath={}", xpath);
+      context.getAnnotationData()
+          .add(new AnnotationData()//
+              .setAnnotatedBaseText(annotatedBaseText)//
+              .setLevel(XmlAnnotationLevel.element)//
+              .setType(element.getName())//
+              .setValue(element)//
+              .setXPath(xpath));
     }
-    String xpath = context.substringOffsetXPath(context.getTextOffsetStack().pop());
-    Log.info("xpath={}", xpath);
-    context.getAnnotationData()
-        .add(new AnnotationData()//
-            .setAnnotatedBaseText(annotatedBaseText)//
-            .setLevel(XmlAnnotationLevel.element)//
-            .setType(element.getName())//
-            .setValue(element)//
-            .setXPath(xpath));
     return Traversal.NEXT;
   }
 
