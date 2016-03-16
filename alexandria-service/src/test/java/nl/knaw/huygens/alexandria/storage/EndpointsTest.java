@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.storage;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -73,6 +73,25 @@ public class EndpointsTest extends TinkergraphServiceEndpointTest {
   }
 
   @Test
+  public void testUpdatingATentativeResourceLeadsToConflictException() {
+    Response response = target(ROOTPATH).request().post(jsonEntity("{'resource':{'ref':'REF'}}"));
+    Log.debug("response={}", response);
+    assertThat(response.getLocation().toString()).contains("/resources/");
+    assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
+
+    UUID id = extractId(response);
+    Log.debug("uuid={}", id);
+    AlexandriaResource resource = getService().readResource(id).get();
+    assertThat(resource.getState()).isEqualTo(AlexandriaState.TENTATIVE);
+
+    response = target(ROOTPATH).path(id.toString()).request().put(jsonEntity("{'resource':{'id':'" + id + "','ref':'REF'}}"));
+    assertThat(response.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
+
+    resource = getService().readResource(id).get();
+    assertThat(resource.getState()).isEqualTo(AlexandriaState.TENTATIVE);
+  }
+
+  @Test
   public void testPostResourceSetsStateToTentativeAndPutSetsStateToConfirmed() {
     Response response = target(ROOTPATH).request().post(jsonEntity("{'resource':{'ref':'REF'}}"));
     Log.debug("response={}", response);
@@ -83,6 +102,8 @@ public class EndpointsTest extends TinkergraphServiceEndpointTest {
     Log.debug("uuid={}", id);
     AlexandriaResource resource = getService().readResource(id).get();
     assertThat(resource.getState()).isEqualTo(AlexandriaState.TENTATIVE);
+
+    getService().confirmResource(id);
 
     response = target(ROOTPATH).path(id.toString()).request().put(jsonEntity("{'resource':{'id':'" + id + "','ref':'REF'}}"));
     assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());

@@ -1,6 +1,29 @@
 package nl.knaw.huygens.alexandria.text;
 
+/*
+ * #%L
+ * alexandria-main
+ * =======
+ * Copyright (C) 2015 - 2016 Huygens ING (KNAW)
+ * =======
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import static java.util.stream.Collectors.joining;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
@@ -108,7 +131,7 @@ public class TextUtilTest extends AlexandriaTest {
     // given
     String xml = singleQuotesToDouble("<text>"//
         + "<div>"//
-        + "<p>Lorem Ipsum Dolor Etc.<note>Damned<note>Is this really necessary?</note> interesting, please continue</note></p>"//
+        + "<p>Lorem Ipsum Dolor Etc.<note n='1'>Damned<note n='1-1'>Is this really necessary?</note> interesting, please continue</note></p>"//
         + "</div>"//
         + "</text>");
     String expected = singleQuotesToDouble("<text xml:id='text-1'>"//
@@ -128,8 +151,8 @@ public class TextUtilTest extends AlexandriaTest {
     String baseLayer = baseLayerData.getBaseLayer();
 
     // then expect
-    softly.assertThat(baseLayerData.validationFailed()).isFalse();
-    softly.assertThat(baseLayer).isEqualTo(expected);
+    assertThat(baseLayerData.validationFailed()).isFalse();
+    assertThat(baseLayer).isEqualTo(expected);
     Log.info(expected);
     baseLayerData.getAnnotationData().forEach(a -> Log.info(">> {}", a.toVerbose()));
   }

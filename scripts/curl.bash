@@ -323,3 +323,29 @@ a-dry-run '<body xml:id="body1" lang="en">
 </body>'
 
 a-dry-run '<body xml:id="body1"><p xml:id="p1"><hi rend="i">Hello <lb/> M<sup xml:id="sup1">r</sup>. <persName>Jones</persName>!</hi></p></body>'
+
+a-dry-run '<body xml:id="body1"><p xml:id="p1"><hi rend="i">Hello<note who="me">WTF?<note who="boss">language!</note></note> <lb/> M<sup xml:id="sup1">r</sup>. <persName>Jones</persName>!</hi></p></body>'
+
+
+
+curl -i -H "${authheader}" -X POST $be/searches -H 'Content-type: application/json' \
+--data-binary '{"query" : {
+      "find" : "annotation",
+      "where" : "state:eq(\"CONFIRMED\") resource.id:inSet(\"73c04232-f5f4-4d69-88ea-5ba4a669b72d\",\"c88423cc-3c4d-472e-ac99-2c67eabf02dc\")",
+      "sort" : "-when",
+      "distinct" : true,
+      "pageSize" : 100,
+      "return" : "id,value,resource.id,subresource.id"
+    }}'
+
+
+// Meertens bug report
+curl -i -H "${authheader}" -X POST $be/searches -H 'Content-type: application/json' \
+--data-binary '{"query" : {
+"find" : "annotation",
+"where" : "state:eq(\"CONFIRMED\") who:eq(\"gebruikertje_meertens.knaw.nl\") resource.id:inSet(\"e023002c-011b-11e4-b0ff-51bcbd7c379f\",\"e0a2bd62-011b-11e4-b0ff-51bcbd7c379f\")",
+"sort" : "-when",
+"distinct" : true,
+"pageSize" : 100,
+"return" : "id,value,resource.id,subresource.id"
+}}'
