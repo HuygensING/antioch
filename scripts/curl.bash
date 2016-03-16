@@ -349,3 +349,5 @@ curl -i -H "${authheader}" -X POST $be/searches -H 'Content-type: application/js
 "pageSize" : 100,
 "return" : "id,value,resource.id,subresource.id"
 }}'
+
+a-dry-run-from-file scripts/cwg/huyg003-1376.xml

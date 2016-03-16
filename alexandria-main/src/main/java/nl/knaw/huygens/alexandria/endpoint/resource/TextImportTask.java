@@ -32,6 +32,7 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.text.AnnotationData;
 import nl.knaw.huygens.alexandria.text.BaseLayerData;
 import nl.knaw.huygens.alexandria.text.TextUtil;
 import nl.knaw.huygens.alexandria.text.XmlAnnotationLevel;
@@ -67,56 +68,89 @@ public class TextImportTask implements Runnable {
 
   @Override
   public void run() {
-
     BaseLayerData baseLayerData = TextUtil.extractBaseLayerData(xml, bld);
     if (baseLayerData.validationFailed()) {
       throw new BadRequestException(baseLayerData.getValidationErrors().stream().collect(joining("\n")));
     }
-    service.setResourceTextFromStream(resourceId, streamIn(baseLayerData.getBaseLayer()));
     status.setBaseLayerURI(locationBuilder.locationOf(resource, "text"));
-    // ResourceTextUploadEntity resourceTextUploadEntity = ResourceTextUploadEntity.of(bld.getBaseLayerDefiningResourceId(), baseLayerData).withLocationBuilder(locationBuilder);
+    service.setResourceTextFromStream(resourceId, streamIn(baseLayerData.getBaseLayer()));
 
-    baseLayerData.getAnnotationData().forEach(annotationData -> {
+    generateAnnotationsAndSubresources(resource, baseLayerData);
+
+    status.setDone(true);
+  }
+
+  private void generateAnnotationsAndSubresources(AlexandriaResource parentResource, BaseLayerData baseLayerData) {
+    generateAnnotations(parentResource, baseLayerData.getAnnotationData());
+    generateSubresources(parentResource, baseLayerData.getSubLayerData());
+  }
+
+  private void generateAnnotations(AlexandriaResource parentResource, List<AnnotationData> annotationDataList) {
+    annotationDataList.forEach(annotationData -> {
       AlexandriaTextLocator textLocator = new ByXPathTextLocator().withXPath(annotationData.getXPath());
-      TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(ThreadContext.getUserName(), Instant.now(), "initial text import");
+      TentativeAlexandriaProvenance provenance = newProvenance();
       String type = annotationData.getType();
       String value = annotationData.getValue().toString();
-      if (annotationData.getLevel().equals(XmlAnnotationLevel.element)) {
+      boolean annotationIsXmlElementAnnotation = annotationData.getLevel().equals(XmlAnnotationLevel.element);
+      if (annotationIsXmlElementAnnotation) {
         value = type;
         type = TYPE_XML_ELEMENT;
       } else {
         type = TYPE_XML_ATTRIBUTE + type;
       }
       AlexandriaAnnotationBody annotationbody = service.createAnnotationBody(UUID.randomUUID(), type, value, provenance);
-      AlexandriaAnnotation annotation = service.annotate(resource, textLocator, annotationbody, provenance);
+      AlexandriaAnnotation annotation = service.annotate(parentResource, textLocator, annotationbody, provenance);
       service.confirmAnnotation(annotation.getId());
-      status.getGeneratedAnnotations().add(locationBuilder.locationOf(annotation));
-      if (annotationData.getLevel().equals(XmlAnnotationLevel.element)) {
+      URI annotationURI = locationBuilder.locationOf(annotation);
+      if (annotationIsXmlElementAnnotation) {
+        status.getGeneratedXmlElementAnnotations().add(annotationURI);
         Element element = (Element) annotationData.getValue();
         element.getAttributes().forEach((key, attributeValue) -> {
           AlexandriaAnnotationBody subannotationbody = service.createAnnotationBody(UUID.randomUUID(), TYPE_XML_ATTRIBUTE + key, attributeValue, provenance);
           AlexandriaAnnotation subAnnotation = service.annotate(annotation, subannotationbody, provenance);
           service.confirmAnnotation(subAnnotation.getId());
-          status.getGeneratedAnnotations().add(locationBuilder.locationOf(subAnnotation));
+          status.getGeneratedXmlElementAttributeAnnotations().add(locationBuilder.locationOf(subAnnotation));
         });
       }
     });
-    status.setDone(true);
+  }
+
+  private void generateSubresources(AlexandriaResource parentResource, List<BaseLayerData> sublayerData) {
+    sublayerData.forEach(data -> {
+      TentativeAlexandriaProvenance provenance = newProvenance();
+      UUID subresourceId = UUID.randomUUID();
+      AlexandriaResource subresource = service.createSubResource(subresourceId, parentResource.getId(), data.getId(), provenance);
+      service.setResourceTextFromStream(subresourceId, streamIn(data.getBaseLayer()));
+      service.confirmResource(subresourceId);
+      status.getGeneratedSubresources().add(locationBuilder.locationOf(subresource));
+      generateAnnotationsAndSubresources(subresource, data);
+    });
+  }
+
+  private TentativeAlexandriaProvenance newProvenance() {
+    TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(ThreadContext.getUserName(), Instant.now(), "initial text import");
+    return provenance;
   }
 
   private InputStream streamIn(String body) {
     return IOUtils.toInputStream(body);
   }
 
+  public boolean isExpired() {
+    return status.getExpires() != null && Instant.now().isAfter(status.getExpires());
+  }
+
   @JsonTypeName("textImportStatus")
   @JsonInclude(Include.NON_NULL)
   public static class Status extends JsonWrapperObject implements Entity {
     private boolean done = false;
-    private List<URI> generatedAnnotations = Lists.newArrayList();
-    private URI baseLayerDefinitionURI;
+    private List<URI> generatedXmlElementAnnotations = Lists.newArrayList();
+    private List<URI> generatedXmlElementAttributeAnnotations = Lists.newArrayList();
+    private List<URI> generatedSubresources = Lists.newArrayList();
     private List<String> validationErrors = Lists.newArrayList();
-    private Instant expires;
+    private URI baseLayerDefinitionURI;
     private URI baseLayerURI;
+    private Instant expires;
 
     public URI getBaseLayerURI() {
       return baseLayerURI;
@@ -131,9 +165,31 @@ public class TextImportTask implements Runnable {
       this.expires = Instant.now().plus(1l, ChronoUnit.HOURS);
     }
 
-    @JsonProperty(PropertyPrefix.LINK + "generatedAnnotations")
-    public List<URI> getGeneratedAnnotations() {
-      return generatedAnnotations;
+    public Integer getXmlElementAnnotationsGenerated() {
+      return generatedXmlElementAnnotations.size();
+    }
+
+    @JsonProperty(PropertyPrefix.LINK + "generatedXmlElementAnnotations")
+    public List<URI> getGeneratedXmlElementAnnotations() {
+      return generatedXmlElementAnnotations;
+    }
+
+    public Integer getXmlElementAttributeAnnotationsGenerated() {
+      return generatedXmlElementAttributeAnnotations.size();
+    }
+
+    @JsonProperty(PropertyPrefix.LINK + "generatedXmlElementAttributeAnnotations")
+    public List<URI> getGeneratedXmlElementAttributeAnnotations() {
+      return generatedXmlElementAttributeAnnotations;
+    }
+
+    public Integer getSubresourcesGenerated() {
+      return generatedSubresources.size();
+    }
+
+    @JsonProperty(PropertyPrefix.LINK + "generatedSubresources")
+    public List<URI> getGeneratedSubresources() {
+      return generatedSubresources;
     }
 
     @JsonProperty(PropertyPrefix.LINK + "baseLayerDefinition")
@@ -159,10 +215,6 @@ public class TextImportTask implements Runnable {
       return expires;
     }
 
-  }
-
-  public boolean isExpired() {
-    return status.getExpires() != null && Instant.now().isAfter(status.getExpires());
   }
 
 }

@@ -183,8 +183,14 @@ function a-dry-run-from-file {
 	      "baseAttributes": [ "type" ]
 	    }, {
 	      "name": "text"
-	    }, {
-	      "name": "p"
+      }, {
+        "name": "p"
+      }, {
+        "name": "table"
+      }, {
+        "name": "row"
+      }, {
+        "name": "cell"
 	    }, {
 	      "name": "sub"
 	    }, {
