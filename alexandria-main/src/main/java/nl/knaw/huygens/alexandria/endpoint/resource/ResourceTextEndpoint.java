@@ -56,6 +56,7 @@ import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
+import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
@@ -105,7 +106,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
 
   private void startTextProcessing(String xml, BaseLayerDefinition bld) {
     removeExpiredTasks();
-    TextImportTask task = new TextImportTask(service, locationBuilder, bld, xml, resource);
+    TextImportTask task = new TextImportTask(service, locationBuilder, bld, xml, resource, ThreadContext.getUserName());
     taskStatusMap.put(resource.getId(), task.getStatus());
     new Thread(task).start();
   }

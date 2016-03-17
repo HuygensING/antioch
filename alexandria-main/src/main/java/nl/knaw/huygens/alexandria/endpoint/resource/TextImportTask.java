@@ -27,7 +27,6 @@ import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
-import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
@@ -51,13 +50,15 @@ public class TextImportTask implements Runnable {
   private UUID resourceId;
   private AlexandriaResource resource;
   private Status status;
+  private String who;
 
-  public TextImportTask(AlexandriaService service, LocationBuilder locationBuilder, BaseLayerDefinition bld, String xml, AlexandriaResource resource) {
+  public TextImportTask(AlexandriaService service, LocationBuilder locationBuilder, BaseLayerDefinition bld, String xml, AlexandriaResource resource, String who) {
     this.service = service;
     this.locationBuilder = locationBuilder;
     this.bld = bld;
     this.xml = xml;
     this.resource = resource;
+    this.who = who;
     this.resourceId = resource.getId();
     this.status = new Status();
     status.setBaseLayerDefinitionURI(locationBuilder.locationOf(resource, EndpointPaths.BASELAYERDEFINITION));
@@ -129,7 +130,7 @@ public class TextImportTask implements Runnable {
   }
 
   private TentativeAlexandriaProvenance newProvenance() {
-    TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(ThreadContext.getUserName(), Instant.now(), "initial text import");
+    TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(who, Instant.now(), "initial text import");
     return provenance;
   }
 
