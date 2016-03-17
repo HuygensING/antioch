@@ -84,12 +84,12 @@ public class ResourceTextEndpoint extends JSONEndpoint {
     return getTextResponse();
   }
 
-  @GET
-  @Produces(MediaType.TEXT_PLAIN)
-  @ApiOperation("get text as plain text")
-  public Response getPlainText() {
-    return getTextResponse();
-  }
+  // @GET
+  // @Produces(MediaType.TEXT_PLAIN)
+  // @ApiOperation("get text as plain text")
+  // public Response getPlainText() {
+  // return getTextResponse();
+  // }
 
   @PUT
   @Consumes(MediaType.TEXT_XML)
