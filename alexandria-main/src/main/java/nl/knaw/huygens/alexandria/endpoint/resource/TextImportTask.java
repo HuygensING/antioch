@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -136,10 +137,6 @@ public class TextImportTask implements Runnable {
     return IOUtils.toInputStream(body);
   }
 
-  public boolean isExpired() {
-    return status.getExpires() != null && Instant.now().isAfter(status.getExpires());
-  }
-
   @JsonTypeName("textImportStatus")
   @JsonInclude(Include.NON_NULL)
   public static class Status extends JsonWrapperObject implements Entity {
@@ -158,6 +155,11 @@ public class TextImportTask implements Runnable {
 
     public boolean isDone() {
       return done;
+    }
+
+    @JsonIgnore
+    public boolean isExpired() {
+      return expires != null && Instant.now().isAfter(expires);
     }
 
     public void setDone(boolean done) {

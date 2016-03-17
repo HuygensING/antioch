@@ -64,7 +64,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   private final UUID resourceId;
   private final AlexandriaResource resource;
   private LocationBuilder locationBuilder;
-  private static Map<UUID, TextImportTask> tasks = Maps.newHashMap();
+  private static Map<UUID, TextImportTask.Status> taskStatusMap = Maps.newHashMap();
 
   @Inject
   public ResourceTextEndpoint(AlexandriaService service, //
@@ -106,7 +106,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   private void startTextProcessing(String xml, BaseLayerDefinition bld) {
     removeExpiredTasks();
     TextImportTask task = new TextImportTask(service, locationBuilder, bld, xml, resource);
-    tasks.put(resource.getId(), task);
+    taskStatusMap.put(resource.getId(), task.getStatus());
     new Thread(task).start();
   }
 
@@ -135,9 +135,9 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @Path("status")
   public Response getTextImportStatus() {
     removeExpiredTasks();
-    if (tasks.containsKey(resourceId)) {
-      TextImportTask textImportTask = tasks.get(resourceId);
-      return Response.ok().entity(textImportTask.getStatus()).build();
+    if (taskStatusMap.containsKey(resourceId)) {
+      TextImportTask.Status textImportTaskStatus = taskStatusMap.get(resourceId);
+      return Response.ok().entity(textImportTaskStatus).build();
     }
     throw new NotFoundException();
   }
@@ -169,10 +169,10 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   }
 
   private void removeExpiredTasks() {
-    List<UUID> expiredEntries = tasks.keySet().stream()//
-        .filter(uuid -> tasks.get(uuid).isExpired())//
+    List<UUID> expiredEntries = taskStatusMap.keySet().stream()//
+        .filter(uuid -> taskStatusMap.get(uuid).isExpired())//
         .collect(toList());
-    expiredEntries.forEach(key -> tasks.remove(key));
+    expiredEntries.forEach(key -> taskStatusMap.remove(key));
   }
 
 }
