@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>nl.knaw.huygens.alexandria</groupId>
   <artifactId>alexandria</artifactId>
@@ -47,7 +47,7 @@
     <commons-lang3.version>3.4</commons-lang3.version>
     <guava.version>19.0</guava.version>
     <guice.version>4.0</guice.version>
-    <jackson.version>2.7.2</jackson.version>
+    <jackson.version>2.7.3</jackson.version>
     <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
     <jdk.version>1.8</jdk.version>
 
@@ -60,30 +60,30 @@
     <junitparams.version>1.0.4</junitparams.version>
     <log.version>1.1.1</log.version>
     <visitei.version>0.6.1</visitei.version>
-    
-    <!-- 3.2,3.3 leads to compiler error in Jenkins: java.lang.IllegalStateException: endPosTable already set -->
+
+    <!-- 3.2,3.3 leads to compiler error in Jenkins: java.lang.IllegalStateException: 
+      endPosTable already set -->
     <maven-compiler.version>3.5.1</maven-compiler.version>
 
-    <mockito.version>2.0.43-beta</mockito.version>
+    <mockito.version>2.0.44-beta</mockito.version>
     <peapod.version>0.2.2</peapod.version>
     <reflections.version>0.9.10</reflections.version>
     <servlet-api.version>4.0.0-b01</servlet-api.version>
 
-    <!--
-    <swagger-maven-plugin.version>3.1.0</swagger-maven-plugin.version>
-    -->
-    <swagger.version>1.5.7</swagger.version>
-
+    <!-- <swagger-maven-plugin.version>3.1.0</swagger-maven-plugin.version> -->
+    <swagger.version>1.5.8</swagger.version>
+    <jackson-datatype-jsr310.version>2.7.3</jackson-datatype-jsr310.version>
     <tinkerpop.groupId>org.apache.tinkerpop</tinkerpop.groupId>
     <tinkerpop.version>3.0.1-incubating</tinkerpop.version> <!-- can only be updated when titan.version is compatible with the new version -->
     <titan.version>1.0.0</titan.version>
     <sleepycat.version>5.0.73</sleepycat.version>
 
-    <!--  neo4j -->    
+    <!-- neo4j -->
     <neo4j-gremlin.version>3.0.0.M7</neo4j-gremlin.version>
     <neo4j-tinkerpop-api-impl.version>0.3-2.3.2</neo4j-tinkerpop-api-impl.version>
-    
-    <xml-apis.version>1.4.01</xml-apis.version><!-- > 1.4.01 fails some acceptance tests due to missing class -->
+
+    <xml-apis.version>1.4.01</xml-apis.version><!-- > 1.4.01 fails some acceptance 
+      tests due to missing class -->
 
     <!-- maven plugins -->
     <bcel-findbugs.version>6.0</bcel-findbugs.version>
@@ -109,7 +109,7 @@
     <tomcat7-maven.version>2.2</tomcat7-maven.version>
     <velocity.version>1.7</velocity.version>
     <wagon-ssh.version>2.7</wagon-ssh.version>
-    
+
     <!-- Concordion settings (move to acceptance-test module?) -->
     <concordion.reportDir>${project.build.directory}/concordion-reports</concordion.reportDir>
     <integration.testOutputDir>${project.build.directory}/integration-test-classes</integration.testOutputDir>
@@ -123,7 +123,8 @@
     <port>9000</port>
 
     <!-- Settings for maven-scm-publish-plugin used to publish site to GitHub -->
-    <scmpublish.checkinComment>Publishing Site Docs for ${project.artifactId}:${project.version}</scmpublish.checkinComment>
+    <scmpublish.checkinComment>Publishing Site Docs for
+      ${project.artifactId}:${project.version}</scmpublish.checkinComment>
     <scmpublish.pubScmUrl>scm:git:git@github.com:huygensING/alexandria.git</scmpublish.pubScmUrl>
     <scmpublish.scm.branch>gh-pages</scmpublish.scm.branch>
 
@@ -401,7 +402,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore/>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>
