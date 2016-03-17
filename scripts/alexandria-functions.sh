@@ -115,6 +115,12 @@ function a-use-localhost {
   a-set-authkey ${ALEXANDRIA_AUTHKEY_LOCAL}
 }
 
+function a-use-localip {
+  localip=$(ipconfig|grep Autoconfiguration|sed -e "s/.*: //")
+  a-set-backend http://${localip}:2015
+  a-set-authkey ${ALEXANDRIA_AUTHKEY_LOCAL}
+}
+
 function a-use-test {
   a-set-backend http://test.alexandria.huygens.knaw.nl/
   a-set-authkey ${ALEXANDRIA_AUTHKEY_TEST}
@@ -207,4 +213,4 @@ function a-dry-run-from-file {
 }
 
 
-a-use-localhost
+a-use-localip
