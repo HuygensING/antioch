@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
@@ -66,13 +67,16 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   private final AlexandriaResource resource;
   private LocationBuilder locationBuilder;
   private static Map<UUID, TextImportTask.Status> taskStatusMap = Maps.newHashMap();
+  private ExecutorService executorService;
 
   @Inject
   public ResourceTextEndpoint(AlexandriaService service, //
       ResourceValidatorFactory validatorFactory, //
+      ExecutorService executorService, //
       LocationBuilder locationBuilder, //
       @PathParam("uuid") final UUIDParam uuidParam) {
     this.service = service;
+    this.executorService = executorService;
     this.locationBuilder = locationBuilder;
     this.resource = validatorFactory.validateExistingResource(uuidParam).notTentative();
     this.resourceId = resource.getId();
@@ -108,7 +112,8 @@ public class ResourceTextEndpoint extends JSONEndpoint {
     removeExpiredTasks();
     TextImportTask task = new TextImportTask(service, locationBuilder, bld, xml, resource, ThreadContext.getUserName());
     taskStatusMap.put(resource.getId(), task.getStatus());
-    new Thread(task).start();
+    // task.run();
+    executorService.execute(task);
   }
 
   @PUT

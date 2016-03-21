@@ -206,11 +206,12 @@ function a-dry-run-from-file {
 	}'
   a-log "result uploading text:"
   location=$(curl -i --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:application/octet-stream' --data @"$*" |a-location)
+  a-log "Location: ${location}"
   curl --silent ${location} | jq "."
   a-log "extracted baselayer:"
   curl ${be}/resources/${ri}/text
   curl --silent ${location} | jq "."
+  echo "see status at ${location}"
 }
-
 
 a-use-localip
