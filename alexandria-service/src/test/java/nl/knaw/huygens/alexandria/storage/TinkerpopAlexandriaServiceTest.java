@@ -60,15 +60,6 @@ public class TinkerpopAlexandriaServiceTest {
   @SuppressWarnings("unchecked")
   @Before
   public void before() {
-    /*
-     * Maven compiler plugin warns about unchecked / unsafe code here:
-     * [WARNING] TinkerpopAlexandriaServiceTest.java:[68,50] unchecked conversion
-     * required: java.util.function.Supplier<T>
-     * found: java.util.function.Supplier
-     * [WARNING] TinkerpopAlexandriaServiceTest.java:[68,9] unchecked method invocation: method when in class org.mockito.Mockito is applied to given types
-     * required: T
-     * found: java.lang.Object
-     */
     when(mockStorage.runInTransaction(Matchers.any(Supplier.class))).thenCallRealMethod();//
   }
 
