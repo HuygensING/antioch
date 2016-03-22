@@ -169,4 +169,35 @@ function a-dry-run {
   curl ${be}/resources/${ri}/text
 }
 
+function a-gutenberg-import-file {
+  ri=$(uuidgen)
+  a-generate-resource-with-uuid $ri
+  curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
+  --data-binary '{
+    "baseLayerDefinition": {
+      "subresourceElements": ["note"],
+      "baseElements": [ {
+        "name": "TEI"
+      }, {
+        "name": "div",
+        "baseAttributes": [ "type" ]
+      }, {
+        "name": "body"
+      }, {
+        "name": "p"
+      }, {
+        "name": "sub"
+      }, {
+        "name": "sup"
+      } ]
+    }
+  }'
+  a-log "result uploading text:"
+  curl --silent --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:application/octet-stream' --data @"$*" | jq "."
+  a-log "extracted baselayer:"
+  curl ${be}/resources/${ri}/text
+}
+
+
+
 a-use-localhost
