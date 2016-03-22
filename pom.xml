@@ -260,6 +260,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${maven-compiler.version}</version>
         <configuration>
+          <compilerArgument>-Xlint</compilerArgument>
           <source>${jdk.version}</source>
           <target>${jdk.version}</target>
           <testSource>${jdk.version}</testSource>

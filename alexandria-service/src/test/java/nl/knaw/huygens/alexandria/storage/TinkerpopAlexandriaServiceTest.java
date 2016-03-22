@@ -57,7 +57,9 @@ public class TinkerpopAlexandriaServiceTest {
   private static Storage mockStorage = mock(Storage.class);
   private final TinkerPopService service = new TinkerPopService(mockStorage, new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()), new InMemoryTextService());
 
-  static {
+  @SuppressWarnings("unchecked")
+  @Before
+  public void before() {
     when(mockStorage.runInTransaction(Mockito.any(Supplier.class))).thenCallRealMethod();//
     when(mockStorage.getTransactionIsOpen()).thenCallRealMethod();
     doCallRealMethod().when(mockStorage).setTransactionIsOpen(Mockito.any(Boolean.class));
