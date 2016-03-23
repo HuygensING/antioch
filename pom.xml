@@ -59,10 +59,9 @@
     <junit.version>4.12</junit.version>
     <junitparams.version>1.0.4</junitparams.version>
     <log.version>1.1.1</log.version>
-    <visitei.version>0.6.1</visitei.version>
-
-    <!-- 3.2,3.3 leads to compiler error in Jenkins: java.lang.IllegalStateException: 
-      endPosTable already set -->
+    <visitei.version>0.6.2</visitei.version>
+    
+    <!-- 3.2,3.3 leads to compiler error in Jenkins: java.lang.IllegalStateException: endPosTable already set -->
     <maven-compiler.version>3.5.1</maven-compiler.version>
 
     <mockito.version>2.0.44-beta</mockito.version>
@@ -100,7 +99,7 @@
     <maven-license.version>1.8</maven-license.version>
     <maven-project-info-reports.version>2.8.1</maven-project-info-reports.version>
     <maven-shared-jar.version>1.2</maven-shared-jar.version>
-    <maven-site.version>3.5</maven-site.version>
+    <maven-site.version>3.4</maven-site.version><!-- 3.5 messed up out github pages -->
     <maven-surefire.version>2.18.1</maven-surefire.version>
     <maven-surefire-report.version>2.19.1</maven-surefire-report.version>
     <maven-war.version>2.6</maven-war.version>

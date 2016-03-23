@@ -33,7 +33,7 @@ function a-find-annotations-for-resource {
     \"return\" : \"id,when,who,type,value,resource.id,resource.url,subresource.id,subresource.url\",
     \"pageSize\" : 100
     }}" 2>/dev/null|a-location)
-    echo "search URI=" $url
+    echo "search URI=" ${url}
     curl ${url}/resultpages/1
 }
 
@@ -43,7 +43,7 @@ function a-show-first-resultpage {
 
 function a-generate-random-resource-with-annotation {
   id=$(uuidgen)
-  a-generate-resource-with-uuid $id
+  a-generate-resource-with-uuid ${id}
   url=$(a-annotate-resource "$id" "Tag" "Test annotation for resource $id" | a-location)
   a-confirm $url
 }

@@ -23,6 +23,7 @@ package nl.knaw.huygens.alexandria.jersey.exceptionmappers;
  */
 
 import javax.inject.Singleton;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -41,6 +42,7 @@ public class RuntimeExceptionMapper implements ExceptionMapper<RuntimeException>
     return Response//
         .status(Status.INTERNAL_SERVER_ERROR)//
         .entity(ErrorEntityBuilder.build(e))//
+        .type(MediaType.APPLICATION_JSON)//
         .build();
   }
 
