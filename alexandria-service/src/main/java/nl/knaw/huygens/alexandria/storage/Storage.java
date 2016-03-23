@@ -89,7 +89,7 @@ public class Storage {
 
   // framedGraph methods
 
-  public <T extends Object> T runInTransaction(Supplier<T> supplier) {
+  public <T> T runInTransaction(Supplier<T> supplier) {
     boolean inOpenTransaction = transactionOpen;
     if (!inOpenTransaction) {
       startTransaction();

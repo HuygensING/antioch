@@ -61,7 +61,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   private final AlexandriaService service;
   private final UUID resourceId;
   private final AlexandriaResource resource;
-  private LocationBuilder locationBuilder;
+  private final LocationBuilder locationBuilder;
 
   @Inject
   public ResourceTextEndpoint(AlexandriaService service, //
@@ -105,7 +105,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
 
   @PUT
   @Consumes(MediaType.APPLICATION_JSON)
-  @ApiOperation("set text from text protoype")
+  @ApiOperation("set text from text prototype")
   public Response setTextWithPrototype(@NotNull @Valid TextPrototype prototype) {
     String body = prototype.getBody();
     return setTextFromXml(body);
