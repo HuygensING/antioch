@@ -36,6 +36,8 @@ import nl.knaw.huygens.alexandria.service.TinkerPopService;
 import nl.knaw.huygens.alexandria.util.Scheduler;
 
 public abstract class AbstractAlexandriaServletModule extends ServletModule {
+  private static final int NTHREADS = 5;
+
   @Override
   protected void configureServlets() {
     // guice binds here
@@ -46,7 +48,7 @@ public abstract class AbstractAlexandriaServletModule extends ServletModule {
     bind(AnnotationEntityBuilder.class).in(Scopes.SINGLETON);
     bind(ResourceEntityBuilder.class).in(Scopes.SINGLETON);
     bind(Scheduler.class).in(Scopes.SINGLETON);
-    ExecutorService executorService = Executors.newSingleThreadExecutor();
+    ExecutorService executorService = Executors.newFixedThreadPool(NTHREADS);
     bind(ExecutorService.class).toInstance(executorService);
     super.configureServlets();
   }
