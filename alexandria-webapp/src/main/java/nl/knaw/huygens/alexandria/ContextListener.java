@@ -56,7 +56,7 @@ public class ContextListener extends JerseyGuiceServletContextListener {
 
   @Override
   public void contextInitialized(ServletContextEvent servletContextEvent) {
-    Scheduler.scheduleExpiredTentativesRemoval();
+    getInjector().getInstance(Scheduler.class).scheduleExpiredTentativesRemoval();
   }
 
   @Override

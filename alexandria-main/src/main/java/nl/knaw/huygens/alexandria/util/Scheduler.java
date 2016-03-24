@@ -22,18 +22,22 @@ package nl.knaw.huygens.alexandria.util;
  * #L%
  */
 
-
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+
 public class Scheduler {
-  private Scheduler() {
+  private CleanupCommand cleanupCommand;
+
+  @Inject
+  private Scheduler(CleanupCommand cleanupCommand) {
+    this.cleanupCommand = cleanupCommand;
   }
 
-  public static void scheduleExpiredTentativesRemoval() {
+  public void scheduleExpiredTentativesRemoval() {
     ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-    CleanupCommand cleanupCommand = new CleanupCommand();
     scheduledExecutorService.scheduleAtFixedRate(cleanupCommand, 0, 1, TimeUnit.HOURS);
   }
 

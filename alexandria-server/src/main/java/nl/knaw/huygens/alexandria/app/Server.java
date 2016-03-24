@@ -56,7 +56,6 @@ public class Server {
     URI uri = getBaseURI();
     final HttpServer httpServer = startServer(uri);
     Log.info("Jersey app started with WADL available at {}/application.wadl\n", uri);
-    Scheduler.scheduleExpiredTentativesRemoval();
 
     Runtime.getRuntime().addShutdownHook(new Thread(() -> shutdown(httpServer)));
 
@@ -85,6 +84,8 @@ public class Server {
     Log.info("AlexandriaService {} initialized", service);
     ResourceConfig config = new AlexandriaApplication();
     Log.info("Starting grizzly at {} ...", uri);
+    Scheduler scheduler = locator.getService(Scheduler.class);
+    scheduler.scheduleExpiredTentativesRemoval();
     return GrizzlyHttpServerFactory.createHttpServer(uri, config, locator);
   }
 

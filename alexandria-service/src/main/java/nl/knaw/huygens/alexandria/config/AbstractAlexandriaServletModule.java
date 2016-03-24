@@ -33,6 +33,7 @@ import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerPopService;
+import nl.knaw.huygens.alexandria.util.Scheduler;
 
 public abstract class AbstractAlexandriaServletModule extends ServletModule {
   @Override
@@ -44,6 +45,7 @@ public abstract class AbstractAlexandriaServletModule extends ServletModule {
     bind(TinkerPopService.class).to(tinkerpopServiceClass);
     bind(AnnotationEntityBuilder.class).in(Scopes.SINGLETON);
     bind(ResourceEntityBuilder.class).in(Scopes.SINGLETON);
+    bind(Scheduler.class).in(Scopes.SINGLETON);
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     bind(ExecutorService.class).toInstance(executorService);
     super.configureServlets();
