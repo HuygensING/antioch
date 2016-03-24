@@ -30,53 +30,51 @@
       <artifactId>servlet-api</artifactId>
       <version>${javaxservlet-api.version}</version>
     </dependency>
-
+    <dependency>
+      <!-- needed for the uberjar: https://github.com/Squarespace/jersey2-guice/issues/30 -->
+      <groupId>org.glassfish.jersey.media</groupId>
+      <artifactId>jersey-media-jaxb</artifactId>
+      <version>${jersey.version}</version>
+    </dependency>
   </dependencies>
 
-  <!--
+  <!-- mvn clean package -->
   <build>
     <plugins>
       <plugin>
-        <groupId>com.github.kongchen</groupId>
-        <artifactId>swagger-maven-plugin</artifactId>
-        <version>${swagger-maven-plugin.version}</version>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>${maven-assembly.version}</version>
         <configuration>
-          <apiSources>
-            <apiSource>
-              <info>
-                <title>REST api</title>
-                <version>v1</version>
-                <description>
-                  Alexandria REST API
-                </description>
-                <termsOfService>
-                  http://example.org/terms-of-service
-                </termsOfService>
-                <contact>
-                  <email>bram.buitendijk@huygens.knaw.nl</email>
-                  <name>Bram Buitendijk</name>
-                </contact>
-                <license>
-                  <name>${project.license.name}</name>
-                  <url>${project.license.url}</url>
-                </license>
-              </info>
-              <springmvc>false</springmvc>
-              <locations>nl.knaw.huygens.alexandria.endpoint</locations>
-              <swaggerDirectory>${basedir}/generated/</swaggerDirectory>
-            </apiSource>
-          </apiSources>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <mainClass>nl.knaw.huygens.alexandria.app.Server</mainClass>
+            </manifest>
+          </archive>
         </configuration>
         <executions>
           <execution>
-            <phase>compile</phase>
+            <id>make-assembly</id>
+            <phase>package</phase>
             <goals>
-              <goal>generate</goal>
+              <goal>single</goal>
             </goals>
           </execution>
         </executions>
       </plugin>
+      <!-- <plugin> <groupId>com.github.kongchen</groupId> <artifactId>swagger-maven-plugin</artifactId> 
+        <version>${swagger-maven-plugin.version}</version> <configuration> <apiSources> 
+        <apiSource> <info> <title>REST api</title> <version>v1</version> <description> 
+        Alexandria REST API </description> <termsOfService> http://example.org/terms-of-service 
+        </termsOfService> <contact> <email>bram.buitendijk@huygens.knaw.nl</email> 
+        <name>Bram Buitendijk</name> </contact> <license> <name>${project.license.name}</name> 
+        <url>${project.license.url}</url> </license> </info> <springmvc>false</springmvc> 
+        <locations>nl.knaw.huygens.alexandria.endpoint</locations> <swaggerDirectory>${basedir}/generated/</swaggerDirectory> 
+        </apiSource> </apiSources> </configuration> <executions> <execution> <phase>compile</phase> 
+        <goals> <goal>generate</goal> </goals> </execution> </executions> </plugin> -->
     </plugins>
   </build>
-  -->
 </project>
