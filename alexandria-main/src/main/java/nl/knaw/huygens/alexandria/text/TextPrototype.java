@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint.resource;
+package nl.knaw.huygens.alexandria.text;
 
 /*
  * #%L

@@ -54,6 +54,9 @@ import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.text.TaskStatusMap;
+import nl.knaw.huygens.alexandria.text.TextImportTask;
+import nl.knaw.huygens.alexandria.text.TextPrototype;
 
 public class ResourceTextEndpoint extends JSONEndpoint {
   private final AlexandriaService service;

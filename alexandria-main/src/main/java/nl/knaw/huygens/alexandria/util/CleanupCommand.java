@@ -25,8 +25,8 @@ package nl.knaw.huygens.alexandria.util;
 import javax.inject.Inject;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.endpoint.resource.TaskStatusMap;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.text.TaskStatusMap;
 
 public class CleanupCommand implements Runnable {
   @Inject

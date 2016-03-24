@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint.resource;
+package nl.knaw.huygens.alexandria.text;
 
 import static java.util.stream.Collectors.toList;
 
@@ -10,7 +10,7 @@ import java.util.UUID;
 import com.google.common.collect.Maps;
 import com.google.inject.Singleton;
 
-import nl.knaw.huygens.alexandria.endpoint.resource.TextImportTask.Status;
+import nl.knaw.huygens.alexandria.text.TextImportTask.Status;
 
 @Singleton
 public class TaskStatusMap {

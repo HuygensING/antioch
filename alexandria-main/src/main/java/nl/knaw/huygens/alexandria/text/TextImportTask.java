@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint.resource;
+package nl.knaw.huygens.alexandria.text;
 
 import static java.util.stream.Collectors.joining;
 
@@ -32,10 +32,6 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.alexandria.text.AnnotationData;
-import nl.knaw.huygens.alexandria.text.BaseLayerData;
-import nl.knaw.huygens.alexandria.text.TextUtil;
-import nl.knaw.huygens.alexandria.text.XmlAnnotationLevel;
 import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
 import nl.knaw.huygens.alexandria.textlocator.ByXPathTextLocator;
 import nl.knaw.huygens.tei.Element;
