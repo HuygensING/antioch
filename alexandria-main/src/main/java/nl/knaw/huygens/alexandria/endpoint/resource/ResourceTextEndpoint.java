@@ -1,7 +1,5 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
-import static java.util.stream.Collectors.toList;
-
 /*
  * #%L
  * alexandria-main
@@ -26,8 +24,6 @@ import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
@@ -48,8 +44,6 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 
-import com.google.common.collect.Maps;
-
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
@@ -65,19 +59,21 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   private final AlexandriaService service;
   private final UUID resourceId;
   private final AlexandriaResource resource;
-  private static Map<UUID, TextImportTask.Status> taskStatusMap = Maps.newHashMap();
   private ExecutorService executorService;
   private final LocationBuilder locationBuilder;
+  private final TaskStatusMap taskStatusMap;
 
   @Inject
   public ResourceTextEndpoint(AlexandriaService service, //
       ResourceValidatorFactory validatorFactory, //
       ExecutorService executorService, //
       LocationBuilder locationBuilder, //
+      TaskStatusMap taskStatusMap, //
       @PathParam("uuid") final UUIDParam uuidParam) {
     this.service = service;
     this.executorService = executorService;
     this.locationBuilder = locationBuilder;
+    this.taskStatusMap = taskStatusMap;
     this.resource = validatorFactory.validateExistingResource(uuidParam).notTentative();
     this.resourceId = resource.getId();
   }
@@ -109,10 +105,8 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   }
 
   private void startTextProcessing(String xml, BaseLayerDefinition bld) {
-    removeExpiredTasks();
     TextImportTask task = new TextImportTask(service, locationBuilder, bld, xml, resource, ThreadContext.getUserName());
     taskStatusMap.put(resource.getId(), task.getStatus());
-    // task.run();
     executorService.execute(task);
   }
 
@@ -140,12 +134,9 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @GET
   @Path("status")
   public Response getTextImportStatus() {
-    removeExpiredTasks();
-    if (taskStatusMap.containsKey(resourceId)) {
-      TextImportTask.Status textImportTaskStatus = taskStatusMap.get(resourceId);
-      return Response.ok().entity(textImportTaskStatus).build();
-    }
-    throw new NotFoundException();
+    TextImportTask.Status textImportTaskStatus = taskStatusMap.get(resourceId)//
+        .orElseThrow(() -> new NotFoundException());
+    return Response.ok().entity(textImportTaskStatus).build();
   }
 
   private Supplier<ConflictException> noBaseLayerDefined() {
@@ -174,11 +165,5 @@ public class ResourceTextEndpoint extends JSONEndpoint {
     return output -> IOUtils.copy(is, output);
   }
 
-  private void removeExpiredTasks() {
-    List<UUID> expiredEntries = taskStatusMap.keySet().stream()//
-        .filter(uuid -> taskStatusMap.get(uuid).isExpired())//
-        .collect(toList());
-    expiredEntries.forEach(key -> taskStatusMap.remove(key));
-  }
 
 }

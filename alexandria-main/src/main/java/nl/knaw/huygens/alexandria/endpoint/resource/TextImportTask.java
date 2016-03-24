@@ -70,16 +70,23 @@ public class TextImportTask implements Runnable {
 
   @Override
   public void run() {
+    status.setStarted();
     BaseLayerData baseLayerData = TextUtil.extractBaseLayerData(xml, bld);
     if (baseLayerData.validationFailed()) {
       throw new BadRequestException(baseLayerData.getValidationErrors().stream().collect(joining("\n")));
     }
     status.setBaseLayerURI(locationBuilder.locationOf(resource, "text"));
+    status.setExpectedTotal(calculateExpectedTotal(baseLayerData));
     service.setResourceTextFromStream(resourceId, streamIn(baseLayerData.getBaseLayer()));
 
     generateAnnotationsAndSubresources(resource, baseLayerData);
 
-    status.setDone(true);
+    status.setDone();
+  }
+
+  private static int calculateExpectedTotal(BaseLayerData baseLayerData) {
+    return baseLayerData.getAnnotationData().size() +
+      baseLayerData.getSubLayerData().stream().map(TextImportTask::calculateExpectedTotal).mapToInt(i -> i).sum();
   }
 
   private void generateAnnotationsAndSubresources(AlexandriaResource parentResource, BaseLayerData baseLayerData) {
@@ -141,7 +148,10 @@ public class TextImportTask implements Runnable {
   @JsonTypeName("textImportStatus")
   @JsonInclude(Include.NON_NULL)
   public static class Status extends JsonWrapperObject implements Entity {
+    enum State {waiting, processing, done}
+
     private boolean done = false;
+    private State state = State.waiting;
     private List<URI> generatedXmlElementAnnotations = Lists.newArrayList();
     private List<URI> generatedXmlElementAttributeAnnotations = Lists.newArrayList();
     private List<URI> generatedSubresources = Lists.newArrayList();
@@ -149,6 +159,11 @@ public class TextImportTask implements Runnable {
     private URI baseLayerDefinitionURI;
     private URI baseLayerURI;
     private Instant expires;
+    private float expectedTotal = 0;
+
+    public void setExpectedTotal(float expectedTotal) {
+      this.expectedTotal = expectedTotal;
+    }
 
     public URI getBaseLayerURI() {
       return baseLayerURI;
@@ -158,13 +173,22 @@ public class TextImportTask implements Runnable {
       return done;
     }
 
+    public State getState() {
+      return state;
+    }
+
+    public void setStarted() {
+      this.state = State.processing;
+    }
+
     @JsonIgnore
     public boolean isExpired() {
       return expires != null && Instant.now().isAfter(expires);
     }
 
-    public void setDone(boolean done) {
-      this.done = done;
+    public void setDone() {
+      this.done = true;
+      this.state = State.done;
       this.expires = Instant.now().plus(1l, ChronoUnit.HOURS);
     }
 
@@ -216,6 +240,10 @@ public class TextImportTask implements Runnable {
     @JsonSerialize(using = InstantSerializer.class)
     public Instant getExpires() {
       return expires;
+    }
+
+    public float getPercentageDone() {
+      return expectedTotal == 0 ? 0 : (getXmlElementAnnotationsGenerated() * 100) / expectedTotal;
     }
 
   }
