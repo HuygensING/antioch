@@ -30,6 +30,8 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.ws.rs.core.Application;
@@ -140,6 +142,8 @@ public class AlexandriaAcceptanceTest extends RestFixture {
         bind(AnnotationEntityBuilder.class).in(Scopes.SINGLETON);
         bind(EndpointPathResolver.class).in(Scopes.SINGLETON);
         bind(ResourceEntityBuilder.class).in(Scopes.SINGLETON);
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        bind(ExecutorService.class).toInstance(executorService);
       }
     };
   }
