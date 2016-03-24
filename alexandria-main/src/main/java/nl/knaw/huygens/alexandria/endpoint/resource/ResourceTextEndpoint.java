@@ -54,6 +54,7 @@ import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.text.TaskStatusMap;
 import nl.knaw.huygens.alexandria.text.TextImportTask;
 import nl.knaw.huygens.alexandria.text.TextPrototype;
@@ -137,7 +138,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @GET
   @Path("status")
   public Response getTextImportStatus() {
-    TextImportTask.Status textImportTaskStatus = taskStatusMap.get(resourceId)//
+    TextImportStatus textImportTaskStatus = taskStatusMap.get(resourceId)//
         .orElseThrow(() -> new NotFoundException());
     return Response.ok().entity(textImportTaskStatus).build();
   }

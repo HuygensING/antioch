@@ -10,18 +10,16 @@ import java.util.UUID;
 import com.google.common.collect.Maps;
 import com.google.inject.Singleton;
 
-import nl.knaw.huygens.alexandria.text.TextImportTask.Status;
-
 @Singleton
 public class TaskStatusMap {
-  private static Map<UUID, TextImportTask.Status> map = Maps.newHashMap();
+  private static Map<UUID, TextImportStatus> map = Maps.newHashMap();
 
-  public void put(UUID id, Status status) {
+  public void put(UUID id, TextImportStatus status) {
     removeExpiredTasks();
     map.put(id, status);
   }
 
-  public Optional<TextImportTask.Status> get(UUID id) {
+  public Optional<TextImportStatus> get(UUID id) {
     removeExpiredTasks();
     return Optional.ofNullable(map.get(id));
   }

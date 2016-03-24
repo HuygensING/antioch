@@ -5,26 +5,13 @@ import static java.util.stream.Collectors.joining;
 import java.io.InputStream;
 import java.net.URI;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer;
-import com.google.common.collect.Lists;
-
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
-import nl.knaw.huygens.alexandria.api.model.Entity;
-import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
-import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
@@ -45,7 +32,7 @@ public class TextImportTask implements Runnable {
   private String xml;
   private UUID resourceId;
   private AlexandriaResource resource;
-  private Status status;
+  private TextImportStatus status;
   private String who;
 
   public TextImportTask(AlexandriaService service, LocationBuilder locationBuilder, BaseLayerDefinition bld, String xml, AlexandriaResource resource, String who) {
@@ -56,11 +43,11 @@ public class TextImportTask implements Runnable {
     this.resource = resource;
     this.who = who;
     this.resourceId = resource.getId();
-    this.status = new Status();
+    this.status = new TextImportStatus();
     status.setBaseLayerDefinitionURI(locationBuilder.locationOf(resource, EndpointPaths.BASELAYERDEFINITION));
   }
 
-  public Status getStatus() {
+  public TextImportStatus getStatus() {
     return status;
   }
 
@@ -139,109 +126,6 @@ public class TextImportTask implements Runnable {
 
   private InputStream streamIn(String body) {
     return IOUtils.toInputStream(body);
-  }
-
-  @JsonTypeName("textImportStatus")
-  @JsonInclude(Include.NON_NULL)
-  public static class Status extends JsonWrapperObject implements Entity {
-    enum State {waiting, processing, done}
-
-    private boolean done = false;
-    private State state = State.waiting;
-    private List<URI> generatedXmlElementAnnotations = Lists.newArrayList();
-    private List<URI> generatedXmlElementAttributeAnnotations = Lists.newArrayList();
-    private List<URI> generatedSubresources = Lists.newArrayList();
-    private List<String> validationErrors = Lists.newArrayList();
-    private URI baseLayerDefinitionURI;
-    private URI baseLayerURI;
-    private Instant expires;
-    private float expectedTotal = 0;
-
-    public void setExpectedTotal(float expectedTotal) {
-      this.expectedTotal = expectedTotal;
-    }
-
-    public URI getBaseLayerURI() {
-      return baseLayerURI;
-    }
-
-    public boolean isDone() {
-      return done;
-    }
-
-    public State getState() {
-      return state;
-    }
-
-    public void setStarted() {
-      this.state = State.processing;
-    }
-
-    @JsonIgnore
-    public boolean isExpired() {
-      return expires != null && Instant.now().isAfter(expires);
-    }
-
-    public void setDone() {
-      this.done = true;
-      this.state = State.done;
-      this.expires = Instant.now().plus(1l, ChronoUnit.HOURS);
-    }
-
-    public Integer getXmlElementAnnotationsGenerated() {
-      return generatedXmlElementAnnotations.size();
-    }
-
-    @JsonProperty(PropertyPrefix.LINK + "generatedXmlElementAnnotations")
-    public List<URI> getGeneratedXmlElementAnnotations() {
-      return generatedXmlElementAnnotations;
-    }
-
-    public Integer getXmlElementAttributeAnnotationsGenerated() {
-      return generatedXmlElementAttributeAnnotations.size();
-    }
-
-    @JsonProperty(PropertyPrefix.LINK + "generatedXmlElementAttributeAnnotations")
-    public List<URI> getGeneratedXmlElementAttributeAnnotations() {
-      return generatedXmlElementAttributeAnnotations;
-    }
-
-    public Integer getSubresourcesGenerated() {
-      return generatedSubresources.size();
-    }
-
-    @JsonProperty(PropertyPrefix.LINK + "generatedSubresources")
-    public List<URI> getGeneratedSubresources() {
-      return generatedSubresources;
-    }
-
-    @JsonProperty(PropertyPrefix.LINK + "baseLayerDefinition")
-    public URI getBaseLayerDefinitionURI() {
-      return baseLayerDefinitionURI;
-    }
-
-    public void setBaseLayerDefinitionURI(URI baseLayerDefinitionURI) {
-      this.baseLayerDefinitionURI = baseLayerDefinitionURI;
-    }
-
-    @JsonProperty(PropertyPrefix.LINK + "baseLayer")
-    public void setBaseLayerURI(URI baseLayerURI) {
-      this.baseLayerURI = baseLayerURI;
-    }
-
-    public List<String> getValidationErrors() {
-      return validationErrors;
-    }
-
-    @JsonSerialize(using = InstantSerializer.class)
-    public Instant getExpires() {
-      return expires;
-    }
-
-    public float getPercentageDone() {
-      return expectedTotal == 0 ? 0 : (getXmlElementAnnotationsGenerated() * 100) / expectedTotal;
-    }
-
   }
 
 }
