@@ -65,6 +65,16 @@ function a-generate-resource-with-uuid {
   }}"
 }
 
+function a-generate-resource-with-uuid-and-ref {
+  id=$1
+  ref=$2
+  curl -i -X PUT $be/resources/$id --header "${authheader}" --header 'Content-type: application/json' \
+  --data-binary "{\"resource\":{
+    \"id\":\"$id\",
+    \"ref\":\"${ref}\"
+  }}"
+}
+
 function a-generate-confirmed-subresource-with-title {
   suburi=$(curl -i --header "${authheader}" -X POST $be/resources/$ri/subresources --header 'Content-type: application/json' \
     --data-binary '{"subresource":{ "sub":"$1" }}' | a-location )
@@ -170,8 +180,11 @@ function a-dry-run {
 }
 
 function a-gutenberg-import-file {
+  title=$1
+  shift
+  a-log ${title}
   ri=$(uuidgen)
-  a-generate-resource-with-uuid $ri
+  a-generate-resource-with-uuid-and-ref $ri "gutenberg:${title}"
   curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
   --data-binary '{
     "baseLayerDefinition": {
