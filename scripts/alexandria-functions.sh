@@ -189,6 +189,8 @@ function a-gutenberg-import-file {
         "name": "sub"
       }, {
         "name": "sup"
+      }, {
+        "name": "lb"
       } ]
     }
   }'
