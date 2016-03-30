@@ -1,5 +1,8 @@
 package nl.knaw.huygens.alexandria.query;
 
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+
 /*
  * #%L
  * alexandria-service
@@ -114,10 +117,35 @@ public class ParsedAlexandriaQuery {
     this.listField = listField;
   }
 
-  public String getListField() {
+  String getListField() {
     return listField;
   }
 
-  // TODO add groupingFunction, listMapper
+  public boolean doGrouping() {
+    return listField != null;
+  }
 
+  public String concatenateGroupByFieldsValues(Map<String, Object> map) {
+    if (doGrouping()) {
+      return returnFields.stream()//
+          .filter(f -> !f.equals(listField))//
+          .sorted()//
+          .map(map::get)//
+          .map(Object::toString)//
+          .collect(joining());
+    }
+    return null;
+  }
+
+  public Map<String, Object> collectListFieldValues(List<Map<String, Object>> mapList) {
+    if (doGrouping()) {
+      Map<String, Object> map = mapList.get(0);
+      List<Object> list = mapList.stream()//
+          .map((m) -> m.get(listField))//
+          .collect(toList());
+      map.put(listField, list);
+      return map;
+    }
+    return null;
+  }
 }

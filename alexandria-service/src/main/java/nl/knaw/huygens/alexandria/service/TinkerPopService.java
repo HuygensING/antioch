@@ -22,6 +22,7 @@ package nl.knaw.huygens.alexandria.service;
  * #L%
  */
 
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -761,8 +762,12 @@ public class TinkerPopService implements AlexandriaService {
     if (pQuery.isDistinct()) {
       mapStream = mapStream.distinct();
     }
-    if (pQuery.getListField() != null) {
-      mapStream.collect(pQuery.get);
+    if (pQuery.doGrouping()) {
+      Stream<Map<String, Object>> groupByStream = mapStream//
+          .collect(groupingBy(pQuery::concatenateGroupByFieldsValues))//
+          .values().stream()//
+          .map(pQuery::collectListFieldValues);
+      mapStream = groupByStream;
     }
     List<Map<String, Object>> results = mapStream//
         .collect(toList());
