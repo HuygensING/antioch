@@ -90,7 +90,7 @@
     <buildnumber-maven.version>1.4</buildnumber-maven.version>
     <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
     <maven-antrun.version>1.8</maven-antrun.version>
-    <maven-assembly.version>2.4</maven-assembly.version>
+    <maven-assembly.version>2.6</maven-assembly.version>
     <maven-concordion-reporting.version>1.0.2</maven-concordion-reporting.version>
     <maven-failsafe.version>2.19.1</maven-failsafe.version>
     <maven-javadoc.version>2.10.3</maven-javadoc.version>

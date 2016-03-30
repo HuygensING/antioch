@@ -140,13 +140,19 @@ public class BaseLayerVisitor extends DelegatingVisitor<BLVContext> implements C
         }
       });
       logXPath(base);
-      context.addOpenTag(base);
+      if (element.hasChildren()) {
+        context.addOpenTag(base);
+      } else {
+        context.addEmptyElementTag(base);
+      }
       return Traversal.NEXT;
     }
 
     @Override
     public Traversal leaveElement(Element element, BLVContext context) {
-      context.addCloseTag(element);
+      if (element.hasChildren()) {
+        context.addCloseTag(element);
+      }
       return Traversal.NEXT;
     }
 

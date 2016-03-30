@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.text;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -56,10 +56,15 @@ public class AddMissingBaseLayerIdVisitor extends ExportVisitor {
   static class BaseElementHandler implements ElementHandler<XmlContext> {
     @Override
     public Traversal enterElement(Element element, XmlContext context) {
-      if (!element.hasAttribute(TextUtil.XML_ID)) {
-        addId(element);
+      if (element.hasChildren()) {
+        if (!element.hasAttribute(TextUtil.XML_ID)) {
+          addId(element);
+        }
+        context.addOpenTag(element);
+      } else {
+        // TODO: should milestone base elements get an xml:id?
+        context.addEmptyElementTag(element);
       }
-      context.addOpenTag(element);
       return Traversal.NEXT;
     }
 
@@ -75,7 +80,9 @@ public class AddMissingBaseLayerIdVisitor extends ExportVisitor {
 
     @Override
     public Traversal leaveElement(Element element, XmlContext context) {
-      context.addCloseTag(element);
+      if (element.hasChildren()) {
+        context.addCloseTag(element);
+      }
       return Traversal.NEXT;
     }
   }

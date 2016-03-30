@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.query;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -428,6 +428,7 @@ public class AlexandriaQueryParser {
 
   private void parseReturn(final ParsedAlexandriaQuery paq, final String fieldString) {
     final List<String> fields = splitToList(fieldString);
+    final String listField = extractListfield(fieldString);
     final List<String> allowedFields = QueryField.ALL_EXTERNAL_NAMES;
     final List<String> unknownFields = Lists.newArrayList(fields);
     unknownFields.removeAll(allowedFields);
@@ -436,6 +437,7 @@ public class AlexandriaQueryParser {
 
     } else {
       paq.setReturnFields(fields);
+      paq.setListField(listField);
 
       final Function<AnnotationVF, Map<String, Object>> mapper = avf -> fields.stream()//
           .collect(toMap(Function.identity(), f -> QueryFieldGetters.get(QueryField.fromExternalName(f)).apply(avf)));
@@ -444,8 +446,15 @@ public class AlexandriaQueryParser {
     }
   }
 
+  static final Pattern LISTPATTERN = Pattern.compile("list\\((.*)\\)");
+
+  private String extractListfield(String fieldString) {
+    Matcher matcher = LISTPATTERN.matcher(fieldString);
+    return matcher.find() ? matcher.group(1) : null;
+  }
+
   private static List<String> splitToList(final String fieldString) {
-    return Splitter.on(",").trimResults().splitToList(fieldString);
+    return Splitter.on(",").trimResults().splitToList(fieldString.replace("list(", "").replace(")", ""));
   }
 
 }

@@ -8,3 +8,7 @@ See the [generated Maven site](http://huygensING.github.io/alexandria) for docum
 
 ###### Generating the site and publishing it:
 	mvn clean verify site:site site:stage scm-publish:publish-scm
+
+###### Generating a single-jar version of the server and running it:
+	mvn clean package assembly:single -pl alexandria-server
+	java -jar alexandria-server/target/alexandria-server-${version}-jar-with-dependencies.jar

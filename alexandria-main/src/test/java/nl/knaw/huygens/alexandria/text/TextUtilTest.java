@@ -157,4 +157,33 @@ public class TextUtilTest extends AlexandriaTest {
     baseLayerData.getAnnotationData().forEach(a -> Log.info(">> {}", a.toVerbose()));
   }
 
+  @Test
+  public void testBaseLayerExtractionWithMilestoneBaseElements() {
+    // given
+    String xml = singleQuotesToDouble("<text>"//
+        + "<div>"//
+        + "<p>Lorem Ipsum Dolor Etc.<lb/>Dolor etc.</p>"//
+        + "</div>"//
+        + "</text>");
+    String expected = singleQuotesToDouble("<text xml:id='text-1'>"//
+        + "<div xml:id='div-1'>"//
+        + "<p xml:id='p-1'>Lorem Ipsum Dolor Etc.<lb/>Dolor etc.</p>"//
+        + "</div>"//
+        + "</text>");
+    BaseLayerDefinition def = BaseLayerDefinition.withBaseElements(//
+        BaseElementDefinition.withName("text"), //
+        BaseElementDefinition.withName("lb"), //
+        BaseElementDefinition.withName("div").withAttributes("xml:id"), //
+        BaseElementDefinition.withName("p").withAttributes("xml:id") //
+    ).setSubresourceElements(ImmutableList.of("note"));
+
+    // when
+    BaseLayerData baseLayerData = TextUtil.extractBaseLayerData(xml, def);
+    Log.info("AnnotationData =\n{}", baseLayerData.getAnnotationData().stream().map(AnnotationData::toVerbose).collect(joining("\n")));
+    String baseLayer = baseLayerData.getBaseLayer();
+
+    // then expect
+    assertThat(baseLayerData.validationFailed()).isFalse();
+    assertThat(baseLayer).isEqualTo(expected);
+  }
 }

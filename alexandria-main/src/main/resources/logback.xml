@@ -19,7 +19,7 @@
     </encoder>
   </appender>
 
-  <logger name="nl.knaw.huygens" level="trace" />
+  <logger name="nl.knaw.huygens" level="info" />
   <logger name="io.swagger" level="info" />
   <logger name="com.thinkaurelius.titan" level="warn" />
   <logger name="org.apache" level="warn" />
@@ -27,7 +27,7 @@
   <logger name="org.hibernate" level="warn" />
   <logger name="org.glassfish" level="warn" />
 
-  <root level="debug">
+  <root level="info">
     <appender-ref ref="STDOUT" />
   </root>
 </configuration>

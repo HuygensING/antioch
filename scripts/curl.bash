@@ -351,3 +351,17 @@ curl -i -H "${authheader}" -X POST $be/searches -H 'Content-type: application/js
 }}'
 
 a-dry-run-from-file scripts/cwg/huyg003-1376.xml
+
+curl -i -H "${authheader}" -X POST $be/searches -H 'Content-type: application/json' \
+--data-binary '{"query":{
+  "find" : "annotation",
+  "where" : "resource.id:inSet(\"b5b6e318-f74d-449c-af30-217140b95105\",\"e7abb6a6-5df2-4428-82ea-f2a7af31b892\",\"1785cda1-73bb-44e6-bc25-620ff3148e91\")",
+  "return" : "id,resource.url"
+}}'
+
+curl -i -H "${authheader}" -X POST $be/searches -H 'Content-type: application/json' \
+--data-binary '{"query":{
+  "find" : "annotation",
+  "where" : "resource.id:inSet(\"b5b6e318-f74d-449c-af30-217140b95105\",\"e7abb6a6-5df2-4428-82ea-f2a7af31b892\",\"1785cda1-73bb-44e6-bc25-620ff3148e91\")",
+  "return" : "list(id),resource.url"
+}}'

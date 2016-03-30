@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.query;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -40,6 +41,7 @@ import org.assertj.core.data.MapEntry;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
@@ -112,6 +114,30 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
     aQuery.setFields("id, resource.id, subresource.id");
     ParsedAlexandriaQuery paq = alexandriaQueryParser.parse(aQuery);
     assertThat(paq.getReturnFields()).containsExactly("id", "resource.id", "subresource.id");
+    assertThat(paq.getListField()).isNull();
+  }
+
+  @Test
+  public void testReturnFieldsWithList() {
+    AlexandriaQuery aQuery = new AlexandriaQuery();
+    aQuery.setFind("annotation");
+    aQuery.setFields("list(id), resource.id, resource.url");
+    ParsedAlexandriaQuery paq = alexandriaQueryParser.parse(aQuery);
+    assertThat(paq.getReturnFields()).containsExactly("id", "resource.id", "resource.url");
+    assertThat(paq.getListField()).isEqualTo("id");
+
+    Map<String, Object> map = ImmutableMap.of("id", "Id", "resource.id", "Resource.id", "resource.url", "Resource.URL");
+    assertThat(paq.concatenateGroupByFieldsValues(map)).isEqualTo("Resource.idResource.URL");
+
+    Map<String, Object> map1 = new HashMap<>();
+    map1.put("id", "Id1");
+    map1.put("resource.id", "Resource.id");
+    map1.put("resource.url", "Resource.URL");
+    Map<String, Object> map2 = ImmutableMap.of("id", "Id2", "resource.id", "Resource.id", "resource.url", "Resource.URL");
+    Map<String, Object> map3 = ImmutableMap.of("id", "Id3", "resource.id", "Resource.id", "resource.url", "Resource.URL");
+    List<Map<String, Object>> mapList = ImmutableList.of(map1, map2, map3);
+    Map<String, Object> expected = ImmutableMap.of("id", ImmutableList.<String> of("Id1", "Id2", "Id3"), "resource.id", "Resource.id", "resource.url", "Resource.URL");
+    assertThat(paq.collectListFieldValues(mapList)).containsAllEntriesOf(expected);
   }
 
   @Test
