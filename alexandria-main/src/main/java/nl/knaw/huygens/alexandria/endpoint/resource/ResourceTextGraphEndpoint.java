@@ -54,25 +54,25 @@ import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.alexandria.text.TaskStatusMap;
-import nl.knaw.huygens.alexandria.text.TextImportStatus;
-import nl.knaw.huygens.alexandria.text.TextImportTask;
 import nl.knaw.huygens.alexandria.text.TextPrototype;
+import nl.knaw.huygens.alexandria.textgraph.TextGraphImportStatus;
+import nl.knaw.huygens.alexandria.textgraph.TextGraphImportTask;
+import nl.knaw.huygens.alexandria.textgraph.TextGraphTaskStatusMap;
 
-public class ResourceTextEndpoint extends JSONEndpoint {
+public class ResourceTextGraphEndpoint extends JSONEndpoint {
   private final AlexandriaService service;
   private final UUID resourceId;
   private final AlexandriaResource resource;
   private ExecutorService executorService;
   private final LocationBuilder locationBuilder;
-  private final TaskStatusMap taskStatusMap;
+  private final TextGraphTaskStatusMap taskStatusMap;
 
   @Inject
-  public ResourceTextEndpoint(AlexandriaService service, //
+  public ResourceTextGraphEndpoint(AlexandriaService service, //
       ResourceValidatorFactory validatorFactory, //
       ExecutorService executorService, //
       LocationBuilder locationBuilder, //
-      TaskStatusMap taskStatusMap, //
+      TextGraphTaskStatusMap taskStatusMap, //
       @PathParam("uuid") final UUIDParam uuidParam) {
     this.service = service;
     this.executorService = executorService;
@@ -109,10 +109,16 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   }
 
   private void startTextProcessing(String xml, BaseLayerDefinition bld) {
-    TextImportTask task = new TextImportTask(service, locationBuilder, bld, xml, resource, ThreadContext.getUserName());
+    TextGraphImportTask task = new TextGraphImportTask(service, locationBuilder, bld, xml, resource, ThreadContext.getUserName());
     taskStatusMap.put(resource.getId(), task.getStatus());
     executorService.execute(task);
   }
+
+  // private void startTextGraphProcessing(String xml, BaseLayerDefinition bld) {
+  // TextGraphImportTask task = new TextGraphImportTask(service, locationBuilder, bld, xml, resource, ThreadContext.getUserName());
+  // taskStatusMap.put(resource.getId(), task.getStatus());
+  // executorService.execute(task);
+  // }
 
   @PUT
   @Consumes(MediaType.APPLICATION_JSON)
@@ -137,10 +143,10 @@ public class ResourceTextEndpoint extends JSONEndpoint {
 
   @GET
   @Path("status")
-  public Response getTextImportStatus() {
-    TextImportStatus textImportTaskStatus = taskStatusMap.get(resourceId)//
+  public Response getTextGraphImportStatus() {
+    TextGraphImportStatus textGraphImportTaskStatus = taskStatusMap.get(resourceId)//
         .orElseThrow(() -> new NotFoundException());
-    return Response.ok().entity(textImportTaskStatus).build();
+    return Response.ok().entity(textGraphImportTaskStatus).build();
   }
 
   private Supplier<ConflictException> noBaseLayerDefined() {

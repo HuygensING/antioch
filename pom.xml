@@ -81,8 +81,7 @@
     <neo4j-gremlin.version>3.0.0.M7</neo4j-gremlin.version>
     <neo4j-tinkerpop-api-impl.version>0.3-2.3.2</neo4j-tinkerpop-api-impl.version>
 
-    <xml-apis.version>1.4.01</xml-apis.version><!-- > 1.4.01 fails some acceptance 
-      tests due to missing class -->
+    <xml-apis.version>1.4.01</xml-apis.version><!-- > 1.4.01 fails some acceptance tests due to missing class -->
 
     <!-- maven plugins -->
     <bcel-findbugs.version>6.0</bcel-findbugs.version>
