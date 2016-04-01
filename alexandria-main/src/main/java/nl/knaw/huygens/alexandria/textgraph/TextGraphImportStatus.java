@@ -31,18 +31,10 @@ public class TextGraphImportStatus extends JsonWrapperObject implements Entity {
   private State state = State.waiting;
   private Duration processingTime;
   private Instant startTime;
-  private List<URI> generatedXmlElementAnnotations = Lists.newArrayList();
-  private List<URI> generatedXmlElementAttributeAnnotations = Lists.newArrayList();
-  private List<URI> generatedSubresources = Lists.newArrayList();
   private List<String> validationErrors = Lists.newArrayList();
   private URI baseLayerDefinitionURI;
   private URI baseLayerURI;
   private Instant expires;
-  private float expectedTotal = 0;
-
-  public void setExpectedTotal(float expectedTotal) {
-    this.expectedTotal = expectedTotal;
-  }
 
   public URI getBaseLayerURI() {
     return baseLayerURI;
@@ -71,33 +63,6 @@ public class TextGraphImportStatus extends JsonWrapperObject implements Entity {
   @JsonIgnore
   public boolean isExpired() {
     return expires != null && Instant.now().isAfter(expires);
-  }
-
-  public Integer getXmlElementAnnotationsGenerated() {
-    return generatedXmlElementAnnotations.size();
-  }
-
-  @JsonProperty(PropertyPrefix.LINK + "generatedXmlElementAnnotations")
-  public List<URI> getGeneratedXmlElementAnnotations() {
-    return generatedXmlElementAnnotations;
-  }
-
-  public Integer getXmlElementAttributeAnnotationsGenerated() {
-    return generatedXmlElementAttributeAnnotations.size();
-  }
-
-  @JsonProperty(PropertyPrefix.LINK + "generatedXmlElementAttributeAnnotations")
-  public List<URI> getGeneratedXmlElementAttributeAnnotations() {
-    return generatedXmlElementAttributeAnnotations;
-  }
-
-  public Integer getSubresourcesGenerated() {
-    return generatedSubresources.size();
-  }
-
-  @JsonProperty(PropertyPrefix.LINK + "generatedSubresources")
-  public List<URI> getGeneratedSubresources() {
-    return generatedSubresources;
   }
 
   @JsonProperty(PropertyPrefix.LINK + "baseLayerDefinition")
@@ -131,10 +96,6 @@ public class TextGraphImportStatus extends JsonWrapperObject implements Entity {
   @JsonSerialize(using = DurationSerializer.class)
   public Duration getProcessingTime() {
     return processingTime;
-  }
-
-  public float getPercentageDone() {
-    return expectedTotal == 0 ? 0 : (getXmlElementAnnotationsGenerated() * 100) / expectedTotal;
   }
 
 }

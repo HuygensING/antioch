@@ -5,7 +5,8 @@ import java.util.Map;
 public class TextAnnotation {
   public static class Properties {
     public static final String name = "name";
-    public static final String attributes = "attributes";
+    public static final String attribute_keys = "attribute_keys";
+    public static final String attribute_values = "attribute_values";
     public static final String depth = "depth";
   }
 

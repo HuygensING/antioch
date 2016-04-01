@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -824,10 +825,20 @@ public class TinkerPopService implements AlexandriaService {
   private void storeTextAnnotations(Set<XmlAnnotation> xmlAnnotations, Vertex text, List<Vertex> textSegments) {
     Vertex previous = null;
     for (XmlAnnotation xmlAnnotation : xmlAnnotations) {
+      Map<String, String> attributes = xmlAnnotation.getAttributes();
+      String[] attributeKeys = new String[attributes.size()];
+      String[] attributeValues = new String[attributes.size()];
+      int i = 0;
+      for (Entry<String, String> kv : attributes.entrySet()) {
+        attributeKeys[i] = kv.getKey();
+        attributeValues[i] = kv.getValue();
+        i++;
+      }
       Vertex v = storage.addVertex(//
           T.label, VertexLabels.TEXTANNOTATION, //
           TextAnnotation.Properties.name, xmlAnnotation.getName(), //
-          TextAnnotation.Properties.attributes, xmlAnnotation.getAttributes(), //
+          TextAnnotation.Properties.attribute_keys, attributeKeys, //
+          TextAnnotation.Properties.attribute_values, attributeValues, //
           TextAnnotation.Properties.depth, xmlAnnotation.getDepth()//
       );
       v.addEdge(EdgeLabels.FIRST_TEXT_SEGMENT, textSegments.get(xmlAnnotation.getFirstSegmentIndex()));
@@ -843,21 +854,35 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceId) {
-    Path textSegmentPath = storage.getVertexTraversal()//
-        .has(Storage.IDENTIFIER_PROPERTY, resourceId.toString())//
-        .out(EdgeLabels.HAS_TEXTGRAPH)//
-        .out(EdgeLabels.FIRST_TEXT_SEGMENT)//
-        .repeat(__.out(EdgeLabels.NEXT))//
-        .until(__.outE(EdgeLabels.NEXT).count().is(0))//
-        .path().next();
+    List<TextGraphSegment> listToTakeOutOfTheTransaction = storage.runInTransaction(() -> {
+      // TODO: figure out how to deal with the transaction in the endpoint, because this is not as streaming as it should be
+      Path textSegmentPath = storage.getVertexTraversal()//
+          .has(Storage.IDENTIFIER_PROPERTY, resourceId.toString())//
+          .out(EdgeLabels.HAS_TEXTGRAPH)//
+          .out(EdgeLabels.FIRST_TEXT_SEGMENT)//
+          .repeat(__.out(EdgeLabels.NEXT))//
+          .until(__.outE(EdgeLabels.NEXT).count().is(0))//
+          .path().next();
 
-    return textSegmentPath.objects().stream().map(Vertex.class::cast)//
-        .map(TinkerPopService::toTextGraphSegment);
+      Stream<TextGraphSegment> stream = textSegmentPath.objects().stream()//
+          .map(Vertex.class::cast)//
+          .filter(v -> v.label().equals(VertexLabels.TEXTSEGMENT))//
+          .map(TinkerPopService::toTextGraphSegment);
+
+      return stream.collect(toList());
+    });
+
+    // See previous todo
+    return listToTakeOutOfTheTransaction.stream();
   }
 
   public static TextGraphSegment toTextGraphSegment(Vertex textSegment) {
+    Log.info("vertex={}", textSegment);
+    Log.info("vertex.label={}", textSegment.label());
     TextGraphSegment textGraphSegment = new TextGraphSegment();
-    textGraphSegment.setTextSegment(textSegment.value(TextSegment.Properties.text));
+    if (textSegment.keys().contains(TextSegment.Properties.text)) {
+      textGraphSegment.setTextSegment(textSegment.value(TextSegment.Properties.text));
+    }
     textGraphSegment.setAnnotationsToOpen(getTextAnnotationsToOpen(textSegment));
     textGraphSegment.setAnnotationsToClose(getTextAnnotationsToClose(textSegment));
     return textGraphSegment;
@@ -878,15 +903,24 @@ public class TinkerPopService implements AlexandriaService {
   private static List<TextAnnotation> getTextAnnotations(Vertex textSegment, String edgeLabel, Comparator<TextAnnotation> comparator) {
     Iterable<Vertex> iterable = () -> textSegment.vertices(Direction.IN, edgeLabel);
     return StreamSupport.stream(iterable.spliterator(), false)//
+        .filter(v -> v.label().equals(VertexLabels.TEXTANNOTATION))//
         .map(TinkerPopService::toTextAnnotation)//
         .sorted(comparator)//
         .collect(toList());
   }
 
   private static TextAnnotation toTextAnnotation(Vertex textAnnotation) {
+    Map<String, String> attributes = Maps.newLinkedHashMap();
+    if (textAnnotation.keys().contains(TextAnnotation.Properties.attribute_keys)) {
+      String[] keys = textAnnotation.value(TextAnnotation.Properties.attribute_keys);
+      String[] values = textAnnotation.value(TextAnnotation.Properties.attribute_values);
+      for (int i = 0; i < keys.length; i++) {
+        attributes.put(keys[i], values[i]);
+      }
+    }
     return new TextAnnotation(//
         textAnnotation.value(TextAnnotation.Properties.name), //
-        textAnnotation.value(TextAnnotation.Properties.attributes), //
+        attributes, //
         textAnnotation.value(TextAnnotation.Properties.depth)//
     );
   }
