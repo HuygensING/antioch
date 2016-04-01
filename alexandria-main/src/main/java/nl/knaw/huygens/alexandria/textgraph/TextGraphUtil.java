@@ -57,17 +57,22 @@ public class TextGraphUtil {
     elementsToOpenIndexes.forEach(j -> {
       XmlAnnotation xmlAnnotation = xmlAnnotations.get(j);
       builder.append("<").append(xmlAnnotation.getName());
-      for (Map.Entry<String, String> entry : xmlAnnotation.getAttributes().entrySet()) {
-        builder.append(' ').append(entry.getKey()).append('=');
-        builder.append('"');
-        appendAttributeValue(builder, entry.getValue());
-        builder.append('"');
-      }
+      Map<String, String> attributes = xmlAnnotation.getAttributes();
+      appendAttributes(builder, attributes);
       if (xmlAnnotation.isMilestone()) {
         builder.append("/");
       }
       builder.append(">");
     });
+  }
+
+  public static void appendAttributes(StringBuilder builder, Map<String, String> attributes) {
+    for (Map.Entry<String, String> entry : attributes.entrySet()) {
+      builder.append(' ').append(entry.getKey()).append('=');
+      builder.append('"');
+      appendAttributeValue(builder, entry.getValue());
+      builder.append('"');
+    }
   }
 
   private static void appendClosingElements(StringBuilder builder, int i, List<XmlAnnotation> xmlAnnotations) {
@@ -102,4 +107,23 @@ public class TextGraphUtil {
       }
     }
   }
+
+  public static String getMilestoneTag(String name, Map<String, String> attributes) {
+    return openingTagBuilder(name, attributes).append("/>").toString();
+  }
+
+  public static String getOpenTag(String name, Map<String, String> attributes) {
+    return openingTagBuilder(name, attributes).append(">").toString();
+  }
+
+  public static String getCloseTag(String name) {
+    return "</" + name + ">";
+  }
+
+  private static StringBuilder openingTagBuilder(String name, Map<String, String> attributes) {
+    StringBuilder builder = new StringBuilder("<").append(name);
+    appendAttributes(builder, attributes);
+    return builder;
+  }
+
 }

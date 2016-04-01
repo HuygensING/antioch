@@ -788,8 +788,9 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public boolean storeTextGraph(UUID resourceId, ParseResult result) {
+  public boolean storeTextGraph(UUID resourceId, ParseResult result, String who) {
     if (readResource(resourceId).isPresent()) {
+      readResource(resourceId).get().setHasText(true);
       storage.runInTransaction(() -> {
         Vertex resource = storage.getVertexTraversal().has(Storage.IDENTIFIER_PROPERTY, resourceId.toString()).next();
         Vertex text = storage.addVertex(T.label, VertexLabels.TEXTGRAPH);
@@ -799,6 +800,8 @@ public class TinkerPopService implements AlexandriaService {
       });
       return true;
     }
+    // something went wrong
+    readResource(resourceId).get().setHasText(false);
     return false;
   }
 
@@ -855,11 +858,8 @@ public class TinkerPopService implements AlexandriaService {
   public static TextGraphSegment toTextGraphSegment(Vertex textSegment) {
     TextGraphSegment textGraphSegment = new TextGraphSegment();
     textGraphSegment.setTextSegment(textSegment.value(TextSegment.Properties.text));
-
     textGraphSegment.setAnnotationsToOpen(getTextAnnotationsToOpen(textSegment));
-
     textGraphSegment.setAnnotationsToClose(getTextAnnotationsToClose(textSegment));
-
     return textGraphSegment;
   }
 

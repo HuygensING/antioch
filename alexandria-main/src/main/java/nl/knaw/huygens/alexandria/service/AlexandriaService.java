@@ -128,7 +128,7 @@ public interface AlexandriaService {
 
   Optional<BaseLayerDefinition> getBaseLayerDefinitionForResource(UUID resourceUUID);
 
-  boolean storeTextGraph(UUID resourceId, ParseResult result);
+  boolean storeTextGraph(UUID resourceId, ParseResult result, String who);
 
   Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceId);
 }
