@@ -45,10 +45,7 @@ public class XmlVisitor extends DelegatingVisitor<XmlContext> implements Comment
   public Traversal leaveElement(Element element, XmlContext context) {
     elementStack.pop();
     lastNodeWasText = false;
-    XmlAnnotation xmlAnnotation = new XmlAnnotation()//
-        .setDepth(elementStack.size())//
-        .setName(element.getName())//
-        .setAttributes(element.getAttributes())//
+    XmlAnnotation xmlAnnotation = new XmlAnnotation(element.getName(), element.getAttributes(), elementStack.size())//
         .setMilestone(element.hasNoChildren())//
         .setFirstSegmentIndex(startIndexStack.pop())//
         .setLastSegmentIndex(result.getTextSegments().size() - 1)//
