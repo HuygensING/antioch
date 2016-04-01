@@ -1,13 +1,13 @@
 package nl.knaw.huygens.alexandria.textgraph;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.assertj.core.util.Lists;
 
 public class TextGraphSegment {
-  List<TextAnnotation> textAnnotationsToOpen = Lists.newArrayList();
+  List<TextAnnotation> textAnnotationsToOpen = new ArrayList<>();
   String textSegment = "";
-  List<TextAnnotation> textAnnotationsToClose = Lists.newArrayList();
+  List<TextAnnotation> textAnnotationsToClose = new ArrayList<>();
 
   public List<TextAnnotation> gettextAnnotationsToOpen() {
     return textAnnotationsToOpen;
