@@ -329,4 +329,9 @@ public class Storage {
     Preconditions.checkState(getTransactionIsOpen(), "We're not in an open transaction!");
   }
 
+  public Vertex addVertex(Object... keyValues) {
+    assertInTransaction();
+    return graph.addVertex(keyValues);
+  }
+
 }

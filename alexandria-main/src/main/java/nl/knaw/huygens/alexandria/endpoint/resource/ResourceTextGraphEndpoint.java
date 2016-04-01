@@ -109,7 +109,7 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
   }
 
   private void startTextProcessing(String xml, BaseLayerDefinition bld) {
-    TextGraphImportTask task = new TextGraphImportTask(service, locationBuilder, bld, xml, resource, ThreadContext.getUserName());
+    TextGraphImportTask task = new TextGraphImportTask(service, locationBuilder, xml, resource, ThreadContext.getUserName());
     taskStatusMap.put(resource.getId(), task.getStatus());
     executorService.execute(task);
   }

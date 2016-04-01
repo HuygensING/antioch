@@ -32,6 +32,7 @@ import java.io.OutputStream;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -43,12 +44,17 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import javax.inject.Inject;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tinkerpop.gremlin.structure.Element;
+import org.apache.tinkerpop.gremlin.process.traversal.Path;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
+import org.apache.tinkerpop.gremlin.structure.Direction;
+import org.apache.tinkerpop.gremlin.structure.T;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.jooq.lambda.Unchecked;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -76,12 +82,18 @@ import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.query.AlexandriaQueryParser;
 import nl.knaw.huygens.alexandria.query.ParsedAlexandriaQuery;
 import nl.knaw.huygens.alexandria.storage.DumpFormat;
+import nl.knaw.huygens.alexandria.storage.EdgeLabels;
 import nl.knaw.huygens.alexandria.storage.Storage;
+import nl.knaw.huygens.alexandria.storage.VertexLabels;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import nl.knaw.huygens.alexandria.text.TextService;
+import nl.knaw.huygens.alexandria.textgraph.ParseResult;
+import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
+import nl.knaw.huygens.alexandria.textgraph.TextGraphSegment;
+import nl.knaw.huygens.alexandria.textgraph.XmlAnnotation;
 import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorFactory;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorParseException;
@@ -566,7 +578,7 @@ public class TinkerPopService implements AlexandriaService {
   // - package methods -//
 
   Storage clearGraph() {
-    storage.getVertexTraversal().forEachRemaining(Element::remove);
+    storage.getVertexTraversal().forEachRemaining(org.apache.tinkerpop.gremlin.structure.Element::remove);
     return storage;
   }
 
@@ -773,6 +785,110 @@ public class TinkerPopService implements AlexandriaService {
         .collect(toList());
     Log.debug("results={}", results);
     return results;
+  }
+
+  @Override
+  public boolean storeTextGraph(UUID resourceId, ParseResult result) {
+    if (readResource(resourceId).isPresent()) {
+      storage.runInTransaction(() -> {
+        Vertex resource = storage.getVertexTraversal().has(Storage.IDENTIFIER_PROPERTY, resourceId.toString()).next();
+        Vertex text = storage.addVertex(T.label, VertexLabels.TEXTGRAPH);
+        resource.addEdge(EdgeLabels.HAS_TEXTGRAPH, text);
+        List<Vertex> textSegments = storeTextSegments(result.getTextSegments(), text);
+        storeTextAnnotations(result.getXmlAnnotations(), text, textSegments);
+      });
+      return true;
+    }
+    return false;
+  }
+
+  private List<Vertex> storeTextSegments(List<String> textSegments, Vertex text) {
+    List<Vertex> textSegmentVertices = new ArrayList<>();
+    Vertex previous = null;
+    for (String s : textSegments) {
+      Vertex v = storage.addVertex(T.label, VertexLabels.TEXTSEGMENT, TextSegment.Properties.text, s);
+      if (previous == null) {
+        text.addEdge(EdgeLabels.FIRST_TEXT_SEGMENT, v);
+      } else {
+        previous.addEdge(EdgeLabels.NEXT, v);
+      }
+      textSegmentVertices.add(v);
+      previous = v;
+    }
+    return textSegmentVertices;
+  }
+
+  private void storeTextAnnotations(Set<XmlAnnotation> xmlAnnotations, Vertex text, List<Vertex> textSegments) {
+    Vertex previous = null;
+    for (XmlAnnotation xmlAnnotation : xmlAnnotations) {
+      Vertex v = storage.addVertex(//
+          T.label, VertexLabels.TEXTANNOTATION, //
+          TextAnnotation.Properties.name, xmlAnnotation.getName(), //
+          TextAnnotation.Properties.attributes, xmlAnnotation.getAttributes(), //
+          TextAnnotation.Properties.depth, xmlAnnotation.getDepth()//
+      );
+      v.addEdge(EdgeLabels.FIRST_TEXT_SEGMENT, textSegments.get(xmlAnnotation.getFirstSegmentIndex()));
+      v.addEdge(EdgeLabels.LAST_TEXT_SEGMENT, textSegments.get(xmlAnnotation.getLastSegmentIndex()));
+      if (previous == null) {
+        text.addEdge(EdgeLabels.FIRST_ANNOTATION, v);
+      } else {
+        previous.addEdge(EdgeLabels.NEXT, v);
+      }
+      previous = v;
+    }
+  }
+
+  @Override
+  public Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceId) {
+    Path textSegmentPath = storage.getVertexTraversal()//
+        .has(Storage.IDENTIFIER_PROPERTY, resourceId.toString())//
+        .out(EdgeLabels.HAS_TEXTGRAPH)//
+        .out(EdgeLabels.FIRST_TEXT_SEGMENT)//
+        .repeat(__.out(EdgeLabels.NEXT))//
+        .until(__.outE(EdgeLabels.NEXT).count().is(0))//
+        .path().next();
+
+    return textSegmentPath.objects().stream().map(Vertex.class::cast)//
+        .map(TinkerPopService::toTextGraphSegment);
+  }
+
+  public static TextGraphSegment toTextGraphSegment(Vertex textSegment) {
+    TextGraphSegment textGraphSegment = new TextGraphSegment();
+    textGraphSegment.setTextSegment(textSegment.value(TextSegment.Properties.text));
+
+    textGraphSegment.setAnnotationsToOpen(getTextAnnotationsToOpen(textSegment));
+
+    textGraphSegment.setAnnotationsToClose(getTextAnnotationsToClose(textSegment));
+
+    return textGraphSegment;
+  }
+
+  private static final Comparator<TextAnnotation> BY_DECREASING_DEPTH = (e1, e2) -> e2.getDepth().compareTo(e1.getDepth());
+
+  private static List<TextAnnotation> getTextAnnotationsToOpen(Vertex textSegment) {
+    return getTextAnnotations(textSegment, EdgeLabels.FIRST_TEXT_SEGMENT, BY_DECREASING_DEPTH);
+  }
+
+  private static final Comparator<TextAnnotation> BY_INCREASING_DEPTH = (e1, e2) -> e1.getDepth().compareTo(e2.getDepth());
+
+  private static List<TextAnnotation> getTextAnnotationsToClose(Vertex textSegment) {
+    return getTextAnnotations(textSegment, EdgeLabels.LAST_TEXT_SEGMENT, BY_INCREASING_DEPTH);
+  }
+
+  private static List<TextAnnotation> getTextAnnotations(Vertex textSegment, String edgeLabel, Comparator<TextAnnotation> comparator) {
+    Iterable<Vertex> iterable = () -> textSegment.vertices(Direction.IN, edgeLabel);
+    return StreamSupport.stream(iterable.spliterator(), false)//
+        .map(TinkerPopService::toTextAnnotation)//
+        .sorted(comparator)//
+        .collect(toList());
+  }
+
+  private static TextAnnotation toTextAnnotation(Vertex textAnnotation) {
+    return new TextAnnotation(//
+        textAnnotation.value(TextAnnotation.Properties.name), //
+        textAnnotation.value(TextAnnotation.Properties.attributes), //
+        textAnnotation.value(TextAnnotation.Properties.depth)//
+    );
   }
 
   // @SuppressWarnings("unchecked")
