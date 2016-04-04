@@ -116,6 +116,18 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
     return ok(outputstream);
   }
 
+  @GET
+  @Path("xml")
+  @Produces(MediaType.TEXT_XML)
+  @ApiOperation("get baselayer as xml")
+  public Response getXML() {
+    // if (!resource.hasText()) {
+    // throw new NotFoundException("this resource has no text");
+    // }
+    StreamingOutput outputstream = TextGraphUtil.streamXML(service, resourceId);
+    return ok(outputstream);
+  }
+
   private void startTextProcessing(String xml) {
     TextGraphImportTask task = new TextGraphImportTask(service, locationBuilder, xml, resource, ThreadContext.getUserName());
     taskStatusMap.put(resource.getId(), task.getStatus());
