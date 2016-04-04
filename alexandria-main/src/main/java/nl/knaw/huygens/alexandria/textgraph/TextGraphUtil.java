@@ -11,8 +11,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 
 import javax.ws.rs.core.StreamingOutput;
 
@@ -25,6 +25,7 @@ import com.google.common.collect.Multimap;
 
 import nl.knaw.huygens.alexandria.api.model.BaseElementDefinition;
 import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.tei.Document;
 
 public class TextGraphUtil {
@@ -137,14 +138,16 @@ public class TextGraphUtil {
     return builder;
   }
 
-  public static StreamingOutput streamBaseLayerXML(BaseLayerDefinition baseLayerDefinition, Stream<TextGraphSegment> textGraphSegmentStream) {
+  public static StreamingOutput streamBaseLayerXML(AlexandriaService service, UUID resourceId, BaseLayerDefinition baseLayerDefinition) {
     List<BaseElementDefinition> baseElementDefinitions = baseLayerDefinition.getBaseElementDefinitions();
     StreamingOutput outputstream = output -> {
-      Writer writer = new BufferedWriter(new OutputStreamWriter(output));
-      textGraphSegmentStream.forEach(Unchecked.consumer(//
-          segment -> TextGraphUtil.streamTextGraphSegment(writer, segment, baseElementDefinitions)//
-      ));
-      writer.flush();
+      service.runInTransaction(Unchecked.runnable(() -> {
+        Writer writer = new BufferedWriter(new OutputStreamWriter(output));
+        service.getTextGraphSegmentStream(resourceId).forEach(Unchecked.consumer(//
+            segment -> TextGraphUtil.streamTextGraphSegment(writer, segment, baseElementDefinitions)//
+        ));
+        writer.flush();
+      }));
     };
     return outputstream;
   }
@@ -160,25 +163,25 @@ public class TextGraphUtil {
       String name = milestone.getName();
       if (baseElementNames.contains(name)) {
         Map<String, String> baseAttributes = baseAttributes(baseElementAttributes.get(name), milestone);
-        String openTag = TextGraphUtil.getOpenTag(name, baseAttributes);
+        String openTag = TextGraphUtil.getMilestoneTag(name, baseAttributes);
         writer.write(openTag);
       }
 
     } else {
-      for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
-        String name = textAnnotation.getName();
-        if (baseElementNames.contains(name)) {
-          String closeTag = TextGraphUtil.getCloseTag(name);
-          writer.write(closeTag);
-        }
-      }
-      writer.write(segment.getTextSegment());
       for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
         String name = textAnnotation.getName();
         if (baseElementNames.contains(name)) {
           Map<String, String> baseAttributes = baseAttributes(baseElementAttributes.get(name), textAnnotation);
           String openTag = TextGraphUtil.getOpenTag(name, baseAttributes);
           writer.write(openTag);
+        }
+      }
+      writer.write(segment.getTextSegment());
+      for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
+        String name = textAnnotation.getName();
+        if (baseElementNames.contains(name)) {
+          String closeTag = TextGraphUtil.getCloseTag(name);
+          writer.write(closeTag);
         }
       }
     }

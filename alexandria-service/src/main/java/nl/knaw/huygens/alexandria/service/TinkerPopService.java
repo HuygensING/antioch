@@ -579,7 +579,8 @@ public class TinkerPopService implements AlexandriaService {
   // - package methods -//
 
   Storage clearGraph() {
-    storage.getVertexTraversal().forEachRemaining(org.apache.tinkerpop.gremlin.structure.Element::remove);
+    storage.getVertexTraversal()//
+        .forEachRemaining(org.apache.tinkerpop.gremlin.structure.Element::remove);
     return storage;
   }
 
@@ -791,11 +792,14 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public boolean storeTextGraph(UUID resourceId, ParseResult result, String who) {
     if (readResource(resourceId).isPresent()) {
-      readResource(resourceId).get().setHasText(true);
       storage.runInTransaction(() -> {
-        Vertex resource = storage.getVertexTraversal().has(Storage.IDENTIFIER_PROPERTY, resourceId.toString()).next();
+        Vertex resource = storage.getVertexTraversal()//
+            .has(T.label, "Resource")//
+            .has(Storage.IDENTIFIER_PROPERTY, resourceId.toString())//
+            .next();
         Vertex text = storage.addVertex(T.label, VertexLabels.TEXTGRAPH);
         resource.addEdge(EdgeLabels.HAS_TEXTGRAPH, text);
+        resource.property("hasText", true);
         List<Vertex> textSegments = storeTextSegments(result.getTextSegments(), text);
         storeTextAnnotations(result.getXmlAnnotations(), text, textSegments);
       });
@@ -854,26 +858,19 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceId) {
-    List<TextGraphSegment> listToTakeOutOfTheTransaction = storage.runInTransaction(() -> {
-      // TODO: figure out how to deal with the transaction in the endpoint, because this is not as streaming as it should be
-      Path textSegmentPath = storage.getVertexTraversal()//
-          .has(Storage.IDENTIFIER_PROPERTY, resourceId.toString())//
-          .out(EdgeLabels.HAS_TEXTGRAPH)//
-          .out(EdgeLabels.FIRST_TEXT_SEGMENT)//
-          .repeat(__.out(EdgeLabels.NEXT))//
-          .until(__.outE(EdgeLabels.NEXT).count().is(0))//
-          .path().next();
+    Path textSegmentPath = storage.getVertexTraversal()//
+        .has(T.label, "Resource")//
+        .has(Storage.IDENTIFIER_PROPERTY, resourceId.toString())//
+        .out(EdgeLabels.HAS_TEXTGRAPH)//
+        .out(EdgeLabels.FIRST_TEXT_SEGMENT)//
+        .repeat(__.out(EdgeLabels.NEXT))//
+        .until(__.outE(EdgeLabels.NEXT).count().is(0))//
+        .path().next(); // Since there can be only one Path
 
-      Stream<TextGraphSegment> stream = textSegmentPath.objects().stream()//
-          .map(Vertex.class::cast)//
-          .filter(v -> v.label().equals(VertexLabels.TEXTSEGMENT))//
-          .map(TinkerPopService::toTextGraphSegment);
-
-      return stream.collect(toList());
-    });
-
-    // See previous todo
-    return listToTakeOutOfTheTransaction.stream();
+    return textSegmentPath.objects().stream()//
+        .map(Vertex.class::cast)//
+        .filter(v -> VertexLabels.TEXTSEGMENT.equals(v.label()))//
+        .map(TinkerPopService::toTextGraphSegment);
   }
 
   public static TextGraphSegment toTextGraphSegment(Vertex textSegment) {
@@ -888,13 +885,13 @@ public class TinkerPopService implements AlexandriaService {
     return textGraphSegment;
   }
 
-  private static final Comparator<TextAnnotation> BY_DECREASING_DEPTH = (e1, e2) -> e2.getDepth().compareTo(e1.getDepth());
+  private static final Comparator<TextAnnotation> BY_DECREASING_DEPTH = (e1, e2) -> e1.getDepth().compareTo(e2.getDepth());
 
   private static List<TextAnnotation> getTextAnnotationsToOpen(Vertex textSegment) {
     return getTextAnnotations(textSegment, EdgeLabels.FIRST_TEXT_SEGMENT, BY_DECREASING_DEPTH);
   }
 
-  private static final Comparator<TextAnnotation> BY_INCREASING_DEPTH = (e1, e2) -> e1.getDepth().compareTo(e2.getDepth());
+  private static final Comparator<TextAnnotation> BY_INCREASING_DEPTH = (e1, e2) -> e2.getDepth().compareTo(e1.getDepth());
 
   private static List<TextAnnotation> getTextAnnotationsToClose(Vertex textSegment) {
     return getTextAnnotations(textSegment, EdgeLabels.LAST_TEXT_SEGMENT, BY_INCREASING_DEPTH);
@@ -923,6 +920,11 @@ public class TinkerPopService implements AlexandriaService {
         attributes, //
         textAnnotation.value(TextAnnotation.Properties.depth)//
     );
+  }
+
+  @Override
+  public void runInTransaction(Runnable runner) {
+    storage.runInTransaction(runner);
   }
 
   // @SuppressWarnings("unchecked")

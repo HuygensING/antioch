@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -36,7 +35,6 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.text.TextPrototype;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphImportStatus;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphImportTask;
-import nl.knaw.huygens.alexandria.textgraph.TextGraphSegment;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphTaskStatusMap;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 
@@ -114,8 +112,7 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
     BaseLayerDefinition baseLayerDefinition = service.getBaseLayerDefinitionForResource(resourceId)//
         .orElseThrow(noBaseLayerDefined());
 
-    Stream<TextGraphSegment> textGraphSegmentStream = service.getTextGraphSegmentStream(resourceId);
-    StreamingOutput outputstream = TextGraphUtil.streamBaseLayerXML(baseLayerDefinition, textGraphSegmentStream);
+    StreamingOutput outputstream = TextGraphUtil.streamBaseLayerXML(service, resourceId, baseLayerDefinition);
     return ok(outputstream);
   }
 

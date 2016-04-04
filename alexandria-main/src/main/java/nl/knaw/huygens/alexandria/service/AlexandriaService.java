@@ -131,4 +131,6 @@ public interface AlexandriaService {
   boolean storeTextGraph(UUID resourceId, ParseResult result, String who);
 
   Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceId);
+
+  void runInTransaction(Runnable runner);
 }

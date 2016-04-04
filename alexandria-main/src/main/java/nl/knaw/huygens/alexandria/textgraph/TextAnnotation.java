@@ -2,6 +2,9 @@ package nl.knaw.huygens.alexandria.textgraph;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 public class TextAnnotation {
   public static class Properties {
     public static final String name = "name";
@@ -32,4 +35,8 @@ public class TextAnnotation {
     return depth;
   }
 
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+  }
 }
