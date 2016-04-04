@@ -60,7 +60,6 @@ public class TextGraphUtil {
       builder.append(t);
       appendClosingElements(builder, i.getAndIncrement(), xmlAnnotationList);
     });
-    appendClosingElements(builder, i.get(), xmlAnnotationList);
     return builder.toString();
   }
 
