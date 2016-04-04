@@ -37,6 +37,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSo
 import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Graph.Features.GraphFeatures;
+import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.io.IoCore;
 import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
@@ -175,6 +176,11 @@ public class Storage {
   public GraphTraversal<Vertex, Vertex> getVertexTraversal(Object... vertexIds) {
     assertInTransaction();
     return graph.traversal().V(vertexIds);
+  }
+
+  public GraphTraversal<Vertex, Vertex> getResourceVertexTraversal(Object... vertexIds) {
+    assertInTransaction();
+    return graph.traversal().V(vertexIds).has(T.label, "Resource");
   }
 
   // graph methods
