@@ -67,7 +67,8 @@
         </dd>
         <dt><code>return</code></dt>
         <dd>used to select which fields (ref. <code>where</code>) from the result-set are returned in the output.<br/>
-            <small>(if left unspecified, <code>id</code> is returned by default)</small>
+            <small>(if left unspecified, <code>id</code> is returned by default)</small><br/>
+            one of these fields can be wrapped in the function <code>list()</code>, in the results this field will be returned as a list of values, grouped by the combination of the values for the other fields in the <code>return</code> clause.
         </dd>
         <dt><code>distinct</code></dt>
         <dd>used to indicate the resulting combinations of values for the selected return fields should be unique.<br/>
