@@ -112,40 +112,28 @@
         we expect status
         <h:status>200 OK</h:status>
         and a response body containing:
-        <small>(only paging details shown for brevity)</small>
+        <small>(showing only details relevant to paging, actual record details withheld for brevity)</small>
         <h:jsonResponse>{
-            "searchResult" : {
-            "totalResults" : 8,
-            "totalPages" : 3,
-            "pageSize" : 3,
-            "^firstPage" : "https://{host}/searches/$searchId/pages/1"
-            } }
+            "searchResultPage" : {
+              "pageNumber" : 1,
+              "searchInfo" : {
+                "totalResults" : 8,
+                "totalPages" : 3,
+                "pageSize" : 3
+              },
+              "records" : [
+                { "_resultNumber" : 1 },
+                { "_resultNumber" : 2 },
+                { "_resultNumber" : 3 }
+              ],
+              "^firstPage" : "https://{host}/searches/$searchId/pages/1",
+              "^nextPage" : "https://{host}/searches/$searchId/pages/2",
+              "^lastPage" : "https://{host}/searches/$searchId/pages/3"
+            }}
         </h:jsonResponse>
     </h:request>
 
     <hr/>
-
-    <h:request>
-        When we
-        <h:get>/searches/$searchId/pages/1</h:get>
-        we expect status
-        <h:status>200 OK</h:status>
-        and body
-        <small>(showing only details relevant to paging, actual record details withheld for brevity)</small>
-        <h:jsonResponse>{
-            "searchResultPage" : {
-            "pageNumber" : 1,
-            "records" : [
-            { "_resultNumber" : 1 },
-            { "_resultNumber" : 2 },
-            { "_resultNumber" : 3 }
-            ],
-            "^firstPage" : "https://{host}/searches/$searchId/pages/1",
-            "^nextPage" : "https://{host}/searches/$searchId/pages/2",
-            "^lastPage" : "https://{host}/searches/$searchId/pages/3"
-            } }
-        </h:jsonResponse>
-    </h:request>
 
     <div class="alert alert-info sm">
         Convenience links <code>^firstPage</code> and <code>^lastPage</code> are included on all pages.

@@ -532,7 +532,8 @@
         <h:status>200 OK</h:status>
         and body
         <h:jsonResponse>{
-            "searchResult" : {
+            "searchResultPage" : {
+            "searchInfo" : {
             "id" : "$searchId",
             "query" : {
             "find" : "annotation",
@@ -541,7 +542,8 @@
             "return" : "id,type,value,resource.url"
             },
             "totalResults" : 3,
-            "totalPages" : 1,
+            "totalPages" : 1
+            },
             "^firstPage": "https://{host}/searches/$searchId/pages/1"
             } }
         </h:jsonResponse>
@@ -622,21 +624,11 @@
         <h:status>200 OK</h:status>
         and body
         <small>(only selected fields shown for brevity)</small>
-        <h:jsonResponse>{
-            "searchResult" : {
-            "totalResults" : 2,
-            "^firstPage": "https://{host}/searches/$searchId2/pages/1"
-            } }
-        </h:jsonResponse>
-    </h:request>
-
-    <h:request>We
-        <h:get>/searches/$searchId2/pages/1</h:get>
-        expecting
-        <h:status>200 OK</h:status>
-        and body
-        <small>(only selected fields shown for brevity)</small>
         <h:jsonResponse>{ "searchResultPage": {
+            "searchInfo" : {
+            "totalResults" : 2
+            },
+            "^firstPage": "https://{host}/searches/$searchId2/pages/1",
             "records": [
             {
             "value": "An early user comment.",
@@ -688,21 +680,11 @@
         <h:status>200 OK</h:status>
         and body
         <small>(only selected fields shown for brevity)</small>
-        <h:jsonResponse>{
-            "searchResult" : {
-            "totalResults" : 1,
-            "^firstPage": "https://{host}/searches/$searchId3/pages/1"
-            } }
-        </h:jsonResponse>
-    </h:request>
-
-    <h:request>We
-        <h:get>/searches/$searchId3/pages/1</h:get>
-        expecting
-        <h:status>200 OK</h:status>
-        and body
-        <small>(only selected fields shown for brevity)</small>
         <h:jsonResponse>{ "searchResultPage": {
+            "searchInfo" : {
+            "totalResults" : 1
+            },
+            "^firstPage": "https://{host}/searches/$searchId3/pages/1",
             "records": [
             {
             "value": "An early user comment.",
@@ -791,7 +773,8 @@
         <h:status>200 OK</h:status>
         and body
         <h:jsonResponse>{
-            "searchResult" : {
+            "searchResultPage" : {
+            "searchInfo": {
             "id" : "$searchId",
             "query" : {
             "find" : "annotation",
@@ -800,7 +783,7 @@
             "return" : "resource.id"
             },
             "totalResults" : 4,
-            "totalPages" : 1,
+            "totalPages" : 1},
             "^firstPage": "https://{host}/searches/$searchId/pages/1"
             } }
         </h:jsonResponse>
