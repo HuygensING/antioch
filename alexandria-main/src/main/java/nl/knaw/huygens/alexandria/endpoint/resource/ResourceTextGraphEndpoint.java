@@ -106,9 +106,9 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
   @Produces(MediaType.TEXT_XML)
   @ApiOperation("get baselayer as xml")
   public Response getBaseLayerXML() {
-    // if (!resource.hasText()) {
-    // throw new NotFoundException("this resource has no text");
-    // }
+    if (!resource.hasText()) {
+      throw new NotFoundException("this resource has no text");
+    }
     BaseLayerDefinition baseLayerDefinition = service.getBaseLayerDefinitionForResource(resourceId)//
         .orElseThrow(noBaseLayerDefined());
 
@@ -121,9 +121,9 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
   @Produces(MediaType.TEXT_XML)
   @ApiOperation("get baselayer as xml")
   public Response getXML() {
-    // if (!resource.hasText()) {
-    // throw new NotFoundException("this resource has no text");
-    // }
+    if (!resource.hasText()) {
+      throw new NotFoundException("this resource has no text");
+    }
     StreamingOutput outputstream = TextGraphUtil.streamXML(service, resourceId);
     return ok(outputstream);
   }
@@ -131,8 +131,8 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
   private void startTextProcessing(String xml) {
     TextGraphImportTask task = new TextGraphImportTask(service, locationBuilder, xml, resource, ThreadContext.getUserName());
     taskStatusMap.put(resource.getId(), task.getStatus());
-    task.run();
-    // executorService.execute(task);
+    // task.run();
+    executorService.execute(task);
   }
 
   private Supplier<ConflictException> noBaseLayerDefined() {
