@@ -39,49 +39,6 @@ public class TextGraphUtil {
     return result;
   }
 
-  public static String renderBaseLayer(List<String> textSegments, Set<XmlAnnotation> xmlAnnotations, BaseLayerDefinition baselayerDefinition) {
-    List<String> baseElementNames = baselayerDefinition.getBaseElementDefinitions().stream().map(BaseElementDefinition::getName).collect(toList());
-    StringBuilder builder = new StringBuilder();
-
-    List<XmlAnnotation> xmlAnnotationList = Lists.newArrayList(xmlAnnotations);
-    for (int i = 0; i < xmlAnnotationList.size(); i++) {
-      XmlAnnotation xmlAnnotation = xmlAnnotationList.get(i);
-      if (baseElementNames.contains(xmlAnnotation.getName())) {
-        openBeforeText.put(xmlAnnotation.getFirstSegmentIndex(), i);
-        closeAfterText.put(xmlAnnotation.getLastSegmentIndex(), i);
-      }
-    }
-
-    final AtomicInteger i = new AtomicInteger(0);
-    textSegments.forEach(t -> {
-      appendOpeningElements(builder, i.get(), xmlAnnotationList);
-      builder.append(t);
-      appendClosingElements(builder, i.getAndIncrement(), xmlAnnotationList);
-    });
-    return builder.toString();
-  }
-
-  public static void appendAttributes(StringBuilder builder, Map<String, String> attributes) {
-    for (Map.Entry<String, String> entry : attributes.entrySet()) {
-      builder.append(' ').append(entry.getKey()).append('=');
-      builder.append('"');
-      appendAttributeValue(builder, entry.getValue());
-      builder.append('"');
-    }
-  }
-
-  public static String getMilestoneTag(String name, Map<String, String> attributes) {
-    return openingTagBuilder(name, attributes).append("/>").toString();
-  }
-
-  public static String getOpenTag(String name, Map<String, String> attributes) {
-    return openingTagBuilder(name, attributes).append(">").toString();
-  }
-
-  public static String getCloseTag(String name) {
-    return "</" + name + ">";
-  }
-
   public static StreamingOutput streamXML(AlexandriaService service, UUID resourceId) {
     StreamingOutput outputstream = output -> {
       Writer writer = new BufferedWriter(new OutputStreamWriter(output));
@@ -171,6 +128,49 @@ public class TextGraphUtil {
     } catch (IOException ioe) {
       throw new RuntimeException(ioe);
     }
+  }
+
+  public static String renderBaseLayer(List<String> textSegments, Set<XmlAnnotation> xmlAnnotations, BaseLayerDefinition baselayerDefinition) {
+    List<String> baseElementNames = baselayerDefinition.getBaseElementDefinitions().stream().map(BaseElementDefinition::getName).collect(toList());
+    StringBuilder builder = new StringBuilder();
+
+    List<XmlAnnotation> xmlAnnotationList = Lists.newArrayList(xmlAnnotations);
+    for (int i = 0; i < xmlAnnotationList.size(); i++) {
+      XmlAnnotation xmlAnnotation = xmlAnnotationList.get(i);
+      if (baseElementNames.contains(xmlAnnotation.getName())) {
+        openBeforeText.put(xmlAnnotation.getFirstSegmentIndex(), i);
+        closeAfterText.put(xmlAnnotation.getLastSegmentIndex(), i);
+      }
+    }
+
+    final AtomicInteger i = new AtomicInteger(0);
+    textSegments.forEach(t -> {
+      appendOpeningElements(builder, i.get(), xmlAnnotationList);
+      builder.append(t);
+      appendClosingElements(builder, i.getAndIncrement(), xmlAnnotationList);
+    });
+    return builder.toString();
+  }
+
+  public static void appendAttributes(StringBuilder builder, Map<String, String> attributes) {
+    for (Map.Entry<String, String> entry : attributes.entrySet()) {
+      builder.append(' ').append(entry.getKey()).append('=');
+      builder.append('"');
+      appendAttributeValue(builder, entry.getValue());
+      builder.append('"');
+    }
+  }
+
+  public static String getMilestoneTag(String name, Map<String, String> attributes) {
+    return openingTagBuilder(name, attributes).append("/>").toString();
+  }
+
+  public static String getOpenTag(String name, Map<String, String> attributes) {
+    return openingTagBuilder(name, attributes).append(">").toString();
+  }
+
+  public static String getCloseTag(String name) {
+    return "</" + name + ">";
   }
 
   private static Map<String, String> baseAttributes(List<String> baseElementAttributeNames, TextAnnotation milestone) {
