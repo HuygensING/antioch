@@ -34,6 +34,7 @@ import java.time.Instant;
 import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -51,8 +52,6 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tinkerpop.gremlin.process.traversal.Path;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -857,17 +856,28 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceId) {
-    Path textSegmentPath = storage.getResourceVertexTraversal()//
-        .has(Storage.IDENTIFIER_PROPERTY, resourceId.toString())//
-        .out(EdgeLabels.HAS_TEXTGRAPH)//
-        .out(EdgeLabels.FIRST_TEXT_SEGMENT)//
-        .repeat(__.out(EdgeLabels.NEXT))//
-        .until(__.outE(EdgeLabels.NEXT).count().is(0))//
-        .path().next(); // Since there can be only one Path
+    Iterator<Vertex> textSegmentIterator = new Iterator<Vertex>() {
+      Vertex textSegment = storage.getResourceVertexTraversal()//
+          .has(Storage.IDENTIFIER_PROPERTY, resourceId.toString())//
+          .out(EdgeLabels.HAS_TEXTGRAPH)//
+          .out(EdgeLabels.FIRST_TEXT_SEGMENT)//
+          .next();// because there can only be one
 
-    return textSegmentPath.objects().stream()//
-        .map(Vertex.class::cast)//
-        .filter(v -> VertexLabels.TEXTSEGMENT.equals(v.label()))//
+      @Override
+      public boolean hasNext() {
+        return textSegment != null;
+      }
+
+      @Override
+      public Vertex next() {
+        Vertex next = textSegment;
+        Iterator<Vertex> nextVertices = textSegment.vertices(Direction.OUT, EdgeLabels.NEXT);
+        textSegment = nextVertices.hasNext() ? nextVertices.next() : null;
+        return next;
+      }
+    };
+    Iterable<Vertex> iterable = () -> textSegmentIterator;
+    return StreamSupport.stream(iterable.spliterator(), false)//
         .map(TinkerPopService::toTextGraphSegment);
   }
 
