@@ -16,8 +16,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.ws.rs.core.StreamingOutput;
 
-import org.jooq.lambda.Unchecked;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -86,13 +84,12 @@ public class TextGraphUtil {
 
   public static StreamingOutput streamXML(AlexandriaService service, UUID resourceId) {
     StreamingOutput outputstream = output -> {
-      service.runInTransaction(Unchecked.runnable(() -> {
-        Writer writer = new BufferedWriter(new OutputStreamWriter(output));
-        service.getTextGraphSegmentStream(resourceId).forEach(Unchecked.consumer(//
-            segment -> streamTextGraphSegment(writer, segment)//
-        ));
-        writer.flush();
-      }));
+      Writer writer = new BufferedWriter(new OutputStreamWriter(output));
+      service.runInTransaction(() -> {
+        service.getTextGraphSegmentStream(resourceId).forEach(segment -> streamTextGraphSegment(writer, segment)//
+        );
+      });
+      writer.flush();
     };
     return outputstream;
   }
@@ -100,71 +97,79 @@ public class TextGraphUtil {
   public static StreamingOutput streamBaseLayerXML(AlexandriaService service, UUID resourceId, BaseLayerDefinition baseLayerDefinition) {
     List<BaseElementDefinition> baseElementDefinitions = baseLayerDefinition.getBaseElementDefinitions();
     StreamingOutput outputstream = output -> {
-      service.runInTransaction(Unchecked.runnable(() -> {
-        Writer writer = new BufferedWriter(new OutputStreamWriter(output));
-        service.getTextGraphSegmentStream(resourceId).forEach(Unchecked.consumer(//
+      Writer writer = new BufferedWriter(new OutputStreamWriter(output));
+      service.runInTransaction(() -> {
+        service.getTextGraphSegmentStream(resourceId).forEach(//
             segment -> streamTextGraphSegment(writer, segment, baseElementDefinitions)//
-        ));
-        writer.flush();
-      }));
+        );
+      });
+      writer.flush();
     };
     return outputstream;
   }
 
-  public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment, List<BaseElementDefinition> baseElementDefinitions) throws IOException {
+  public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment, List<BaseElementDefinition> baseElementDefinitions) {
     Set<String> baseElementNames = baseElementDefinitions.stream().map(BaseElementDefinition::getName).collect(toSet());
     Map<String, List<String>> baseElementAttributes = Maps.newHashMap();
     for (BaseElementDefinition bed : baseElementDefinitions) {
       baseElementAttributes.put(bed.getName(), bed.getBaseAttributes());
     }
-    if (segment.isMilestone()) {
-      TextAnnotation milestone = segment.getMilestone();
-      String name = milestone.getName();
-      if (baseElementNames.contains(name)) {
-        Map<String, String> baseAttributes = baseAttributes(baseElementAttributes.get(name), milestone);
-        String openTag = getMilestoneTag(name, baseAttributes);
-        writer.write(openTag);
-      }
-
-    } else {
-      for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
-        String name = textAnnotation.getName();
+    try {
+      if (segment.isMilestone()) {
+        TextAnnotation milestone = segment.getMilestone();
+        String name = milestone.getName();
         if (baseElementNames.contains(name)) {
-          Map<String, String> baseAttributes = baseAttributes(baseElementAttributes.get(name), textAnnotation);
-          String openTag = getOpenTag(name, baseAttributes);
+          Map<String, String> baseAttributes = baseAttributes(baseElementAttributes.get(name), milestone);
+          String openTag = getMilestoneTag(name, baseAttributes);
           writer.write(openTag);
         }
+
+      } else {
+        for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
+          String name = textAnnotation.getName();
+          if (baseElementNames.contains(name)) {
+            Map<String, String> baseAttributes = baseAttributes(baseElementAttributes.get(name), textAnnotation);
+            String openTag = getOpenTag(name, baseAttributes);
+            writer.write(openTag);
+          }
+        }
+        writer.write(segment.getTextSegment());
+        for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
+          String name = textAnnotation.getName();
+          if (baseElementNames.contains(name)) {
+            String closeTag = getCloseTag(name);
+            writer.write(closeTag);
+          }
+        }
       }
-      writer.write(segment.getTextSegment());
-      for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
-        String name = textAnnotation.getName();
-        if (baseElementNames.contains(name)) {
+    } catch (IOException ioe) {
+      throw new RuntimeException(ioe);
+    }
+  }
+
+  public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment) {
+    try {
+      if (segment.isMilestone()) {
+        TextAnnotation milestone = segment.getMilestone();
+        String name = milestone.getName();
+        String openTag = getMilestoneTag(name, milestone.getAttributes());
+        writer.write(openTag);
+
+      } else {
+        for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
+          String name = textAnnotation.getName();
+          String openTag = getOpenTag(name, textAnnotation.getAttributes());
+          writer.write(openTag);
+        }
+        writer.write(segment.getTextSegment());
+        for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
+          String name = textAnnotation.getName();
           String closeTag = getCloseTag(name);
           writer.write(closeTag);
         }
       }
-    }
-  }
-
-  public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment) throws IOException {
-    if (segment.isMilestone()) {
-      TextAnnotation milestone = segment.getMilestone();
-      String name = milestone.getName();
-      String openTag = getMilestoneTag(name, milestone.getAttributes());
-      writer.write(openTag);
-
-    } else {
-      for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
-        String name = textAnnotation.getName();
-        String openTag = getOpenTag(name, textAnnotation.getAttributes());
-        writer.write(openTag);
-      }
-      writer.write(segment.getTextSegment());
-      for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
-        String name = textAnnotation.getName();
-        String closeTag = getCloseTag(name);
-        writer.write(closeTag);
-      }
+    } catch (IOException ioe) {
+      throw new RuntimeException(ioe);
     }
   }
 
