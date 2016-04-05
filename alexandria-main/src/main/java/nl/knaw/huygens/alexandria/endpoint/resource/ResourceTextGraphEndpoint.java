@@ -68,7 +68,7 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
     assertResourceHasNoText();
     startTextProcessing(xml);
     return Response.accepted()//
-        .location(locationBuilder.locationOf(resource, "textgraph", "status"))//
+        .location(locationBuilder.locationOf(resource, "text", "status"))//
         .build();
   }
 
