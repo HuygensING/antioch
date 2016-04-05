@@ -27,7 +27,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.Duration;
 import java.time.Instant;
@@ -89,7 +88,6 @@ import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
-import nl.knaw.huygens.alexandria.text.TextService;
 import nl.knaw.huygens.alexandria.textgraph.ParseResult;
 import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphSegment;
@@ -103,14 +101,12 @@ public class TinkerPopService implements AlexandriaService {
   private Storage storage;
   private LocationBuilder locationBuilder;
   private AlexandriaQueryParser alexandriaQueryParser;
-  private TextService textService;
 
   @Inject
-  public TinkerPopService(Storage storage, LocationBuilder locationBuilder, TextService textService) {
+  public TinkerPopService(Storage storage, LocationBuilder locationBuilder) {
     Log.trace("{} created, locationBuilder=[{}]", getClass().getSimpleName(), locationBuilder);
     this.locationBuilder = locationBuilder;
     this.alexandriaQueryParser = new AlexandriaQueryParser(locationBuilder);
-    this.textService = textService;
     setStorage(storage);
   }
 
@@ -390,14 +386,6 @@ public class TinkerPopService implements AlexandriaService {
     throw new NotImplementedException();
   }
 
-  @Override
-  public void setResourceTextFromStream(UUID resourceUUID, InputStream inputStream) {
-    textService.setFromStream(resourceUUID, inputStream);
-    storage.runInTransaction(() -> {
-      ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
-      resourceVF.setHasText(true);
-    });
-  }
 
   @Override
   public void setBaseLayerDefinition(UUID resourceUUID, BaseLayerDefinitionPrototype bldPrototype) {
@@ -482,20 +470,6 @@ public class TinkerPopService implements AlexandriaService {
     // Log.info("destroy done");
   }
 
-  // @Override
-  // public void setResourceText(UUID resourceUUID, String text) {
-  // textService.set(resourceUUID, text);
-  // }
-  //
-  // @Override
-  // public Optional<String> getResourceText(UUID resourceUUID) {
-  // return textService.get(resourceUUID);
-  // }
-
-  @Override
-  public Optional<InputStream> getResourceTextAsStream(UUID resourceUUID) {
-    return textService.getAsStream(resourceUUID);
-  }
 
   @Override
   public void exportDb(String format, String filename) {
@@ -505,7 +479,6 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public void importDb(String format, String filename) {
     storage = clearGraph();
-    // storage.startTransaction();
     storage.runInTransaction(Unchecked.runnable(() -> storage.readGraph(DumpFormat.valueOf(format), filename)));
   }
 
@@ -934,23 +907,5 @@ public class TinkerPopService implements AlexandriaService {
   public void runInTransaction(Runnable runner) {
     storage.runInTransaction(runner);
   }
-
-  // @SuppressWarnings("unchecked")
-  // private void findAllConfirmedAnnotationsRelatedToResource(String uuid) {
-  // // case: find all annotations related to a given resource (or its subresources)
-  // // start with the resource
-  // // from there: find subresources, add them to resource list
-  // // foreach resource in the list, get the confirmed annotations of that resource, add them to annotations list
-  // // foreach annotation in the annotationlist, find the confirmed annotations of that annotation, add them to
-  // annotations list
-  // GraphTraversal<Vertex, Vertex> traversal = storage.getVertexTraversal();
-  // traversal.has("uuid", uuid).in(ResourceVF.PART_OF).in("annotates").has("state", "CONFIRMED").as("a").out
-  // ("has_body").as("b").toList();
-  // traversal.has("uuid", uuid)
-  // .union(//
-  // __.in(ResourceVF.PART_OF).in(AnnotationVF.ANNOTATES_RESOURCE), //
-  // __.in(AnnotationVF.ANNOTATES_RESOURCE)//
-  // ).has("state", AlexandriaState.CONFIRMED.name()).as("a").out(AnnotationVF.HAS_BODY).as("b").toList();
-  // }
 
 }

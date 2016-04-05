@@ -17,12 +17,12 @@ import java.util.stream.StreamSupport;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -56,7 +56,6 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.storage.Storage;
-import nl.knaw.huygens.alexandria.text.TextService;
 
 @Singleton
 public class TitanService extends TinkerPopService {
@@ -123,8 +122,8 @@ public class TitanService extends TinkerPopService {
   }
 
   @Inject
-  public TitanService(LocationBuilder locationBuilder, AlexandriaConfiguration configuration, TextService textService) {
-    super(getStorage(configuration), locationBuilder, textService);
+  public TitanService(LocationBuilder locationBuilder, AlexandriaConfiguration configuration) {
+    super(getStorage(configuration), locationBuilder);
     this.configuration = configuration;
   }
 

@@ -180,9 +180,9 @@ function a-dry-run {
 	  }
 	}'
   a-log "result uploading text:"
-  curl --silent --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:text/xml' --data "$*" | jq "."
+  curl --silent --header "${authheader}" -X PUT ${be}/resources/${ri}/text/baselayer --header 'Content-Type:text/xml' --data "$*" | jq "."
   a-log "extracted baselayer:"
-  curl ${be}/resources/${ri}/text
+  curl ${be}/resources/${ri}/text/baselayer
 }
 
 function a-dry-run-from-file {
@@ -219,7 +219,7 @@ function a-dry-run-from-file {
   a-log "Location: ${location}"
   curl --silent ${location} | jq "."
   a-log "extracted baselayer:"
-  curl ${be}/resources/${ri}/text
+  curl ${be}/resources/${ri}/text/baselayer
   curl --silent ${location} | jq "."
   a-log "see status at ${location}"
 }
@@ -253,7 +253,7 @@ function a-gutenberg-import-file {
     }
   }'
   a-log "result uploading text:"
-  location=$(curl -i --header "${authheader}" -X PUT ${be}/resources/${ri}/textgraph --header 'Content-Type:application/octet-stream' --data @"$*" |a-location)
+  location=$(curl -i --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:application/octet-stream' --data @"$*" |a-location)
   a-log "Location: ${location}"
   curl --silent ${location} | jq "."
   a-log "see status at ${location}"

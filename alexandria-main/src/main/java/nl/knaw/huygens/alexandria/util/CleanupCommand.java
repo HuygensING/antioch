@@ -28,14 +28,14 @@ import com.google.common.base.Preconditions;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.alexandria.text.TaskStatusMap;
+import nl.knaw.huygens.alexandria.textgraph.TextGraphTaskStatusMap;
 
 public class CleanupCommand implements Runnable {
   private AlexandriaService service;
-  private TaskStatusMap taskStatusMap;
+  private TextGraphTaskStatusMap taskStatusMap;
 
   @Inject
-  public CleanupCommand(AlexandriaService service, TaskStatusMap taskStatusMap) {
+  public CleanupCommand(AlexandriaService service, TextGraphTaskStatusMap taskStatusMap) {
     this.service = service;
     this.taskStatusMap = taskStatusMap;
   }

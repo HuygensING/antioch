@@ -1,5 +1,22 @@
 package nl.knaw.huygens.alexandria.storage;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.time.Instant;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Supplier;
+
+import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.mockito.Mockito;
+
 /*
  * #%L
  * alexandria-service
@@ -27,28 +44,18 @@ import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
-import nl.knaw.huygens.alexandria.model.*;
+import nl.knaw.huygens.alexandria.model.Accountable;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
+import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.TinkerPopService;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
-import nl.knaw.huygens.alexandria.text.InMemoryTextService;
-import org.apache.tinkerpop.gremlin.structure.Graph;
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import java.time.Instant;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Supplier;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
 public class TinkerpopAlexandriaServiceTest {
   private static Storage mockStorage = mock(Storage.class);
-  private final TinkerPopService service = new TinkerPopService(mockStorage, new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()), new InMemoryTextService());
+  private final TinkerPopService service = new TinkerPopService(mockStorage, new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()));
 
   @SuppressWarnings("unchecked")
   @Before

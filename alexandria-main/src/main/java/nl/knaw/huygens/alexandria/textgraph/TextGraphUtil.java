@@ -27,7 +27,6 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.tei.Document;
 
 public class TextGraphUtil {
-
   private static Multimap<Integer, Integer> openBeforeText = ArrayListMultimap.create();
   private static Multimap<Integer, Integer> closeAfterText = ArrayListMultimap.create();
 

@@ -47,8 +47,6 @@ import nl.knaw.huygens.alexandria.service.AlexandriaServletModule;
 import nl.knaw.huygens.alexandria.service.TinkerPopService;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
-import nl.knaw.huygens.alexandria.text.InMemoryTextService;
-import nl.knaw.huygens.alexandria.text.TextService;
 
 public abstract class AlexandriaClientTest extends AlexandriaTest {
   static final String AUTHKEY = "AUTHKEY";
@@ -107,7 +105,6 @@ public abstract class AlexandriaClientTest extends AlexandriaTest {
       @Override
       protected void configure() {
         bind(AlexandriaConfiguration.class).toInstance(testConfig);
-        bind(TextService.class).toInstance(new InMemoryTextService());
       }
     };
     BootstrapUtils.newInjector(locator, Arrays.asList(new AlexandriaServletModule(), configModule));
