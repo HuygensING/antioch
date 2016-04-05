@@ -245,27 +245,19 @@
     </div>
 
     <h:request>We
-        <h:get>/searches/$searchId</h:get>
-        and inspect the number of results and the <code>where</code> clause of our query
-        <h:jsonResponse>{
-            "searchResult" : {
-            "id" : "$searchId",
-            "query" : {
-            "where" : "who:eq(\"nederlab\") state:eq(\"CONFIRMED\")"
-            },
-            "totalResults" : 2,
-            "^firstPage" : "https://{host}/searches/$searchId/pages/1"
-            } }
-        </h:jsonResponse>
-    </h:request>
-
-    <h:request>We
-        <h:success>successfully</h:success>
-        <h:get>/searches/$searchId/pages/1</h:get>
+        <h:get>/searches/$searchId</h:get>,
+        inspect the number of results and the <code>where</code> clause of our query in <code>searchInfo</code>
         and find the expected annotation URLs and values:
         <h:jsonResponse>{
             "searchResultPage" : {
             "pageNumber" : 1,
+            "searchInfo" : {
+            "id" : "$searchId",
+            "query" : {
+            "where" : "who:eq(\"nederlab\") state:eq(\"CONFIRMED\")"
+            },
+            "totalResults" : 2
+            },
             "records" : [
             {"value" : "a confirmed annotation", "url": "https://{host}/annotations/$confirmedId"},
             {"value" : "the annotation value after deprecation", "url": "https://{host}/annotations/$deprecatedId"}
@@ -295,22 +287,14 @@
         <h:get>/searches/$searchId</h:get>
         and verify the body
         <h:jsonResponse>{
-            "searchResult": {
+            "searchResultPage": {
+            "searchInfo" : {
             "id": "$searchId",
             "query": {
             "where": "who:eq(\"nederlab\") state:inSet(\"TENTATIVE\", \"DELETED\")"
             },
             "totalResults": 2
-            } }
-        </h:jsonResponse>
-    </h:request>
-
-    <h:request>We
-        <h:success>successfully</h:success>
-        <h:get>/searches/$searchId/pages/1</h:get>
-        and verify the body
-        <h:jsonResponse>{
-            "searchResultPage": {
+            },
             "records": [ {
             "state": "TENTATIVE",
             "value": "a tentative annotation",
@@ -322,6 +306,7 @@
             } ] } }
         </h:jsonResponse>
     </h:request>
+
 </div>
 
 <div id="try-cheat-state-of-confirmed" data-desc="Can I cheat a CONFIRMED annotation back to TENTATIVE?"

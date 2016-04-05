@@ -33,8 +33,8 @@ function a-find-annotations-for-resource {
     \"return\" : \"id,when,who,type,value,resource.id,resource.url,subresource.id,subresource.url\",
     \"pageSize\" : 100
     }}" 2>/dev/null|a-location)
-    echo "search URI=" ${url}
-    curl ${url}/resultpages/1
+  echo "search URI=" ${url}
+  curl ${url}/pages/1
 }
 
 function a-show-first-resultpage {
