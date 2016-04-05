@@ -50,8 +50,8 @@
 <a class="jxr_linenumber" name="L42" href="#L42">42</a>          + <span class="jxr_string">"&lt;p xml:id='p-1'&gt;foo&lt;alexandria_subtextplaceholder xml:id='alexandria:subtext-1'/&gt;&lt;/p&gt;"</span><em class="jxr_comment">//</em>
 <a class="jxr_linenumber" name="L43" href="#L43">43</a>          + <span class="jxr_string">"&lt;p xml:id='p-2'&gt;bar&lt;alexandria_subtextplaceholder xml:id='alexandria:subtext-2'/&gt;&lt;/p&gt;"</span><em class="jxr_comment">//</em>
 <a class="jxr_linenumber" name="L44" href="#L44">44</a>          + <span class="jxr_string">"&lt;/text&gt;"</span>);
-<a class="jxr_linenumber" name="L45" href="#L45">45</a>      String expectedSubText1 = singleQuotesToDouble(<span class="jxr_string">"&lt;text n='1' subtext_type='note'&gt;probably by &lt;persName&gt;someone&lt;/persName&gt;&lt;/text&gt;"</span>);
-<a class="jxr_linenumber" name="L46" href="#L46">46</a>      String expectedSubText2 = singleQuotesToDouble(<span class="jxr_string">"&lt;text n='2' subtext_type='comment'&gt;most likely by &lt;persName&gt;someone else&lt;/persName&gt;&lt;/text&gt;"</span>);
+<a class="jxr_linenumber" name="L45" href="#L45">45</a>      String expectedSubText1 = singleQuotesToDouble(<span class="jxr_string">"&lt;note n='1'&gt;probably by &lt;persName&gt;someone&lt;/persName&gt;&lt;/note&gt;"</span>);
+<a class="jxr_linenumber" name="L46" href="#L46">46</a>      String expectedSubText2 = singleQuotesToDouble(<span class="jxr_string">"&lt;comment n='2'&gt;most likely by &lt;persName&gt;someone else&lt;/persName&gt;&lt;/comment&gt;"</span>);
 <a class="jxr_linenumber" name="L47" href="#L47">47</a>      List&lt;String&gt; subresourceElements = ImmutableList.of(<span class="jxr_string">"note"</span>, <span class="jxr_string">"comment"</span>);
 <a class="jxr_linenumber" name="L48" href="#L48">48</a>      SEVContext context = <strong class="jxr_keyword">new</strong> SEVContext();
 <a class="jxr_linenumber" name="L49" href="#L49">49</a>      SubresourceElementVisitor subresourceVisitor = <strong class="jxr_keyword">new</strong> SubresourceElementVisitor(context, subresourceElements);
@@ -79,10 +79,10 @@
 <a class="jxr_linenumber" name="L71" href="#L71">71</a>      String expectedBase = singleQuotesToDouble(<span class="jxr_string">"&lt;text xml:id='text-1'&gt;"</span><em class="jxr_comment">//</em>
 <a class="jxr_linenumber" name="L72" href="#L72">72</a>          + <span class="jxr_string">"&lt;p xml:id='p-1'&gt;foo&lt;alexandria_subtextplaceholder xml:id='alexandria:subtext-1'/&gt;&lt;/p&gt;"</span><em class="jxr_comment">//</em>
 <a class="jxr_linenumber" name="L73" href="#L73">73</a>          + <span class="jxr_string">"&lt;/text&gt;"</span>);
-<a class="jxr_linenumber" name="L74" href="#L74">74</a>      String expectedSubText = singleQuotesToDouble(<span class="jxr_string">"&lt;text n='1' subtext_type='note'&gt;"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L74" href="#L74">74</a>      String expectedSubText = singleQuotesToDouble(<span class="jxr_string">"&lt;note n='1'&gt;"</span><em class="jxr_comment">//</em>
 <a class="jxr_linenumber" name="L75" href="#L75">75</a>          + <span class="jxr_string">"probably by &lt;persName&gt;someone&lt;/persName&gt;"</span><em class="jxr_comment">//</em>
 <a class="jxr_linenumber" name="L76" href="#L76">76</a>          + <span class="jxr_string">"&lt;note n='2'&gt;most likely by &lt;persName&gt;someone else&lt;/persName&gt;&lt;/note&gt;"</span><em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L77" href="#L77">77</a>          + <span class="jxr_string">"&lt;/text&gt;"</span>);
+<a class="jxr_linenumber" name="L77" href="#L77">77</a>          + <span class="jxr_string">"&lt;/note&gt;"</span>);
 <a class="jxr_linenumber" name="L78" href="#L78">78</a>      List&lt;String&gt; subresourceElements = ImmutableList.of(<span class="jxr_string">"note"</span>);
 <a class="jxr_linenumber" name="L79" href="#L79">79</a>      SEVContext context = <strong class="jxr_keyword">new</strong> SEVContext();
 <a class="jxr_linenumber" name="L80" href="#L80">80</a>      SubresourceElementVisitor subresourceVisitor = <strong class="jxr_keyword">new</strong> SubresourceElementVisitor(context, subresourceElements);

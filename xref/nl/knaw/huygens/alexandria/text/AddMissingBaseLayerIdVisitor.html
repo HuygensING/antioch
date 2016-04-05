@@ -64,30 +64,37 @@
 <a class="jxr_linenumber" name="L56" href="#L56">56</a>    <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/text/AddMissingBaseLayerIdVisitor.html">BaseElementHandler</a> <strong class="jxr_keyword">implements</strong> ElementHandler&lt;XmlContext&gt; {
 <a class="jxr_linenumber" name="L57" href="#L57">57</a>      @Override
 <a class="jxr_linenumber" name="L58" href="#L58">58</a>      <strong class="jxr_keyword">public</strong> Traversal enterElement(Element element, XmlContext context) {
-<a class="jxr_linenumber" name="L59" href="#L59">59</a>        <strong class="jxr_keyword">if</strong> (!element.hasAttribute(TextUtil.XML_ID)) {
-<a class="jxr_linenumber" name="L60" href="#L60">60</a>          addId(element);
-<a class="jxr_linenumber" name="L61" href="#L61">61</a>        }
-<a class="jxr_linenumber" name="L62" href="#L62">62</a>        context.addOpenTag(element);
-<a class="jxr_linenumber" name="L63" href="#L63">63</a>        <strong class="jxr_keyword">return</strong> Traversal.NEXT;
-<a class="jxr_linenumber" name="L64" href="#L64">64</a>      }
-<a class="jxr_linenumber" name="L65" href="#L65">65</a>  
-<a class="jxr_linenumber" name="L66" href="#L66">66</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> addId(Element baseElement) {
-<a class="jxr_linenumber" name="L67" href="#L67">67</a>        String name = baseElement.getName();
-<a class="jxr_linenumber" name="L68" href="#L68">68</a>        String id;
-<a class="jxr_linenumber" name="L69" href="#L69">69</a>        counters.putIfAbsent(name, <strong class="jxr_keyword">new</strong> AtomicLong(0));
-<a class="jxr_linenumber" name="L70" href="#L70">70</a>        <strong class="jxr_keyword">do</strong> {
-<a class="jxr_linenumber" name="L71" href="#L71">71</a>          id = name + XMLID_MARKER + counters.get(name).incrementAndGet();
-<a class="jxr_linenumber" name="L72" href="#L72">72</a>        } <strong class="jxr_keyword">while</strong> (exisitingBaseElementIds.contains(id));
-<a class="jxr_linenumber" name="L73" href="#L73">73</a>        baseElement.setAttribute(TextUtil.XML_ID, id);
-<a class="jxr_linenumber" name="L74" href="#L74">74</a>      }
-<a class="jxr_linenumber" name="L75" href="#L75">75</a>  
-<a class="jxr_linenumber" name="L76" href="#L76">76</a>      @Override
-<a class="jxr_linenumber" name="L77" href="#L77">77</a>      <strong class="jxr_keyword">public</strong> Traversal leaveElement(Element element, XmlContext context) {
-<a class="jxr_linenumber" name="L78" href="#L78">78</a>        context.addCloseTag(element);
-<a class="jxr_linenumber" name="L79" href="#L79">79</a>        <strong class="jxr_keyword">return</strong> Traversal.NEXT;
-<a class="jxr_linenumber" name="L80" href="#L80">80</a>      }
-<a class="jxr_linenumber" name="L81" href="#L81">81</a>    }
-<a class="jxr_linenumber" name="L82" href="#L82">82</a>  }
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>        <strong class="jxr_keyword">if</strong> (element.hasChildren()) {
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>          <strong class="jxr_keyword">if</strong> (!element.hasAttribute(TextUtil.XML_ID)) {
+<a class="jxr_linenumber" name="L61" href="#L61">61</a>            addId(element);
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>          }
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>          context.addOpenTag(element);
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>        } <strong class="jxr_keyword">else</strong> {
+<a class="jxr_linenumber" name="L65" href="#L65">65</a>          <em class="jxr_comment">// TODO: should milestone base elements get an xml:id?</em>
+<a class="jxr_linenumber" name="L66" href="#L66">66</a>          context.addEmptyElementTag(element);
+<a class="jxr_linenumber" name="L67" href="#L67">67</a>        }
+<a class="jxr_linenumber" name="L68" href="#L68">68</a>        <strong class="jxr_keyword">return</strong> Traversal.NEXT;
+<a class="jxr_linenumber" name="L69" href="#L69">69</a>      }
+<a class="jxr_linenumber" name="L70" href="#L70">70</a>  
+<a class="jxr_linenumber" name="L71" href="#L71">71</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> addId(Element baseElement) {
+<a class="jxr_linenumber" name="L72" href="#L72">72</a>        String name = baseElement.getName();
+<a class="jxr_linenumber" name="L73" href="#L73">73</a>        String id;
+<a class="jxr_linenumber" name="L74" href="#L74">74</a>        counters.putIfAbsent(name, <strong class="jxr_keyword">new</strong> AtomicLong(0));
+<a class="jxr_linenumber" name="L75" href="#L75">75</a>        <strong class="jxr_keyword">do</strong> {
+<a class="jxr_linenumber" name="L76" href="#L76">76</a>          id = name + XMLID_MARKER + counters.get(name).incrementAndGet();
+<a class="jxr_linenumber" name="L77" href="#L77">77</a>        } <strong class="jxr_keyword">while</strong> (exisitingBaseElementIds.contains(id));
+<a class="jxr_linenumber" name="L78" href="#L78">78</a>        baseElement.setAttribute(TextUtil.XML_ID, id);
+<a class="jxr_linenumber" name="L79" href="#L79">79</a>      }
+<a class="jxr_linenumber" name="L80" href="#L80">80</a>  
+<a class="jxr_linenumber" name="L81" href="#L81">81</a>      @Override
+<a class="jxr_linenumber" name="L82" href="#L82">82</a>      <strong class="jxr_keyword">public</strong> Traversal leaveElement(Element element, XmlContext context) {
+<a class="jxr_linenumber" name="L83" href="#L83">83</a>        <strong class="jxr_keyword">if</strong> (element.hasChildren()) {
+<a class="jxr_linenumber" name="L84" href="#L84">84</a>          context.addCloseTag(element);
+<a class="jxr_linenumber" name="L85" href="#L85">85</a>        }
+<a class="jxr_linenumber" name="L86" href="#L86">86</a>        <strong class="jxr_keyword">return</strong> Traversal.NEXT;
+<a class="jxr_linenumber" name="L87" href="#L87">87</a>      }
+<a class="jxr_linenumber" name="L88" href="#L88">88</a>    }
+<a class="jxr_linenumber" name="L89" href="#L89">89</a>  }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2015&#x2013;2016 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>

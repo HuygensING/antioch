@@ -436,27 +436,36 @@
 <a class="jxr_linenumber" name="L428" href="#L428">428</a> 
 <a class="jxr_linenumber" name="L429" href="#L429">429</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> parseReturn(<strong class="jxr_keyword">final</strong> <a href="../../../../../nl/knaw/huygens/alexandria/query/ParsedAlexandriaQuery.html">ParsedAlexandriaQuery</a> paq, <strong class="jxr_keyword">final</strong> String fieldString) {
 <a class="jxr_linenumber" name="L430" href="#L430">430</a>     <strong class="jxr_keyword">final</strong> List&lt;String&gt; fields = splitToList(fieldString);
-<a class="jxr_linenumber" name="L431" href="#L431">431</a>     <strong class="jxr_keyword">final</strong> List&lt;String&gt; allowedFields = QueryField.ALL_EXTERNAL_NAMES;
-<a class="jxr_linenumber" name="L432" href="#L432">432</a>     <strong class="jxr_keyword">final</strong> List&lt;String&gt; unknownFields = Lists.newArrayList(fields);
-<a class="jxr_linenumber" name="L433" href="#L433">433</a>     unknownFields.removeAll(allowedFields);
-<a class="jxr_linenumber" name="L434" href="#L434">434</a>     <strong class="jxr_keyword">if</strong> (!unknownFields.isEmpty()) {
-<a class="jxr_linenumber" name="L435" href="#L435">435</a>       parseErrors.add(<span class="jxr_string">"return: unknown field(s) "</span> + Joiner.on(<span class="jxr_string">", "</span>).join(unknownFields) + ALLOWED_FIELDS);
-<a class="jxr_linenumber" name="L436" href="#L436">436</a> 
-<a class="jxr_linenumber" name="L437" href="#L437">437</a>     } <strong class="jxr_keyword">else</strong> {
-<a class="jxr_linenumber" name="L438" href="#L438">438</a>       paq.setReturnFields(fields);
-<a class="jxr_linenumber" name="L439" href="#L439">439</a> 
-<a class="jxr_linenumber" name="L440" href="#L440">440</a>       <strong class="jxr_keyword">final</strong> Function&lt;AnnotationVF, Map&lt;String, Object&gt;&gt; mapper = avf -&gt; fields.stream()<em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L441" href="#L441">441</a>           .collect(toMap(Function.identity(), f -&gt; QueryFieldGetters.get(QueryField.fromExternalName(f)).apply(avf)));
-<a class="jxr_linenumber" name="L442" href="#L442">442</a>       <em class="jxr_comment">// TODO: cache resultmapper?</em>
-<a class="jxr_linenumber" name="L443" href="#L443">443</a>       paq.setResultMapper(mapper);
-<a class="jxr_linenumber" name="L444" href="#L444">444</a>     }
-<a class="jxr_linenumber" name="L445" href="#L445">445</a>   }
-<a class="jxr_linenumber" name="L446" href="#L446">446</a> 
-<a class="jxr_linenumber" name="L447" href="#L447">447</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> List&lt;String&gt; splitToList(<strong class="jxr_keyword">final</strong> String fieldString) {
-<a class="jxr_linenumber" name="L448" href="#L448">448</a>     <strong class="jxr_keyword">return</strong> Splitter.on(<span class="jxr_string">","</span>).trimResults().splitToList(fieldString);
-<a class="jxr_linenumber" name="L449" href="#L449">449</a>   }
+<a class="jxr_linenumber" name="L431" href="#L431">431</a>     <strong class="jxr_keyword">final</strong> String listField = extractListfield(fieldString);
+<a class="jxr_linenumber" name="L432" href="#L432">432</a>     <strong class="jxr_keyword">final</strong> List&lt;String&gt; allowedFields = QueryField.ALL_EXTERNAL_NAMES;
+<a class="jxr_linenumber" name="L433" href="#L433">433</a>     <strong class="jxr_keyword">final</strong> List&lt;String&gt; unknownFields = Lists.newArrayList(fields);
+<a class="jxr_linenumber" name="L434" href="#L434">434</a>     unknownFields.removeAll(allowedFields);
+<a class="jxr_linenumber" name="L435" href="#L435">435</a>     <strong class="jxr_keyword">if</strong> (!unknownFields.isEmpty()) {
+<a class="jxr_linenumber" name="L436" href="#L436">436</a>       parseErrors.add(<span class="jxr_string">"return: unknown field(s) "</span> + Joiner.on(<span class="jxr_string">", "</span>).join(unknownFields) + ALLOWED_FIELDS);
+<a class="jxr_linenumber" name="L437" href="#L437">437</a> 
+<a class="jxr_linenumber" name="L438" href="#L438">438</a>     } <strong class="jxr_keyword">else</strong> {
+<a class="jxr_linenumber" name="L439" href="#L439">439</a>       paq.setReturnFields(fields);
+<a class="jxr_linenumber" name="L440" href="#L440">440</a>       paq.setListField(listField);
+<a class="jxr_linenumber" name="L441" href="#L441">441</a> 
+<a class="jxr_linenumber" name="L442" href="#L442">442</a>       <strong class="jxr_keyword">final</strong> Function&lt;AnnotationVF, Map&lt;String, Object&gt;&gt; mapper = avf -&gt; fields.stream()<em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L443" href="#L443">443</a>           .collect(toMap(Function.identity(), f -&gt; QueryFieldGetters.get(QueryField.fromExternalName(f)).apply(avf)));
+<a class="jxr_linenumber" name="L444" href="#L444">444</a>       <em class="jxr_comment">// TODO: cache resultmapper?</em>
+<a class="jxr_linenumber" name="L445" href="#L445">445</a>       paq.setResultMapper(mapper);
+<a class="jxr_linenumber" name="L446" href="#L446">446</a>     }
+<a class="jxr_linenumber" name="L447" href="#L447">447</a>   }
+<a class="jxr_linenumber" name="L448" href="#L448">448</a> 
+<a class="jxr_linenumber" name="L449" href="#L449">449</a>   <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> Pattern LISTPATTERN = Pattern.compile(<span class="jxr_string">"list&#92;&#92;((.*)&#92;&#92;)"</span>);
 <a class="jxr_linenumber" name="L450" href="#L450">450</a> 
-<a class="jxr_linenumber" name="L451" href="#L451">451</a> }
+<a class="jxr_linenumber" name="L451" href="#L451">451</a>   <strong class="jxr_keyword">private</strong> String extractListfield(String fieldString) {
+<a class="jxr_linenumber" name="L452" href="#L452">452</a>     Matcher matcher = LISTPATTERN.matcher(fieldString);
+<a class="jxr_linenumber" name="L453" href="#L453">453</a>     <strong class="jxr_keyword">return</strong> matcher.find() ? matcher.group(1) : <strong class="jxr_keyword">null</strong>;
+<a class="jxr_linenumber" name="L454" href="#L454">454</a>   }
+<a class="jxr_linenumber" name="L455" href="#L455">455</a> 
+<a class="jxr_linenumber" name="L456" href="#L456">456</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> List&lt;String&gt; splitToList(<strong class="jxr_keyword">final</strong> String fieldString) {
+<a class="jxr_linenumber" name="L457" href="#L457">457</a>     <strong class="jxr_keyword">return</strong> Splitter.on(<span class="jxr_string">","</span>).trimResults().splitToList(fieldString.replace(<span class="jxr_string">"list("</span>, <span class="jxr_string">""</span>).replace(<span class="jxr_string">")"</span>, <span class="jxr_string">""</span>));
+<a class="jxr_linenumber" name="L458" href="#L458">458</a>   }
+<a class="jxr_linenumber" name="L459" href="#L459">459</a> 
+<a class="jxr_linenumber" name="L460" href="#L460">460</a> }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2015&#x2013;2016 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
