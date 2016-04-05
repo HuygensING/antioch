@@ -1,6 +1,7 @@
 package nl.knaw.huygens.alexandria.app;
 
-import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 
 /*
  * #%L
@@ -12,7 +13,7 @@ import java.net.InetAddress;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -25,7 +26,6 @@ import java.net.InetAddress;
  */
 
 import java.net.URI;
-import java.net.UnknownHostException;
 
 import javax.ws.rs.core.UriBuilder;
 
@@ -37,8 +37,12 @@ public class TestConfiguration extends AbstractAlexandriaConfigurationUsingAlexa
   public URI getBaseURI() {
     String localhost = "localhost";
     try {
-      localhost = InetAddress.getLocalHost().getHostAddress();
-    } catch (UnknownHostException e) {
+      // localhost = InetAddress.getLocalHost().getHostAddress();
+      localhost = NetworkInterface.getByName("eth3").getInetAddresses().nextElement().getHostAddress();
+      // } catch (UnknownHostException e) {
+      // e.printStackTrace();
+    } catch (SocketException e) {
+      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     return UriBuilder.fromUri("http://" + localhost).port(2015).build();

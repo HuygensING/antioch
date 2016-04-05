@@ -126,7 +126,7 @@ function a-use-localhost {
 }
 
 function a-use-localip {
-  localip=$(ipconfig|grep Autoconfiguration|sed -e "s/.*: //")
+  localip=$(ipconfig|grep IPv4|grep -v Autoconfiguration|sed -e "s/.*: //")
   a-set-backend http://${localip}:2015
   a-set-authkey ${ALEXANDRIA_AUTHKEY_LOCAL}
 }
