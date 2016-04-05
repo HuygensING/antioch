@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.endpoint.search;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -35,6 +35,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.google.common.collect.ImmutableMap;
 
 import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
@@ -56,13 +57,23 @@ public class SearchResultPage extends JsonWrapperObject {
   @JsonIgnore
   private int lastPageNumber;
 
-  public SearchResultPage(String baseURI, int pageNumber, int lastPageNumber, int pageSize) {
+  private Map<String, Object> searchInfo;
+
+  public SearchResultPage(String baseURI, int pageNumber, SearchResult searchResult) {
     this.baseURI = baseURI;
     this.pageNumber = pageNumber;
-    this.lastPageNumber = lastPageNumber;
+    this.lastPageNumber = Math.max(1, searchResult.getTotalPages());
     this.isLast = pageNumber == lastPageNumber;
-    this.counter = new AtomicInteger(pageSize * (pageNumber - 1));
+    this.counter = new AtomicInteger(searchResult.getPageSize() * (pageNumber - 1));
     this.counterFunction = t -> counter.incrementAndGet();
+    this.searchInfo = ImmutableMap.<String, Object> builder()//
+        .put("id", searchResult.getId())//
+        .put("query", searchResult.getQuery())//
+        .put("searchDurationInMs", searchResult.getSearchDurationInMs())//
+        .put("totalPages", searchResult.getTotalPages())//
+        .put("pageSize", searchResult.getPageSize())//
+        .put("totalResults", searchResult.getTotalResults())//
+        .build();
   }
 
   @JsonProperty(PropertyPrefix.LINK + "previousPage")
@@ -94,5 +105,9 @@ public class SearchResultPage extends JsonWrapperObject {
 
   public List<Map<String, Object>> getRecords() {
     return recordList;
+  }
+
+  public Map<String, Object> getSearchInfo() {
+    return searchInfo;
   }
 }

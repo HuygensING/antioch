@@ -532,7 +532,8 @@
         <h:status>200 OK</h:status>
         and body
         <h:jsonResponse>{
-            "searchResult" : {
+            "searchResultPage" : {
+            "searchInfo" : {
             "id" : "$searchId",
             "query" : {
             "find" : "annotation",
@@ -541,7 +542,8 @@
             "return" : "id,type,value,resource.url"
             },
             "totalResults" : 3,
-            "totalPages" : 1,
+            "totalPages" : 1
+            },
             "^firstPage": "https://{host}/searches/$searchId/pages/1"
             } }
         </h:jsonResponse>
@@ -622,21 +624,11 @@
         <h:status>200 OK</h:status>
         and body
         <small>(only selected fields shown for brevity)</small>
-        <h:jsonResponse>{
-            "searchResult" : {
-            "totalResults" : 2,
-            "^firstPage": "https://{host}/searches/$searchId2/pages/1"
-            } }
-        </h:jsonResponse>
-    </h:request>
-
-    <h:request>We
-        <h:get>/searches/$searchId2/pages/1</h:get>
-        expecting
-        <h:status>200 OK</h:status>
-        and body
-        <small>(only selected fields shown for brevity)</small>
         <h:jsonResponse>{ "searchResultPage": {
+            "searchInfo" : {
+            "totalResults" : 2
+            },
+            "^firstPage": "https://{host}/searches/$searchId2/pages/1",
             "records": [
             {
             "value": "An early user comment.",
@@ -688,21 +680,11 @@
         <h:status>200 OK</h:status>
         and body
         <small>(only selected fields shown for brevity)</small>
-        <h:jsonResponse>{
-            "searchResult" : {
-            "totalResults" : 1,
-            "^firstPage": "https://{host}/searches/$searchId3/pages/1"
-            } }
-        </h:jsonResponse>
-    </h:request>
-
-    <h:request>We
-        <h:get>/searches/$searchId3/pages/1</h:get>
-        expecting
-        <h:status>200 OK</h:status>
-        and body
-        <small>(only selected fields shown for brevity)</small>
         <h:jsonResponse>{ "searchResultPage": {
+            "searchInfo" : {
+            "totalResults" : 1
+            },
+            "^firstPage": "https://{host}/searches/$searchId3/pages/1",
             "records": [
             {
             "value": "An early user comment.",
@@ -791,7 +773,8 @@
         <h:status>200 OK</h:status>
         and body
         <h:jsonResponse>{
-            "searchResult" : {
+            "searchResultPage" : {
+            "searchInfo": {
             "id" : "$searchId",
             "query" : {
             "find" : "annotation",
@@ -800,7 +783,7 @@
             "return" : "resource.id"
             },
             "totalResults" : 4,
-            "totalPages" : 1,
+            "totalPages" : 1},
             "^firstPage": "https://{host}/searches/$searchId/pages/1"
             } }
         </h:jsonResponse>
@@ -890,6 +873,211 @@
         </h:jsonResponse>
     </h:request>
 </div>
+
+<div id="show-grouped-annotation-ids" data-desc="How can I group annotation values by resource.id?" c:execute="clearStorage()">
+    Given the following annotated resources (for brevity, all annotations are considered to be of type 'Tag')
+    in order of creation timestamp
+    <table class="table"
+           c:execute="resourceExistsWithTagForUserAtInstant(#resId, #value, #who, #when)">
+        <thead>
+        <tr>
+            <th c:set="#resId">Resource Id</th>
+            <th c:set="#value">Annotation value</th>
+            <th c:set="#who">Owner</th>
+            <th c:set="#when">Created at</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>A very early user comment.</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-06-06T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>A slightly later user comment.</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-06-07T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>An early user comment.</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-07-07T07:07:07+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
+            <td><code>Something entirely unrelated.</code></td>
+            <td><code>peer-1337</code></td>
+            <td><code>2015-08-08T08:08:08+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>A more recent user comment.</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="alert alert-info sm">
+        We show how to find the annotation values of all annotations of type
+        <mark><strong>Tag</strong></mark>
+        belonging to resources 
+        <mark><strong>00000001-5ba6-11e5-9054-ab0dd746f7f7</strong></mark>
+        or 
+        <mark><strong>00000003-5b7f-11e5-898c-237ee1c6d1d4</strong></mark>
+    </div>
+
+    <h:request>
+        We
+        <h:post>/searches</h:post>
+        the body
+        <h:jsonBody>{
+            "query": {
+            "find": "annotation",
+            "where": "type:eq(\"Tag\") resource.id:inSet(\"00000001-5ba6-11e5-9054-ab0dd746f7f7\",\"00000003-5b7f-11e5-898c-237ee1c6d1d4\") state:eq(\"CONFIRMED\")",
+            "return": "resource.id, value"
+            } }
+        </h:jsonBody>
+        and observe status
+        <h:status>201 Created</h:status>
+        with the Location header pointing to the results of our query.
+    </h:request>
+
+    <div c:execute="#searchId = uuid()">&#160;</div>
+
+    <h:request>We follow the Location header and
+        <h:get>/searches/$searchId</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "searchResultPage" : {
+	            "searchInfo": {
+		            "id" : "$searchId",
+		            "query" : {
+			            "find" : "annotation",
+	                "where": "type:eq(\"Tag\") resource.id:inSet(\"00000001-5ba6-11e5-9054-ab0dd746f7f7\",\"00000003-5b7f-11e5-898c-237ee1c6d1d4\") state:eq(\"CONFIRMED\")",
+			            "sort" : "-when",
+	                "return": "resource.id, value"
+		            },
+		            "totalResults" : 4,
+		            "totalPages" : 1
+		          },
+	            "^firstPage": "https://{host}/searches/$searchId/pages/1"
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+    <div class="alert alert-warning sm">
+        <ul>
+            <li>
+                The <code>sort</code> field, which we left unspecified, defaults to <code>"-when"</code>
+                (= reverse timestamp order: "most recent first").
+            </li>
+            <li>
+                The <code>state</code> of the <code>where</code> field, which we left unspecified, defaults to
+                <code>"CONFIRMED"</code>
+            </li>
+        </ul>
+    </div>
+
+    <h:request>We
+        <h:get>/searches/$searchId/pages/1</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{ "searchResultPage": {
+            "pageNumber": 1,
+            "records": [
+            {
+            "resource.id": "00000003-5b7f-11e5-898c-237ee1c6d1d4",
+            "value": "A more recent user comment.",
+            "_resultNumber": 1
+            },
+            {
+            "resource.id": "00000003-5b7f-11e5-898c-237ee1c6d1d4",
+            "value": "An early user comment.",
+            "_resultNumber": 2
+            },
+            {
+            "resource.id": "00000001-5ba6-11e5-9054-ab0dd746f7f7",
+            "value": "A slightly later user comment.",
+            "_resultNumber": 3
+            },
+            {
+            "resource.id": "00000001-5ba6-11e5-9054-ab0dd746f7f7",
+            "value": "A very early user comment.",
+            "_resultNumber": 4
+            } ] } }
+        </h:jsonResponse>
+    </h:request>
+    
+    Notice that the resource.id <code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code> and <code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code> are each returned twice.
+
+    <div class="alert alert-warning sm">
+        <ul>
+            <li>
+                To group the annotation <code>value</code>s by <code>resource.id</code>, we add the <code>list()</code> function to the <code>where</code> part of the query
+            </li>
+        </ul>
+    </div>
+    
+    <h:request>
+        We
+        <h:post>/searches</h:post>
+        the body
+        <h:jsonBody>{
+            "query": {
+            "find": "annotation",
+            "where": "type:eq(\"Tag\") resource.id:inSet(\"00000001-5ba6-11e5-9054-ab0dd746f7f7\",\"00000003-5b7f-11e5-898c-237ee1c6d1d4\")",
+            "return": "resource.id, list(value)"
+            } }
+        </h:jsonBody>
+        and observe status
+        <h:status>201 Created</h:status>
+        with the Location header pointing to the results of our query.
+    </h:request>
+
+    <div c:execute="#searchId = uuid()">&#160;</div>
+
+    <h:request>We follow the Location header and
+        <h:get>/searches/$searchId</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "searchResultPage" : {
+              "pageNumber": 1,
+              "searchInfo": {
+                "totalResults" : 2,
+                "totalPages" : 1
+              },
+	            "records": [
+		            {
+			            "resource.id": "00000001-5ba6-11e5-9054-ab0dd746f7f7",
+			            "value" : [
+			              "A slightly later user comment.",
+			              "A very early user comment."
+			            ],
+			            "_resultNumber": 1
+		            },
+		            {
+			            "resource.id": "00000003-5b7f-11e5-898c-237ee1c6d1d4",
+	                "value" : [
+	                  "A more recent user comment.",
+	                  "An early user comment."
+	                ],
+			            "_resultNumber": 2
+	              } ] } }
+        </h:jsonResponse>
+    </h:request>
+    
+    Note that, due to the grouping, the annotations are only sorted by <code>-when</code> within the group determined by <code>resource.id</code>
+</div>
+
 
 </body>
 </html>

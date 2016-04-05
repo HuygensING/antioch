@@ -1,5 +1,8 @@
 package nl.knaw.huygens.alexandria.query;
 
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+
 /*
  * #%L
  * alexandria-service
@@ -10,12 +13,12 @@ package nl.knaw.huygens.alexandria.query;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -45,6 +48,7 @@ public class ParsedAlexandriaQuery {
   private Boolean distinct;
 
   private List<String> returnFields;
+  private String listField;
   private Predicate<AnnotationVF> predicate;
   private Comparator<AnnotationVF> comparator;
   private Function<AnnotationVF, Map<String, Object>> mapper;
@@ -109,4 +113,39 @@ public class ParsedAlexandriaQuery {
     return annotationVFFinder;
   }
 
+  public void setListField(String listField) {
+    this.listField = listField;
+  }
+
+  String getListField() {
+    return listField;
+  }
+
+  public boolean doGrouping() {
+    return listField != null;
+  }
+
+  public String concatenateGroupByFieldsValues(Map<String, Object> map) {
+    if (doGrouping()) {
+      return returnFields.stream()//
+          .filter(f -> !f.equals(listField))//
+          .sorted()//
+          .map(map::get)//
+          .map(Object::toString)//
+          .collect(joining());
+    }
+    return null;
+  }
+
+  public Map<String, Object> collectListFieldValues(List<Map<String, Object>> mapList) {
+    if (doGrouping()) {
+      Map<String, Object> map = mapList.get(0);
+      List<Object> list = mapList.stream()//
+          .map((m) -> m.get(listField))//
+          .collect(toList());
+      map.put(listField, list);
+      return map;
+    }
+    return null;
+  }
 }

@@ -24,6 +24,7 @@ package nl.knaw.huygens.alexandria.jersey.exceptionmappers;
 
 import javax.inject.Singleton;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -41,6 +42,7 @@ public class WebApplicationExceptionMapper implements ExceptionMapper<WebApplica
     Response response = e.getResponse();
     return Response//
         .status(response.getStatus())//
+        .type(MediaType.APPLICATION_JSON)//
         .entity(ErrorEntityBuilder.build(e.getMessage()))//
         .build();
   }

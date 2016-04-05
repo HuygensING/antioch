@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.text;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -39,6 +39,7 @@ import nl.knaw.huygens.tei.handlers.XmlTextHandler;
 
 public class BaseLayerVisitor extends DelegatingVisitor<BLVContext> implements CommentHandler<BLVContext>, ElementHandler<BLVContext>, ProcessingInstructionHandler<BLVContext> {
   private String id = "";
+  private List<String> subresourceElements;
 
   public BaseLayerVisitor(BLVContext blContext, BaseLayerDefinition baseLayerDefinition, String id) {
     super(blContext);
@@ -47,6 +48,7 @@ public class BaseLayerVisitor extends DelegatingVisitor<BLVContext> implements C
     setTextHandler(new OffsetXmlTextHandler());
     setDefaultElementHandler(this);
     setProcessingInstructionHandler(this);
+    subresourceElements = baseLayerDefinition.getSubresourceElements();
     baseLayerDefinition.getBaseElementDefinitions().forEach(bed -> addElementHandler(new BaseElementHandler(bed.getBaseAttributes()), bed.getName()));
     addElementHandler(new SubTextPlaceholderHandler(), TextUtil.SUBTEXTPLACEHOLDER);
   }
@@ -55,8 +57,12 @@ public class BaseLayerVisitor extends DelegatingVisitor<BLVContext> implements C
   @Override
   public Traversal enterElement(Element element, BLVContext context) {
     context.getElementTally().tally(element);
-    if (element.getParent() == null) {
-      context.getValidationErrors().add("Validation error: root element <" + element.getName() + "> is not in the base layer definition.");
+    if (isRootElement(element)) {
+      if (isSubResourceElement(element)) {
+        context.addOpenTag(element);
+      } else {
+        context.getValidationErrors().add("Validation error: root element <" + element.getName() + "> is not in the base layer definition.");
+      }
     }
     context.getTextOffsetStack().push(context.getTextOffset());
     context.openLayer();
@@ -67,6 +73,9 @@ public class BaseLayerVisitor extends DelegatingVisitor<BLVContext> implements C
   public Traversal leaveElement(Element element, BLVContext context) {
     String annotatedBaseText = context.closeLayer();
     context.addLiteral(annotatedBaseText);
+    if (isRootElement(element) && isSubResourceElement(element)) {
+      context.addCloseTag(element);
+    }
     String xpath = context.substringOffsetXPath(context.getTextOffsetStack().pop());
     Log.info("xpath={}", xpath);
     context.getAnnotationData()
@@ -77,6 +86,14 @@ public class BaseLayerVisitor extends DelegatingVisitor<BLVContext> implements C
             .setValue(element)//
             .setXPath(xpath));
     return Traversal.NEXT;
+  }
+
+  private boolean isSubResourceElement(Element element) {
+    return subresourceElements.contains(element.getName());
+  }
+
+  private boolean isRootElement(Element element) {
+    return element.getParent() == null;
   }
 
   @Override
@@ -122,13 +139,19 @@ public class BaseLayerVisitor extends DelegatingVisitor<BLVContext> implements C
         }
       });
       logXPath(base);
-      context.addOpenTag(base);
+      if (element.hasChildren()) {
+        context.addOpenTag(base);
+      } else {
+        context.addEmptyElementTag(base);
+      }
       return Traversal.NEXT;
     }
 
     @Override
     public Traversal leaveElement(Element element, BLVContext context) {
-      context.addCloseTag(element);
+      if (element.hasChildren()) {
+        context.addCloseTag(element);
+      }
       return Traversal.NEXT;
     }
 

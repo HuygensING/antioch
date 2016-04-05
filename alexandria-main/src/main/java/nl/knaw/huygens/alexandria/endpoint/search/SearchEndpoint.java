@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.endpoint.search;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -52,15 +52,12 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 public class SearchEndpoint extends JSONEndpoint {
 
   private final AlexandriaService service;
-  private final SearchResultEntityBuilder entityBuilder;
   private final LocationBuilder locationBuilder;
 
   @Inject
   public SearchEndpoint(final AlexandriaService service, //
-      final SearchResultEntityBuilder entityBuilder, //
       final LocationBuilder locationBuilder) {
     this.service = service;
-    this.entityBuilder = entityBuilder;
     this.locationBuilder = locationBuilder;
   }
 
@@ -78,8 +75,7 @@ public class SearchEndpoint extends JSONEndpoint {
   @Path("{uuid}")
   @ApiOperation(value = "Get the SearchResult with the given uuid", response = SearchResult.class)
   public Response getSearchResultsByID(@PathParam("uuid") final UUIDParam uuid) {
-    SearchResult search = getSearchResult(uuid);
-    return Response.ok(entityBuilder.build(search)).build();
+    return getResultPage(uuid, 1);
   }
 
   public static final String RESULTPAGES = "pages";
@@ -89,15 +85,15 @@ public class SearchEndpoint extends JSONEndpoint {
   @ApiOperation(value = "Get the SearchResultPage with the given uuid and page number", response = SearchResultPage.class)
   public Response getResultPage(@PathParam("uuid") final UUIDParam uuid, @PathParam("pageNumber") int pageNumber) {
     SearchResult searchResult = getSearchResult(uuid);
-    int totalResultPages = searchResult.getTotalPages();
-    if (totalResultPages == 0) {
-      throw new NotFoundException("no result pages found");
-    }
+    int totalResultPages = Math.max(1, searchResult.getTotalPages());
+    // if (totalResultPages == 0) {
+    // throw new NotFoundException("no result pages found");
+    // }
     if (pageNumber < 1 || pageNumber > totalResultPages) {
       throw new NotFoundException("pageNumber should be between 1 and " + totalResultPages);
     }
     String baseURI = locationBuilder.locationOf(searchResult, RESULTPAGES) + "/";
-    SearchResultPage page = new SearchResultPage(baseURI, pageNumber, totalResultPages, searchResult.getPageSize());
+    SearchResultPage page = new SearchResultPage(baseURI, pageNumber, searchResult);
     page.setResults(searchResult.getRecordsForPage(pageNumber));
     return Response.ok(page).build();
   }

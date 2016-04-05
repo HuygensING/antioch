@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.text;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -42,8 +42,8 @@ public class SubresourceElementVisitorTest extends AlexandriaVisitorTest {
         + "<p xml:id='p-1'>foo<alexandria_subtextplaceholder xml:id='alexandria:subtext-1'/></p>"//
         + "<p xml:id='p-2'>bar<alexandria_subtextplaceholder xml:id='alexandria:subtext-2'/></p>"//
         + "</text>");
-    String expectedSubText1 = singleQuotesToDouble("<text n='1' subtext_type='note'>probably by <persName>someone</persName></text>");
-    String expectedSubText2 = singleQuotesToDouble("<text n='2' subtext_type='comment'>most likely by <persName>someone else</persName></text>");
+    String expectedSubText1 = singleQuotesToDouble("<note n='1'>probably by <persName>someone</persName></note>");
+    String expectedSubText2 = singleQuotesToDouble("<comment n='2'>most likely by <persName>someone else</persName></comment>");
     List<String> subresourceElements = ImmutableList.of("note", "comment");
     SEVContext context = new SEVContext();
     SubresourceElementVisitor subresourceVisitor = new SubresourceElementVisitor(context, subresourceElements);
@@ -71,10 +71,10 @@ public class SubresourceElementVisitorTest extends AlexandriaVisitorTest {
     String expectedBase = singleQuotesToDouble("<text xml:id='text-1'>"//
         + "<p xml:id='p-1'>foo<alexandria_subtextplaceholder xml:id='alexandria:subtext-1'/></p>"//
         + "</text>");
-    String expectedSubText = singleQuotesToDouble("<text n='1' subtext_type='note'>"//
+    String expectedSubText = singleQuotesToDouble("<note n='1'>"//
         + "probably by <persName>someone</persName>"//
         + "<note n='2'>most likely by <persName>someone else</persName></note>"//
-        + "</text>");
+        + "</note>");
     List<String> subresourceElements = ImmutableList.of("note");
     SEVContext context = new SEVContext();
     SubresourceElementVisitor subresourceVisitor = new SubresourceElementVisitor(context, subresourceElements);

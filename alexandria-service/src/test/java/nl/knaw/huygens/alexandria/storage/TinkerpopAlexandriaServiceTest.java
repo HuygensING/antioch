@@ -33,9 +33,10 @@ import java.util.function.Supplier;
 
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mockito;
+import org.mockito.Matchers;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
@@ -56,8 +57,10 @@ public class TinkerpopAlexandriaServiceTest {
   private static Storage mockStorage = mock(Storage.class);
   private final TinkerPopService service = new TinkerPopService(mockStorage, new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()), new InMemoryTextService());
 
-  static {
-    when(mockStorage.runInTransaction(Mockito.any(Supplier.class))).thenCallRealMethod();//
+  @SuppressWarnings("unchecked")
+  @Before
+  public void before() {
+    when(mockStorage.runInTransaction(Matchers.any(Supplier.class))).thenCallRealMethod();//
   }
 
   @Ignore

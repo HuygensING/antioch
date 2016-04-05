@@ -33,8 +33,8 @@ function a-find-annotations-for-resource {
     \"return\" : \"id,when,who,type,value,resource.id,resource.url,subresource.id,subresource.url\",
     \"pageSize\" : 100
     }}" 2>/dev/null|a-location)
-    echo "search URI=" $url
-    curl ${url}/resultpages/1
+  echo "search URI=" ${url}
+  curl ${url}/pages/1
 }
 
 function a-show-first-resultpage {
@@ -43,7 +43,7 @@ function a-show-first-resultpage {
 
 function a-generate-random-resource-with-annotation {
   id=$(uuidgen)
-  a-generate-resource-with-uuid $id
+  a-generate-resource-with-uuid ${id}
   url=$(a-annotate-resource "$id" "Tag" "Test annotation for resource $id" | a-location)
   a-confirm $url
 }
@@ -62,6 +62,16 @@ function a-generate-resource-with-uuid {
   --data-binary "{\"resource\":{
     \"id\":\"$id\",
     \"ref\":\"reference $n\"
+  }}"
+}
+
+function a-generate-resource-with-uuid-and-ref {
+  id=$1
+  ref=$2
+  curl -i -X PUT $be/resources/$id --header "${authheader}" --header 'Content-type: application/json' \
+  --data-binary "{\"resource\":{
+    \"id\":\"$id\",
+    \"ref\":\"${ref}\"
   }}"
 }
 
@@ -168,5 +178,41 @@ function a-dry-run {
   a-log "extracted baselayer:"
   curl ${be}/resources/${ri}/text
 }
+
+function a-gutenberg-import-file {
+  title=$1
+  shift
+  a-log ${title}
+  ri=$(uuidgen)
+  a-generate-resource-with-uuid-and-ref $ri "gutenberg:${title}"
+  curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
+  --data-binary '{
+    "baseLayerDefinition": {
+      "subresourceElements": ["note"],
+      "baseElements": [ {
+        "name": "TEI"
+      }, {
+        "name": "div",
+        "baseAttributes": [ "type" ]
+      }, {
+        "name": "body"
+      }, {
+        "name": "p"
+      }, {
+        "name": "sub"
+      }, {
+        "name": "sup"
+      }, {
+        "name": "lb"
+      } ]
+    }
+  }'
+  a-log "result uploading text:"
+  curl --silent --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:application/octet-stream' --data @"$*" | jq "."
+  a-log "extracted baselayer:"
+  curl ${be}/resources/${ri}/text
+}
+
+
 
 a-use-localhost

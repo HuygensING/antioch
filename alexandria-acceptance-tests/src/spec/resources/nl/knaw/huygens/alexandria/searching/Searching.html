@@ -39,7 +39,7 @@
             "find": "annotation",
             "where": "who:eq(\"nederlab\")",
             "sort": "-when",
-            "return": "id,resource.url",
+            "return": "list(id),resource.url",
             "distinct": false,
             "pageSize": 10
             } }
@@ -67,7 +67,8 @@
         </dd>
         <dt><code>return</code></dt>
         <dd>used to select which fields (ref. <code>where</code>) from the result-set are returned in the output.<br/>
-            <small>(if left unspecified, <code>id</code> is returned by default)</small>
+            <small>(if left unspecified, <code>id</code> is returned by default)</small><br/>
+            one of these fields can be wrapped in the function <code>list()</code>, in the results this field will be returned as a list of values, grouped by the combination of the values for the other fields in the <code>return</code> clause.
         </dd>
         <dt><code>distinct</code></dt>
         <dd>used to indicate the resulting combinations of values for the selected return fields should be unique.<br/>
@@ -112,40 +113,28 @@
         we expect status
         <h:status>200 OK</h:status>
         and a response body containing:
-        <small>(only paging details shown for brevity)</small>
+        <small>(showing only details relevant to paging, actual record details withheld for brevity)</small>
         <h:jsonResponse>{
-            "searchResult" : {
-            "totalResults" : 8,
-            "totalPages" : 3,
-            "pageSize" : 3,
-            "^firstPage" : "https://{host}/searches/$searchId/pages/1"
-            } }
+            "searchResultPage" : {
+              "pageNumber" : 1,
+              "searchInfo" : {
+                "totalResults" : 8,
+                "totalPages" : 3,
+                "pageSize" : 3
+              },
+              "records" : [
+                { "_resultNumber" : 1 },
+                { "_resultNumber" : 2 },
+                { "_resultNumber" : 3 }
+              ],
+              "^firstPage" : "https://{host}/searches/$searchId/pages/1",
+              "^nextPage" : "https://{host}/searches/$searchId/pages/2",
+              "^lastPage" : "https://{host}/searches/$searchId/pages/3"
+            }}
         </h:jsonResponse>
     </h:request>
 
     <hr/>
-
-    <h:request>
-        When we
-        <h:get>/searches/$searchId/pages/1</h:get>
-        we expect status
-        <h:status>200 OK</h:status>
-        and body
-        <small>(showing only details relevant to paging, actual record details withheld for brevity)</small>
-        <h:jsonResponse>{
-            "searchResultPage" : {
-            "pageNumber" : 1,
-            "records" : [
-            { "_resultNumber" : 1 },
-            { "_resultNumber" : 2 },
-            { "_resultNumber" : 3 }
-            ],
-            "^firstPage" : "https://{host}/searches/$searchId/pages/1",
-            "^nextPage" : "https://{host}/searches/$searchId/pages/2",
-            "^lastPage" : "https://{host}/searches/$searchId/pages/3"
-            } }
-        </h:jsonResponse>
-    </h:request>
 
     <div class="alert alert-info sm">
         Convenience links <code>^firstPage</code> and <code>^lastPage</code> are included on all pages.

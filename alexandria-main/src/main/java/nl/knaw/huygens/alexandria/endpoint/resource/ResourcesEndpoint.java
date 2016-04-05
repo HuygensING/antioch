@@ -25,6 +25,8 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
 import static nl.knaw.huygens.alexandria.api.EndpointPaths.RESOURCES;
 import static nl.knaw.huygens.alexandria.endpoint.resource.ResourceValidatorFactory.resourceNotFoundForId;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.Valid;
@@ -125,6 +127,9 @@ public class ResourcesEndpoint extends JSONEndpoint {
   public Response setBaseLayerDefinition(@PathParam("uuid") final UUIDParam uuidParam, @NotNull BaseLayerDefinitionPrototype protoType) {
     Log.trace("protoType=[{}]", protoType);
     AlexandriaResource resource = readExistingResource(uuidParam);
+    if (!isConfirmed(resource)) {
+      throw new ConflictException("This resource has state " + resource.getState() + "; it needs to be CONFIRMED before the BaseLayerDefinition can be added.");
+    }
     if (resource.getDirectBaseLayerDefinition().isPresent()) {
       throw new ConflictException("This resource already has a baselayer definition");
     }
@@ -159,6 +164,10 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
     protoType.setState(AlexandriaState.CONFIRMED);
     protoType.setId(uuid); // in case the prototype has no id, get it from the Path
+    Optional<AlexandriaResource> existingResource = service.readResource(uuid.getValue());
+    if (existingResource.isPresent() && !isConfirmed(existingResource.get())) {
+      throw new ConflictException("This resource has state " + existingResource.get().getState() + "; only CONFIRMED resources can be updated.");
+    }
     final ResourceCreationRequest request = requestBuilder.build(protoType);
     AlexandriaResource resource = request.execute(service);
 
@@ -176,17 +185,19 @@ public class ResourcesEndpoint extends JSONEndpoint {
   // Sub-resource delegation
 
   @Path("{uuid}/subresources")
-  public Class<SubResourcesEndpoint> getSubResourcesEndpoint() {
+  public Class<SubResourcesEndpoint> getSubResourcesEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
     return SubResourcesEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }
 
   @Path("{uuid}/annotations")
-  public Class<ResourceAnnotationsEndpoint> getAnnotationsEndpoint() {
+  public Class<ResourceAnnotationsEndpoint> getAnnotationsEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
+    assertResourceIsConfirmed(uuidParam);
     return ResourceAnnotationsEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }
 
   @Path("{uuid}/text")
-  public Class<ResourceTextEndpoint> getResourceTextEndpoint() {
+  public Class<ResourceTextEndpoint> getResourceTextEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
+    assertResourceIsConfirmed(uuidParam);
     return ResourceTextEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }
 
@@ -207,5 +218,16 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   private AlexandriaResource readExistingResource(UUIDParam id) {
     return service.readResource(id.getValue()).orElseThrow(resourceNotFoundForId(id));
+  }
+
+  private boolean isConfirmed(AlexandriaResource resource) {
+    return resource.getState().equals(AlexandriaState.CONFIRMED);
+  }
+
+  private void assertResourceIsConfirmed(UUIDParam uuidParam) {
+    AlexandriaResource resource = readExistingResource(uuidParam);
+    if (!isConfirmed(resource)) {
+      throw new ConflictException("This resource has state " + resource.getState() + "; it needs to be CONFIRMED first.");
+    }
   }
 }
