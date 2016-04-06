@@ -35,12 +35,17 @@ public class TextGraphImportTask implements Runnable {
   @Override
   public void run() {
     status.setStarted();
-    ParseResult result = TextGraphUtil.parse(xml);
-    boolean success = service.storeTextGraph(resourceId, result, who);
-    if (success) {
-      status.setBaseLayerURI(locationBuilder.locationOf(resource, "text", "baselayer"));
-    } else {
-      status.getValidationErrors().add("textgraph store failed");
+    try {
+      ParseResult result = TextGraphUtil.parse(xml);
+      boolean success = service.storeTextGraph(resourceId, result, who);
+      if (success) {
+        status.setBaseLayerURI(locationBuilder.locationOf(resource, "text", "baselayer"));
+      } else {
+        status.getValidationErrors().add("textgraph store failed");
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      status.getValidationErrors().add("Exception thrown: " + e.getMessage());
     }
     status.setDone();
   }

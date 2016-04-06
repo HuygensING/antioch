@@ -739,7 +739,6 @@ public class TinkerPopService implements AlexandriaService {
     Function<AnnotationVF, Map<String, Object>> mapper = pQuery.getResultMapper();
 
     Stream<AnnotationVF> stream = pQuery.getAnnotationVFFinder().apply(storage);
-    Log.debug("list={}", stream);
 
     Stream<Map<String, Object>> mapStream = stream//
         .filter(predicate)//
@@ -757,7 +756,6 @@ public class TinkerPopService implements AlexandriaService {
     }
     List<Map<String, Object>> results = mapStream//
         .collect(toList());
-    Log.debug("results={}", results);
     return results;
   }
 
@@ -855,8 +853,6 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   public static TextGraphSegment toTextGraphSegment(Vertex textSegment) {
-    Log.info("vertex={}", textSegment);
-    Log.info("vertex.label={}", textSegment.label());
     TextGraphSegment textGraphSegment = new TextGraphSegment();
     if (textSegment.keys().contains(TextSegment.Properties.text)) {
       textGraphSegment.setTextSegment(textSegment.value(TextSegment.Properties.text));
