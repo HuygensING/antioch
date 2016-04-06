@@ -96,6 +96,13 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
   }
 
   @GET
+  public Response getTextEntity() {
+    assertResourceHasText();
+    TextEntity text = TextEntity.of(resourceId).withLocationBuilder(locationBuilder);
+    return Response.ok().entity(text).build();
+  }
+
+  @GET
   @Path("status")
   public Response getTextGraphImportStatus() {
     TextGraphImportStatus textGraphImportTaskStatus = taskStatusMap.get(resourceId)//
@@ -128,7 +135,7 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
 
   @GET
   @Path("dot")
-  @Produces(MediaType.TEXT_PLAIN)
+  @Produces(MediaType.TEXT_PLAIN + "; charSet=utf-8")
   @ApiOperation("get textgraph as .dot output")
   public Response getDot() {
     assertResourceHasText();
