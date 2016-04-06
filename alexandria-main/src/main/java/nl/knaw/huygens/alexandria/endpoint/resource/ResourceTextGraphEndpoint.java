@@ -33,6 +33,7 @@ import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.text.TextPrototype;
+import nl.knaw.huygens.alexandria.textgraph.DotFactory;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphImportStatus;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphImportTask;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphTaskStatusMap;
@@ -104,12 +105,10 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
 
   @GET
   @Path("baselayer")
-  @Produces(MediaType.TEXT_XML + "; charset=utf-8")
+  @Produces(MediaType.TEXT_XML)
   @ApiOperation("get baselayer as xml")
   public Response getBaseLayerXML() {
-    if (!resource.hasText()) {
-      throw new NotFoundException("this resource has no text");
-    }
+    assertResourceHasText();
     BaseLayerDefinition baseLayerDefinition = service.getBaseLayerDefinitionForResource(resourceId)//
         .orElseThrow(noBaseLayerDefined());
 
@@ -119,25 +118,36 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
 
   @GET
   @Path("xml")
-  @Produces(MediaType.TEXT_XML + "; charset=utf-8")
-  @ApiOperation("get baselayer as xml")
+  @Produces(MediaType.TEXT_XML)
+  @ApiOperation("get textgraph as xml")
   public Response getXML() {
-    if (!resource.hasText()) {
-      throw new NotFoundException("this resource has no text");
-    }
+    assertResourceHasText();
     StreamingOutput outputstream = TextGraphUtil.streamXML(service, resourceId);
     return ok(outputstream);
   }
 
+  @GET
+  @Path("dot")
+  @Produces(MediaType.TEXT_PLAIN)
+  @ApiOperation("get textgraph as .dot output")
+  public Response getDot() {
+    assertResourceHasText();
+    String dot = DotFactory.createDot(service, resourceId);
+    return ok(dot);
+  }
+
+  /* private methods */
+
   private void startTextProcessing(String xml) {
     TextGraphImportTask task = new TextGraphImportTask(service, locationBuilder, xml, resource, ThreadContext.getUserName());
     taskStatusMap.put(resource.getId(), task.getStatus());
-    // task.run();
     executorService.execute(task);
   }
 
-  private Supplier<ConflictException> noBaseLayerDefined() {
-    return () -> new ConflictException(String.format("No base layer defined for resource: %s", resourceId));
+  private void assertResourceHasText() {
+    if (!resource.hasText()) {
+      throw new NotFoundException("this resource has no text");
+    }
   }
 
   private void assertResourceHasNoText() {
@@ -151,4 +161,7 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
         .orElseThrow(noBaseLayerDefined());
   }
 
+  private Supplier<ConflictException> noBaseLayerDefined() {
+    return () -> new ConflictException(String.format("No base layer defined for resource: %s", resourceId));
+  }
 }

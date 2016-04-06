@@ -51,6 +51,32 @@ public class TextGraphUtil {
     return outputstream;
   }
 
+  public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment) {
+    try {
+      if (segment.isMilestone()) {
+        TextAnnotation milestone = segment.getMilestone();
+        String name = milestone.getName();
+        String openTag = getMilestoneTag(name, milestone.getAttributes());
+        writer.write(openTag);
+
+      } else {
+        for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
+          String name = textAnnotation.getName();
+          String openTag = getOpenTag(name, textAnnotation.getAttributes());
+          writer.write(openTag);
+        }
+        writer.write(segment.getTextSegment());
+        for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
+          String name = textAnnotation.getName();
+          String closeTag = getCloseTag(name);
+          writer.write(closeTag);
+        }
+      }
+    } catch (IOException ioe) {
+      throw new RuntimeException(ioe);
+    }
+  }
+
   public static StreamingOutput streamBaseLayerXML(AlexandriaService service, UUID resourceId, BaseLayerDefinition baseLayerDefinition) {
     List<BaseElementDefinition> baseElementDefinitions = baseLayerDefinition.getBaseElementDefinitions();
     StreamingOutput outputstream = output -> {
@@ -104,29 +130,25 @@ public class TextGraphUtil {
     }
   }
 
-  public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment) {
-    try {
-      if (segment.isMilestone()) {
-        TextAnnotation milestone = segment.getMilestone();
-        String name = milestone.getName();
-        String openTag = getMilestoneTag(name, milestone.getAttributes());
-        writer.write(openTag);
 
-      } else {
-        for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
-          String name = textAnnotation.getName();
-          String openTag = getOpenTag(name, textAnnotation.getAttributes());
-          writer.write(openTag);
-        }
-        writer.write(segment.getTextSegment());
-        for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
-          String name = textAnnotation.getName();
-          String closeTag = getCloseTag(name);
-          writer.write(closeTag);
-        }
-      }
-    } catch (IOException ioe) {
-      throw new RuntimeException(ioe);
+  public static String getMilestoneTag(String name, Map<String, String> attributes) {
+    return openingTagBuilder(name, attributes).append("/>").toString();
+  }
+
+  public static String getOpenTag(String name, Map<String, String> attributes) {
+    return openingTagBuilder(name, attributes).append(">").toString();
+  }
+
+  public static String getCloseTag(String name) {
+    return "</" + name + ">";
+  }
+
+  public static void appendAttributes(StringBuilder builder, Map<String, String> attributes) {
+    for (Map.Entry<String, String> entry : attributes.entrySet()) {
+      builder.append(' ').append(entry.getKey()).append('=');
+      builder.append('"');
+      appendAttributeValue(builder, entry.getValue());
+      builder.append('"');
     }
   }
 
@@ -152,25 +174,18 @@ public class TextGraphUtil {
     return builder.toString();
   }
 
-  public static void appendAttributes(StringBuilder builder, Map<String, String> attributes) {
-    for (Map.Entry<String, String> entry : attributes.entrySet()) {
-      builder.append(' ').append(entry.getKey()).append('=');
-      builder.append('"');
-      appendAttributeValue(builder, entry.getValue());
-      builder.append('"');
-    }
+  /* private methods */
+
+  private static Writer createBufferedUTF8OutputStreamWriter(OutputStream output) throws UnsupportedEncodingException {
+    Writer writer = new BufferedWriter(new OutputStreamWriter(output, "UTF-8"));
+    return writer;
   }
 
-  public static String getMilestoneTag(String name, Map<String, String> attributes) {
-    return openingTagBuilder(name, attributes).append("/>").toString();
-  }
-
-  public static String getOpenTag(String name, Map<String, String> attributes) {
-    return openingTagBuilder(name, attributes).append(">").toString();
-  }
-
-  public static String getCloseTag(String name) {
-    return "</" + name + ">";
+  private static void stream(AlexandriaService service, UUID resourceId, Writer writer, Consumer<TextGraphSegment> action) throws IOException {
+    service.runInTransaction(() -> {
+      service.getTextGraphSegmentStream(resourceId).forEach(action);
+    });
+    writer.flush();
   }
 
   private static Map<String, String> baseAttributes(List<String> baseElementAttributeNames, TextAnnotation milestone) {
@@ -188,6 +203,27 @@ public class TextGraphUtil {
     StringBuilder builder = new StringBuilder("<").append(name);
     appendAttributes(builder, attributes);
     return builder;
+  }
+
+  private static void appendAttributeValue(StringBuilder builder, String value) {
+    int n = value.length();
+    for (int i = 0; i < n; i++) {
+      char c = value.charAt(i);
+      switch (c) {
+      case '<':
+        builder.append("&lt;");
+        break;
+      case '>':
+        builder.append("&gt;");
+        break;
+      case '&':
+        builder.append("&amp;");
+        break;
+      default:
+        builder.append(c);
+        break;
+      }
+    }
   }
 
   private static void appendOpeningElements(StringBuilder builder, int i, List<XmlAnnotation> xmlAnnotations) {
@@ -216,36 +252,4 @@ public class TextGraphUtil {
     });
   }
 
-  private static void appendAttributeValue(StringBuilder builder, String value) {
-    int n = value.length();
-    for (int i = 0; i < n; i++) {
-      char c = value.charAt(i);
-      switch (c) {
-      case '<':
-        builder.append("&lt;");
-        break;
-      case '>':
-        builder.append("&gt;");
-        break;
-      case '&':
-        builder.append("&amp;");
-        break;
-      default:
-        builder.append(c);
-        break;
-      }
-    }
-  }
-
-  private static Writer createBufferedUTF8OutputStreamWriter(OutputStream output) throws UnsupportedEncodingException {
-    Writer writer = new BufferedWriter(new OutputStreamWriter(output, "UTF-8"));
-    return writer;
-  }
-
-  private static void stream(AlexandriaService service, UUID resourceId, Writer writer, Consumer<TextGraphSegment> action) throws IOException {
-    service.runInTransaction(() -> {
-      service.getTextGraphSegmentStream(resourceId).forEach(action);
-    });
-    writer.flush();
-  }
 }
