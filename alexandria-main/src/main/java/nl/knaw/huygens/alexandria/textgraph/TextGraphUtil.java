@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -79,15 +80,17 @@ public class TextGraphUtil {
 
   public static StreamingOutput streamBaseLayerXML(AlexandriaService service, UUID resourceId, BaseLayerDefinition baseLayerDefinition) {
     List<BaseElementDefinition> baseElementDefinitions = baseLayerDefinition.getBaseElementDefinitions();
+    List<String> noteElements = baseLayerDefinition.getSubresourceElements();
     StreamingOutput outputstream = output -> {
       Writer writer = createBufferedUTF8OutputStreamWriter(output);
-      Consumer<TextGraphSegment> action = segment -> streamTextGraphSegment(writer, segment, baseElementDefinitions);
+      Stack<TextAnnotation> noteStack = new Stack<>();
+      Consumer<TextGraphSegment> action = segment -> streamTextGraphSegment(writer, segment, baseElementDefinitions, noteElements, noteStack);
       stream(service, resourceId, writer, action);
     };
     return outputstream;
   }
 
-  public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment, List<BaseElementDefinition> baseElementDefinitions) {
+  public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment, List<BaseElementDefinition> baseElementDefinitions, List<String> noteElements, Stack<TextAnnotation> noteStack) {
     Set<String> baseElementNames = baseElementDefinitions.stream().map(BaseElementDefinition::getName).collect(toSet());
     Map<String, List<String>> baseElementAttributes = Maps.newHashMap();
     for (BaseElementDefinition bed : baseElementDefinitions) {
@@ -115,13 +118,21 @@ public class TextGraphUtil {
             String openTag = getOpenTag(name, baseAttributes);
             writer.write(openTag);
           }
+          if (noteElements.contains(name)) {
+            noteStack.push(textAnnotation);
+          }
         }
-        writer.write(segment.getTextSegment());
+        if (noteStack.isEmpty()) {
+          writer.write(segment.getTextSegment());
+        }
         for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
           String name = textAnnotation.getName();
           if (baseElementNames.contains(name)) {
             String closeTag = getCloseTag(name);
             writer.write(closeTag);
+          }
+          if (noteElements.contains(name)) {
+            noteStack.pop();
           }
         }
       }
@@ -129,7 +140,6 @@ public class TextGraphUtil {
       throw new RuntimeException(ioe);
     }
   }
-
 
   public static String getMilestoneTag(String name, Map<String, String> attributes) {
     return openingTagBuilder(name, attributes).append("/>").toString();
