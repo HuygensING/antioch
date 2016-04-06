@@ -29,73 +29,6 @@
 
 <body data-desc="Resource Texts">
 
-<div id="store-resource-text1" c:execute="clearStorage()"
-     data-desc="How do I submit a text as JSON and retrieve it as XML?">
-    <h:request>
-        Given that I have
-        <h:success>successfully</h:success>
-        <h:put>/resources/11111111-1111-1111-1111-111111111111</h:put>
-        the body:
-        <h:jsonBody>{
-            "resource": {
-            "id": "11111111-1111-1111-1111-111111111111",
-            "ref": "grotius-3160-v1"
-            } }
-        </h:jsonBody>
-    </h:request>
-    
-    <h:request>
-     And I have 
-     <h:success>successfully</h:success>
-     <h:put>/resources/11111111-1111-1111-1111-111111111111/baselayerdefinition</h:put>
-     the body:
-     <h:jsonBody>{
-         "baseLayerDefinition": {
-         "subresourceElements": ["note"],
-         "baseElements": [
-         {"name" : "text" },
-         {"name" : "p", "baseAttributes" : ["auth","lang"] }
-         ] } }
-     </h:jsonBody>
-     using
-     <h:setHeader name="Content-Type">application/json</h:setHeader>,
-     to set the base layer definition:
-    </h:request>
-    <br/>
-
-    <h:request>
-        When I
-        <h:put>/resources/11111111-1111-1111-1111-111111111111/text</h:put>
-        the body:
-        <h:jsonBody>{
-            "text": {
-            "body": "&lt;text&gt;&lt;p xml:id=\&quot;p-1\&quot; lang=\&quot;en\&quot; auth=\&quot;me\&quot;&gt;paragraph 1&lt;/p&gt;&lt;p&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;"
-            } }
-        </h:jsonBody>
-        using
-        <h:setHeader name="Content-Type">application/json</h:setHeader>
-        Then I should receive
-        <h:status>200 OK</h:status>
-        and the response body is
-        <h:jsonResponse>{
-           "resourceTextUploadResult" : {
-           "^baseLayerDefinition" : "https://{host}/resources/11111111-1111-1111-1111-111111111111/baselayerdefinition"
-        } }
-        </h:jsonResponse>
-    </h:request>
-    <br/>
-    <h:request>
-        Thereafter,
-        <h:get>/resources/11111111-1111-1111-1111-111111111111/text</h:get>
-        using
-        <h:setHeader name="Accept">text/xml</h:setHeader>
-        yields response body:<br/>
-        <h:responseBody>&lt;text xml:id="text-1"&gt;&lt;p xml:id="p-1" auth="me" lang="en"&gt;paragraph 1&lt;/p&gt;&lt;p xml:id="p-2"&gt;pârágràph 2&lt;/p&gt;&lt;/text&gt;</h:responseBody><br/>
-        Notice that base layer elements have been given a unique xml:id if they didn't have one already.<br/>
-        Notice also that the attribute order on &lt;p&gt; is the one defined in the base layer definition.<br/>
-    </h:request>
-</div>
-
 <div id="store-resource-text2" c:execute="clearStorage()"
      data-desc="How do I submit a text as XML and retrieve it as XML?">
     <h:request>
@@ -133,27 +66,63 @@
         When I
         <h:put>/resources/22222222-2222-2222-2222-222222222222/text</h:put>
         the body:
-        <h:requestBody>&lt;text&gt;&lt;p&gt;other text&lt;/p&gt;&lt;/text&gt;</h:requestBody>
+        <h:requestBody>&lt;text&gt;&lt;p xml:id=&quot;p-1&quot; lang=&quot;en&quot; auth=&quot;me&quot;&gt;paragraph 1&lt;/p&gt;&lt;p&gt;Párâgràph 2&lt;/p&gt;&lt;/text&gt;</h:requestBody>
         using
-        <h:setHeader name="Content-Type">text/xml</h:setHeader>
-        Then I should receive
-        <h:status>200 OK</h:status>
-        and the response body is
-        <h:jsonResponse>{
-           "resourceTextUploadResult" : {
-           "^baseLayerDefinition" : "https://{host}/resources/22222222-2222-2222-2222-222222222222/baselayerdefinition"
-        } }
-        </h:jsonResponse>
+        <h:setHeader name="Content-Type">text/xml</h:setHeader>,
+        then I should receive
+        <ul>
+          <li><h:status>202 Accepted</h:status></li>
+          <li>and a location header
+            <h:location>https://{host}/resources/22222222-2222-2222-2222-222222222222/text/status</h:location>
+          </li>
+          <li>and the response body is <h:responseBody/>
+          </li>
+        </ul>
+        
     </h:request>
     <br/>
     <h:request>
-        Thereafter,
-        <h:get>/resources/22222222-2222-2222-2222-222222222222/text</h:get>
+        When I
+        <h:get>/resources/22222222-2222-2222-2222-222222222222/text/status</h:get>
+        then I should receive
+        <ul>
+            <li>status
+                <h:status>200 OK</h:status>
+            </li>
+            <li>and body
+             <small>(only relevant fields shown for brevity)</small>
+                <h:jsonResponse>{
+								  "textGraphImportStatus" : {
+								    "done" : false,
+								    "state" : "processing",
+								    "validationErrors" : [ ],
+								    "^baseLayerDefinition" : "https://{host}/resources/22222222-2222-2222-2222-222222222222/baselayerdefinition"
+								  }
+								}
+                </h:jsonResponse>
+            </li>
+        </ul>
+        If the status indicates the text is still being processed, we should wait a while before getting the status again.
+    </h:request>
+    <br/>
+    <h:request>
+        Once textGraphImportStatus.done == true, and there are no validationErrors,<br/>
+        <h:get>/resources/22222222-2222-2222-2222-222222222222/text/baselayer</h:get><br/>
         using
-        <h:setHeader name="Accept">text/xml</h:setHeader>
+        <h:setHeader name="Accept">text/xml</h:setHeader><br/>
         yields response body:<br/>
-        <h:responseBody>&lt;text xml:id="text-1"&gt;&lt;p xml:id="p-1"&gt;other text&lt;/p&gt;&lt;/text&gt;</h:responseBody><br/>
-        Notice that base layer elements have been given a unique xml:id if they didn't have one already.
+        <h:responseBody>&lt;text&gt;&lt;p xml:id="p-1"&gt;paragraph 1&lt;/p&gt;&lt;p&gt;Párâgràph 2&lt;/p&gt;&lt;/text&gt;</h:responseBody><br/>
+        Notice that the attribute order on &lt;p&gt; is the one defined in the base layer definition.<br/>
+    </h:request>
+    <br/>
+    <h:request>
+        Also,<br/>
+        <h:get>/resources/22222222-2222-2222-2222-222222222222/text/xml</h:get><br/>
+        using
+        <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+        yields response body:<br/>
+        <h:responseBody>&lt;text&gt;&lt;p xml:id=&quot;p-1&quot; lang=&quot;en&quot; auth=&quot;me&quot;&gt;paragraph 1&lt;/p&gt;&lt;p&gt;Párâgràph 2&lt;/p&gt;&lt;/text&gt;</h:responseBody><br/>
+        (the originally uploaded text)
     </h:request>
 </div>
 
@@ -178,11 +147,11 @@
      <h:put>/resources/33333333-3333-3333-3333-333333333333/baselayerdefinition</h:put>
      the body:
      <h:jsonBody>{
-         "baseLayerDefinition": {
-         "baseElements": [
-         {"name" : "text" },
-         {"name" : "p" }
-         ] } }
+       "baseLayerDefinition": {
+	       "baseElements": [
+		       {"name" : "text" },
+		       {"name" : "p" }
+       ] } }
      </h:jsonBody>
      using
      <h:setHeader name="Content-Type">application/json</h:setHeader>,
@@ -198,24 +167,14 @@
         using
         <h:setHeader name="Content-Type">application/octet-stream</h:setHeader>
         Then I should receive
-        <h:status>200 OK</h:status>
+        <h:status>202 Accepted</h:status>
+        and a location header
+        <h:location>https://{host}/resources/33333333-3333-3333-3333-333333333333/text/status</h:location>
         and the response body is
-        <h:jsonResponse>{
-           "resourceTextUploadResult" : {
-           "^baseLayerDefinition" : "https://{host}/resources/33333333-3333-3333-3333-333333333333/baselayerdefinition"
-        } }
-        </h:jsonResponse>
+        <h:responseBody/>
     </h:request>
     <br/>
-    <h:request>
-        Thereafter,
-        <h:get>/resources/33333333-3333-3333-3333-333333333333/text</h:get>
-        using
-        <h:setHeader name="Accept">text/xml</h:setHeader>
-        yields response body:<br/>
-        <h:responseBody>&lt;text xml:id="text-1"&gt;&lt;p xml:id="p-1"&gt;different text&lt;/p&gt;&lt;/text&gt;</h:responseBody><br/>
-        Notice that base layer elements have been given a unique xml:id if they didn't have one already.
-    </h:request>
+    After this, getting the status and the baselayer is done the same way as when submitting text as XML.
 </div>
 
 <div id="overwrite-resource-text" data-desc="What if I upload a text to a resource that already has a text?">

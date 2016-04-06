@@ -5,7 +5,9 @@ import static java.util.stream.Collectors.toSet;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import javax.ws.rs.core.StreamingOutput;
 
@@ -24,6 +27,7 @@ import com.google.common.collect.Multimap;
 import nl.knaw.huygens.alexandria.api.model.BaseElementDefinition;
 import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.text.TextUtil;
 import nl.knaw.huygens.tei.Document;
 
 public class TextGraphUtil {
@@ -40,12 +44,9 @@ public class TextGraphUtil {
 
   public static StreamingOutput streamXML(AlexandriaService service, UUID resourceId) {
     StreamingOutput outputstream = output -> {
-      Writer writer = new BufferedWriter(new OutputStreamWriter(output));
-      service.runInTransaction(() -> {
-        service.getTextGraphSegmentStream(resourceId).forEach(segment -> streamTextGraphSegment(writer, segment)//
-        );
-      });
-      writer.flush();
+      Writer writer = createBufferedUTF8OutputStreamWriter(output);
+      Consumer<TextGraphSegment> action = segment -> streamTextGraphSegment(writer, segment);
+      stream(service, resourceId, writer, action);
     };
     return outputstream;
   }
@@ -53,13 +54,9 @@ public class TextGraphUtil {
   public static StreamingOutput streamBaseLayerXML(AlexandriaService service, UUID resourceId, BaseLayerDefinition baseLayerDefinition) {
     List<BaseElementDefinition> baseElementDefinitions = baseLayerDefinition.getBaseElementDefinitions();
     StreamingOutput outputstream = output -> {
-      Writer writer = new BufferedWriter(new OutputStreamWriter(output));
-      service.runInTransaction(() -> {
-        service.getTextGraphSegmentStream(resourceId).forEach(//
-            segment -> streamTextGraphSegment(writer, segment, baseElementDefinitions)//
-        );
-      });
-      writer.flush();
+      Writer writer = createBufferedUTF8OutputStreamWriter(output);
+      Consumer<TextGraphSegment> action = segment -> streamTextGraphSegment(writer, segment, baseElementDefinitions);
+      stream(service, resourceId, writer, action);
     };
     return outputstream;
   }
@@ -68,7 +65,11 @@ public class TextGraphUtil {
     Set<String> baseElementNames = baseElementDefinitions.stream().map(BaseElementDefinition::getName).collect(toSet());
     Map<String, List<String>> baseElementAttributes = Maps.newHashMap();
     for (BaseElementDefinition bed : baseElementDefinitions) {
-      baseElementAttributes.put(bed.getName(), bed.getBaseAttributes());
+      List<String> baseAttributes = bed.getBaseAttributes();
+      if (!baseAttributes.contains(TextUtil.XML_ID)) {
+        baseAttributes.add(0, TextUtil.XML_ID);
+      }
+      baseElementAttributes.put(bed.getName(), baseAttributes);
     }
     try {
       if (segment.isMilestone()) {
@@ -234,5 +235,17 @@ public class TextGraphUtil {
         break;
       }
     }
+  }
+
+  private static Writer createBufferedUTF8OutputStreamWriter(OutputStream output) throws UnsupportedEncodingException {
+    Writer writer = new BufferedWriter(new OutputStreamWriter(output, "UTF-8"));
+    return writer;
+  }
+
+  private static void stream(AlexandriaService service, UUID resourceId, Writer writer, Consumer<TextGraphSegment> action) throws IOException {
+    service.runInTransaction(() -> {
+      service.getTextGraphSegmentStream(resourceId).forEach(action);
+    });
+    writer.flush();
   }
 }

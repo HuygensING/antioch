@@ -66,6 +66,7 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
   @ApiOperation("set text from xml")
   public Response setTextFromXml(@NotNull @Valid String xml) {
     assertResourceHasNoText();
+    assertResourceHasBaseLayerDefinition();
     startTextProcessing(xml);
     return Response.accepted()//
         .location(locationBuilder.locationOf(resource, "text", "status"))//
@@ -103,7 +104,7 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
 
   @GET
   @Path("baselayer")
-  @Produces(MediaType.TEXT_XML)
+  @Produces(MediaType.TEXT_XML + "; charset=utf-8")
   @ApiOperation("get baselayer as xml")
   public Response getBaseLayerXML() {
     if (!resource.hasText()) {
@@ -118,7 +119,7 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
 
   @GET
   @Path("xml")
-  @Produces(MediaType.TEXT_XML)
+  @Produces(MediaType.TEXT_XML + "; charset=utf-8")
   @ApiOperation("get baselayer as xml")
   public Response getXML() {
     if (!resource.hasText()) {
@@ -143,6 +144,11 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
     if (resource.hasText()) {
       throw new ConflictException("This resource already has a text, which cannot be replaced.");
     }
+  }
+
+  private void assertResourceHasBaseLayerDefinition() {
+    service.getBaseLayerDefinitionForResource(resourceId)//
+        .orElseThrow(noBaseLayerDefined());
   }
 
 }
