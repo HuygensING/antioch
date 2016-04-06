@@ -205,6 +205,37 @@
     </h:request>
 </div>
 
+<div id="dot-output" data-desc="How do I get a representation of the textgraph in DOT?">
+    <h:request>
+        Given the resource I made earlier,
+        when I
+        <h:get>/resources/33333333-3333-3333-3333-333333333333/text/dot</h:get>
+        using
+		    <h:setHeader name="Accept">text/plain</h:setHeader>,
+        then I should receive
+        <ul>
+            <li>status
+                <h:status>200 OK</h:status>
+            </li>
+            <li>and body
+            <pre><h:responseBody>digraph TextGraph {
+  ranksep=1.0
+  t0 [shape=box, label="different text"];
+  a0 [label="text"];
+  a1 [label="p"];
+  a0 -> a1;
+  a1 -> t0 [color="blue"];
+  {rank=same;t0;}
+  {rank=same;a0;}
+  {rank=same;a1;}
+}</h:responseBody></pre>
+            </li>
+        </ul>
+
+    </h:request>
+</div>
+
+
 <div id="text-without-baselayer-definition" c:execute="clearStorage()"
      data-desc="What happens if no base layer is defined?">
     <h:request>
