@@ -65,11 +65,6 @@ public class TextGraphImportStatus extends JsonWrapperObject implements Entity {
     return expires != null && Instant.now().isAfter(expires);
   }
 
-  @JsonProperty(PropertyPrefix.LINK + "baseLayerDefinition")
-  public URI getBaseLayerDefinitionURI() {
-    return baseLayerDefinitionURI;
-  }
-
   public void setBaseLayerDefinitionURI(URI baseLayerDefinitionURI) {
     this.baseLayerDefinitionURI = baseLayerDefinitionURI;
   }
