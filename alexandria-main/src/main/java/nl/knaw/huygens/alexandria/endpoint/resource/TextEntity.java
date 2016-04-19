@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.collect.Lists;
 
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.Entity;
 import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
@@ -40,12 +41,12 @@ public class TextEntity extends JsonWrapperObject implements Entity {
 
   @JsonProperty(PropertyPrefix.LINK + "xml")
   public URI getXml() {
-    return locationBuilder.locationOf(AlexandriaResource.class, resourceId, "text", "xml");
+    return locationBuilder.locationOf(AlexandriaResource.class, resourceId, EndpointPaths.TEXT, "xml");
   }
 
   @JsonProperty(PropertyPrefix.LINK + "dot")
   public URI getDot() {
-    return locationBuilder.locationOf(AlexandriaResource.class, resourceId, "text", "dot");
+    return locationBuilder.locationOf(AlexandriaResource.class, resourceId, EndpointPaths.TEXT, "dot");
   }
 
 }

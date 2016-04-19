@@ -2,6 +2,7 @@ package nl.knaw.huygens.alexandria.textgraph;
 
 import java.util.UUID;
 
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -38,7 +39,7 @@ public class TextGraphImportTask implements Runnable {
       ParseResult result = TextGraphUtil.parse(xml);
       boolean success = service.storeTextGraph(resourceId, result, who);
       if (success) {
-        status.setBaseLayerURI(locationBuilder.locationOf(resource, "text", "baselayer"));
+        status.setBaseLayerURI(locationBuilder.locationOf(resource, EndpointPaths.TEXT, EndpointPaths.TEXTVIEWS, "baselayer"));
       } else {
         status.getValidationErrors().add("textgraph store failed");
       }

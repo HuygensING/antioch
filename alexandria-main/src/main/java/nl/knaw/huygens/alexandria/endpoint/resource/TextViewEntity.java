@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.Entity;
 import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
@@ -39,13 +40,13 @@ public class TextViewEntity extends JsonWrapperObject implements Entity {
 
   @JsonProperty(PropertyPrefix.LINK + "xml")
   public URI getXml() {
-    URI uri = locationBuilder.locationOf(AlexandriaResource.class, resourceId, "text", "xml");
+    URI uri = locationBuilder.locationOf(AlexandriaResource.class, resourceId, EndpointPaths.TEXT, "xml");
     return UriBuilder.fromUri(uri).queryParam("view", viewId).build();
   }
 
   @JsonProperty(PropertyPrefix.LINK + "definition")
   public URI getDefinition() {
-    return locationBuilder.locationOf(AlexandriaResource.class, resourceId, "text", "views", viewId);
+    return locationBuilder.locationOf(AlexandriaResource.class, resourceId, EndpointPaths.TEXT, EndpointPaths.TEXTVIEWS, viewId);
   }
 
 }

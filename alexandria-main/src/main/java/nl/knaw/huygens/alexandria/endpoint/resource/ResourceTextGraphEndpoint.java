@@ -26,6 +26,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import io.swagger.annotations.ApiOperation;
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.TextView;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -72,7 +73,7 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
     assertResourceHasNoText();
     startTextProcessing(xml);
     return Response.accepted()//
-        .location(locationBuilder.locationOf(resource, "text", "status"))//
+        .location(locationBuilder.locationOf(resource, EndpointPaths.TEXT, "status"))//
         .build();
   }
 

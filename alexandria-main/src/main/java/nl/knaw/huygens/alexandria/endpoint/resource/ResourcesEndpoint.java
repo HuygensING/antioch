@@ -21,8 +21,8 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import static nl.knaw.huygens.alexandria.api.EndpointPaths.RESOURCES;
+import static nl.knaw.huygens.alexandria.api.EndpointPaths.TEXT;
 import static nl.knaw.huygens.alexandria.endpoint.resource.ResourceValidatorFactory.resourceNotFoundForId;
 
 import java.util.Optional;
@@ -192,7 +192,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
     return ResourceAnnotationsEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }
 
-  @Path("{uuid}/text")
+  @Path("{uuid}/" + TEXT)
   public Class<ResourceTextGraphEndpoint> getResourceTextGraphEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
     assertResourceIsConfirmed(uuidParam);
     return ResourceTextGraphEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
