@@ -1,15 +1,15 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import java.net.URI;
-import java.util.List;
 import java.util.UUID;
+
+import javax.ws.rs.core.UriBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.common.collect.Lists;
 
 import nl.knaw.huygens.alexandria.api.model.Entity;
 import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
@@ -17,35 +17,35 @@ import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 
-@JsonTypeName("resourceText")
+@JsonTypeName("resourceTextView")
 @JsonInclude(Include.NON_NULL)
-public class TextEntity extends JsonWrapperObject implements Entity {
+public class TextViewEntity extends JsonWrapperObject implements Entity {
   @JsonIgnore
-  private final LocationBuilder locationBuilder;
+  private String viewId;
   @JsonIgnore
-  private final UUID resourceId;
+  private LocationBuilder locationBuilder;
   @JsonIgnore
-  private List<TextViewEntity> textViews = Lists.newArrayList();
+  private UUID resourceId;
 
-  public TextEntity(UUID resourceId, LocationBuilder locationBuilder) {
+  public TextViewEntity(UUID resourceId, String viewId, LocationBuilder locationBuilder) {
     this.resourceId = resourceId;
+    this.viewId = viewId;
     this.locationBuilder = locationBuilder;
-    textViews.add(new TextViewEntity(resourceId, "baselayer", locationBuilder));
   }
 
-  @JsonProperty("views")
-  public List<TextViewEntity> getTextViews() {
-    return textViews;
+  public String getId() {
+    return viewId;
   }
 
   @JsonProperty(PropertyPrefix.LINK + "xml")
   public URI getXml() {
-    return locationBuilder.locationOf(AlexandriaResource.class, resourceId, "text", "xml");
+    URI uri = locationBuilder.locationOf(AlexandriaResource.class, resourceId, "text", "xml");
+    return UriBuilder.fromUri(uri).queryParam("view", viewId).build();
   }
 
-  @JsonProperty(PropertyPrefix.LINK + "dot")
-  public URI getDot() {
-    return locationBuilder.locationOf(AlexandriaResource.class, resourceId, "text", "dot");
+  @JsonProperty(PropertyPrefix.LINK + "definition")
+  public URI getDefinition() {
+    return locationBuilder.locationOf(AlexandriaResource.class, resourceId, "text", "views", viewId);
   }
 
 }

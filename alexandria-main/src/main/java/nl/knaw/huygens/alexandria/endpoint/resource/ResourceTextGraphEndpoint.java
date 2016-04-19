@@ -9,18 +9,21 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
@@ -97,7 +100,7 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
   @GET
   public Response getTextEntity() {
     assertResourceHasText();
-    TextEntity text = TextEntity.of(resourceId).withLocationBuilder(locationBuilder);
+    TextEntity text = new TextEntity(resourceId, locationBuilder);
     return Response.ok().entity(text).build();
   }
 
@@ -110,25 +113,25 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
   }
 
   @GET
-  @Path("baselayer")
-  @Produces(MediaType.TEXT_XML)
-  @ApiOperation("get baselayer as xml")
-  public Response getBaseLayerXML() {
-    assertResourceHasText();
-    BaseLayerDefinition baseLayerDefinition = service.getBaseLayerDefinitionForResource(resourceId)//
-        .orElseThrow(noBaseLayerDefined());
-
-    StreamingOutput outputstream = TextGraphUtil.streamBaseLayerXML(service, resourceId, baseLayerDefinition);
-    return ok(outputstream);
-  }
-
-  @GET
   @Path("xml")
   @Produces(MediaType.TEXT_XML)
   @ApiOperation("get textgraph as xml")
-  public Response getXML() {
+  public Response getXML(@QueryParam("view") String view) {
     assertResourceHasText();
-    StreamingOutput outputstream = TextGraphUtil.streamXML(service, resourceId);
+    StreamingOutput outputstream;
+    if (StringUtils.isNotBlank(view)) {
+      if ("baselayer".equals(view)) {
+        BaseLayerDefinition baseLayerDefinition = service.getBaseLayerDefinitionForResource(resourceId)//
+            .orElseThrow(noBaseLayerDefined());
+        outputstream = TextGraphUtil.streamBaseLayerXML(service, resourceId, baseLayerDefinition);
+      } else {
+        throw new BadRequestException("View " + view + " not defined for this resource.");
+      }
+
+    } else {
+      outputstream = TextGraphUtil.streamXML(service, resourceId);
+    }
+
     return ok(outputstream);
   }
 
