@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly
+  xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3 http://maven.apache.org/xsd/assembly-1.1.3.xsd">
+  <id>app</id>
+
+  <formats>
+    <format>zip</format>
+  </formats>
+
+  <moduleSets>
+    <moduleSet>
+      <!-- Enable access to all projects in the current multimodule build! -->
+      <useAllReactorProjects>true</useAllReactorProjects>
+      <!-- Now, select which projects to include in this module-set. -->
+      <includes>
+        <include>${project.groupId}:alexandria-server</include>
+      </includes>
+      <binaries>
+        <outputDirectory>modules/alexandria-server</outputDirectory>
+        <includeDependencies>true</includeDependencies>
+        <unpack>false</unpack>
+      </binaries>
+    </moduleSet>
+  </moduleSets>
+
+  <fileSets>
+    <fileSet>
+      <directory>alexandria-server/target/generated-resources/appassembler/jsw/alexandria-server/</directory>
+      <outputDirectory />
+      <fileMode>0755</fileMode>
+      <includes>
+        <include>bin/**</include>
+        <include>lib/**.dll</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>alexandria-server/target/generated-resources/appassembler/jsw/alexandria-server/</directory>
+      <outputDirectory />
+      <excludes>
+        <exclude>bin/**</exclude>
+        <exclude>lib/**.dll</exclude>
+      </excludes>
+    </fileSet>
+    <fileSet>
+      <includes>
+        <include>README*</include>
+        <include>LICENSE*</include>
+        <include>NOTICE*</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+</assembly>

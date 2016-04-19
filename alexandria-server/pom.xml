@@ -41,30 +41,73 @@
   <!-- mvn clean package -->
   <build>
     <plugins>
+      <!-- <plugin> <artifactId>maven-assembly-plugin</artifactId> <version>${maven-assembly.version}</version> 
+        <configuration> <descriptorRefs> <descriptorRef>jar-with-dependencies</descriptorRef> 
+        </descriptorRefs> <archive> <manifest> <addClasspath>true</addClasspath> 
+        <mainClass>nl.knaw.huygens.alexandria.app.Server</mainClass> </manifest> 
+        </archive> </configuration> <executions> <execution> <id>make-assembly</id> 
+        <phase>package</phase> <goals> <goal>single</goal> </goals> </execution> 
+        </executions> </plugin> -->
+
       <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>${maven-assembly.version}</version>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>appassembler-maven-plugin</artifactId>
+        <version>${appassembler-maven.version}</version>
         <configuration>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-          <archive>
-            <manifest>
-              <addClasspath>true</addClasspath>
+          <repositoryLayout>flat</repositoryLayout>
+          <repositoryName>lib</repositoryName>
+          <includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
+          <useWildcardClassPath>true</useWildcardClassPath>
+          <extraJvmArguments>-Xmx512m</extraJvmArguments>
+          <daemons>
+            <daemon>
+              <id>alexandria-server</id>
               <mainClass>nl.knaw.huygens.alexandria.app.Server</mainClass>
-            </manifest>
-          </archive>
+              <commandLineArguments>
+                <commandLineArgument>start</commandLineArgument>
+                <commandLineArgument>stop</commandLineArgument>
+                <commandLineArgument>restart</commandLineArgument>
+                <commandLineArgument>status</commandLineArgument>
+              </commandLineArguments>
+              <generatorConfigurations>
+                <generatorConfiguration>
+                  <generator>jsw</generator>
+                  <includes>
+                    <include>aix-ppc-32</include>
+                    <include>aix-ppc-64</include>
+                    <include>hpux-parisc-64</include>
+                    <include>linux-x86-32</include>
+                    <include>linux-x86-64</include>
+                    <include>linux-ppc-64</include>
+                    <include>macosx-ppc-32</include>
+                    <include>macosx-x86-universal-32</include>
+                    <include>macosx-universal-32</include>
+                    <include>macosx-universal-64</include>
+                    <include>solaris-sparc-32</include>
+                    <include>solaris-sparc-64</include>
+                    <include>solaris-x86-32</include>
+                    <include>windows-x86-32</include>
+                    <include>windows-x86-64</include>
+                  </includes>
+                </generatorConfiguration>
+              </generatorConfigurations>
+              <platforms>
+                <platform>jsw</platform>
+              </platforms>
+            </daemon>
+          </daemons>
         </configuration>
         <executions>
           <execution>
-            <id>make-assembly</id>
+            <id>app-assemble</id>
             <phase>package</phase>
             <goals>
-              <goal>single</goal>
+              <goal>generate-daemons</goal>
             </goals>
           </execution>
         </executions>
       </plugin>
+
       <!-- <plugin> <groupId>com.github.kongchen</groupId> <artifactId>swagger-maven-plugin</artifactId> 
         <version>${swagger-maven-plugin.version}</version> <configuration> <apiSources> 
         <apiSource> <info> <title>REST api</title> <version>v1</version> <description> 
