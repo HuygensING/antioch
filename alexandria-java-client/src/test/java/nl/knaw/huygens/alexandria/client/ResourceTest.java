@@ -27,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.net.URI;
 import java.util.UUID;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import nl.knaw.huygens.Log;
@@ -99,6 +100,7 @@ public class ResourceTest extends AlexandriaClientTest {
     softly.assertThat(resourceEntity.getState().getValue()).as("state").isEqualTo(AlexandriaState.CONFIRMED);
   }
 
+  @Ignore
   @Test
   public void testSetAndRetrieveTextView() {
     // first, create a resource
