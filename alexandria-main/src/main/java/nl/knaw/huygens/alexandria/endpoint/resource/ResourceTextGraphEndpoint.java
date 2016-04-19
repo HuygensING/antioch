@@ -67,7 +67,6 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
   @ApiOperation("set text from xml")
   public Response setTextFromXml(@NotNull @Valid String xml) {
     assertResourceHasNoText();
-    assertResourceHasBaseLayerDefinition();
     startTextProcessing(xml);
     return Response.accepted()//
         .location(locationBuilder.locationOf(resource, "text", "status"))//
