@@ -25,8 +25,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
-import nl.knaw.huygens.alexandria.api.model.BaseElementDefinition;
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.api.model.ElementDefinition;
+import nl.knaw.huygens.alexandria.api.model.TextView;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.text.TextUtil;
 import nl.knaw.huygens.tei.Document;
@@ -78,9 +78,9 @@ public class TextGraphUtil {
     }
   }
 
-  public static StreamingOutput streamBaseLayerXML(AlexandriaService service, UUID resourceId, BaseLayerDefinition baseLayerDefinition) {
-    List<BaseElementDefinition> baseElementDefinitions = baseLayerDefinition.getBaseElementDefinitions();
-    List<String> noteElements = baseLayerDefinition.getSubresourceElements();
+  public static StreamingOutput streamBaseLayerXML(AlexandriaService service, UUID resourceId, TextView baseLayerDefinition) {
+    List<ElementDefinition> baseElementDefinitions = baseLayerDefinition.getIncludedElementDefinitions();
+    List<String> noteElements = baseLayerDefinition.getIgnoredElements();
     StreamingOutput outputstream = output -> {
       Writer writer = createBufferedUTF8OutputStreamWriter(output);
       Stack<TextAnnotation> noteStack = new Stack<>();
@@ -90,10 +90,10 @@ public class TextGraphUtil {
     return outputstream;
   }
 
-  public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment, List<BaseElementDefinition> baseElementDefinitions, List<String> noteElements, Stack<TextAnnotation> noteStack) {
-    Set<String> baseElementNames = baseElementDefinitions.stream().map(BaseElementDefinition::getName).collect(toSet());
+  public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment, List<ElementDefinition> baseElementDefinitions, List<String> noteElements, Stack<TextAnnotation> noteStack) {
+    Set<String> baseElementNames = baseElementDefinitions.stream().map(ElementDefinition::getName).collect(toSet());
     Map<String, List<String>> baseElementAttributes = Maps.newHashMap();
-    for (BaseElementDefinition bed : baseElementDefinitions) {
+    for (ElementDefinition bed : baseElementDefinitions) {
       List<String> baseAttributes = bed.getBaseAttributes();
       if (!baseAttributes.contains(TextUtil.XML_ID)) {
         baseAttributes.add(0, TextUtil.XML_ID);
@@ -162,8 +162,8 @@ public class TextGraphUtil {
     }
   }
 
-  public static String renderBaseLayer(List<String> textSegments, Set<XmlAnnotation> xmlAnnotations, BaseLayerDefinition baselayerDefinition) {
-    List<String> baseElementNames = baselayerDefinition.getBaseElementDefinitions().stream().map(BaseElementDefinition::getName).collect(toList());
+  public static String renderBaseLayer(List<String> textSegments, Set<XmlAnnotation> xmlAnnotations, TextView baselayerDefinition) {
+    List<String> baseElementNames = baselayerDefinition.getIncludedElementDefinitions().stream().map(ElementDefinition::getName).collect(toList());
     StringBuilder builder = new StringBuilder();
 
     List<XmlAnnotation> xmlAnnotationList = Lists.newArrayList(xmlAnnotations);

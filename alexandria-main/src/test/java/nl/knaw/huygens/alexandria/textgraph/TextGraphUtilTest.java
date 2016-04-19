@@ -8,8 +8,8 @@ import org.junit.Test;
 import com.google.common.base.Joiner;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.api.model.BaseElementDefinition;
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.api.model.ElementDefinition;
+import nl.knaw.huygens.alexandria.api.model.TextView;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 
 public class TextGraphUtilTest extends AlexandriaTest {
@@ -46,11 +46,11 @@ public class TextGraphUtilTest extends AlexandriaTest {
     softly.assertThat(xmlAnnotations).hasSize(9);
     Log.info("annotations = \n\t{}", Joiner.on("\n\t").join(xmlAnnotations));
 
-    BaseLayerDefinition baselayerDefinition = BaseLayerDefinition.withBaseElements(//
-        BaseElementDefinition.withName("text"), //
-        BaseElementDefinition.withName("div"), //
-        BaseElementDefinition.withName("lb"), //
-        BaseElementDefinition.withName("p")//
+    TextView baselayerDefinition = TextView.withIncludedElements(//
+        ElementDefinition.withName("text"), //
+        ElementDefinition.withName("div"), //
+        ElementDefinition.withName("lb"), //
+        ElementDefinition.withName("p")//
     );
     String baseLayer = TextGraphUtil.renderBaseLayer(textSegments, xmlAnnotations, baselayerDefinition);
     softly.assertThat(baseLayer).isEqualTo(expectedBaseLayer);

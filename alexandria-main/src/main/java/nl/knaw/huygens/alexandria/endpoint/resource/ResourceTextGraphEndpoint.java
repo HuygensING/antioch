@@ -26,7 +26,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import io.swagger.annotations.ApiOperation;
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.api.model.TextView;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
@@ -121,7 +121,7 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
     StreamingOutput outputstream;
     if (StringUtils.isNotBlank(view)) {
       if ("baselayer".equals(view)) {
-        BaseLayerDefinition baseLayerDefinition = service.getBaseLayerDefinitionForResource(resourceId)//
+        TextView baseLayerDefinition = service.getBaseLayerDefinitionForResource(resourceId)//
             .orElseThrow(noBaseLayerDefined());
         outputstream = TextGraphUtil.streamBaseLayerXML(service, resourceId, baseLayerDefinition);
       } else {

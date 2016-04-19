@@ -42,9 +42,9 @@ import org.junit.Test;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.api.model.BaseElementDefinition;
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinitionPrototype;
+import nl.knaw.huygens.alexandria.api.model.ElementDefinition;
+import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.TextViewPrototype;
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -263,9 +263,9 @@ public class TinkerPopServiceTest {
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
     AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
     service.createOrUpdateResource(resource);
-    BaseElementDefinition bedText = BaseElementDefinition.withName("text");
-    BaseElementDefinition bedDiv = BaseElementDefinition.withName("div");
-    BaseLayerDefinitionPrototype prototype = new BaseLayerDefinitionPrototype().setBaseElements(bedText, bedDiv);
+    ElementDefinition bedText = ElementDefinition.withName("text");
+    ElementDefinition bedDiv = ElementDefinition.withName("div");
+    TextViewPrototype prototype = new TextViewPrototype().setIncludedElements(bedText, bedDiv);
     service.setBaseLayerDefinition(resourceId, prototype);
 
     UUID subUuid1 = UUID.randomUUID();
@@ -275,9 +275,9 @@ public class TinkerPopServiceTest {
     UUID subUuid2 = UUID.randomUUID();
     service.createSubResource(subUuid2, subUuid1, "sub2", provenance);
 
-    Optional<BaseLayerDefinition> optDef = service.getBaseLayerDefinitionForResource(subUuid2);
+    Optional<TextView> optDef = service.getBaseLayerDefinitionForResource(subUuid2);
     assertThat(optDef).isPresent();
-    List<BaseElementDefinition> returnedBaseElementDefinitions = optDef.get().getBaseElementDefinitions();
+    List<ElementDefinition> returnedBaseElementDefinitions = optDef.get().getIncludedElementDefinitions();
     assertThat(returnedBaseElementDefinitions).containsExactly(bedText, bedDiv);
   }
 
@@ -296,7 +296,7 @@ public class TinkerPopServiceTest {
     UUID subUuid2 = UUID.randomUUID();
     service.createSubResource(subUuid2, subUuid1, "sub2", provenance);
 
-    Optional<BaseLayerDefinition> optDef = service.getBaseLayerDefinitionForResource(subUuid2);
+    Optional<TextView> optDef = service.getBaseLayerDefinitionForResource(subUuid2);
     assertThat(optDef.isPresent()).isFalse();
   }
 

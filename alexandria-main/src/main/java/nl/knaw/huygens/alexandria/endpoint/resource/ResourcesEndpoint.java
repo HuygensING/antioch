@@ -44,16 +44,13 @@ import javax.ws.rs.core.Response;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinitionPrototype;
 import nl.knaw.huygens.alexandria.api.model.StatePrototype;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
-import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
@@ -120,33 +117,33 @@ public class ResourcesEndpoint extends JSONEndpoint {
     throw new BadRequestException("for now, you can only set the state to CONFIRMED");
   }
 
-  @PUT
-  @Path("{uuid}/" + EndpointPaths.BASELAYERDEFINITION)
-  @Consumes(MediaType.APPLICATION_JSON)
-  @ApiOperation(value = "Set the baselayer definition")
-  public Response setBaseLayerDefinition(@PathParam("uuid") final UUIDParam uuidParam, @NotNull BaseLayerDefinitionPrototype protoType) {
-    Log.trace("protoType=[{}]", protoType);
-    AlexandriaResource resource = readExistingResource(uuidParam);
-    if (!isConfirmed(resource)) {
-      throw new ConflictException("This resource has state " + resource.getState() + "; it needs to be CONFIRMED before the BaseLayerDefinition can be added.");
-    }
-    if (resource.getDirectBaseLayerDefinition().isPresent()) {
-      throw new ConflictException("This resource already has a baselayer definition");
-    }
-    service.setBaseLayerDefinition(uuidParam.getValue(), protoType);
-    return created(locationBuilder.locationOf(resource, EndpointPaths.BASELAYERDEFINITION));
-  }
+  // @PUT
+  // @Path("{uuid}/" + EndpointPaths.BASELAYERDEFINITION)
+  // @Consumes(MediaType.APPLICATION_JSON)
+  // @ApiOperation(value = "Set the baselayer definition")
+  // public Response setBaseLayerDefinition(@PathParam("uuid") final UUIDParam uuidParam, @NotNull TextViewPrototype protoType) {
+  // Log.trace("protoType=[{}]", protoType);
+  // AlexandriaResource resource = readExistingResource(uuidParam);
+  // if (!isConfirmed(resource)) {
+  // throw new ConflictException("This resource has state " + resource.getState() + "; it needs to be CONFIRMED before the BaseLayerDefinition can be added.");
+  // }
+  // if (resource.getDirectBaseLayerDefinition().isPresent()) {
+  // throw new ConflictException("This resource already has a baselayer definition");
+  // }
+  // service.setBaseLayerDefinition(uuidParam.getValue(), protoType);
+  // return created(locationBuilder.locationOf(resource, EndpointPaths.BASELAYERDEFINITION));
+  // }
 
-  @GET
-  @Path("{uuid}/" + EndpointPaths.BASELAYERDEFINITION)
-  @ApiOperation(value = "Get the baselayer definition")
-  public Response getBaseLayerDefinition(@PathParam("uuid") final UUIDParam uuidParam) {
-    AlexandriaResource resource = readExistingResource(uuidParam);
-    if (!resource.getDirectBaseLayerDefinition().isPresent()) {
-      throw new NotFoundException("This resource has no baselayer definition"); // TODO: alternatively, throw redirected to ancestor baselayer definition (if any)
-    }
-    return ok(resource.getDirectBaseLayerDefinition().get());
-  }
+  // @GET
+  // @Path("{uuid}/" + EndpointPaths.BASELAYERDEFINITION)
+  // @ApiOperation(value = "Get the baselayer definition")
+  // public Response getBaseLayerDefinition(@PathParam("uuid") final UUIDParam uuidParam) {
+  // AlexandriaResource resource = readExistingResource(uuidParam);
+  // if (!resource.getDirectBaseLayerDefinition().isPresent()) {
+  // throw new NotFoundException("This resource has no baselayer definition"); // TODO: alternatively, throw redirected to ancestor baselayer definition (if any)
+  // }
+  // return ok(resource.getDirectBaseLayerDefinition().get());
+  // }
 
   @DELETE
   @Path("{uuid}")

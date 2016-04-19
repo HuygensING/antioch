@@ -64,8 +64,8 @@ import com.google.common.collect.Maps;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinitionPrototype;
+import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.TextViewPrototype;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
@@ -388,7 +388,7 @@ public class TinkerPopService implements AlexandriaService {
 
 
   @Override
-  public void setBaseLayerDefinition(UUID resourceUUID, BaseLayerDefinitionPrototype bldPrototype) {
+  public void setBaseLayerDefinition(UUID resourceUUID, TextViewPrototype bldPrototype) {
     storage.runInTransaction(() -> {
       ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
       String json;
@@ -403,9 +403,9 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public Optional<BaseLayerDefinition> getBaseLayerDefinitionForResource(UUID resourceUUID) {
+  public Optional<TextView> getBaseLayerDefinitionForResource(UUID resourceUUID) {
     return storage.runInTransaction(() -> {
-      Optional<BaseLayerDefinition> optDef = Optional.empty();
+      Optional<TextView> optDef = Optional.empty();
 
       ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
       while (resourceVF != null //
@@ -416,14 +416,14 @@ public class TinkerPopService implements AlexandriaService {
       if (resourceVF != null) {
         String json = resourceVF.getBaseLayerDefinition();
         if (StringUtils.isNotEmpty(json)) {
-          BaseLayerDefinition bld;
+          TextView bld;
           try {
             bld = deserializeBaseLayerDefinition(json);
           } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
           }
-          bld.setBaseLayerDefiningResourceId(UUID.fromString(resourceVF.getUuid()));
+          bld.setTextViewDefiningResourceId(UUID.fromString(resourceVF.getUuid()));
           optDef = Optional.of(bld);
         }
       }
@@ -431,10 +431,10 @@ public class TinkerPopService implements AlexandriaService {
     });
   }
 
-  private BaseLayerDefinition deserializeBaseLayerDefinition(String json) throws IOException {
-    BaseLayerDefinitionPrototype prototype = new ObjectMapper().readValue(json, new TypeReference<BaseLayerDefinitionPrototype>() {
+  private TextView deserializeBaseLayerDefinition(String json) throws IOException {
+    TextViewPrototype prototype = new ObjectMapper().readValue(json, new TypeReference<TextViewPrototype>() {
     });
-    return BaseLayerDefinition.withBaseElements(prototype.getBaseElements()).setSubresourceElements(prototype.getSubresourceElements());
+    return TextView.withIncludedElements(prototype.getIncludedElements()).setIgnoredElements(prototype.getIgnoredElements());
   }
 
   @Override
@@ -637,7 +637,7 @@ public class TinkerPopService implements AlexandriaService {
     String baseLayerDefinitionJson = rvf.getBaseLayerDefinition();
     if (StringUtils.isNotEmpty(baseLayerDefinitionJson)) {
       try {
-        BaseLayerDefinition bld = deserializeBaseLayerDefinition(baseLayerDefinitionJson);
+        TextView bld = deserializeBaseLayerDefinition(baseLayerDefinitionJson);
         resource.setDirectBaseLayerDefinition(bld);
       } catch (IOException e) {
         e.printStackTrace();

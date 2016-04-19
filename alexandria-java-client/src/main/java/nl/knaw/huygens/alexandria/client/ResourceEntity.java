@@ -49,23 +49,12 @@ public class ResourceEntity extends JsonWrapperObject {
   @JsonProperty(PropertyPrefix.LINK + "text")
   URI textURI;
 
-  @JsonProperty(PropertyPrefix.LINK + "baseLayerDefinition")
-  URI baseLayerDefinitionURI;
-
   public URI getTextURI() {
     return textURI;
   }
 
   public void setTextURI(URI textURI) {
     this.textURI = textURI;
-  }
-
-  public URI getBaseLayerDefinitionURI() {
-    return baseLayerDefinitionURI;
-  }
-
-  public void setBaseLayerDefinitionURI(URI baseLayerDefinitionURI) {
-    this.baseLayerDefinitionURI = baseLayerDefinitionURI;
   }
 
   public String getId() {

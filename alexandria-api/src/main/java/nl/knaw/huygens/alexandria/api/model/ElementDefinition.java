@@ -27,20 +27,20 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class BaseElementDefinition {
+public class ElementDefinition {
   String name = "";
   List<String> baseAttributes = new ArrayList<>();
 
-  private BaseElementDefinition() {
+  private ElementDefinition() {
   }
 
-  public static BaseElementDefinition withName(final String name) {
-    BaseElementDefinition baseElementDefinition = new BaseElementDefinition();
+  public static ElementDefinition withName(final String name) {
+    ElementDefinition baseElementDefinition = new ElementDefinition();
     baseElementDefinition.setName(name);
     return baseElementDefinition;
   }
 
-  public BaseElementDefinition withAttributes(final String... attributes) {
+  public ElementDefinition withAttributes(final String... attributes) {
     setBaseAttributes(Arrays.asList(attributes));
     return this;
   }
@@ -68,9 +68,9 @@ public class BaseElementDefinition {
 
   @Override
   public boolean equals(Object other) {
-    return other instanceof BaseElementDefinition //
-        && Objects.equals(this.getName(), ((BaseElementDefinition) other).getName())//
-        && Objects.equals(this.getBaseAttributes(), ((BaseElementDefinition) other).getBaseAttributes());
+    return other instanceof ElementDefinition //
+        && Objects.equals(this.getName(), ((ElementDefinition) other).getName())//
+        && Objects.equals(this.getBaseAttributes(), ((ElementDefinition) other).getBaseAttributes());
   }
 
 }

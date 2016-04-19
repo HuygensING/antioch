@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import jersey.repackaged.com.google.common.collect.Lists;
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.api.model.TextView;
 
 public class AlexandriaResource extends AbstractAnnotatable {
 
@@ -35,7 +35,7 @@ public class AlexandriaResource extends AbstractAnnotatable {
   private Optional<IdentifiablePointer<AlexandriaResource>> parentResourcePointer = Optional.empty(); // only used in subresources
   private Optional<IdentifiablePointer<AlexandriaResource>> firstParentResourceWithBaseLayerDefinitionPointer = Optional.empty(); // only used in subresources
   private Collection<IdentifiablePointer<AlexandriaResource>> subResourcePointers = Lists.newArrayList();
-  private Optional<BaseLayerDefinition> directBaseLayerDefinition = Optional.empty();
+  private Optional<TextView> directBaseLayerDefinition = Optional.empty();
   private boolean hasText = false;
 
   public AlexandriaResource(UUID id, TentativeAlexandriaProvenance provenance) {
@@ -80,11 +80,11 @@ public class AlexandriaResource extends AbstractAnnotatable {
     }
   }
 
-  public Optional<BaseLayerDefinition> getDirectBaseLayerDefinition() {
+  public Optional<TextView> getDirectBaseLayerDefinition() {
     return directBaseLayerDefinition;
   }
 
-  public void setDirectBaseLayerDefinition(BaseLayerDefinition baseLayerDefinition) {
+  public void setDirectBaseLayerDefinition(TextView baseLayerDefinition) {
     this.directBaseLayerDefinition = Optional.of(baseLayerDefinition);
   }
 

@@ -30,8 +30,8 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinitionPrototype;
+import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.TextViewPrototype;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
@@ -118,9 +118,9 @@ public interface AlexandriaService {
 
   void importDb(String format, String filename);
 
-  void setBaseLayerDefinition(UUID resourceUUID, BaseLayerDefinitionPrototype baseLayerDefinition);
+  void setBaseLayerDefinition(UUID resourceUUID, TextViewPrototype baseLayerDefinition);
 
-  Optional<BaseLayerDefinition> getBaseLayerDefinitionForResource(UUID resourceUUID);
+  Optional<TextView> getBaseLayerDefinitionForResource(UUID resourceUUID);
 
   boolean storeTextGraph(UUID resourceId, ParseResult result, String who);
 

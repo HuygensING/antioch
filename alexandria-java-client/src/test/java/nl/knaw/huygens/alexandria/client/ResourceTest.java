@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.client;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -32,9 +32,9 @@ import org.junit.Test;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.api.model.BaseElementDefinition;
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinitionPrototype;
+import nl.knaw.huygens.alexandria.api.model.ElementDefinition;
+import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.TextViewPrototype;
 
 public class ResourceTest extends AlexandriaClientTest {
   @Test
@@ -100,7 +100,7 @@ public class ResourceTest extends AlexandriaClientTest {
   }
 
   @Test
-  public void testSetAndRetrieveBaseLayerDefinition() {
+  public void testSetAndRetrieveTextView() {
     // first, create a resource
     client.setAuthKey(AUTHKEY);
     String ref = "corpus";
@@ -110,19 +110,19 @@ public class ResourceTest extends AlexandriaClientTest {
     assertRequestSucceeded(result);
 
     // then, set the base layer definition
-    BaseElementDefinition baseElement1 = BaseElementDefinition.withName("body").withAttributes("lang");
-    BaseElementDefinition baseElement2 = BaseElementDefinition.withName("p").withAttributes("n");
-    BaseLayerDefinitionPrototype baselayerDefinition = new BaseLayerDefinitionPrototype().setBaseElements(baseElement1, baseElement2).setSubresourceElements("note");
-    RestResult<URI> result2 = client.setBaseLayerDefinition(resourceId, baselayerDefinition);
+    ElementDefinition baseElement1 = ElementDefinition.withName("body").withAttributes("lang");
+    ElementDefinition baseElement2 = ElementDefinition.withName("p").withAttributes("n");
+    TextViewPrototype textView = new TextViewPrototype().setIncludedElements(baseElement1, baseElement2).setIgnoredElements("note");
+    RestResult<URI> result2 = client.addTextView(resourceId, textView);
     assertRequestSucceeded(result2);
-    softly.assertThat(result2.get().toString()).as("Location").endsWith("/" + resourceId + "/" + EndpointPaths.BASELAYERDEFINITION);
+    softly.assertThat(result2.get().toString()).as("Location").endsWith("/" + resourceId + "/" + EndpointPaths.TEXT + "/" + EndpointPaths.TEXTVIEWS);
 
     // now, retrieve the base layer definition
-    RestResult<BaseLayerDefinition> result3 = client.getBaseLayerDefinition(resourceId);
+    RestResult<TextView> result3 = client.getTextViewDefinition(resourceId);
     assertRequestSucceeded(result3);
-    BaseLayerDefinition returnedDefinition = result3.get();
-    softly.assertThat(returnedDefinition.getSubresourceElements()).as("SubresourceElements").containsExactly("note");
-    softly.assertThat(returnedDefinition.getBaseElementDefinitions()).as("BaseElements").containsExactly(baseElement1, baseElement2);
+    TextView returnedDefinition = result3.get();
+    softly.assertThat(returnedDefinition.getIgnoredElements()).as("SubresourceElements").containsExactly("note");
+    softly.assertThat(returnedDefinition.getIncludedElementDefinitions()).as("BaseElements").containsExactly(baseElement1, baseElement2);
   }
 
 }

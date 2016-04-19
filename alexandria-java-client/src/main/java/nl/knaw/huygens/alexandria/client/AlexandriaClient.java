@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.client;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -42,9 +42,9 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinitionPrototype;
 import nl.knaw.huygens.alexandria.api.model.StatePrototype;
+import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.TextViewPrototype;
 
 public class AlexandriaClient {
   private WebTarget rootTarget;
@@ -153,11 +153,12 @@ public class AlexandriaClient {
         .getResult();
   }
 
-  public RestResult<URI> setBaseLayerDefinition(UUID resourceUuid, BaseLayerDefinitionPrototype baselayerDefinition) {
-    Entity<BaseLayerDefinitionPrototype> entity = Entity.json(baselayerDefinition);
+  public RestResult<URI> addTextView(UUID resourceUUID, TextViewPrototype textView) {
+    Entity<TextViewPrototype> entity = Entity.json(textView);
     Supplier<Response> responseSupplier = () -> rootTarget.path(EndpointPaths.RESOURCES)//
-        .path(resourceUuid.toString())//
-        .path(EndpointPaths.BASELAYERDEFINITION)//
+        .path(resourceUUID.toString())//
+        .path(EndpointPaths.TEXT)//
+        .path(EndpointPaths.TEXTVIEWS)//
         .request()//
         .header(HEADER_AUTH, authHeader)//
         .put(entity);
@@ -173,15 +174,16 @@ public class AlexandriaClient {
         .getResult();
   }
 
-  public RestResult<BaseLayerDefinition> getBaseLayerDefinition(UUID uuid) {
-    RestRequester<BaseLayerDefinition> requester = RestRequester.withResponseSupplier(() -> rootTarget.path(EndpointPaths.RESOURCES)//
+  public RestResult<TextView> getTextViewDefinition(UUID uuid) {
+    RestRequester<TextView> requester = RestRequester.withResponseSupplier(() -> rootTarget.path(EndpointPaths.RESOURCES)//
         .path(uuid.toString())//
-        .path(EndpointPaths.BASELAYERDEFINITION)//
+        .path(EndpointPaths.TEXT)//
+        .path(EndpointPaths.TEXTVIEWS)//
         .request().get());
     return requester//
         .onStatus(Status.OK, (response) -> {
-          RestResult<BaseLayerDefinition> result = new RestResult<>();
-          BaseLayerDefinition cargo = response.readEntity(BaseLayerDefinition.class);
+          RestResult<TextView> result = new RestResult<>();
+          TextView cargo = response.readEntity(TextView.class);
           result.setCargo(cargo);
           return result;
         })//
