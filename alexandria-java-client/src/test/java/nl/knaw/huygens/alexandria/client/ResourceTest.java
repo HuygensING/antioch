@@ -118,7 +118,7 @@ public class ResourceTest extends AlexandriaClientTest {
     softly.assertThat(result2.get().toString()).as("Location").endsWith("/" + resourceId + "/" + EndpointPaths.TEXT + "/" + EndpointPaths.TEXTVIEWS);
 
     // now, retrieve the base layer definition
-    RestResult<TextView> result3 = client.getTextViewDefinition(resourceId);
+    RestResult<TextView> result3 = client.getTextView(resourceId);
     assertRequestSucceeded(result3);
     TextView returnedDefinition = result3.get();
     softly.assertThat(returnedDefinition.getIgnoredElements()).as("SubresourceElements").containsExactly("note");

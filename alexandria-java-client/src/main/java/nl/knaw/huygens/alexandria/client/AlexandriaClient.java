@@ -174,7 +174,7 @@ public class AlexandriaClient {
         .getResult();
   }
 
-  public RestResult<TextView> getTextViewDefinition(UUID uuid) {
+  public RestResult<TextView> getTextView(UUID uuid) {
     RestRequester<TextView> requester = RestRequester.withResponseSupplier(() -> rootTarget.path(EndpointPaths.RESOURCES)//
         .path(uuid.toString())//
         .path(EndpointPaths.TEXT)//
