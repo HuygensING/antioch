@@ -60,6 +60,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import nl.knaw.huygens.Log;
@@ -386,15 +387,14 @@ public class TinkerPopService implements AlexandriaService {
     throw new NotImplementedException();
   }
 
-
   @Override
-  public void setBaseLayerDefinition(UUID resourceUUID, TextViewPrototype bldPrototype) {
+  public void setTextView(UUID resourceUUID, TextViewPrototype textViewPrototype) {
     storage.runInTransaction(() -> {
       ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
       String json;
       try {
-        json = new ObjectMapper().writeValueAsString(bldPrototype);
-        resourceVF.setBaseLayerDefinition(json);
+        json = new ObjectMapper().writeValueAsString(textViewPrototype);
+        resourceVF.setSerializedTextViews(json);
       } catch (JsonProcessingException e) {
         e.printStackTrace();
         throw new RuntimeException(e);
@@ -403,38 +403,37 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public Optional<TextView> getBaseLayerDefinitionForResource(UUID resourceUUID) {
+  public List<TextView> getTextViewsForResource(UUID resourceUUID) {
+    List<TextView> textViews = new ArrayList<>();
+
     return storage.runInTransaction(() -> {
-      Optional<TextView> optDef = Optional.empty();
-
       ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
-      while (resourceVF != null //
-          && StringUtils.isEmpty(resourceVF.getBaseLayerDefinition())) {
-        resourceVF = resourceVF.getParentResource();
-      }
-
-      if (resourceVF != null) {
-        String json = resourceVF.getBaseLayerDefinition();
-        if (StringUtils.isNotEmpty(json)) {
-          TextView bld;
+      while (resourceVF != null) {
+        String serializedTextViews = resourceVF.getSerializedTextViews();
+        if (StringUtils.isNotEmpty(serializedTextViews)) {
           try {
-            bld = deserializeBaseLayerDefinition(json);
-          } catch (IOException e) {
+            textViews.addAll(deserializeTextViews(serializedTextViews));
+          } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
           }
-          bld.setTextViewDefiningResourceId(UUID.fromString(resourceVF.getUuid()));
-          optDef = Optional.of(bld);
         }
+        resourceVF = resourceVF.getParentResource();
       }
-      return optDef;
+      return textViews;
     });
   }
 
-  private TextView deserializeBaseLayerDefinition(String json) throws IOException {
+  @Override
+  public Optional<TextView> getTextView(UUID resourceId, String view) {
+    TextView textView = null;
+    return Optional.ofNullable(textView);
+  }
+
+  private List<TextView> deserializeTextViews(String json) throws IOException {
     TextViewPrototype prototype = new ObjectMapper().readValue(json, new TypeReference<TextViewPrototype>() {
     });
-    return TextView.withIncludedElements(prototype.getIncludedElements()).setIgnoredElements(prototype.getIgnoredElements());
+    return Lists.newArrayList(TextView.withIncludedElements(prototype.getIncludedElements()).setIgnoredElements(prototype.getIgnoredElements()));
   }
 
   @Override
@@ -469,7 +468,6 @@ public class TinkerPopService implements AlexandriaService {
     storage.destroy();
     // Log.info("destroy done");
   }
-
 
   @Override
   public void exportDb(String format, String filename) {
@@ -611,7 +609,7 @@ public class TinkerPopService implements AlexandriaService {
     resource.setCargo(rvf.getCargo());
     resource.setState(AlexandriaState.valueOf(rvf.getState()));
     resource.setStateSince(Instant.ofEpochSecond(rvf.getStateSince()));
-    setOptionalBaseLayerDefinition(rvf, resource);
+    setTextViews(rvf, resource);
 
     for (AnnotationVF annotationVF : rvf.getAnnotatedBy()) {
       AlexandriaAnnotation annotation = deframeAnnotation(annotationVF);
@@ -621,7 +619,7 @@ public class TinkerPopService implements AlexandriaService {
     if (parentResource != null) {
       resource.setParentResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, parentResource.getUuid()));
       ResourceVF ancestorResource = parentResource;
-      while (ancestorResource != null && StringUtils.isEmpty(ancestorResource.getBaseLayerDefinition())) {
+      while (ancestorResource != null && StringUtils.isEmpty(ancestorResource.getSerializedTextViews())) {
         ancestorResource = ancestorResource.getParentResource();
       }
       if (ancestorResource != null) {
@@ -633,12 +631,12 @@ public class TinkerPopService implements AlexandriaService {
     return resource;
   }
 
-  private void setOptionalBaseLayerDefinition(ResourceVF rvf, AlexandriaResource resource) {
-    String baseLayerDefinitionJson = rvf.getBaseLayerDefinition();
-    if (StringUtils.isNotEmpty(baseLayerDefinitionJson)) {
+  private void setTextViews(ResourceVF rvf, AlexandriaResource resource) {
+    String textViewsJson = rvf.getSerializedTextViews();
+    if (StringUtils.isNotEmpty(textViewsJson)) {
       try {
-        TextView bld = deserializeBaseLayerDefinition(baseLayerDefinitionJson);
-        resource.setDirectBaseLayerDefinition(bld);
+        List<TextView> bld = deserializeTextViews(textViewsJson);
+        resource.setDirectTextViews(bld);
       } catch (IOException e) {
         e.printStackTrace();
         throw new RuntimeException(e);

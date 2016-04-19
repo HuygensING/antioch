@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
-import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -105,6 +103,11 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
     return Response.ok().entity(text).build();
   }
 
+  @Path(EndpointPaths.TEXTVIEWS)
+  public Class<ResourceTextViewEndpoint> getTextViewEndpoint() {
+    return ResourceTextViewEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
+  }
+
   @GET
   @Path("status")
   public Response getTextGraphImportStatus() {
@@ -121,13 +124,9 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
     assertResourceHasText();
     StreamingOutput outputstream;
     if (StringUtils.isNotBlank(view)) {
-      if ("baselayer".equals(view)) {
-        TextView baseLayerDefinition = service.getBaseLayerDefinitionForResource(resourceId)//
-            .orElseThrow(noBaseLayerDefined());
-        outputstream = TextGraphUtil.streamBaseLayerXML(service, resourceId, baseLayerDefinition);
-      } else {
-        throw new BadRequestException("View " + view + " not defined for this resource.");
-      }
+      TextView textView = service.getTextView(resourceId, view)//
+          .orElseThrow(() -> new NotFoundException("No view '" + view + "' found for this resource."));
+      outputstream = TextGraphUtil.streamTextViewXML(service, resourceId, textView);
 
     } else {
       outputstream = TextGraphUtil.streamXML(service, resourceId);
@@ -166,12 +165,12 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
     }
   }
 
-  private void assertResourceHasBaseLayerDefinition() {
-    service.getBaseLayerDefinitionForResource(resourceId)//
-        .orElseThrow(noBaseLayerDefined());
-  }
+  // private void assertResourceHasBaseLayerDefinition() {
+  // service.getBaseLayerDefinitionForResource(resourceId)//
+  // .orElseThrow(noBaseLayerDefined());
+  // }
 
-  private Supplier<ConflictException> noBaseLayerDefined() {
-    return () -> new ConflictException(String.format("No base layer defined for resource: %s", resourceId));
-  }
+  // private Supplier<ConflictException> noBaseLayerDefined() {
+  // return () -> new ConflictException(String.format("No base layer defined for resource: %s", resourceId));
+  // }
 }

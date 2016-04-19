@@ -37,13 +37,13 @@ import nl.knaw.huygens.tei.handlers.DefaultProcessingInstructionHandler;
 import nl.knaw.huygens.tei.handlers.RenderElementHandler;
 import nl.knaw.huygens.tei.handlers.XmlTextHandler;
 
-public class AddMissingBaseLayerIdVisitor extends ExportVisitor {
+public class AddMissingIdVisitor extends ExportVisitor {
   private static final String XMLID_MARKER = "-";
   private static List<String> exisitingBaseElementIds;
   private static final Map<String, AtomicLong> counters = new HashMap<>();
 
-  public AddMissingBaseLayerIdVisitor(List<String> exisitingBaseElementIds, List<String> baseElementNames) {
-    AddMissingBaseLayerIdVisitor.exisitingBaseElementIds = exisitingBaseElementIds;
+  public AddMissingIdVisitor(List<String> exisitingBaseElementIds, List<String> baseElementNames) {
+    AddMissingIdVisitor.exisitingBaseElementIds = exisitingBaseElementIds;
     setCommentHandler(new DefaultCommentHandler<>());
     setTextHandler(new XmlTextHandler<>());
     setDefaultElementHandler(new RenderElementHandler());

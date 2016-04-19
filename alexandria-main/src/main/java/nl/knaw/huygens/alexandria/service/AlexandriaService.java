@@ -23,6 +23,7 @@ package nl.knaw.huygens.alexandria.service;
  */
 
 import java.time.temporal.TemporalAmount;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -118,13 +119,16 @@ public interface AlexandriaService {
 
   void importDb(String format, String filename);
 
-  void setBaseLayerDefinition(UUID resourceUUID, TextViewPrototype baseLayerDefinition);
+  void setTextView(UUID resourceUUID, TextViewPrototype textViewPrototype);
 
-  Optional<TextView> getBaseLayerDefinitionForResource(UUID resourceUUID);
+  Optional<TextView> getTextView(UUID resourceId, String view);
+
+  List<TextView> getTextViewsForResource(UUID resourceUUID);
 
   boolean storeTextGraph(UUID resourceId, ParseResult result, String who);
 
   Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceId);
 
   void runInTransaction(Runnable runner);
+
 }

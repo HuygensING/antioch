@@ -78,7 +78,7 @@ public class TextGraphUtil {
     }
   }
 
-  public static StreamingOutput streamBaseLayerXML(AlexandriaService service, UUID resourceId, TextView baseLayerDefinition) {
+  public static StreamingOutput streamTextViewXML(AlexandriaService service, UUID resourceId, TextView baseLayerDefinition) {
     List<ElementDefinition> baseElementDefinitions = baseLayerDefinition.getIncludedElementDefinitions();
     List<String> noteElements = baseLayerDefinition.getIgnoredElements();
     StreamingOutput outputstream = output -> {

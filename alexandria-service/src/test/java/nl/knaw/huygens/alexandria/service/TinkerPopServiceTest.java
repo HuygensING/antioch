@@ -257,7 +257,7 @@ public class TinkerPopServiceTest {
   }
 
   @Test
-  public void testGetBaseLayerDefinitionForResourceReturnsTheFirstDefinitionUpTheResourceChain() {
+  public void testGetTextViewsForResourceReturnsTheFirstDefinitionUpTheResourceChain() {
     // given
     UUID resourceId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
@@ -266,7 +266,7 @@ public class TinkerPopServiceTest {
     ElementDefinition bedText = ElementDefinition.withName("text");
     ElementDefinition bedDiv = ElementDefinition.withName("div");
     TextViewPrototype prototype = new TextViewPrototype().setIncludedElements(bedText, bedDiv);
-    service.setBaseLayerDefinition(resourceId, prototype);
+    service.setTextView(resourceId, prototype);
 
     UUID subUuid1 = UUID.randomUUID();
     String sub = "sub1";
@@ -275,14 +275,14 @@ public class TinkerPopServiceTest {
     UUID subUuid2 = UUID.randomUUID();
     service.createSubResource(subUuid2, subUuid1, "sub2", provenance);
 
-    Optional<TextView> optDef = service.getBaseLayerDefinitionForResource(subUuid2);
-    assertThat(optDef).isPresent();
-    List<ElementDefinition> returnedBaseElementDefinitions = optDef.get().getIncludedElementDefinitions();
-    assertThat(returnedBaseElementDefinitions).containsExactly(bedText, bedDiv);
+    List<TextView> views = service.getTextViewsForResource(subUuid2);
+    assertThat(views).isNotEmpty();
+    List<ElementDefinition> returnedElementDefinitions = views.get(0).getIncludedElementDefinitions();
+    assertThat(returnedElementDefinitions).containsExactly(bedText, bedDiv);
   }
 
   @Test
-  public void testGetBaseLayerDefinitionForResourceReturnsNullOptionalsWhenNoDefinitionPresentUpTheResourceChain() {
+  public void testGetTextViewsForResourceReturnsNullOptionalsWhenNoDefinitionPresentUpTheResourceChain() {
     // given
     UUID resourceId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
@@ -296,8 +296,8 @@ public class TinkerPopServiceTest {
     UUID subUuid2 = UUID.randomUUID();
     service.createSubResource(subUuid2, subUuid1, "sub2", provenance);
 
-    Optional<TextView> optDef = service.getBaseLayerDefinitionForResource(subUuid2);
-    assertThat(optDef.isPresent()).isFalse();
+    List<TextView> textViews = service.getTextViewsForResource(subUuid2);
+    assertThat(textViews).isEmpty();
   }
 
 }

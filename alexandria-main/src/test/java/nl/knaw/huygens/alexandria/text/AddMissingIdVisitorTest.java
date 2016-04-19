@@ -30,7 +30,7 @@ import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 
-public class AddMissingBaseLayerIdVisitorTest extends AlexandriaVisitorTest {
+public class AddMissingIdVisitorTest extends AlexandriaVisitorTest {
   @Test
   public void testVisitor() {
     String xml = singleQuotesToDouble("<text>"//
@@ -43,7 +43,7 @@ public class AddMissingBaseLayerIdVisitorTest extends AlexandriaVisitorTest {
         + "</text>");
     List<String> existingBaseElementIds = ImmutableList.of("p-1");
     List<String> baseElementNames = ImmutableList.of("text", "p");
-    AddMissingBaseLayerIdVisitor addIdVisitor = new AddMissingBaseLayerIdVisitor(existingBaseElementIds, baseElementNames);
+    AddMissingIdVisitor addIdVisitor = new AddMissingIdVisitor(existingBaseElementIds, baseElementNames);
 
     visitXml(xml, addIdVisitor);
 
