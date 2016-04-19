@@ -55,16 +55,16 @@
     <jersey.version>2.17</jersey.version>
     <jersey2-guice.version>0.10</jersey2-guice.version>
 
-    <jool.version>0.9.10</jool.version>
+    <jool.version>0.9.11</jool.version>
     <junit.version>4.12</junit.version>
-    <junitparams.version>1.0.4</junitparams.version>
+    <junitparams.version>1.0.5</junitparams.version>
     <log.version>1.1.1</log.version>
     <visitei.version>0.6.2</visitei.version>
     
     <!-- 3.2,3.3 leads to compiler error in Jenkins: java.lang.IllegalStateException: endPosTable already set -->
     <maven-compiler.version>3.5.1</maven-compiler.version>
 
-    <mockito.version>2.0.44-beta</mockito.version>
+    <mockito.version>2.0.48-beta</mockito.version>
     <peapod.version>0.3.0</peapod.version>
     <reflections.version>0.9.10</reflections.version>
     <servlet-api.version>4.0.0-b01</servlet-api.version>
@@ -79,7 +79,7 @@
 
     <!-- neo4j -->
     <neo4j-gremlin.version>3.0.0.M7</neo4j-gremlin.version>
-    <neo4j-tinkerpop-api-impl.version>0.3-2.3.2</neo4j-tinkerpop-api-impl.version>
+    <neo4j-tinkerpop-api-impl.version>0.3-2.3.3</neo4j-tinkerpop-api-impl.version>
 
     <xml-apis.version>1.4.01</xml-apis.version><!-- > 1.4.01 fails some acceptance tests due to missing class -->
 
