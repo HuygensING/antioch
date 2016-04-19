@@ -22,6 +22,7 @@
     <module>alexandria-aql</module>
     <module>alexandria-java-client</module>
     <module>alexandria-api</module>
+    <module>alexandria-dropwizard</module>
   </modules>
 
   <properties>
@@ -45,6 +46,7 @@
     <antlr4.visitor>true</antlr4.visitor>
 
     <commons-lang3.version>3.4</commons-lang3.version>
+    <dropwizard.version>0.9.2</dropwizard.version>
     <guava.version>19.0</guava.version>
     <guice.version>4.0</guice.version>
     <jackson.version>2.7.3</jackson.version>
