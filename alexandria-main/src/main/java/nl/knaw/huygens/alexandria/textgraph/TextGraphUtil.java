@@ -90,23 +90,23 @@ public class TextGraphUtil {
     return outputstream;
   }
 
-  public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment, List<ElementDefinition> baseElementDefinitions, List<String> noteElements, Stack<TextAnnotation> noteStack) {
-    Set<String> baseElementNames = baseElementDefinitions.stream().map(ElementDefinition::getName).collect(toSet());
-    Map<String, List<String>> baseElementAttributes = Maps.newHashMap();
-    for (ElementDefinition bed : baseElementDefinitions) {
-      List<String> baseAttributes = bed.getBaseAttributes();
-      if (!baseAttributes.contains(TextUtil.XML_ID)) {
-        baseAttributes.add(0, TextUtil.XML_ID);
+  public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment, List<ElementDefinition> includedElementDefinitions, List<String> noteElements, Stack<TextAnnotation> noteStack) {
+    Set<String> baseElementNames = includedElementDefinitions.stream().map(ElementDefinition::getName).collect(toSet());
+    Map<String, List<String>> includedElementAttributes = Maps.newHashMap();
+    for (ElementDefinition bed : includedElementDefinitions) {
+      List<String> includedAttributes = bed.getIncludedAttributes();
+      if (!includedAttributes.contains(TextUtil.XML_ID)) {
+        includedAttributes.add(0, TextUtil.XML_ID);
       }
-      baseElementAttributes.put(bed.getName(), baseAttributes);
+      includedElementAttributes.put(bed.getName(), includedAttributes);
     }
     try {
       if (segment.isMilestone()) {
         TextAnnotation milestone = segment.getMilestone();
         String name = milestone.getName();
         if (baseElementNames.contains(name)) {
-          Map<String, String> baseAttributes = baseAttributes(baseElementAttributes.get(name), milestone);
-          String openTag = getMilestoneTag(name, baseAttributes);
+          Map<String, String> includedAttributes = includedAttributes(includedElementAttributes.get(name), milestone);
+          String openTag = getMilestoneTag(name, includedAttributes);
           writer.write(openTag);
         }
 
@@ -114,8 +114,8 @@ public class TextGraphUtil {
         for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
           String name = textAnnotation.getName();
           if (baseElementNames.contains(name)) {
-            Map<String, String> baseAttributes = baseAttributes(baseElementAttributes.get(name), textAnnotation);
-            String openTag = getOpenTag(name, baseAttributes);
+            Map<String, String> includedAttributes = includedAttributes(includedElementAttributes.get(name), textAnnotation);
+            String openTag = getOpenTag(name, includedAttributes);
             writer.write(openTag);
           }
           if (noteElements.contains(name)) {
@@ -198,7 +198,7 @@ public class TextGraphUtil {
     writer.flush();
   }
 
-  private static Map<String, String> baseAttributes(List<String> baseElementAttributeNames, TextAnnotation milestone) {
+  private static Map<String, String> includedAttributes(List<String> baseElementAttributeNames, TextAnnotation milestone) {
     Map<String, String> allAttributes = milestone.getAttributes();
     Map<String, String> baseAttributes = Maps.newHashMap();
     for (String name : baseElementAttributeNames) {

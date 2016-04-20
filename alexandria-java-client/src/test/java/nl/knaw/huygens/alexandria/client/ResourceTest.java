@@ -25,10 +25,13 @@ package nl.knaw.huygens.alexandria.client;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.Ignore;
 import org.junit.Test;
+
+import com.google.common.collect.Lists;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
@@ -114,7 +117,8 @@ public class ResourceTest extends AlexandriaClientTest {
     // then, set the base layer definition
     ElementDefinition baseElement1 = ElementDefinition.withName("body").withAttributes("lang");
     ElementDefinition baseElement2 = ElementDefinition.withName("p").withAttributes("n");
-    TextViewPrototype textView = new TextViewPrototype().setIncludedElements(baseElement1, baseElement2).setIgnoredElements("note");
+    List<ElementDefinition> list = Lists.newArrayList(baseElement1, baseElement2);
+    TextViewPrototype textView = new TextViewPrototype().setIncludedElements(list).setIgnoredElements(Lists.newArrayList("note"));
     RestResult<URI> result2 = client.addTextView(resourceId, textView);
     assertRequestSucceeded(result2);
     softly.assertThat(result2.get().toString()).as("Location").endsWith("/" + resourceId + "/" + EndpointPaths.TEXT + "/" + EndpointPaths.TEXTVIEWS);

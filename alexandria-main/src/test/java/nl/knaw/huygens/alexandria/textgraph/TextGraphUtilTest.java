@@ -6,6 +6,7 @@ import java.util.Set;
 import org.junit.Test;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.ElementDefinition;
@@ -46,14 +47,14 @@ public class TextGraphUtilTest extends AlexandriaTest {
     softly.assertThat(xmlAnnotations).hasSize(9);
     Log.info("annotations = \n\t{}", Joiner.on("\n\t").join(xmlAnnotations));
 
-    TextView baselayerDefinition = TextView.withIncludedElements(//
-        ElementDefinition.withName("text"), //
-        ElementDefinition.withName("div"), //
-        ElementDefinition.withName("lb"), //
-        ElementDefinition.withName("p")//
-    );
+    TextView baselayerDefinition = new TextView("baselayer").setIncludedElementDefinitions(//
+        Lists.newArrayList(//
+            ElementDefinition.withName("text"), //
+            ElementDefinition.withName("div"), //
+            ElementDefinition.withName("lb"), //
+            ElementDefinition.withName("p")//
+    ));
     String baseLayer = TextGraphUtil.renderBaseLayer(textSegments, xmlAnnotations, baselayerDefinition);
     softly.assertThat(baseLayer).isEqualTo(expectedBaseLayer);
-
   }
 }

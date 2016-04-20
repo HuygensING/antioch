@@ -23,18 +23,28 @@ package nl.knaw.huygens.alexandria.api.model;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @JsonTypeName("textView")
 public class TextViewPrototype extends JsonWrapperObject implements Prototype {
+  private String description = "";
   private List<ElementDefinition> includedElements = new ArrayList<>();
+  private List<String> excludedElementTags = new ArrayList<>();
   private List<String> ignoredElements = new ArrayList<>();
 
-  public TextViewPrototype setIncludedElements(ElementDefinition... baseElements) {
-    this.includedElements.addAll(Arrays.asList(baseElements));
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public TextViewPrototype setIncludedElements(List<ElementDefinition> includedElements) {
+    this.includedElements = includedElements;
     return this;
   }
 
@@ -42,8 +52,16 @@ public class TextViewPrototype extends JsonWrapperObject implements Prototype {
     return includedElements;
   }
 
-  public TextViewPrototype setIgnoredElements(String... ignoredElementTags) {
-    this.ignoredElements.addAll(Arrays.asList(ignoredElementTags));
+  public void setExcludedElements(List<String> excludedElementTags) {
+    this.excludedElementTags = excludedElementTags;
+  }
+
+  public List<String> getExcludedElementTags() {
+    return excludedElementTags;
+  }
+
+  public TextViewPrototype setIgnoredElements(List<String> ignoredElements) {
+    this.ignoredElements = ignoredElements;
     return this;
   }
 
@@ -51,4 +69,9 @@ public class TextViewPrototype extends JsonWrapperObject implements Prototype {
     return ignoredElements;
   }
 
+  @JsonIgnore
+  public boolean isValid() {
+    // defining both includedElements and excludedElements makes no sense
+    return includedElements.isEmpty() || excludedElementTags.isEmpty();
+  }
 }

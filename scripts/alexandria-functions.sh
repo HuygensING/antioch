@@ -82,12 +82,13 @@ function a-generate-confirmed-subresource-with-title {
   echo ${suburi}
 }
 
-function a-set-default-baselayer-definition {
-  a-log "Setting default baselayer definition for ${be}/resources/$ri"
-  curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
-     --data-binary '{"baseLayerDefinition":{
-     	 "subresourceElements": ["note"],
-       "baseElements" : [
+function a-set-baselayer-textview {
+  a-log "Setting default baselayer textview for ${be}/resources/$ri"
+  curl -i -H "${authheader}" -X PUT $be/resources/$ri/text/views/baselayer -H 'Content-type: application/json' \
+     --data-binary '{"textView":{
+       "description" : "The base layer"
+     	 "ignoredElements": ["note"],
+       "includedElements" : [
           { "name": "text", "baseAttributes": [ "id" ] },
           { "name": "p", "baseAttributes": [ "id" ] },
           { "name": "div", "baseAttributes" : [ "id", "by" ] }
@@ -161,24 +162,33 @@ function a-about-service {
 function a-dry-run {
   ri=$(uuidgen)
   a-generate-resource-with-uuid $ri
-  curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
-	--data-binary '{
-	  "baseLayerDefinition": {
-	  	"subresourceElements": ["note"],
-	    "baseElements": [ {
-	      "name": "body"
-	    }, {
-	      "name": "div",
-	      "baseAttributes": [ "type" ]
-	    }, {
-	      "name": "p"
-	    }, {
-	      "name": "sub"
-	    }, {
-	      "name": "sup"
-	    } ]
-	  }
-	}'
+  curl -i -H "${authheader}" -X PUT $be/resources/$ri/text/views/baselayer -H 'Content-type: application/json' \
+  --data-binary '{
+    "description" : "The Base Layer",
+    "textView": {
+      "ignoredElements": ["note"],
+      "includedElements": [ {
+        "name": "body"
+      }, {
+        "name": "div",
+        "baseAttributes": [ "type" ]
+      }, {
+        "name": "text"
+      }, {
+        "name": "p"
+      }, {
+        "name": "table"
+      }, {
+        "name": "row"
+      }, {
+        "name": "cell"
+      }, {
+        "name": "sub"
+      }, {
+        "name": "sup"
+      } ]
+    }
+  }'
   a-log "result uploading text:"
   curl --silent --header "${authheader}" -X PUT ${be}/resources/${ri}/text/baselayer --header 'Content-Type:text/xml' --data "$*" | jq "."
   a-log "extracted baselayer:"
@@ -188,17 +198,22 @@ function a-dry-run {
 function a-dry-run-from-file {
   ri=$(uuidgen)
   a-generate-resource-with-uuid $ri
-  curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
-	--data-binary '{
-	  "baseLayerDefinition": {
-	  	"subresourceElements": ["note"],
-	    "baseElements": [ {
-	      "name": "body"
-	    }, {
-	      "name": "div",
-	      "baseAttributes": [ "type" ]
-	    }, {
-	      "name": "text"
+  a-log "result uploading text:"
+  location=$(curl -i --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:application/octet-stream' --data @"$*" |a-location)
+  a-log "Location: ${location}"
+  curl --silent ${location} | jq "."
+  curl -i -H "${authheader}" -X PUT $be/resources/$ri/text/views/baselayer -H 'Content-type: application/json' \
+  --data-binary '{
+    "description" : "The Base Layer",
+    "textView": {
+      "ignoredElements": ["note"],
+      "includedElements": [ {
+        "name": "body"
+      }, {
+        "name": "div",
+        "baseAttributes": [ "type" ]
+      }, {
+        "name": "text"
       }, {
         "name": "p"
       }, {
@@ -207,19 +222,15 @@ function a-dry-run-from-file {
         "name": "row"
       }, {
         "name": "cell"
-	    }, {
-	      "name": "sub"
-	    }, {
-	      "name": "sup"
-	    } ]
-	  }
-	}'
-  a-log "result uploading text:"
-  location=$(curl -i --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:application/octet-stream' --data @"$*" |a-location)
-  a-log "Location: ${location}"
-  curl --silent ${location} | jq "."
+      }, {
+        "name": "sub"
+      }, {
+        "name": "sup"
+      } ]
+    }
+  }'
   a-log "extracted baselayer:"
-  curl ${be}/resources/${ri}/text/baselayer
+  curl ${be}/resources/${ri}/text/views/baselayer
   curl --silent ${location} | jq "."
   a-log "see status at ${location}"
 }

@@ -119,10 +119,13 @@ public interface AlexandriaService {
 
   void importDb(String format, String filename);
 
-  void setTextView(UUID resourceUUID, TextViewPrototype textViewPrototype);
+  void setTextView(UUID resourceUUID, String viewId, TextViewPrototype textViewPrototype);
 
-  Optional<TextView> getTextView(UUID resourceId, String view);
+  Optional<TextView> getTextView(UUID resourceId, String viewId);
 
+  /**
+   * Gets the textviews for the resource and all its ancestors
+   */
   List<TextView> getTextViewsForResource(UUID resourceUUID);
 
   boolean storeTextGraph(UUID resourceId, ParseResult result, String who);

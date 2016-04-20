@@ -59,8 +59,9 @@ import org.jooq.lambda.Unchecked;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.base.Stopwatch;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import nl.knaw.huygens.Log;
@@ -98,7 +99,12 @@ import nl.knaw.huygens.alexandria.textlocator.TextLocatorFactory;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorParseException;
 
 public class TinkerPopService implements AlexandriaService {
+  private static final TypeReference<Map<String, TextViewPrototype>> TEXTVIEWPROTOTYPE_TYPEREF = new TypeReference<Map<String, TextViewPrototype>>() {
+  };
+  private static final ObjectReader TEXTVIEWPROTOTYPE_READER = new ObjectMapper().reader(TEXTVIEWPROTOTYPE_TYPEREF);
+  private static final ObjectWriter TEXTVIEWPROTOTYPE_WRITER = new ObjectMapper().writerFor(TEXTVIEWPROTOTYPE_TYPEREF);
   private static final TemporalAmount TENTATIVES_TTL = Duration.ofDays(1);
+
   private Storage storage;
   private LocationBuilder locationBuilder;
   private AlexandriaQueryParser alexandriaQueryParser;
@@ -388,18 +394,25 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public void setTextView(UUID resourceUUID, TextViewPrototype textViewPrototype) {
+  public void setTextView(UUID resourceUUID, String viewId, TextViewPrototype textViewPrototype) {
     storage.runInTransaction(() -> {
       ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
       String json;
       try {
-        json = new ObjectMapper().writeValueAsString(textViewPrototype);
-        resourceVF.setSerializedTextViews(json);
-      } catch (JsonProcessingException e) {
+        String serializedTextViewMap = resourceVF.getSerializedTextViewMap();
+        Map<String, TextViewPrototype> textViewMap = deserializeToTextViewMap(serializedTextViewMap);
+        textViewMap.put(viewId, textViewPrototype);
+        json = serializeToJson(textViewMap);
+        resourceVF.setSerializedTextViewMap(json);
+      } catch (Exception e) {
         e.printStackTrace();
         throw new RuntimeException(e);
       }
     });
+  }
+
+  private String serializeToJson(Map<String, TextViewPrototype> textViewMap) throws JsonProcessingException {
+    return TEXTVIEWPROTOTYPE_WRITER.writeValueAsString(textViewMap);
   }
 
   @Override
@@ -409,10 +422,11 @@ public class TinkerPopService implements AlexandriaService {
     return storage.runInTransaction(() -> {
       ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
       while (resourceVF != null) {
-        String serializedTextViews = resourceVF.getSerializedTextViews();
+        String serializedTextViews = resourceVF.getSerializedTextViewMap();
         if (StringUtils.isNotEmpty(serializedTextViews)) {
           try {
-            textViews.addAll(deserializeTextViews(serializedTextViews));
+            List<TextView> deserializedTextViews = deserializeToTextViews(serializedTextViews);
+            textViews.addAll(deserializedTextViews);
           } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -430,10 +444,12 @@ public class TinkerPopService implements AlexandriaService {
     return Optional.ofNullable(textView);
   }
 
-  private List<TextView> deserializeTextViews(String json) throws IOException {
-    TextViewPrototype prototype = new ObjectMapper().readValue(json, new TypeReference<TextViewPrototype>() {
-    });
-    return Lists.newArrayList(TextView.withIncludedElements(prototype.getIncludedElements()).setIgnoredElements(prototype.getIgnoredElements()));
+  private Map<String, TextViewPrototype> deserializeToTextViewMap(String json) throws IOException {
+    if (StringUtils.isEmpty(json)) {
+      return Maps.newHashMap();
+    }
+    Map<String, TextViewPrototype> textViewMap = TEXTVIEWPROTOTYPE_READER.readValue(json);
+    return textViewMap;
   }
 
   @Override
@@ -619,7 +635,7 @@ public class TinkerPopService implements AlexandriaService {
     if (parentResource != null) {
       resource.setParentResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, parentResource.getUuid()));
       ResourceVF ancestorResource = parentResource;
-      while (ancestorResource != null && StringUtils.isEmpty(ancestorResource.getSerializedTextViews())) {
+      while (ancestorResource != null && StringUtils.isEmpty(ancestorResource.getSerializedTextViewMap())) {
         ancestorResource = ancestorResource.getParentResource();
       }
       if (ancestorResource != null) {
@@ -632,17 +648,35 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   private void setTextViews(ResourceVF rvf, AlexandriaResource resource) {
-    String textViewsJson = rvf.getSerializedTextViews();
+    String textViewsJson = rvf.getSerializedTextViewMap();
     if (StringUtils.isNotEmpty(textViewsJson)) {
       try {
-        List<TextView> bld = deserializeTextViews(textViewsJson);
-        resource.setDirectTextViews(bld);
+        List<TextView> textViews = deserializeToTextViews(textViewsJson);
+        resource.setDirectTextViews(textViews);
       } catch (IOException e) {
         e.printStackTrace();
         throw new RuntimeException(e);
       }
     }
+  }
 
+  private List<TextView> deserializeToTextViews(String textViewsJson) throws IOException {
+    Map<String, TextViewPrototype> textViewMap = deserializeToTextViewMap(textViewsJson);
+    List<TextView> textViews = textViewMap.entrySet()//
+        .stream()//
+        .map(this::toTextView)//
+        .collect(toList());
+    return textViews;
+  }
+
+  private TextView toTextView(Entry<String, TextViewPrototype> entry) {
+    TextViewPrototype prototype = entry.getValue();
+    TextView textView = new TextView(entry.getKey())//
+        .setDescription(prototype.getDescription())//
+        .setIncludedElementDefinitions(prototype.getIncludedElements())//
+        .setExcludedElementTags(prototype.getExcludedElementTags())//
+        .setIgnoredElements(prototype.getIgnoredElements());
+    return textView;
   }
 
   private AlexandriaAnnotation deframeAnnotation(AnnotationVF annotationVF) {

@@ -23,7 +23,6 @@ package nl.knaw.huygens.alexandria.api.model;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,22 +34,29 @@ public class TextView {
   List<String> excludedElementTags = new ArrayList<>();
   List<String> ignoredElements = new ArrayList<>();
   UUID textViewDefiningResourceId;
+  String description = "";
+  private String name;
 
-  private TextView() {
+  public TextView(String name) {
+    this.name = name;
   }
 
-  public static TextView withIncludedElements(final ElementDefinition... includedElements) {
-    return TextView.withIncludedElements(Arrays.asList(includedElements));
+  public String getName() {
+    return name;
   }
 
-  public static TextView withIncludedElements(final List<ElementDefinition> baseElements) {
-    final TextView textView = new TextView();
-    textView.setIncludedElementDefinitions(baseElements);
-    return textView;
+  public TextView setDescription(String description) {
+    this.description = description;
+    return this;
   }
 
-  public void setIncludedElementDefinitions(final List<ElementDefinition> baseElements) {
+  public String getDescription() {
+    return description;
+  }
+
+  public TextView setIncludedElementDefinitions(final List<ElementDefinition> baseElements) {
     this.includedElements = baseElements;
+    return this;
   }
 
   public void addIncludedElementDefinition(final ElementDefinition definition) {
@@ -88,12 +94,14 @@ public class TextView {
     return excludedElementTags;
   }
 
-  public void setTextViewDefiningResourceId(UUID textViewDefiningResourceId) {
+  public TextView setTextViewDefiningResourceId(UUID textViewDefiningResourceId) {
     this.textViewDefiningResourceId = textViewDefiningResourceId;
+    return this;
   }
 
   @JsonIgnore
   public UUID getTextViewDefiningResourceId() {
     return textViewDefiningResourceId;
   }
+
 }

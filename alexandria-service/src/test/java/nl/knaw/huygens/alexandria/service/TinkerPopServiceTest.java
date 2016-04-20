@@ -40,6 +40,7 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import jersey.repackaged.com.google.common.collect.Lists;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.ElementDefinition;
@@ -265,8 +266,9 @@ public class TinkerPopServiceTest {
     service.createOrUpdateResource(resource);
     ElementDefinition bedText = ElementDefinition.withName("text");
     ElementDefinition bedDiv = ElementDefinition.withName("div");
-    TextViewPrototype prototype = new TextViewPrototype().setIncludedElements(bedText, bedDiv);
-    service.setTextView(resourceId, prototype);
+    List<ElementDefinition> list = Lists.newArrayList(bedText, bedDiv);
+    TextViewPrototype prototype = new TextViewPrototype().setIncludedElements(list);
+    service.setTextView(resourceId, "baselayer", prototype);
 
     UUID subUuid1 = UUID.randomUUID();
     String sub = "sub1";
