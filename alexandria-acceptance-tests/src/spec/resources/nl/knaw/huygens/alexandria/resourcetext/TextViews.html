@@ -29,24 +29,69 @@
 
 <body data-desc="Views on text">
 
+<div id="textview-anatomy" c:execute="clearStorage()"
+     data-desc="Anatomy of a view description">
+    <h:request>
+        Given that I have
+        <h:success>successfully</h:success>
+        <h:put>/resources/00000000-0000-0000-0000-000000000001</h:put>
+        the body:
+        <h:jsonBody>{
+            "resource": {
+            "id": "00000000-0000-0000-0000-000000000001",
+            "ref": "grotius-3160-v1"
+            } }
+        </h:jsonBody>
+    </h:request>
+    <br/>
+    <h:request>
+        Then I can set a view called inclusive by
+        <h:put>/resources/00000000-0000-0000-0000-000000000002/text/views/inclusive</h:put>
+        the body:
+        <h:jsonBody>
+          {
+            "textView": {
+              "description": "Description of the view",
+              "ignoredElements": ["note"],
+              "includedElements": [
+                {"name" : "div", "includedAttributes" : ["id"] },
+                {"name" : "p" }
+          ] } }
+        </h:jsonBody>
+    </h:request>
+    <h:request>
+        And I can set a view called exclusive by
+        <h:put>/resources/00000000-0000-0000-0000-000000000002/text/views/exclusive</h:put>
+        the body:
+        <h:jsonBody>
+          {
+            "textView": {
+              "description": "Description of the view",
+              "ignoredElements": ["note"],
+              "excludedElements": ["p","hi"]
+          } }
+        </h:jsonBody>
+    </h:request>
+</div>
+
 <div id="set-baselayer-1" c:execute="clearStorage()"
      data-desc="How do I define the base layer for a resource?">
     <h:request>
         Given that I have
         <h:success>successfully</h:success>
-        <h:put>/resources/11111111-1111-1111-1111-111111111111</h:put>
+        <h:put>/resources/00000000-0000-0000-0000-000000000002</h:put>
         the body:
         <h:jsonBody>{
             "resource": {
-            "id": "11111111-1111-1111-1111-111111111111",
-            "ref": "grotius-3160-v1"
+            "id": "00000000-0000-0000-0000-000000000002",
+            "ref": "grotius-3160-v2"
             } }
         </h:jsonBody>
     </h:request>
 
     <h:request>
         When I
-        <h:put>/resources/11111111-1111-1111-1111-111111111111/text/views/baselayer</h:put>
+        <h:put>/resources/00000000-0000-0000-0000-000000000002/text/views/baselayer</h:put>
         the body:
         <h:jsonBody>
           {
@@ -64,7 +109,7 @@
         <ul>
           <li>status <h:status>201 Created</h:status></li>
           <li>location header
-              <h:location>https://{host}/resources/11111111-1111-1111-1111-111111111111/text/views/baselayer</h:location>
+              <h:location>https://{host}/resources/00000000-0000-0000-0000-000000000002/text/views/baselayer</h:location>
           </li>
 	        <li>and the response body is <h:responseBody/></li>
         </ul>
@@ -73,7 +118,7 @@
 
     <h:request>
         When I
-        <h:get>/resources/11111111-1111-1111-1111-111111111111/text/views</h:get>,<br/>
+        <h:get>/resources/00000000-0000-0000-0000-000000000002/text/views</h:get>,<br/>
         then I should receive
         <ul>
             <li>status
@@ -84,8 +129,8 @@
                 <h:jsonResponse>
                 [ {
                   "id" : "baselayer",
-                  "^definition" : "https://{host}/resources/11111111-1111-1111-1111-111111111111/text/views/baselayer",
-                  "^xml" : "https://{host}/resources/11111111-1111-1111-1111-111111111111/text/xml?view=baselayer"
+                  "^definition" : "https://{host}/resources/00000000-0000-0000-0000-000000000002/text/views/baselayer",
+                  "^xml" : "https://{host}/resources/00000000-0000-0000-0000-000000000002/text/xml?view=baselayer"
                 } ]
                 </h:jsonResponse>
             </li>
@@ -95,7 +140,7 @@
 
     <h:request>
         If I then
-        <h:get>/resources/11111111-1111-1111-1111-111111111111/text/views/baselayer</h:get>
+        <h:get>/resources/00000000-0000-0000-0000-000000000002/text/views/baselayer</h:get>
         Then I should receive
         <ul>
             <li>status
@@ -123,7 +168,7 @@
     <h:request>
         Given the previously made resource with its baselayer view, 
         if I add a subresource by  
-        <h:post>/resources/11111111-1111-1111-1111-111111111111/subresources</h:post>
+        <h:post>/resources/00000000-0000-0000-0000-000000000002/subresources</h:post>
         the body
         <h:jsonBody>{ "subresource": { "sub": "Letter clusius-0012" } }</h:jsonBody>
         and observe status
@@ -163,7 +208,7 @@
                 <h:jsonResponse>
                 [ {
 								  "id" : "baselayer",
-								  "^definition" : "https://{host}/resources/11111111-1111-1111-1111-111111111111/text/views/baselayer",
+								  "^definition" : "https://{host}/resources/00000000-0000-0000-0000-000000000002/text/views/baselayer",
 								  "^xml" : "https://{host}/resources/$uuid/text/xml?view=baselayer"
 								} ]
                 </h:jsonResponse>
