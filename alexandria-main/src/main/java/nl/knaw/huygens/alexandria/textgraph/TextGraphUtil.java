@@ -90,21 +90,24 @@ public class TextGraphUtil {
     return outputstream;
   }
 
-  public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment, List<ElementDefinition> includedElementDefinitions, List<String> noteElements, Stack<TextAnnotation> noteStack) {
-    Set<String> baseElementNames = includedElementDefinitions.stream().map(ElementDefinition::getName).collect(toSet());
+  public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment, List<ElementDefinition> includedElementDefinitions, List<String> ignoredElements,
+      Stack<TextAnnotation> ignoredElementStack) {
+    Set<String> includedElementNames = includedElementDefinitions.stream()//
+        .map(ElementDefinition::getName)//
+        .collect(toSet());
     Map<String, List<String>> includedElementAttributes = Maps.newHashMap();
-    for (ElementDefinition bed : includedElementDefinitions) {
-      List<String> includedAttributes = bed.getIncludedAttributes();
+    for (ElementDefinition definition : includedElementDefinitions) {
+      List<String> includedAttributes = definition.getIncludedAttributes();
       if (!includedAttributes.contains(TextUtil.XML_ID)) {
         includedAttributes.add(0, TextUtil.XML_ID);
       }
-      includedElementAttributes.put(bed.getName(), includedAttributes);
+      includedElementAttributes.put(definition.getName(), includedAttributes);
     }
     try {
       if (segment.isMilestone()) {
         TextAnnotation milestone = segment.getMilestone();
         String name = milestone.getName();
-        if (baseElementNames.contains(name)) {
+        if (includeTag(ignoredElementStack, includedElementNames, name)) {
           Map<String, String> includedAttributes = includedAttributes(includedElementAttributes.get(name), milestone);
           String openTag = getMilestoneTag(name, includedAttributes);
           writer.write(openTag);
@@ -113,32 +116,36 @@ public class TextGraphUtil {
       } else {
         for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
           String name = textAnnotation.getName();
-          if (baseElementNames.contains(name)) {
+          if (includeTag(ignoredElementStack, includedElementNames, name)) {
             Map<String, String> includedAttributes = includedAttributes(includedElementAttributes.get(name), textAnnotation);
             String openTag = getOpenTag(name, includedAttributes);
             writer.write(openTag);
           }
-          if (noteElements.contains(name)) {
-            noteStack.push(textAnnotation);
+          if (ignoredElements.contains(name)) {
+            ignoredElementStack.push(textAnnotation);
           }
         }
-        if (noteStack.isEmpty()) {
+        if (ignoredElementStack.isEmpty()) {
           writer.write(segment.getTextSegment());
         }
         for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
           String name = textAnnotation.getName();
-          if (baseElementNames.contains(name)) {
+          if (includeTag(ignoredElementStack, includedElementNames, name)) {
             String closeTag = getCloseTag(name);
             writer.write(closeTag);
           }
-          if (noteElements.contains(name)) {
-            noteStack.pop();
+          if (ignoredElements.contains(name)) {
+            ignoredElementStack.pop();
           }
         }
       }
     } catch (IOException ioe) {
       throw new RuntimeException(ioe);
     }
+  }
+
+  private static boolean includeTag(Stack<TextAnnotation> ignoredElementStack, Set<String> includedElementNames, String name) {
+    return ignoredElementStack.isEmpty() && includedElementNames.contains(name);
   }
 
   public static String getMilestoneTag(String name, Map<String, String> attributes) {
@@ -162,14 +169,17 @@ public class TextGraphUtil {
     }
   }
 
-  public static String renderBaseLayer(List<String> textSegments, Set<XmlAnnotation> xmlAnnotations, TextView baselayerDefinition) {
-    List<String> baseElementNames = baselayerDefinition.getIncludedElementDefinitions().stream().map(ElementDefinition::getName).collect(toList());
+  public static String renderTextView(List<String> textSegments, Set<XmlAnnotation> xmlAnnotations, TextView textView) {
+    List<String> includedElementNames = textView.getIncludedElementDefinitions()//
+        .stream()//
+        .map(ElementDefinition::getName)//
+        .collect(toList());
     StringBuilder builder = new StringBuilder();
 
     List<XmlAnnotation> xmlAnnotationList = Lists.newArrayList(xmlAnnotations);
     for (int i = 0; i < xmlAnnotationList.size(); i++) {
       XmlAnnotation xmlAnnotation = xmlAnnotationList.get(i);
-      if (baseElementNames.contains(xmlAnnotation.getName())) {
+      if (includedElementNames.contains(xmlAnnotation.getName())) {
         openBeforeText.put(xmlAnnotation.getFirstSegmentIndex(), i);
         closeAfterText.put(xmlAnnotation.getLastSegmentIndex(), i);
       }

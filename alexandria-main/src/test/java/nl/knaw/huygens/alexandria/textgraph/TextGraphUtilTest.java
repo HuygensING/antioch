@@ -54,7 +54,7 @@ public class TextGraphUtilTest extends AlexandriaTest {
             ElementDefinition.withName("lb"), //
             ElementDefinition.withName("p")//
     ));
-    String baseLayer = TextGraphUtil.renderBaseLayer(textSegments, xmlAnnotations, baselayerDefinition);
+    String baseLayer = TextGraphUtil.renderTextView(textSegments, xmlAnnotations, baselayerDefinition);
     softly.assertThat(baseLayer).isEqualTo(expectedBaseLayer);
   }
 }

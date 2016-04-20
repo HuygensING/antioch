@@ -445,13 +445,13 @@ public class TinkerPopService implements AlexandriaService {
       String serializedTextViews = resourceVF.getSerializedTextViewMap();
       try {
         Map<String, TextViewPrototype> textViewMap = deserializeToTextViewMap(serializedTextViews);
-        return textViewMap//
+        List<TextView> textViews = textViewMap//
             .entrySet()//
             .stream()//
             .filter(e -> e.getKey().equals(view))//
             .map(this::toTextView)//
-            .collect(toList())//
-            .get(0);
+            .collect(toList());
+        return textViews.isEmpty() ? null : textViews.get(0);
       } catch (Exception e) {
         e.printStackTrace();
         throw new RuntimeException(e);
