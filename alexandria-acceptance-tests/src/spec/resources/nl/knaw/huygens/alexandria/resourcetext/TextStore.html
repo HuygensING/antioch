@@ -43,23 +43,6 @@
             } }
         </h:jsonBody>
     </h:request>
-
-    <h:request>
-     And I have 
-     <h:success>successfully</h:success>
-     <h:put>/resources/22222222-2222-2222-2222-222222222222/baselayerdefinition</h:put>
-     the body:
-     <h:jsonBody>{
-         "baseLayerDefinition": {
-         "baseElements": [
-         {"name" : "text" },
-         {"name" : "p" }
-         ] } }
-     </h:jsonBody>
-     using
-     <h:setHeader name="Content-Type">application/json</h:setHeader>,
-     to set the base layer definition:
-    </h:request>
     <br/>
 
     <h:request>
@@ -68,19 +51,19 @@
         the body:
         <h:requestBody>&lt;text&gt;&lt;p xml:id=&quot;p-1&quot; lang=&quot;en&quot; auth=&quot;me&quot;&gt;paragraph 1&lt;/p&gt;&lt;p&gt;Párâgràph 2&lt;/p&gt;&lt;/text&gt;</h:requestBody>
         using
-        <h:setHeader name="Content-Type">text/xml</h:setHeader>,
+        <h:setHeader name="Content-Type">text/xml</h:setHeader>,<br/>
         then I should receive
         <ul>
-          <li><h:status>202 Accepted</h:status></li>
-          <li>and a location header
+          <li>status <h:status>202 Accepted</h:status></li>
+          <li>location header
             <h:location>https://{host}/resources/22222222-2222-2222-2222-222222222222/text/status</h:location>
           </li>
           <li>and the response body is <h:responseBody/>
           </li>
         </ul>
-        
     </h:request>
     <br/>
+
     <h:request>
         When I
         <h:get>/resources/22222222-2222-2222-2222-222222222222/text/status</h:get>
@@ -95,8 +78,7 @@
 								  "textGraphImportStatus" : {
 								    "done" : false,
 								    "state" : "processing",
-								    "validationErrors" : [ ],
-								    "^baseLayerDefinition" : "https://{host}/resources/22222222-2222-2222-2222-222222222222/baselayerdefinition"
+								    "validationErrors" : [ ]
 								  }
 								}
                 </h:jsonResponse>
@@ -105,18 +87,9 @@
         If the status indicates the text is still being processed, we should wait a while before getting the status again.
     </h:request>
     <br/>
+
     <h:request>
         Once textGraphImportStatus.done == true, and there are no validationErrors,<br/>
-        <h:get>/resources/22222222-2222-2222-2222-222222222222/text/xml?view=baselayer</h:get><br/>
-        using
-        <h:setHeader name="Accept">text/xml</h:setHeader><br/>
-        yields response body:<br/>
-        <h:responseBody>&lt;text&gt;&lt;p xml:id="p-1"&gt;paragraph 1&lt;/p&gt;&lt;p&gt;Párâgràph 2&lt;/p&gt;&lt;/text&gt;</h:responseBody><br/>
-        Notice that the attribute order on &lt;p&gt; is the one defined in the base layer definition.<br/>
-    </h:request>
-    <br/>
-    <h:request>
-        Also,<br/>
         <h:get>/resources/22222222-2222-2222-2222-222222222222/text/xml</h:get><br/>
         using
         <h:setHeader name="Accept">text/xml</h:setHeader><br/>
@@ -140,23 +113,6 @@
             } }
         </h:jsonBody>
     </h:request>
-
-    <h:request>
-     And I have 
-     <h:success>successfully</h:success>
-     <h:put>/resources/33333333-3333-3333-3333-333333333333/baselayerdefinition</h:put>
-     the body:
-     <h:jsonBody>{
-       "baseLayerDefinition": {
-	       "baseElements": [
-		       {"name" : "text" },
-		       {"name" : "p" }
-       ] } }
-     </h:jsonBody>
-     using
-     <h:setHeader name="Content-Type">application/json</h:setHeader>,
-     to set the base layer definition:
-    </h:request>
     <br/>
 
     <h:request>
@@ -174,7 +130,8 @@
         <h:responseBody/>
     </h:request>
     <br/>
-    After this, getting the status and the baselayer is done the same way as when submitting text as XML.
+
+    After this, getting the status and the xml is done the same way as when submitting text as XML.
 </div>
 
 <div id="overwrite-resource-text" data-desc="What if I upload a text to a resource that already has a text?">

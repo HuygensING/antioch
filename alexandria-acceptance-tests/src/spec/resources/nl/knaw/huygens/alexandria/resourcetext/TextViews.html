@@ -48,47 +48,51 @@
         When I
         <h:put>/resources/11111111-1111-1111-1111-111111111111/text/views/baselayer</h:put>
         the body:
-        <h:jsonBody>{
-            "textViewDefinition": {
-            "subresourceElements": ["note"],
-            "baseElements": [
-            {"name" : "div", "baseAttributes" : ["id"] },
-            {"name" : "p" }
-            ] } }
+        <h:jsonBody>
+          {
+            "textView": {
+              "description": "The Base Layer",
+              "ignoredElements": ["note"],
+	            "includedElements": [
+		            {"name" : "div", "includedAttributes" : ["id"] },
+		            {"name" : "p" }
+          ] } }
         </h:jsonBody>
         using
-        <h:setHeader name="Content-Type">application/json</h:setHeader>
-        Then I should receive
-        <h:status>201 Created</h:status>
-        and a location header
-        <h:location>https://{host}/resources/11111111-1111-1111-1111-111111111111/text/views/baselayer</h:location>
-        and the response body is
-        <h:responseBody/>
+        <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+        then I should receive
+        <ul>
+          <li>status <h:status>201 Created</h:status></li>
+          <li>location header
+              <h:location>https://{host}/resources/11111111-1111-1111-1111-111111111111/text/views/baselayer</h:location>
+          </li>
+	        <li>and the response body is <h:responseBody/></li>
+        </ul>
     </h:request>
     <br/>
+
     <h:request>
         When I
-        <h:get>/resources/11111111-1111-1111-1111-111111111111/text</h:get>
-        Then I should receive
+        <h:get>/resources/11111111-1111-1111-1111-111111111111/text/views</h:get>,<br/>
+        then I should receive
         <ul>
             <li>status
                 <h:status>200 OK</h:status>
             </li>
             <li>and body
              <small>(only relevant fields shown for brevity)</small>
-                <h:jsonResponse>{
-                "resourceText" : {
-                  "views" : {
-                    "id": "baselayer"
-                    "^definition": "https://{host}/resources/11111111-1111-1111-1111-111111111111/text/views/baselayer"
-                    "^xml": "https://{host}/resources/11111111-1111-1111-1111-111111111111/text/xml?view=baselayer"
-                  }
-                } }
+                <h:jsonResponse>
+                [ {
+                  "id" : "baselayer",
+                  "^definition" : "https://{host}/resources/11111111-1111-1111-1111-111111111111/text/views/baselayer",
+                  "^xml" : "https://{host}/resources/11111111-1111-1111-1111-111111111111/text/xml?view=baselayer"
+                } ]
                 </h:jsonResponse>
             </li>
         </ul>
     </h:request>
     <br/>
+
     <h:request>
         If I then
         <h:get>/resources/11111111-1111-1111-1111-111111111111/text/views/baselayer</h:get>
@@ -99,23 +103,25 @@
             </li>
             <li>and body
                 <h:jsonResponse>{
-            "baseElements": [
-            {"name" : "div", "baseAttributes" : ["id"] },
-            {"name" : "p" }
-            ] }
+                "description": "The Base Layer",
+                "ignoredElements" : [ "note" ],
+		            "includedElements": [
+			            {"name" : "div", "includedAttributes" : ["id"] },
+			            {"name" : "p" }
+		            ] }
                 </h:jsonResponse>
             </li>
         </ul>
     </h:request>
 </div>
 
-<div id="baselayer-for-subresource"
-    data-desc="How is the base layer defined for a subresource?">
+<div id="view-for-subresource"
+    data-desc="How is the view defined for a subresource?">
     
     <ul>
     <li>
     <h:request>
-        Given the previously made resource with its baselayer definition, 
+        Given the previously made resource with its baselayer view, 
         if I add a subresource by  
         <h:post>/resources/11111111-1111-1111-1111-111111111111/subresources</h:post>
         the body
@@ -146,7 +152,7 @@
     <li>
     <h:request>
         When I
-        <h:get>/resources/$uuid</h:get>
+        <h:get>/resources/$uuid/text/views</h:get>
         Then I should receive
         <ul>
             <li>status
@@ -154,10 +160,12 @@
             </li>
             <li>and body
              <small>(only relevant fields shown for brevity)</small>
-                <h:jsonResponse>{
-                "subresource" : {
-                "^baseLayerDefinition": "https://{host}/resources/11111111-1111-1111-1111-111111111111/baselayerdefinition"
-                } }
+                <h:jsonResponse>
+                [ {
+								  "id" : "baselayer",
+								  "^definition" : "https://{host}/resources/11111111-1111-1111-1111-111111111111/text/views/baselayer",
+								  "^xml" : "https://{host}/resources/$uuid/text/xml?view=baselayer"
+								} ]
                 </h:jsonResponse>
                 (The subresource uses the baseLayerDefinition of <strong>its parent</strong> resource)
             </li>
@@ -165,62 +173,67 @@
     </h:request>
     </li>
     <li>
-    <h:request>
-        To override this baselayer definition, I
-        <h:put>/resources/$uuid/baselayerdefinition</h:put>
+      <h:request>
+        To override this baselayer view, I
+        <h:put>/resources/$uuid/text/views/baselayer</h:put>
         the body:
         <h:jsonBody>{
-            "baseLayerDefinition": {
-            "subresourceElements": ["note"],
-            "baseElements": [
-            {"name" : "div", "baseAttributes" : ["ref"] },
-            {"name" : "p" }
+            "textView": {
+	            "description": "The Base Layer for the subresource",
+	            "ignoredElements": ["note"],
+	            "includedElements": [
+		            {"name" : "div", "includedAttributes" : ["ref"] },
+		            {"name" : "p" }
             ] } }
         </h:jsonBody>
         using
-        <h:setHeader name="Content-Type">application/json</h:setHeader>
-        Then I should receive
-        <h:status>201 Created</h:status>
-        and a location header
-        <h:location>https://{host}/resources/$uuid/baselayerdefinition</h:location>
-        and the response body is
-        <h:responseBody/>
-    </h:request>
+        <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+        then I should receive
+        <ul>
+          <li>status <h:status>201 Created</h:status></li>
+          <li>location header
+              <h:location>https://{host}/resources/$uuid/text/views/baselayer</h:location>
+          </li>
+          <li>and the response body is <h:responseBody/></li>
+        </ul>
+      </h:request>
     </li>
     <li>
     <h:request>
         Now when I
-        <h:get>/resources/$uuid</h:get>
-        Then I should receive
+        <h:get>/resources/$uuid/text/views</h:get>,<br/>
+        then I should receive
         <ul>
             <li>status
                 <h:status>200 OK</h:status>
             </li>
             <li>and body
              <small>(only relevant fields shown for brevity)</small>
-                <h:jsonResponse>{
-                "subresource" : {
-                "^baseLayerDefinition": "https://{host}/resources/$uuid/baselayerdefinition"
-                } }
+                <h:jsonResponse>
+                [ {
+                  "id" : "baselayer",
+                  "^definition" : "https://{host}/resources/$uuid/text/views/baselayer",
+                  "^xml" : "https://{host}/resources/$uuid/text/xml?view=baselayer"
+                } ]
                 </h:jsonResponse>
                 (The subresource uses <strong>its own</strong> baseLayerDefinition)
             </li>
         </ul>
     </h:request>
     </li>
-    </ul>
+  </ul>
 </div>
 
-<div id="exclude-element-tags"
-    data-desc="How do I exclude element tags in a view?">
+<div id="ignore-elements"
+    data-desc="How do I ignore a given set of elements (including their text) in a view?">
 </div>
 
 <div id="include-element-tags"
     data-desc="How do I show only a given set of element tags in a view?">
 </div>
 
-<div id="ignore-elements"
-    data-desc="How do I ignore a given set of elements (including their text) in a view?">
+<div id="exclude-element-tags"
+    data-desc="How do I exclude element tags in a view?">
 </div>
 
 </body>

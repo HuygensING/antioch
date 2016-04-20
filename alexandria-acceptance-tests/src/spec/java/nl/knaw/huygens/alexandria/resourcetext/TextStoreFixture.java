@@ -1,6 +1,4 @@
-package nl.knaw.huygens.alexandria.resource;
-
-import org.concordion.api.ExpectedToFail;
+package nl.knaw.huygens.alexandria.resourcetext;
 
 /*
  * #%L
@@ -27,7 +25,8 @@ import org.concordion.api.ExpectedToFail;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.runner.RunWith;
 
+import nl.knaw.huygens.alexandria.resource.ResourcesBase;
+
 @RunWith(ConcordionRunner.class)
-@ExpectedToFail
 public class TextStoreFixture extends ResourcesBase {
 }
