@@ -89,9 +89,9 @@ function a-set-baselayer-textview {
        "description" : "The base layer"
      	 "ignoredElements": ["note"],
        "includedElements" : [
-          { "name": "text", "baseAttributes": [ "id" ] },
-          { "name": "p", "baseAttributes": [ "id" ] },
-          { "name": "div", "baseAttributes" : [ "id", "by" ] }
+          { "name": "text", "includedAttributes": [ "id" ] },
+          { "name": "p", "includedAttributes": [ "id" ] },
+          { "name": "div", "includedAttributes" : [ "id", "by" ] }
        ]}
      }'
 }
@@ -171,7 +171,7 @@ function a-dry-run {
         "name": "body"
       }, {
         "name": "div",
-        "baseAttributes": [ "type" ]
+        "includedAttributes": [ "type" ]
       }, {
         "name": "text"
       }, {
@@ -204,14 +204,14 @@ function a-dry-run-from-file {
   curl --silent ${location} | jq "."
   curl -i -H "${authheader}" -X PUT $be/resources/$ri/text/views/baselayer -H 'Content-type: application/json' \
   --data-binary '{
-    "description" : "The Base Layer",
     "textView": {
+      "description" : "The Base Layer",
       "ignoredElements": ["note"],
       "includedElements": [ {
         "name": "body"
       }, {
         "name": "div",
-        "baseAttributes": [ "type" ]
+        "includedAttributes": [ "type" ]
       }, {
         "name": "text"
       }, {
@@ -249,7 +249,7 @@ function a-gutenberg-import-file {
         "name": "TEI"
       }, {
         "name": "div",
-        "baseAttributes": [ "type" ]
+        "includedAttributes": [ "type" ]
       }, {
         "name": "body"
       }, {

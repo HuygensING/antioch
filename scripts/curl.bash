@@ -279,24 +279,33 @@ curl -i -H "${authheader}" -X POST $be/annotations/$ai/annotations -H 'Content-t
 
 
 
-curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
+curl -i -H "${authheader}" -X PUT $be/resources/$ri/text/views/baselayer -H 'Content-type: application/json' \
 --data-binary '{
-  "baseLayerDefinition": {
-  	"subresourceElements": ["note"],
-    "baseElements": [ {
-      "name": "body"
-    }, {
-      "name": "div",
-      "baseAttributes": [ "type" ]
-    }, {
-      "name": "p"
-    }, {
-      "name": "sub"
-    }, {
-      "name": "sup"
-    } ]
-  }
-}'
+    "textView": {
+      "description" : "The Base Layer",
+      "ignoredElements": ["note"],
+      "includedElements": [ {
+        "name": "body"
+      }, {
+        "name": "div",
+        "includedAttributes": [ "type" ]
+      }, {
+        "name": "text"
+      }, {
+        "name": "p"
+      }, {
+        "name": "table"
+      }, {
+        "name": "row"
+      }, {
+        "name": "cell"
+      }, {
+        "name": "sub"
+      }, {
+        "name": "sup"
+      } ]
+    }
+  }'
 
 curl -i -H "${authheader}" $be/resources/$ri/baselayerdefinition
 

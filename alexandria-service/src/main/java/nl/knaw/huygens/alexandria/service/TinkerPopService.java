@@ -440,7 +440,23 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Optional<TextView> getTextView(UUID resourceId, String view) {
-    TextView textView = null;
+    TextView textView = storage.runInTransaction(() -> {
+      ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceId).get();
+      String serializedTextViews = resourceVF.getSerializedTextViewMap();
+      try {
+        Map<String, TextViewPrototype> textViewMap = deserializeToTextViewMap(serializedTextViews);
+        return textViewMap//
+            .entrySet()//
+            .stream()//
+            .filter(e -> e.getKey().equals(view))//
+            .map(this::toTextView)//
+            .collect(toList())//
+            .get(0);
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new RuntimeException(e);
+      }
+    });
     return Optional.ofNullable(textView);
   }
 
