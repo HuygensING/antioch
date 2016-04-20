@@ -78,43 +78,42 @@ public class TextGraphUtil {
     }
   }
 
-  public static StreamingOutput streamTextViewXML(AlexandriaService service, UUID resourceId, TextView baseLayerDefinition) {
-    List<ElementDefinition> baseElementDefinitions = baseLayerDefinition.getIncludedElementDefinitions();
-    List<String> noteElements = baseLayerDefinition.getIgnoredElements();
+  public static StreamingOutput streamTextViewXML(AlexandriaService service, UUID resourceId, TextView textView) {
     StreamingOutput outputstream = output -> {
       Writer writer = createBufferedUTF8OutputStreamWriter(output);
-      Stack<TextAnnotation> noteStack = new Stack<>();
-      Consumer<TextGraphSegment> action = segment -> streamTextGraphSegment(writer, segment, baseElementDefinitions, noteElements, noteStack);
+      TextViewContext textViewContext = new TextViewContext(textView);
+      Consumer<TextGraphSegment> action = segment -> streamTextGraphSegment(writer, segment, textViewContext);
       stream(service, resourceId, writer, action);
     };
     return outputstream;
   }
 
   private static class TextViewContext {
-    Set<String> includedElementNames;
-    Stack<TextAnnotation> ignoredElementStack;
-    Map<String, List<String>> includedElementAttributes = Maps.newHashMap();
+    final Set<String> elementNamesToInclude;
+    final Map<String, List<String>> elementAttributesToInclude = Maps.newHashMap();
+    final List<String> elementsToIgnore;
+    final Stack<TextAnnotation> ignoredAnnotationStack = new Stack<>();
 
-    public TextViewContext(List<ElementDefinition> includedElementDefinitions, Stack<TextAnnotation> ignoredElementStack) {
-      this.ignoredElementStack = ignoredElementStack;
-      includedElementNames = includedElementDefinitions.stream()//
+    public TextViewContext(TextView textView) {
+      elementsToIgnore = textView.getIgnoredElements();
+      elementNamesToInclude = textView.getIncludedElementDefinitions().stream()//
           .map(ElementDefinition::getName)//
           .collect(toSet());
-      for (ElementDefinition definition : includedElementDefinitions) {
+      for (ElementDefinition definition : textView.getIncludedElementDefinitions()) {
         List<String> includedAttributes = definition.getIncludedAttributes();
         if (!includedAttributes.contains(TextUtil.XML_ID)) {
           includedAttributes.add(0, TextUtil.XML_ID);
         }
-        includedElementAttributes.put(definition.getName(), includedAttributes);
+        elementAttributesToInclude.put(definition.getName(), includedAttributes);
       }
     }
 
     public boolean includeTag(String name) {
-      return ignoredElementStack.isEmpty() && includedElementNames.contains(name);
+      return notInIgnoredElement() && elementNamesToInclude.contains(name);
     }
 
     public Map<String, String> includedAttributes(TextAnnotation textAnnotation) {
-      List<String> baseElementAttributeNames = includedElementAttributes.get(textAnnotation.getName());
+      List<String> baseElementAttributeNames = elementAttributesToInclude.get(textAnnotation.getName());
       Map<String, String> allAttributes = textAnnotation.getAttributes();
       Map<String, String> baseAttributes = Maps.newHashMap();
       for (String name : baseElementAttributeNames) {
@@ -124,43 +123,53 @@ public class TextGraphUtil {
       }
       return baseAttributes;
     }
+
+    public void pushWhenIgnoring(TextAnnotation textAnnotation) {
+      if (elementsToIgnore.contains(textAnnotation.getName())) {
+        ignoredAnnotationStack.push(textAnnotation);
+      }
+    }
+
+    public void popWhenIgnoring(String name) {
+      if (elementsToIgnore.contains(name) && !ignoredAnnotationStack.isEmpty()) {
+        ignoredAnnotationStack.pop();
+      }
+    }
+
+    public boolean notInIgnoredElement() {
+      return ignoredAnnotationStack.isEmpty();
+    }
   }
 
-  public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment, List<ElementDefinition> includedElementDefinitions, List<String> ignoredElements,
-      Stack<TextAnnotation> ignoredElementStack) {
-    TextViewContext context = new TextViewContext(includedElementDefinitions, ignoredElementStack);
+  public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment, TextViewContext textViewContext) {
     try {
       if (segment.isMilestone()) {
         TextAnnotation milestone = segment.getMilestone();
         String name = milestone.getName();
-        if (context.includeTag(name)) {
-          String openTag = getMilestoneTag(name, context.includedAttributes(milestone));
+        if (textViewContext.includeTag(name)) {
+          String openTag = getMilestoneTag(name, textViewContext.includedAttributes(milestone));
           writer.write(openTag);
         }
 
       } else {
         for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
           String name = textAnnotation.getName();
-          if (context.includeTag(name)) {
-            String openTag = getOpenTag(name, context.includedAttributes(textAnnotation));
+          if (textViewContext.includeTag(name)) {
+            String openTag = getOpenTag(name, textViewContext.includedAttributes(textAnnotation));
             writer.write(openTag);
           }
-          if (ignoredElements.contains(name)) {
-            ignoredElementStack.push(textAnnotation);
-          }
+          textViewContext.pushWhenIgnoring(textAnnotation);
         }
-        if (ignoredElementStack.isEmpty()) {
+        if (textViewContext.notInIgnoredElement()) {
           writer.write(segment.getTextSegment());
         }
         for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
           String name = textAnnotation.getName();
-          if (context.includeTag(name)) {
+          if (textViewContext.includeTag(name)) {
             String closeTag = getCloseTag(name);
             writer.write(closeTag);
           }
-          if (ignoredElements.contains(name)) {
-            ignoredElementStack.pop();
-          }
+          textViewContext.popWhenIgnoring(name);
         }
       }
     } catch (IOException ioe) {
