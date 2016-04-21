@@ -1,7 +1,10 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
+import static java.util.stream.Collectors.toList;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
@@ -99,7 +102,11 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
   @GET
   public Response getTextEntity() {
     assertResourceHasText();
-    TextEntity text = new TextEntity(resourceId, locationBuilder);
+    List<TextViewEntity> textViewEntities = service.getTextViewsForResource(resourceId)//
+        .stream()//
+        .map(tv -> new TextViewEntity(resourceId, tv, locationBuilder))//
+        .collect(toList());
+    TextEntity text = new TextEntity(resourceId, locationBuilder, textViewEntities);
     return Response.ok().entity(text).build();
   }
 

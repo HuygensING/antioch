@@ -163,6 +163,14 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     service.setStorage(tinkerGraphStorage());
   }
 
+  public void wait5seconds() {
+    try {
+      Thread.sleep(5000l);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+
   public void resourceExists(String resId) {
     service.createOrUpdateResource(fromString(resId), aRef(), aProvenance(), CONFIRMED);
   }

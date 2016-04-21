@@ -88,6 +88,8 @@
     </h:request>
     <br/>
 
+    <div c:execute="wait5seconds()"><!-- wait 5 seconds --></div>
+
     <h:request>
         Once textGraphImportStatus.done == true, and there are no validationErrors,<br/>
         <h:get>/resources/22222222-2222-2222-2222-222222222222/text/xml</h:get><br/>

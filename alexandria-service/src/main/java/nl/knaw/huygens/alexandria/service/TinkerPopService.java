@@ -63,6 +63,7 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
@@ -418,19 +419,23 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public List<TextView> getTextViewsForResource(UUID resourceUUID) {
     List<TextView> textViews = new ArrayList<>();
+    Set<String> viewNames = Sets.newHashSet();
 
     return storage.runInTransaction(() -> {
       ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
       while (resourceVF != null) {
         String serializedTextViews = resourceVF.getSerializedTextViewMap();
-        if (StringUtils.isNotEmpty(serializedTextViews)) {
-          try {
-            List<TextView> deserializedTextViews = deserializeToTextViews(serializedTextViews);
-            textViews.addAll(deserializedTextViews);
-          } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-          }
+        UUID uuid = UUID.fromString(resourceVF.getUuid());
+        try {
+          deserializeToTextViews(serializedTextViews).stream().filter(v -> !viewNames.contains(v.getName())).forEach((tv) -> {
+            tv.setTextViewDefiningResourceId(uuid);
+            textViews.add(tv);
+            viewNames.add(tv.getName());
+          });
+
+        } catch (Exception e) {
+          e.printStackTrace();
+          throw new RuntimeException(e);
         }
         resourceVF = resourceVF.getParentResource();
       }

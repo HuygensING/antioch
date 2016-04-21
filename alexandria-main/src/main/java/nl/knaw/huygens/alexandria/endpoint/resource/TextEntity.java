@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.common.collect.Lists;
 
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.Entity;
@@ -26,12 +25,12 @@ public class TextEntity extends JsonWrapperObject implements Entity {
   @JsonIgnore
   private final UUID resourceId;
   @JsonIgnore
-  private List<TextViewEntity> textViews = Lists.newArrayList();
+  private List<TextViewEntity> textViews;
 
-  public TextEntity(UUID resourceId, LocationBuilder locationBuilder) {
+  public TextEntity(UUID resourceId, LocationBuilder locationBuilder, List<TextViewEntity> textViews) {
     this.resourceId = resourceId;
     this.locationBuilder = locationBuilder;
-    textViews.add(new TextViewEntity(resourceId, "baselayer", locationBuilder));
+    this.textViews = textViews;
   }
 
   @JsonProperty("views")

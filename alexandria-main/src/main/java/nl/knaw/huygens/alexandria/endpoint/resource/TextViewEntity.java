@@ -15,6 +15,7 @@ import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.Entity;
 import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
+import nl.knaw.huygens.alexandria.api.model.TextView;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 
@@ -27,10 +28,13 @@ public class TextViewEntity extends JsonWrapperObject implements Entity {
   private LocationBuilder locationBuilder;
   @JsonIgnore
   private UUID resourceId;
+  @JsonIgnore
+  private UUID viewResourceId;
 
-  public TextViewEntity(UUID resourceId, String viewId, LocationBuilder locationBuilder) {
+  public TextViewEntity(UUID resourceId, TextView textView, LocationBuilder locationBuilder) {
     this.resourceId = resourceId;
-    this.viewId = viewId;
+    this.viewId = textView.getName();
+    this.viewResourceId = textView.getTextViewDefiningResourceId();
     this.locationBuilder = locationBuilder;
   }
 
@@ -46,7 +50,7 @@ public class TextViewEntity extends JsonWrapperObject implements Entity {
 
   @JsonProperty(PropertyPrefix.LINK + "definition")
   public URI getDefinition() {
-    return locationBuilder.locationOf(AlexandriaResource.class, resourceId, EndpointPaths.TEXT, EndpointPaths.TEXTVIEWS, viewId);
+    return locationBuilder.locationOf(AlexandriaResource.class, viewResourceId, EndpointPaths.TEXT, EndpointPaths.TEXTVIEWS, viewId);
   }
 
 }

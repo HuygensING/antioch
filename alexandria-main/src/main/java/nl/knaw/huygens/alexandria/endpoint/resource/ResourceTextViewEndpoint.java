@@ -77,6 +77,6 @@ public class ResourceTextViewEndpoint extends JSONEndpoint {
   }
 
   private TextViewEntity toTextViewEntity(TextView textView) {
-    return new TextViewEntity(resourceId, textView.getName(), locationBuilder);
+    return new TextViewEntity(resourceId, textView, locationBuilder);
   }
 }
