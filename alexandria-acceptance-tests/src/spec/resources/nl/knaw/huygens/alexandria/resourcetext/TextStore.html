@@ -78,6 +78,7 @@
 								  "textGraphImportStatus" : {
 								    "done" : false,
 								    "state" : "processing",
+								    "startTime" : "{date.anyValid}"
 								    "validationErrors" : [ ]
 								  }
 								}
@@ -91,7 +92,32 @@
     <div c:execute="wait5seconds()"><!-- wait 5 seconds --></div>
 
     <h:request>
-        Once textGraphImportStatus.done == true, and there are no validationErrors,<br/>
+        Eventually, 
+        <h:get>/resources/22222222-2222-2222-2222-222222222222/text/status</h:get>
+        should yield
+        <ul>
+            <li>status
+                <h:status>200 OK</h:status>
+            </li>
+            <li>and body
+             <small>(only relevant fields shown for brevity)</small>
+                <h:jsonResponse>{
+                  "textGraphImportStatus" : {
+                    "done" : true,
+                    "state" : "done",
+                    "validationErrors" : [ ],
+                    "startTime" : "{date.beforeNow}"
+                    "expires" : "{date.afterNow}"
+                  }
+                }
+                </h:jsonResponse>
+            </li>
+        </ul>
+    </h:request>
+    <br/>
+
+    <h:request>
+        Since textGraphImportStatus.done == true, and there are no validationErrors,<br/>
         <h:get>/resources/22222222-2222-2222-2222-222222222222/text/xml</h:get><br/>
         using
         <h:setHeader name="Accept">text/xml</h:setHeader><br/>

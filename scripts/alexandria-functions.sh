@@ -164,8 +164,8 @@ function a-dry-run {
   a-generate-resource-with-uuid $ri
   curl -i -H "${authheader}" -X PUT $be/resources/$ri/text/views/baselayer -H 'Content-type: application/json' \
   --data-binary '{
-    "description" : "The Base Layer",
     "textView": {
+      "description" : "The Base Layer",
       "ignoredElements": ["note"],
       "includedElements": [ {
         "name": "body"
@@ -190,9 +190,9 @@ function a-dry-run {
     }
   }'
   a-log "result uploading text:"
-  curl --silent --header "${authheader}" -X PUT ${be}/resources/${ri}/text/baselayer --header 'Content-Type:text/xml' --data "$*" | jq "."
+  curl --silent --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:text/xml' --data "$*" | jq "."
   a-log "extracted baselayer:"
-  curl ${be}/resources/${ri}/text/baselayer
+  curl ${be}/resources/${ri}/text/xml?view=baselayer
 }
 
 function a-dry-run-from-file {
