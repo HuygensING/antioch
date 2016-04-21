@@ -89,16 +89,24 @@ public class TextGraphUtil {
   }
 
   private static class TextViewContext {
+    enum Mode {
+      inclusive, exclusive
+    }
+
     final Set<String> elementNamesToInclude;
+    final List<String> elementNamesToExclude;
     final Map<String, List<String>> elementAttributesToInclude = Maps.newHashMap();
     final List<String> elementsToIgnore;
     final Stack<TextAnnotation> ignoredAnnotationStack = new Stack<>();
+    final Mode mode;
 
     public TextViewContext(TextView textView) {
       elementsToIgnore = textView.getIgnoredElements();
       elementNamesToInclude = textView.getIncludedElementDefinitions().stream()//
           .map(ElementDefinition::getName)//
           .collect(toSet());
+      elementNamesToExclude = textView.getExcludedElementTags();
+      mode = elementNamesToInclude.isEmpty() ? Mode.exclusive : Mode.inclusive;
       for (ElementDefinition definition : textView.getIncludedElementDefinitions()) {
         List<String> includedAttributes = definition.getIncludedAttributes();
         if (!includedAttributes.contains(TextUtil.XML_ID)) {
@@ -109,19 +117,25 @@ public class TextGraphUtil {
     }
 
     public boolean includeTag(String name) {
-      return notInIgnoredElement() && elementNamesToInclude.contains(name);
+      boolean notIgnoredElement = !elementsToIgnore.contains(name);
+      boolean inclusiveAndInclude = mode.equals(Mode.inclusive) && elementNamesToInclude.contains(name);
+      boolean exclusiveAndInclude = mode.equals(Mode.exclusive) && !elementNamesToExclude.contains(name);
+      return notIgnoredElement && notInsideIgnoredElement() && (inclusiveAndInclude || exclusiveAndInclude);
     }
 
     public Map<String, String> includedAttributes(TextAnnotation textAnnotation) {
-      List<String> baseElementAttributeNames = elementAttributesToInclude.get(textAnnotation.getName());
+      if (mode.equals(Mode.exclusive)) {
+        return textAnnotation.getAttributes();
+      }
+      List<String> includedElementAttributeNames = elementAttributesToInclude.get(textAnnotation.getName());
       Map<String, String> allAttributes = textAnnotation.getAttributes();
-      Map<String, String> baseAttributes = Maps.newHashMap();
-      for (String name : baseElementAttributeNames) {
+      Map<String, String> attributesToInclude = Maps.newHashMap();
+      for (String name : includedElementAttributeNames) {
         if (allAttributes.containsKey(name)) {
-          baseAttributes.put(name, allAttributes.get(name));
+          attributesToInclude.put(name, allAttributes.get(name));
         }
       }
-      return baseAttributes;
+      return attributesToInclude;
     }
 
     public void pushWhenIgnoring(TextAnnotation textAnnotation) {
@@ -136,7 +150,7 @@ public class TextGraphUtil {
       }
     }
 
-    public boolean notInIgnoredElement() {
+    public boolean notInsideIgnoredElement() {
       return ignoredAnnotationStack.isEmpty();
     }
   }
@@ -160,7 +174,7 @@ public class TextGraphUtil {
           }
           textViewContext.pushWhenIgnoring(textAnnotation);
         }
-        if (textViewContext.notInIgnoredElement()) {
+        if (textViewContext.notInsideIgnoredElement()) {
           writer.write(segment.getTextSegment());
         }
         for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {

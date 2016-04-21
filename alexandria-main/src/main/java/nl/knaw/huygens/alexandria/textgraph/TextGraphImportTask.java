@@ -39,7 +39,7 @@ public class TextGraphImportTask implements Runnable {
       ParseResult result = TextGraphUtil.parse(xml);
       boolean success = service.storeTextGraph(resourceId, result, who);
       if (success) {
-        status.setBaseLayerURI(locationBuilder.locationOf(resource, EndpointPaths.TEXT, EndpointPaths.TEXTVIEWS, "baselayer"));
+        status.setTextURI(locationBuilder.locationOf(resource, EndpointPaths.TEXT, "xml"));
       } else {
         status.getValidationErrors().add("textgraph store failed");
       }

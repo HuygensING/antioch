@@ -32,13 +32,8 @@ public class TextGraphImportStatus extends JsonWrapperObject implements Entity {
   private Duration processingTime;
   private Instant startTime;
   private List<String> validationErrors = Lists.newArrayList();
-  private URI baseLayerDefinitionURI;
-  private URI baseLayerURI;
+  private URI textURI;
   private Instant expires;
-
-  public URI getBaseLayerURI() {
-    return baseLayerURI;
-  }
 
   public State getState() {
     return state;
@@ -65,13 +60,13 @@ public class TextGraphImportStatus extends JsonWrapperObject implements Entity {
     return expires != null && Instant.now().isAfter(expires);
   }
 
-  public void setBaseLayerDefinitionURI(URI baseLayerDefinitionURI) {
-    this.baseLayerDefinitionURI = baseLayerDefinitionURI;
+  public void setTextURI(URI textURI) {
+    this.textURI = textURI;
   }
 
-  @JsonProperty(PropertyPrefix.LINK + "baseLayer")
-  public void setBaseLayerURI(URI baseLayerURI) {
-    this.baseLayerURI = baseLayerURI;
+  @JsonProperty(PropertyPrefix.LINK + "xml")
+  public URI getTextURI() {
+    return textURI;
   }
 
   public List<String> getValidationErrors() {

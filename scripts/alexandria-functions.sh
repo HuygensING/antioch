@@ -86,7 +86,7 @@ function a-set-baselayer-textview {
   a-log "Setting default baselayer textview for ${be}/resources/$ri"
   curl -i -H "${authheader}" -X PUT $be/resources/$ri/text/views/baselayer -H 'Content-type: application/json' \
      --data-binary '{"textView":{
-       "description" : "The base layer"
+       "description" : "The base layer",
      	 "ignoredElements": ["note"],
        "includedElements" : [
           { "name": "text", "includedAttributes": [ "id" ] },
