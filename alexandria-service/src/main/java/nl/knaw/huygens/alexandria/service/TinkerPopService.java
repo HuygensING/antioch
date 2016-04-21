@@ -107,12 +107,12 @@ public class TinkerPopService implements AlexandriaService {
     Log.trace("{} created, locationBuilder=[{}]", getClass().getSimpleName(), locationBuilder);
     this.locationBuilder = locationBuilder;
     this.alexandriaQueryParser = new AlexandriaQueryParser(locationBuilder);
-    this.textGraphService = new TextGraphService(storage);
     setStorage(storage);
   }
 
   public void setStorage(Storage storage) {
     this.storage = storage;
+    this.textGraphService = new TextGraphService(storage);
   }
 
   // - AlexandriaService methods -//

@@ -75,44 +75,18 @@
             <li>and body
              <small>(only relevant fields shown for brevity)</small>
                 <h:jsonResponse>{
-								  "textGraphImportStatus" : {
-								    "done" : false,
-								    "state" : "processing",
-								    "startTime" : "{date.anyValid}",
-								    "validationErrors" : [ ]
-								  }
-								}
-                </h:jsonResponse>
-            </li>
-        </ul>
-        If the status indicates the text is still being processed, we should wait a while before getting the status again.
-    </h:request>
-    <br/>
-
-    <div c:execute="wait5seconds()"><!-- wait 5 seconds --></div>
-
-    <h:request>
-        Eventually, 
-        <h:get>/resources/22222222-2222-2222-2222-222222222222/text/status</h:get>
-        should yield
-        <ul>
-            <li>status
-                <h:status>200 OK</h:status>
-            </li>
-            <li>and body
-             <small>(only relevant fields shown for brevity)</small>
-                <h:jsonResponse>{
                   "textGraphImportStatus" : {
                     "done" : true,
                     "state" : "done",
                     "validationErrors" : [ ],
                     "startTime" : "{date.beforeNow}",
-                    "expires" : "{date.afterNow}"
+                    "expires" : "{date.anyValid}"
                   }
                 }
                 </h:jsonResponse>
             </li>
         </ul>
+        If the status indicates the text is still being processed (done=false, state=processing), we should wait a while before getting the status again.
     </h:request>
     <br/>
 

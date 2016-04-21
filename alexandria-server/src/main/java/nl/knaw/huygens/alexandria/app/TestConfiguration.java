@@ -53,4 +53,9 @@ public class TestConfiguration extends AbstractAlexandriaConfigurationUsingAlexa
     return "e:/data/alexandria";
   }
 
+  @Override
+  public Boolean asynchronousEndpointsAllowed() {
+    return true;
+  }
+
 }

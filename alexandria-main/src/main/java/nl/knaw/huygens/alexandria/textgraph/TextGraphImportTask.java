@@ -2,6 +2,8 @@ package nl.knaw.huygens.alexandria.textgraph;
 
 import java.util.UUID;
 
+import com.google.common.base.Joiner;
+
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
@@ -25,7 +27,6 @@ public class TextGraphImportTask implements Runnable {
     this.resourceId = resource.getId();
     this.who = who;
     this.status = new TextGraphImportStatus();
-    // status.setBaseLayerDefinitionURI(locationBuilder.locationOf(resource, EndpointPaths.BASELAYERDEFINITION));
   }
 
   public TextGraphImportStatus getStatus() {
@@ -45,7 +46,9 @@ public class TextGraphImportTask implements Runnable {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      status.getValidationErrors().add("Exception thrown: " + e.getMessage());
+      status.getValidationErrors().add("Exception thrown: " + e);
+      status.getValidationErrors().add("Exception message: " + e.getMessage());
+      status.getValidationErrors().add("Stacktrace: " + Joiner.on("\n").join(e.getStackTrace()));
     }
     status.setDone();
   }

@@ -123,6 +123,11 @@ public class AlexandriaAcceptanceTest extends RestFixture {
       public String getAdminKey() {
         return "whatever";
       }
+
+      @Override
+      public Boolean asynchronousEndpointsAllowed() {
+        return false;
+      }
     };
   }
 

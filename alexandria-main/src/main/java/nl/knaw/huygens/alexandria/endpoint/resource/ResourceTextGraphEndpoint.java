@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
@@ -51,15 +52,18 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
   private ExecutorService executorService;
   private final LocationBuilder locationBuilder;
   private final TextGraphTaskStatusMap taskStatusMap;
+  private AlexandriaConfiguration config;
 
   @Inject
   public ResourceTextGraphEndpoint(AlexandriaService service, //
+      AlexandriaConfiguration config,//
       ResourceValidatorFactory validatorFactory, //
       ExecutorService executorService, //
       LocationBuilder locationBuilder, //
       TextGraphTaskStatusMap taskStatusMap, //
       @PathParam("uuid") final UUIDParam uuidParam) {
     this.service = service;
+    this.config = config;
     this.executorService = executorService;
     this.locationBuilder = locationBuilder;
     this.taskStatusMap = taskStatusMap;
@@ -157,7 +161,12 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
   private void startTextProcessing(String xml) {
     TextGraphImportTask task = new TextGraphImportTask(service, locationBuilder, xml, resource, ThreadContext.getUserName());
     taskStatusMap.put(resource.getId(), task.getStatus());
-    executorService.execute(task);
+    if (config.asynchronousEndpointsAllowed()) {
+      executorService.execute(task);
+    } else {
+      // For now, for the acceptance tests.
+      task.run();
+    }
   }
 
   private void assertResourceHasText() {
