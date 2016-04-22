@@ -85,6 +85,7 @@ import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import nl.knaw.huygens.alexandria.textgraph.ParseResult;
+import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphSegment;
 import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorFactory;
@@ -822,8 +823,19 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
+  public Stream<TextAnnotation> getTextAnnotationStream(UUID resourceId) {
+    return textGraphService.getTextAnnotationStream(resourceId);
+  }
+
+  @Override
+  public void updateTextAnnotation(TextAnnotation textAnnotation) {
+    textGraphService.updateTextAnnotation(textAnnotation);
+  }
+
+  @Override
   public void runInTransaction(Runnable runner) {
     storage.runInTransaction(runner);
   }
+
 
 }

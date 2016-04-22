@@ -42,6 +42,7 @@ import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.textgraph.ParseResult;
+import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphSegment;
 import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
 
@@ -133,5 +134,9 @@ public interface AlexandriaService {
   Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceId);
 
   void runInTransaction(Runnable runner);
+
+  Stream<TextAnnotation> getTextAnnotationStream(UUID resourceId);
+
+  void updateTextAnnotation(TextAnnotation textAnnotation);
 
 }

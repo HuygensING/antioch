@@ -25,6 +25,8 @@ package nl.knaw.huygens.alexandria.api;
 public final class EndpointPaths {
   public static final String ABOUT = "about";
 
+  public static final String COMMANDS = "commands";
+
   public static final String RESOURCES = "resources";
   public static final String TEXT = "text";
   public static final String TEXTVIEWS = "views";

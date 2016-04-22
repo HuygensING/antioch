@@ -73,6 +73,32 @@ public class TextGraphService {
         .map(this::toTextGraphSegment);
   }
 
+  public Stream<TextAnnotation> getTextAnnotationStream(UUID resourceId) {
+    Iterator<Vertex> textAnnotationIterator = new Iterator<Vertex>() {
+      Vertex textAnnotationVertex = storage.getResourceVertexTraversal()//
+          .has(Storage.IDENTIFIER_PROPERTY, resourceId.toString())//
+          .out(EdgeLabels.HAS_TEXTGRAPH)//
+          .out(EdgeLabels.FIRST_ANNOTATION)//
+          .next();// because there can only be one
+
+      @Override
+      public boolean hasNext() {
+        return textAnnotationVertex != null;
+      }
+
+      @Override
+      public Vertex next() {
+        Vertex next = textAnnotationVertex;
+        Iterator<Vertex> nextVertices = textAnnotationVertex.vertices(Direction.OUT, EdgeLabels.NEXT);
+        textAnnotationVertex = nextVertices.hasNext() ? nextVertices.next() : null;
+        return next;
+      }
+    };
+    Iterable<Vertex> iterable = () -> textAnnotationIterator;
+    return StreamSupport.stream(iterable.spliterator(), false)//
+        .map(this::toTextAnnotation);
+  }
+
   private List<Vertex> storeTextSegments(List<String> textSegments, Vertex text) {
     List<Vertex> textSegmentVertices = new ArrayList<>();
     Vertex previous = null;
@@ -92,22 +118,7 @@ public class TextGraphService {
   private void storeTextAnnotations(Set<XmlAnnotation> xmlAnnotations, Vertex text, List<Vertex> textSegments) {
     Vertex previous = null;
     for (XmlAnnotation xmlAnnotation : xmlAnnotations) {
-      Map<String, String> attributes = xmlAnnotation.getAttributes();
-      String[] attributeKeys = new String[attributes.size()];
-      String[] attributeValues = new String[attributes.size()];
-      int i = 0;
-      for (Entry<String, String> kv : attributes.entrySet()) {
-        attributeKeys[i] = kv.getKey();
-        attributeValues[i] = kv.getValue();
-        i++;
-      }
-      Vertex v = storage.addVertex(//
-          T.label, VertexLabels.TEXTANNOTATION, //
-          TextAnnotation.Properties.name, xmlAnnotation.getName(), //
-          TextAnnotation.Properties.attribute_keys, attributeKeys, //
-          TextAnnotation.Properties.attribute_values, attributeValues, //
-          TextAnnotation.Properties.depth, xmlAnnotation.getDepth()//
-      );
+      Vertex v = toVertex(xmlAnnotation);
       v.addEdge(EdgeLabels.FIRST_TEXT_SEGMENT, textSegments.get(xmlAnnotation.getFirstSegmentIndex()));
       v.addEdge(EdgeLabels.LAST_TEXT_SEGMENT, textSegments.get(xmlAnnotation.getLastSegmentIndex()));
       if (previous == null) {
@@ -117,6 +128,26 @@ public class TextGraphService {
       }
       previous = v;
     }
+  }
+
+  private Vertex toVertex(TextAnnotation textAnnotation) {
+    Map<String, String> attributes = textAnnotation.getAttributes();
+    String[] attributeKeys = new String[attributes.size()];
+    String[] attributeValues = new String[attributes.size()];
+    int i = 0;
+    for (Entry<String, String> kv : attributes.entrySet()) {
+      attributeKeys[i] = kv.getKey();
+      attributeValues[i] = kv.getValue();
+      i++;
+    }
+    Vertex v = storage.addVertex(//
+        T.label, VertexLabels.TEXTANNOTATION, //
+        TextAnnotation.Properties.name, textAnnotation.getName(), //
+        TextAnnotation.Properties.attribute_keys, attributeKeys, //
+        TextAnnotation.Properties.attribute_values, attributeValues, //
+        TextAnnotation.Properties.depth, textAnnotation.getDepth()//
+    );
+    return v;
   }
 
   private TextGraphSegment toTextGraphSegment(Vertex textSegment) {
@@ -164,6 +195,10 @@ public class TextGraphService {
         attributes, //
         textAnnotation.value(TextAnnotation.Properties.depth)//
     );
+  }
+
+
+  public void updateTextAnnotation(TextAnnotation textAnnotation) {
   }
 
 }

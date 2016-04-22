@@ -384,3 +384,9 @@ curl -i -H "${authheader}" -X PUT $be/resources/$ri/text/views/no-hi-l -H 'Conte
       "excludedElements": [ "hi", "l" ]
     }
   }'
+
+curl -i -H "${authheader}" -X POST $be/commands/add-unique-id -H 'Content-type: application/json' \
+--data-binary "{
+      \"resourceIds\" : [\"$ri\"],
+      \"elements\": [ \"div\", \"p\" ]
+  }"
