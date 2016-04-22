@@ -1,5 +1,9 @@
 package nl.knaw.huygens.alexandria.resourcetext;
 
+import static java.util.UUID.fromString;
+
+import org.concordion.api.ExpectedToFail;
+
 /*
  * #%L
  * alexandria-acceptance-tests
@@ -25,8 +29,16 @@ package nl.knaw.huygens.alexandria.resourcetext;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.runner.RunWith;
 
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.resource.ResourcesBase;
 
 @RunWith(ConcordionRunner.class)
-public class TextAnnotationsFixture extends ResourcesBase {
+@ExpectedToFail
+public class TextModificationsFixture extends ResourcesBase {
+
+  public void resourceHasText(String resId, String xml) {
+    final AlexandriaResource resource = theResource(fromString(resId));
+    // do something!
+  }
+
 }

@@ -38,6 +38,7 @@ public class TextGraphUtil {
   public static ParseResult parse(String xml) {
     ParseResult result = new ParseResult();
     Document document = Document.createFromXml(xml, true);
+    // TODO: verify xml:ids are unique
     XmlVisitor visitor = new XmlVisitor(result);
     document.accept(visitor);
     return result;

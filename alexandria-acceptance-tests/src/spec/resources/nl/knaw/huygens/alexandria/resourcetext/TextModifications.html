@@ -1,0 +1,115 @@
+<!--
+  #%L
+  alexandria-acceptance-tests
+  =======
+  Copyright (C) 2015 - 2016 Huygens ING (KNAW)
+  =======
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/gpl-3.0.html>.
+  #L%
+  -->
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+
+<title>Modifying the text</title>
+
+<body data-desc="Modifying text annotations">
+
+<div id="annotate-text" c:execute="clearStorage()"
+     data-desc="How can I add unique identifiers to certain elements in certain resource texts?">
+     
+   Given a
+   <mark>resource</mark>
+   with id <code c:set="#resId1">00000000-0000-0000-0000-000000000001</code>
+   <span c:execute="resourceExists(#resId1)">exists</span>,<br/>
+   which has
+   <span c:execute="resourceHasText(#resId1,#text1)">text
+      <code c:set="#text1">&lt;body&gt;&lt;div&gt;&lt;p&gt;First paragraph&lt;/p&gt;&lt;/div&gt;&lt;div xml:id=&quot;div-1&quot;&gt;&lt;p&gt;Second paragraph&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</code>
+   </span>,
+   
+   a second
+   <mark>resource</mark><br/>
+   with id <code c:set="#resId2">00000000-0000-0000-0000-000000000002</code>
+   <span c:execute="resourceExists(#resId2)">exists</span>,<br/>
+   which has
+   <span c:execute="resourceHasText(#resId2,#text2)">text
+      <code c:set="#text2">&lt;body&gt;&lt;div&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</code>
+   </span>,<br/>
+   
+   and a third
+   <mark>resource</mark>
+   with id <code c:set="#resId3">00000000-0000-0000-0000-000000000003</code>
+   <span c:execute="resourceExists(#resId3)">exists</span>,<br/>
+   which has
+   <span c:execute="resourceHasText(#resId3,#text3)">text
+      <code c:set="#text3">&lt;body&gt;&lt;div&gt;&lt;p&gt;Mei mazim iriure ancillae ut.&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</code>
+   </span>
+	
+	<h:request>
+	   If i now
+	   <h:put>/commands/add-unique-id</h:put>
+	   the body:
+	   <h:jsonBody>
+	     {
+	       "resourceIds" : ["00000000-0000-0000-0000-000000000001","00000000-0000-0000-0000-000000000002"],
+	       "elements" : ["div","p"]
+	     }
+	   </h:jsonBody>
+	   using
+	   <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+	   then I should receive
+	   <ul>
+	     <li>status <h:status>200 OK</h:status></li>
+	     <li>and the response body is <h:responseBody/>
+	     </li>
+	   </ul>
+	</h:request>
+	<br/>
+	
+  <h:request>
+     Then
+     <h:get>/resources/00000000-0000-0000-0000-000000000001/text/xml</h:get>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     yields response body:<br/>
+     <h:responseBody>&lt;body&gt;&lt;div xml:id=&quot;div-2&quot;&gt;&lt;p xml:id=&quot;p-1&quot;&gt;First paragraph&lt;/p&gt;&lt;/div&gt;&lt;div xml:id=&quot;div-1&quot;&gt;&lt;p xml:id=&quot;p-2&quot;&gt;Second paragraph&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</h:responseBody><br/>
+     Note: elements that already had an xml:id kept this xml:id, and existing xml:ids were not used again. 
+  </h:request>
+	
+  <h:request>
+     And
+     <h:get>/resources/00000000-0000-0000-0000-000000000002/text/xml</h:get>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     yields response body:<br/>
+     <h:responseBody>&lt;body&gt;&lt;div&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</h:responseBody><br/>
+  </h:request>
+     
+  <h:request>
+     Finally,
+     <h:get>/resources/00000000-0000-0000-0000-000000000003/text/xml</h:get>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     yields response body:<br/>
+     <h:responseBody>&lt;body&gt;&lt;div&gt;&lt;p&gt;Mei mazim iriure ancillae ut.&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</h:responseBody><br/>
+     (Since this resource was not part of resourceIds, it has not been modified.)
+  </h:request>
+     
+</div>
+
+</body>
+</html>
