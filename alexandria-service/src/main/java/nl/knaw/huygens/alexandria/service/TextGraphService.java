@@ -99,6 +99,14 @@ public class TextGraphService {
         .map(this::toTextAnnotation);
   }
 
+  public void updateTextAnnotation(TextAnnotation textAnnotation) {
+    Object id = textAnnotation.getId();
+    Vertex vertex = storage.getVertexTraversal(id).next();
+    update(vertex, textAnnotation);
+  }
+
+  // private methods //
+
   private List<Vertex> storeTextSegments(List<String> textSegments, Vertex text) {
     List<Vertex> textSegmentVertices = new ArrayList<>();
     Vertex previous = null;
@@ -131,6 +139,12 @@ public class TextGraphService {
   }
 
   private Vertex toVertex(TextAnnotation textAnnotation) {
+    Vertex v = storage.addVertex(T.label, VertexLabels.TEXTANNOTATION);
+    update(v, textAnnotation);
+    return v;
+  }
+
+  private void update(Vertex v, TextAnnotation textAnnotation) {
     Map<String, String> attributes = textAnnotation.getAttributes();
     String[] attributeKeys = new String[attributes.size()];
     String[] attributeValues = new String[attributes.size()];
@@ -140,14 +154,10 @@ public class TextGraphService {
       attributeValues[i] = kv.getValue();
       i++;
     }
-    Vertex v = storage.addVertex(//
-        T.label, VertexLabels.TEXTANNOTATION, //
-        TextAnnotation.Properties.name, textAnnotation.getName(), //
-        TextAnnotation.Properties.attribute_keys, attributeKeys, //
-        TextAnnotation.Properties.attribute_values, attributeValues, //
-        TextAnnotation.Properties.depth, textAnnotation.getDepth()//
-    );
-    return v;
+    v.property(TextAnnotation.Properties.name, textAnnotation.getName());
+    v.property(TextAnnotation.Properties.attribute_keys, attributeKeys);
+    v.property(TextAnnotation.Properties.attribute_values, attributeValues);
+    v.property(TextAnnotation.Properties.depth, textAnnotation.getDepth());
   }
 
   private TextGraphSegment toTextGraphSegment(Vertex textSegment) {
@@ -181,24 +191,27 @@ public class TextGraphService {
         .collect(toList());
   }
 
-  private TextAnnotation toTextAnnotation(Vertex textAnnotation) {
+  private TextAnnotation toTextAnnotation(Vertex vertex) {
+    Map<String, String> attributes = getAttributeMap(vertex);
+    TextAnnotation textAnnotation = new TextAnnotation(//
+        vertex.value(TextAnnotation.Properties.name), //
+        attributes, //
+        vertex.value(TextAnnotation.Properties.depth)//
+    );
+    textAnnotation.setId(vertex.id());
+    return textAnnotation;
+  }
+
+  private Map<String, String> getAttributeMap(Vertex vertex) {
     Map<String, String> attributes = Maps.newLinkedHashMap();
-    if (textAnnotation.keys().contains(TextAnnotation.Properties.attribute_keys)) {
-      String[] keys = textAnnotation.value(TextAnnotation.Properties.attribute_keys);
-      String[] values = textAnnotation.value(TextAnnotation.Properties.attribute_values);
+    if (vertex.keys().contains(TextAnnotation.Properties.attribute_keys)) {
+      String[] keys = vertex.value(TextAnnotation.Properties.attribute_keys);
+      String[] values = vertex.value(TextAnnotation.Properties.attribute_values);
       for (int i = 0; i < keys.length; i++) {
         attributes.put(keys[i], values[i]);
       }
     }
-    return new TextAnnotation(//
-        textAnnotation.value(TextAnnotation.Properties.name), //
-        attributes, //
-        textAnnotation.value(TextAnnotation.Properties.depth)//
-    );
-  }
-
-
-  public void updateTextAnnotation(TextAnnotation textAnnotation) {
+    return attributes;
   }
 
 }

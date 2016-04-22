@@ -11,8 +11,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.inject.Inject;
 
-//import org.apache.tinkerpop.gremlin.structure.TextAnnotation;
-
 import com.google.common.collect.Lists;
 
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -94,7 +92,10 @@ public class AddUniqueIdCommand implements AlexandriaCommand {
     boolean valid = true;
     Parameters parameters = new Parameters();
     try {
-      parameters.resourceIds = (List<UUID>) parameterMap.get("resourceIds");
+      parameters.resourceIds = ((List<String>) parameterMap.get("resourceIds"))//
+          .stream()//
+          .map(UUID::fromString)//
+          .collect(toList());
     } catch (ClassCastException e) {
       commandResponse.addErrorLine("Parameter 'resourceIds' should be list of UUIDs.");
       valid = false;
