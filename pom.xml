@@ -38,7 +38,7 @@
     <classloader-leak-prevention.version>1.15.2</classloader-leak-prevention.version>
 
     <!-- Concordion Acceptance Test extensions -->
-    <cat.version>1.3.2</cat.version>
+    <cat.version>1.3.3</cat.version>
 
     <antlr4.version>4.5.3</antlr4.version>
     <!-- Generate parse tree visitor interface and base class. -->
