@@ -32,36 +32,47 @@
 <div id="annotate-text" c:execute="clearStorage()"
      data-desc="How can I add unique identifiers to certain elements in certain resource texts?">
      
-   Given a
-   <mark>resource</mark>
+   Given a resource
    with id <code c:set="#resId1">00000000-0000-0000-0000-000000000001</code>
    <span c:execute="resourceExists(#resId1)">exists</span>,<br/>
    which has
-   <span c:execute="resourceHasText(#resId1,#text1)">text
+   <span c:execute="resourceHasText(#resId1,#text1)">text<br/>
       <code c:set="#text1">&lt;body&gt;&lt;div&gt;&lt;p&gt;First paragraph&lt;/p&gt;&lt;/div&gt;&lt;div xml:id=&quot;div-1&quot;&gt;&lt;p&gt;Second paragraph&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</code>
-   </span>,
+   </span>,<br/>
    
-   a second
-   <mark>resource</mark><br/>
+   a second resource
    with id <code c:set="#resId2">00000000-0000-0000-0000-000000000002</code>
    <span c:execute="resourceExists(#resId2)">exists</span>,<br/>
    which has
-   <span c:execute="resourceHasText(#resId2,#text2)">text
+   <span c:execute="resourceHasText(#resId2,#text2)">text<br/>
       <code c:set="#text2">&lt;body&gt;&lt;div&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</code>
    </span>,<br/>
    
-   and a third
-   <mark>resource</mark>
+   and a third resource
    with id <code c:set="#resId3">00000000-0000-0000-0000-000000000003</code>
-   <span c:execute="resourceExists(#resId3)">exists</span>,<br/>
+   <span c:execute="resourceExists(#resId3)">exists</span>,
    which has
-   <span c:execute="resourceHasText(#resId3,#text3)">text
+   <span c:execute="resourceHasText(#resId3,#text3)">text<br/>
       <code c:set="#text3">&lt;body&gt;&lt;div&gt;&lt;p&gt;Mei mazim iriure ancillae ut.&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</code>
    </span>
-	
+  <br/>
+  <br/>
+
+  <h:request>
+     Then a
+     <h:get>/resources/00000000-0000-0000-0000-000000000001/text/xml</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     yields response body:<br/>
+     <h:responseBody>&lt;body&gt;&lt;div xml:id=&quot;div-2&quot;&gt;&lt;p xml:id=&quot;p-1&quot;&gt;First paragraph&lt;/p&gt;&lt;/div&gt;&lt;div xml:id=&quot;div-1&quot;&gt;&lt;p xml:id=&quot;p-2&quot;&gt;Second paragraph&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</h:responseBody><br/>
+     Note: elements that already had an xml:id kept this xml:id, and existing xml:ids were not used again. 
+  </h:request>
+  <br/>
+  <br/>
+
 	<h:request>
 	   If i now
-	   <h:put>/commands/add-unique-id</h:put>
+	   <h:post>/commands/add-unique-id</h:post>
 	   the body:
 	   <h:jsonBody>
 	     {
@@ -81,14 +92,15 @@
 	<br/>
 	
   <h:request>
-     Then
-     <h:get>/resources/00000000-0000-0000-0000-000000000001/text/xml</h:get>
+     Then a
+     <h:get>/resources/00000000-0000-0000-0000-000000000001/text/xml</h:get><br/>
      using
      <h:setHeader name="Accept">text/xml</h:setHeader><br/>
      yields response body:<br/>
      <h:responseBody>&lt;body&gt;&lt;div xml:id=&quot;div-2&quot;&gt;&lt;p xml:id=&quot;p-1&quot;&gt;First paragraph&lt;/p&gt;&lt;/div&gt;&lt;div xml:id=&quot;div-1&quot;&gt;&lt;p xml:id=&quot;p-2&quot;&gt;Second paragraph&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</h:responseBody><br/>
      Note: elements that already had an xml:id kept this xml:id, and existing xml:ids were not used again. 
   </h:request>
+  <br/>
 	
   <h:request>
      And
@@ -98,6 +110,7 @@
      yields response body:<br/>
      <h:responseBody>&lt;body&gt;&lt;div&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</h:responseBody><br/>
   </h:request>
+  <br/>
      
   <h:request>
      Finally,
