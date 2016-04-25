@@ -139,4 +139,6 @@ public interface AlexandriaService {
 
   void updateTextAnnotation(TextAnnotation textAnnotation);
 
+  void insertTextAnnotationAfter(TextAnnotation existingTextAnnotation, TextAnnotation newTextAnnotation);
+
 }

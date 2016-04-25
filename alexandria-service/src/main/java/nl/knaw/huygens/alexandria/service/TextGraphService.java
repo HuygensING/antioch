@@ -105,6 +105,9 @@ public class TextGraphService {
     update(vertex, textAnnotation);
   }
 
+  public void insertTextAnnotationAfter(TextAnnotation existingTextAnnotation, TextAnnotation newTextAnnotation) {
+  }
+
   // private methods //
 
   private List<Vertex> storeTextSegments(List<String> textSegments, Vertex text) {

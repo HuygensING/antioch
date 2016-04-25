@@ -60,4 +60,8 @@ public class TextAnnotation {
   public void setId(Object object) {
     this.id = object;
   }
+
+  public void setDepth(int newDepth) {
+    this.depth = newDepth;
+  }
 }

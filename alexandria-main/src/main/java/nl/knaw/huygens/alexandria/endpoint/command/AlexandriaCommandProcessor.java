@@ -16,11 +16,17 @@ public class AlexandriaCommandProcessor {
   }
 
   public CommandResponse process(String command, Map<String, Object> parameterMap) {
-    if (AddUniqueIdCommand.COMMAND_NAME.equals(command)) {
+    switch (command) {
+    case AddUniqueIdCommand.COMMAND_NAME:
       return new AddUniqueIdCommand(service).runWith(parameterMap);
+
+    case WrapContentInElementCommand.COMMAND_NAME:
+      return new WrapContentInElementCommand(service).runWith(parameterMap);
+
+    default:
+      return new CommandResponse().addErrorLine("command '" + command + "' not known.");
     }
 
-    return new CommandResponse().addErrorLine("command '" + command + "' not known.");
   }
 
 }

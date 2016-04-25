@@ -511,6 +511,42 @@ public class TinkerPopService implements AlexandriaService {
     storage.runInTransaction(Unchecked.runnable(() -> storage.readGraph(DumpFormat.valueOf(format), filename)));
   }
 
+  @Override
+  public void runInTransaction(Runnable runner) {
+    storage.runInTransaction(runner);
+  }
+
+  @Override
+  public boolean storeTextGraph(UUID resourceId, ParseResult result) {
+    if (readResource(resourceId).isPresent()) {
+      textGraphService.storeTextGraph(resourceId, result);
+      return true;
+    }
+    // something went wrong
+    readResource(resourceId).get().setHasText(false);
+    return false;
+  }
+
+  @Override
+  public Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceId) {
+    return textGraphService.getTextGraphSegmentStream(resourceId);
+  }
+
+  @Override
+  public Stream<TextAnnotation> getTextAnnotationStream(UUID resourceId) {
+    return textGraphService.getTextAnnotationStream(resourceId);
+  }
+
+  @Override
+  public void updateTextAnnotation(TextAnnotation textAnnotation) {
+    textGraphService.updateTextAnnotation(textAnnotation);
+  }
+
+  @Override
+  public void insertTextAnnotationAfter(TextAnnotation existingTextAnnotation, TextAnnotation newTextAnnotation) {
+    textGraphService.insertTextAnnotationAfter(existingTextAnnotation, newTextAnnotation);
+  }
+
   // - other public methods -//
 
   public void createSubResource(AlexandriaResource subResource) {
@@ -805,37 +841,5 @@ public class TinkerPopService implements AlexandriaService {
         .collect(toList());
     return results;
   }
-
-  @Override
-  public boolean storeTextGraph(UUID resourceId, ParseResult result) {
-    if (readResource(resourceId).isPresent()) {
-      textGraphService.storeTextGraph(resourceId, result);
-      return true;
-    }
-    // something went wrong
-    readResource(resourceId).get().setHasText(false);
-    return false;
-  }
-
-  @Override
-  public Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceId) {
-    return textGraphService.getTextGraphSegmentStream(resourceId);
-  }
-
-  @Override
-  public Stream<TextAnnotation> getTextAnnotationStream(UUID resourceId) {
-    return textGraphService.getTextAnnotationStream(resourceId);
-  }
-
-  @Override
-  public void updateTextAnnotation(TextAnnotation textAnnotation) {
-    textGraphService.updateTextAnnotation(textAnnotation);
-  }
-
-  @Override
-  public void runInTransaction(Runnable runner) {
-    storage.runInTransaction(runner);
-  }
-
 
 }
