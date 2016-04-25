@@ -6,6 +6,7 @@ import static nl.knaw.huygens.alexandria.text.TextUtil.XML_ID;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -13,6 +14,7 @@ import javax.inject.Inject;
 
 import com.google.common.collect.Lists;
 
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
 
@@ -97,10 +99,23 @@ public class AddUniqueIdCommand implements AlexandriaCommand {
           .stream()//
           .map(UUID::fromString)//
           .collect(toList());
-    } catch (ClassCastException e) {
-      commandResponse.addErrorLine("Parameter 'resourceIds' should be list of UUIDs.");
+    } catch (ClassCastException | IllegalArgumentException e) {
+      commandResponse.addErrorLine("Parameter 'resourceIds' should be list of UUIDs referring to existing resources that have a text.");
       valid = false;
     }
+
+    for (UUID resourceId : parameters.resourceIds) {
+      Optional<AlexandriaResource> optionalResource = service.readResource(resourceId);
+      if (optionalResource.isPresent()) {
+        if (!optionalResource.get().hasText()) {
+          commandResponse.addErrorLine("resource '" + resourceId + "' does not have a text.");
+        }
+      } else {
+        commandResponse.addErrorLine("resourceId '" + resourceId + "' does not exist.");
+        valid = false;
+      }
+    }
+
     try {
       parameters.elementNames = (List<String>) parameterMap.get("elements");
     } catch (ClassCastException e) {
