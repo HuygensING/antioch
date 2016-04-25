@@ -390,3 +390,15 @@ curl -i -H "${authheader}" -X POST $be/commands/add-unique-id -H 'Content-type: 
       \"resourceIds\" : [\"$ri\"],
       \"elements\": [ \"div\", \"p\" ]
   }"
+
+curl -i -H "${authheader}" -X POST $be/commands/wrap-content-in-element -H 'Content-type: application/json' \
+--data-binary "{
+      \"resourceIds\" : [\"$ri\"],
+      \"xmlIds\": [ \"\", \"\" ]
+      \"element\": {
+        \"name\" : \"hi\",
+        \"attributes\" : {
+          \"rend\" : \"green\"
+        }
+      }
+  }"

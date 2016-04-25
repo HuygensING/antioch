@@ -26,13 +26,14 @@ public class AddUniqueIdCommand extends TextAnnotationCommand {
 
   private static class Context {
     private static final String XMLID_MARKER = "-";
-    private static final Map<String, AtomicLong> counters = new HashMap<>();
-    private List<String> existingIds = Lists.newArrayList();
+    private final Map<String, AtomicLong> counters;
+    private List<String> existingIds;
     private AlexandriaService service;
 
     public Context(AlexandriaService service) {
       this.service = service;
-      counters.clear();
+      this.counters = new HashMap<>();
+      this.existingIds = Lists.newArrayList();
     }
 
     public void setXmlId(TextAnnotation textAnnotation) {

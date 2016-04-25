@@ -6,7 +6,9 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
+import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.text.TextUtil;
 import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
 
 public class WrapContentInElementCommand extends TextAnnotationCommand {
@@ -19,19 +21,27 @@ public class WrapContentInElementCommand extends TextAnnotationCommand {
   }
 
   private static class Context {
-    private AlexandriaService service;
-    private TextAnnotation contentWrapper;
+    private final AlexandriaService service;
+    private final TextAnnotation contentWrapper;
+    private final List<String> xmlIds;
 
-    public Context(AlexandriaService service, TextAnnotation contentWrapper) {
+    public Context(AlexandriaService service, Parameters parameters) {
       this.service = service;
-      this.contentWrapper = contentWrapper;
+      this.contentWrapper = parameters.contentWrapper;
+      this.xmlIds = parameters.xmlIds;
     }
 
-    public void wrapContent(TextAnnotation textAnnotation) {
-      int newDepth = textAnnotation.getDepth() + 1;
-      contentWrapper.setDepth(newDepth);
-      service.insertTextAnnotationAfter(textAnnotation, contentWrapper);
+    public void wrapContent(TextAnnotation parentTextAnnotation) {
+      contentWrapper.setDepth(parentTextAnnotation.getDepth() + 1);
+      service.wrapContentInChildTextAnnotation(parentTextAnnotation, contentWrapper);
     }
+
+    public boolean hasRelevantXmlId(TextAnnotation textAnnotation) {
+      Log.info("textAnnotation={}", textAnnotation);
+      String xmlId = textAnnotation.getAttributes().get(TextUtil.XML_ID);
+      return xmlIds.contains(xmlId);
+    }
+
   }
 
   private CommandResponse commandResponse = new CommandResponse();
@@ -48,9 +58,9 @@ public class WrapContentInElementCommand extends TextAnnotationCommand {
     if (commandResponse.paremetersAreValid()) {
       for (UUID resourceId : parameters.resourceIds) {
         service.runInTransaction(() -> {
-          Context context = new Context(service, parameters.contentWrapper);
+          Context context = new Context(service, parameters);
           service.getTextAnnotationStream(resourceId)//
-              .filter(parameters.xmlIds::contains)//
+              .filter(context::hasRelevantXmlId)//
               .forEach(context::wrapContent);
         });
       }
@@ -72,7 +82,10 @@ public class WrapContentInElementCommand extends TextAnnotationCommand {
 
     try {
       Map<String, Object> elementMap = (Map) parameterMap.get("element");
-
+      String name = (String) elementMap.get("name");
+      Map<String, String> attributes = (Map<String, String>) elementMap.get("attributes");
+      TextAnnotation newTextAnnotation = new TextAnnotation(name, attributes, 0);
+      parameters.contentWrapper = newTextAnnotation;
 
     } catch (ClassCastException e) {
       commandResponse.addErrorLine("Parameter 'element' should be a single element with name and attributes.");

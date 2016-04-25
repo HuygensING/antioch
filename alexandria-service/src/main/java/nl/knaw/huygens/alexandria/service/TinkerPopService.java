@@ -543,8 +543,8 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public void insertTextAnnotationAfter(TextAnnotation existingTextAnnotation, TextAnnotation newTextAnnotation) {
-    textGraphService.insertTextAnnotationAfter(existingTextAnnotation, newTextAnnotation);
+  public void wrapContentInChildTextAnnotation(TextAnnotation existingTextAnnotation, TextAnnotation newTextAnnotation) {
+    textGraphService.wrapContentInChildTextAnnotation(existingTextAnnotation, newTextAnnotation);
   }
 
   // - other public methods -//

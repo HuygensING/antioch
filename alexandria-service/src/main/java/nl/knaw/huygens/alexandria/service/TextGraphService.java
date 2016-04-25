@@ -14,11 +14,13 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.apache.tinkerpop.gremlin.structure.Direction;
+import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import com.google.common.collect.Maps;
 
+import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.storage.EdgeLabels;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.VertexLabels;
@@ -100,15 +102,41 @@ public class TextGraphService {
   }
 
   public void updateTextAnnotation(TextAnnotation textAnnotation) {
-    Object id = textAnnotation.getId();
-    Vertex vertex = storage.getVertexTraversal(id).next();
+    Vertex vertex = getTextAnnotationVertex(textAnnotation);
     update(vertex, textAnnotation);
   }
 
-  public void insertTextAnnotationAfter(TextAnnotation existingTextAnnotation, TextAnnotation newTextAnnotation) {
+  public void wrapContentInChildTextAnnotation(TextAnnotation existingTextAnnotation, TextAnnotation newTextAnnotation) {
+    Vertex parentVertex = getTextAnnotationVertex(existingTextAnnotation);
+    Log.debug("wrapContentInChildTextAnnotation: parent={}", parentVertex);
+    Iterator<Edge> parentOutEdges = parentVertex.edges(Direction.OUT, EdgeLabels.FIRST_TEXT_SEGMENT, EdgeLabels.LAST_TEXT_SEGMENT, EdgeLabels.NEXT);
+    Vertex childVertex = toVertex(newTextAnnotation);
+    Log.debug("wrapContentInChildTextAnnotation: child={}", childVertex);
+
+    // copy FIRST_TEXT_SEGMENT, LAST_TEXT_SEGMENT, NEXT edges from parentVertex to childVertex
+    while (parentOutEdges.hasNext()) {
+      Edge outEdge = parentOutEdges.next();
+      Log.debug("wrapContentInChildTextAnnotation: outEdge={}", outEdge);
+      childVertex.addEdge(outEdge.label(), outEdge.inVertex());
+    }
+    // remove existing NEXT edge for parentVertex, replace with NEXT edge pointing to childVertex
+    Iterator<Edge> parentNextEdgeIterator = parentVertex.edges(Direction.OUT, EdgeLabels.NEXT);
+    if (parentNextEdgeIterator.hasNext()) {
+      Edge nextEdge = parentNextEdgeIterator.next();
+      Log.debug("wrapContentInChildTextAnnotation: nextEdge={}", nextEdge);
+      nextEdge.remove();
+      Edge newNextEdge = parentVertex.addEdge(EdgeLabels.NEXT, childVertex);
+      Log.debug("wrapContentInChildTextAnnotation: newNextEdge={}", newNextEdge);
+    }
   }
 
   // private methods //
+
+  private Vertex getTextAnnotationVertex(TextAnnotation textAnnotation) {
+    Object id = textAnnotation.getId();
+    Vertex vertex = storage.getVertexTraversal(id).next();
+    return vertex;
+  }
 
   private List<Vertex> storeTextSegments(List<String> textSegments, Vertex text) {
     List<Vertex> textSegmentVertices = new ArrayList<>();
