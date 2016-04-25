@@ -37,9 +37,10 @@
    <span c:execute="resourceExists(#resId1)">exists</span>,<br/>
    which has
    <span c:execute="resourceHasText(#resId1,#text1)">text<br/>
-      <code c:set="#text1">&lt;body&gt;&lt;div&gt;&lt;p&gt;First paragraph&lt;/p&gt;&lt;/div&gt;&lt;div xml:id=&quot;div-1&quot;&gt;&lt;p&gt;Second paragraph&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</code>
+     <code c:set="#text1">&lt;body&gt;&lt;div&gt;&lt;p&gt;First paragraph&lt;/p&gt;&lt;/div&gt;&lt;div xml:id=&quot;div-1&quot;&gt;&lt;p&gt;Second paragraph&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</code>
    </span>,<br/>
-   
+   <br/>
+
    a second resource
    with id <code c:set="#resId2">00000000-0000-0000-0000-000000000002</code>
    <span c:execute="resourceExists(#resId2)">exists</span>,<br/>
@@ -47,7 +48,8 @@
    <span c:execute="resourceHasText(#resId2,#text2)">text<br/>
       <code c:set="#text2">&lt;body&gt;&lt;div&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</code>
    </span>,<br/>
-   
+   <br/>
+      
    and a third resource
    with id <code c:set="#resId3">00000000-0000-0000-0000-000000000003</code>
    <span c:execute="resourceExists(#resId3)">exists</span>,
@@ -91,7 +93,15 @@
      using
      <h:setHeader name="Accept">text/xml</h:setHeader><br/>
      yields response body:<br/>
-     <h:responseBody>&lt;body&gt;&lt;div xml:id=&quot;div-2&quot;&gt;&lt;p xml:id=&quot;p-1&quot;&gt;First paragraph&lt;/p&gt;&lt;/div&gt;&lt;div xml:id=&quot;div-1&quot;&gt;&lt;p xml:id=&quot;p-2&quot;&gt;Second paragraph&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</h:responseBody><br/>
+     <h:xmlResponse>
+<![CDATA[
+<body>
+  <div xml:id="div-2"><p xml:id="p-1">First paragraph</p></div>
+  <div xml:id="div-1"><p xml:id="p-2">Second paragraph</p></div>
+</body>
+]]>
+     </h:xmlResponse><br/>
+     <small>(indentation added for increased readability)</small><br/>
      Note: elements that already had an xml:id kept this xml:id, and existing xml:ids were not used again. 
   </h:request>
   <br/>
@@ -102,7 +112,16 @@
      using
      <h:setHeader name="Accept">text/xml</h:setHeader><br/>
      yields response body:<br/>
-     <h:responseBody>&lt;body&gt;&lt;div xml:id=&quot;div-1&quot;&gt;&lt;p xml:id=&quot;p-1&quot;&gt;Lorem ipsum&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</h:responseBody><br/>
+     <h:xmlResponse>
+<![CDATA[
+<body>
+  <div xml:id="div-1">
+    <p xml:id="p-1">Lorem ipsum</p>
+  </div>
+</body>
+]]>
+     </h:xmlResponse><br/>
+     <small>(indentation added for increased readability)</small><br/>
   </h:request>
   <br/>
      
@@ -112,7 +131,16 @@
      using
      <h:setHeader name="Accept">text/xml</h:setHeader><br/>
      yields response body:<br/>
-     <h:responseBody>&lt;body&gt;&lt;div&gt;&lt;p&gt;Mei mazim iriure ancillae ut.&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</h:responseBody><br/>
+     <h:xmlResponse>
+<![CDATA[
+<body>
+  <div>
+    <p>Mei mazim iriure ancillae ut.</p>
+  </div>
+</body>
+]]>
+     </h:xmlResponse><br/>
+     <small>(indentation added for increased readability)</small><br/>
      (Since this resource was not part of resourceIds, it has not been modified.)
   </h:request>
      
@@ -170,7 +198,15 @@
      using
      <h:setHeader name="Accept">text/xml</h:setHeader><br/>
      yields response body:<br/>
-     <h:responseBody>&lt;body&gt;&lt;div xml:id=&quot;div-1&quot;&gt;&lt;hi rend=&quot;italic&quot;&gt;&lt;p xml:id=&quot;p-1&quot;&gt;First paragraph&lt;/p&gt;&lt;/hi&gt;&lt;/div&gt;&lt;div xml:id=&quot;div-2&quot;&gt;&lt;p xml:id=&quot;p-2&quot;&gt;&lt;hi rend=&quot;italic&quot;&gt;Second paragraph&lt;/hi&gt;&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</h:responseBody><br/>
+     <h:xmlResponse>
+<![CDATA[
+<body>
+  <div xml:id="div-1"><hi rend="italic"><p xml:id="p-1">First paragraph</p></hi></div>
+  <div xml:id="div-2"><p xml:id="p-2"><hi rend="italic">Second paragraph</hi></p></div>
+</body>
+]]>
+     </h:xmlResponse><br/>
+     <small>(indentation added for increased readability)</small><br/>
   </h:request>
   <br/>
 </div>

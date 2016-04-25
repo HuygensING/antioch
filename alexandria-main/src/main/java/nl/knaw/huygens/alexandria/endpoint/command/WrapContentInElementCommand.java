@@ -64,11 +64,21 @@ public class WrapContentInElementCommand extends TextAnnotationCommand {
     boolean valid = (commandResponse.getErrorLines().isEmpty());
 
     try {
-      // parameters.elementNames = (List<String>) parameterMap.get("elements");
+      parameters.xmlIds = (List<String>) parameterMap.get("xmlIds");
     } catch (ClassCastException e) {
-      // commandResponse.addErrorLine("Parameter 'elements' should be list of Strings.");
+      commandResponse.addErrorLine("Parameter 'xmlIds' should be a list of Strings.");
       valid = false;
     }
+
+    try {
+      Map<String, Object> elementMap = (Map) parameterMap.get("element");
+
+
+    } catch (ClassCastException e) {
+      commandResponse.addErrorLine("Parameter 'element' should be a single element with name and attributes.");
+      valid = false;
+    }
+
     if (valid) {
       commandResponse.setParametersAreValid();
     }
