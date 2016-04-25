@@ -4,6 +4,8 @@ import static java.util.UUID.fromString;
 
 import java.util.UUID;
 
+import org.concordion.api.ExpectedToFail;
+
 /*
  * #%L
  * alexandria-acceptance-tests
@@ -35,6 +37,7 @@ import nl.knaw.huygens.alexandria.textgraph.ParseResult;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 
 @RunWith(ConcordionRunner.class)
+@ExpectedToFail
 public class TextModificationsFixture extends ResourcesBase {
 
   public void resourceHasText(String resId, String xml) {
