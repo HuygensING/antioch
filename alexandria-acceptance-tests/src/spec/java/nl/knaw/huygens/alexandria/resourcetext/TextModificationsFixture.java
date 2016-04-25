@@ -2,7 +2,7 @@ package nl.knaw.huygens.alexandria.resourcetext;
 
 import static java.util.UUID.fromString;
 
-import org.concordion.api.ExpectedToFail;
+import java.util.UUID;
 
 /*
  * #%L
@@ -31,14 +31,16 @@ import org.junit.runner.RunWith;
 
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.resource.ResourcesBase;
+import nl.knaw.huygens.alexandria.textgraph.ParseResult;
+import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 
 @RunWith(ConcordionRunner.class)
-@ExpectedToFail
 public class TextModificationsFixture extends ResourcesBase {
 
   public void resourceHasText(String resId, String xml) {
     final AlexandriaResource resource = theResource(fromString(resId));
-    // do something!
+    ParseResult result = TextGraphUtil.parse(xml);
+    service().storeTextGraph(UUID.fromString(resId), result);
   }
 
 }

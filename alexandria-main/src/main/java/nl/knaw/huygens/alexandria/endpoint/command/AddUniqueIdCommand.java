@@ -32,6 +32,7 @@ public class AddUniqueIdCommand implements AlexandriaCommand {
 
     public Context(AlexandriaService service) {
       this.service = service;
+      counters.clear();
     }
 
     public void setXmlId(TextAnnotation textAnnotation) {

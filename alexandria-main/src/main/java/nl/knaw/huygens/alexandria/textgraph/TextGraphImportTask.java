@@ -16,16 +16,14 @@ public class TextGraphImportTask implements Runnable {
   private String xml;
   private AlexandriaResource resource;
   private TextGraphImportStatus status;
-  private String who;
   private UUID resourceId;
 
-  public TextGraphImportTask(AlexandriaService service, LocationBuilder locationBuilder, String xml, AlexandriaResource resource, String who) {
+  public TextGraphImportTask(AlexandriaService service, LocationBuilder locationBuilder, String xml, AlexandriaResource resource) {
     this.service = service;
     this.locationBuilder = locationBuilder;
     this.xml = xml;
     this.resource = resource;
     this.resourceId = resource.getId();
-    this.who = who;
     this.status = new TextGraphImportStatus();
   }
 
@@ -38,7 +36,7 @@ public class TextGraphImportTask implements Runnable {
     status.setStarted();
     try {
       ParseResult result = TextGraphUtil.parse(xml);
-      boolean success = service.storeTextGraph(resourceId, result, who);
+      boolean success = service.storeTextGraph(resourceId, result);
       if (success) {
         status.setTextURI(locationBuilder.locationOf(resource, EndpointPaths.TEXT, "xml"));
       } else {

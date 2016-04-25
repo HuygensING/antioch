@@ -58,18 +58,6 @@
   <br/>
   <br/>
 
-  <h:request>
-     Then a
-     <h:get>/resources/00000000-0000-0000-0000-000000000001/text/xml</h:get><br/>
-     using
-     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
-     yields response body:<br/>
-     <h:responseBody>&lt;body&gt;&lt;div xml:id=&quot;div-2&quot;&gt;&lt;p xml:id=&quot;p-1&quot;&gt;First paragraph&lt;/p&gt;&lt;/div&gt;&lt;div xml:id=&quot;div-1&quot;&gt;&lt;p xml:id=&quot;p-2&quot;&gt;Second paragraph&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</h:responseBody><br/>
-     Note: elements that already had an xml:id kept this xml:id, and existing xml:ids were not used again. 
-  </h:request>
-  <br/>
-  <br/>
-
 	<h:request>
 	   If i now
 	   <h:post>/commands/add-unique-id</h:post>
@@ -85,7 +73,13 @@
 	   then I should receive
 	   <ul>
 	     <li>status <h:status>200 OK</h:status></li>
-	     <li>and the response body is <h:responseBody/>
+	     <li>and the response body is
+	     <h:jsonResponse>
+          {
+            "errorLines" : [ ],
+            "paremetersAreValid" : true
+          }
+	     </h:jsonResponse>
 	     </li>
 	   </ul>
 	</h:request>
@@ -108,7 +102,7 @@
      using
      <h:setHeader name="Accept">text/xml</h:setHeader><br/>
      yields response body:<br/>
-     <h:responseBody>&lt;body&gt;&lt;div&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</h:responseBody><br/>
+     <h:responseBody>&lt;body&gt;&lt;div xml:id=&quot;div-1&quot;&gt;&lt;p xml:id=&quot;p-1&quot;&gt;Lorem ipsum&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</h:responseBody><br/>
   </h:request>
   <br/>
      

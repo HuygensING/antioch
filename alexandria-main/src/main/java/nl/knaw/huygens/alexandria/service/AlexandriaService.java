@@ -129,7 +129,7 @@ public interface AlexandriaService {
    */
   List<TextView> getTextViewsForResource(UUID resourceUUID);
 
-  boolean storeTextGraph(UUID resourceId, ParseResult result, String who);
+  boolean storeTextGraph(UUID resourceId, ParseResult result);
 
   Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceId);
 

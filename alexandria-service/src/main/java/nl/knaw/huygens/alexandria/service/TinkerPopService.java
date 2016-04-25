@@ -807,7 +807,7 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public boolean storeTextGraph(UUID resourceId, ParseResult result, String who) {
+  public boolean storeTextGraph(UUID resourceId, ParseResult result) {
     if (readResource(resourceId).isPresent()) {
       textGraphService.storeTextGraph(resourceId, result);
       return true;

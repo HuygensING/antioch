@@ -35,7 +35,6 @@ import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
-import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.text.TextPrototype;
@@ -159,7 +158,7 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
   /* private methods */
 
   private void startTextProcessing(String xml) {
-    TextGraphImportTask task = new TextGraphImportTask(service, locationBuilder, xml, resource, ThreadContext.getUserName());
+    TextGraphImportTask task = new TextGraphImportTask(service, locationBuilder, xml, resource);
     taskStatusMap.put(resource.getId(), task.getStatus());
     if (config.asynchronousEndpointsAllowed()) {
       executorService.execute(task);
