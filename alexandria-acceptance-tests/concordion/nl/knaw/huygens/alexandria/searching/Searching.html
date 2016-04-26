@@ -181,7 +181,7 @@ ins {
     "find" : "annotation",
     "where" : "who:eq(\"nederlab\")",
     "sort" : "-when",
-    "return" : "list(id),resource.url",
+    "return" : "list(id,subresource.sub),resource.url",
     "distinct" : false,
     "pageSize" : 10
   }
@@ -210,7 +210,7 @@ ins {
         <dt><code>return</code></dt>
         <dd>used to select which fields (ref. <code>where</code>) from the result-set are returned in the output.<br />
             <small>(if left unspecified, <code>id</code> is returned by default)</small><br />
-            one of these fields can be wrapped in the function <code>list()</code>, in the results this field will be returned as a list of values, grouped by the combination of the values for the other fields in the <code>return</code> clause.
+            one or more of these fields can be wrapped in the function <code>list()</code>, in the results these fields will be returned as a list of values, grouped by the combination of the values for the other fields in the <code>return</code> clause.
         </dd>
         <dt><code>distinct</code></dt>
         <dd>used to indicate the resulting combinations of values for the selected return fields should be unique.<br />
@@ -243,13 +243,13 @@ ins {
     </div>
 
     <div c:execute="#searchId = uuid()">In this case the generated search id (taken from the <code>Location</code>
-        header) is: <code c:echo="#searchId">e74e52fa-2c6f-4f50-b2b2-10d500967881</code>.
+        header) is: <code c:echo="#searchId">5716cba7-26e9-42cd-8c0d-8a80187278fd</code>.
     </div>
 
     <hr />
 
     <div h:request="">When we
-        <code class="get">/searches/e74e52fa-2c6f-4f50-b2b2-10d500967881</code>
+        <code class="get">/searches/5716cba7-26e9-42cd-8c0d-8a80187278fd</code>
         we expect status
         <code h:status="" class="success">200 OK</code>
         and a response body containing:
@@ -269,9 +269,9 @@ ins {
     }, {
       "_resultNumber" : 3
     } ],
-    "^firstPage" : "https://{host}/searches/e74e52fa-2c6f-4f50-b2b2-10d500967881/pages/1",
-    "^nextPage" : "https://{host}/searches/e74e52fa-2c6f-4f50-b2b2-10d500967881/pages/2",
-    "^lastPage" : "https://{host}/searches/e74e52fa-2c6f-4f50-b2b2-10d500967881/pages/3"
+    "^firstPage" : "https://{host}/searches/5716cba7-26e9-42cd-8c0d-8a80187278fd/pages/1",
+    "^nextPage" : "https://{host}/searches/5716cba7-26e9-42cd-8c0d-8a80187278fd/pages/2",
+    "^lastPage" : "https://{host}/searches/5716cba7-26e9-42cd-8c0d-8a80187278fd/pages/3"
   }
 }</pre>
     </div>
@@ -287,7 +287,7 @@ ins {
 
     <div h:request="">
         Now
-        <code class="get">/searches/e74e52fa-2c6f-4f50-b2b2-10d500967881/pages/2</code>
+        <code class="get">/searches/5716cba7-26e9-42cd-8c0d-8a80187278fd/pages/2</code>
         results in status
         <code h:status="" class="success">200 OK</code>
         and body
@@ -301,10 +301,10 @@ ins {
     }, {
       "_resultNumber" : 6
     } ],
-    "^firstPage" : "https://{host}/searches/e74e52fa-2c6f-4f50-b2b2-10d500967881/pages/1",
-    "^nextPage" : "https://{host}/searches/e74e52fa-2c6f-4f50-b2b2-10d500967881/pages/3",
-    "^previousPage" : "https://{host}/searches/e74e52fa-2c6f-4f50-b2b2-10d500967881/pages/1",
-    "^lastPage" : "https://{host}/searches/e74e52fa-2c6f-4f50-b2b2-10d500967881/pages/3"
+    "^firstPage" : "https://{host}/searches/5716cba7-26e9-42cd-8c0d-8a80187278fd/pages/1",
+    "^nextPage" : "https://{host}/searches/5716cba7-26e9-42cd-8c0d-8a80187278fd/pages/3",
+    "^previousPage" : "https://{host}/searches/5716cba7-26e9-42cd-8c0d-8a80187278fd/pages/1",
+    "^lastPage" : "https://{host}/searches/5716cba7-26e9-42cd-8c0d-8a80187278fd/pages/3"
   }
 }</pre>
     </div>
@@ -313,7 +313,7 @@ ins {
 
     <div h:request="">
         And
-        <code class="get">/searches/e74e52fa-2c6f-4f50-b2b2-10d500967881/pages/3</code>
+        <code class="get">/searches/5716cba7-26e9-42cd-8c0d-8a80187278fd/pages/3</code>
         results in status
         <code h:status="" class="success">200 OK</code>
         and body
@@ -325,9 +325,9 @@ ins {
     }, {
       "_resultNumber" : 8
     } ],
-    "^firstPage" : "https://{host}/searches/e74e52fa-2c6f-4f50-b2b2-10d500967881/pages/1",
-    "^previousPage" : "https://{host}/searches/e74e52fa-2c6f-4f50-b2b2-10d500967881/pages/2",
-    "^lastPage" : "https://{host}/searches/e74e52fa-2c6f-4f50-b2b2-10d500967881/pages/3"
+    "^firstPage" : "https://{host}/searches/5716cba7-26e9-42cd-8c0d-8a80187278fd/pages/1",
+    "^previousPage" : "https://{host}/searches/5716cba7-26e9-42cd-8c0d-8a80187278fd/pages/2",
+    "^lastPage" : "https://{host}/searches/5716cba7-26e9-42cd-8c0d-8a80187278fd/pages/3"
   }
 }</pre>
     </div>
@@ -335,14 +335,14 @@ ins {
     <hr />
 
     <div h:request="">When we try to
-        <code class="get">/searches/e74e52fa-2c6f-4f50-b2b2-10d500967881/pages/0</code>
+        <code class="get">/searches/5716cba7-26e9-42cd-8c0d-8a80187278fd/pages/0</code>
         we receive
         <code h:status="" class="success">404 Not Found</code>
     </div>
 
     <div h:request="">
         Likewise
-        <code class="get">/searches/e74e52fa-2c6f-4f50-b2b2-10d500967881/pages/4</code>
+        <code class="get">/searches/5716cba7-26e9-42cd-8c0d-8a80187278fd/pages/4</code>
         results in status
         <code h:status="" class="success">404 Not Found</code>
         as the requested page lies beyond the maximum.
@@ -352,5 +352,5 @@ ins {
         Valid result page numbers are <code>1</code> up to and including the number of <code>totalPages</code>.
     </div>
 
-</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 227 ms on 05-Apr-2016 at 14:24:24 CEST</div></div></body>
+</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 149 ms on 26-Apr-2016 at 14:04:24 CEST</div></div></body>
 </html>
