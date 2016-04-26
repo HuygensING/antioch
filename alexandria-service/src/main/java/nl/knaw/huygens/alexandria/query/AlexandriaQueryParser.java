@@ -428,7 +428,7 @@ public class AlexandriaQueryParser {
 
   private void parseReturn(final ParsedAlexandriaQuery paq, final String fieldString) {
     final List<String> fields = splitToList(fieldString);
-    final String listField = extractListfield(fieldString);
+    final List<String> listFields = extractListfields(fieldString);
     final List<String> allowedFields = QueryField.ALL_EXTERNAL_NAMES;
     final List<String> unknownFields = Lists.newArrayList(fields);
     unknownFields.removeAll(allowedFields);
@@ -437,7 +437,7 @@ public class AlexandriaQueryParser {
 
     } else {
       paq.setReturnFields(fields);
-      paq.setListField(listField);
+      paq.setFieldsToGroup(listFields);
 
       final Function<AnnotationVF, Map<String, Object>> mapper = avf -> fields.stream()//
           .collect(toMap(Function.identity(), f -> QueryFieldGetters.get(QueryField.fromExternalName(f)).apply(avf)));
@@ -448,13 +448,17 @@ public class AlexandriaQueryParser {
 
   static final Pattern LISTPATTERN = Pattern.compile("list\\((.*)\\)");
 
-  private String extractListfield(String fieldString) {
+  private List<String> extractListfields(String fieldString) {
     Matcher matcher = LISTPATTERN.matcher(fieldString);
-    return matcher.find() ? matcher.group(1) : null;
+    String listFields = matcher.find() ? matcher.group(1) : "";
+    return splitToList(listFields);
   }
 
   private static List<String> splitToList(final String fieldString) {
-    return Splitter.on(",").trimResults().splitToList(fieldString.replace("list(", "").replace(")", ""));
+    return Splitter.on(",")//
+        .trimResults()//
+        .omitEmptyStrings()//
+        .splitToList(fieldString.replace("list(", "").replace(")", ""));
   }
 
 }

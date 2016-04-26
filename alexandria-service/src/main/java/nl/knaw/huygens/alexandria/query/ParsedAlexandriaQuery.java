@@ -1,7 +1,6 @@
 package nl.knaw.huygens.alexandria.query;
 
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
 
 /*
  * #%L
@@ -33,6 +32,9 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
@@ -48,7 +50,7 @@ public class ParsedAlexandriaQuery {
   private Boolean distinct;
 
   private List<String> returnFields;
-  private String listField;
+  private List<String> fieldsToGroup = Lists.newArrayList();
   private Predicate<AnnotationVF> predicate;
   private Comparator<AnnotationVF> comparator;
   private Function<AnnotationVF, Map<String, Object>> mapper;
@@ -113,22 +115,22 @@ public class ParsedAlexandriaQuery {
     return annotationVFFinder;
   }
 
-  public void setListField(String listField) {
-    this.listField = listField;
+  public void setFieldsToGroup(List<String> listFields) {
+    this.fieldsToGroup = listFields;
   }
 
-  String getListField() {
-    return listField;
+  List<String> getFieldsToGroup() {
+    return fieldsToGroup;
   }
 
   public boolean doGrouping() {
-    return listField != null;
+    return !fieldsToGroup.isEmpty();
   }
 
   public String concatenateGroupByFieldsValues(Map<String, Object> map) {
     if (doGrouping()) {
       return returnFields.stream()//
-          .filter(f -> !f.equals(listField))//
+          .filter(f -> !fieldsToGroup.contains(f))//
           .sorted()//
           .map(map::get)//
           .map(Object::toString)//
@@ -140,10 +142,16 @@ public class ParsedAlexandriaQuery {
   public Map<String, Object> collectListFieldValues(List<Map<String, Object>> mapList) {
     if (doGrouping()) {
       Map<String, Object> map = mapList.get(0);
-      List<Object> list = mapList.stream()//
-          .map((m) -> m.get(listField))//
-          .collect(toList());
-      map.put(listField, list);
+      List<Map<String, Object>> groupedValuesList = Lists.newArrayList();
+      for (Map<String, Object> resultMap : mapList) {
+        Map<String, Object> groupedValuesMap = Maps.newHashMap();
+        for (String field : fieldsToGroup) {
+          groupedValuesMap.put(field, resultMap.get(field));
+        }
+        groupedValuesList.add(groupedValuesMap);
+      }
+      fieldsToGroup.forEach(map::remove);
+      map.put("_list", groupedValuesList);
       return map;
     }
     return null;
