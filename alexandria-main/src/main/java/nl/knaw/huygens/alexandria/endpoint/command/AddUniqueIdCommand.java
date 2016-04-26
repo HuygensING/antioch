@@ -78,6 +78,7 @@ public class AddUniqueIdCommand extends TextAnnotationCommand {
     return commandResponse;
   }
 
+  @SuppressWarnings("unchecked")
   private Parameters validateParameters(Map<String, Object> parameterMap) {
     final Parameters parameters = new Parameters();
     parameters.resourceIds = validateResourceIds(parameterMap, commandResponse, service);

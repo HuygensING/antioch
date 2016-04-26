@@ -68,6 +68,7 @@ public class WrapContentInElementCommand extends TextAnnotationCommand {
     return commandResponse;
   }
 
+  @SuppressWarnings("unchecked")
   private Parameters validateParameters(Map<String, Object> parameterMap) {
     Parameters parameters = new Parameters();
     parameters.resourceIds = validateResourceIds(parameterMap, commandResponse, service);

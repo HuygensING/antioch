@@ -18,9 +18,9 @@ import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.storage.EdgeLabels;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.VertexLabels;
@@ -108,26 +108,52 @@ public class TextGraphService {
 
   public void wrapContentInChildTextAnnotation(TextAnnotation existingTextAnnotation, TextAnnotation newTextAnnotation) {
     Vertex parentVertex = getTextAnnotationVertex(existingTextAnnotation);
-    Log.debug("wrapContentInChildTextAnnotation: parent={}", parentVertex);
     Iterator<Edge> parentOutEdges = parentVertex.edges(Direction.OUT, EdgeLabels.FIRST_TEXT_SEGMENT, EdgeLabels.LAST_TEXT_SEGMENT, EdgeLabels.NEXT);
     Vertex childVertex = toVertex(newTextAnnotation);
-    Log.debug("wrapContentInChildTextAnnotation: child={}", childVertex);
 
     // copy FIRST_TEXT_SEGMENT, LAST_TEXT_SEGMENT, NEXT edges from parentVertex to childVertex
     while (parentOutEdges.hasNext()) {
       Edge outEdge = parentOutEdges.next();
-      Log.debug("wrapContentInChildTextAnnotation: outEdge={}", outEdge);
       childVertex.addEdge(outEdge.label(), outEdge.inVertex());
     }
     // remove existing NEXT edge for parentVertex, replace with NEXT edge pointing to childVertex
     Iterator<Edge> parentNextEdgeIterator = parentVertex.edges(Direction.OUT, EdgeLabels.NEXT);
     if (parentNextEdgeIterator.hasNext()) {
       Edge nextEdge = parentNextEdgeIterator.next();
-      Log.debug("wrapContentInChildTextAnnotation: nextEdge={}", nextEdge);
       nextEdge.remove();
-      Edge newNextEdge = parentVertex.addEdge(EdgeLabels.NEXT, childVertex);
-      Log.debug("wrapContentInChildTextAnnotation: newNextEdge={}", newNextEdge);
+      parentVertex.addEdge(EdgeLabels.NEXT, childVertex);
+
+      // increase the depth of the next textannotations as long as they point to the same textsegments
+      Vertex firstTextSegment = firstTextSegment(parentVertex);
+      Vertex lastTextSegment = lastTextSegment(parentVertex);
+      boolean goOn = true;
+      while (goOn) {
+        Vertex next = nextTextAnnotation(childVertex);
+        Vertex newFirst = firstTextSegment(next);
+        Vertex newLast = lastTextSegment(next);
+        if (newFirst.equals(firstTextSegment) && newLast.equals(lastTextSegment)) {
+          int currentDepth = (int) next.property(TextAnnotation.Properties.depth).value();
+          next.property(TextAnnotation.Properties.depth, currentDepth + 1);
+          childVertex = next;
+          goOn = childVertex.edges(Direction.OUT, EdgeLabels.NEXT).hasNext();
+        } else {
+          goOn = false;
+        }
+      }
     }
+
+  }
+
+  private Vertex nextTextAnnotation(Vertex childVertex) {
+    return childVertex.vertices(Direction.OUT, EdgeLabels.NEXT).next();
+  }
+
+  private Vertex lastTextSegment(Vertex parentVertex) {
+    return parentVertex.vertices(Direction.OUT, EdgeLabels.LAST_TEXT_SEGMENT).next();
+  }
+
+  private Vertex firstTextSegment(Vertex parentVertex) {
+    return parentVertex.vertices(Direction.OUT, EdgeLabels.FIRST_TEXT_SEGMENT).next();
   }
 
   // private methods //
@@ -201,24 +227,22 @@ public class TextGraphService {
     return textGraphSegment;
   }
 
-  private static final Comparator<TextAnnotation> BY_DECREASING_DEPTH = (e1, e2) -> e1.getDepth().compareTo(e2.getDepth());
+  private static final Comparator<TextAnnotation> BY_INCREASING_DEPTH = (e1, e2) -> e1.getDepth().compareTo(e2.getDepth());
 
   private List<TextAnnotation> getTextAnnotationsToOpen(Vertex textSegment) {
-    return getTextAnnotations(textSegment, EdgeLabels.FIRST_TEXT_SEGMENT, BY_DECREASING_DEPTH);
+    return getTextAnnotations(textSegment, EdgeLabels.FIRST_TEXT_SEGMENT);
   }
-
-  private static final Comparator<TextAnnotation> BY_INCREASING_DEPTH = (e1, e2) -> e2.getDepth().compareTo(e1.getDepth());
 
   private List<TextAnnotation> getTextAnnotationsToClose(Vertex textSegment) {
-    return getTextAnnotations(textSegment, EdgeLabels.LAST_TEXT_SEGMENT, BY_INCREASING_DEPTH);
+    return Lists.reverse(getTextAnnotations(textSegment, EdgeLabels.LAST_TEXT_SEGMENT));
   }
 
-  private List<TextAnnotation> getTextAnnotations(Vertex textSegment, String edgeLabel, Comparator<TextAnnotation> comparator) {
+  private List<TextAnnotation> getTextAnnotations(Vertex textSegment, String edgeLabel) {
     Iterable<Vertex> iterable = () -> textSegment.vertices(Direction.IN, edgeLabel);
     return StreamSupport.stream(iterable.spliterator(), false)//
-        .filter(v -> v.label().equals(VertexLabels.TEXTANNOTATION))//
+        .filter(v -> v.label().equals(VertexLabels.TEXTANNOTATION))// this filter should not be necessary
         .map(this::toTextAnnotation)//
-        .sorted(comparator)//
+        .sorted(BY_INCREASING_DEPTH)//
         .collect(toList());
   }
 

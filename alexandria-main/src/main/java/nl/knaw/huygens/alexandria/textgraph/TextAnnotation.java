@@ -34,6 +34,7 @@ public class TextAnnotation {
     return attributes;
   }
 
+  // TODO:: does this need to be stored?
   public Integer getDepth() {
     return depth;
   }
