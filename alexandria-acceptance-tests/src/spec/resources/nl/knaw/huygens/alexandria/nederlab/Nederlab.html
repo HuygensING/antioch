@@ -938,7 +938,7 @@
             "query": {
             "find": "annotation",
             "where": "type:eq(\"Tag\") resource.id:inSet(\"00000001-5ba6-11e5-9054-ab0dd746f7f7\",\"00000003-5b7f-11e5-898c-237ee1c6d1d4\") state:eq(\"CONFIRMED\")",
-            "return": "resource.id, value"
+            "return": "resource.id, value, who"
             } }
         </h:jsonBody>
         and observe status
@@ -961,7 +961,7 @@
 			            "find" : "annotation",
 	                "where": "type:eq(\"Tag\") resource.id:inSet(\"00000001-5ba6-11e5-9054-ab0dd746f7f7\",\"00000003-5b7f-11e5-898c-237ee1c6d1d4\") state:eq(\"CONFIRMED\")",
 			            "sort" : "-when",
-	                "return": "resource.id, value"
+	                "return": "resource.id, value, who"
 		            },
 		            "totalResults" : 4,
 		            "totalPages" : 1
@@ -995,21 +995,25 @@
             {
             "resource.id": "00000003-5b7f-11e5-898c-237ee1c6d1d4",
             "value": "A more recent user comment.",
+            "who": "user-4242",
             "_resultNumber": 1
             },
             {
             "resource.id": "00000003-5b7f-11e5-898c-237ee1c6d1d4",
             "value": "An early user comment.",
+            "who": "user-4242",
             "_resultNumber": 2
             },
             {
             "resource.id": "00000001-5ba6-11e5-9054-ab0dd746f7f7",
             "value": "A slightly later user comment.",
+            "who": "user-4242",
             "_resultNumber": 3
             },
             {
             "resource.id": "00000001-5ba6-11e5-9054-ab0dd746f7f7",
             "value": "A very early user comment.",
+            "who": "user-4242",
             "_resultNumber": 4
             } ] } }
         </h:jsonResponse>
@@ -1020,7 +1024,7 @@
     <div class="alert alert-warning sm">
         <ul>
             <li>
-                To group the annotation <code>value</code>s by <code>resource.id</code>, we add the <code>list()</code> function to the <code>where</code> part of the query
+                To group the annotation <code>value</code> and <code>who</code>s by <code>resource.id</code>, we add the <code>list()</code> function to the <code>where</code> part of the query
             </li>
         </ul>
     </div>
@@ -1033,7 +1037,7 @@
             "query": {
             "find": "annotation",
             "where": "type:eq(\"Tag\") resource.id:inSet(\"00000001-5ba6-11e5-9054-ab0dd746f7f7\",\"00000003-5b7f-11e5-898c-237ee1c6d1d4\")",
-            "return": "resource.id, list(value)"
+            "return": "resource.id, list(value,who)"
             } }
         </h:jsonBody>
         and observe status
@@ -1058,18 +1062,24 @@
 	            "records": [
 		            {
 			            "resource.id": "00000001-5ba6-11e5-9054-ab0dd746f7f7",
-			            "value" : [
-			              "A slightly later user comment.",
-			              "A very early user comment."
-			            ],
+			            "list": [{
+			              "value" : "A slightly later user comment.",
+			              "who" : "user-4242"
+			              },{
+                          "value" : "A very early user comment.",
+                          "who" : "user-4242"
+			              }],
 			            "_resultNumber": 1
 		            },
 		            {
 			            "resource.id": "00000003-5b7f-11e5-898c-237ee1c6d1d4",
-	                "value" : [
-	                  "A more recent user comment.",
-	                  "An early user comment."
-	                ],
+                        "list": [{
+                          "value" : "A more recent user comment.",
+                          "who" : "user-4242"
+                          },{
+                          "value" : "An early user comment.",
+                          "who" : "user-4242"
+                          }],
 			            "_resultNumber": 2
 	              } ] } }
         </h:jsonResponse>
