@@ -106,7 +106,7 @@ public class TextGraphUtil {
       elementNamesToInclude = textView.getIncludedElementDefinitions().stream()//
           .map(ElementDefinition::getName)//
           .collect(toSet());
-      elementNamesToExclude = textView.getExcludedElementTags();
+      elementNamesToExclude = textView.getExcludedElements();
       mode = elementNamesToInclude.isEmpty() ? Mode.exclusive : Mode.inclusive;
       for (ElementDefinition definition : textView.getIncludedElementDefinitions()) {
         List<String> includedAttributes = definition.getIncludedAttributes();

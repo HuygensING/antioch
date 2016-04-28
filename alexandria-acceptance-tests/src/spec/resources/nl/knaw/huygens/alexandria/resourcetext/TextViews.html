@@ -226,7 +226,7 @@
     <ul>
     <li>
     <h:request>
-        Given the previously made resource with its baselayer view, 
+        Given the previously made resource <code>$resourceId</code> with its baselayer view, 
         if I add a subresource by  
         <h:post>/resources/$resourceId/subresources</h:post>
         the body
@@ -267,10 +267,10 @@
              <small>(only relevant fields shown for brevity)</small>
                 <h:jsonResponse>
                 [ {
-								  "id" : "baselayer",
-								  "^definition" : "https://{host}/resources/$resourceId/text/views/baselayer",
-								  "^xml" : "https://{host}/resources/$uuid/text/xml?view=baselayer"
-								} ]
+                  "id" : "baselayer",
+                  "^definition" : "https://{host}/resources/$resourceId/text/views/baselayer",
+                  "^xml" : "https://{host}/resources/$uuid/text/xml?view=baselayer"
+                } ]
                 </h:jsonResponse>
                 (The subresource uses the baseLayerDefinition of <strong>its parent</strong> resource)
             </li>
@@ -284,11 +284,11 @@
         the body:
         <h:jsonBody>{
             "textView": {
-	            "description": "The Base Layer for the subresource",
-	            "ignoredElements": ["note"],
-	            "includedElements": [
-		            {"name" : "div", "includedAttributes" : ["ref"] },
-		            {"name" : "p" }
+              "description": "The Base Layer for the subresource",
+              "ignoredElements": ["note"],
+              "includedElements": [
+                {"name" : "div", "includedAttributes" : ["ref"] },
+                {"name" : "p" }
             ] } }
         </h:jsonBody>
         using
@@ -328,18 +328,127 @@
     </li>
   </ul>
 </div>
-<!-- 
-<div id="ignore-elements"
-    data-desc="How do I ignore a given set of elements (including their text) in a view?">
+
+<div id="set-excluding-view" c:execute="clearStorage()"
+     data-desc="How do I define a view where I only indicate which element tags NOT to show?">
+
+  Given a resource
+  with id <code c:set="#resourceId3">00000000-0000-0000-0000-000000000003</code>
+  <span c:execute="resourceExists(#resourceId3)">exists</span>,<br/>
+  which has
+  <span c:execute="resourceHasText(#resourceId3,#text3)">text<br/>
+    <code c:set="#text3">&lt;text&gt;&lt;div id=&quot;div-1&quot; ed=&quot;#someone&quot;&gt;&lt;p id=&quot;p-1&quot;&gt;Paragraph the &lt;num n=&quot;1&quot;&gt;First&lt;/num&gt;.&lt;/p&gt;&lt;p id=&quot;p-2&quot;&gt;Paragraph the &lt;num n=&quot;2&quot;&gt;Second&lt;/num&gt;.&lt;note&gt;Note the &lt;num n=&quot;1&quot;&gt;first&lt;/num&gt;.&lt;/note&gt;&lt;/p&gt;&lt;/div&gt;&lt;/text&gt;</code>
+  </span><br/>
+  <br/>
+
+  <h:request>
+     Then a
+     <h:get>/resources/$resourceId3/text/xml</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     <h:success>successfully</h:success>
+     yields response body:<br/>
+     <h:xmlResponse>
+<![CDATA[
+<text>
+  <div id="div-1" ed="#someone">
+    <p id="p-1">Paragraph the <num n="1">First</num>.</p>
+    <p id="p-2">Paragraph the <num n="2">Second</num>.<note>Note the <num n="1">first</num>.</note>
+    </p>
+  </div>
+</text>]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+  <br/>
+     
+    <h:request>
+        When I
+        <h:put>/resources/$resourceId3/text/views/no-num</h:put>
+        the body:
+        <h:jsonBody>
+          {
+            "textView": {
+              "description": "Don't show num tags",
+              "ignoredElements": ["note"],
+              "excludedElements": [ "num" ]
+          } }
+        </h:jsonBody>
+        using
+        <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+        then I should receive
+        <ul>
+          <li>status <h:status>201 Created</h:status></li>
+          <li>location header
+              <h:location>https://{host}/resources/$resourceId3/text/views/no-num</h:location>
+          </li>
+          <li>and the response body is <h:responseBody/></li>
+        </ul>
+    </h:request>
+    <br/>
+
+    <h:request>
+        When I
+        <h:get>/resources/$resourceId3/text/views</h:get>,<br/>
+        then I should receive
+        <ul>
+            <li>status
+                <h:status>200 OK</h:status>
+            </li>
+            <li>and body
+             <small>(only relevant fields shown for brevity)</small>
+                <h:jsonResponse>
+                [ {
+                  "id" : "no-num",
+                  "^definition" : "https://{host}/resources/$resourceId3/text/views/no-num",
+                  "^xml" : "https://{host}/resources/$resourceId3/text/xml?view=no-num"
+                } ]
+                </h:jsonResponse>
+            </li>
+        </ul>
+    </h:request>
+    <br/>
+
+    <h:request>
+        If I then
+        <h:get>/resources/$resourceId3/text/views/no-num</h:get>
+        Then I should receive
+        <ul>
+            <li>status
+                <h:status>200 OK</h:status>
+            </li>
+            <li>and body
+              <h:jsonResponse>{
+                "description": "Don't show num tags",
+                "ignoredElements" : [ "note" ],
+                "excludedElements": [ "num" ]
+               }
+              </h:jsonResponse>
+            </li>
+        </ul>
+    </h:request>
+    <br/>
+
+  <h:request>
+     Then a
+     <h:get>/resources/$resourceId3/text/xml?view=no-num</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     <h:success>successfully</h:success>
+     yields response body:
+     <h:xmlResponse>
+<![CDATA[
+<text>
+  <div id="div-1" ed="#someone">
+    <p id="p-1">Paragraph the First.</p>
+    <p id="p-2">Paragraph the Second.</p>
+  </div>
+</text>
+]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
 </div>
 
-<div id="include-element-tags"
-    data-desc="How do I show only a given set of element tags in a view?">
-</div>
-
-<div id="exclude-element-tags"
-    data-desc="How do I exclude element tags in a view?">
-</div>
- -->
 </body>
 </html>

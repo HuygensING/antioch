@@ -725,7 +725,7 @@ public class TinkerPopService implements AlexandriaService {
     TextView textView = new TextView(entry.getKey())//
         .setDescription(prototype.getDescription())//
         .setIncludedElementDefinitions(prototype.getIncludedElements())//
-        .setExcludedElementTags(prototype.getExcludedElementTags())//
+        .setExcludedElements(prototype.getExcludedElementTags())//
         .setIgnoredElements(prototype.getIgnoredElements());
     return textView;
   }

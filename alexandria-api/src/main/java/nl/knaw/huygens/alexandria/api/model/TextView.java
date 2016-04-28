@@ -81,7 +81,7 @@ public class TextView {
     return ignoredElements;
   }
 
-  public TextView setExcludedElementTags(List<String> excludedElementTags) {
+  public TextView setExcludedElements(List<String> excludedElementTags) {
     this.excludedElementTags = excludedElementTags;
     return this;
   }
@@ -90,7 +90,7 @@ public class TextView {
     excludedElementTags.add(excludedTag);
   }
 
-  public List<String> getExcludedElementTags() {
+  public List<String> getExcludedElements() {
     return excludedElementTags;
   }
 
