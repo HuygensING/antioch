@@ -1,9 +1,5 @@
 package nl.knaw.huygens.alexandria.resourcetext;
 
-import static java.util.UUID.fromString;
-
-import java.util.UUID;
-
 /*
  * #%L
  * alexandria-acceptance-tests
@@ -29,18 +25,9 @@ import java.util.UUID;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.runner.RunWith;
 
-import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.resource.ResourcesBase;
-import nl.knaw.huygens.alexandria.textgraph.ParseResult;
-import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 
 @RunWith(ConcordionRunner.class)
 public class TextModificationsFixture extends ResourcesBase {
-
-  public void resourceHasText(String resId, String xml) {
-    final AlexandriaResource resource = theResource(fromString(resId));
-    ParseResult result = TextGraphUtil.parse(xml);
-    service().storeTextGraph(UUID.fromString(resId), result);
-  }
 
 }

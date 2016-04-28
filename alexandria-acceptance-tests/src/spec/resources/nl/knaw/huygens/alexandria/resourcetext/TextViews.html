@@ -31,10 +31,11 @@
 
 <div id="textview-anatomy" c:execute="clearStorage()"
      data-desc="Anatomy of a view description">
+    For resource <span c:set="#id">00000000-0000-0000-0000-000000000001</span>:<br/>
     <h:request>
         Given that I have
         <h:success>successfully</h:success>
-        <h:put>/resources/00000000-0000-0000-0000-000000000001</h:put>
+        <h:put>/resources/$id</h:put>
         the body:
         <h:jsonBody>{
             "resource": {
@@ -46,7 +47,7 @@
     <br/>
     <h:request>
         Then I can set a view called inclusive by
-        <h:put>/resources/00000000-0000-0000-0000-000000000002/text/views/inclusive</h:put>
+        <h:put>/resources/$id/text/views/inclusive</h:put>
         the body:
         <h:jsonBody>
           {
@@ -61,7 +62,7 @@
     </h:request>
     <h:request>
         And I can set a view called exclusive by
-        <h:put>/resources/00000000-0000-0000-0000-000000000002/text/views/exclusive</h:put>
+        <h:put>/resources/$id/text/views/exclusive</h:put>
         the body:
         <h:jsonBody>
           {
@@ -72,26 +73,62 @@
           } }
         </h:jsonBody>
     </h:request>
+    
+    The textView definition has the following properties:
+    <dl class="dl-horizontal">
+      <dt><code>description</code></dt>
+      <dd>optional. A text describing what the view is for.</dd>
+
+      <dt><code>ignoredElements</code></dt>
+      <dd>optional. A list of the xml elements to be ignored for this view. Neither the tags nor the contents of these elements will be shown.</dd>
+        
+      <dt><code>includedElements</code></dt>
+      <dd>required<sup>*</sup>. A list of the xml element tags to show in this view. If attributes are present, only the ones in <code>includedAttributes</code> will be shown.</dd>
+
+      <dt><code>excludedElements</code></dt>
+      <dd>required<sup>*</sup>. A list of the xml element tags NOT to show in this view. The contents of these elements will be shown.</dd>
+    </dl>
+    <sup>*</sup> A textView definition cannot have both <code>includedElements</code> ánd <code>excludedElements</code>.
+                 Using <code>includedElements</code> makes it an <i>including</i> view,
+                 using <code>excludedElements</code> maked it an <i>excluding</i> view.  
 </div>
 
-<div id="set-baselayer-1" c:execute="clearStorage()"
-     data-desc="How do I define the base layer for a resource?">
-    <h:request>
-        Given that I have
-        <h:success>successfully</h:success>
-        <h:put>/resources/00000000-0000-0000-0000-000000000002</h:put>
-        the body:
-        <h:jsonBody>{
-            "resource": {
-            "id": "00000000-0000-0000-0000-000000000002",
-            "ref": "grotius-3160-v2"
-            } }
-        </h:jsonBody>
-    </h:request>
+<div id="set-including-view" c:execute="clearStorage()"
+     data-desc="How do I define a view where I indicate which element tags to show?">
 
+  Given a resource
+  with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000002</code>
+  <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
+  which has
+  <span c:execute="resourceHasText(#resourceId,#text1)">text<br/>
+    <code c:set="#text1">&lt;text&gt;&lt;div id=&quot;div-1&quot; ed=&quot;#someone&quot;&gt;&lt;p id=&quot;p-1&quot;&gt;Paragraph the First.&lt;/p&gt;&lt;p id=&quot;p-2&quot;&gt;Paragraph the Second.&lt;note&gt;Note the first.&lt;/note&gt;&lt;/p&gt;&lt;/div&gt;&lt;/text&gt;</code>
+  </span>,<br/>
+  <br/>
+
+  <h:request>
+     Then a
+     <h:get>/resources/$resourceId/text/xml</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     <h:success>successfully</h:success>
+     yields response body:<br/>
+     <h:xmlResponse>
+<![CDATA[
+<text>
+  <div id="div-1" ed="#someone">
+    <p id="p-1">Paragraph the First.</p>
+    <p id="p-2">Paragraph the Second.<note>Note the first.</note></p>
+  </div>
+</text>
+]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+  <br/>
+     
     <h:request>
         When I
-        <h:put>/resources/00000000-0000-0000-0000-000000000002/text/views/baselayer</h:put>
+        <h:put>/resources/$resourceId/text/views/baselayer</h:put>
         the body:
         <h:jsonBody>
           {
@@ -99,7 +136,8 @@
               "description": "The Base Layer",
               "ignoredElements": ["note"],
 	            "includedElements": [
-		            {"name" : "div", "includedAttributes" : ["id"] },
+                {"name" : "text" },
+                {"name" : "div", "includedAttributes" : ["id"] },
 		            {"name" : "p" }
           ] } }
         </h:jsonBody>
@@ -109,7 +147,7 @@
         <ul>
           <li>status <h:status>201 Created</h:status></li>
           <li>location header
-              <h:location>https://{host}/resources/00000000-0000-0000-0000-000000000002/text/views/baselayer</h:location>
+              <h:location>https://{host}/resources/$resourceId/text/views/baselayer</h:location>
           </li>
 	        <li>and the response body is <h:responseBody/></li>
         </ul>
@@ -118,7 +156,7 @@
 
     <h:request>
         When I
-        <h:get>/resources/00000000-0000-0000-0000-000000000002/text/views</h:get>,<br/>
+        <h:get>/resources/$resourceId/text/views</h:get>,<br/>
         then I should receive
         <ul>
             <li>status
@@ -129,8 +167,8 @@
                 <h:jsonResponse>
                 [ {
                   "id" : "baselayer",
-                  "^definition" : "https://{host}/resources/00000000-0000-0000-0000-000000000002/text/views/baselayer",
-                  "^xml" : "https://{host}/resources/00000000-0000-0000-0000-000000000002/text/xml?view=baselayer"
+                  "^definition" : "https://{host}/resources/$resourceId/text/views/baselayer",
+                  "^xml" : "https://{host}/resources/$resourceId/text/xml?view=baselayer"
                 } ]
                 </h:jsonResponse>
             </li>
@@ -140,7 +178,7 @@
 
     <h:request>
         If I then
-        <h:get>/resources/00000000-0000-0000-0000-000000000002/text/views/baselayer</h:get>
+        <h:get>/resources/$resourceId/text/views/baselayer</h:get>
         Then I should receive
         <ul>
             <li>status
@@ -151,6 +189,7 @@
                 "description": "The Base Layer",
                 "ignoredElements" : [ "note" ],
 		            "includedElements": [
+                  {"name" : "text" },
 			            {"name" : "div", "includedAttributes" : ["id"] },
 			            {"name" : "p" }
 		            ] }
@@ -158,6 +197,27 @@
             </li>
         </ul>
     </h:request>
+    <br/>
+
+  <h:request>
+     Then a
+     <h:get>/resources/$resourceId/text/xml?view=baselayer</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     <h:success>successfully</h:success>
+     yields response body:
+     <h:xmlResponse>
+<![CDATA[
+<text>
+  <div id="div-1">
+    <p>Paragraph the First.</p>
+    <p>Paragraph the Second.</p>
+  </div>
+</text>
+]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
 </div>
 
 <div id="view-for-subresource"
@@ -168,7 +228,7 @@
     <h:request>
         Given the previously made resource with its baselayer view, 
         if I add a subresource by  
-        <h:post>/resources/00000000-0000-0000-0000-000000000002/subresources</h:post>
+        <h:post>/resources/$resourceId/subresources</h:post>
         the body
         <h:jsonBody>{ "subresource": { "sub": "Letter clusius-0012" } }</h:jsonBody>
         and observe status
@@ -208,7 +268,7 @@
                 <h:jsonResponse>
                 [ {
 								  "id" : "baselayer",
-								  "^definition" : "https://{host}/resources/00000000-0000-0000-0000-000000000002/text/views/baselayer",
+								  "^definition" : "https://{host}/resources/$resourceId/text/views/baselayer",
 								  "^xml" : "https://{host}/resources/$uuid/text/xml?view=baselayer"
 								} ]
                 </h:jsonResponse>

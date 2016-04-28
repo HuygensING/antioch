@@ -65,6 +65,8 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerGraphService;
 import nl.knaw.huygens.alexandria.service.TinkerPopService;
 import nl.knaw.huygens.alexandria.storage.Storage;
+import nl.knaw.huygens.alexandria.textgraph.ParseResult;
+import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 import nl.knaw.huygens.cat.RestExtension;
 import nl.knaw.huygens.cat.RestFixture;
 
@@ -178,6 +180,12 @@ public class AlexandriaAcceptanceTest extends RestFixture {
 
   public void resourceExists(String resId) {
     service.createOrUpdateResource(fromString(resId), aRef(), aProvenance(), CONFIRMED);
+  }
+
+  public void resourceHasText(String resId, String xml) {
+    final AlexandriaResource resource = theResource(fromString(resId));
+    ParseResult result = TextGraphUtil.parse(xml);
+    service().storeTextGraph(UUID.fromString(resId), result);
   }
 
   protected AlexandriaService service() {
