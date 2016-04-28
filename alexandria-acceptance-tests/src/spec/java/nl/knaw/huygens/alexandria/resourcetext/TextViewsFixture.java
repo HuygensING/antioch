@@ -28,6 +28,6 @@ import org.junit.runner.RunWith;
 import nl.knaw.huygens.alexandria.resource.ResourcesBase;
 
 @RunWith(ConcordionRunner.class)
-// @ExpectedToFail
+ @ExpectedToFail
 public class TextViewsFixture extends ResourcesBase {
 }
