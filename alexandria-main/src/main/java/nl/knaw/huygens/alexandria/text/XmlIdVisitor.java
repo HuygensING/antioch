@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.text;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -36,23 +36,23 @@ import nl.knaw.huygens.tei.XmlContext;
 import nl.knaw.huygens.tei.export.ExportVisitor;
 import nl.knaw.huygens.tei.handlers.XmlTextHandler;
 
-public class BaseLayerIdVisitor extends ExportVisitor implements CommentHandler<XmlContext>, ElementHandler<XmlContext>, ProcessingInstructionHandler<XmlContext> {
-  private static List<String> baseElementIds = new ArrayList<>();
+public class XmlIdVisitor extends ExportVisitor implements CommentHandler<XmlContext>, ElementHandler<XmlContext>, ProcessingInstructionHandler<XmlContext> {
+  private static List<String> xmlIds = new ArrayList<>();
 
-  public BaseLayerIdVisitor(List<String> baseElementNames) {
+  public XmlIdVisitor() {
     super();
     setCommentHandler(this);
     setTextHandler(new XmlTextHandler<>());
     setDefaultElementHandler(this);
     setProcessingInstructionHandler(this);
-    String[] elementNames = baseElementNames.toArray(new String[baseElementNames.size()]);
-    addElementHandler(new BaseElementHandler(), elementNames);
-    baseElementIds.clear();
+    xmlIds.clear();
   }
 
-  // non-base elements
   @Override
   public Traversal enterElement(Element element, XmlContext context) {
+    if (element.hasAttribute(TextUtil.XML_ID)) {
+      xmlIds.add(element.getAttribute(TextUtil.XML_ID));
+    }
     return Traversal.NEXT;
   }
 
@@ -71,24 +71,8 @@ public class BaseLayerIdVisitor extends ExportVisitor implements CommentHandler<
     return Traversal.NEXT;
   }
 
-  static class BaseElementHandler implements ElementHandler<XmlContext> {
-    @Override
-    public Traversal enterElement(Element element, XmlContext context) {
-      if (element.hasAttribute(TextUtil.XML_ID)) {
-        baseElementIds.add(element.getAttribute(TextUtil.XML_ID));
-      }
-      return Traversal.NEXT;
-    }
-
-    @Override
-    public Traversal leaveElement(Element element, XmlContext context) {
-      return Traversal.NEXT;
-    }
-
-  }
-
-  public List<String> getBaseElementIds() {
-    return baseElementIds;
+  public List<String> getXmlIds() {
+    return xmlIds;
   }
 
 }
