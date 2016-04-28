@@ -49,19 +49,6 @@ public abstract class AbstractResourceEntity extends AbstractAnnotatableEntity {
     return hasText() ? locationBuilder.locationOf(getResource(), EndpointPaths.TEXT) : null;
   }
 
-  // @JsonProperty(PropertyPrefix.LINK + "baseLayerDefinition")
-  // public URI getBaseLayerDefinition() {
-  // if (getResource().getDirectBaseLayerDefinition().isPresent()) {
-  // return locationBuilder.locationOf(getResource(), EndpointPaths.BASELAYERDEFINITION);
-  // }
-  //
-  // Optional<IdentifiablePointer<AlexandriaResource>> firstAncestorResourceWithBaseLayerDefinitionPointer = getResource().getFirstAncestorResourceWithBaseLayerDefinitionPointer();
-  // if (firstAncestorResourceWithBaseLayerDefinitionPointer.isPresent()) {
-  // return locationBuilder.locationOf(firstAncestorResourceWithBaseLayerDefinitionPointer.get(), EndpointPaths.BASELAYERDEFINITION);
-  // }
-  // return null;
-  // }
-
   @JsonProperty(PropertyPrefix.LINK + "subresources")
   public Set<URI> getSubResources() {
     return getResource().getSubResourcePointers().stream().map(locationBuilder::locationOf).collect(toSet());

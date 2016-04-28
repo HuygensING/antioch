@@ -180,12 +180,4 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
     }
   }
 
-  // private void assertResourceHasBaseLayerDefinition() {
-  // service.getBaseLayerDefinitionForResource(resourceId)//
-  // .orElseThrow(noBaseLayerDefined());
-  // }
-
-  // private Supplier<ConflictException> noBaseLayerDefined() {
-  // return () -> new ConflictException(String.format("No base layer defined for resource: %s", resourceId));
-  // }
 }

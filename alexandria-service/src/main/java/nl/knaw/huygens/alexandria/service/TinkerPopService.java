@@ -685,13 +685,13 @@ public class TinkerPopService implements AlexandriaService {
     ResourceVF parentResource = rvf.getParentResource();
     if (parentResource != null) {
       resource.setParentResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, parentResource.getUuid()));
-      ResourceVF ancestorResource = parentResource;
-      while (ancestorResource != null && StringUtils.isEmpty(ancestorResource.getSerializedTextViewMap())) {
-        ancestorResource = ancestorResource.getParentResource();
-      }
-      if (ancestorResource != null) {
-        resource.setFirstAncestorResourceWithBaseLayerDefinitionPointer(new IdentifiablePointer<>(AlexandriaResource.class, ancestorResource.getUuid()));
-      }
+      // ResourceVF ancestorResource = parentResource;
+      // while (ancestorResource != null && StringUtils.isEmpty(ancestorResource.getSerializedTextViewMap())) {
+      // ancestorResource = ancestorResource.getParentResource();
+      // }
+      // if (ancestorResource != null) {
+      // resource.setFirstAncestorResourceWithBaseLayerDefinitionPointer(new IdentifiablePointer<>(AlexandriaResource.class, ancestorResource.getUuid()));
+      // }
     }
     rvf.getSubResources().stream()//
         .forEach(vf -> resource.addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
