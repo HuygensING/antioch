@@ -30,6 +30,7 @@ import java.util.Objects;
 public class ElementDefinition {
   String name = "";
   List<String> includedAttributes = new ArrayList<>();
+  String condition = "";
 
   private ElementDefinition() {
   }
@@ -51,6 +52,14 @@ public class ElementDefinition {
 
   public String getName() {
     return name;
+  }
+
+  public String getCondition() {
+    return condition;
+  }
+
+  public void setCondition(String condition) {
+    this.condition = condition;
   }
 
   public void setIncludedAttributes(final List<String> includedAttributes) {
