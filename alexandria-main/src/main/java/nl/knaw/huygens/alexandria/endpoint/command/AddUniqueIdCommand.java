@@ -64,7 +64,6 @@ public class AddUniqueIdCommand extends TextAnnotationCommand {
         service.runInTransaction(() -> {
           Context context = new Context(service);
           context.existingIds = service.getTextAnnotationStream(resourceId)//
-              .filter(ta -> textAnnotationHasRelevantName(parameters, ta))//
               .filter(this::hasXmlId)//
               .map(this::getXmlId)//
               .collect(toList());
