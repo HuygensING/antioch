@@ -44,6 +44,7 @@ import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.StatePrototype;
 import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.TextViewDefinition;
 import nl.knaw.huygens.alexandria.api.model.TextViewPrototype;
 
 public class AlexandriaClient {
@@ -188,6 +189,11 @@ public class AlexandriaClient {
           return result;
         })//
         .getResult();
+  }
+
+  public RestResult<ResourceEntity> setResourceTextView(UUID resourceUuid, String textViewName, TextViewDefinition textView) {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

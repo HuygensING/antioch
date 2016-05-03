@@ -402,3 +402,48 @@ curl -i -H "${authheader}" -X POST $be/commands/wrap-content-in-element -H 'Cont
         }
       }
   }"
+
+
+##
+
+condition: "attribute(ref).equals(#ed)"
+condition: "attribute(ref).firstOf('#ed','#ad1','')"
+
+{
+    "textView": {
+      "description" : "Do not show hi or l tags ",
+      "elements" : [
+        ":default" : {
+          "elementMode" : "show" # show <element> + children
+          "attributeMode" : "show" # show <element> + children
+        },
+        "note" : {
+          "mode" : "hideElement" # don't show <element> + children
+        },
+        "l" : {
+          "mode" : "hideElementTag" # don't show <element> tag, show children
+        },
+        "hi" : {
+          "mode" : "showElement"
+          "condition" : "attribute(rend).equals('red')" # show according to mode if condition met, use default 
+        }
+      ]
+      "ignoredElements": ["note"],
+      "excludedElements": [ "hi", "l" ]
+    }
+  }
+
+#  elementMode: (optional, use default settings if absent)
+#    show : show <element> + children
+#    hide : don't show <element> + children 
+#    hideTag : don't show <element> tag, show children
+
+#  attributeMode: (optional, use default settings if absent)
+#    showAll : show all attributes
+#    showOnly([attribute1,  ...]) : show only indicated attributes
+#    hideAll : don't show any attribute
+#    hideOnly([attribute1, ...]) : show all attributes except the indicated ones
+
+# when (optional, always when 'when' not given)
+#    attribute(rend).is('red')
+#    attribute(resp).firstOf('#ed0','#ed1','')

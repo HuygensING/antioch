@@ -486,7 +486,7 @@
      
     <h:request>
         When I define a view <code c:set="#view">conditional</code> by
-        <h:put>/resources/$resourceId4/text/views/$view</h:put>
+        <h:put>/resources/$resourceId4/text/views1/$view</h:put>
         the body:
         <h:jsonBody>
           {
@@ -495,7 +495,7 @@
               "ignoredElements": ["note"],
               "includedElements": [
                 {"name" : "div", "includedAttributes" : ["ref"] },
-                {"name" : "p", "condition": "transcriber=#a" }
+                {"name" : "p", "condition": "attribute(transcriber).equals('#a')" }
             ]          } }
         </h:jsonBody>
         using
@@ -547,7 +547,7 @@
                 "ignoredElements" : [ "note" ],
                 "includedElements": [
                 {"name" : "div", "includedAttributes" : ["ref"] },
-                {"name" : "p", "condition": "transcriber=#a" }
+                {"name" : "p", "condition": "attribute(transcriber).equals('#a')" }
             ] }
               </h:jsonResponse>
             </li>
