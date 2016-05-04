@@ -13,7 +13,10 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
+
+import nl.knaw.huygens.alexandria.api.model.ElementView.AttributeFunction;
 
 public class TextViewDefinitionParser {
 
@@ -22,6 +25,10 @@ public class TextViewDefinitionParser {
 
   public TextViewDefinitionParser(final TextViewDefinition d) {
     parse(d);
+  }
+
+  public TextView getTextView() {
+    return textView;
   }
 
   public boolean isValid() {
@@ -116,16 +123,35 @@ public class TextViewDefinitionParser {
     return parameters;
   }
 
+  static final Pattern WHEN_PATTERN = Pattern.compile("attribute\\((\\w+)\\)\\.(\\w+)\\((.*)\\)");
+
   private void parseWhen(final String elementName, final Optional<String> optionalWhen, final ElementView elementView) {
     if (optionalWhen.isPresent()) {
       final String when = optionalWhen.get();
       final String prefix = MessageFormat.format("{0}: \"{1}\" ", elementName, when);
+      Matcher matcher = WHEN_PATTERN.matcher(when);
+      if (matcher.matches()) {
+        String attribute = matcher.group(1);
+        String function = matcher.group(2);
+        try {
+          AttributeFunction attributeFunction = AttributeFunction.valueOf(AttributeFunction.class, function);
+          String parameterString = matcher.group(3);
+          List<String> parameters = Splitter.on(",")//
+              .trimResults(CharMatcher.is('\''))//
+              .splitToList(parameterString);
+          elementView.setPrecondition(attribute, attributeFunction, parameters);
+        } catch (IllegalArgumentException e) {
+          addInvalidWhenError(prefix);
+        }
+        return;
+      }
 
+      addInvalidWhenError(prefix);
     }
   }
 
-  public TextView getTextView() {
-    return textView;
+  private void addInvalidWhenError(final String prefix) {
+    errors.add(prefix + "is not a valid condition. Valid when values are: \"attribute(a).is('value')\", \"attribute(a).isNot('value')\", \"attribute(a).firstOf('value0','value1',...)\".");
   }
 
 }

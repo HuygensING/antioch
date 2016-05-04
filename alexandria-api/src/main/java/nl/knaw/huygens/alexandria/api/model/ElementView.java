@@ -13,9 +13,14 @@ public class ElementView {
     showAll, showOnly, hideAll, hideOnly
   }
 
+  enum AttributeFunction {
+    is, isNot, firstOf
+  }
+
+  private Optional<ElementView.ElementMode> elementMode;
   private ElementView.AttributeMode attributeMode;
   private List<String> relevantAttributes = new ArrayList<>();
-  private Optional<ElementView.ElementMode> elementMode;
+  private AttributePreCondition precondition;
 
   public void setElementMode(Optional<ElementView.ElementMode> elementMode) {
     this.elementMode = elementMode;
@@ -44,6 +49,14 @@ public class ElementView {
 
   public void setRelevantAttributes(List<String> relevantAttributes) {
     this.relevantAttributes = relevantAttributes;
+  }
+
+  public void setPrecondition(String attribute, AttributeFunction attributeFunction, List<String> parameters) {
+    this.precondition = new AttributePreCondition(attribute, attributeFunction, parameters);
+  }
+
+  public Optional<AttributePreCondition> getPreCondition() {
+    return Optional.ofNullable(precondition);
   }
 
 }

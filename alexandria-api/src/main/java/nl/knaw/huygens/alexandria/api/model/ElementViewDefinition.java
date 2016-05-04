@@ -15,9 +15,9 @@ public class ElementViewDefinition {
 
   // # attributeMode: (optional, use default settings if absent)
   // # showAll : show all attributes
-  // # showOnly([attribute1, ...]) : show only indicated attributes
+  // # showOnly attribute1 attribute2 ... : show only indicated attributes
   // # hideAll : don't show any attribute
-  // # hideOnly([attribute1, ...]) : show all attributes except the indicated ones
+  // # hideOnly attribute1 attribute2 ... : show all attributes except the indicated ones
   private String attributeMode;
 
   // # when (optional, always when 'when' not given)

@@ -11,6 +11,7 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
+import nl.knaw.huygens.alexandria.api.model.ElementView.AttributeFunction;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 
 public class TextViewDefinitionTest extends AlexandriaTest {
@@ -141,5 +142,100 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     assertThat(elementView.getElementMode().get()).isEqualTo(ElementView.ElementMode.show);
     assertThat(elementView.getAttributeMode().get()).isEqualTo(ElementView.AttributeMode.hideOnly);
     assertThat(elementView.getRelevantAttributes()).containsExactly("note");
+  }
+
+  @Test
+  public void testParsingOfIsWhen() throws IOException {
+    TextViewDefinition tvd = new TextViewDefinition();
+    ElementViewDefinition evd = new ElementViewDefinition()//
+        .setElementMode(ElementView.ElementMode.show)//
+        .setWhen("attribute(resp).is('#ed1')");
+    tvd.getElementViewDefinitions().put("element", evd);
+
+    TextViewDefinitionParser tvdp = new TextViewDefinitionParser(tvd);
+    TextView textView = tvdp.getTextView();
+    Map<String, ElementView> elementViewMap = textView.getElementViewMap();
+
+    assertThat(tvdp.isValid()).isTrue();
+    assertThat(elementViewMap).containsKey("element");
+
+    ElementView elementView = elementViewMap.get("element");
+    assertThat(elementView.getElementMode()).isPresent();
+    assertThat(elementView.getElementMode().get()).isEqualTo(ElementView.ElementMode.show);
+    assertThat(elementView.getAttributeMode()).isNotPresent();
+    assertThat(elementView.getRelevantAttributes()).isEmpty();
+
+    AttributePreCondition preCondition = elementView.getPreCondition().get();
+    assertThat(preCondition.getAttribute()).isEqualTo("resp");
+    assertThat(preCondition.getFunction()).isEqualTo(AttributeFunction.is);
+    assertThat(preCondition.getValues()).containsExactly("#ed1");
+  }
+
+  @Test
+  public void testParsingOfIsNotWhen() throws IOException {
+    TextViewDefinition tvd = new TextViewDefinition();
+    ElementViewDefinition evd = new ElementViewDefinition()//
+        .setElementMode(ElementView.ElementMode.show)//
+        .setWhen("attribute(resp).isNot('#ed2')");
+    tvd.getElementViewDefinitions().put("element", evd);
+
+    TextViewDefinitionParser tvdp = new TextViewDefinitionParser(tvd);
+    TextView textView = tvdp.getTextView();
+    Map<String, ElementView> elementViewMap = textView.getElementViewMap();
+
+    assertThat(tvdp.isValid()).isTrue();
+    assertThat(elementViewMap).containsKey("element");
+
+    ElementView elementView = elementViewMap.get("element");
+    assertThat(elementView.getElementMode()).isPresent();
+    assertThat(elementView.getElementMode().get()).isEqualTo(ElementView.ElementMode.show);
+    assertThat(elementView.getAttributeMode()).isNotPresent();
+    assertThat(elementView.getRelevantAttributes()).isEmpty();
+
+    AttributePreCondition preCondition = elementView.getPreCondition().get();
+    assertThat(preCondition.getAttribute()).isEqualTo("resp");
+    assertThat(preCondition.getFunction()).isEqualTo(AttributeFunction.isNot);
+    assertThat(preCondition.getValues()).containsExactly("#ed2");
+  }
+
+  @Test
+  public void testParsingOfFirstOfWhen() throws IOException {
+    TextViewDefinition tvd = new TextViewDefinition();
+    ElementViewDefinition evd = new ElementViewDefinition()//
+        .setElementMode(ElementView.ElementMode.show)//
+        .setWhen("attribute(resp).firstOf('#ed1','#ed2','')");
+    tvd.getElementViewDefinitions().put("element", evd);
+
+    TextViewDefinitionParser tvdp = new TextViewDefinitionParser(tvd);
+    TextView textView = tvdp.getTextView();
+    Map<String, ElementView> elementViewMap = textView.getElementViewMap();
+
+    assertThat(tvdp.isValid()).isTrue();
+    assertThat(elementViewMap).containsKey("element");
+
+    ElementView elementView = elementViewMap.get("element");
+    assertThat(elementView.getElementMode()).isPresent();
+    assertThat(elementView.getElementMode().get()).isEqualTo(ElementView.ElementMode.show);
+    assertThat(elementView.getAttributeMode()).isNotPresent();
+    assertThat(elementView.getRelevantAttributes()).isEmpty();
+
+    AttributePreCondition preCondition = elementView.getPreCondition().get();
+    assertThat(preCondition.getAttribute()).isEqualTo("resp");
+    assertThat(preCondition.getFunction()).isEqualTo(AttributeFunction.firstOf);
+    assertThat(preCondition.getValues()).containsExactly("#ed1", "#ed2", "");
+  }
+
+  @Test
+  public void testParsingOfInvalidWhen() throws IOException {
+    TextViewDefinition tvd = new TextViewDefinition();
+    ElementViewDefinition evd = new ElementViewDefinition()//
+        .setElementMode(ElementView.ElementMode.show)//
+        .setWhen("attribute(resp).myownfunction('#ed1','#ed2','')");
+    tvd.getElementViewDefinitions().put("element", evd);
+
+    TextViewDefinitionParser tvdp = new TextViewDefinitionParser(tvd);
+    assertThat(tvdp.isValid()).isFalse();
+    assertThat(tvdp.getErrors()).containsExactly(
+        "element: \"attribute(resp).myownfunction('#ed1','#ed2','')\" is not a valid condition. Valid when values are: \"attribute(a).is('value')\", \"attribute(a).isNot('value')\", \"attribute(a).firstOf('value0','value1',...)\".");
   }
 }
