@@ -7,6 +7,10 @@ public class TextView {
   private String description = "";
   private Map<String, ElementView> elementViewMap = new HashMap<>();
 
+  public TextView() {
+    elementViewMap.clear();
+  }
+
   public void setDescription(String description) {
     this.description = description;
   }

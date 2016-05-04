@@ -8,9 +8,13 @@ import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
+import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.ElementView.AttributeFunction;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 
@@ -111,7 +115,7 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     tvd.getElementViewDefinitions().put("element", evd);
 
     TextViewDefinitionParser tvdp = new TextViewDefinitionParser(tvd);
-    TextView textView = tvdp.getTextView();
+    TextView textView = tvdp.getTextView().get();
     Map<String, ElementView> elementViewMap = textView.getElementViewMap();
 
     assertThat(tvdp.isValid()).isTrue();
@@ -121,6 +125,7 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     assertThat(elementView.getElementMode().get()).isEqualTo(ElementView.ElementMode.show);
     assertThat(elementView.getAttributeMode().get()).isEqualTo(ElementView.AttributeMode.showOnly);
     assertThat(elementView.getRelevantAttributes()).containsExactly("xml:id", "ref");
+    testJsonSerialization(textView);
   }
 
   @Test
@@ -132,7 +137,7 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     tvd.getElementViewDefinitions().put("element", evd);
 
     TextViewDefinitionParser tvdp = new TextViewDefinitionParser(tvd);
-    TextView textView = tvdp.getTextView();
+    TextView textView = tvdp.getTextView().get();
     Map<String, ElementView> elementViewMap = textView.getElementViewMap();
 
     assertThat(tvdp.isValid()).isTrue();
@@ -142,6 +147,7 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     assertThat(elementView.getElementMode().get()).isEqualTo(ElementView.ElementMode.show);
     assertThat(elementView.getAttributeMode().get()).isEqualTo(ElementView.AttributeMode.hideOnly);
     assertThat(elementView.getRelevantAttributes()).containsExactly("note");
+    testJsonSerialization(textView);
   }
 
   @Test
@@ -153,7 +159,7 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     tvd.getElementViewDefinitions().put("element", evd);
 
     TextViewDefinitionParser tvdp = new TextViewDefinitionParser(tvd);
-    TextView textView = tvdp.getTextView();
+    TextView textView = tvdp.getTextView().get();
     Map<String, ElementView> elementViewMap = textView.getElementViewMap();
 
     assertThat(tvdp.isValid()).isTrue();
@@ -169,6 +175,7 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     assertThat(preCondition.getAttribute()).isEqualTo("resp");
     assertThat(preCondition.getFunction()).isEqualTo(AttributeFunction.is);
     assertThat(preCondition.getValues()).containsExactly("#ed1");
+    testJsonSerialization(textView);
   }
 
   @Test
@@ -180,7 +187,7 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     tvd.getElementViewDefinitions().put("element", evd);
 
     TextViewDefinitionParser tvdp = new TextViewDefinitionParser(tvd);
-    TextView textView = tvdp.getTextView();
+    TextView textView = tvdp.getTextView().get();
     Map<String, ElementView> elementViewMap = textView.getElementViewMap();
 
     assertThat(tvdp.isValid()).isTrue();
@@ -196,6 +203,7 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     assertThat(preCondition.getAttribute()).isEqualTo("resp");
     assertThat(preCondition.getFunction()).isEqualTo(AttributeFunction.isNot);
     assertThat(preCondition.getValues()).containsExactly("#ed2");
+    testJsonSerialization(textView);
   }
 
   @Test
@@ -207,7 +215,7 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     tvd.getElementViewDefinitions().put("element", evd);
 
     TextViewDefinitionParser tvdp = new TextViewDefinitionParser(tvd);
-    TextView textView = tvdp.getTextView();
+    TextView textView = tvdp.getTextView().get();
     Map<String, ElementView> elementViewMap = textView.getElementViewMap();
 
     assertThat(tvdp.isValid()).isTrue();
@@ -223,6 +231,15 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     assertThat(preCondition.getAttribute()).isEqualTo("resp");
     assertThat(preCondition.getFunction()).isEqualTo(AttributeFunction.firstOf);
     assertThat(preCondition.getValues()).containsExactly("#ed1", "#ed2", "");
+
+    testJsonSerialization(textView);
+  }
+
+  private void testJsonSerialization(TextView textView) throws JsonProcessingException, IOException, JsonParseException, JsonMappingException {
+    String json = om.writeValueAsString(textView);
+    Log.info("textview={}", json);
+    TextView tv2 = om.readValue(json, TextView.class);
+    assertThat(tv2).isEqualToComparingFieldByFieldRecursively(textView);
   }
 
   @Test

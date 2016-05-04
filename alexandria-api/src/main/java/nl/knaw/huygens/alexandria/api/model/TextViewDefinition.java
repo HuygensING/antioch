@@ -9,9 +9,15 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("textView")
 public class TextViewDefinition extends JsonWrapperObject implements Prototype {
   public static final String DEFAULT = ":default";
+
   private String description = "";
+
   @JsonProperty("elements")
   private Map<String, ElementViewDefinition> elementViewDefinitions = new LinkedHashMap<>();
+
+  public TextViewDefinition() {
+    elementViewDefinitions.clear();
+  }
 
   public void setDescription(String description) {
     this.description = description;

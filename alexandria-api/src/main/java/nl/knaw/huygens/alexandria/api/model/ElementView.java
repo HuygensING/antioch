@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_ABSENT)
 public class ElementView {
   enum ElementMode {
     show, hide, hideTag
@@ -51,8 +55,12 @@ public class ElementView {
     this.relevantAttributes = relevantAttributes;
   }
 
-  public void setPrecondition(String attribute, AttributeFunction attributeFunction, List<String> parameters) {
-    this.precondition = new AttributePreCondition(attribute, attributeFunction, parameters);
+  public void setPreCondition(AttributePreCondition precondition) {
+    this.precondition = precondition;
+  }
+
+  public void setPreCondition(String attribute, AttributeFunction attributeFunction, List<String> parameters) {
+    setPreCondition(new AttributePreCondition(attribute, attributeFunction, parameters));
   }
 
   public Optional<AttributePreCondition> getPreCondition() {

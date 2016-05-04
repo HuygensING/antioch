@@ -21,14 +21,16 @@ import nl.knaw.huygens.alexandria.api.model.ElementView.AttributeFunction;
 public class TextViewDefinitionParser {
 
   private final List<String> errors = new ArrayList<>();
-  static final TextView textView = new TextView();
+  static TextView textView = new TextView();
 
   public TextViewDefinitionParser(final TextViewDefinition d) {
+    textView = new TextView();
+    errors.clear();
     parse(d);
   }
 
-  public TextView getTextView() {
-    return textView;
+  public Optional<TextView> getTextView() {
+    return isValid() ? Optional.of(textView) : Optional.empty();
   }
 
   public boolean isValid() {
@@ -139,7 +141,7 @@ public class TextViewDefinitionParser {
           List<String> parameters = Splitter.on(",")//
               .trimResults(CharMatcher.is('\''))//
               .splitToList(parameterString);
-          elementView.setPrecondition(attribute, attributeFunction, parameters);
+          elementView.setPreCondition(attribute, attributeFunction, parameters);
         } catch (IllegalArgumentException e) {
           addInvalidWhenError(prefix);
         }
