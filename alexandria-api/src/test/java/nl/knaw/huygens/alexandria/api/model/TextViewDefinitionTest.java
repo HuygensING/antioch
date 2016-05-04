@@ -73,4 +73,31 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     );
   }
 
+  @Test
+  public void testValidationOfInvalidAttributeModeFails() throws IOException {
+    TextViewDefinition d = new TextViewDefinition();
+    ElementViewDefinition evd1 = new ElementViewDefinition()//
+        .setElementMode(ElementMode.show)//
+        .setAttributeMode("showNone");
+    d.getElementViewDefinitions().put("element", evd1);
+    ElementViewDefinition evd2 = new ElementViewDefinition()//
+        .setElementMode(ElementMode.show)//
+        .setAttributeMode("showOnly()");
+    d.getElementViewDefinitions().put("element2", evd2);
+    ElementViewDefinition evd3 = new ElementViewDefinition()//
+        .setElementMode(ElementMode.show)//
+        .setAttributeMode("hideOnly()");
+    d.getElementViewDefinitions().put("element3", evd3);
+    ElementViewDefinition evd4 = new ElementViewDefinition()//
+        .setElementMode(ElementMode.show)//
+        .setAttributeMode("hideAll");
+    d.getElementViewDefinitions().put("element4", evd4);
+    TextViewDefinitionParser tvdp = new TextViewDefinitionParser(d);
+    assertThat(tvdp.isValid()).isFalse();
+    assertThat(tvdp.getErrors()).containsExactly(//
+        "element: \"showNone\" is not a valid attributeMode. Valid attributeMode values are: \"showAll\", \"showOnly(attribute,...)\", \"hideAll\", \"hideOnly(attribute,...)\".", //
+        "element2: \"showOnly()\" needs one or more attribute names.", //
+        "element3: \"hideOnly()\" needs one or more attribute names."//
+    );
+  }
 }

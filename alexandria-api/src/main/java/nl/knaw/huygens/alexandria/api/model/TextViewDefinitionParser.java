@@ -1,9 +1,14 @@
 package nl.knaw.huygens.alexandria.api.model;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.google.common.base.Splitter;
 
 public class TextViewDefinitionParser {
   private List<String> errors = new ArrayList<>();
@@ -22,13 +27,14 @@ public class TextViewDefinitionParser {
 
   private void validate(TextViewDefinition d) {
     for (Entry<String, ElementViewDefinition> entry : d.getElementViewDefinitions().entrySet()) {
-      validateElementName(entry.getKey());
-      validateElementViewDefinition(entry.getValue());
+      String elementName = entry.getKey();
+      validateElementName(elementName);
+      validateElementViewDefinition(entry.getValue(), elementName);
     }
   }
 
-  Pattern ELEMENTNAME_PATTERN1 = Pattern.compile("[_a-zA-Z].+");
-  Pattern ELEMENTNAME_PATTERN2 = Pattern.compile("[\\w-\\.]+");
+  static final Pattern ELEMENTNAME_PATTERN1 = Pattern.compile("[_a-zA-Z].+");
+  static final Pattern ELEMENTNAME_PATTERN2 = Pattern.compile("[\\w-\\.]+");
 
   private void validateElementName(String elementName) {
     if (TextViewDefinition.DEFAULT.equals(elementName)) {
@@ -49,8 +55,56 @@ public class TextViewDefinitionParser {
     }
   }
 
-  private void validateElementViewDefinition(ElementViewDefinition evd) {
+  private void validateElementViewDefinition(ElementViewDefinition evd, String elementName) {
+    validateAttributeMode(elementName, evd.getAttributeMode());
+    validateWhen(elementName, evd.getWhen());
+  }
 
+  static final Pattern ATTRIBUTEMODE_SHOWONLY = Pattern.compile("showOnly\\((.*)\\)");
+  static final Pattern ATTRIBUTEMODE_HIDEONLY = Pattern.compile("hideOnly\\((.*)\\)");
+
+  private void validateAttributeMode(String elementName, Optional<String> attributeMode) {
+    if (attributeMode.isPresent()) {
+      String mode = attributeMode.get();
+      String prefix = MessageFormat.format("{0}: \"{1}\" ", elementName, mode);
+
+      if ("showAll".equals(mode)) {
+        return;
+      }
+
+      Matcher matcher2 = ATTRIBUTEMODE_SHOWONLY.matcher(mode);
+      if (matcher2.matches()) {
+        parseParameters(prefix, matcher2.group(1));
+        return;
+      }
+
+      if ("hideAll".equals(mode)) {
+        return;
+      }
+
+      Matcher matcher4 = ATTRIBUTEMODE_HIDEONLY.matcher(mode);
+      if (matcher4.matches()) {
+        parseParameters(prefix, matcher4.group(1));
+        return;
+      }
+
+      errors.add(prefix + "is not a valid attributeMode. Valid attributeMode values are: \"showAll\", \"showOnly(attribute,...)\", \"hideAll\", \"hideOnly(attribute,...)\".");
+    }
+  }
+
+  private void parseParameters(String prefix, String group) {
+    List<String> parameters = Splitter.on(",").trimResults().omitEmptyStrings().splitToList(group);
+    if (parameters.isEmpty()) {
+      errors.add(prefix + "needs one or more attribute names.");
+    }
+  }
+
+  private void validateWhen(String elementName, Optional<String> optionalWhen) {
+    if (optionalWhen.isPresent()) {
+      String when = optionalWhen.get();
+      String prefix = MessageFormat.format("{0}: \"{1}\" ", elementName, when);
+
+    }
   }
 
 }
