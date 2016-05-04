@@ -56,8 +56,8 @@ public class ResourceTextViewEndpoint extends JSONEndpoint {
 
   @GET
   @Path("{viewId}")
-  public Response getTextView(@PathParam("viewId") String viewId) {
-    TextView textView = service.getTextView(resourceId, viewId)//
+  public Response getTextViewDefinition(@PathParam("viewId") String viewId) {
+    TextViewDefinition textView = service.getTextViewDefinition(resourceId, viewId)//
         .orElseThrow(() -> new NotFoundException("No view '" + viewId + "' found for this resource."));
     return ok(textView);
   }
@@ -69,8 +69,9 @@ public class ResourceTextViewEndpoint extends JSONEndpoint {
     TextViewDefinitionParser textViewDefinitionParser = new TextViewDefinitionParser(textViewDefinition);
     TextView textView = textViewDefinitionParser.getTextView()//
         .orElseThrow(() -> new BadRequestException(Joiner.on("\n").join(textViewDefinitionParser.getErrors())));
-    boolean updateView = service.getTextView(resourceId, viewId).isPresent();
-    service.setTextView(resourceId, viewId, textView);
+
+    boolean updateView = service.getTextViewDefinition(resourceId, viewId).isPresent();
+    service.setTextView(resourceId, viewId, textView, textViewDefinition);
     URI location = locationBuilder.locationOf(AlexandriaResource.class, resourceId, EndpointPaths.TEXT, EndpointPaths.TEXTVIEWS, viewId);
     return updateView //
         ? noContent() //

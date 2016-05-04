@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.TextViewDefinition;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
@@ -119,9 +120,11 @@ public interface AlexandriaService {
 
   void importDb(String format, String filename);
 
-  void setTextView(UUID resourceUUID, String viewId, TextView textView);
+  void setTextView(UUID resourceUUID, String viewId, TextView textView, TextViewDefinition textViewDefinition);
 
-  Optional<TextView> getTextView(UUID resourceId, String viewId);
+  Optional<TextViewDefinition> getTextViewDefinition(UUID resourceId, String viewId);
+
+  Optional<TextView> getTextView(UUID resourceId, String view);
 
   /**
    * Gets the textviews for the resource and all its ancestors
@@ -139,5 +142,6 @@ public interface AlexandriaService {
   void updateTextAnnotation(TextAnnotation textAnnotation);
 
   void wrapContentInChildTextAnnotation(TextAnnotation existingTextAnnotation, TextAnnotation newChildTextAnnotation);
+
 
 }

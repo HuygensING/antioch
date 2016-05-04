@@ -52,6 +52,7 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.ElementDefinition;
 import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.TextViewDefinition;
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -264,7 +265,7 @@ public class TinkerPopServiceTest extends AlexandriaTest {
   }
 
   @Test
-  public void testGetTextViewsForResourceReturnsTheFirstDefinitionUpTheResourceChain() {
+  public void testGetTextViewDefinitionsForResourceReturnsTheFirstDefinitionUpTheResourceChain() {
     AlexandriaResource resource = aResource();
     service.createOrUpdateResource(resource);
     ElementDefinition bedText = ElementDefinition.withName("text");
@@ -272,7 +273,8 @@ public class TinkerPopServiceTest extends AlexandriaTest {
     List<ElementDefinition> list = Lists.newArrayList(bedText, bedDiv);
     TextView textView = new TextView();
     UUID resourceId = resource.getId();
-    service.setTextView(resourceId, "baselayer", textView);
+    TextViewDefinition textViewDefinition = new TextViewDefinition();
+    service.setTextView(resourceId, "baselayer", textView, textViewDefinition);
 
     UUID subUuid1 = UUID.randomUUID();
     String sub = "sub1";
@@ -293,7 +295,7 @@ public class TinkerPopServiceTest extends AlexandriaTest {
   }
 
   @Test
-  public void testGetTextViewsForResourceReturnsNullOptionalsWhenNoDefinitionPresentUpTheResourceChain() {
+  public void testGetTextViewDefinitionsForResourceReturnsNullOptionalsWhenNoDefinitionPresentUpTheResourceChain() {
     AlexandriaResource resource = aResource();
     service.createOrUpdateResource(resource);
 

@@ -64,6 +64,7 @@ import com.google.common.collect.Sets;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.TextViewDefinition;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
@@ -93,10 +94,17 @@ import nl.knaw.huygens.alexandria.textlocator.TextLocatorParseException;
 
 public class TinkerPopService implements AlexandriaService {
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new Jdk8Module());
+
   private static final TypeReference<Map<String, TextView>> TEXTVIEW_TYPEREF = new TypeReference<Map<String, TextView>>() {
   };
   private static final ObjectReader TEXTVIEW_READER = OBJECT_MAPPER.readerFor(TEXTVIEW_TYPEREF);
   private static final ObjectWriter TEXTVIEW_WRITER = OBJECT_MAPPER.writerFor(TEXTVIEW_TYPEREF);
+
+  private static final TypeReference<Map<String, TextViewDefinition>> TEXTVIEWDEFINITION_TYPEREF = new TypeReference<Map<String, TextViewDefinition>>() {
+  };
+  private static final ObjectReader TEXTVIEWDEFINITION_READER = OBJECT_MAPPER.readerFor(TEXTVIEWDEFINITION_TYPEREF);
+  private static final ObjectWriter TEXTVIEWDEFINITION_WRITER = OBJECT_MAPPER.writerFor(TEXTVIEWDEFINITION_TYPEREF);
+
   private static final TemporalAmount TENTATIVES_TTL = Duration.ofDays(1);
 
   private Storage storage;
@@ -390,7 +398,7 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public void setTextView(UUID resourceUUID, String viewId, TextView textView) {
+  public void setTextView(UUID resourceUUID, String viewId, TextView textView, TextViewDefinition textViewDefinition) {
     storage.runInTransaction(() -> {
       ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
       String json;
@@ -398,17 +406,20 @@ public class TinkerPopService implements AlexandriaService {
         String serializedTextViewMap = resourceVF.getSerializedTextViewMap();
         Map<String, TextView> textViewMap = deserializeToTextViewMap(serializedTextViewMap);
         textViewMap.put(viewId, textView);
-        json = serializeToJson(textViewMap);
+        json = serializeTextViewMap(textViewMap);
         resourceVF.setSerializedTextViewMap(json);
+
+        String serializedTextViewDefinitionMap = resourceVF.getSerializedTextViewDefinitionMap();
+        Map<String, TextViewDefinition> textViewDefinitionMap = deserializeToTextViewDefinitionMap(serializedTextViewDefinitionMap);
+        textViewDefinitionMap.put(viewId, textViewDefinition);
+        json = serializeTextViewDefinitionMap(textViewDefinitionMap);
+        resourceVF.setSerializedTextViewDefinitionMap(json);
+
       } catch (Exception e) {
         e.printStackTrace();
         throw new RuntimeException(e);
       }
     });
-  }
-
-  private String serializeToJson(Map<String, TextView> textViewMap) throws JsonProcessingException {
-    return TEXTVIEW_WRITER.writeValueAsString(textViewMap);
   }
 
   @Override
@@ -460,12 +471,21 @@ public class TinkerPopService implements AlexandriaService {
     return Optional.ofNullable(textView);
   }
 
-  private Map<String, TextView> deserializeToTextViewMap(String json) throws IOException {
-    if (StringUtils.isEmpty(json)) {
-      return Maps.newHashMap();
-    }
-    Map<String, TextView> textViewMap = TEXTVIEW_READER.readValue(json);
-    return textViewMap;
+  @Override
+  public Optional<TextViewDefinition> getTextViewDefinition(UUID resourceId, String view) {
+    TextViewDefinition textViewDefinition = storage.runInTransaction(() -> {
+      ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceId).get();
+      String serializedTextViewDefinitions = resourceVF.getSerializedTextViewDefinitionMap();
+      try {
+        Map<String, TextViewDefinition> textViewDefinitionMap = deserializeToTextViewDefinitionMap(serializedTextViewDefinitions);
+        return textViewDefinitionMap.get(view);
+
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new RuntimeException(e);
+      }
+    });
+    return Optional.ofNullable(textViewDefinition);
   }
 
   @Override
@@ -658,6 +678,30 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   // - private methods -//
+
+  private String serializeTextViewMap(Map<String, TextView> textViewMap) throws JsonProcessingException {
+    return TEXTVIEW_WRITER.writeValueAsString(textViewMap);
+  }
+
+  private Map<String, TextView> deserializeToTextViewMap(String json) throws IOException {
+    if (StringUtils.isEmpty(json)) {
+      return Maps.newHashMap();
+    }
+    Map<String, TextView> textViewMap = TEXTVIEW_READER.readValue(json);
+    return textViewMap;
+  }
+
+  private String serializeTextViewDefinitionMap(Map<String, TextViewDefinition> textViewDefinitionMap) throws JsonProcessingException {
+    return TEXTVIEWDEFINITION_WRITER.writeValueAsString(textViewDefinitionMap);
+  }
+
+  private Map<String, TextViewDefinition> deserializeToTextViewDefinitionMap(String json) throws JsonProcessingException, IOException {
+    if (StringUtils.isEmpty(json)) {
+      return Maps.newHashMap();
+    }
+    Map<String, TextViewDefinition> textViewDefinitionMap = TEXTVIEWDEFINITION_READER.readValue(json);
+    return textViewDefinitionMap;
+  }
 
   private AlexandriaAnnotation createAnnotation(AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
     return new AlexandriaAnnotation(UUID.randomUUID(), annotationbody, provenance);
