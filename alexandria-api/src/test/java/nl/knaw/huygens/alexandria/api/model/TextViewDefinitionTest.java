@@ -4,15 +4,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 import nl.knaw.huygens.alexandria.api.model.ElementViewDefinition.ElementMode;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 
 public class TextViewDefinitionTest extends AlexandriaTest {
-  private ObjectMapper om = new ObjectMapper();
+  private static ObjectMapper om = new ObjectMapper();
+
+  @BeforeClass
+  public static void beforeClass() {
+    om.registerModule(new Jdk8Module());
+  }
 
   @Test
   public void testJsonSerializing() throws IOException {
@@ -24,6 +31,7 @@ public class TextViewDefinitionTest extends AlexandriaTest {
 
     TextViewDefinitionParser tvdp = new TextViewDefinitionParser(d);
     assertThat(tvdp.isValid()).isTrue();
+
     String json = om.writeValueAsString(d);
     String expected = singleQuotesToDouble("{'textView':"//
         + "{"//
@@ -34,8 +42,9 @@ public class TextViewDefinitionTest extends AlexandriaTest {
         + "'persName':{'elementMode':'show','when':'attribute(resp).is(\\'#ed\\')'}"//
         + "}"//
         + "}}");
-    assertThat(json).isEqualTo(expected);
+
     TextViewDefinition d2 = om.readValue(json, TextViewDefinition.class);
+    assertThat(json).isEqualTo(expected);
     assertThat(d2).isEqualToComparingFieldByFieldRecursively(d);
   }
 
@@ -57,11 +66,11 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     TextViewDefinitionParser tvdp = new TextViewDefinitionParser(d);
     assertThat(tvdp.isValid()).isFalse();
     assertThat(tvdp.getErrors()).containsExactly(//
-        "\"3lement\" is not a valid element name: element names must start with a letter or underscore.",//
-        "\"xmlIsDaBomb\" is not a valid element name: element names cannot start with the letters xml (or XML, or Xml, etc).",//
-        "\"element?\" is not a valid element name: element names can only contain letters, digits, hyphens, underscores, and periods.",//
+        "\"3lement\" is not a valid element name: element names must start with a letter or underscore.", //
+        "\"xmlIsDaBomb\" is not a valid element name: element names cannot start with the letters xml (or XML, or Xml, etc).", //
+        "\"element?\" is not a valid element name: element names can only contain letters, digits, hyphens, underscores, and periods.", //
         "\"e le ment\" is not a valid element name: element names cannot contain spaces."//
-        );
+    );
   }
 
 }
