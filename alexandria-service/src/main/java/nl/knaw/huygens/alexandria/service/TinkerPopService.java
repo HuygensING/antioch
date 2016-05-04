@@ -56,14 +56,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.api.model.DeprecatedTextView;
-import nl.knaw.huygens.alexandria.api.model.TextViewPrototype;
+import nl.knaw.huygens.alexandria.api.model.TextView;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
@@ -92,10 +92,11 @@ import nl.knaw.huygens.alexandria.textlocator.TextLocatorFactory;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorParseException;
 
 public class TinkerPopService implements AlexandriaService {
-  private static final TypeReference<Map<String, TextViewPrototype>> TEXTVIEWPROTOTYPE_TYPEREF = new TypeReference<Map<String, TextViewPrototype>>() {
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new Jdk8Module());
+  private static final TypeReference<Map<String, TextView>> TEXTVIEW_TYPEREF = new TypeReference<Map<String, TextView>>() {
   };
-  private static final ObjectReader TEXTVIEWPROTOTYPE_READER = new ObjectMapper().reader(TEXTVIEWPROTOTYPE_TYPEREF);
-  private static final ObjectWriter TEXTVIEWPROTOTYPE_WRITER = new ObjectMapper().writerFor(TEXTVIEWPROTOTYPE_TYPEREF);
+  private static final ObjectReader TEXTVIEW_READER = OBJECT_MAPPER.readerFor(TEXTVIEW_TYPEREF);
+  private static final ObjectWriter TEXTVIEW_WRITER = OBJECT_MAPPER.writerFor(TEXTVIEW_TYPEREF);
   private static final TemporalAmount TENTATIVES_TTL = Duration.ofDays(1);
 
   private Storage storage;
@@ -389,14 +390,14 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public void setTextView(UUID resourceUUID, String viewId, TextViewPrototype textViewPrototype) {
+  public void setTextView(UUID resourceUUID, String viewId, TextView textView) {
     storage.runInTransaction(() -> {
       ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
       String json;
       try {
         String serializedTextViewMap = resourceVF.getSerializedTextViewMap();
-        Map<String, TextViewPrototype> textViewMap = deserializeToTextViewMap(serializedTextViewMap);
-        textViewMap.put(viewId, textViewPrototype);
+        Map<String, TextView> textViewMap = deserializeToTextViewMap(serializedTextViewMap);
+        textViewMap.put(viewId, textView);
         json = serializeToJson(textViewMap);
         resourceVF.setSerializedTextViewMap(json);
       } catch (Exception e) {
@@ -406,13 +407,13 @@ public class TinkerPopService implements AlexandriaService {
     });
   }
 
-  private String serializeToJson(Map<String, TextViewPrototype> textViewMap) throws JsonProcessingException {
-    return TEXTVIEWPROTOTYPE_WRITER.writeValueAsString(textViewMap);
+  private String serializeToJson(Map<String, TextView> textViewMap) throws JsonProcessingException {
+    return TEXTVIEW_WRITER.writeValueAsString(textViewMap);
   }
 
   @Override
-  public List<DeprecatedTextView> getTextViewsForResource(UUID resourceUUID) {
-    List<DeprecatedTextView> textViews = new ArrayList<>();
+  public List<TextView> getTextViewsForResource(UUID resourceUUID) {
+    List<TextView> textViews = new ArrayList<>();
     Set<String> viewNames = Sets.newHashSet();
 
     return storage.runInTransaction(() -> {
@@ -438,17 +439,17 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public Optional<DeprecatedTextView> getTextView(UUID resourceId, String view) {
-    DeprecatedTextView textView = storage.runInTransaction(() -> {
+  public Optional<TextView> getTextView(UUID resourceId, String view) {
+    TextView textView = storage.runInTransaction(() -> {
       ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceId).get();
       String serializedTextViews = resourceVF.getSerializedTextViewMap();
       try {
-        Map<String, TextViewPrototype> textViewMap = deserializeToTextViewMap(serializedTextViews);
-        List<DeprecatedTextView> textViews = textViewMap//
+        Map<String, TextView> textViewMap = deserializeToTextViewMap(serializedTextViews);
+        List<TextView> textViews = textViewMap//
             .entrySet()//
             .stream()//
             .filter(e -> e.getKey().equals(view))//
-            .map(this::toTextView)//
+            .map(this::setName)//
             .collect(toList());
         return textViews.isEmpty() ? null : textViews.get(0);
       } catch (Exception e) {
@@ -459,11 +460,11 @@ public class TinkerPopService implements AlexandriaService {
     return Optional.ofNullable(textView);
   }
 
-  private Map<String, TextViewPrototype> deserializeToTextViewMap(String json) throws IOException {
+  private Map<String, TextView> deserializeToTextViewMap(String json) throws IOException {
     if (StringUtils.isEmpty(json)) {
       return Maps.newHashMap();
     }
-    Map<String, TextViewPrototype> textViewMap = TEXTVIEWPROTOTYPE_READER.readValue(json);
+    Map<String, TextView> textViewMap = TEXTVIEW_READER.readValue(json);
     return textViewMap;
   }
 
@@ -702,7 +703,7 @@ public class TinkerPopService implements AlexandriaService {
     String textViewsJson = rvf.getSerializedTextViewMap();
     if (StringUtils.isNotEmpty(textViewsJson)) {
       try {
-        List<DeprecatedTextView> textViews = deserializeToTextViews(textViewsJson);
+        List<TextView> textViews = deserializeToTextViews(textViewsJson);
         resource.setDirectTextViews(textViews);
       } catch (IOException e) {
         e.printStackTrace();
@@ -711,22 +712,18 @@ public class TinkerPopService implements AlexandriaService {
     }
   }
 
-  private List<DeprecatedTextView> deserializeToTextViews(String textViewsJson) throws IOException {
-    Map<String, TextViewPrototype> textViewMap = deserializeToTextViewMap(textViewsJson);
-    List<DeprecatedTextView> textViews = textViewMap.entrySet()//
+  private List<TextView> deserializeToTextViews(String textViewsJson) throws IOException {
+    Map<String, TextView> textViewMap = deserializeToTextViewMap(textViewsJson);
+    List<TextView> textViews = textViewMap.entrySet()//
         .stream()//
-        .map(this::toTextView)//
+        .map(this::setName)//
         .collect(toList());
     return textViews;
   }
 
-  private DeprecatedTextView toTextView(Entry<String, TextViewPrototype> entry) {
-    TextViewPrototype prototype = entry.getValue();
-    DeprecatedTextView textView = new DeprecatedTextView(entry.getKey())//
-        .setDescription(prototype.getDescription())//
-        .setIncludedElementDefinitions(prototype.getIncludedElements())//
-        .setExcludedElements(prototype.getExcludedElementTags())//
-        .setIgnoredElements(prototype.getIgnoredElements());
+  private TextView setName(Entry<String, TextView> entry) {
+    TextView textView = entry.getValue();
+    textView.setName(entry.getKey());
     return textView;
   }
 

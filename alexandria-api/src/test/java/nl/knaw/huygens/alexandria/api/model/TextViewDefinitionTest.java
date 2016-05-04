@@ -112,15 +112,15 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     ElementViewDefinition evd = new ElementViewDefinition()//
         .setElementMode(ElementView.ElementMode.show)//
         .setAttributeMode("showOnly xml:id ref");
-    tvd.getElementViewDefinitions().put("element", evd);
+    tvd.getElementViewDefinitions().put("p", evd);
 
     TextViewDefinitionParser tvdp = new TextViewDefinitionParser(tvd);
     TextView textView = tvdp.getTextView().get();
     Map<String, ElementView> elementViewMap = textView.getElementViewMap();
 
     assertThat(tvdp.isValid()).isTrue();
-    assertThat(elementViewMap).containsKey("element");
-    ElementView elementView = elementViewMap.get("element");
+    assertThat(elementViewMap).containsKey("p");
+    ElementView elementView = elementViewMap.get("p");
     assertThat(elementView.getElementMode()).isPresent();
     assertThat(elementView.getElementMode().get()).isEqualTo(ElementView.ElementMode.show);
     assertThat(elementView.getAttributeMode().get()).isEqualTo(ElementView.AttributeMode.showOnly);

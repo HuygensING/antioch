@@ -30,13 +30,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 import jersey.repackaged.com.google.common.collect.Lists;
-import nl.knaw.huygens.alexandria.api.model.DeprecatedTextView;
+import nl.knaw.huygens.alexandria.api.model.TextView;
 
 public class AlexandriaResource extends AbstractAnnotatable {
   private String cargo; // ref for resource, sub for subresource
   private Optional<IdentifiablePointer<AlexandriaResource>> parentResourcePointer = Optional.empty(); // only used in subresources
   private Collection<IdentifiablePointer<AlexandriaResource>> subResourcePointers = Lists.newArrayList();
-  private List<DeprecatedTextView> directTextViews = new ArrayList<>();
+  private List<TextView> directTextViews = new ArrayList<>();
   private boolean hasText = false;
 
   public AlexandriaResource(UUID id, TentativeAlexandriaProvenance provenance) {
@@ -81,11 +81,11 @@ public class AlexandriaResource extends AbstractAnnotatable {
     }
   }
 
-  public List<DeprecatedTextView> getDirectTextViews() {
+  public List<TextView> getDirectTextViews() {
     return directTextViews;
   }
 
-  public void setDirectTextViews(List<DeprecatedTextView> textViews) {
+  public void setDirectTextViews(List<TextView> textViews) {
     this.directTextViews = textViews;
   }
 

@@ -53,11 +53,13 @@
           {
             "textView": {
               "description": "Description of the view",
-              "ignoredElements": ["note"],
-              "includedElements": [
-                {"name" : "div", "includedAttributes" : ["id"] },
-                {"name" : "p" }
-          ] } }
+              "elements": {
+                ":default": { "elementMode": "hideTag", "attributeMode": "hideAll" },
+                "div"     : { "elementMode": "show",    "attributeMode": "showOnly('id')" },
+                "p"       : { "elementMode": "show" },
+                "note"    : { "elementMode": "hide" }
+              }
+          } }
         </h:jsonBody>
     </h:request>
     <h:request>
@@ -68,8 +70,12 @@
           {
             "textView": {
               "description": "Description of the view",
-              "ignoredElements": ["note"],
-              "excludedElements": ["p","hi"]
+              "elements": {
+                ":default": { "elementMode": "show", "attributeMode" : "showAll" },
+                "p"       : { "elementMode": "hideTag" },
+                "hi"      : { "elementMode": "hideTag" },
+                "note"    : { "elementMode": "hide" }
+              }
           } }
         </h:jsonBody>
     </h:request>
@@ -79,18 +85,21 @@
       <dt><code>description</code></dt>
       <dd>optional. A text describing what the view is for.</dd>
 
-      <dt><code>ignoredElements</code></dt>
-      <dd>optional. A list of the xml elements to be ignored for this view. Neither the tags nor the contents of these elements will be shown.</dd>
-        
-      <dt><code>includedElements</code></dt>
-      <dd>required<sup>*</sup>. A list of the xml element tags to show in this view. If attributes are present, only the ones in <code>includedAttributes</code> will be shown.</dd>
+      <dt><code>elements</code></dt>
+      <dd>A map of xml element names and what to do with them in this view. With element name <code>:default</code> you can set view settings for elements not defined here. The properties are:
+         <dl>
+           <dt><code>elementMode</code></dt>
+           <dd></dd>
 
-      <dt><code>excludedElements</code></dt>
-      <dd>required<sup>*</sup>. A list of the xml element tags NOT to show in this view. The contents of these elements will be shown.</dd>
+           <dt><code>attributeMode</code></dt>
+           <dd></dd>
+           
+           <dt><code>when</code></dt>
+           <dd></dd>
+         </dl>
+      </dd>
+        
     </dl>
-    <sup>*</sup> A textView definition cannot have both <code>includedElements</code> ánd <code>excludedElements</code>.
-                 Using <code>includedElements</code> makes it an <i>including</i> view,
-                 using <code>excludedElements</code> maked it an <i>excluding</i> view.  
 </div>
 
 <div id="set-including-view" c:execute="clearStorage()"
@@ -134,12 +143,14 @@
           {
             "textView": {
               "description": "The Base Layer",
-              "ignoredElements": ["note"],
-	            "includedElements": [
-                {"name" : "text" },
-                {"name" : "div", "includedAttributes" : ["id"] },
-		            {"name" : "p" }
-          ] } }
+              "elements": {
+                ":default": { "elementMode": "hideTag", "attributeMode" : "hideAll" },
+                "div"     : { "elementMode": "show", "attributeMode" : "showOnly('id')" },
+                "p"       : { "elementMode": "show" },
+                "text"    : { "elementMode": "show" },
+                "note"    : { "elementMode": "hide" }
+              }
+          } }
         </h:jsonBody>
         using
         <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
@@ -186,13 +197,15 @@
             </li>
             <li>and body
                 <h:jsonResponse>{
-                "description": "The Base Layer",
-                "ignoredElements" : [ "note" ],
-		            "includedElements": [
-                  {"name" : "text" },
-			            {"name" : "div", "includedAttributes" : ["id"] },
-			            {"name" : "p" }
-		            ] }
+	                "description": "The Base Layer",
+		              "elements": {
+		                ":default": { "elementMode": "hideTag", "attributeMode" : "hideAll" },
+		                "div"     : { "elementMode": "show", "attributeMode" : "showOnly('id')" },
+		                "p"       : { "elementMode": "show" },
+		                "text"    : { "elementMode": "show" },
+		                "note"    : { "elementMode": "hide" }
+		              }
+		            }
                 </h:jsonResponse>
             </li>
         </ul>
@@ -285,11 +298,13 @@
         <h:jsonBody>{
             "textView": {
               "description": "The Base Layer for the subresource",
-              "ignoredElements": ["note"],
-              "includedElements": [
-                {"name" : "div", "includedAttributes" : ["ref"] },
-                {"name" : "p" }
-            ] } }
+              "elements": {
+                ":default": { "elementMode": "hideTag", "attributeMode" : "hideAll" },
+                "div"     : { "elementMode": "show", "attributeMode" : "showOnly('ref')" },
+                "p"       : { "elementMode": "show" },
+                "note"    : { "elementMode": "hide" }
+              }
+          } }
         </h:jsonBody>
         using
         <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
@@ -370,8 +385,11 @@
           {
             "textView": {
               "description": "Don't show num tags",
-              "ignoredElements": ["note"],
-              "excludedElements": [ "num" ]
+              "elements": {
+                ":default": { "elementMode": "show", "attributeMode" : "showAll" },
+                "num"     : { "elementMode": "hideTag" },
+                "note"    : { "elementMode": "hide" }
+              }
           } }
         </h:jsonBody>
         using
@@ -420,9 +438,11 @@
             <li>and body
               <h:jsonResponse>{
                 "description": "Don't show num tags",
-                "ignoredElements" : [ "note" ],
-                "excludedElements": [ "num" ]
-               }
+	              "elements": {
+	                ":default": { "elementMode": "show", "attributeMode" : "showAll" },
+	                "num"     : { "elementMode": "hideTag" },
+	                "note"    : { "elementMode": "hide" }
+	            } }
               </h:jsonResponse>
             </li>
         </ul>
@@ -486,17 +506,18 @@
      
     <h:request>
         When I define a view <code c:set="#view">conditional</code> by
-        <h:put>/resources/$resourceId4/text/views1/$view</h:put>
+        <h:put>/resources/$resourceId4/text/views/$view</h:put>
         the body:
         <h:jsonBody>
           {
             "textView": {
               "description": "Transcriber A preferred",
-              "ignoredElements": ["note"],
-              "includedElements": [
-                {"name" : "div", "includedAttributes" : ["ref"] },
-                {"name" : "p", "condition": "attribute(transcriber).equals('#a')" }
-            ]          } }
+              "elements": {
+                ":default": { "elementMode": "hideTag", "attributeMode" : "showAll" },
+                "div"     : { "elementMode": "show",    "attributeMode" : "showOnly('ref')" },
+                "p"       : { "elementMode": "hideTag", "when" : "attribute(transcriber).isNot('#a')" },
+                "note"    : { "elementMode": "hide" }
+          } } }
         </h:jsonBody>
         using
         <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
@@ -543,12 +564,13 @@
             </li>
             <li>and body
               <h:jsonResponse>{
-              "description": "Transcriber A preferred",
-                "ignoredElements" : [ "note" ],
-                "includedElements": [
-                {"name" : "div", "includedAttributes" : ["ref"] },
-                {"name" : "p", "condition": "attribute(transcriber).equals('#a')" }
-            ] }
+	              "description": "Transcriber A preferred",
+	              "elements": {
+	                ":default": { "elementMode": "hideTag", "attributeMode" : "showAll" },
+	                "div"     : { "elementMode": "show",    "attributeMode" : "showOnly('ref')" },
+	                "p"       : { "elementMode": "hideTag", "when" : "attribute(transcriber).isNot('#a')" },
+	                "note"    : { "elementMode": "hide" }
+	            } }
               </h:jsonResponse>
             </li>
         </ul>

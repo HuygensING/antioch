@@ -16,10 +16,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import nl.knaw.huygens.Log;
+import com.google.common.base.Joiner;
+
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
-import nl.knaw.huygens.alexandria.api.model.DeprecatedTextView;
-import nl.knaw.huygens.alexandria.api.model.TextViewPrototype;
+import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.TextViewDefinition;
+import nl.knaw.huygens.alexandria.api.model.TextViewDefinitionParser;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
@@ -55,7 +57,7 @@ public class ResourceTextViewEndpoint extends JSONEndpoint {
   @GET
   @Path("{viewId}")
   public Response getTextView(@PathParam("viewId") String viewId) {
-    DeprecatedTextView textView = service.getTextView(resourceId, viewId)//
+    TextView textView = service.getTextView(resourceId, viewId)//
         .orElseThrow(() -> new NotFoundException("No view '" + viewId + "' found for this resource."));
     return ok(textView);
   }
@@ -63,20 +65,19 @@ public class ResourceTextViewEndpoint extends JSONEndpoint {
   @PUT
   @Path("{viewId}")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response updateTextView(@PathParam("viewId") String viewId, @NotNull TextViewPrototype protoType) {
-    Log.trace("protoType=[{}]", protoType);
-    if (!protoType.isValid()) {
-      throw new BadRequestException("Setting both includedElements and excludedElements is not allowed.");
-    }
+  public Response updateTextView(@PathParam("viewId") String viewId, @NotNull TextViewDefinition textViewDefinition) {
+    TextViewDefinitionParser textViewDefinitionParser = new TextViewDefinitionParser(textViewDefinition);
+    TextView textView = textViewDefinitionParser.getTextView()//
+        .orElseThrow(() -> new BadRequestException(Joiner.on("\n").join(textViewDefinitionParser.getErrors())));
     boolean updateView = service.getTextView(resourceId, viewId).isPresent();
-    service.setTextView(resourceId, viewId, protoType);
+    service.setTextView(resourceId, viewId, textView);
     URI location = locationBuilder.locationOf(AlexandriaResource.class, resourceId, EndpointPaths.TEXT, EndpointPaths.TEXTVIEWS, viewId);
     return updateView //
         ? noContent() //
         : created(location);
   }
 
-  private TextViewEntity toTextViewEntity(DeprecatedTextView textView) {
+  private TextViewEntity toTextViewEntity(TextView textView) {
     return new TextViewEntity(resourceId, textView, locationBuilder);
   }
 }

@@ -1,34 +1,25 @@
 package nl.knaw.huygens.alexandria.textgraph;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import javax.ws.rs.core.StreamingOutput;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
-import nl.knaw.huygens.alexandria.api.model.ElementDefinition;
-import nl.knaw.huygens.alexandria.api.model.DeprecatedTextView;
+import nl.knaw.huygens.alexandria.api.model.ElementView;
+import nl.knaw.huygens.alexandria.api.model.TextView;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.alexandria.text.TextUtil;
 import nl.knaw.huygens.tei.Document;
 
 public class TextGraphUtil {
@@ -79,7 +70,7 @@ public class TextGraphUtil {
     }
   }
 
-  public static StreamingOutput streamTextViewXML(AlexandriaService service, UUID resourceId, DeprecatedTextView textView) {
+  public static StreamingOutput streamTextViewXML(AlexandriaService service, UUID resourceId, TextView textView) {
     StreamingOutput outputstream = output -> {
       Writer writer = createBufferedUTF8OutputStreamWriter(output);
       TextViewContext textViewContext = new TextViewContext(textView);
@@ -89,64 +80,49 @@ public class TextGraphUtil {
     return outputstream;
   }
 
+  // TODO: use new TextView
   private static class TextViewContext {
-    enum Mode {
-      inclusive, exclusive
-    }
+    private Map<String, ElementView> elementViewMap;
+    private Stack<String> ignoredAnnotationStack = new Stack<>();
 
-    final Set<String> elementNamesToInclude;
-    final List<String> elementNamesToExclude;
-    final Map<String, List<String>> elementAttributesToInclude = Maps.newHashMap();
-    final List<String> elementsToIgnore;
-    final Stack<TextAnnotation> ignoredAnnotationStack = new Stack<>();
-    final Mode mode;
-
-    public TextViewContext(DeprecatedTextView textView) {
-      elementsToIgnore = textView.getIgnoredElements();
-      elementNamesToInclude = textView.getIncludedElementDefinitions().stream()//
-          .map(ElementDefinition::getName)//
-          .collect(toSet());
-      elementNamesToExclude = textView.getExcludedElements();
-      mode = elementNamesToInclude.isEmpty() ? Mode.exclusive : Mode.inclusive;
-      for (ElementDefinition definition : textView.getIncludedElementDefinitions()) {
-        List<String> includedAttributes = definition.getIncludedAttributes();
-        if (!includedAttributes.contains(TextUtil.XML_ID)) {
-          includedAttributes.add(0, TextUtil.XML_ID);
-        }
-        elementAttributesToInclude.put(definition.getName(), includedAttributes);
-      }
+    public TextViewContext(TextView textView) {
+      elementViewMap = textView.getElementViewMap();
     }
 
     public boolean includeTag(String name) {
-      boolean notIgnoredElement = !elementsToIgnore.contains(name);
-      boolean inclusiveAndInclude = mode.equals(Mode.inclusive) && elementNamesToInclude.contains(name);
-      boolean exclusiveAndInclude = mode.equals(Mode.exclusive) && !elementNamesToExclude.contains(name);
-      return notIgnoredElement && notInsideIgnoredElement() && (inclusiveAndInclude || exclusiveAndInclude);
+      if (elementViewMap.containsKey(name)){
+        elementViewMap.get(name).getElementMode();
+      }
+//      boolean notIgnoredElement = !elementsToIgnore.contains(name);
+//      boolean inclusiveAndInclude = mode.equals(Mode.inclusive) && elementNamesToInclude.contains(name);
+//      boolean exclusiveAndInclude = mode.equals(Mode.exclusive) && !elementNamesToExclude.contains(name);
+//      return notIgnoredElement && notInsideIgnoredElement() && (inclusiveAndInclude || exclusiveAndInclude);
+      return true;
     }
 
     public Map<String, String> includedAttributes(TextAnnotation textAnnotation) {
-      if (mode.equals(Mode.exclusive)) {
-        return textAnnotation.getAttributes();
-      }
-      List<String> includedElementAttributeNames = elementAttributesToInclude.get(textAnnotation.getName());
+      // if (mode.equals(Mode.exclusive)) {
+      // return textAnnotation.getAttributes();
+      // }
+      // List<String> includedElementAttributeNames = elementAttributesToInclude.get(textAnnotation.getName());
       Map<String, String> allAttributes = textAnnotation.getAttributes();
       Map<String, String> attributesToInclude = Maps.newHashMap();
-      for (String name : includedElementAttributeNames) {
-        if (allAttributes.containsKey(name)) {
-          attributesToInclude.put(name, allAttributes.get(name));
-        }
-      }
+      // for (String name : includedElementAttributeNames) {
+      // if (allAttributes.containsKey(name)) {
+      // attributesToInclude.put(name, allAttributes.get(name));
+      // }
+      // }
       return attributesToInclude;
     }
 
     public void pushWhenIgnoring(TextAnnotation textAnnotation) {
-      if (elementsToIgnore.contains(textAnnotation.getName())) {
-        ignoredAnnotationStack.push(textAnnotation);
-      }
+      // if (elementsToIgnore.contains(textAnnotation.getName())) {
+      // ignoredAnnotationStack.push(textAnnotation);
+      // }
     }
 
     public void popWhenIgnoring(String name) {
-      if (elementsToIgnore.contains(name) && !ignoredAnnotationStack.isEmpty()) {
+      if (/* elementsToIgnore.contains(name) && */!ignoredAnnotationStack.isEmpty()) {
         ignoredAnnotationStack.pop();
       }
     }
@@ -213,30 +189,30 @@ public class TextGraphUtil {
     }
   }
 
-  public static String renderTextView(List<String> textSegments, Set<XmlAnnotation> xmlAnnotations, DeprecatedTextView textView) {
-    List<String> includedElementNames = textView.getIncludedElementDefinitions()//
-        .stream()//
-        .map(ElementDefinition::getName)//
-        .collect(toList());
-    StringBuilder builder = new StringBuilder();
-
-    List<XmlAnnotation> xmlAnnotationList = Lists.newArrayList(xmlAnnotations);
-    for (int i = 0; i < xmlAnnotationList.size(); i++) {
-      XmlAnnotation xmlAnnotation = xmlAnnotationList.get(i);
-      if (includedElementNames.contains(xmlAnnotation.getName())) {
-        openBeforeText.put(xmlAnnotation.getFirstSegmentIndex(), i);
-        closeAfterText.put(xmlAnnotation.getLastSegmentIndex(), i);
-      }
-    }
-
-    final AtomicInteger i = new AtomicInteger(0);
-    textSegments.forEach(t -> {
-      appendOpeningElements(builder, i.get(), xmlAnnotationList);
-      builder.append(t);
-      appendClosingElements(builder, i.getAndIncrement(), xmlAnnotationList);
-    });
-    return builder.toString();
-  }
+  // public static String renderTextView(List<String> textSegments, Set<XmlAnnotation> xmlAnnotations, TextView textView) {
+  // List<String> includedElementNames = textView.getIncludedElementDefinitions()//
+  // .stream()//
+  // .map(ElementDefinition::getName)//
+  // .collect(toList());
+  // StringBuilder builder = new StringBuilder();
+  //
+  // List<XmlAnnotation> xmlAnnotationList = Lists.newArrayList(xmlAnnotations);
+  // for (int i = 0; i < xmlAnnotationList.size(); i++) {
+  // XmlAnnotation xmlAnnotation = xmlAnnotationList.get(i);
+  // if (includedElementNames.contains(xmlAnnotation.getName())) {
+  // openBeforeText.put(xmlAnnotation.getFirstSegmentIndex(), i);
+  // closeAfterText.put(xmlAnnotation.getLastSegmentIndex(), i);
+  // }
+  // }
+  //
+  // final AtomicInteger i = new AtomicInteger(0);
+  // textSegments.forEach(t -> {
+  // appendOpeningElements(builder, i.get(), xmlAnnotationList);
+  // builder.append(t);
+  // appendClosingElements(builder, i.getAndIncrement(), xmlAnnotationList);
+  // });
+  // return builder.toString();
+  // }
 
   /* private methods */
 
@@ -279,30 +255,30 @@ public class TextGraphUtil {
     }
   }
 
-  private static void appendOpeningElements(StringBuilder builder, int i, List<XmlAnnotation> xmlAnnotations) {
-    Collection<Integer> elementsToOpenIndexes = openBeforeText.get(i);
-    elementsToOpenIndexes.forEach(j -> {
-      XmlAnnotation xmlAnnotation = xmlAnnotations.get(j);
-      builder.append("<").append(xmlAnnotation.getName());
-      Map<String, String> attributes = xmlAnnotation.getAttributes();
-      appendAttributes(builder, attributes);
-      if (xmlAnnotation.isMilestone()) {
-        builder.append("/");
-      }
-      builder.append(">");
-    });
-  }
-
-  private static void appendClosingElements(StringBuilder builder, int i, List<XmlAnnotation> xmlAnnotations) {
-    List<Integer> elementsToCloseIndexes = Lists.reverse(Lists.newArrayList(closeAfterText.get(i)));
-    elementsToCloseIndexes.forEach(j -> {
-      XmlAnnotation xmlAnnotation = xmlAnnotations.get(j);
-      if (!xmlAnnotation.isMilestone()) {
-        builder.append("</")//
-            .append(xmlAnnotation.getName())//
-            .append(">");
-      }
-    });
-  }
+  // private static void appendOpeningElements(StringBuilder builder, int i, List<XmlAnnotation> xmlAnnotations) {
+  // Collection<Integer> elementsToOpenIndexes = openBeforeText.get(i);
+  // elementsToOpenIndexes.forEach(j -> {
+  // XmlAnnotation xmlAnnotation = xmlAnnotations.get(j);
+  // builder.append("<").append(xmlAnnotation.getName());
+  // Map<String, String> attributes = xmlAnnotation.getAttributes();
+  // appendAttributes(builder, attributes);
+  // if (xmlAnnotation.isMilestone()) {
+  // builder.append("/");
+  // }
+  // builder.append(">");
+  // });
+  // }
+  //
+  // private static void appendClosingElements(StringBuilder builder, int i, List<XmlAnnotation> xmlAnnotations) {
+  // List<Integer> elementsToCloseIndexes = Lists.reverse(Lists.newArrayList(closeAfterText.get(i)));
+  // elementsToCloseIndexes.forEach(j -> {
+  // XmlAnnotation xmlAnnotation = xmlAnnotations.get(j);
+  // if (!xmlAnnotation.isMilestone()) {
+  // builder.append("</")//
+  // .append(xmlAnnotation.getName())//
+  // .append(">");
+  // }
+  // });
+  // }
 
 }
