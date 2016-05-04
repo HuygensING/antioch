@@ -3,7 +3,6 @@ package nl.knaw.huygens.alexandria.api.model;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.junit.Test;
 
@@ -22,7 +21,9 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     d.getElementViewDefinitions().put(TextViewDefinition.DEFAULT, new ElementViewDefinition().setElementMode(ElementMode.show).setAttributeMode("showAll"));
     d.getElementViewDefinitions().put("note", new ElementViewDefinition().setElementMode(ElementMode.hide));
     d.getElementViewDefinitions().put("persName", new ElementViewDefinition().setElementMode(ElementMode.show).setWhen("attribute(resp).is(\"#ed\")"));
-    assertThat(d.isValid()).isTrue();
+
+    TextViewDefinitionParser tvdp = new TextViewDefinitionParser(d);
+    assertThat(tvdp.isValid()).isTrue();
     String json = om.writeValueAsString(d);
     String expected = singleQuotesToDouble("{'textView':"//
         + "{"//
@@ -46,16 +47,16 @@ public class TextViewDefinitionTest extends AlexandriaTest {
   // Element names cannot start with the letters xml (or XML, or Xml, etc)
   // Element names can contain letters, digits, hyphens, underscores, and periods
   // Element names cannot contain spaces
-  // @Test
+  @Test
   public void testValidationOfInvalidElementNamesFails() throws IOException {
     TextViewDefinition d = new TextViewDefinition();
     d.getElementViewDefinitions().put("3lement", new ElementViewDefinition().setElementMode(ElementMode.show));
     d.getElementViewDefinitions().put("xmlIsDaBomb", new ElementViewDefinition().setElementMode(ElementMode.show));
     d.getElementViewDefinitions().put("element?", new ElementViewDefinition().setElementMode(ElementMode.show));
     d.getElementViewDefinitions().put("e le ment", new ElementViewDefinition().setElementMode(ElementMode.show));
-    assertThat(d.isValid()).isFalse();
-    List<String> errors = d.validate();
-    assertThat(errors).containsExactly(//
+    TextViewDefinitionParser tvdp = new TextViewDefinitionParser(d);
+    assertThat(tvdp.isValid()).isFalse();
+    assertThat(tvdp.getErrors()).containsExactly(//
         "\"3lement\" is not a valid element name: element names must start with a letter or underscore.",//
         "\"xmlIsDaBomb\" is not a valid element name: element names cannot start with the letters xml (or XML, or Xml, etc).",//
         "\"element?\" is not a valid element name: element names can only contain letters, digits, hyphens, underscores, and periods.",//
