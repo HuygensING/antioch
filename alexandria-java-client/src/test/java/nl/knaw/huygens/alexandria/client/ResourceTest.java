@@ -37,7 +37,7 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.ElementDefinition;
-import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.DeprecatedTextView;
 import nl.knaw.huygens.alexandria.api.model.TextViewPrototype;
 
 public class ResourceTest extends AlexandriaClientTest {
@@ -124,9 +124,9 @@ public class ResourceTest extends AlexandriaClientTest {
     softly.assertThat(result2.get().toString()).as("Location").endsWith("/" + resourceId + "/" + EndpointPaths.TEXT + "/" + EndpointPaths.TEXTVIEWS);
 
     // now, retrieve the base layer definition
-    RestResult<TextView> result3 = client.getTextView(resourceId);
+    RestResult<DeprecatedTextView> result3 = client.getTextView(resourceId);
     assertRequestSucceeded(result3);
-    TextView returnedDefinition = result3.get();
+    DeprecatedTextView returnedDefinition = result3.get();
     softly.assertThat(returnedDefinition.getIgnoredElements()).as("SubresourceElements").containsExactly("note");
     softly.assertThat(returnedDefinition.getIncludedElementDefinitions()).as("BaseElements").containsExactly(baseElement1, baseElement2);
   }

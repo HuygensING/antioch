@@ -28,7 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
-import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.DeprecatedTextView;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -134,7 +134,7 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
     assertResourceHasText();
     StreamingOutput outputstream;
     if (StringUtils.isNotBlank(view)) {
-      TextView textView = service.getTextView(resourceId, view)//
+      DeprecatedTextView textView = service.getTextView(resourceId, view)//
           .orElseThrow(() -> new NotFoundException("No view '" + view + "' found for this resource."));
       outputstream = TextGraphUtil.streamTextViewXML(service, resourceId, textView);
 

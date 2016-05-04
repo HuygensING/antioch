@@ -18,7 +18,7 @@ import javax.ws.rs.core.Response;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
-import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.DeprecatedTextView;
 import nl.knaw.huygens.alexandria.api.model.TextViewPrototype;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -55,7 +55,7 @@ public class ResourceTextViewEndpoint extends JSONEndpoint {
   @GET
   @Path("{viewId}")
   public Response getTextView(@PathParam("viewId") String viewId) {
-    TextView textView = service.getTextView(resourceId, viewId)//
+    DeprecatedTextView textView = service.getTextView(resourceId, viewId)//
         .orElseThrow(() -> new NotFoundException("No view '" + viewId + "' found for this resource."));
     return ok(textView);
   }
@@ -76,7 +76,7 @@ public class ResourceTextViewEndpoint extends JSONEndpoint {
         : created(location);
   }
 
-  private TextViewEntity toTextViewEntity(TextView textView) {
+  private TextViewEntity toTextViewEntity(DeprecatedTextView textView) {
     return new TextViewEntity(resourceId, textView, locationBuilder);
   }
 }

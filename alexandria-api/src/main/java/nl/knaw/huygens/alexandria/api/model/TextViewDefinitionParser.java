@@ -1,5 +1,10 @@
 package nl.knaw.huygens.alexandria.api.model;
 
+import static nl.knaw.huygens.alexandria.api.model.ElementView.AttributeMode.hideAll;
+import static nl.knaw.huygens.alexandria.api.model.ElementView.AttributeMode.hideOnly;
+import static nl.knaw.huygens.alexandria.api.model.ElementView.AttributeMode.showAll;
+import static nl.knaw.huygens.alexandria.api.model.ElementView.AttributeMode.showOnly;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +16,12 @@ import java.util.regex.Pattern;
 import com.google.common.base.Splitter;
 
 public class TextViewDefinitionParser {
-  private List<String> errors = new ArrayList<>();
 
-  public TextViewDefinitionParser(TextViewDefinition d) {
-    validate(d);
+  private final List<String> errors = new ArrayList<>();
+  static final TextView textView = new TextView();
+
+  public TextViewDefinitionParser(final TextViewDefinition d) {
+    parse(d);
   }
 
   public boolean isValid() {
@@ -25,22 +32,24 @@ public class TextViewDefinitionParser {
     return errors;
   }
 
-  private void validate(TextViewDefinition d) {
-    for (Entry<String, ElementViewDefinition> entry : d.getElementViewDefinitions().entrySet()) {
-      String elementName = entry.getKey();
+  private void parse(final TextViewDefinition d) {
+    textView.setDescription(d.getDescription());
+    for (final Entry<String, ElementViewDefinition> entry : d.getElementViewDefinitions().entrySet()) {
+      final String elementName = entry.getKey();
       validateElementName(elementName);
-      validateElementViewDefinition(entry.getValue(), elementName);
+      final ElementView elementView = parseElementViewDefinition(elementName, entry.getValue());
+      textView.putElementView(elementName, elementView);
     }
   }
 
   static final Pattern ELEMENTNAME_PATTERN1 = Pattern.compile("[_a-zA-Z].+");
   static final Pattern ELEMENTNAME_PATTERN2 = Pattern.compile("[\\w-\\.]+");
 
-  private void validateElementName(String elementName) {
+  private void validateElementName(final String elementName) {
     if (TextViewDefinition.DEFAULT.equals(elementName)) {
       return;
     }
-    String prefix = "\"" + elementName + "\" is not a valid element name: element names ";
+    final String prefix = "\"" + elementName + "\" is not a valid element name: element names ";
     if (elementName.contains(" ")) {
       errors.add(prefix + "cannot contain spaces.");
 
@@ -55,56 +64,68 @@ public class TextViewDefinitionParser {
     }
   }
 
-  private void validateElementViewDefinition(ElementViewDefinition evd, String elementName) {
-    validateAttributeMode(elementName, evd.getAttributeMode());
-    validateWhen(elementName, evd.getWhen());
+  private ElementView parseElementViewDefinition(final String elementName, final ElementViewDefinition evd) {
+    final ElementView elementView = new ElementView();
+    elementView.setElementMode(evd.getElementMode());
+    parseAttributeMode(elementName, evd.getAttributeMode(), elementView);
+    parseWhen(elementName, evd.getWhen(), elementView);
+    return elementView;
   }
 
-  static final Pattern ATTRIBUTEMODE_SHOWONLY = Pattern.compile("showOnly\\((.*)\\)");
-  static final Pattern ATTRIBUTEMODE_HIDEONLY = Pattern.compile("hideOnly\\((.*)\\)");
+  static final Pattern ATTRIBUTEMODE_SHOWONLY = Pattern.compile(showOnly.name() + "(.*)");
+  static final Pattern ATTRIBUTEMODE_HIDEONLY = Pattern.compile(hideOnly.name() + "(.*)");
 
-  private void validateAttributeMode(String elementName, Optional<String> attributeMode) {
+  private void parseAttributeMode(final String elementName, final Optional<String> attributeMode, final ElementView elementView) {
     if (attributeMode.isPresent()) {
-      String mode = attributeMode.get();
-      String prefix = MessageFormat.format("{0}: \"{1}\" ", elementName, mode);
+      final String mode = attributeMode.get();
+      final String prefix = MessageFormat.format("{0}: \"{1}\" ", elementName, mode);
 
-      if ("showAll".equals(mode)) {
+      if (showAll.name().equals(mode)) {
+        elementView.setAttributeMode(showAll, new ArrayList<>());
         return;
       }
 
-      Matcher matcher2 = ATTRIBUTEMODE_SHOWONLY.matcher(mode);
+      final Matcher matcher2 = ATTRIBUTEMODE_SHOWONLY.matcher(mode);
       if (matcher2.matches()) {
-        parseParameters(prefix, matcher2.group(1));
+        List<String> parameters = parseParameters(prefix, matcher2.group(1));
+        elementView.setAttributeMode(showOnly, parameters);
         return;
       }
 
-      if ("hideAll".equals(mode)) {
+      if (hideAll.name().equals(mode)) {
+        elementView.setAttributeMode(hideAll, new ArrayList<>());
         return;
       }
 
-      Matcher matcher4 = ATTRIBUTEMODE_HIDEONLY.matcher(mode);
+      final Matcher matcher4 = ATTRIBUTEMODE_HIDEONLY.matcher(mode);
       if (matcher4.matches()) {
-        parseParameters(prefix, matcher4.group(1));
+        List<String> parameters = parseParameters(prefix, matcher4.group(1));
+        elementView.setAttributeMode(hideOnly, parameters);
         return;
       }
 
-      errors.add(prefix + "is not a valid attributeMode. Valid attributeMode values are: \"showAll\", \"showOnly(attribute,...)\", \"hideAll\", \"hideOnly(attribute,...)\".");
+      errors.add(prefix + "is not a valid attributeMode. Valid attributeMode values are: \"showAll\", \"showOnly attribute...\", \"hideAll\", \"hideOnly attribute...\".");
     }
   }
 
-  private void parseParameters(String prefix, String group) {
-    List<String> parameters = Splitter.on(",").trimResults().omitEmptyStrings().splitToList(group);
+  private List<String> parseParameters(final String prefix, final String group) {
+    final List<String> parameters = Splitter.on(" ").trimResults().omitEmptyStrings().splitToList(group);
     if (parameters.isEmpty()) {
       errors.add(prefix + "needs one or more attribute names.");
     }
+    return parameters;
   }
 
-  private void validateWhen(String elementName, Optional<String> optionalWhen) {
+  private void parseWhen(final String elementName, final Optional<String> optionalWhen, final ElementView elementView) {
     if (optionalWhen.isPresent()) {
-      String when = optionalWhen.get();
-      String prefix = MessageFormat.format("{0}: \"{1}\" ", elementName, when);
+      final String when = optionalWhen.get();
+      final String prefix = MessageFormat.format("{0}: \"{1}\" ", elementName, when);
 
     }
+  }
+
+  public TextView getTextView() {
+    return textView;
   }
 
 }

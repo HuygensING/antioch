@@ -26,7 +26,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 import nl.knaw.huygens.alexandria.api.model.ElementDefinition;
-import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.DeprecatedTextView;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.text.TextUtil;
 import nl.knaw.huygens.tei.Document;
@@ -79,7 +79,7 @@ public class TextGraphUtil {
     }
   }
 
-  public static StreamingOutput streamTextViewXML(AlexandriaService service, UUID resourceId, TextView textView) {
+  public static StreamingOutput streamTextViewXML(AlexandriaService service, UUID resourceId, DeprecatedTextView textView) {
     StreamingOutput outputstream = output -> {
       Writer writer = createBufferedUTF8OutputStreamWriter(output);
       TextViewContext textViewContext = new TextViewContext(textView);
@@ -101,7 +101,7 @@ public class TextGraphUtil {
     final Stack<TextAnnotation> ignoredAnnotationStack = new Stack<>();
     final Mode mode;
 
-    public TextViewContext(TextView textView) {
+    public TextViewContext(DeprecatedTextView textView) {
       elementsToIgnore = textView.getIgnoredElements();
       elementNamesToInclude = textView.getIncludedElementDefinitions().stream()//
           .map(ElementDefinition::getName)//
@@ -213,7 +213,7 @@ public class TextGraphUtil {
     }
   }
 
-  public static String renderTextView(List<String> textSegments, Set<XmlAnnotation> xmlAnnotations, TextView textView) {
+  public static String renderTextView(List<String> textSegments, Set<XmlAnnotation> xmlAnnotations, DeprecatedTextView textView) {
     List<String> includedElementNames = textView.getIncludedElementDefinitions()//
         .stream()//
         .map(ElementDefinition::getName)//

@@ -31,7 +31,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.DeprecatedTextView;
 import nl.knaw.huygens.alexandria.api.model.TextViewPrototype;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.model.Accountable;
@@ -122,12 +122,12 @@ public interface AlexandriaService {
 
   void setTextView(UUID resourceUUID, String viewId, TextViewPrototype textViewPrototype);
 
-  Optional<TextView> getTextView(UUID resourceId, String viewId);
+  Optional<DeprecatedTextView> getTextView(UUID resourceId, String viewId);
 
   /**
    * Gets the textviews for the resource and all its ancestors
    */
-  List<TextView> getTextViewsForResource(UUID resourceUUID);
+  List<DeprecatedTextView> getTextViewsForResource(UUID resourceUUID);
 
   boolean storeTextGraph(UUID resourceId, ParseResult result);
 

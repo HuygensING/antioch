@@ -43,7 +43,7 @@ import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.StatePrototype;
-import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.DeprecatedTextView;
 import nl.knaw.huygens.alexandria.api.model.TextViewDefinition;
 import nl.knaw.huygens.alexandria.api.model.TextViewPrototype;
 
@@ -175,16 +175,16 @@ public class AlexandriaClient {
         .getResult();
   }
 
-  public RestResult<TextView> getTextView(UUID uuid) {
-    RestRequester<TextView> requester = RestRequester.withResponseSupplier(() -> rootTarget.path(EndpointPaths.RESOURCES)//
+  public RestResult<DeprecatedTextView> getTextView(UUID uuid) {
+    RestRequester<DeprecatedTextView> requester = RestRequester.withResponseSupplier(() -> rootTarget.path(EndpointPaths.RESOURCES)//
         .path(uuid.toString())//
         .path(EndpointPaths.TEXT)//
         .path(EndpointPaths.TEXTVIEWS)//
         .request().get());
     return requester//
         .onStatus(Status.OK, (response) -> {
-          RestResult<TextView> result = new RestResult<>();
-          TextView cargo = response.readEntity(TextView.class);
+          RestResult<DeprecatedTextView> result = new RestResult<>();
+          DeprecatedTextView cargo = response.readEntity(DeprecatedTextView.class);
           result.setCargo(cargo);
           return result;
         })//

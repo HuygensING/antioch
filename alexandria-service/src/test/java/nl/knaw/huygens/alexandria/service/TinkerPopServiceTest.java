@@ -51,7 +51,7 @@ import jersey.repackaged.com.google.common.collect.Lists;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.ElementDefinition;
-import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.DeprecatedTextView;
 import nl.knaw.huygens.alexandria.api.model.TextViewPrototype;
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
@@ -283,7 +283,7 @@ public class TinkerPopServiceTest extends AlexandriaTest {
     UUID subUuid2 = UUID.randomUUID();
     service.createSubResource(subUuid2, subUuid1, "sub2", provenance);
 
-    List<TextView> views = service.getTextViewsForResource(subUuid2);
+    List<DeprecatedTextView> views = service.getTextViewsForResource(subUuid2);
     assertThat(views).isNotEmpty();
     List<ElementDefinition> returnedElementDefinitions = views.get(0).getIncludedElementDefinitions();
     assertThat(returnedElementDefinitions).containsExactly(bedText, bedDiv);
@@ -308,7 +308,7 @@ public class TinkerPopServiceTest extends AlexandriaTest {
     UUID subUuid2 = UUID.randomUUID();
     service.createSubResource(subUuid2, subUuid1, "sub2", provenance);
 
-    List<TextView> textViews = service.getTextViewsForResource(subUuid2);
+    List<DeprecatedTextView> textViews = service.getTextViewsForResource(subUuid2);
     assertThat(textViews).isEmpty();
   }
 

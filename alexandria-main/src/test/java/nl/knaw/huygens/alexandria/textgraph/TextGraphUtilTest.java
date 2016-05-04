@@ -10,7 +10,7 @@ import com.google.common.collect.Lists;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.ElementDefinition;
-import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.DeprecatedTextView;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 
 public class TextGraphUtilTest extends AlexandriaTest {
@@ -47,7 +47,7 @@ public class TextGraphUtilTest extends AlexandriaTest {
     softly.assertThat(xmlAnnotations).hasSize(9);
     Log.info("annotations = \n\t{}", Joiner.on("\n\t").join(xmlAnnotations));
 
-    TextView baselayerDefinition = new TextView("baselayer").setIncludedElementDefinitions(//
+    DeprecatedTextView baselayerDefinition = new DeprecatedTextView("baselayer").setIncludedElementDefinitions(//
         Lists.newArrayList(//
             ElementDefinition.withName("text"), //
             ElementDefinition.withName("div"), //

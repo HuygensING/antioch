@@ -7,15 +7,11 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_ABSENT)
 public class ElementViewDefinition {
-  enum ElementMode {
-    show, hide, hideTag
-  }
-
   // # elementMode: (optional, use default settings if absent)
   // # show : show <element> + children
   // # hide : don't show <element> + children
   // # hideTag : don't show <element> tag, show children
-  private ElementMode elementMode;
+  private ElementView.ElementMode elementMode;
 
   // # attributeMode: (optional, use default settings if absent)
   // # showAll : show all attributes
@@ -30,11 +26,11 @@ public class ElementViewDefinition {
   // # attribute(resp).firstOf('#ed0','#ed1','')
   private String when;
 
-  public Optional<ElementMode> getElementMode() {
+  public Optional<ElementView.ElementMode> getElementMode() {
     return Optional.ofNullable(elementMode);
   }
 
-  public ElementViewDefinition setElementMode(ElementMode elementMode) {
+  public ElementViewDefinition setElementMode(ElementView.ElementMode elementMode) {
     this.elementMode = elementMode;
     return this;
   }

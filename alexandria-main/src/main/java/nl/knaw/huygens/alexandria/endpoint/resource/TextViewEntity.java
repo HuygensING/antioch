@@ -15,7 +15,7 @@ import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.Entity;
 import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
-import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.DeprecatedTextView;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 
@@ -31,7 +31,7 @@ public class TextViewEntity extends JsonWrapperObject implements Entity {
   @JsonIgnore
   private UUID viewResourceId;
 
-  public TextViewEntity(UUID resourceId, TextView textView, LocationBuilder locationBuilder) {
+  public TextViewEntity(UUID resourceId, DeprecatedTextView textView, LocationBuilder locationBuilder) {
     this.resourceId = resourceId;
     this.viewId = textView.getName();
     this.viewResourceId = textView.getTextViewDefiningResourceId();
