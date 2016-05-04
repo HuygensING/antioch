@@ -52,7 +52,7 @@ public class TextViewDefinitionParser {
   }
 
   static final Pattern ELEMENTNAME_PATTERN1 = Pattern.compile("[_a-zA-Z].+");
-  static final Pattern ELEMENTNAME_PATTERN2 = Pattern.compile("[\\w-\\.]+");
+  static final Pattern ELEMENTNAME_PATTERN2 = Pattern.compile("[\\w-\\.:]+");
 
   private void validateElementName(final String elementName) {
     if (TextViewDefinition.DEFAULT.equals(elementName)) {
