@@ -9,25 +9,30 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_ABSENT)
 public class ElementView {
-  enum ElementMode {
+  public enum ElementMode {
     show, hide, hideTag
   }
 
-  enum AttributeMode {
+  public enum AttributeMode {
     showAll, showOnly, hideAll, hideOnly
   }
 
-  enum AttributeFunction {
+  public enum AttributeFunction {
     is, isNot, firstOf
   }
+
+  public static final ElementView DEFAULT = new ElementView()//
+      .setElementMode(ElementMode.show)//
+      .setAttributeMode(AttributeMode.showAll);
 
   private ElementView.ElementMode elementMode;
   private ElementView.AttributeMode attributeMode;
   private List<String> relevantAttributes = new ArrayList<>();
   private AttributePreCondition precondition;
 
-  public void setElementMode(ElementView.ElementMode elementMode) {
+  public ElementView setElementMode(ElementView.ElementMode elementMode) {
     this.elementMode = elementMode;
+    return this;
   }
 
   public ElementView.ElementMode getElementMode() {
@@ -43,16 +48,18 @@ public class ElementView {
     return attributeMode;
   }
 
-  public void setAttributeMode(ElementView.AttributeMode attributeMode) {
+  public ElementView setAttributeMode(ElementView.AttributeMode attributeMode) {
     this.attributeMode = attributeMode;
+    return this;
   }
 
   public List<String> getRelevantAttributes() {
     return relevantAttributes;
   }
 
-  public void setRelevantAttributes(List<String> relevantAttributes) {
+  public ElementView setRelevantAttributes(List<String> relevantAttributes) {
     this.relevantAttributes = relevantAttributes;
+    return this;
   }
 
   public void setPreCondition(AttributePreCondition precondition) {

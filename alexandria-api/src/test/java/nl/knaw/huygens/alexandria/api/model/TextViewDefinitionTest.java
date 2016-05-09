@@ -31,7 +31,7 @@ public class TextViewDefinitionTest extends AlexandriaTest {
   public void testJsonSerializing() throws IOException {
     TextViewDefinition d = new TextViewDefinition();
     d.setDescription("Test definition");
-    d.getElementViewDefinitions().put(TextViewDefinition.DEFAULT, new ElementViewDefinition().setElementMode(ElementView.ElementMode.show).setAttributeMode("showAll"));
+    d.getElementViewDefinitions().put(TextViewDefinition.DEFAULT_ATTRIBUTENAME, new ElementViewDefinition().setElementMode(ElementView.ElementMode.show).setAttributeMode("showAll"));
     d.getElementViewDefinitions().put("note", new ElementViewDefinition().setElementMode(ElementView.ElementMode.hide));
     d.getElementViewDefinitions().put("persName", new ElementViewDefinition().setElementMode(ElementView.ElementMode.show).setWhen("attribute(resp).is(\"#ed\")"));
 
@@ -105,6 +105,27 @@ public class TextViewDefinitionTest extends AlexandriaTest {
         "element2: \"showOnly\" needs one or more attribute names.", //
         "element3: \"hideOnly\" needs one or more attribute names."//
     );
+  }
+
+  @Test
+  public void testParsingOfDefinitionWithJustAttributeModePasses() throws IOException {
+    TextViewDefinition tvd = new TextViewDefinition();
+    ElementViewDefinition evd = new ElementViewDefinition()//
+        .setAttributeMode("showOnly xml:id ref");
+    tvd.getElementViewDefinitions().put("p", evd);
+
+    TextViewDefinitionParser tvdp = new TextViewDefinitionParser(tvd);
+    TextView textView = tvdp.getTextView().get();
+    Map<String, ElementView> elementViewMap = textView.getElementViewMap();
+
+    assertThat(tvdp.isValid()).isTrue();
+    assertThat(elementViewMap).containsKey("p");
+    ElementView elementView = elementViewMap.get("p");
+    assertThat(elementView.getElementMode()).isNotNull();
+    assertThat(elementView.getElementMode()).isEqualTo(ElementView.ElementMode.show);
+    assertThat(elementView.getAttributeMode()).isEqualTo(ElementView.AttributeMode.showOnly);
+    assertThat(elementView.getRelevantAttributes()).containsExactly("xml:id", "ref");
+    testJsonSerialization(textView);
   }
 
   @Test

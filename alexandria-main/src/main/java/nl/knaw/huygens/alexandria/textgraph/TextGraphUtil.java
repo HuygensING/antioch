@@ -6,7 +6,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Stack;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -17,8 +19,12 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
+import nl.knaw.huygens.alexandria.api.model.AttributePreCondition;
 import nl.knaw.huygens.alexandria.api.model.ElementView;
+import nl.knaw.huygens.alexandria.api.model.ElementView.AttributeMode;
+import nl.knaw.huygens.alexandria.api.model.ElementView.ElementMode;
 import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.TextViewDefinition;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.tei.Document;
 
@@ -80,49 +86,108 @@ public class TextGraphUtil {
     return outputstream;
   }
 
-  // TODO: use new TextView
-  private static class TextViewContext {
+  protected static class TextViewContext {
     private Map<String, ElementView> elementViewMap;
-    private Stack<String> ignoredAnnotationStack = new Stack<>();
+    private Stack<TextAnnotation> ignoredAnnotationStack = new Stack<>();
 
     public TextViewContext(TextView textView) {
       elementViewMap = textView.getElementViewMap();
     }
 
-    public boolean includeTag(String name) {
-      if (elementViewMap.containsKey(name)){
-        elementViewMap.get(name).getElementMode();
+    public boolean includeTag(String name, Map<String, String> attributes) {
+      ElementView defaultElementView = elementViewMap.get(TextViewDefinition.DEFAULT_ATTRIBUTENAME);
+      ElementView elementView = elementViewMap.getOrDefault(name, defaultElementView);
+      ElementMode elementMode = elementView.getElementMode();
+      ElementMode defaultViewElementMode = defaultElementView.getElementMode();
+      Optional<AttributePreCondition> preCondition = elementView.getPreCondition();
+      boolean includeAccordingToElementMode = elementMode.equals(ElementMode.show);
+      boolean preConditionIsMet = preConditionIsMet(preCondition, attributes);
+      if (!preConditionIsMet) {
+        includeAccordingToElementMode = defaultViewElementMode.equals(ElementMode.show);
       }
-//      boolean notIgnoredElement = !elementsToIgnore.contains(name);
-//      boolean inclusiveAndInclude = mode.equals(Mode.inclusive) && elementNamesToInclude.contains(name);
-//      boolean exclusiveAndInclude = mode.equals(Mode.exclusive) && !elementNamesToExclude.contains(name);
-//      return notIgnoredElement && notInsideIgnoredElement() && (inclusiveAndInclude || exclusiveAndInclude);
+
+      return notInsideIgnoredElement() && includeAccordingToElementMode;
+    }
+
+    private boolean preConditionIsMet(Optional<AttributePreCondition> preCondition, Map<String, String> attributes) {
+      if (preCondition.isPresent()) {
+        AttributePreCondition attributePreCondition = preCondition.get();
+        String attribute = attributePreCondition.getAttribute();
+        List<String> values = attributePreCondition.getValues();
+        String actualValue = attributes.get(attribute);
+        switch (attributePreCondition.getFunction()) {
+        case is:
+          return values.contains(actualValue);
+        case isNot:
+          return !values.contains(actualValue);
+        case firstOf:
+          // TODO
+          break;
+        }
+
+      }
       return true;
     }
 
     public Map<String, String> includedAttributes(TextAnnotation textAnnotation) {
-      // if (mode.equals(Mode.exclusive)) {
-      // return textAnnotation.getAttributes();
-      // }
-      // List<String> includedElementAttributeNames = elementAttributesToInclude.get(textAnnotation.getName());
+      ElementView elementView = elementViewMap.getOrDefault(textAnnotation.getName(), elementViewMap.get(TextViewDefinition.DEFAULT_ATTRIBUTENAME));
       Map<String, String> allAttributes = textAnnotation.getAttributes();
       Map<String, String> attributesToInclude = Maps.newHashMap();
-      // for (String name : includedElementAttributeNames) {
-      // if (allAttributes.containsKey(name)) {
-      // attributesToInclude.put(name, allAttributes.get(name));
-      // }
-      // }
+      AttributeMode attributeMode = elementView.getAttributeMode();
+
+      switch (attributeMode) {
+      case showAll:
+        return allAttributes;
+
+      case hideAll:
+        break;
+
+      case showOnly:
+        allAttributes.forEach((k, v) -> {
+          if (elementView.getRelevantAttributes().contains(k)) {
+            attributesToInclude.put(k, v);
+          }
+        });
+        break;
+
+      case hideOnly:
+        allAttributes.forEach((k, v) -> {
+          if (!elementView.getRelevantAttributes().contains(k)) {
+            attributesToInclude.put(k, v);
+          }
+        });
+        break;
+
+      default:
+        throw new RuntimeException("unexpected attributemode: " + attributeMode);
+      }
       return attributesToInclude;
     }
 
     public void pushWhenIgnoring(TextAnnotation textAnnotation) {
-      // if (elementsToIgnore.contains(textAnnotation.getName())) {
-      // ignoredAnnotationStack.push(textAnnotation);
-      // }
+      boolean ignoring = determineIgnoring(textAnnotation);
+      if (ignoring) {
+        ignoredAnnotationStack.push(textAnnotation);
+      }
     }
 
-    public void popWhenIgnoring(String name) {
-      if (/* elementsToIgnore.contains(name) && */!ignoredAnnotationStack.isEmpty()) {
+    private boolean determineIgnoring(TextAnnotation textAnnotation) {
+      ElementView defaultElementView = elementViewMap.get(TextViewDefinition.DEFAULT_ATTRIBUTENAME);
+      ElementView elementView = elementViewMap.getOrDefault(textAnnotation.getName(), defaultElementView);
+      ElementMode elementMode = elementView.getElementMode();
+      ElementMode defaultElementMode = defaultElementView.getElementMode();
+      Optional<AttributePreCondition> preCondition = elementView.getPreCondition();
+      boolean preConditionIsMet = preConditionIsMet(preCondition, textAnnotation.getAttributes());
+      boolean hideThisElement = elementMode.equals(ElementMode.hide);
+      if (!preConditionIsMet){
+        hideThisElement = defaultElementMode.equals(ElementMode.hide);
+      }
+      return hideThisElement;
+    }
+
+    public void popWhenIgnoring(TextAnnotation textAnnotation) {
+      boolean ignoring = determineIgnoring(textAnnotation);
+      if (ignoring && !ignoredAnnotationStack.isEmpty()) {
         ignoredAnnotationStack.pop();
       }
     }
@@ -137,7 +202,7 @@ public class TextGraphUtil {
       if (segment.isMilestone()) {
         TextAnnotation milestone = segment.getMilestone();
         String name = milestone.getName();
-        if (textViewContext.includeTag(name)) {
+        if (textViewContext.includeTag(name, milestone.getAttributes())) {
           String openTag = getMilestoneTag(name, textViewContext.includedAttributes(milestone));
           writer.write(openTag);
         }
@@ -145,7 +210,7 @@ public class TextGraphUtil {
       } else {
         for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
           String name = textAnnotation.getName();
-          if (textViewContext.includeTag(name)) {
+          if (textViewContext.includeTag(name, textAnnotation.getAttributes())) {
             String openTag = getOpenTag(name, textViewContext.includedAttributes(textAnnotation));
             writer.write(openTag);
           }
@@ -156,11 +221,11 @@ public class TextGraphUtil {
         }
         for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
           String name = textAnnotation.getName();
-          if (textViewContext.includeTag(name)) {
+          if (textViewContext.includeTag(name, textAnnotation.getAttributes())) {
             String closeTag = getCloseTag(name);
             writer.write(closeTag);
           }
-          textViewContext.popWhenIgnoring(name);
+          textViewContext.popWhenIgnoring(textAnnotation);
         }
       }
     } catch (IOException ioe) {

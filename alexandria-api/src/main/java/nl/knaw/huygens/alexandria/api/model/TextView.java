@@ -21,6 +21,7 @@ public class TextView {
 
   public TextView() {
     elementViewMap.clear();
+    elementViewMap.put(TextViewDefinition.DEFAULT_ATTRIBUTENAME, ElementView.DEFAULT);
   }
 
   public void setDescription(String description) {

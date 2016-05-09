@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @JsonTypeName("textView")
 public class TextViewDefinition extends JsonWrapperObject implements Prototype {
-  public static final String DEFAULT = ":default";
+  public static final String DEFAULT_ATTRIBUTENAME = ":default";
 
   private String description = "";
 

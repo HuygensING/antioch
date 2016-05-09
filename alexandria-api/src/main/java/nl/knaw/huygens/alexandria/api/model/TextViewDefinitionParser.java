@@ -46,8 +46,8 @@ public class TextViewDefinitionParser {
   private void parse(final TextViewDefinition d) {
     textView.setDescription(d.getDescription());
     Map<String, ElementViewDefinition> elementViewDefinitions = d.getElementViewDefinitions();
-    elementViewDefinitions.putIfAbsent(TextViewDefinition.DEFAULT, ElementViewDefinition.DEFAULT);
-    ElementViewDefinition defaultElementViewDefinition = elementViewDefinitions.get(TextViewDefinition.DEFAULT);
+    elementViewDefinitions.putIfAbsent(TextViewDefinition.DEFAULT_ATTRIBUTENAME, ElementViewDefinition.DEFAULT);
+    ElementViewDefinition defaultElementViewDefinition = elementViewDefinitions.get(TextViewDefinition.DEFAULT_ATTRIBUTENAME);
     for (final Entry<String, ElementViewDefinition> entry : elementViewDefinitions.entrySet()) {
       final String elementName = entry.getKey();
       validateElementName(elementName);
@@ -67,7 +67,7 @@ public class TextViewDefinitionParser {
   static final Pattern ELEMENTNAME_PATTERN2 = Pattern.compile("[\\w-\\.:]+");
 
   private void validateElementName(final String elementName) {
-    if (TextViewDefinition.DEFAULT.equals(elementName)) {
+    if (TextViewDefinition.DEFAULT_ATTRIBUTENAME.equals(elementName)) {
       return;
     }
     final String prefix = "\"" + elementName + "\" is not a valid element name: element names ";
@@ -87,7 +87,9 @@ public class TextViewDefinitionParser {
 
   private ElementView parseElementViewDefinition(final String elementName, final ElementViewDefinition evd) {
     final ElementView elementView = new ElementView();
-    elementView.setElementMode(evd.getElementMode().get());
+    if (evd.getElementMode().isPresent()) {
+      elementView.setElementMode(evd.getElementMode().get());
+    }
     parseAttributeMode(elementName, evd.getAttributeMode(), elementView);
     parseWhen(elementName, evd.getWhen(), elementView);
     return elementView;
