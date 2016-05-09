@@ -68,7 +68,7 @@ public class SearchEndpoint extends JSONEndpoint {
     Log.trace("query=[{}]", query);
     SearchResult searchResult = service.execute(query);
     SearchResultCache.add(searchResult);
-    return Response.created(locationBuilder.locationOf(searchResult)).build();
+    return created(locationBuilder.locationOf(searchResult));
   }
 
   @GET
@@ -95,7 +95,7 @@ public class SearchEndpoint extends JSONEndpoint {
     String baseURI = locationBuilder.locationOf(searchResult, RESULTPAGES) + "/";
     SearchResultPage page = new SearchResultPage(baseURI, pageNumber, searchResult);
     page.setResults(searchResult.getRecordsForPage(pageNumber));
-    return Response.ok(page).build();
+    return ok(page);
   }
 
   private SearchResult getSearchResult(final UUIDParam uuid) {

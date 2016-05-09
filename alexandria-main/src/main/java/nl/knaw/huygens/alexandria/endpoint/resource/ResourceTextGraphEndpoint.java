@@ -110,7 +110,7 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
         .map(tv -> new TextViewEntity(resourceId, tv, locationBuilder))//
         .collect(toList());
     TextEntity text = new TextEntity(resourceId, locationBuilder, textViewEntities);
-    return Response.ok().entity(text).build();
+    return ok(text);
   }
 
   @Path(EndpointPaths.TEXTVIEWS)
@@ -123,7 +123,7 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
   public Response getTextGraphImportStatus() {
     TextGraphImportStatus textGraphImportTaskStatus = taskStatusMap.get(resourceId)//
         .orElseThrow(() -> new NotFoundException());
-    return Response.ok().entity(textGraphImportTaskStatus).build();
+    return ok(textGraphImportTaskStatus);
   }
 
   @GET
