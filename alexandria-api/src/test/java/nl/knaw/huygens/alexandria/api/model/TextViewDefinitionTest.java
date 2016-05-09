@@ -253,6 +253,6 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     TextViewDefinitionParser tvdp = new TextViewDefinitionParser(tvd);
     assertThat(tvdp.isValid()).isFalse();
     assertThat(tvdp.getErrors()).containsExactly(
-        "element: \"attribute(resp).myownfunction('#ed1','#ed2','')\" is not a valid condition. Valid when values are: \"attribute(a).is('value')\", \"attribute(a).isNot('value')\", \"attribute(a).firstOf('value0','value1',...)\".");
+        "element: \"attribute(resp).myownfunction('#ed1','#ed2','')\" is not a valid condition. Valid 'when' values are: \"attribute(a).is('value')\", \"attribute(a).isNot('value')\", \"attribute(a).firstOf('value0','value1',...)\".");
   }
 }
