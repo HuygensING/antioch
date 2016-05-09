@@ -8,6 +8,7 @@ import static nl.knaw.huygens.alexandria.api.model.ElementView.AttributeMode.sho
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -17,6 +18,7 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 
 import nl.knaw.huygens.alexandria.api.model.ElementView.AttributeFunction;
+import nl.knaw.huygens.alexandria.api.model.ElementView.AttributeMode;
 
 public class TextViewDefinitionParser {
 
@@ -43,10 +45,20 @@ public class TextViewDefinitionParser {
 
   private void parse(final TextViewDefinition d) {
     textView.setDescription(d.getDescription());
-    for (final Entry<String, ElementViewDefinition> entry : d.getElementViewDefinitions().entrySet()) {
+    Map<String, ElementViewDefinition> elementViewDefinitions = d.getElementViewDefinitions();
+    elementViewDefinitions.putIfAbsent(TextViewDefinition.DEFAULT, ElementViewDefinition.DEFAULT);
+    ElementViewDefinition defaultElementViewDefinition = elementViewDefinitions.get(TextViewDefinition.DEFAULT);
+    for (final Entry<String, ElementViewDefinition> entry : elementViewDefinitions.entrySet()) {
       final String elementName = entry.getKey();
       validateElementName(elementName);
       final ElementView elementView = parseElementViewDefinition(elementName, entry.getValue());
+      if (elementView.getElementMode() == null) {
+        elementView.setElementMode(defaultElementViewDefinition.getElementMode().get());
+      }
+      if (elementView.getAttributeMode() == null) {
+        String modeString = defaultElementViewDefinition.getAttributeMode().get();
+        elementView.setAttributeMode(AttributeMode.valueOf(modeString));
+      }
       textView.putElementView(elementName, elementView);
     }
   }
@@ -75,7 +87,7 @@ public class TextViewDefinitionParser {
 
   private ElementView parseElementViewDefinition(final String elementName, final ElementViewDefinition evd) {
     final ElementView elementView = new ElementView();
-    elementView.setElementMode(evd.getElementMode());
+    elementView.setElementMode(evd.getElementMode().get());
     parseAttributeMode(elementName, evd.getAttributeMode(), elementView);
     parseWhen(elementName, evd.getWhen(), elementView);
     return elementView;

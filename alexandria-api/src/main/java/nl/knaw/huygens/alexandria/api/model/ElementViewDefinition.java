@@ -5,8 +5,15 @@ import java.util.Optional;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import nl.knaw.huygens.alexandria.api.model.ElementView.AttributeMode;
+import nl.knaw.huygens.alexandria.api.model.ElementView.ElementMode;
+
 @JsonInclude(Include.NON_ABSENT)
 public class ElementViewDefinition {
+  public static final ElementViewDefinition DEFAULT = new ElementViewDefinition()//
+      .setAttributeMode(AttributeMode.showAll.name())//
+      .setElementMode(ElementMode.show);
+
   // # elementMode: (optional, use default settings if absent)
   // # show : show <element> + children
   // # hide : don't show <element> + children

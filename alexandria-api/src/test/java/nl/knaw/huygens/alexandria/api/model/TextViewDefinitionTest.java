@@ -16,6 +16,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.ElementView.AttributeFunction;
+import nl.knaw.huygens.alexandria.api.model.ElementView.AttributeMode;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 
 public class TextViewDefinitionTest extends AlexandriaTest {
@@ -121,9 +122,9 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     assertThat(tvdp.isValid()).isTrue();
     assertThat(elementViewMap).containsKey("p");
     ElementView elementView = elementViewMap.get("p");
-    assertThat(elementView.getElementMode()).isPresent();
-    assertThat(elementView.getElementMode().get()).isEqualTo(ElementView.ElementMode.show);
-    assertThat(elementView.getAttributeMode().get()).isEqualTo(ElementView.AttributeMode.showOnly);
+    assertThat(elementView.getElementMode()).isNotNull();
+    assertThat(elementView.getElementMode()).isEqualTo(ElementView.ElementMode.show);
+    assertThat(elementView.getAttributeMode()).isEqualTo(ElementView.AttributeMode.showOnly);
     assertThat(elementView.getRelevantAttributes()).containsExactly("xml:id", "ref");
     testJsonSerialization(textView);
   }
@@ -143,9 +144,9 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     assertThat(tvdp.isValid()).isTrue();
     assertThat(elementViewMap).containsKey("element");
     ElementView elementView = elementViewMap.get("element");
-    assertThat(elementView.getElementMode()).isPresent();
-    assertThat(elementView.getElementMode().get()).isEqualTo(ElementView.ElementMode.show);
-    assertThat(elementView.getAttributeMode().get()).isEqualTo(ElementView.AttributeMode.hideOnly);
+    assertThat(elementView.getElementMode()).isNotNull();
+    assertThat(elementView.getElementMode()).isEqualTo(ElementView.ElementMode.show);
+    assertThat(elementView.getAttributeMode()).isEqualTo(ElementView.AttributeMode.hideOnly);
     assertThat(elementView.getRelevantAttributes()).containsExactly("note");
     testJsonSerialization(textView);
   }
@@ -166,9 +167,9 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     assertThat(elementViewMap).containsKey("element");
 
     ElementView elementView = elementViewMap.get("element");
-    assertThat(elementView.getElementMode()).isPresent();
-    assertThat(elementView.getElementMode().get()).isEqualTo(ElementView.ElementMode.show);
-    assertThat(elementView.getAttributeMode()).isNotPresent();
+    assertThat(elementView.getElementMode()).isNotNull();
+    assertThat(elementView.getElementMode()).isEqualTo(ElementView.ElementMode.show);
+    assertThat(elementView.getAttributeMode()).isEqualTo(AttributeMode.showAll); // default
     assertThat(elementView.getRelevantAttributes()).isEmpty();
 
     AttributePreCondition preCondition = elementView.getPreCondition().get();
@@ -194,9 +195,9 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     assertThat(elementViewMap).containsKey("element");
 
     ElementView elementView = elementViewMap.get("element");
-    assertThat(elementView.getElementMode()).isPresent();
-    assertThat(elementView.getElementMode().get()).isEqualTo(ElementView.ElementMode.show);
-    assertThat(elementView.getAttributeMode()).isNotPresent();
+    assertThat(elementView.getElementMode()).isNotNull();
+    assertThat(elementView.getElementMode()).isEqualTo(ElementView.ElementMode.show);
+    assertThat(elementView.getAttributeMode()).isEqualTo(AttributeMode.showAll); // default
     assertThat(elementView.getRelevantAttributes()).isEmpty();
 
     AttributePreCondition preCondition = elementView.getPreCondition().get();
@@ -222,9 +223,9 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     assertThat(elementViewMap).containsKey("element");
 
     ElementView elementView = elementViewMap.get("element");
-    assertThat(elementView.getElementMode()).isPresent();
-    assertThat(elementView.getElementMode().get()).isEqualTo(ElementView.ElementMode.show);
-    assertThat(elementView.getAttributeMode()).isNotPresent();
+    assertThat(elementView.getElementMode()).isNotNull();
+    assertThat(elementView.getElementMode()).isEqualTo(ElementView.ElementMode.show);
+    assertThat(elementView.getAttributeMode()).isEqualTo(AttributeMode.showAll); // default
     assertThat(elementView.getRelevantAttributes()).isEmpty();
 
     AttributePreCondition preCondition = elementView.getPreCondition().get();

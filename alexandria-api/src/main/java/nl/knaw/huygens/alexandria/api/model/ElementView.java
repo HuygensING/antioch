@@ -21,16 +21,16 @@ public class ElementView {
     is, isNot, firstOf
   }
 
-  private Optional<ElementView.ElementMode> elementMode;
+  private ElementView.ElementMode elementMode;
   private ElementView.AttributeMode attributeMode;
   private List<String> relevantAttributes = new ArrayList<>();
   private AttributePreCondition precondition;
 
-  public void setElementMode(Optional<ElementView.ElementMode> elementMode) {
+  public void setElementMode(ElementView.ElementMode elementMode) {
     this.elementMode = elementMode;
   }
 
-  public Optional<ElementView.ElementMode> getElementMode() {
+  public ElementView.ElementMode getElementMode() {
     return elementMode;
   }
 
@@ -39,8 +39,8 @@ public class ElementView {
     this.relevantAttributes = parameters;
   }
 
-  public Optional<ElementView.AttributeMode> getAttributeMode() {
-    return Optional.ofNullable(attributeMode);
+  public ElementView.AttributeMode getAttributeMode() {
+    return attributeMode;
   }
 
   public void setAttributeMode(ElementView.AttributeMode attributeMode) {
