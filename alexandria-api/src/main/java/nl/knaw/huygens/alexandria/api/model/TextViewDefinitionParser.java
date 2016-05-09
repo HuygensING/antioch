@@ -153,7 +153,7 @@ public class TextViewDefinitionParser {
   }
 
   private void addInvalidWhenError(final String prefix) {
-    errors.add(prefix + "is not a valid condition. Valid when values are: \"attribute(a).is('value')\", \"attribute(a).isNot('value')\", \"attribute(a).firstOf('value0','value1',...)\".");
+    errors.add(prefix + "is not a valid condition. Valid 'when' values are: \"attribute(a).is('value')\", \"attribute(a).isNot('value')\", \"attribute(a).firstOf('value0','value1',...)\".");
   }
 
 }
