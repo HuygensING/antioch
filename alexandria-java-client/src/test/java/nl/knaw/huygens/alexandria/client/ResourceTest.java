@@ -39,6 +39,8 @@ import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.ElementDefinition;
 import nl.knaw.huygens.alexandria.api.model.TextView;
 import nl.knaw.huygens.alexandria.api.model.TextViewPrototype;
+import nl.knaw.huygens.alexandria.client.model.ProvenancePojo;
+import nl.knaw.huygens.alexandria.client.model.ResourcePojo;
 
 public class ResourceTest extends AlexandriaClientTest {
   @Test
@@ -46,7 +48,7 @@ public class ResourceTest extends AlexandriaClientTest {
     client.setAuthKey(AUTHKEY);
     client.setAutoConfirm(false);
     String resourceRef = "corpus";
-    ResourcePrototype resource = new ResourcePrototype(resourceRef);
+    ResourcePojo resource = new ResourcePojo(resourceRef);
     RestResult<UUID> result = client.addResource(resource);
     assertRequestSucceeded(result);
     UUID resourceUuid = result.get();
@@ -54,30 +56,30 @@ public class ResourceTest extends AlexandriaClientTest {
     softly.assertThat(resourceUuid).isNotNull();
 
     // retrieve the resource
-    RestResult<ResourceEntity> result2 = client.getResource(resourceUuid);
+    RestResult<ResourcePojo> result2 = client.getResource(resourceUuid);
     assertRequestSucceeded(result2);
-    ResourceEntity resourceEntity = result2.get();
-    softly.assertThat(resourceEntity).isNotNull();
-    softly.assertThat(resourceEntity.getRef()).as("ref").isEqualTo(resourceRef);
-    softly.assertThat(resourceEntity.getState().getValue()).as("state").isEqualTo(AlexandriaState.TENTATIVE);
+    ResourcePojo ResourcePojo = result2.get();
+    softly.assertThat(ResourcePojo).isNotNull();
+    softly.assertThat(ResourcePojo.getRef()).as("ref").isEqualTo(resourceRef);
+    softly.assertThat(ResourcePojo.getState().getValue()).as("state").isEqualTo(AlexandriaState.TENTATIVE);
 
     // confirm the resource
     RestResult<Void> result3 = client.confirmResource(resourceUuid);
     assertRequestSucceeded(result3);
 
     // retrieve the resource again
-    RestResult<ResourceEntity> result4 = client.getResource(resourceUuid);
+    RestResult<ResourcePojo> result4 = client.getResource(resourceUuid);
     assertRequestSucceeded(result4);
-    ResourceEntity resourceEntity2 = result4.get();
-    softly.assertThat(resourceEntity2).isNotNull();
-    softly.assertThat(resourceEntity2.getRef()).as("ref").isEqualTo(resourceRef);
-    softly.assertThat(resourceEntity2.getState().getValue()).as("state").isEqualTo(AlexandriaState.CONFIRMED);
+    ResourcePojo ResourcePojo2 = result4.get();
+    softly.assertThat(ResourcePojo2).isNotNull();
+    softly.assertThat(ResourcePojo2.getRef()).as("ref").isEqualTo(resourceRef);
+    softly.assertThat(ResourcePojo2.getState().getValue()).as("state").isEqualTo(AlexandriaState.CONFIRMED);
   }
 
   @Test
   public void testAddResourceWithProvenanceReturnsValidUUID() {
     client.setAuthKey(AUTHKEY);
-    ResourcePrototype resource = new ResourcePrototype("corpus2").withProvenance(new ProvenancePrototype().setWho("test").setWhy("because test"));
+    ResourcePojo resource = new ResourcePojo("corpus2").withProvenance(new ProvenancePojo().setWho("test").setWhy("because test"));
     RestResult<UUID> result = client.addResource(resource);
     assertRequestSucceeded(result);
     UUID resourceUuid = result.get();
@@ -89,18 +91,18 @@ public class ResourceTest extends AlexandriaClientTest {
   public void testSetResourceWithProvidedUUID() {
     client.setAuthKey(AUTHKEY);
     String ref = "resource3";
-    ResourcePrototype resource = new ResourcePrototype(ref).withProvenance(new ProvenancePrototype().setWho("test3").setWhy("because test3"));
+    ResourcePojo resource = new ResourcePojo(ref).withProvenance(new ProvenancePojo().setWho("test3").setWhy("because test3"));
     UUID resourceId = UUID.fromString("11111111-1111-1111-1111-111111111111");
     RestResult<Void> result = client.setResource(resourceId, resource);
     assertRequestSucceeded(result);
 
     // retrieve the resource
-    RestResult<ResourceEntity> result2 = client.getResource(resourceId);
+    RestResult<ResourcePojo> result2 = client.getResource(resourceId);
     assertRequestSucceeded(result2);
-    ResourceEntity resourceEntity = result2.get();
-    softly.assertThat(resourceEntity).as("entity != null").isNotNull();
-    softly.assertThat(resourceEntity.getRef()).as("ref").isEqualTo(ref);
-    softly.assertThat(resourceEntity.getState().getValue()).as("state").isEqualTo(AlexandriaState.CONFIRMED);
+    ResourcePojo ResourcePojo = result2.get();
+    softly.assertThat(ResourcePojo).as("entity != null").isNotNull();
+    softly.assertThat(ResourcePojo.getRef()).as("ref").isEqualTo(ref);
+    softly.assertThat(ResourcePojo.getState().getValue()).as("state").isEqualTo(AlexandriaState.CONFIRMED);
   }
 
   @Ignore
@@ -109,7 +111,7 @@ public class ResourceTest extends AlexandriaClientTest {
     // first, create a resource
     client.setAuthKey(AUTHKEY);
     String ref = "corpus";
-    ResourcePrototype resource = new ResourcePrototype(ref).withProvenance(new ProvenancePrototype().setWho("test").setWhy("because test"));
+    ResourcePojo resource = new ResourcePojo(ref).withProvenance(new ProvenancePojo().setWho("test").setWhy("because test"));
     UUID resourceId = UUID.randomUUID();
     RestResult<Void> result = client.setResource(resourceId, resource);
     assertRequestSucceeded(result);

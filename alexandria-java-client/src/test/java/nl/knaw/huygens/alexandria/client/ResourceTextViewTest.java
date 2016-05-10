@@ -8,6 +8,7 @@ import org.junit.Test;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.TextViewDefinition;
+import nl.knaw.huygens.alexandria.client.model.ResourcePojo;
 
 public class ResourceTextViewTest extends AlexandriaClientTest {
   @Ignore
@@ -16,7 +17,7 @@ public class ResourceTextViewTest extends AlexandriaClientTest {
     client.setAuthKey(AUTHKEY);
     client.setAutoConfirm(false);
     String resourceRef = "corpus";
-    ResourcePrototype resource = new ResourcePrototype(resourceRef);
+    ResourcePojo resource = new ResourcePojo(resourceRef);
     RestResult<UUID> result = client.addResource(resource);
     assertRequestSucceeded(result);
     UUID resourceUuid = result.get();
@@ -30,12 +31,12 @@ public class ResourceTextViewTest extends AlexandriaClientTest {
     String textViewName = "view0";
     TextViewDefinition textView = new TextViewDefinition();
     // retrieve the resource again
-    RestResult<ResourceEntity> result4 = client.setResourceTextView(resourceUuid, textViewName, textView);
+    RestResult<ResourcePojo> result4 = client.setResourceTextView(resourceUuid, textViewName, textView);
     assertRequestSucceeded(result4);
-    ResourceEntity resourceEntity2 = result4.get();
-    softly.assertThat(resourceEntity2).isNotNull();
-    softly.assertThat(resourceEntity2.getRef()).as("ref").isEqualTo(resourceRef);
-    softly.assertThat(resourceEntity2.getState().getValue()).as("state").isEqualTo(AlexandriaState.CONFIRMED);
+    ResourcePojo ResourcePojo2 = result4.get();
+    softly.assertThat(ResourcePojo2).isNotNull();
+    softly.assertThat(ResourcePojo2.getRef()).as("ref").isEqualTo(resourceRef);
+    softly.assertThat(ResourcePojo2.getState().getValue()).as("state").isEqualTo(AlexandriaState.CONFIRMED);
   }
 
 }

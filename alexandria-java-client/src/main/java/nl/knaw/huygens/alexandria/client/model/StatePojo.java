@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.client;
+package nl.knaw.huygens.alexandria.client.model;
 
 /*
  * #%L
@@ -22,22 +22,32 @@ package nl.knaw.huygens.alexandria.client;
  * #L%
  */
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.time.LocalDate;
 
-@JsonTypeName("resource")
-public class ResourcePrototype extends AbstractAccountablePrototype<ResourcePrototype> {
-  private String ref;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 
-  public ResourcePrototype(String ref) {
-    this.setRef(ref);
+import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+
+public class StatePojo {
+  AlexandriaState value;
+  LocalDate since;
+
+  public AlexandriaState getValue() {
+    return value;
   }
 
-  public String getRef() {
-    return ref;
+  public void setValue(AlexandriaState value) {
+    this.value = value;
   }
 
-  public void setRef(String ref) {
-    this.ref = ref;
+  public LocalDate getSince() {
+    return since;
+  }
+
+  @JsonDeserialize(using = LocalDateDeserializer.class)
+  public void setSince(LocalDate since) {
+    this.since = since;
   }
 
 }

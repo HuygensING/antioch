@@ -1,4 +1,9 @@
-package nl.knaw.huygens.alexandria.client;
+package nl.knaw.huygens.alexandria.client.model;
+
+import java.net.URI;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /*
  * #%L
@@ -10,32 +15,27 @@ package nl.knaw.huygens.alexandria.client;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
 
-import java.net.URI;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
 
 @JsonTypeName("resource")
-public class ResourceEntity extends JsonWrapperObject {
-  String id;
-  String ref;
-  StateEntity state;
+public class ResourcePojo extends AbstractAccountablePojo<ResourcePojo> {
+  private String id;
+  private String ref;
+  private StatePojo state;
 
   @JsonProperty(PropertyPrefix.LINK + "annotations")
   List<URI> annotationURIs;
@@ -49,11 +49,18 @@ public class ResourceEntity extends JsonWrapperObject {
   @JsonProperty(PropertyPrefix.LINK + "text")
   URI textURI;
 
+  public ResourcePojo() {
+  }
+
+  public ResourcePojo(final String ref) {
+    this.setRef(ref);
+  }
+
   public URI getTextURI() {
     return textURI;
   }
 
-  public void setTextURI(URI textURI) {
+  public void setTextURI(final URI textURI) {
     this.textURI = textURI;
   }
 
@@ -61,7 +68,7 @@ public class ResourceEntity extends JsonWrapperObject {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(final String id) {
     this.id = id;
   }
 
@@ -69,7 +76,7 @@ public class ResourceEntity extends JsonWrapperObject {
     return ref;
   }
 
-  public void setRef(String ref) {
+  public void setRef(final String ref) {
     this.ref = ref;
   }
 
@@ -77,7 +84,7 @@ public class ResourceEntity extends JsonWrapperObject {
     return annotationURIs;
   }
 
-  public void setAnnotationURIs(List<URI> annotationURIs) {
+  public void setAnnotationURIs(final List<URI> annotationURIs) {
     this.annotationURIs = annotationURIs;
   }
 
@@ -85,7 +92,7 @@ public class ResourceEntity extends JsonWrapperObject {
     return provenanceURI;
   }
 
-  public void setProvenanceURI(URI provenanceURI) {
+  public void setProvenanceURI(final URI provenanceURI) {
     this.provenanceURI = provenanceURI;
   }
 
@@ -93,15 +100,16 @@ public class ResourceEntity extends JsonWrapperObject {
     return subresourceURIs;
   }
 
-  public void setSubresourceURIs(List<URI> subresourceURIs) {
+  public void setSubresourceURIs(final List<URI> subresourceURIs) {
     this.subresourceURIs = subresourceURIs;
   }
 
-  public StateEntity getState() {
+  public StatePojo getState() {
     return state;
   }
 
-  public void setState(StateEntity state) {
+  public void setState(final StatePojo state) {
     this.state = state;
   }
+
 }
