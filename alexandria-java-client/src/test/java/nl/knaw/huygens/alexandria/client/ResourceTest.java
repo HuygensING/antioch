@@ -41,6 +41,7 @@ import nl.knaw.huygens.alexandria.api.model.TextView;
 import nl.knaw.huygens.alexandria.api.model.TextViewPrototype;
 import nl.knaw.huygens.alexandria.client.model.ProvenancePojo;
 import nl.knaw.huygens.alexandria.client.model.ResourcePojo;
+import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 
 public class ResourceTest extends AlexandriaClientTest {
   @Test
@@ -48,7 +49,7 @@ public class ResourceTest extends AlexandriaClientTest {
     client.setAuthKey(AUTHKEY);
     client.setAutoConfirm(false);
     String resourceRef = "corpus";
-    ResourcePojo resource = new ResourcePojo(resourceRef);
+    ResourcePrototype resource = new ResourcePrototype().setRef(resourceRef);
     RestResult<UUID> result = client.addResource(resource);
     assertRequestSucceeded(result);
     UUID resourceUuid = result.get();
@@ -79,7 +80,9 @@ public class ResourceTest extends AlexandriaClientTest {
   @Test
   public void testAddResourceWithProvenanceReturnsValidUUID() {
     client.setAuthKey(AUTHKEY);
-    ResourcePojo resource = new ResourcePojo("corpus2").withProvenance(new ProvenancePojo().setWho("test").setWhy("because test"));
+    ResourcePrototype resource = new ResourcePrototype()//
+        .setRef("corpus2")//
+        .setProvenance(new ProvenancePojo().setWho("test").setWhy("because test"));
     RestResult<UUID> result = client.addResource(resource);
     assertRequestSucceeded(result);
     UUID resourceUuid = result.get();
@@ -91,7 +94,7 @@ public class ResourceTest extends AlexandriaClientTest {
   public void testSetResourceWithProvidedUUID() {
     client.setAuthKey(AUTHKEY);
     String ref = "resource3";
-    ResourcePojo resource = new ResourcePojo(ref).withProvenance(new ProvenancePojo().setWho("test3").setWhy("because test3"));
+    ResourcePrototype resource = new ResourcePrototype().setRef(ref).setProvenance(new ProvenancePojo().setWho("test3").setWhy("because test3"));
     UUID resourceId = UUID.fromString("11111111-1111-1111-1111-111111111111");
     RestResult<Void> result = client.setResource(resourceId, resource);
     assertRequestSucceeded(result);
@@ -111,7 +114,7 @@ public class ResourceTest extends AlexandriaClientTest {
     // first, create a resource
     client.setAuthKey(AUTHKEY);
     String ref = "corpus";
-    ResourcePojo resource = new ResourcePojo(ref).withProvenance(new ProvenancePojo().setWho("test").setWhy("because test"));
+    ResourcePrototype resource = new ResourcePrototype().setRef(ref).setProvenance(new ProvenancePojo().setWho("test").setWhy("because test"));
     UUID resourceId = UUID.randomUUID();
     RestResult<Void> result = client.setResource(resourceId, resource);
     assertRequestSucceeded(result);

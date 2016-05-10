@@ -5,7 +5,8 @@ import java.util.UUID;
 import org.junit.Test;
 
 import nl.knaw.huygens.alexandria.client.model.AnnotationPojo;
-import nl.knaw.huygens.alexandria.client.model.ResourcePojo;
+import nl.knaw.huygens.alexandria.client.model.AnnotationPrototype;
+import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 
 public class AnnotationTest extends AlexandriaClientTest {
   @Test
@@ -13,7 +14,7 @@ public class AnnotationTest extends AlexandriaClientTest {
     client.setAuthKey(AUTHKEY);
     client.setAutoConfirm(false);
     String resourceRef = "resource";
-    ResourcePojo resource = new ResourcePojo(resourceRef);
+    ResourcePrototype resource = new ResourcePrototype().setRef(resourceRef);
     UUID resourceUuid = UUID.randomUUID();
     RestResult<Void> result = client.setResource(resourceUuid, resource);
     assertRequestSucceeded(result);
@@ -21,7 +22,7 @@ public class AnnotationTest extends AlexandriaClientTest {
     // annotate the resource
     String annotationType = "userRemark";
     String annotationValue = "WTF?";
-    AnnotationPojo annotationPrototype = new AnnotationPojo()//
+    AnnotationPrototype annotationPrototype = new AnnotationPrototype()//
         .setType(annotationType)//
         .setValue(annotationValue);
     RestResult<UUID> result2 = client.annotateResource(resourceUuid, annotationPrototype);

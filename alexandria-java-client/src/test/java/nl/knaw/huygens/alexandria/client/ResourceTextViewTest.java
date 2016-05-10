@@ -9,6 +9,7 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.TextViewDefinition;
 import nl.knaw.huygens.alexandria.client.model.ResourcePojo;
+import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 
 public class ResourceTextViewTest extends AlexandriaClientTest {
   @Ignore
@@ -17,7 +18,7 @@ public class ResourceTextViewTest extends AlexandriaClientTest {
     client.setAuthKey(AUTHKEY);
     client.setAutoConfirm(false);
     String resourceRef = "corpus";
-    ResourcePojo resource = new ResourcePojo(resourceRef);
+    ResourcePrototype resource = new ResourcePrototype().setRef(resourceRef);
     RestResult<UUID> result = client.addResource(resource);
     assertRequestSucceeded(result);
     UUID resourceUuid = result.get();

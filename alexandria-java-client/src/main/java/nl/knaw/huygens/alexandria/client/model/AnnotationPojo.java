@@ -13,27 +13,24 @@ public class AnnotationPojo extends AbstractAccountablePojo<AnnotationPojo> {
   private String value;
   private String locator;
 
-  public AnnotationPojo setType(String type) {
+  public void setType(String type) {
     this.type = type;
-    return this;
   }
 
   public String getType() {
     return type;
   }
 
-  public AnnotationPojo setValue(String value) {
+  public void setValue(String value) {
     this.value = value;
-    return this;
   }
 
   public String getValue() {
     return value;
   }
 
-  public AnnotationPojo setLocator(String locator) {
+  public void setLocator(String locator) {
     this.locator = locator;
-    return this;
   }
 
   public String getLocator() {

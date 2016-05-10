@@ -51,7 +51,9 @@ import nl.knaw.huygens.alexandria.api.model.TextView;
 import nl.knaw.huygens.alexandria.api.model.TextViewDefinition;
 import nl.knaw.huygens.alexandria.api.model.TextViewPrototype;
 import nl.knaw.huygens.alexandria.client.model.AnnotationPojo;
+import nl.knaw.huygens.alexandria.client.model.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.client.model.ResourcePojo;
+import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 
 public class AlexandriaClient {
   private WebTarget rootTarget;
@@ -97,8 +99,8 @@ public class AlexandriaClient {
         .getResult();
   }
 
-  public RestResult<Void> setResource(UUID resourceId, ResourcePojo resource) {
-    Entity<ResourcePojo> entity = Entity.json(resource);
+  public RestResult<Void> setResource(UUID resourceId, ResourcePrototype resource) {
+    Entity<ResourcePrototype> entity = Entity.json(resource);
     Supplier<Response> responseSupplier = () -> rootTarget//
         .path(EndpointPaths.RESOURCES)//
         .path(resourceId.toString())//
@@ -112,8 +114,8 @@ public class AlexandriaClient {
         .getResult();
   }
 
-  public RestResult<UUID> addResource(ResourcePojo resource) {
-    Entity<ResourcePojo> entity = Entity.json(resource);
+  public RestResult<UUID> addResource(ResourcePrototype resource) {
+    Entity<ResourcePrototype> entity = Entity.json(resource);
     Supplier<Response> responseSupplier = () -> rootTarget//
         .path(EndpointPaths.RESOURCES)//
         .request()//
@@ -186,8 +188,8 @@ public class AlexandriaClient {
     return null;
   }
 
-  public RestResult<UUID> annotateResource(UUID resourceUuid, AnnotationPojo annotationPrototype) {
-    Entity<AnnotationPojo> entity = Entity.json(annotationPrototype);
+  public RestResult<UUID> annotateResource(UUID resourceUuid, AnnotationPrototype annotationPrototype) {
+    Entity<AnnotationPrototype> entity = Entity.json(annotationPrototype);
     Supplier<Response> responseSupplier = () -> rootTarget//
         .path(EndpointPaths.RESOURCES)//
         .path(resourceUuid.toString())//
