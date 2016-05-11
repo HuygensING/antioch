@@ -75,7 +75,7 @@
             <li>and body
              <small>(only relevant fields shown for brevity)</small>
                 <h:jsonResponse>{
-                  "textGraphImportStatus" : {
+                  "textImportStatus" : {
                     "done" : true,
                     "state" : "done",
                     "processingTime" : "{duration.anyValid}",
@@ -92,7 +92,7 @@
     <br/>
 
     <h:request>
-        Since textGraphImportStatus.done == true, and there are no validationErrors,<br/>
+        Since textImportStatus.done == true, and there are no validationErrors,<br/>
         <h:get>/resources/22222222-2222-2222-2222-222222222222/text/xml</h:get><br/>
         using
         <h:setHeader name="Accept">text/xml</h:setHeader><br/>

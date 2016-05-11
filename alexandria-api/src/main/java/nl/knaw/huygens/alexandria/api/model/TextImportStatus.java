@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.textgraph;
+package nl.knaw.huygens.alexandria.api.model;
 
 import java.net.URI;
 import java.time.Duration;
@@ -17,13 +17,10 @@ import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer;
 import com.google.common.collect.Lists;
 
 import nl.knaw.huygens.alexandria.api.JsonTypeNames;
-import nl.knaw.huygens.alexandria.api.model.Entity;
-import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
-import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
 
-@JsonTypeName(JsonTypeNames.TEXTGRAPHIMPORTSTATUS)
+@JsonTypeName(JsonTypeNames.TEXTIMPORTSTATUS)
 @JsonInclude(Include.NON_NULL)
-public class TextGraphImportStatus extends JsonWrapperObject implements Entity {
+public class TextImportStatus extends JsonWrapperObject implements Entity {
   enum State {
     waiting, processing, done
   }

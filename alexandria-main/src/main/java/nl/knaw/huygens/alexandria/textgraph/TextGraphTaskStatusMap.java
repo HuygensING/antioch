@@ -9,15 +9,17 @@ import java.util.UUID;
 
 import com.google.common.collect.Maps;
 
-public class TextGraphTaskStatusMap {
-  private static Map<UUID, TextGraphImportStatus> map = Maps.newHashMap();
+import nl.knaw.huygens.alexandria.api.model.TextImportStatus;
 
-  public void put(UUID id, TextGraphImportStatus status) {
+public class TextGraphTaskStatusMap {
+  private static Map<UUID, TextImportStatus> map = Maps.newHashMap();
+
+  public void put(UUID id, TextImportStatus status) {
     removeExpiredTasks();
     map.put(id, status);
   }
 
-  public Optional<TextGraphImportStatus> get(UUID id) {
+  public Optional<TextImportStatus> get(UUID id) {
     removeExpiredTasks();
     return Optional.ofNullable(map.get(id));
   }

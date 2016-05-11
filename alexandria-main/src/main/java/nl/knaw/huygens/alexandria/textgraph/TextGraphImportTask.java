@@ -5,6 +5,7 @@ import java.util.UUID;
 import com.google.common.base.Joiner;
 
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.TextImportStatus;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -15,7 +16,7 @@ public class TextGraphImportTask implements Runnable {
   private LocationBuilder locationBuilder;
   private String xml;
   private AlexandriaResource resource;
-  private TextGraphImportStatus status;
+  private TextImportStatus status;
   private UUID resourceId;
 
   public TextGraphImportTask(AlexandriaService service, LocationBuilder locationBuilder, String xml, AlexandriaResource resource) {
@@ -24,10 +25,10 @@ public class TextGraphImportTask implements Runnable {
     this.xml = xml;
     this.resource = resource;
     this.resourceId = resource.getId();
-    this.status = new TextGraphImportStatus();
+    this.status = new TextImportStatus();
   }
 
-  public TextGraphImportStatus getStatus() {
+  public TextImportStatus getStatus() {
     return status;
   }
 

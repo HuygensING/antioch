@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.TextView;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
@@ -39,7 +40,6 @@ import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.text.TextPrototype;
 import nl.knaw.huygens.alexandria.textgraph.DotFactory;
-import nl.knaw.huygens.alexandria.textgraph.TextGraphImportStatus;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphImportTask;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphTaskStatusMap;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
@@ -121,7 +121,7 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
   @GET
   @Path("status")
   public Response getTextGraphImportStatus() {
-    TextGraphImportStatus textGraphImportTaskStatus = taskStatusMap.get(resourceId)//
+    TextImportStatus textGraphImportTaskStatus = taskStatusMap.get(resourceId)//
         .orElseThrow(() -> new NotFoundException());
     return ok(textGraphImportTaskStatus);
   }

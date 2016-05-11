@@ -9,7 +9,7 @@ public class JsonTypeNames {
   public static final String ANNOTATIONBODY = "annotationBody";
   public static final String RESOURCETEXT = "resourceText";
   public static final String TEXTVIEW = "textView";
-  public static final String TEXTGRAPHIMPORTSTATUS = "textGraphImportStatus";
+  public static final String TEXTIMPORTSTATUS = "textImportStatus";
   public static final String QUERY = "query";
   public static final String SEARCHRESULTPAGE = "searchResultPage";
 }

@@ -31,7 +31,9 @@ import java.util.function.Supplier;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.SyncInvoker;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -40,6 +42,7 @@ import org.glassfish.jersey.client.ClientProperties;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
 import nl.knaw.huygens.Log;
@@ -47,6 +50,7 @@ import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.StatePrototype;
+import nl.knaw.huygens.alexandria.api.model.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.TextView;
 import nl.knaw.huygens.alexandria.api.model.TextViewDefinition;
 import nl.knaw.huygens.alexandria.api.model.TextViewPrototype;
@@ -60,13 +64,15 @@ import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
 public class AlexandriaClient {
   private WebTarget rootTarget;
   private String authHeader = "";
-  private Client client;
-  private URI alexandriaURI;
+  private final Client client;
+  private final URI alexandriaURI;
   private boolean autoConfirm = true;
 
-  public AlexandriaClient(URI alexandriaURI) {
+  public AlexandriaClient(final URI alexandriaURI) {
     this.alexandriaURI = alexandriaURI;
-    final ObjectMapper objectMapper = new ObjectMapper().registerModule(new Jdk8Module());
+    final ObjectMapper objectMapper = new ObjectMapper()//
+        .registerModule(new Jdk8Module())//
+        .registerModule(new JavaTimeModule());
     final JacksonJaxbJsonProvider jacksonProvider = new JacksonJaxbJsonProvider();
     jacksonProvider.setMapper(objectMapper);
     client = ClientBuilder.newClient(new ClientConfig(jacksonProvider));
@@ -75,56 +81,47 @@ public class AlexandriaClient {
     rootTarget = client.target(alexandriaURI);
   }
 
-  public void setProperty(String jerseyClientProperty, Object value) {
+  public void setProperty(final String jerseyClientProperty, final Object value) {
     client.property(jerseyClientProperty, value);
     rootTarget = client.target(alexandriaURI);
   }
 
-  public void setAuthKey(String authKey) {
+  public void setAuthKey(final String authKey) {
     authHeader = "SimpleAuth " + authKey;
     Log.info("authheader=[{}]", authHeader);
   }
 
-  public void setAutoConfirm(boolean autoConfirm) {
+  public void setAutoConfirm(final boolean autoConfirm) {
     this.autoConfirm = autoConfirm;
   }
 
   public RestResult<AboutEntity> getAbout() {
-    RestRequester<AboutEntity> requester = RestRequester.withResponseSupplier(() -> rootTarget.path(EndpointPaths.ABOUT).request().get());
+    final RestRequester<AboutEntity> requester = RestRequester.withResponseSupplier(() -> rootTarget//
+        .path(EndpointPaths.ABOUT)//
+        .request()//
+        .get());
     return requester//
-        .onStatus(Status.OK, (response) -> {
-          RestResult<AboutEntity> result = new RestResult<>();
-          AboutEntity cargo = response.readEntity(AboutEntity.class);
-          result.setCargo(cargo);
-          return result;
-        })//
+        .onStatus(Status.OK, this::toAboutEntityRestResult)//
         .getResult();
   }
 
-  public RestResult<Void> setResource(UUID resourceId, ResourcePrototype resource) {
-    Entity<ResourcePrototype> entity = Entity.json(resource);
-    Supplier<Response> responseSupplier = () -> rootTarget//
-        .path(EndpointPaths.RESOURCES)//
-        .path(resourceId.toString())//
-        .request()//
-        .header(HEADER_AUTH, authHeader)//
-        .put(entity);
-    RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
+  public RestResult<Void> setResource(final UUID resourceId, final ResourcePrototype resource) {
+    final WebTarget path = resourceTarget(resourceId);
+    final Entity<ResourcePrototype> entity = Entity.json(resource);
+    final Supplier<Response> responseSupplier = authorizedPut(path, entity);
+    final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
 
     return requester//
         .onStatus(Status.CREATED, (response) -> new RestResult<>())//
         .getResult();
   }
 
-  public RestResult<UUID> addResource(ResourcePrototype resource) {
-    Entity<ResourcePrototype> entity = Entity.json(resource);
-    Supplier<Response> responseSupplier = () -> rootTarget//
-        .path(EndpointPaths.RESOURCES)//
-        .request()//
-        .header(HEADER_AUTH, authHeader)//
-        .post(entity);
-    RestRequester<UUID> requester = RestRequester.withResponseSupplier(responseSupplier);
-    RestResult<UUID> addResult = requester//
+  public RestResult<UUID> addResource(final ResourcePrototype resource) {
+    final WebTarget path = rootTarget.path(EndpointPaths.RESOURCES);
+    final Entity<ResourcePrototype> entity = Entity.json(resource);
+    final Supplier<Response> responseSupplier = authorizedPost(path, entity);
+    final RestRequester<UUID> requester = RestRequester.withResponseSupplier(responseSupplier);
+    final RestResult<UUID> addResult = requester//
         .onStatus(Status.CREATED, this::uuidFromLocationHeader)//
         .getResult();
     if (autoConfirm && !addResult.hasFailed()) {
@@ -134,31 +131,24 @@ public class AlexandriaClient {
     return addResult;
   }
 
-  public RestResult<UUID> addSubResource(UUID parentResourceId, SubResourcePrototype subresource) {
-    Entity<SubResourcePrototype> entity = Entity.json(subresource);
-    Supplier<Response> responseSupplier = () -> rootTarget//
-        .path(EndpointPaths.RESOURCES)//
-        .path(parentResourceId.toString())//
-        .path(EndpointPaths.SUBRESOURCES)//
-        .request()//
-        .header(HEADER_AUTH, authHeader)//
-        .post(entity);
-    RestRequester<UUID> requester = RestRequester.withResponseSupplier(responseSupplier);
-    RestResult<UUID> addResult = requester//
+  public RestResult<UUID> addSubResource(final UUID parentResourceId, final SubResourcePrototype subresource) {
+    final Entity<SubResourcePrototype> entity = Entity.json(subresource);
+    final WebTarget path = resourceTarget(parentResourceId)//
+        .path(EndpointPaths.SUBRESOURCES);
+    final Supplier<Response> responseSupplier = authorizedPost(path, entity);
+    final RestRequester<UUID> requester = RestRequester.withResponseSupplier(responseSupplier);
+    final RestResult<UUID> addResult = requester//
         .onStatus(Status.CREATED, this::uuidFromLocationHeader)//
         .getResult();
     if (autoConfirm && !addResult.hasFailed()) {
       confirmResource(addResult.get());
     }
-
     return addResult;
   }
 
-  public RestResult<ResourcePojo> getResource(UUID uuid) {
-    RestRequester<ResourcePojo> requester = RestRequester.withResponseSupplier(//
-        () -> rootTarget.path(EndpointPaths.RESOURCES)//
-            .path(uuid.toString())//
-            .request()//
+  public RestResult<ResourcePojo> getResource(final UUID uuid) {
+    final RestRequester<ResourcePojo> requester = RestRequester.withResponseSupplier(//
+        () -> resourceTarget(uuid).request()//
             .get()//
     );
     return requester//
@@ -166,11 +156,9 @@ public class AlexandriaClient {
         .getResult();
   }
 
-  public RestResult<SubResourcePojo> getSubResource(UUID uuid) {
-    RestRequester<SubResourcePojo> requester = RestRequester.withResponseSupplier(//
-        () -> rootTarget.path(EndpointPaths.RESOURCES)//
-            .path(uuid.toString())//
-            .request()//
+  public RestResult<SubResourcePojo> getSubResource(final UUID uuid) {
+    final RestRequester<SubResourcePojo> requester = RestRequester.withResponseSupplier(//
+        () -> resourceTarget(uuid).request()//
             .get()//
     );
     return requester//
@@ -178,65 +166,93 @@ public class AlexandriaClient {
         .getResult();
   }
 
-  public RestResult<Void> confirmResource(UUID resourceUuid) {
+  public RestResult<Void> confirmResource(final UUID resourceUuid) {
     return confirm(EndpointPaths.RESOURCES, resourceUuid);
   }
 
-  public RestResult<Void> confirmAnnotation(UUID annotationUuid) {
+  public RestResult<Void> confirmAnnotation(final UUID annotationUuid) {
     return confirm(EndpointPaths.ANNOTATIONS, annotationUuid);
   }
 
-  public RestResult<URI> addTextView(UUID resourceUUID, TextViewPrototype textView) {
-    Entity<TextViewPrototype> entity = Entity.json(textView);
-    Supplier<Response> responseSupplier = () -> rootTarget.path(EndpointPaths.RESOURCES)//
-        .path(resourceUUID.toString())//
-        .path(EndpointPaths.TEXT)//
-        .path(EndpointPaths.TEXTVIEWS)//
-        .request()//
-        .header(HEADER_AUTH, authHeader)//
-        .put(entity);
-    RestRequester<URI> requester = RestRequester.withResponseSupplier(responseSupplier);
+  public RestResult<URI> setResourceText(final UUID resourceUUID, final String xml) {
+    final Entity<String> entity = Entity.entity(xml, MediaType.TEXT_XML);
+    WebTarget path = resourceTextTarget(resourceUUID);
+    final Supplier<Response> responseSupplier = authorizedPut(path, entity);
+    final RestRequester<URI> requester = RestRequester.withResponseSupplier(responseSupplier);
+    return requester//
+        .onStatus(Status.ACCEPTED, this::uriFromLocationHeader)//
+        .getResult();
+  }
+
+  public RestResult<TextImportStatus> getTextImportStatus(final UUID resourceUUID) {
+    final WebTarget path = resourceTextTarget(resourceUUID)//
+        .path("status");
+    final Supplier<Response> responseSupplier = () -> authorizedRequest(path).get();
+    final RestRequester<TextImportStatus> requester = RestRequester.withResponseSupplier(responseSupplier);
+    return requester//
+        .onStatus(Status.OK, this::toTextImportStatusRestResult)//
+        .getResult();
+  }
+
+  public RestResult<URI> addTextView(final UUID resourceUUID, final TextViewPrototype textView) {
+    final Entity<TextViewPrototype> entity = Entity.json(textView);
+    final WebTarget path = resourceTextTarget(resourceUUID)//
+        .path(EndpointPaths.TEXTVIEWS);
+    final Supplier<Response> responseSupplier = authorizedPut(path, entity);
+    final RestRequester<URI> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
         .onStatus(Status.CREATED, this::uriFromLocationHeader)//
         .getResult();
   }
 
-  public RestResult<TextView> getTextView(UUID uuid) {
-    RestRequester<TextView> requester = RestRequester.withResponseSupplier(() -> rootTarget.path(EndpointPaths.RESOURCES)//
-        .path(uuid.toString())//
-        .path(EndpointPaths.TEXT)//
-        .path(EndpointPaths.TEXTVIEWS)//
-        .request().get());
+  public RestResult<String> getText(final UUID uuid) {
+    final RestRequester<String> requester = RestRequester.withResponseSupplier(() -> resourceTextTarget(uuid).request()//
+        .get());
     return requester//
-        .onStatus(Status.OK, (response) -> {
-          RestResult<TextView> result = new RestResult<>();
-          TextView cargo = response.readEntity(TextView.class);
-          result.setCargo(cargo);
-          return result;
-        })//
+        .onStatus(Status.OK, this::toStringRestResult)//
         .getResult();
   }
 
-  public RestResult<ResourcePojo> setResourceTextView(UUID resourceUuid, String textViewName, TextViewDefinition textView) {
+  public RestResult<TextView> getTextView(final UUID uuid) {
+    final RestRequester<TextView> requester = RestRequester.withResponseSupplier(() -> resourceTextTarget(uuid).path(EndpointPaths.TEXTVIEWS)//
+        .request().get());
+    return requester//
+        .onStatus(Status.OK, this::toTextViewRestResult)//
+        .getResult();
+  }
+
+  public RestResult<ResourcePojo> setResourceTextView(final UUID resourceUuid, final String textViewName, final TextViewDefinition textView) {
     // TODO Auto-generated method stub
     return null;
   }
 
-  public RestResult<UUID> annotateResource(UUID resourceUuid, AnnotationPrototype annotationPrototype) {
+  public RestResult<UUID> annotateResource(final UUID resourceUuid, final AnnotationPrototype annotationPrototype) {
     return annotate(resourceUuid, annotationPrototype, EndpointPaths.RESOURCES);
   }
 
-  private RestResult<UUID> annotate(UUID annotatableUuid, AnnotationPrototype annotationPrototype, String annotatablePath) {
-    Entity<AnnotationPrototype> entity = Entity.json(annotationPrototype);
-    Supplier<Response> responseSupplier = () -> rootTarget//
+  public RestResult<UUID> annotateAnnotation(final UUID annotationUuid, final AnnotationPrototype annotationPrototype) {
+    return annotate(annotationUuid, annotationPrototype, EndpointPaths.ANNOTATIONS);
+  }
+
+  public RestResult<AnnotationPojo> getAnnotation(final UUID uuid) {
+    final RestRequester<AnnotationPojo> requester = RestRequester.withResponseSupplier(() -> rootTarget.path(EndpointPaths.ANNOTATIONS).path(uuid.toString()).request().get());
+    return requester//
+        .onStatus(Status.OK, this::toAnnotationPojoRestResult)//
+        .getResult();
+  }
+
+  // private methods
+
+  private RestResult<UUID> annotate(final UUID annotatableUuid, final AnnotationPrototype annotationPrototype, final String annotatablePath) {
+    final Entity<AnnotationPrototype> entity = Entity.json(annotationPrototype);
+    final WebTarget path = rootTarget//
         .path(annotatablePath)//
         .path(annotatableUuid.toString())//
-        .path(EndpointPaths.ANNOTATIONS).request()//
-        .header(HEADER_AUTH, authHeader)//
-        .post(entity);
+        .path(EndpointPaths.ANNOTATIONS);
+    final Supplier<Response> responseSupplier = authorizedPost(path, entity);
 
-    RestRequester<UUID> requester = RestRequester.withResponseSupplier(responseSupplier);
-    RestResult<UUID> annotateResult = requester//
+    final RestRequester<UUID> requester = RestRequester.withResponseSupplier(responseSupplier);
+    final RestResult<UUID> annotateResult = requester//
         .onStatus(Status.CREATED, this::uuidFromLocationHeader)//
         .getResult();
     if (autoConfirm && !annotateResult.hasFailed()) {
@@ -245,68 +261,91 @@ public class AlexandriaClient {
     return annotateResult;
   }
 
-  public RestResult<UUID> annotateAnnotation(UUID annotationUuid, AnnotationPrototype annotationPrototype) {
-    return annotate(annotationUuid, annotationPrototype, EndpointPaths.ANNOTATIONS);
+  private WebTarget resourceTextTarget(final UUID resourceUUID) {
+    return resourceTarget(resourceUUID).path(EndpointPaths.TEXT);
   }
 
-  public RestResult<AnnotationPojo> getAnnotation(UUID uuid) {
-    RestRequester<AnnotationPojo> requester = RestRequester.withResponseSupplier(() -> rootTarget.path(EndpointPaths.ANNOTATIONS).path(uuid.toString()).request().get());
-    return requester//
-        .onStatus(Status.OK, this::toAnnotationPojoRestResult)//
-        .getResult();
+  private WebTarget resourceTarget(final UUID uuid) {
+    return rootTarget//
+        .path(EndpointPaths.RESOURCES)//
+        .path(uuid.toString());
   }
 
-  // private methods
-
-  private RestResult<Void> confirm(String endpoint, UUID resourceUuid) {
-    StatePrototype state = new StatePrototype().setState(AlexandriaState.CONFIRMED);
-    Entity<StatePrototype> confirmation = Entity.json(state);
-    Supplier<Response> responseSupplier = () -> {
-      return rootTarget.path(endpoint)//
-          .path(resourceUuid.toString())//
-          .path("state")//
-          .request()//
-          .header(HEADER_AUTH, authHeader)//
-          .put(confirmation);
-    };
-    RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
+  private RestResult<Void> confirm(final String endpoint, final UUID resourceUuid) {
+    final StatePrototype state = new StatePrototype().setState(AlexandriaState.CONFIRMED);
+    final Entity<StatePrototype> confirmation = Entity.json(state);
+    final WebTarget path = rootTarget//
+        .path(endpoint)//
+        .path(resourceUuid.toString())//
+        .path("state");
+    final Supplier<Response> responseSupplier = authorizedPut(path, confirmation);
+    final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
         .onStatus(Status.NO_CONTENT, (response) -> new RestResult<>())//
         .getResult();
   }
 
-  private RestResult<ResourcePojo> toResourcePojoRestResult(Response response) {
+  private RestResult<String> toStringRestResult(final Response response) {
+    return toEntityRestResult(response, String.class);
+  }
+
+  private RestResult<AboutEntity> toAboutEntityRestResult(final Response response) {
+    return toEntityRestResult(response, AboutEntity.class);
+  }
+
+  private RestResult<ResourcePojo> toResourcePojoRestResult(final Response response) {
     return toEntityRestResult(response, ResourcePojo.class);
   }
 
-  private RestResult<SubResourcePojo> toSubResourcePojoRestResult(Response response) {
+  private RestResult<SubResourcePojo> toSubResourcePojoRestResult(final Response response) {
     return toEntityRestResult(response, SubResourcePojo.class);
   }
 
-  private RestResult<AnnotationPojo> toAnnotationPojoRestResult(Response response) {
+  private RestResult<AnnotationPojo> toAnnotationPojoRestResult(final Response response) {
     return toEntityRestResult(response, AnnotationPojo.class);
   }
 
-  private <E> RestResult<E> toEntityRestResult(Response response, Class<E> entityClass) {
-    RestResult<E> result = new RestResult<>();
-    E cargo = response.readEntity(entityClass);
+  private RestResult<TextImportStatus> toTextImportStatusRestResult(final Response response) {
+    return toEntityRestResult(response, TextImportStatus.class);
+  }
+
+  private RestResult<TextView> toTextViewRestResult(final Response response) {
+    return toEntityRestResult(response, TextView.class);
+  }
+
+  private <E> RestResult<E> toEntityRestResult(final Response response, final Class<E> entityClass) {
+    final RestResult<E> result = new RestResult<>();
+    final E cargo = response.readEntity(entityClass);
     result.setCargo(cargo);
     return result;
   }
 
-  private RestResult<URI> uriFromLocationHeader(Response response) {
-    RestResult<URI> result = new RestResult<>();
-    String location = response.getHeaderString("Location");
-    URI uri = URI.create(location);
+  private RestResult<URI> uriFromLocationHeader(final Response response) {
+    final RestResult<URI> result = new RestResult<>();
+    final String location = response.getHeaderString("Location");
+    final URI uri = URI.create(location);
     result.setCargo(uri);
     return result;
   }
 
-  private RestResult<UUID> uuidFromLocationHeader(Response response) {
-    RestResult<UUID> result = new RestResult<>();
-    String location = response.getHeaderString("Location");
-    UUID uuid = UUID.fromString(location.replaceFirst(".*/", ""));
+  private RestResult<UUID> uuidFromLocationHeader(final Response response) {
+    final RestResult<UUID> result = new RestResult<>();
+    final String location = response.getHeaderString("Location");
+    final UUID uuid = UUID.fromString(location.replaceFirst(".*/", ""));
     result.setCargo(uuid);
     return result;
+  }
+
+  private Supplier<Response> authorizedPut(final WebTarget path, final Entity<?> entity) {
+    return () -> authorizedRequest(path).put(entity);
+  }
+
+  private Supplier<Response> authorizedPost(final WebTarget path, final Entity<?> entity) {
+    return () -> authorizedRequest(path).post(entity);
+  }
+
+  private SyncInvoker authorizedRequest(final WebTarget target) {
+    return target.request()//
+        .header(HEADER_AUTH, authHeader);
   }
 }
