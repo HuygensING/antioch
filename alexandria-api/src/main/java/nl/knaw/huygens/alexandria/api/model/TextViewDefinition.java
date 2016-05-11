@@ -38,4 +38,8 @@ public class TextViewDefinition extends JsonWrapperObject implements Prototype {
     this.elementViewDefinitions = elementViewDefinitions;
   }
 
+  public void setElementViewDefinition(String elementName, ElementViewDefinition elementViewDefinition) {
+    this.elementViewDefinitions.put(elementName, elementViewDefinition);
+  }
+
 }

@@ -63,14 +63,14 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
       ResourceValidatorFactory validatorFactory, //
       ExecutorService executorService, //
       LocationBuilder locationBuilder, //
-      ResourceTextFactory textViewFactory, //
+      ResourceTextFactory resourceTextFactory, //
       TextGraphTaskStatusMap taskStatusMap, //
       @PathParam("uuid") final UUIDParam uuidParam) {
     this.service = service;
     this.config = config;
     this.executorService = executorService;
     this.locationBuilder = locationBuilder;
-    this.textFactory = textViewFactory;
+    this.textFactory = resourceTextFactory;
     this.taskStatusMap = taskStatusMap;
     this.resource = validatorFactory.validateExistingResource(uuidParam).notTentative();
     this.resourceId = resource.getId();

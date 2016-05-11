@@ -25,17 +25,18 @@ package nl.knaw.huygens.alexandria.api;
 public final class EndpointPaths {
   public static final String ABOUT = "about";
 
-  public static final String COMMANDS = "commands";
-
   public static final String RESOURCES = "resources";
+  public static final String SUBRESOURCES = "subresources";
   public static final String TEXT = "text";
   public static final String TEXTVIEWS = "views";
 
   public static final String ANNOTATIONS = "annotations";
+  public static final String REV = "rev";
   public static final String ANNOTATIONBODIES = "annotationbodies";
+
   public static final String SEARCHES = "searches";
 
-  public static final String SUBRESOURCES = "subresources";
+  public static final String COMMANDS = "commands";
 
   private EndpointPaths() {
     throw new AssertionError("Paths shall not be instantiated");

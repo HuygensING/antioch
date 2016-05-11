@@ -32,6 +32,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import io.swagger.annotations.ApiModel;
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.JsonTypeNames;
 import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
 import nl.knaw.huygens.alexandria.endpoint.AbstractAnnotatableEntity;
@@ -92,13 +93,13 @@ public class AnnotationEntity extends AbstractAnnotatableEntity {
   @JsonProperty(PropertyPrefix.LINK + "deprecates")
   public String getDeprecates() {
     return annotation.getRevision() > 0//
-        ? locationBuilder.locationOf(annotation, AnnotationsEndpoint.REVPATH, String.valueOf(annotation.getRevision() - 1)).toString()//
+        ? locationBuilder.locationOf(annotation, EndpointPaths.REV, String.valueOf(annotation.getRevision() - 1)).toString()//
         : "";
   }
 
   @JsonProperty(PropertyPrefix.LINK + "versioned_self")
   public URI getVersionURL() {
-    return locationBuilder.locationOf(annotation, AnnotationsEndpoint.REVPATH, String.valueOf(annotation.getRevision()));
+    return locationBuilder.locationOf(annotation, EndpointPaths.REV, String.valueOf(annotation.getRevision()));
   }
 
   @JsonProperty(PropertyPrefix.LINK + "current_version")

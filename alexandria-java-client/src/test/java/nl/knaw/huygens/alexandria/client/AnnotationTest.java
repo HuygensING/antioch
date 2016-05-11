@@ -27,6 +27,10 @@ public class AnnotationTest extends AlexandriaClientTest {
     AnnotationPojo annotationPojo = readAnnotation(annotationUuid);
     softly.assertThat(annotationPojo.getType()).as("type").isEqualTo(annotationType);
     softly.assertThat(annotationPojo.getValue()).as("value").isEqualTo(annotationValue);
+
+    AnnotationPojo annotationPojo2 = readAnnotationRevision(annotationUuid, 0);
+    softly.assertThat(annotationPojo2.getType()).as("type").isEqualTo(annotationType);
+    softly.assertThat(annotationPojo2.getValue()).as("value").isEqualTo(annotationValue);
   }
 
   @Test
@@ -52,16 +56,25 @@ public class AnnotationTest extends AlexandriaClientTest {
     AnnotationPrototype annotationPrototype = new AnnotationPrototype()//
         .setType(annotationType)//
         .setValue(annotationValue);
-    RestResult<UUID> result2 = client.annotateResource(resourceUuid, annotationPrototype);
-    assertRequestSucceeded(result2);
-    UUID annotationUuid = result2.get();
+    RestResult<UUID> result = client.annotateResource(resourceUuid, annotationPrototype);
+    assertRequestSucceeded(result);
+    UUID annotationUuid = result.get();
     return annotationUuid;
   }
 
   private AnnotationPojo readAnnotation(UUID annotationUuid) {
-    RestResult<AnnotationPojo> result3 = client.getAnnotation(annotationUuid);
-    assertRequestSucceeded(result3);
-    AnnotationPojo annotationPojo = result3.get();
+    RestResult<AnnotationPojo> result = client.getAnnotation(annotationUuid);
+    assertRequestSucceeded(result);
+    AnnotationPojo annotationPojo = result.get();
+
+    softly.assertThat(annotationPojo).isNotNull();
+    return annotationPojo;
+  }
+
+  private AnnotationPojo readAnnotationRevision(UUID annotationUuid, Integer revision) {
+    RestResult<AnnotationPojo> result = client.getAnnotationRevision(annotationUuid, revision);
+    assertRequestSucceeded(result);
+    AnnotationPojo annotationPojo = result.get();
 
     softly.assertThat(annotationPojo).isNotNull();
     return annotationPojo;

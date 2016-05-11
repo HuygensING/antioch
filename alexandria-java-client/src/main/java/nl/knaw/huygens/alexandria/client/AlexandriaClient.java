@@ -246,11 +246,13 @@ public class AlexandriaClient {
   }
 
   public RestResult<AnnotationPojo> getAnnotation(final UUID uuid) {
-    WebTarget path = rootTarget.path(EndpointPaths.ANNOTATIONS).path(uuid.toString());
-    final RestRequester<AnnotationPojo> requester = RestRequester.withResponseSupplier(anonymousGet(path));
-    return requester//
-        .onStatus(Status.OK, this::toAnnotationPojoRestResult)//
-        .getResult();
+    WebTarget path = annotationTarget(uuid);
+    return getAnnotationRestResult(path);
+  }
+
+  public RestResult<AnnotationPojo> getAnnotationRevision(final UUID uuid, final Integer revision) {
+    WebTarget path = annotationTarget(uuid).path(EndpointPaths.REV).path(revision.toString());
+    return getAnnotationRestResult(path);
   }
 
   // private methods
@@ -374,6 +376,17 @@ public class AlexandriaClient {
     final RestRequester<String> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
         .onStatus(Status.OK, this::toStringRestResult)//
+        .getResult();
+  }
+
+  private WebTarget annotationTarget(final UUID uuid) {
+    return rootTarget.path(EndpointPaths.ANNOTATIONS).path(uuid.toString());
+  }
+
+  private RestResult<AnnotationPojo> getAnnotationRestResult(WebTarget path) {
+    final RestRequester<AnnotationPojo> requester = RestRequester.withResponseSupplier(anonymousGet(path));
+    return requester//
+        .onStatus(Status.OK, this::toAnnotationPojoRestResult)//
         .getResult();
   }
 

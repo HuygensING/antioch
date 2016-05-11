@@ -25,13 +25,13 @@ public class ResourceTextViewTest extends AlexandriaClientTest {
 
     String xml = singleQuotesToDouble(//
         "<text>"//
-            + "<p>A</p>"//
+            + "<p>Aap <i>Noot</i> Mies</p>"//
             + "<p>B<note>Borrel</note></p>"//
             + "</text>"//
     );
     String expectedFilteredXml = singleQuotesToDouble(//
         "<text>"//
-            + "<p>A</p>"//
+            + "<p>Aap Noot Mies</p>"//
             + "<p>B</p>"//
             + "</text>"//
     );
@@ -39,7 +39,8 @@ public class ResourceTextViewTest extends AlexandriaClientTest {
 
     String textViewName = "view0";
     TextViewDefinition textView = new TextViewDefinition().setDescription("My View");
-    textView.getElementViewDefinitions().put("note", new ElementViewDefinition().setElementMode(ElementMode.hide));
+    textView.setElementViewDefinition("note", new ElementViewDefinition().setElementMode(ElementMode.hide));
+    textView.setElementViewDefinition("i", new ElementViewDefinition().setElementMode(ElementMode.hideTag));
     RestResult<URI> result = client.setResourceTextView(resourceId, textViewName, textView);
     assertRequestSucceeded(result);
 
