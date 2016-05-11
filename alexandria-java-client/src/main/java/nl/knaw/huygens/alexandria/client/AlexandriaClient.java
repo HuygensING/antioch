@@ -189,13 +189,18 @@ public class AlexandriaClient {
   }
 
   public RestResult<UUID> annotateResource(UUID resourceUuid, AnnotationPrototype annotationPrototype) {
+    return annotate(resourceUuid, annotationPrototype, EndpointPaths.RESOURCES);
+  }
+
+  private RestResult<UUID> annotate(UUID annotatableUuid, AnnotationPrototype annotationPrototype, String annotatablePath) {
     Entity<AnnotationPrototype> entity = Entity.json(annotationPrototype);
     Supplier<Response> responseSupplier = () -> rootTarget//
-        .path(EndpointPaths.RESOURCES)//
-        .path(resourceUuid.toString())//
+        .path(annotatablePath)//
+        .path(annotatableUuid.toString())//
         .path(EndpointPaths.ANNOTATIONS).request()//
         .header(HEADER_AUTH, authHeader)//
         .post(entity);
+
     RestRequester<UUID> requester = RestRequester.withResponseSupplier(responseSupplier);
     RestResult<UUID> annotateResult = requester//
         .onStatus(Status.CREATED, this::uuidFromLocationHeader)//
@@ -204,6 +209,10 @@ public class AlexandriaClient {
       confirmAnnotation(annotateResult.get());
     }
     return annotateResult;
+  }
+
+  public RestResult<UUID> annotateAnnotation(UUID annotationUuid, AnnotationPrototype annotationPrototype) {
+    return annotate(annotationUuid, annotationPrototype, EndpointPaths.ANNOTATIONS);
   }
 
   public RestResult<AnnotationPojo> getAnnotation(UUID uuid) {
