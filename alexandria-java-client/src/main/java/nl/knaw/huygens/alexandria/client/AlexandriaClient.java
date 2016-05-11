@@ -205,11 +205,12 @@ public class AlexandriaClient {
 
   public RestResult<String> getTextAsString(final UUID uuid) {
     WebTarget path = resourceTextTarget(uuid).path("xml");
-    Supplier<Response> responseSupplier = anonymousGet(path);
-    final RestRequester<String> requester = RestRequester.withResponseSupplier(responseSupplier);
-    return requester//
-        .onStatus(Status.OK, this::toStringRestResult)//
-        .getResult();
+    return stringResult(path);
+  }
+
+  public RestResult<String> getTextAsDot(final UUID uuid) {
+    WebTarget path = resourceTextTarget(uuid).path("dot");
+    return stringResult(path);
   }
 
   public RestResult<ResourcePojo> setResourceTextView(final UUID resourceUuid, final String textViewName, final TextViewDefinition textView) {
@@ -352,5 +353,13 @@ public class AlexandriaClient {
   private SyncInvoker authorizedRequest(final WebTarget target) {
     return target.request()//
         .header(HEADER_AUTH, authHeader);
+  }
+
+  private RestResult<String> stringResult(WebTarget path) {
+    Supplier<Response> responseSupplier = anonymousGet(path);
+    final RestRequester<String> requester = RestRequester.withResponseSupplier(responseSupplier);
+    return requester//
+        .onStatus(Status.OK, this::toStringRestResult)//
+        .getResult();
   }
 }

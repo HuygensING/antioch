@@ -40,6 +40,20 @@ public class ResourceTextTest extends AlexandriaClientTest {
     assertRequestSucceeded(xmlReadResult);
     String xml2 = xmlReadResult.get();
     assertThat(xml2).isEqualTo(xml);
+
+    RestResult<String> dotReadResult = client.getTextAsDot(resourceUuid);
+    assertRequestSucceeded(dotReadResult);
+    String dot = dotReadResult.get();
+    String expectedDot = singleQuotesToDouble("digraph TextGraph {\n"//
+        + "  ranksep=1.0\n"//
+        + "  t0 [shape=box, label='Something'];\n"//
+        + "  a0 [label='text'];\n"//
+        + "  a0 -> t0 [color='blue'];\n"//
+        + "  {rank=same;t0;}\n"//
+        + "  {rank=same;a0;}\n"//
+        + "}");
+    assertThat(dot).isEqualTo(expectedDot);
+
   }
 
 }
