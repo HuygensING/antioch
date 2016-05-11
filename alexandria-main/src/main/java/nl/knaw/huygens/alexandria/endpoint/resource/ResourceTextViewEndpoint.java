@@ -22,8 +22,10 @@ import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.TextView;
 import nl.knaw.huygens.alexandria.api.model.TextViewDefinition;
 import nl.knaw.huygens.alexandria.api.model.TextViewDefinitionParser;
+import nl.knaw.huygens.alexandria.api.model.TextViewEntity;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+import nl.knaw.huygens.alexandria.endpoint.ResourceTextFactory;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
@@ -34,14 +36,17 @@ public class ResourceTextViewEndpoint extends JSONEndpoint {
   private LocationBuilder locationBuilder;
   private UUID resourceId;
   private AlexandriaService service;
+  private ResourceTextFactory textFactory;
 
   @Inject
   public ResourceTextViewEndpoint(AlexandriaService service, //
       LocationBuilder locationBuilder, //
+      ResourceTextFactory textFactory, //
       ResourceValidatorFactory validatorFactory, //
       @PathParam("uuid") final UUIDParam uuidParam) {
     this.service = service;
     this.locationBuilder = locationBuilder;
+    this.textFactory = textFactory;
     AlexandriaResource resource = validatorFactory.validateExistingResource(uuidParam).notTentative();
     this.resourceId = resource.getId();
   }
@@ -79,6 +84,6 @@ public class ResourceTextViewEndpoint extends JSONEndpoint {
   }
 
   private TextViewEntity toTextViewEntity(TextView textView) {
-    return new TextViewEntity(resourceId, textView, locationBuilder);
+    return textFactory.createTextViewEntity(resourceId, textView);
   }
 }

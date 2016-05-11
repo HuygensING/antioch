@@ -50,6 +50,7 @@ import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.StatePrototype;
+import nl.knaw.huygens.alexandria.api.model.TextEntity;
 import nl.knaw.huygens.alexandria.api.model.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.TextView;
 import nl.knaw.huygens.alexandria.api.model.TextViewDefinition;
@@ -185,21 +186,19 @@ public class AlexandriaClient {
   public RestResult<TextImportStatus> getTextImportStatus(final UUID resourceUUID) {
     final WebTarget path = resourceTextTarget(resourceUUID)//
         .path("status");
-    final Supplier<Response> responseSupplier = () -> authorizedRequest(path).get();
+    final Supplier<Response> responseSupplier = anonymousGet(path);
     final RestRequester<TextImportStatus> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
         .onStatus(Status.OK, this::toTextImportStatusRestResult)//
         .getResult();
   }
 
-  public RestResult<URI> addTextView(final UUID resourceUUID, final TextViewPrototype textView) {
-    final Entity<TextViewPrototype> entity = Entity.json(textView);
-    final WebTarget path = resourceTextTarget(resourceUUID)//
-        .path(EndpointPaths.TEXTVIEWS);
-    final Supplier<Response> responseSupplier = authorizedPut(path, entity);
-    final RestRequester<URI> requester = RestRequester.withResponseSupplier(responseSupplier);
+  public RestResult<TextEntity> getTextInfo(UUID resourceUuid) {
+    WebTarget path = resourceTextTarget(resourceUuid);
+    final Supplier<Response> responseSupplier = anonymousGet(path);
+    final RestRequester<TextEntity> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.CREATED, this::uriFromLocationHeader)//
+        .onStatus(Status.OK, this::toTextEntityRestResult)//
         .getResult();
   }
 
@@ -216,6 +215,17 @@ public class AlexandriaClient {
   public RestResult<ResourcePojo> setResourceTextView(final UUID resourceUuid, final String textViewName, final TextViewDefinition textView) {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  public RestResult<URI> addTextView(final UUID resourceUUID, final TextViewPrototype textView) {
+    final Entity<TextViewPrototype> entity = Entity.json(textView);
+    final WebTarget path = resourceTextTarget(resourceUUID)//
+        .path(EndpointPaths.TEXTVIEWS);
+    final Supplier<Response> responseSupplier = authorizedPut(path, entity);
+    final RestRequester<URI> requester = RestRequester.withResponseSupplier(responseSupplier);
+    return requester//
+        .onStatus(Status.CREATED, this::uriFromLocationHeader)//
+        .getResult();
   }
 
   public RestResult<TextView> getTextView(final UUID uuid) {
@@ -311,6 +321,10 @@ public class AlexandriaClient {
     return toEntityRestResult(response, TextImportStatus.class);
   }
 
+  private RestResult<TextEntity> toTextEntityRestResult(final Response response) {
+    return toEntityRestResult(response, TextEntity.class);
+  }
+
   private RestResult<TextView> toTextViewRestResult(final Response response) {
     return toEntityRestResult(response, TextView.class);
   }
@@ -338,8 +352,8 @@ public class AlexandriaClient {
     return result;
   }
 
-  private Supplier<Response> anonymousGet(final WebTarget path) {
-    return () -> path.request().get();
+  private Supplier<Response> anonymousGet(final WebTarget target) {
+    return () -> target.request().get();
   }
 
   private Supplier<Response> authorizedPut(final WebTarget path, final Entity<?> entity) {
@@ -362,4 +376,5 @@ public class AlexandriaClient {
         .onStatus(Status.OK, this::toStringRestResult)//
         .getResult();
   }
+
 }

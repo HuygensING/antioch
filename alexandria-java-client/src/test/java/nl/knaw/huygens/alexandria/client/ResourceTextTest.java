@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
+import nl.knaw.huygens.alexandria.api.model.TextEntity;
 import nl.knaw.huygens.alexandria.api.model.TextImportStatus;
 
 public class ResourceTextTest extends AlexandriaClientTest {
@@ -36,6 +37,12 @@ public class ResourceTextTest extends AlexandriaClientTest {
     URI expectedURI = URI.create("http://localhost:2016/resources/" + resourceUuid + "/text/xml");
     assertThat(textGraphImportStatus.getTextURI()).isEqualTo(expectedURI);
 
+    RestResult<TextEntity> textInfoResult = client.getTextInfo(resourceUuid);
+    assertRequestSucceeded(textInfoResult);
+    TextEntity textEntity = textInfoResult.get();
+    assertThat(textEntity.getTextViews()).isEmpty();
+    assertThat(textEntity.getXmlURI()).isEqualTo(expectedURI);
+
     RestResult<String> xmlReadResult = client.getTextAsString(resourceUuid);
     assertRequestSucceeded(xmlReadResult);
     String xml2 = xmlReadResult.get();
@@ -53,7 +60,6 @@ public class ResourceTextTest extends AlexandriaClientTest {
         + "  {rank=same;a0;}\n"//
         + "}");
     assertThat(dot).isEqualTo(expectedDot);
-
   }
 
 }

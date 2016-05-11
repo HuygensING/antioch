@@ -28,11 +28,14 @@ import org.apache.commons.lang3.StringUtils;
 
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.TextEntity;
 import nl.knaw.huygens.alexandria.api.model.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.TextViewEntity;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+import nl.knaw.huygens.alexandria.endpoint.ResourceTextFactory;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
@@ -52,6 +55,7 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
   private final LocationBuilder locationBuilder;
   private final TextGraphTaskStatusMap taskStatusMap;
   private AlexandriaConfiguration config;
+  private ResourceTextFactory textFactory;
 
   @Inject
   public ResourceTextGraphEndpoint(AlexandriaService service, //
@@ -59,12 +63,14 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
       ResourceValidatorFactory validatorFactory, //
       ExecutorService executorService, //
       LocationBuilder locationBuilder, //
+      ResourceTextFactory textViewFactory, //
       TextGraphTaskStatusMap taskStatusMap, //
       @PathParam("uuid") final UUIDParam uuidParam) {
     this.service = service;
     this.config = config;
     this.executorService = executorService;
     this.locationBuilder = locationBuilder;
+    this.textFactory = textViewFactory;
     this.taskStatusMap = taskStatusMap;
     this.resource = validatorFactory.validateExistingResource(uuidParam).notTentative();
     this.resourceId = resource.getId();
@@ -107,9 +113,9 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
     assertResourceHasText();
     List<TextViewEntity> textViewEntities = service.getTextViewsForResource(resourceId)//
         .stream()//
-        .map(tv -> new TextViewEntity(resourceId, tv, locationBuilder))//
+        .map(tv -> textFactory.createTextViewEntity(resourceId, tv))//
         .collect(toList());
-    TextEntity text = new TextEntity(resourceId, locationBuilder, textViewEntities);
+    TextEntity text = textFactory.createTextEntity(resourceId, textViewEntities);
     return ok(text);
   }
 
