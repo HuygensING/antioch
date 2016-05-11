@@ -35,6 +35,8 @@ public final class EndpointPaths {
   public static final String ANNOTATIONBODIES = "annotationbodies";
   public static final String SEARCHES = "searches";
 
+  public static final String SUBRESOURCES = "subresources";
+
   private EndpointPaths() {
     throw new AssertionError("Paths shall not be instantiated");
   }

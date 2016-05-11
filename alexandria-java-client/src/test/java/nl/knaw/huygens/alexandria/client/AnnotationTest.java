@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import nl.knaw.huygens.alexandria.client.model.AnnotationPojo;
 import nl.knaw.huygens.alexandria.client.model.AnnotationPrototype;
-import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 
 public class AnnotationTest extends AlexandriaClientTest {
   @Before
@@ -47,14 +46,6 @@ public class AnnotationTest extends AlexandriaClientTest {
     AnnotationPojo annotationPojo = readAnnotation(annotationUuid2);
     softly.assertThat(annotationPojo.getType()).as("type").isEqualTo(annotationType2);
     softly.assertThat(annotationPojo.getValue()).as("value").isEqualTo(annotationValue2);
-  }
-
-  private UUID createResource(String resourceRef) {
-    ResourcePrototype resource = new ResourcePrototype().setRef(resourceRef);
-    UUID resourceUuid = UUID.randomUUID();
-    RestResult<Void> result = client.setResource(resourceUuid, resource);
-    assertRequestSucceeded(result);
-    return resourceUuid;
   }
 
   private UUID annotateResource(UUID resourceUuid, String annotationType, String annotationValue) {

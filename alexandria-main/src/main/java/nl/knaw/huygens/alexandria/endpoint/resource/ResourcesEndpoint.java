@@ -22,6 +22,7 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
  * #L%
  */
 import static nl.knaw.huygens.alexandria.api.EndpointPaths.RESOURCES;
+import static nl.knaw.huygens.alexandria.api.EndpointPaths.SUBRESOURCES;
 import static nl.knaw.huygens.alexandria.api.EndpointPaths.TEXT;
 import static nl.knaw.huygens.alexandria.endpoint.resource.ResourceValidatorFactory.resourceNotFoundForId;
 
@@ -153,7 +154,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   // Sub-resource delegation
 
-  @Path("{uuid}/subresources")
+  @Path("{uuid}/" + SUBRESOURCES)
   public Class<SubResourcesEndpoint> getSubResourcesEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
     return SubResourcesEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }

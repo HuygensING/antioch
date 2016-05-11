@@ -54,6 +54,8 @@ import nl.knaw.huygens.alexandria.client.model.AnnotationPojo;
 import nl.knaw.huygens.alexandria.client.model.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.client.model.ResourcePojo;
 import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
+import nl.knaw.huygens.alexandria.client.model.SubResourcePojo;
+import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
 
 public class AlexandriaClient {
   private WebTarget rootTarget;
@@ -132,6 +134,26 @@ public class AlexandriaClient {
     return addResult;
   }
 
+  public RestResult<UUID> addSubResource(UUID parentResourceId, SubResourcePrototype subresource) {
+    Entity<SubResourcePrototype> entity = Entity.json(subresource);
+    Supplier<Response> responseSupplier = () -> rootTarget//
+        .path(EndpointPaths.RESOURCES)//
+        .path(parentResourceId.toString())//
+        .path(EndpointPaths.SUBRESOURCES)//
+        .request()//
+        .header(HEADER_AUTH, authHeader)//
+        .post(entity);
+    RestRequester<UUID> requester = RestRequester.withResponseSupplier(responseSupplier);
+    RestResult<UUID> addResult = requester//
+        .onStatus(Status.CREATED, this::uuidFromLocationHeader)//
+        .getResult();
+    if (autoConfirm && !addResult.hasFailed()) {
+      confirmResource(addResult.get());
+    }
+
+    return addResult;
+  }
+
   public RestResult<ResourcePojo> getResource(UUID uuid) {
     RestRequester<ResourcePojo> requester = RestRequester.withResponseSupplier(//
         () -> rootTarget.path(EndpointPaths.RESOURCES)//
@@ -141,6 +163,18 @@ public class AlexandriaClient {
     );
     return requester//
         .onStatus(Status.OK, this::toResourcePojoRestResult)//
+        .getResult();
+  }
+
+  public RestResult<SubResourcePojo> getSubResource(UUID uuid) {
+    RestRequester<SubResourcePojo> requester = RestRequester.withResponseSupplier(//
+        () -> rootTarget.path(EndpointPaths.RESOURCES)//
+            .path(uuid.toString())//
+            .request()//
+            .get()//
+    );
+    return requester//
+        .onStatus(Status.OK, this::toSubResourcePojoRestResult)//
         .getResult();
   }
 
@@ -243,6 +277,10 @@ public class AlexandriaClient {
 
   private RestResult<ResourcePojo> toResourcePojoRestResult(Response response) {
     return toEntityRestResult(response, ResourcePojo.class);
+  }
+
+  private RestResult<SubResourcePojo> toSubResourcePojoRestResult(Response response) {
+    return toEntityRestResult(response, SubResourcePojo.class);
   }
 
   private RestResult<AnnotationPojo> toAnnotationPojoRestResult(Response response) {
