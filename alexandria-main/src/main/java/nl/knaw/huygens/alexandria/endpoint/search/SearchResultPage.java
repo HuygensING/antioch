@@ -37,11 +37,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.collect.ImmutableMap;
 
+import nl.knaw.huygens.alexandria.api.JsonTypeNames;
 import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
 
 @JsonInclude(Include.NON_NULL)
-@JsonTypeName("searchResultPage")
+@JsonTypeName(JsonTypeNames.SEARCHRESULTPAGE)
 public class SearchResultPage extends JsonWrapperObject {
   private int pageNumber;
   @JsonIgnore

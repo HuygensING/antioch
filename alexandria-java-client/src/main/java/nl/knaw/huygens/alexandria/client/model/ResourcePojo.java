@@ -29,9 +29,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import nl.knaw.huygens.alexandria.api.JsonTypeNames;
 import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
 
-@JsonTypeName("resource")
+@JsonTypeName(JsonTypeNames.RESOURCE)
 public class ResourcePojo extends AbstractAccountablePojo<ResourcePojo> {
   private String id;
   private String ref;

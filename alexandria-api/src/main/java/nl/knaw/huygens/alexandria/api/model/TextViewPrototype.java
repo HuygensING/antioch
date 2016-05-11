@@ -28,7 +28,9 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@JsonTypeName("textView")
+import nl.knaw.huygens.alexandria.api.JsonTypeNames;
+
+@JsonTypeName(JsonTypeNames.TEXTVIEW)
 public class TextViewPrototype extends JsonWrapperObject implements Prototype {
   private String description = "";
   private List<ElementDefinition> includedElements = new ArrayList<>();

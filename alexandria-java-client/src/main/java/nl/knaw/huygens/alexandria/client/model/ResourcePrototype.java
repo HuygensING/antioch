@@ -2,7 +2,9 @@ package nl.knaw.huygens.alexandria.client.model;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@JsonTypeName("resource")
+import nl.knaw.huygens.alexandria.api.JsonTypeNames;
+
+@JsonTypeName(JsonTypeNames.RESOURCE)
 public class ResourcePrototype extends Prototype {
   ResourcePojo delegate = new ResourcePojo();
 

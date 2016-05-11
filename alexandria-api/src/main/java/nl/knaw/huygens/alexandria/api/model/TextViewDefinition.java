@@ -6,7 +6,9 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@JsonTypeName("textView")
+import nl.knaw.huygens.alexandria.api.JsonTypeNames;
+
+@JsonTypeName(JsonTypeNames.TEXTVIEW)
 public class TextViewDefinition extends JsonWrapperObject implements Prototype {
   public static final String DEFAULT_ATTRIBUTENAME = ":default";
 

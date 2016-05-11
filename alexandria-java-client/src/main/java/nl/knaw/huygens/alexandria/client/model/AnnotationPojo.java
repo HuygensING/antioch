@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@JsonTypeName("annotation")
+import nl.knaw.huygens.alexandria.api.JsonTypeNames;
+
+@JsonTypeName(JsonTypeNames.ANNOTATION)
 @JsonInclude(Include.NON_ABSENT)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AnnotationPojo extends AbstractAccountablePojo<AnnotationPojo> {

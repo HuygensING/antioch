@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.JsonTypeNames;
 import nl.knaw.huygens.alexandria.api.model.Entity;
 import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
@@ -19,7 +20,7 @@ import nl.knaw.huygens.alexandria.api.model.TextView;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 
-@JsonTypeName("resourceTextView")
+@JsonTypeName(JsonTypeNames.TEXTVIEW)
 @JsonInclude(Include.NON_NULL)
 public class TextViewEntity extends JsonWrapperObject implements Entity {
   @JsonIgnore

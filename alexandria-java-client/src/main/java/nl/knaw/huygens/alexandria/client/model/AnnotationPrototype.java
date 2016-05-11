@@ -2,7 +2,9 @@ package nl.knaw.huygens.alexandria.client.model;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@JsonTypeName("annotation")
+import nl.knaw.huygens.alexandria.api.JsonTypeNames;
+
+@JsonTypeName(JsonTypeNames.ANNOTATION)
 public class AnnotationPrototype extends Prototype {
   AnnotationPojo delegate = new AnnotationPojo();
 
