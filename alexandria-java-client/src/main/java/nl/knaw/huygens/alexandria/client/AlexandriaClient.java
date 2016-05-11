@@ -96,10 +96,10 @@ public class AlexandriaClient {
   }
 
   public RestResult<AboutEntity> getAbout() {
-    final RestRequester<AboutEntity> requester = RestRequester.withResponseSupplier(() -> rootTarget//
-        .path(EndpointPaths.ABOUT)//
-        .request()//
-        .get());
+    WebTarget path = rootTarget//
+        .path(EndpointPaths.ABOUT);
+    Supplier<Response> responseSupplier = anonymousGet(path);
+    final RestRequester<AboutEntity> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
         .onStatus(Status.OK, this::toAboutEntityRestResult)//
         .getResult();
@@ -147,20 +147,18 @@ public class AlexandriaClient {
   }
 
   public RestResult<ResourcePojo> getResource(final UUID uuid) {
-    final RestRequester<ResourcePojo> requester = RestRequester.withResponseSupplier(//
-        () -> resourceTarget(uuid).request()//
-            .get()//
-    );
+    WebTarget path = resourceTarget(uuid);
+    Supplier<Response> responseSupplier = anonymousGet(path);
+    final RestRequester<ResourcePojo> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
         .onStatus(Status.OK, this::toResourcePojoRestResult)//
         .getResult();
   }
 
   public RestResult<SubResourcePojo> getSubResource(final UUID uuid) {
-    final RestRequester<SubResourcePojo> requester = RestRequester.withResponseSupplier(//
-        () -> resourceTarget(uuid).request()//
-            .get()//
-    );
+    WebTarget path = resourceTarget(uuid);
+    Supplier<Response> responseSupplier = anonymousGet(path);
+    final RestRequester<SubResourcePojo> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
         .onStatus(Status.OK, this::toSubResourcePojoRestResult)//
         .getResult();
@@ -205,25 +203,27 @@ public class AlexandriaClient {
         .getResult();
   }
 
-  public RestResult<String> getText(final UUID uuid) {
-    final RestRequester<String> requester = RestRequester.withResponseSupplier(() -> resourceTextTarget(uuid).request()//
-        .get());
+  public RestResult<String> getTextAsString(final UUID uuid) {
+    WebTarget path = resourceTextTarget(uuid).path("xml");
+    Supplier<Response> responseSupplier = anonymousGet(path);
+    final RestRequester<String> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
         .onStatus(Status.OK, this::toStringRestResult)//
-        .getResult();
-  }
-
-  public RestResult<TextView> getTextView(final UUID uuid) {
-    final RestRequester<TextView> requester = RestRequester.withResponseSupplier(() -> resourceTextTarget(uuid).path(EndpointPaths.TEXTVIEWS)//
-        .request().get());
-    return requester//
-        .onStatus(Status.OK, this::toTextViewRestResult)//
         .getResult();
   }
 
   public RestResult<ResourcePojo> setResourceTextView(final UUID resourceUuid, final String textViewName, final TextViewDefinition textView) {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  public RestResult<TextView> getTextView(final UUID uuid) {
+    WebTarget path = resourceTextTarget(uuid).path(EndpointPaths.TEXTVIEWS);
+    Supplier<Response> anonymousGet = anonymousGet(path);
+    final RestRequester<TextView> requester = RestRequester.withResponseSupplier(anonymousGet);
+    return requester//
+        .onStatus(Status.OK, this::toTextViewRestResult)//
+        .getResult();
   }
 
   public RestResult<UUID> annotateResource(final UUID resourceUuid, final AnnotationPrototype annotationPrototype) {
@@ -235,7 +235,8 @@ public class AlexandriaClient {
   }
 
   public RestResult<AnnotationPojo> getAnnotation(final UUID uuid) {
-    final RestRequester<AnnotationPojo> requester = RestRequester.withResponseSupplier(() -> rootTarget.path(EndpointPaths.ANNOTATIONS).path(uuid.toString()).request().get());
+    WebTarget path = rootTarget.path(EndpointPaths.ANNOTATIONS).path(uuid.toString());
+    final RestRequester<AnnotationPojo> requester = RestRequester.withResponseSupplier(anonymousGet(path));
     return requester//
         .onStatus(Status.OK, this::toAnnotationPojoRestResult)//
         .getResult();
@@ -334,6 +335,10 @@ public class AlexandriaClient {
     final UUID uuid = UUID.fromString(location.replaceFirst(".*/", ""));
     result.setCargo(uuid);
     return result;
+  }
+
+  private Supplier<Response> anonymousGet(final WebTarget path) {
+    return () -> path.request().get();
   }
 
   private Supplier<Response> authorizedPut(final WebTarget path, final Entity<?> entity) {

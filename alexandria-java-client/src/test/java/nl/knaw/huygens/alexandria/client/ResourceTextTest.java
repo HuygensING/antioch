@@ -36,8 +36,10 @@ public class ResourceTextTest extends AlexandriaClientTest {
     URI expectedURI = URI.create("http://localhost:2016/resources/" + resourceUuid + "/text/xml");
     assertThat(textGraphImportStatus.getTextURI()).isEqualTo(expectedURI);
 
-    RestResult<String> xmlReadResult = client.getText(resourceUuid);
+    RestResult<String> xmlReadResult = client.getTextAsString(resourceUuid);
     assertRequestSucceeded(xmlReadResult);
+    String xml2 = xmlReadResult.get();
+    assertThat(xml2).isEqualTo(xml);
   }
 
 }
