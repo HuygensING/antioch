@@ -41,6 +41,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.squarespace.jersey2.guice.BootstrapUtils;
 
+import nl.knaw.huygens.alexandria.api.model.TextImportStatus;
 import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.jersey.AlexandriaApplication;
@@ -112,6 +113,22 @@ public abstract class AlexandriaClientTest extends AlexandriaTest {
     RestResult<Void> result = client.setResource(resourceUuid, resource);
     assertRequestSucceeded(result);
     return resourceUuid;
+  }
+
+  protected TextImportStatus setResourceText(UUID resourceUuid, String xml) {
+    RestResult<URI> result = client.setResourceText(resourceUuid, xml);
+    assertThat(result).isNotNull();
+    assertThat(result.hasFailed()).isFalse();
+
+    TextImportStatus textGraphImportStatus = null;
+    boolean goOn = true;
+    while (goOn) {
+      RestResult<TextImportStatus> result2 = client.getTextImportStatus(resourceUuid);
+      assertThat(result2.hasFailed()).isFalse();
+      textGraphImportStatus = result2.get();
+      goOn = !textGraphImportStatus.isDone();
+    }
+    return textGraphImportStatus;
   }
 
   private static ServiceLocator createServiceLocator() {

@@ -24,21 +24,12 @@ package nl.knaw.huygens.alexandria.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.net.URI;
-import java.util.List;
 import java.util.UUID;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.api.model.ElementDefinition;
-import nl.knaw.huygens.alexandria.api.model.TextView;
-import nl.knaw.huygens.alexandria.api.model.TextViewPrototype;
 import nl.knaw.huygens.alexandria.client.model.ProvenancePojo;
 import nl.knaw.huygens.alexandria.client.model.ResourcePojo;
 import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
@@ -128,34 +119,6 @@ public class ResourceTest extends AlexandriaClientTest {
     softly.assertThat(ResourcePojo).as("entity != null").isNotNull();
     softly.assertThat(ResourcePojo.getRef()).as("ref").isEqualTo(ref);
     softly.assertThat(ResourcePojo.getState().getValue()).as("state").isEqualTo(AlexandriaState.CONFIRMED);
-  }
-
-  @Ignore
-  @Test
-  public void testSetAndRetrieveTextView() {
-    // first, create a resource
-    client.setAuthKey(AUTHKEY);
-    String ref = "corpus";
-    ResourcePrototype resource = new ResourcePrototype().setRef(ref).setProvenance(new ProvenancePojo().setWho("test").setWhy("because test"));
-    UUID resourceId = UUID.randomUUID();
-    RestResult<Void> result = client.setResource(resourceId, resource);
-    assertRequestSucceeded(result);
-
-    // then, set the base layer definition
-    ElementDefinition baseElement1 = ElementDefinition.withName("body").withAttributes("lang");
-    ElementDefinition baseElement2 = ElementDefinition.withName("p").withAttributes("n");
-    List<ElementDefinition> list = Lists.newArrayList(baseElement1, baseElement2);
-    TextViewPrototype textView = new TextViewPrototype().setIncludedElements(list).setIgnoredElements(Lists.newArrayList("note"));
-    RestResult<URI> result2 = client.addTextView(resourceId, textView);
-    assertRequestSucceeded(result2);
-    softly.assertThat(result2.get().toString()).as("Location").endsWith("/" + resourceId + "/" + EndpointPaths.TEXT + "/" + EndpointPaths.TEXTVIEWS);
-
-    // now, retrieve the base layer definition
-    RestResult<TextView> result3 = client.getTextView(resourceId);
-    assertRequestSucceeded(result3);
-    TextView returnedDefinition = result3.get();
-    // softly.assertThat(returnedDefinition.getIgnoredElements()).as("SubresourceElements").containsExactly("note");
-    // softly.assertThat(returnedDefinition.getIncludedElementDefinitions()).as("BaseElements").containsExactly(baseElement1, baseElement2);
   }
 
 }

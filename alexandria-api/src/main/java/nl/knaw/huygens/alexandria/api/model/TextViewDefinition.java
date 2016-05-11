@@ -21,8 +21,9 @@ public class TextViewDefinition extends JsonWrapperObject implements Prototype {
     elementViewDefinitions.clear();
   }
 
-  public void setDescription(String description) {
+  public TextViewDefinition setDescription(String description) {
     this.description = description;
+    return this;
   }
 
   public String getDescription() {

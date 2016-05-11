@@ -54,7 +54,6 @@ import nl.knaw.huygens.alexandria.api.model.TextEntity;
 import nl.knaw.huygens.alexandria.api.model.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.TextView;
 import nl.knaw.huygens.alexandria.api.model.TextViewDefinition;
-import nl.knaw.huygens.alexandria.api.model.TextViewPrototype;
 import nl.knaw.huygens.alexandria.client.model.AnnotationPojo;
 import nl.knaw.huygens.alexandria.client.model.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.client.model.ResourcePojo;
@@ -165,8 +164,8 @@ public class AlexandriaClient {
         .getResult();
   }
 
-  public RestResult<Void> confirmResource(final UUID resourceUuid) {
-    return confirm(EndpointPaths.RESOURCES, resourceUuid);
+  public RestResult<Void> confirmResource(final UUID resourceUUID) {
+    return confirm(EndpointPaths.RESOURCES, resourceUUID);
   }
 
   public RestResult<Void> confirmAnnotation(final UUID annotationUuid) {
@@ -193,8 +192,8 @@ public class AlexandriaClient {
         .getResult();
   }
 
-  public RestResult<TextEntity> getTextInfo(UUID resourceUuid) {
-    WebTarget path = resourceTextTarget(resourceUuid);
+  public RestResult<TextEntity> getTextInfo(UUID resourceUUID) {
+    WebTarget path = resourceTextTarget(resourceUUID);
     final Supplier<Response> responseSupplier = anonymousGet(path);
     final RestRequester<TextEntity> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
@@ -207,20 +206,21 @@ public class AlexandriaClient {
     return stringResult(path);
   }
 
+  public RestResult<String> getTextAsString(final UUID uuid, final String viewName) {
+    WebTarget path = resourceTextTarget(uuid).path("xml").queryParam("view", viewName);
+    return stringResult(path);
+  }
+
   public RestResult<String> getTextAsDot(final UUID uuid) {
     WebTarget path = resourceTextTarget(uuid).path("dot");
     return stringResult(path);
   }
 
-  public RestResult<ResourcePojo> setResourceTextView(final UUID resourceUuid, final String textViewName, final TextViewDefinition textView) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  public RestResult<URI> addTextView(final UUID resourceUUID, final TextViewPrototype textView) {
-    final Entity<TextViewPrototype> entity = Entity.json(textView);
+  public RestResult<URI> setResourceTextView(final UUID resourceUUID, final String textViewName, final TextViewDefinition textView) {
+    final Entity<TextViewDefinition> entity = Entity.json(textView);
     final WebTarget path = resourceTextTarget(resourceUUID)//
-        .path(EndpointPaths.TEXTVIEWS);
+        .path(EndpointPaths.TEXTVIEWS)//
+        .path(textViewName);
     final Supplier<Response> responseSupplier = authorizedPut(path, entity);
     final RestRequester<URI> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
@@ -237,8 +237,8 @@ public class AlexandriaClient {
         .getResult();
   }
 
-  public RestResult<UUID> annotateResource(final UUID resourceUuid, final AnnotationPrototype annotationPrototype) {
-    return annotate(resourceUuid, annotationPrototype, EndpointPaths.RESOURCES);
+  public RestResult<UUID> annotateResource(final UUID resourceUUID, final AnnotationPrototype annotationPrototype) {
+    return annotate(resourceUUID, annotationPrototype, EndpointPaths.RESOURCES);
   }
 
   public RestResult<UUID> annotateAnnotation(final UUID annotationUuid, final AnnotationPrototype annotationPrototype) {
@@ -283,12 +283,12 @@ public class AlexandriaClient {
         .path(uuid.toString());
   }
 
-  private RestResult<Void> confirm(final String endpoint, final UUID resourceUuid) {
+  private RestResult<Void> confirm(final String endpoint, final UUID resourceUUID) {
     final StatePrototype state = new StatePrototype().setState(AlexandriaState.CONFIRMED);
     final Entity<StatePrototype> confirmation = Entity.json(state);
     final WebTarget path = rootTarget//
         .path(endpoint)//
-        .path(resourceUuid.toString())//
+        .path(resourceUUID.toString())//
         .path("state");
     final Supplier<Response> responseSupplier = authorizedPut(path, confirmation);
     final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);

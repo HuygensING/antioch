@@ -20,20 +20,10 @@ public class ResourceTextTest extends AlexandriaClientTest {
 
   @Test
   public void testResourceText() {
-    UUID resourceUuid = createResource("test");
+    String resourceRef = "test";
+    UUID resourceUuid = createResource(resourceRef);
     String xml = "<text>Something</text>";
-    RestResult<URI> result = client.setResourceText(resourceUuid, xml);
-    assertThat(result).isNotNull();
-    assertThat(result.hasFailed()).isFalse();
-
-    TextImportStatus textGraphImportStatus = null;
-    boolean goOn = true;
-    while (goOn) {
-      RestResult<TextImportStatus> result2 = client.getTextImportStatus(resourceUuid);
-      assertThat(result2.hasFailed()).isFalse();
-      textGraphImportStatus = result2.get();
-      goOn = !textGraphImportStatus.isDone();
-    }
+    TextImportStatus textGraphImportStatus = setResourceText(resourceUuid, xml);
     URI expectedURI = URI.create("http://localhost:2016/resources/" + resourceUuid + "/text/xml");
     assertThat(textGraphImportStatus.getTextURI()).isEqualTo(expectedURI);
 
@@ -61,5 +51,6 @@ public class ResourceTextTest extends AlexandriaClientTest {
         + "}");
     assertThat(dot).isEqualTo(expectedDot);
   }
+
 
 }
