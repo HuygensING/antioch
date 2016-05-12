@@ -10,8 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.google.common.collect.ImmutableMap;
-
+import nl.knaw.huygens.alexandria.api.model.search.SearchInfo;
 import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
 
 @Singleton
@@ -25,14 +24,13 @@ public class SearchFactory {
     final int pageSize = searchResult.getPageSize();
     final int lastPageNumber = Math.max(1, searchResult.getTotalPages());
 
-    final Map<String, Object> searchInfo = ImmutableMap.<String, Object> builder()//
-        .put("id", searchResult.getId())//
-        .put("query", searchResult.getQuery())//
-        .put("searchDurationInMs", searchResult.getSearchDurationInMs())//
-        .put("totalPages", searchResult.getTotalPages())//
-        .put("pageSize", pageSize)//
-        .put("totalResults", searchResult.getTotalResults())//
-        .build();
+    final SearchInfo searchInfo = new SearchInfo()//
+        .setId(searchResult.getId())//
+        .setQuery(searchResult.getQuery())//
+        .setSearchDurationInMs(searchResult.getSearchDurationInMs())//
+        .setTotalPages(searchResult.getTotalPages())//
+        .setPageSize(pageSize)//
+        .setTotalResults(searchResult.getTotalResults());
 
     final AtomicInteger counter = new AtomicInteger(pageSize * (pageNumber - 1));
     final List<Map<String, Object>> records = results.stream().map(r -> {

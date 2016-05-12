@@ -18,7 +18,7 @@ import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
 public class SearchResultPage extends JsonWrapperObject {
   private int pageNumber;
   private List<Map<String, Object>> records;
-  private Map<String, Object> searchInfo;
+  private SearchInfo searchInfo;
 
   @JsonProperty(PropertyPrefix.LINK + "firstPage")
   private URI firstPageURI;
@@ -53,12 +53,12 @@ public class SearchResultPage extends JsonWrapperObject {
     return records;
   }
 
-  public SearchResultPage setSearchInfo(Map<String, Object> searchInfo) {
+  public SearchResultPage setSearchInfo(SearchInfo searchInfo) {
     this.searchInfo = searchInfo;
     return this;
   }
 
-  public Map<String, Object> getSearchInfo() {
+  public SearchInfo getSearchInfo() {
     return searchInfo;
   }
 
