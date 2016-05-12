@@ -5,7 +5,7 @@ import java.util.UUID;
 import com.google.common.base.Joiner;
 
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
-import nl.knaw.huygens.alexandria.api.model.TextImportStatus;
+import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;

@@ -50,10 +50,12 @@ import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.StatePrototype;
-import nl.knaw.huygens.alexandria.api.model.TextEntity;
-import nl.knaw.huygens.alexandria.api.model.TextImportStatus;
-import nl.knaw.huygens.alexandria.api.model.TextView;
-import nl.knaw.huygens.alexandria.api.model.TextViewDefinition;
+import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
+import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
+import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
 import nl.knaw.huygens.alexandria.client.model.AnnotationPojo;
 import nl.knaw.huygens.alexandria.client.model.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.client.model.ResourcePojo;
@@ -255,6 +257,32 @@ public class AlexandriaClient {
     return getAnnotationRestResult(path);
   }
 
+  public RestResult<UUID> addSearch(AlexandriaQuery query) {
+    final Entity<AlexandriaQuery> entity = Entity.json(query);
+    final WebTarget path = rootTarget.path(EndpointPaths.SEARCHES);
+    final Supplier<Response> responseSupplier = authorizedPost(path, entity);
+    final RestRequester<UUID> requester = RestRequester.withResponseSupplier(responseSupplier);
+    return requester//
+        .onStatus(Status.CREATED, this::uuidFromLocationHeader)//
+        .getResult();
+  }
+
+  public RestResult<SearchResultPage> getSearchResultPage(UUID searchId) {
+    return getSearchResultPage(searchId, 1);
+  }
+
+  public RestResult<SearchResultPage> getSearchResultPage(UUID searchId, Integer page) {
+    final WebTarget path = rootTarget//
+        .path(EndpointPaths.SEARCHES)//
+        .path(searchId.toString())//
+        .path(EndpointPaths.RESULTPAGES)//
+        .path(page.toString());
+    final RestRequester<SearchResultPage> requester = RestRequester.withResponseSupplier(anonymousGet(path));
+    return requester//
+        .onStatus(Status.OK, this::toSearchResultPageRestResult)//
+        .getResult();
+  }
+
   // private methods
 
   private RestResult<UUID> annotate(final UUID annotatableUuid, final AnnotationPrototype annotationPrototype, final String annotatablePath) {
@@ -329,6 +357,10 @@ public class AlexandriaClient {
 
   private RestResult<TextView> toTextViewRestResult(final Response response) {
     return toEntityRestResult(response, TextView.class);
+  }
+
+  private RestResult<SearchResultPage> toSearchResultPageRestResult(final Response response) {
+    return toEntityRestResult(response, SearchResultPage.class);
   }
 
   private <E> RestResult<E> toEntityRestResult(final Response response, final Class<E> entityClass) {

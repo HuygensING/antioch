@@ -13,10 +13,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.api.model.ElementView;
-import nl.knaw.huygens.alexandria.api.model.ElementView.AttributeMode;
-import nl.knaw.huygens.alexandria.api.model.ElementView.ElementMode;
-import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.ElementMode;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil.TextViewContext;
 

@@ -28,10 +28,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
-import nl.knaw.huygens.alexandria.api.model.TextEntity;
-import nl.knaw.huygens.alexandria.api.model.TextImportStatus;
-import nl.knaw.huygens.alexandria.api.model.TextView;
-import nl.knaw.huygens.alexandria.api.model.TextViewEntity;
+import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
+import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewEntity;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;

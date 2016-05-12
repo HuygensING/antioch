@@ -30,7 +30,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-import nl.knaw.huygens.alexandria.model.search.QueryField;
+import nl.knaw.huygens.alexandria.api.model.search.QueryField;
 
 @RunWith(Parameterized.class)
 public class QueryFieldGettersTest {

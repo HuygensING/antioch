@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.api.model;
+package nl.knaw.huygens.alexandria.api.model.text.view;
 
 import java.net.URI;
 
@@ -8,6 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import nl.knaw.huygens.alexandria.api.JsonTypeNames;
+import nl.knaw.huygens.alexandria.api.model.Entity;
+import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
+import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
 
 @JsonTypeName(JsonTypeNames.TEXTVIEW)
 @JsonInclude(Include.NON_NULL)

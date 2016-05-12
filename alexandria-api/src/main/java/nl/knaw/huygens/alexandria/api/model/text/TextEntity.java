@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.api.model;
+package nl.knaw.huygens.alexandria.api.model.text;
 
 import java.net.URI;
 import java.util.List;
@@ -10,6 +10,10 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.collect.Lists;
 
 import nl.knaw.huygens.alexandria.api.JsonTypeNames;
+import nl.knaw.huygens.alexandria.api.model.Entity;
+import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
+import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewEntity;
 
 @JsonTypeName(JsonTypeNames.RESOURCETEXT)
 @JsonInclude(Include.NON_NULL)

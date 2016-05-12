@@ -8,8 +8,8 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
-import nl.knaw.huygens.alexandria.api.model.TextEntity;
-import nl.knaw.huygens.alexandria.api.model.TextImportStatus;
+import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
+import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 
 public class ResourceTextTest extends AlexandriaClientTest {
   @Before

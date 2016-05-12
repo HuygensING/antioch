@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.api.model;
+package nl.knaw.huygens.alexandria.api.model.text.view;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -15,8 +15,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.api.model.ElementView.AttributeFunction;
-import nl.knaw.huygens.alexandria.api.model.ElementView.AttributeMode;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeFunction;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 
 public class TextViewDefinitionTest extends AlexandriaTest {

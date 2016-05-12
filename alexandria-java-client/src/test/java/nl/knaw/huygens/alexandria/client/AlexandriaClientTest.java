@@ -41,7 +41,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.squarespace.jersey2.guice.BootstrapUtils;
 
-import nl.knaw.huygens.alexandria.api.model.TextImportStatus;
+import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
+import nl.knaw.huygens.alexandria.client.model.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.jersey.AlexandriaApplication;
@@ -129,6 +130,16 @@ public abstract class AlexandriaClientTest extends AlexandriaTest {
       goOn = !textGraphImportStatus.isDone();
     }
     return textGraphImportStatus;
+  }
+
+  protected UUID annotateResource(UUID resourceUuid, String annotationType, String annotationValue) {
+    AnnotationPrototype annotationPrototype = new AnnotationPrototype()//
+        .setType(annotationType)//
+        .setValue(annotationValue);
+    RestResult<UUID> result = client.annotateResource(resourceUuid, annotationPrototype);
+    assertRequestSucceeded(result);
+    UUID annotationUuid = result.get();
+    return annotationUuid;
   }
 
   private static ServiceLocator createServiceLocator() {

@@ -1,12 +1,12 @@
-package nl.knaw.huygens.alexandria.api.model;
+package nl.knaw.huygens.alexandria.api.model.text.view;
 
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-import nl.knaw.huygens.alexandria.api.model.ElementView.AttributeMode;
-import nl.knaw.huygens.alexandria.api.model.ElementView.ElementMode;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.ElementMode;
 
 @JsonInclude(Include.NON_ABSENT)
 public class ElementViewDefinition {

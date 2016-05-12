@@ -1,9 +1,9 @@
-package nl.knaw.huygens.alexandria.api.model;
+package nl.knaw.huygens.alexandria.api.model.text.view;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.knaw.huygens.alexandria.api.model.ElementView.AttributeFunction;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeFunction;
 
 public class AttributePreCondition {
   private String attribute;

@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.api.model;
+package nl.knaw.huygens.alexandria.api.model.text.view;
 
 /*
  * #%L
@@ -29,6 +29,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import nl.knaw.huygens.alexandria.api.JsonTypeNames;
+import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
+import nl.knaw.huygens.alexandria.api.model.Prototype;
 
 @JsonTypeName(JsonTypeNames.TEXTVIEW)
 public class TextViewPrototype extends JsonWrapperObject implements Prototype {

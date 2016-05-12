@@ -30,7 +30,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import jersey.repackaged.com.google.common.collect.Lists;
-import nl.knaw.huygens.alexandria.api.model.TextView;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
 
 public class AlexandriaResource extends AbstractAnnotatable {
   private String cargo; // ref for resource, sub for subresource

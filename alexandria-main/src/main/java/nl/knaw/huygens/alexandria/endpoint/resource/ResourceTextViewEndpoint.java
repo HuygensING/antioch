@@ -19,10 +19,10 @@ import javax.ws.rs.core.Response;
 import com.google.common.base.Joiner;
 
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
-import nl.knaw.huygens.alexandria.api.model.TextView;
-import nl.knaw.huygens.alexandria.api.model.TextViewDefinition;
-import nl.knaw.huygens.alexandria.api.model.TextViewDefinitionParser;
-import nl.knaw.huygens.alexandria.api.model.TextViewEntity;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinitionParser;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewEntity;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.ResourceTextFactory;

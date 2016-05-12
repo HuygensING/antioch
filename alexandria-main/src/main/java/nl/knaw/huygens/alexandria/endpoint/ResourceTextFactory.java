@@ -9,9 +9,9 @@ import javax.inject.Singleton;
 import javax.ws.rs.core.UriBuilder;
 
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
-import nl.knaw.huygens.alexandria.api.model.TextEntity;
-import nl.knaw.huygens.alexandria.api.model.TextView;
-import nl.knaw.huygens.alexandria.api.model.TextViewEntity;
+import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewEntity;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 
 @Singleton

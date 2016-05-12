@@ -19,12 +19,12 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
-import nl.knaw.huygens.alexandria.api.model.AttributePreCondition;
-import nl.knaw.huygens.alexandria.api.model.ElementView;
-import nl.knaw.huygens.alexandria.api.model.ElementView.AttributeMode;
-import nl.knaw.huygens.alexandria.api.model.ElementView.ElementMode;
-import nl.knaw.huygens.alexandria.api.model.TextView;
-import nl.knaw.huygens.alexandria.api.model.TextViewDefinition;
+import nl.knaw.huygens.alexandria.api.model.text.view.AttributePreCondition;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.ElementMode;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.tei.Document;
 

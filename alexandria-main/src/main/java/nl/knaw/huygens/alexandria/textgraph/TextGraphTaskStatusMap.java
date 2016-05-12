@@ -9,7 +9,7 @@ import java.util.UUID;
 
 import com.google.common.collect.Maps;
 
-import nl.knaw.huygens.alexandria.api.model.TextImportStatus;
+import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 
 public class TextGraphTaskStatusMap {
   private static Map<UUID, TextImportStatus> map = Maps.newHashMap();

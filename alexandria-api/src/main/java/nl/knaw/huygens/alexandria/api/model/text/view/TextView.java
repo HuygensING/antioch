@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.api.model;
+package nl.knaw.huygens.alexandria.api.model.text.view;
 
 import java.util.HashMap;
 import java.util.Map;

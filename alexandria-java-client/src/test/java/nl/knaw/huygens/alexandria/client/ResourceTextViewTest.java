@@ -8,9 +8,9 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
-import nl.knaw.huygens.alexandria.api.model.ElementView.ElementMode;
-import nl.knaw.huygens.alexandria.api.model.ElementViewDefinition;
-import nl.knaw.huygens.alexandria.api.model.TextViewDefinition;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementViewDefinition;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.ElementMode;
 
 public class ResourceTextViewTest extends AlexandriaClientTest {
   @Before

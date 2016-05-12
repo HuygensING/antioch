@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.model.search;
+package nl.knaw.huygens.alexandria.api.model.search;
 
 /*
  * #%L

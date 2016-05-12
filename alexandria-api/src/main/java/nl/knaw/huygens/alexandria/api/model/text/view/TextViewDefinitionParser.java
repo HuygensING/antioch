@@ -1,9 +1,9 @@
-package nl.knaw.huygens.alexandria.api.model;
+package nl.knaw.huygens.alexandria.api.model.text.view;
 
-import static nl.knaw.huygens.alexandria.api.model.ElementView.AttributeMode.hideAll;
-import static nl.knaw.huygens.alexandria.api.model.ElementView.AttributeMode.hideOnly;
-import static nl.knaw.huygens.alexandria.api.model.ElementView.AttributeMode.showAll;
-import static nl.knaw.huygens.alexandria.api.model.ElementView.AttributeMode.showOnly;
+import static nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode.hideAll;
+import static nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode.hideOnly;
+import static nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode.showAll;
+import static nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode.showOnly;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -17,8 +17,8 @@ import java.util.regex.Pattern;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 
-import nl.knaw.huygens.alexandria.api.model.ElementView.AttributeFunction;
-import nl.knaw.huygens.alexandria.api.model.ElementView.AttributeMode;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeFunction;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode;
 
 public class TextViewDefinitionParser {
 

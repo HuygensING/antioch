@@ -52,16 +52,6 @@ public class AnnotationTest extends AlexandriaClientTest {
     softly.assertThat(annotationPojo.getValue()).as("value").isEqualTo(annotationValue2);
   }
 
-  private UUID annotateResource(UUID resourceUuid, String annotationType, String annotationValue) {
-    AnnotationPrototype annotationPrototype = new AnnotationPrototype()//
-        .setType(annotationType)//
-        .setValue(annotationValue);
-    RestResult<UUID> result = client.annotateResource(resourceUuid, annotationPrototype);
-    assertRequestSucceeded(result);
-    UUID annotationUuid = result.get();
-    return annotationUuid;
-  }
-
   private AnnotationPojo readAnnotation(UUID annotationUuid) {
     RestResult<AnnotationPojo> result = client.getAnnotation(annotationUuid);
     assertRequestSucceeded(result);

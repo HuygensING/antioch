@@ -38,6 +38,8 @@ public final class EndpointPaths {
 
   public static final String COMMANDS = "commands";
 
+  public static final String RESULTPAGES = "pages";
+
   private EndpointPaths() {
     throw new AssertionError("Paths shall not be instantiated");
   }
