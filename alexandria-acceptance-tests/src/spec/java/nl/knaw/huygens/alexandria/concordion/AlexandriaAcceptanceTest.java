@@ -99,7 +99,7 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     return new Storage(TinkerGraph.open());
   }
 
-  private static AlexandriaConfiguration testConfiguration() {
+  protected static AlexandriaConfiguration testConfiguration() {
     return new AlexandriaConfiguration() {
       @Override
       public URI getBaseURI() {
