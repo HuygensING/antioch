@@ -50,13 +50,13 @@ import com.google.common.collect.ImmutableMap;
 import jersey.repackaged.com.google.common.collect.Lists;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.CommandResponse;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementDefinition;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
-import nl.knaw.huygens.alexandria.endpoint.command.CommandResponse;
 import nl.knaw.huygens.alexandria.endpoint.command.WrapContentInElementCommand;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
@@ -355,7 +355,7 @@ public class TinkerPopServiceTest extends AlexandriaTest {
 
     // then
     assertThat(response.getErrorLines()).isEmpty();
-    assertThat(response.paremetersAreValid()).isTrue();
+    assertThat(response.parametersAreValid()).isTrue();
 
     String out = getResourceXml(resourceId);
     assertThat(out).isEqualTo(expected);

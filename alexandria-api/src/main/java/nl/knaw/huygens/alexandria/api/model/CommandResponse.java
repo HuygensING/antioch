@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint.command;
+package nl.knaw.huygens.alexandria.api.model;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 
 public class CommandResponse {
   private List<String> errorLines = Lists.newArrayList();
-  boolean paremetersAreValid = false;
+  boolean parametersAreValid = false;
 
   public CommandResponse addErrorLine(String errorLine) {
     errorLines.add(errorLine);
@@ -17,12 +17,12 @@ public class CommandResponse {
     return errorLines.isEmpty();
   }
 
-  public void setParametersAreValid() {
-    paremetersAreValid = true;
+  public void setParametersAreValid(boolean b) {
+    parametersAreValid = b;
   }
 
-  public boolean paremetersAreValid() {
-    return paremetersAreValid;
+  public boolean parametersAreValid() {
+    return parametersAreValid;
   }
 
   public List<String> getErrorLines() {

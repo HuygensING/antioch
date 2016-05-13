@@ -4,6 +4,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import nl.knaw.huygens.alexandria.api.model.CommandResponse;
+import nl.knaw.huygens.alexandria.api.model.Commands;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class AlexandriaCommandProcessor {
@@ -17,10 +19,10 @@ public class AlexandriaCommandProcessor {
 
   public CommandResponse process(String command, Map<String, Object> parameterMap) {
     switch (command) {
-    case AddUniqueIdCommand.COMMAND_NAME:
+    case Commands.ADD_UNIQUE_ID:
       return new AddUniqueIdCommand(service).runWith(parameterMap);
 
-    case WrapContentInElementCommand.COMMAND_NAME:
+    case Commands.WRAP_CONTENT_IN_ELEMENT:
       return new WrapContentInElementCommand(service).runWith(parameterMap);
 
     default:

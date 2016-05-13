@@ -25,6 +25,7 @@ package nl.knaw.huygens.alexandria.client;
 import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -49,6 +50,7 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.CommandResponse;
 import nl.knaw.huygens.alexandria.api.model.StatePrototype;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
@@ -283,6 +285,16 @@ public class AlexandriaClient {
         .getResult();
   }
 
+  public RestResult<CommandResponse> addCommand(String commandName, Map<String, Object> parameters) {
+    final Entity<Map<String, Object>> entity = Entity.json(parameters);
+    final WebTarget path = rootTarget.path(EndpointPaths.COMMANDS).path(commandName);
+    final Supplier<Response> responseSupplier = authorizedPost(path, entity);
+    final RestRequester<CommandResponse> requester = RestRequester.withResponseSupplier(responseSupplier);
+    return requester//
+        .onStatus(Status.OK, this::toCommandResponseRestResult)//
+        .getResult();
+  }
+
   // private methods
 
   private RestResult<UUID> annotate(final UUID annotatableUuid, final AnnotationPrototype annotationPrototype, final String annotatablePath) {
@@ -361,6 +373,10 @@ public class AlexandriaClient {
 
   private RestResult<SearchResultPage> toSearchResultPageRestResult(final Response response) {
     return toEntityRestResult(response, SearchResultPage.class);
+  }
+
+  private RestResult<CommandResponse> toCommandResponseRestResult(final Response response) {
+    return toEntityRestResult(response, CommandResponse.class);
   }
 
   private <E> RestResult<E> toEntityRestResult(final Response response, final Class<E> entityClass) {

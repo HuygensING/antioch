@@ -13,11 +13,13 @@ import javax.inject.Inject;
 
 import com.google.common.collect.Lists;
 
+import nl.knaw.huygens.alexandria.api.model.CommandResponse;
+import nl.knaw.huygens.alexandria.api.model.Commands;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
 
 public class AddUniqueIdCommand extends TextAnnotationCommand {
-  static final String COMMAND_NAME = "add-unique-id";
+  private static final String PARAMETER_ELEMENTS = "elements";
 
   private static class Parameters {
     List<UUID> resourceIds;
@@ -59,7 +61,7 @@ public class AddUniqueIdCommand extends TextAnnotationCommand {
   @Override
   public CommandResponse runWith(Map<String, Object> parameterMap) {
     Parameters parameters = validateParameters(parameterMap);
-    if (commandResponse.paremetersAreValid()) {
+    if (commandResponse.parametersAreValid()) {
       for (UUID resourceId : parameters.resourceIds) {
         service.runInTransaction(() -> {
           Context context = new Context(service);
@@ -82,17 +84,27 @@ public class AddUniqueIdCommand extends TextAnnotationCommand {
     final Parameters parameters = new Parameters();
     parameters.resourceIds = validateResourceIds(parameterMap, commandResponse, service);
     boolean valid = (commandResponse.getErrorLines().isEmpty());
-
-    try {
-      parameters.elementNames = (List<String>) parameterMap.get("elements");
-    } catch (ClassCastException e) {
-      commandResponse.addErrorLine("Parameter 'elements' should be list of Strings.");
+    if (!parameterMap.containsKey(PARAMETER_ELEMENTS)) {
+      addElementsError();
       valid = false;
+
+    } else {
+      try {
+        parameters.elementNames = (List<String>) parameterMap.get(PARAMETER_ELEMENTS);
+      } catch (ClassCastException e) {
+        addElementsError();
+        valid = false;
+      }
     }
+
     if (valid) {
-      commandResponse.setParametersAreValid();
+      commandResponse.setParametersAreValid(true);
     }
     return parameters;
+  }
+
+  private CommandResponse addElementsError() {
+    return commandResponse.addErrorLine("Parameter '" + PARAMETER_ELEMENTS + "' should be list of element names.");
   }
 
   private boolean textAnnotationHasRelevantName(Parameters parameters, TextAnnotation textAnnotation) {
@@ -101,7 +113,7 @@ public class AddUniqueIdCommand extends TextAnnotationCommand {
 
   @Override
   public String getName() {
-    return COMMAND_NAME;
+    return Commands.ADD_UNIQUE_ID;
   }
 
 }

@@ -15,6 +15,7 @@ import javax.ws.rs.core.Response;
 import com.google.common.base.Joiner;
 
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.CommandResponse;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 
 @Singleton
@@ -33,7 +34,7 @@ public class CommandsEndpoint extends JSONEndpoint {
   @Consumes(MediaType.APPLICATION_JSON)
   public Response doCommand(@PathParam("commandName") String commandName, Map<String, Object> parameterMap) {
     CommandResponse commandResponse = commandProcessor.process(commandName, parameterMap);
-    if (!commandResponse.paremetersAreValid) {
+    if (!commandResponse.parametersAreValid()) {
       throw new BadRequestException(Joiner.on(", ").join(commandResponse.getErrorLines()));
     }
     return ok(commandResponse);

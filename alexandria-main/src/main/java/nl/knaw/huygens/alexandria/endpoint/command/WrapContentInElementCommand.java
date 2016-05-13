@@ -7,13 +7,13 @@ import java.util.UUID;
 import javax.inject.Inject;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.model.CommandResponse;
+import nl.knaw.huygens.alexandria.api.model.Commands;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.text.TextUtil;
 import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
 
 public class WrapContentInElementCommand extends TextAnnotationCommand {
-  static final String COMMAND_NAME = "wrap-content-in-element";
-
   private static class Parameters {
     List<UUID> resourceIds;
     List<String> xmlIds;
@@ -55,7 +55,7 @@ public class WrapContentInElementCommand extends TextAnnotationCommand {
   @Override
   public CommandResponse runWith(Map<String, Object> parameterMap) {
     Parameters parameters = validateParameters(parameterMap);
-    if (commandResponse.paremetersAreValid()) {
+    if (commandResponse.parametersAreValid()) {
       for (UUID resourceId : parameters.resourceIds) {
         service.runInTransaction(() -> {
           Context context = new Context(service, parameters);
@@ -94,14 +94,14 @@ public class WrapContentInElementCommand extends TextAnnotationCommand {
     }
 
     if (valid) {
-      commandResponse.setParametersAreValid();
+      commandResponse.setParametersAreValid(true);
     }
     return parameters;
   }
 
   @Override
   public String getName() {
-    return COMMAND_NAME;
+    return Commands.WRAP_CONTENT_IN_ELEMENT;
   }
 
 }
