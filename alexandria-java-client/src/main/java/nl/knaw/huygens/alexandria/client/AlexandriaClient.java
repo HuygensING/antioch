@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import javax.net.ssl.SSLContext;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -73,13 +74,28 @@ public class AlexandriaClient {
   private boolean autoConfirm = true;
 
   public AlexandriaClient(final URI alexandriaURI) {
+    this(alexandriaURI, null);
+  }
+
+  public AlexandriaClient(final URI alexandriaURI, SSLContext sslContext) {
     this.alexandriaURI = alexandriaURI;
     final ObjectMapper objectMapper = new ObjectMapper()//
         .registerModule(new Jdk8Module())//
         .registerModule(new JavaTimeModule());
     final JacksonJaxbJsonProvider jacksonProvider = new JacksonJaxbJsonProvider();
     jacksonProvider.setMapper(objectMapper);
-    client = ClientBuilder.newClient(new ClientConfig(jacksonProvider));
+    if (sslContext == null) {
+      if ("https".equals(alexandriaURI.getScheme())) {
+        throw new RuntimeException("SSL connections need an SSLContext, use: new AlexandriaClient(uri, sslContext) instead.");
+      }
+      client = ClientBuilder.newClient(new ClientConfig(jacksonProvider));
+
+    } else {
+      client = ClientBuilder.newBuilder()//
+          .sslContext(sslContext)//
+          .withConfig(new ClientConfig(jacksonProvider))//
+          .build();
+    }
     client.property(ClientProperties.CONNECT_TIMEOUT, 60000);
     client.property(ClientProperties.READ_TIMEOUT, 60000);
     rootTarget = client.target(alexandriaURI);
