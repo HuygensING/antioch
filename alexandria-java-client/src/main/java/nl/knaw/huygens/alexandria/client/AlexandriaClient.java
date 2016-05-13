@@ -47,7 +47,6 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
@@ -113,12 +112,13 @@ public class AlexandriaClient implements AutoCloseable {
 
   public void setAuthKey(final String authKey) {
     authHeader = "SimpleAuth " + authKey;
-    Log.info("authheader=[{}]", authHeader);
   }
 
   public void setAutoConfirm(final boolean autoConfirm) {
     this.autoConfirm = autoConfirm;
   }
+
+  // Alexandria API methods
 
   public RestResult<AboutEntity> getAbout() {
     WebTarget path = rootTarget//
