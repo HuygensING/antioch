@@ -66,7 +66,7 @@ import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 import nl.knaw.huygens.alexandria.client.model.SubResourcePojo;
 import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
 
-public class AlexandriaClient {
+public class AlexandriaClient implements AutoCloseable {
   private WebTarget rootTarget;
   private String authHeader = "";
   private final Client client;
@@ -99,6 +99,11 @@ public class AlexandriaClient {
     client.property(ClientProperties.CONNECT_TIMEOUT, 60000);
     client.property(ClientProperties.READ_TIMEOUT, 60000);
     rootTarget = client.target(alexandriaURI);
+  }
+
+  @Override
+  public void close() {
+    client.close();
   }
 
   public void setProperty(final String jerseyClientProperty, final Object value) {

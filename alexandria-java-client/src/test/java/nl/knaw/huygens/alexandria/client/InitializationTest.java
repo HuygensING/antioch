@@ -19,11 +19,12 @@ public class InitializationTest {
 
   @Test
   public void testHttpConnectionWorks() {
-    AlexandriaClient client = new AlexandriaClient(URI.create(INSTANCE_HTTP));
-    client.setAutoConfirm(true);
-    RestResult<AboutEntity> aboutResult = client.getAbout();
-    assertThat(aboutResult.hasFailed()).isTrue();
-    Log.info("error={}", aboutResult.getErrorMessage());
+    try (AlexandriaClient client = new AlexandriaClient(URI.create(INSTANCE_HTTP))) {
+      client.setAutoConfirm(true);
+      RestResult<AboutEntity> aboutResult = client.getAbout();
+      assertThat(aboutResult.hasFailed()).isTrue();
+      Log.info("error={}", aboutResult.getErrorMessage());
+    }
   }
 
   @Test
@@ -44,6 +45,7 @@ public class InitializationTest {
     client.setAutoConfirm(true);
     RestResult<AboutEntity> aboutResult = client.getAbout();
     Log.info("result={}", aboutResult);
+    client.close();
     // assertThat(aboutResult.hasFailed()).isFalse();
     // AboutEntity aboutEntity = aboutResult.get();
     // Log.info("about={}", aboutEntity);

@@ -84,7 +84,7 @@ public abstract class AlexandriaClientTest extends AlexandriaTest {
     }
   };
 
-  AlexandriaClient client = new AlexandriaClient(testURI);
+  static AlexandriaClient client;
 
   @BeforeClass
   public static void startTestServer() {
@@ -93,11 +93,13 @@ public abstract class AlexandriaClientTest extends AlexandriaTest {
     final ResourceConfig resourceConfig = new AlexandriaApplication();
     ((TinkerPopService) service).setStorage(new Storage(TinkerGraph.open()));
     testServer = GrizzlyHttpServerFactory.createHttpServer(testURI, resourceConfig, locator);
+    client = new AlexandriaClient(testURI);
   }
 
   @AfterClass
   public static void stopTestServer() {
     testServer.shutdown();
+    client.close();
   }
 
   void assertRequestSucceeded(RestResult<?> result) {
