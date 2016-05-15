@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.app;
 
+import java.io.File;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 
@@ -26,31 +27,33 @@ import java.net.SocketException;
  */
 
 import java.net.URI;
+import java.util.Collections;
+import java.util.Map;
 
 import javax.ws.rs.core.UriBuilder;
 
 import nl.knaw.huygens.alexandria.config.AbstractAlexandriaConfigurationUsingAlexandriaProperties;
 
-public class TestConfiguration extends AbstractAlexandriaConfigurationUsingAlexandriaProperties {
+public class ServerConfiguration extends AbstractAlexandriaConfigurationUsingAlexandriaProperties {
 
   @Override
   public URI getBaseURI() {
-    String localhost = "localhost";
-    try {
-      // localhost = InetAddress.getLocalHost().getHostAddress();
-      localhost = NetworkInterface.getByName("eth3").getInetAddresses().nextElement().getHostAddress();
-      // } catch (UnknownHostException e) {
-      // e.printStackTrace();
-    } catch (SocketException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    return UriBuilder.fromUri("http://" + localhost).port(2015).build();
+    return URI.create("http://localhost:2015/");
   }
 
   @Override
   public String getStorageDirectory() {
-    return "e:/data/alexandria";
+    return new File(System.getProperty("user.dir", "."), "alexandria-data").getAbsolutePath();
+  }
+
+  @Override
+  public Map<String, String> getAuthKeyIndex() {
+    return Collections.singletonMap("admin", "admin");
+  }
+
+  @Override
+  public String getAdminKey() {
+    return "admin";
   }
 
   @Override

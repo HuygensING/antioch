@@ -139,7 +139,7 @@ public class TitanService extends TinkerPopService {
   }
 
   private static Storage getStorage(AlexandriaConfiguration configuration) {
-    titanGraph = TitanFactory.open(configuration.getStorageDirectory() + "/titan.properties");
+    titanGraph = TitanFactory.open(String.join(":", "berkeleyje", configuration.getStorageDirectory()));
     setIndexes();
     return new Storage(titanGraph);
   }

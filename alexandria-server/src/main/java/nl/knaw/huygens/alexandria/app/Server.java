@@ -44,7 +44,7 @@ import nl.knaw.huygens.alexandria.util.Scheduler;
 
 public class Server {
   private static final long ONE_HOUR = Duration.ofHours(1).toMillis();
-  private AlexandriaConfiguration config = new TestConfiguration();
+  private AlexandriaConfiguration config = new ServerConfiguration();
 
   public static void main(String[] args) throws IOException {
     new Server().run();

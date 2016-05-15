@@ -26,11 +26,11 @@ import com.google.inject.AbstractModule;
 
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 
-public class TestConfigurationModule extends AbstractModule {
+public class ServerConfigurationModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    bind(AlexandriaConfiguration.class).to(TestConfiguration.class);
+    bind(AlexandriaConfiguration.class).to(ServerConfiguration.class);
   }
 
 }
