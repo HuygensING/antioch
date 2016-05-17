@@ -114,6 +114,11 @@ public class AlexandriaClient implements AutoCloseable {
     authHeader = "SimpleAuth " + authKey;
   }
 
+  /**
+   * When autoConfirm is true (default), a resource/annotation made with POST will be automatically confirmed.
+   * 
+   * @param autoConfirm
+   */
   public void setAutoConfirm(final boolean autoConfirm) {
     this.autoConfirm = autoConfirm;
   }
