@@ -1,16 +1,24 @@
 package nl.knaw.huygens.alexandria.textgraph;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.api.model.BaseElementDefinition;
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.ElementMode;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
+import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil.TextViewContext;
 
 public class TextGraphUtilTest extends AlexandriaTest {
   @Test
@@ -46,14 +54,77 @@ public class TextGraphUtilTest extends AlexandriaTest {
     softly.assertThat(xmlAnnotations).hasSize(9);
     Log.info("annotations = \n\t{}", Joiner.on("\n\t").join(xmlAnnotations));
 
-    BaseLayerDefinition baselayerDefinition = BaseLayerDefinition.withBaseElements(//
-        BaseElementDefinition.withName("text"), //
-        BaseElementDefinition.withName("div"), //
-        BaseElementDefinition.withName("lb"), //
-        BaseElementDefinition.withName("p")//
-    );
-    String baseLayer = TextGraphUtil.renderBaseLayer(textSegments, xmlAnnotations, baselayerDefinition);
-    softly.assertThat(baseLayer).isEqualTo(expectedBaseLayer);
+    // DeprecatedTextView baselayerDefinition = new DeprecatedTextView("baselayer").setIncludedElementDefinitions(//
+    // Lists.newArrayList(//
+    // ElementDefinition.withName("text"), //
+    // ElementDefinition.withName("div"), //
+    // ElementDefinition.withName("lb"), //
+    // ElementDefinition.withName("p")//
+    // ));
+    // String baseLayer = TextGraphUtil.renderTextView(textSegments, xmlAnnotations, baselayerDefinition);
+    // softly.assertThat(baseLayer).isEqualTo(expectedBaseLayer);
+  }
 
+  @Test
+  public void teststreamTextGraphSegmentWithDefaultView() {
+    TextView textView = new TextView();
+    TextGraphSegment segment = new TextGraphSegment();
+    TextAnnotation note = new TextAnnotation("note", ImmutableMap.of("xml:id", "note-1"), 0);
+    segment.setAnnotationsToOpen(ImmutableList.of(note));
+    segment.setTextSegment("note text");
+    segment.setAnnotationsToClose(ImmutableList.of(note));
+    String expected = "<note xml:id=\"note-1\">note text</note>";
+    assertSegmentViewAsExpected(segment, textView, expected);
+  }
+
+  @Test
+  public void teststreamTextGraphSegmentWithHideNoteView() {
+    TextView textView = new TextView();
+    textView.putElementView("note", new ElementView().setElementMode(ElementMode.hide));
+    TextGraphSegment segment = new TextGraphSegment();
+    TextAnnotation note = new TextAnnotation("note", ImmutableMap.of("xml:id", "note-1"), 0);
+    segment.setAnnotationsToOpen(ImmutableList.of(note));
+    segment.setTextSegment("note text");
+    segment.setAnnotationsToClose(ImmutableList.of(note));
+    String expected = "";
+    assertSegmentViewAsExpected(segment, textView, expected);
+  }
+
+  @Test
+  public void teststreamTextGraphSegmentWithHideNoteTagView() {
+    TextView textView = new TextView();
+    textView.putElementView("note", new ElementView().setElementMode(ElementMode.hideTag));
+    TextGraphSegment segment = new TextGraphSegment();
+    TextAnnotation note = new TextAnnotation("note", ImmutableMap.of("xml:id", "note-1"), 0);
+    segment.setAnnotationsToOpen(ImmutableList.of(note));
+    segment.setTextSegment("note text");
+    segment.setAnnotationsToClose(ImmutableList.of(note));
+    String expected = "note text";
+    assertSegmentViewAsExpected(segment, textView, expected);
+  }
+
+  @Test
+  public void teststreamTextGraphSegmentWithShowOnlyAttributeMode() {
+    TextView textView = new TextView();
+    ElementView elementView = new ElementView()//
+        .setElementMode(ElementMode.show)//
+        .setAttributeMode(AttributeMode.showOnly)//
+        .setRelevantAttributes(ImmutableList.of("xml:id"));
+    textView.putElementView("note", elementView);
+    TextGraphSegment segment = new TextGraphSegment();
+    TextAnnotation note = new TextAnnotation("note", ImmutableMap.of("xml:id", "note-1", "key", "value"), 0);
+    segment.setAnnotationsToOpen(ImmutableList.of(note));
+    segment.setTextSegment("note text");
+    segment.setAnnotationsToClose(ImmutableList.of(note));
+    String expected = "<note xml:id=\"note-1\">note text</note>";
+    assertSegmentViewAsExpected(segment, textView, expected);
+  }
+
+  private void assertSegmentViewAsExpected(TextGraphSegment segment, TextView textView, String expected) {
+    TextViewContext context = new TextViewContext(textView);
+    StringWriter writer = new StringWriter();
+    TextGraphUtil.streamTextGraphSegment(writer, segment, context);
+    String result = writer.toString();
+    assertThat(result).isEqualTo(expected);
   }
 }

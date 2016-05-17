@@ -37,6 +37,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
@@ -56,10 +57,11 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class EndpointsTest extends TinkergraphServiceEndpointTest {
   private static final String ROOTPATH = EndpointPaths.RESOURCES;
-  ObjectMapper om = new ObjectMapper();
+  static ObjectMapper om = new ObjectMapper();
 
   @BeforeClass
   public static void registerEndpoint() {
+    om.registerModule(new Jdk8Module());
     register(ResourcesEndpoint.class);
     register(AnnotationsEndpoint.class);
     register(ResourceAnnotationsEndpoint.class);

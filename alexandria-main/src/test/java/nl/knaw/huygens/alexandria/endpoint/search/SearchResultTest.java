@@ -34,11 +34,11 @@ import org.junit.Test;
 import com.google.common.collect.ImmutableMap;
 
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
-import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
 
 public class SearchResultTest {
   @Test
@@ -53,7 +53,7 @@ public class SearchResultTest {
     sr.setId(id);
     assertThat(sr.getTotalResults()).isEqualTo(11);
     assertThat(sr.getTotalPages()).isEqualTo(2);
-    String expected = config.getBaseURI() + EndpointPaths.SEARCHES + "/" + id + "/" + SearchEndpoint.RESULTPAGES + "/1";
+    String expected = config.getBaseURI() + EndpointPaths.SEARCHES + "/" + id + "/" + EndpointPaths.RESULTPAGES + "/1";
     assertThat(sr.getFirstResultPage()).hasToString(expected);
   }
 

@@ -1,0 +1,607 @@
+<!--
+  #%L
+  alexandria-acceptance-tests
+  =======
+  Copyright (C) 2015 - 2016 Huygens ING (KNAW)
+  =======
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/gpl-3.0.html>.
+  #L%
+  -->
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+
+<title>Alexandria: Views on text</title>
+
+<body data-desc="Views on text">
+
+<div id="textview-anatomy" c:execute="clearStorage()"
+     data-desc="Anatomy of a view description">
+    For resource <span c:set="#id">00000000-0000-0000-0000-000000000001</span>:<br/>
+    <h:request>
+        Given that I have
+        <h:success>successfully</h:success>
+        <h:put>/resources/$id</h:put>
+        the body:
+        <h:jsonBody>
+        {
+	        "resource": {
+		        "id": "$id",
+		        "ref": "grotius-3160-v1"
+        } }
+        </h:jsonBody>
+    </h:request>
+    <br/>
+    <h:request>
+        Then I can set a view called inclusive by
+        <h:put>/resources/$id/text/views/inclusive</h:put>
+        the body:
+        <h:jsonBody>
+        {
+          "textView": {
+            "description": "Description of the view",
+            "elements": {
+              ":default": { "elementMode": "hideTag", "attributeMode": "hideAll" },
+              "div"     : { "elementMode": "show",    "attributeMode": "showOnly id" },
+              "p"       : { "elementMode": "show" },
+              "note"    : { "elementMode": "hide" }
+        } } }
+        </h:jsonBody>
+    </h:request>
+    <h:request>
+        And I can set a view called exclusive by
+        <h:put>/resources/$id/text/views/exclusive</h:put>
+        the body:
+        <h:jsonBody>
+        {
+          "textView": {
+            "description": "Description of the view",
+            "elements": {
+              ":default": { "elementMode": "show", "attributeMode" : "showAll" },
+              "p"       : { "elementMode": "hideTag" },
+              "hi"      : { "elementMode": "hideTag" },
+              "note"    : { "elementMode": "hide" }
+        } } }
+        </h:jsonBody>
+    </h:request>
+    
+    The textView definition has the following properties:
+    <dl class="dl-horizontal">
+      <dt><code>description</code></dt>
+      <dd>optional. A text describing what the view is for.</dd>
+
+      <dt><code>elements</code></dt>
+      <dd>A map of xml element names and what to do with them in this view. With element name <code>:default</code> you can set view settings for elements not defined here. The properties are:
+         <dl>
+           <dt><code>elementMode</code></dt>
+           <dd></dd>
+
+           <dt><code>attributeMode</code></dt>
+           <dd></dd>
+           
+           <dt><code>when</code></dt>
+           <dd></dd>
+         </dl>
+      </dd>
+        
+    </dl>
+</div>
+
+<div id="set-including-view" c:execute="clearStorage()"
+     data-desc="How do I define a view where I indicate which element tags to show?">
+
+  Given a resource
+  with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000002</code>
+  <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
+  which has
+  <span c:execute="resourceHasText(#resourceId,#text1)">text<br/>
+    <code c:set="#text1">&lt;text&gt;&lt;div id=&quot;div-1&quot; ed=&quot;#someone&quot;&gt;&lt;p id=&quot;p-1&quot;&gt;Paragraph the First.&lt;/p&gt;&lt;p id=&quot;p-2&quot;&gt;Paragraph the Second.&lt;note&gt;Note the first.&lt;/note&gt;&lt;/p&gt;&lt;/div&gt;&lt;/text&gt;</code>
+  </span>,<br/>
+  <br/>
+
+  <h:request>
+     Then a
+     <h:get>/resources/$resourceId/text/xml</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     <h:success>successfully</h:success>
+     yields response body:<br/>
+     <h:xmlResponse>
+<![CDATA[
+<text>
+  <div id="div-1" ed="#someone">
+    <p id="p-1">Paragraph the First.</p>
+    <p id="p-2">Paragraph the Second.<note>Note the first.</note></p>
+  </div>
+</text>
+]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+  <br/>
+     
+    <h:request>
+        When I
+        <h:put>/resources/$resourceId/text/views/baselayer</h:put>
+        the body:
+        <h:jsonBody>
+          {
+            "textView": {
+              "description": "The Base Layer",
+              "elements": {
+                ":default": { "elementMode": "hideTag", "attributeMode" : "hideAll" },
+                "div"     : { "elementMode": "show", "attributeMode" : "showOnly id" },
+                "p"       : { "elementMode": "show" },
+                "text"    : { "elementMode": "show" },
+                "note"    : { "elementMode": "hide" }
+              }
+          } }
+        </h:jsonBody>
+        using
+        <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+        then I should receive
+        <ul>
+          <li>status <h:status>201 Created</h:status></li>
+          <li>location header
+              <h:location>https://{host}/resources/$resourceId/text/views/baselayer</h:location>
+          </li>
+	        <li>and the response body is <h:responseBody/></li>
+        </ul>
+    </h:request>
+    <br/>
+
+    <h:request>
+        When I
+        <h:get>/resources/$resourceId/text/views</h:get>,<br/>
+        then I should receive
+        <ul>
+            <li>status
+                <h:status>200 OK</h:status>
+            </li>
+            <li>and body
+             <small>(only relevant fields shown for brevity)</small>
+                <h:jsonResponse>
+                [ {
+                  "id" : "baselayer",
+                  "^definition" : "https://{host}/resources/$resourceId/text/views/baselayer",
+                  "^xml" : "https://{host}/resources/$resourceId/text/xml?view=baselayer"
+                } ]
+                </h:jsonResponse>
+            </li>
+        </ul>
+    </h:request>
+    <br/>
+
+    <h:request>
+        If I then
+        <h:get>/resources/$resourceId/text/views/baselayer</h:get>
+        Then I should receive
+        <ul>
+            <li>status
+                <h:status>200 OK</h:status>
+            </li>
+            <li>and body
+                <h:jsonResponse>
+                {
+                  "textView": {
+		                "description": "The Base Layer",
+			              "elements": {
+			                ":default": { "elementMode": "hideTag", "attributeMode" : "hideAll" },
+			                "div"     : { "elementMode": "show", "attributeMode" : "showOnly id" },
+			                "p"       : { "elementMode": "show" },
+			                "text"    : { "elementMode": "show" },
+			                "note"    : { "elementMode": "hide" }
+		            } } }
+                </h:jsonResponse>
+            </li>
+        </ul>
+    </h:request>
+    <br/>
+
+  <h:request>
+     Then a
+     <h:get>/resources/$resourceId/text/xml?view=baselayer</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     <h:success>successfully</h:success>
+     yields response body:
+     <h:xmlResponse>
+<![CDATA[
+<text>
+  <div id="div-1">
+    <p>Paragraph the First.</p>
+    <p>Paragraph the Second.</p>
+  </div>
+</text>
+]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+</div>
+
+<div id="view-for-subresource"
+    data-desc="How is the view defined for a subresource?">
+    
+    <ul>
+    <li>
+    <h:request>
+        Given the previously made resource <code>$resourceId</code> with its baselayer view, 
+        if I add a subresource by  
+        <h:post>/resources/$resourceId/subresources</h:post>
+        the body
+        <h:jsonBody>{ "subresource": { "sub": "Letter clusius-0012" } }</h:jsonBody>
+        and observe status
+        <h:status>201 Created</h:status>
+        and a location header starting with
+        <h:location type="base">https://{host}/resources/</h:location>
+        and ending in a generated
+        <h:location type="uuid">well-formed UUID</h:location>
+        for the newly created subresource.
+    </h:request>
+
+    <div c:execute="#uuid = uuid()">In this case the generated uuid happened to be:
+        <strong c:echo="#uuid"></strong>.
+    </div>
+    </li>
+    <li>
+    <h:request>
+        To confirm our subresource, we
+        <h:put>/resources/$uuid/state</h:put>
+        the body
+        <h:jsonBody>{"state": "CONFIRMED"}</h:jsonBody>
+        and observe status
+        <h:status>204 No Content</h:status>
+    </h:request>
+    </li>
+    <li>
+    <h:request>
+        When I
+        <h:get>/resources/$uuid/text/views</h:get>
+        Then I should receive
+        <ul>
+            <li>status
+                <h:status>200 OK</h:status>
+            </li>
+            <li>and body
+             <small>(only relevant fields shown for brevity)</small>
+                <h:jsonResponse>
+                [ {
+                  "id" : "baselayer",
+                  "^definition" : "https://{host}/resources/$resourceId/text/views/baselayer",
+                  "^xml" : "https://{host}/resources/$uuid/text/xml?view=baselayer"
+                } ]
+                </h:jsonResponse>
+                (The subresource uses the baseLayerDefinition of <strong>its parent</strong> resource)
+            </li>
+        </ul>
+    </h:request>
+    </li>
+    <li>
+      <h:request>
+        To override this baselayer view, I
+        <h:put>/resources/$uuid/text/views/baselayer</h:put>
+        the body:
+        <h:jsonBody>
+        {
+	        "textView": {
+	          "description": "The Base Layer for the subresource",
+	          "elements": {
+	            ":default": { "elementMode": "hideTag", "attributeMode" : "hideAll" },
+	            "div"     : { "elementMode": "show", "attributeMode" : "showOnly ref" },
+	            "p"       : { "elementMode": "show" },
+	            "note"    : { "elementMode": "hide" }
+        } } }
+        </h:jsonBody>
+        using
+        <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+        then I should receive
+        <ul>
+          <li>status <h:status>201 Created</h:status></li>
+          <li>location header
+              <h:location>https://{host}/resources/$uuid/text/views/baselayer</h:location>
+          </li>
+          <li>and the response body is <h:responseBody/></li>
+        </ul>
+      </h:request>
+    </li>
+    <li>
+    <h:request>
+        Now when I
+        <h:get>/resources/$uuid/text/views</h:get>,<br/>
+        then I should receive
+        <ul>
+            <li>status
+                <h:status>200 OK</h:status>
+            </li>
+            <li>and body
+             <small>(only relevant fields shown for brevity)</small>
+                <h:jsonResponse>
+                [ {
+                  "id" : "baselayer",
+                  "^definition" : "https://{host}/resources/$uuid/text/views/baselayer",
+                  "^xml" : "https://{host}/resources/$uuid/text/xml?view=baselayer"
+                } ]
+                </h:jsonResponse>
+                (The subresource uses <strong>its own</strong> baseLayerDefinition)
+            </li>
+        </ul>
+    </h:request>
+    </li>
+  </ul>
+</div>
+
+<div id="set-excluding-view" c:execute="clearStorage()"
+     data-desc="How do I define a view where I only indicate which element tags NOT to show?">
+
+  Given a resource
+  with id <code c:set="#resourceId3">00000000-0000-0000-0000-000000000003</code>
+  <span c:execute="resourceExists(#resourceId3)">exists</span>,<br/>
+  which has
+  <span c:execute="resourceHasText(#resourceId3,#text3)">text<br/>
+    <code c:set="#text3">&lt;text&gt;&lt;div id=&quot;div-1&quot; ed=&quot;#someone&quot;&gt;&lt;p id=&quot;p-1&quot;&gt;Paragraph the &lt;num n=&quot;1&quot;&gt;First&lt;/num&gt;.&lt;/p&gt;&lt;p id=&quot;p-2&quot;&gt;Paragraph the &lt;num n=&quot;2&quot;&gt;Second&lt;/num&gt;.&lt;note&gt;Note the &lt;num n=&quot;1&quot;&gt;first&lt;/num&gt;.&lt;/note&gt;&lt;/p&gt;&lt;/div&gt;&lt;/text&gt;</code>
+  </span><br/>
+  <br/>
+
+  <h:request>
+     Then a
+     <h:get>/resources/$resourceId3/text/xml</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     <h:success>successfully</h:success>
+     yields response body:<br/>
+     <h:xmlResponse>
+<![CDATA[
+<text>
+  <div id="div-1" ed="#someone">
+    <p id="p-1">Paragraph the <num n="1">First</num>.</p>
+    <p id="p-2">Paragraph the <num n="2">Second</num>.<note>Note the <num n="1">first</num>.</note>
+    </p>
+  </div>
+</text>]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+  <br/>
+     
+    <h:request>
+        When I
+        <h:put>/resources/$resourceId3/text/views/no-num</h:put>
+        the body:
+        <h:jsonBody>
+          {
+            "textView": {
+              "description": "Don't show num tags",
+              "elements": {
+                ":default": { "elementMode": "show", "attributeMode" : "showAll" },
+                "num"     : { "elementMode": "hideTag" },
+                "note"    : { "elementMode": "hide" }
+              }
+          } }
+        </h:jsonBody>
+        using
+        <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+        then I should receive
+        <ul>
+          <li>status <h:status>201 Created</h:status></li>
+          <li>location header
+              <h:location>https://{host}/resources/$resourceId3/text/views/no-num</h:location>
+          </li>
+          <li>and the response body is <h:responseBody/></li>
+        </ul>
+    </h:request>
+    <br/>
+
+    <h:request>
+        When I
+        <h:get>/resources/$resourceId3/text/views</h:get>,<br/>
+        then I should receive
+        <ul>
+            <li>status
+                <h:status>200 OK</h:status>
+            </li>
+            <li>and body
+             <small>(only relevant fields shown for brevity)</small>
+                <h:jsonResponse>
+                [ {
+                  "id" : "no-num",
+                  "^definition" : "https://{host}/resources/$resourceId3/text/views/no-num",
+                  "^xml" : "https://{host}/resources/$resourceId3/text/xml?view=no-num"
+                } ]
+                </h:jsonResponse>
+            </li>
+        </ul>
+    </h:request>
+    <br/>
+
+    <h:request>
+        If I then
+        <h:get>/resources/$resourceId3/text/views/no-num</h:get>
+        Then I should receive
+        <ul>
+            <li>status
+                <h:status>200 OK</h:status>
+            </li>
+            <li>and body
+              <h:jsonResponse>
+              {
+                "textView": {
+	                "description": "Don't show num tags",
+		              "elements": {
+		                ":default": { "elementMode": "show", "attributeMode" : "showAll" },
+		                "num"     : { "elementMode": "hideTag" },
+		                "note"    : { "elementMode": "hide" }
+	            } } }
+              </h:jsonResponse>
+            </li>
+        </ul>
+    </h:request>
+    <br/>
+
+  <h:request>
+     Then a
+     <h:get>/resources/$resourceId3/text/xml?view=no-num</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     <h:success>successfully</h:success>
+     yields response body:
+     <h:xmlResponse>
+<![CDATA[
+<text>
+  <div id="div-1" ed="#someone">
+    <p id="p-1">Paragraph the First.</p>
+    <p id="p-2">Paragraph the Second.</p>
+  </div>
+</text>
+]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+</div>
+
+<div id="set-conditional-view" c:execute="clearStorage()"
+     data-desc="How do I define a view which for a given element name only shows the elements with a given attribute/value combination?">
+
+  Given a resource
+  with id <code c:set="#resourceId4">00000000-0000-0000-0000-000000000004</code>
+  <span c:execute="resourceExists(#resourceId4)">exists</span>,<br/>
+  which has
+  <span c:execute="resourceHasText(#resourceId4,#text4)">text<br/>
+    <code c:set="#text4">&lt;text&gt;&lt;div id=&quot;div-1&quot; n=&quot;01&quot;&gt;&lt;p id=&quot;p-1a&quot; transcriber=&quot;#a&quot;&gt;It was a dark and stormy night&lt;/p&gt;&lt;p id=&quot;p-1b&quot; transcriber=&quot;#b&quot;&gt;Twas a darke &amp;amp; stormy nite&lt;/p&gt;&lt;/div&gt;&lt;/text&gt;
+</code>
+  </span><br/>
+  <br/>
+
+  <h:request>
+     Then a
+     <h:get>/resources/$resourceId4/text/xml</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     <h:success>successfully</h:success>
+     yields response body:<br/>
+     <h:xmlResponse>
+<![CDATA[
+<text>
+  <div id="div-1" n="01">
+    <p id="p-1a" transcriber="#a">It was a dark and stormy night</p>
+    <p id="p-1b" transcriber="#b">Twas a darke &amp; stormy nite</p>
+  </div>
+</text>
+]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+  <br/>
+     
+    <h:request>
+        When I define a view <code c:set="#view">conditional</code> by
+        <h:put>/resources/$resourceId4/text/views/$view</h:put>
+        the body:
+        <h:jsonBody>
+          {
+            "textView": {
+              "description": "Transcriber A preferred",
+              "elements": {
+                ":default": { "elementMode": "show", "attributeMode" : "showAll" },
+                "div"     : {                        "attributeMode" : "showOnly ref n" },
+                "p"       : { "elementMode": "hide", "when" : "attribute(transcriber).isNot('#a')" },
+                "note"    : { "elementMode": "hide" }
+          } } }
+        </h:jsonBody>
+        using
+        <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+        then I should receive
+        <ul>
+          <li>status <h:status>201 Created</h:status></li>
+          <li>location header
+              <h:location>https://{host}/resources/$resourceId4/text/views/$view</h:location>
+          </li>
+          <li>and the response body is <h:responseBody/></li>
+        </ul>
+    </h:request>
+    <br/>
+
+    <h:request>
+        When I
+        <h:get>/resources/$resourceId4/text/views</h:get>,<br/>
+        then I should receive
+        <ul>
+            <li>status
+                <h:status>200 OK</h:status>
+            </li>
+            <li>and body
+             <small>(only relevant fields shown for brevity)</small>
+                <h:jsonResponse>
+                [ {
+                  "id" : "$view",
+                  "^definition" : "https://{host}/resources/$resourceId4/text/views/$view",
+                  "^xml" : "https://{host}/resources/$resourceId4/text/xml?view=$view"
+                } ]
+                </h:jsonResponse>
+            </li>
+        </ul>
+    </h:request>
+    <br/>
+
+    <h:request>
+        If I then
+        <h:get>/resources/$resourceId4/text/views/$view</h:get>
+        Then I should receive
+        <ul>
+            <li>status
+                <h:status>200 OK</h:status>
+            </li>
+            <li>and body
+              <h:jsonResponse>
+              {
+                "textView": {
+		              "description": "Transcriber A preferred",
+		              "elements": {
+		                ":default": { "elementMode": "show", "attributeMode" : "showAll" },
+		                "div"     : {                        "attributeMode" : "showOnly ref n" },
+		                "p"       : { "elementMode": "hide", "when" : "attribute(transcriber).isNot('#a')" },
+		                "note"    : { "elementMode": "hide" }
+	            } } }
+              </h:jsonResponse>
+            </li>
+        </ul>
+    </h:request>
+    <br/>
+
+  <h:request>
+     Then a
+     <h:get>/resources/$resourceId4/text/xml?view=$view</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     <h:success>successfully</h:success>
+     yields response body:
+     <h:xmlResponse>
+<![CDATA[
+<text>
+  <div n="01">
+    <p id="p-1a" transcriber="#a">It was a dark and stormy night</p>
+  </div>
+</text>
+]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+     <code>text</code>, <code>div</code> and the first <code>p</code> are shown because the <code>:default</code> <code>elementMode</code> is <code>show</code>.<br/>
+     The second <code>p</code> is ignored because the <code>when</code> condition for <code>p</code> is met.<br/>
+  </h:request>
+</div>
+
+</body>
+</html>

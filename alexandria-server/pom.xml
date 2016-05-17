@@ -41,74 +41,40 @@
   <!-- mvn clean package -->
   <build>
     <plugins>
-      <!-- <plugin> <artifactId>maven-assembly-plugin</artifactId> <version>${maven-assembly.version}</version> 
-        <configuration> <descriptorRefs> <descriptorRef>jar-with-dependencies</descriptorRef> 
-        </descriptorRefs> <archive> <manifest> <addClasspath>true</addClasspath> 
-        <mainClass>nl.knaw.huygens.alexandria.app.Server</mainClass> </manifest> 
-        </archive> </configuration> <executions> <execution> <id>make-assembly</id> 
-        <phase>package</phase> <goals> <goal>single</goal> </goals> </execution> 
-        </executions> </plugin> -->
-
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>appassembler-maven-plugin</artifactId>
-        <version>${appassembler-maven.version}</version>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.4.3</version>
         <configuration>
-          <repositoryLayout>flat</repositoryLayout>
-          <repositoryName>lib</repositoryName>
-          <includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
-          <useWildcardClassPath>true</useWildcardClassPath>
-          <extraJvmArguments>-Xmx512m</extraJvmArguments>
-          <daemons>
-            <daemon>
-              <id>alexandria-server</id>
-              <mainClass>nl.knaw.huygens.alexandria.app.Server</mainClass>
-              <commandLineArguments>
-                <commandLineArgument>start</commandLineArgument>
-                <commandLineArgument>stop</commandLineArgument>
-                <commandLineArgument>restart</commandLineArgument>
-                <commandLineArgument>status</commandLineArgument>
-              </commandLineArguments>
-              <generatorConfigurations>
-                <generatorConfiguration>
-                  <generator>jsw</generator>
-                  <includes>
-                    <include>aix-ppc-32</include>
-                    <include>aix-ppc-64</include>
-                    <include>hpux-parisc-64</include>
-                    <include>linux-x86-32</include>
-                    <include>linux-x86-64</include>
-                    <include>linux-ppc-64</include>
-                    <include>macosx-ppc-32</include>
-                    <include>macosx-x86-universal-32</include>
-                    <include>macosx-universal-32</include>
-                    <include>macosx-universal-64</include>
-                    <include>solaris-sparc-32</include>
-                    <include>solaris-sparc-64</include>
-                    <include>solaris-x86-32</include>
-                    <include>windows-x86-32</include>
-                    <include>windows-x86-64</include>
-                  </includes>
-                </generatorConfiguration>
-              </generatorConfigurations>
-              <platforms>
-                <platform>jsw</platform>
-              </platforms>
-            </daemon>
-          </daemons>
+          <createDependencyReducedPom>false</createDependencyReducedPom>
         </configuration>
         <executions>
           <execution>
-            <id>app-assemble</id>
-            <phase>package</phase>
+            <id>shade</id>
             <goals>
-              <goal>generate-daemons</goal>
+              <goal>shade</goal>
             </goals>
+            <configuration>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>nl.knaw.huygens.alexandria.app.Server</mainClass>
+                </transformer>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+              </transformers>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+            </configuration>
           </execution>
         </executions>
       </plugin>
-
-      <!-- <plugin> <groupId>com.github.kongchen</groupId> <artifactId>swagger-maven-plugin</artifactId> 
+      <!-- <plugin> <groupId>com.github.kongchen</groupId> <artifactId>swagger-maven-plugin</artifactId>
         <version>${swagger-maven-plugin.version}</version> <configuration> <apiSources> 
         <apiSource> <info> <title>REST api</title> <version>v1</version> <description> 
         Alexandria REST API </description> <termsOfService> http://example.org/terms-of-service 

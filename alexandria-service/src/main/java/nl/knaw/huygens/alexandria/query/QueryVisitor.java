@@ -31,8 +31,8 @@ import com.google.common.collect.Lists;
 import nl.knaw.huygens.alexandria.antlr.AQLBaseVisitor;
 import nl.knaw.huygens.alexandria.antlr.AQLParser.ParameterContext;
 import nl.knaw.huygens.alexandria.antlr.AQLParser.SubQueryContext;
-import nl.knaw.huygens.alexandria.model.search.QueryField;
-import nl.knaw.huygens.alexandria.model.search.QueryFunction;
+import nl.knaw.huygens.alexandria.api.model.search.QueryField;
+import nl.knaw.huygens.alexandria.api.model.search.QueryFunction;
 
 public class QueryVisitor extends AQLBaseVisitor<Void> {
   public static final String QUOTE = String.valueOf('"');

@@ -38,10 +38,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.google.common.collect.Lists;
 
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
+import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.Identifiable;
-import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
 
 @JsonInclude(Include.NON_NULL)
 public class SearchResult implements Identifiable {
@@ -98,7 +99,7 @@ public class SearchResult implements Identifiable {
 
   @JsonProperty(PropertyPrefix.LINK + "firstPage")
   public URI getFirstResultPage() {
-    return getTotalResults() > 0 ? locationBuilder.locationOf(this,SearchEndpoint.RESULTPAGES , "1") : null;
+    return getTotalResults() > 0 ? locationBuilder.locationOf(this,EndpointPaths.RESULTPAGES , "1") : null;
   }
 
   @JsonIgnore

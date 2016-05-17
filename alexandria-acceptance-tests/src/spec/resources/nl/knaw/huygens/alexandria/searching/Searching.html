@@ -25,7 +25,7 @@
       xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
                           http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
 
-<title>Searching in Alexandria</title>
+<title>Alexandria: Searching in Alexandria</title>
 
 <body data-desc="Searching in Alexandria">
 
@@ -39,7 +39,7 @@
             "find": "annotation",
             "where": "who:eq(\"nederlab\")",
             "sort": "-when",
-            "return": "list(id),resource.url",
+            "return": "list(id,subresource.sub),resource.url",
             "distinct": false,
             "pageSize": 10
             } }
@@ -68,7 +68,7 @@
         <dt><code>return</code></dt>
         <dd>used to select which fields (ref. <code>where</code>) from the result-set are returned in the output.<br/>
             <small>(if left unspecified, <code>id</code> is returned by default)</small><br/>
-            one of these fields can be wrapped in the function <code>list()</code>, in the results this field will be returned as a list of values, grouped by the combination of the values for the other fields in the <code>return</code> clause.
+            one or more of these fields can be wrapped in the function <code>list()</code>, in the results these fields will be returned as a list of values, grouped by the combination of the values for the other fields in the <code>return</code> clause.
         </dd>
         <dt><code>distinct</code></dt>
         <dd>used to indicate the resulting combinations of values for the selected return fields should be unique.<br/>

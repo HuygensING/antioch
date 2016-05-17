@@ -18,6 +18,7 @@ public class TextAnnotation {
   private String name;
   private Map<String, String> attributes;
   private int depth;
+  private Object id;
 
   public TextAnnotation(String name, Map<String, String> attributes, int depth) {
     this.name = name;
@@ -33,6 +34,7 @@ public class TextAnnotation {
     return attributes;
   }
 
+  // TODO:: does this need to be stored?
   public Integer getDepth() {
     return depth;
   }
@@ -50,5 +52,17 @@ public class TextAnnotation {
   @Override
   public boolean equals(Object other) {
     return EqualsBuilder.reflectionEquals(this, other, false);
+  }
+
+  public Object getId() {
+    return id;
+  }
+
+  public void setId(Object object) {
+    this.id = object;
+  }
+
+  public void setDepth(int newDepth) {
+    this.depth = newDepth;
   }
 }

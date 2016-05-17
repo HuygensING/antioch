@@ -44,14 +44,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.api.model.search.QueryField;
+import nl.knaw.huygens.alexandria.api.model.search.QueryFunction;
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.ErrorEntity;
-import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
-import nl.knaw.huygens.alexandria.model.search.QueryField;
-import nl.knaw.huygens.alexandria.model.search.QueryFunction;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
@@ -114,7 +114,7 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
     aQuery.setFields("id, resource.id, subresource.id");
     ParsedAlexandriaQuery paq = alexandriaQueryParser.parse(aQuery);
     assertThat(paq.getReturnFields()).containsExactly("id", "resource.id", "subresource.id");
-    assertThat(paq.getListField()).isNull();
+    assertThat(paq.getFieldsToGroup()).isEmpty();
   }
 
   @Test
@@ -124,7 +124,7 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
     aQuery.setFields("list(id), resource.id, resource.url");
     ParsedAlexandriaQuery paq = alexandriaQueryParser.parse(aQuery);
     assertThat(paq.getReturnFields()).containsExactly("id", "resource.id", "resource.url");
-    assertThat(paq.getListField()).isEqualTo("id");
+    assertThat(paq.getFieldsToGroup()).containsExactly("id");
 
     Map<String, Object> map = ImmutableMap.of("id", "Id", "resource.id", "Resource.id", "resource.url", "Resource.URL");
     assertThat(paq.concatenateGroupByFieldsValues(map)).isEqualTo("Resource.idResource.URL");
@@ -136,7 +136,11 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
     Map<String, Object> map2 = ImmutableMap.of("id", "Id2", "resource.id", "Resource.id", "resource.url", "Resource.URL");
     Map<String, Object> map3 = ImmutableMap.of("id", "Id3", "resource.id", "Resource.id", "resource.url", "Resource.URL");
     List<Map<String, Object>> mapList = ImmutableList.of(map1, map2, map3);
-    Map<String, Object> expected = ImmutableMap.of("id", ImmutableList.<String> of("Id1", "Id2", "Id3"), "resource.id", "Resource.id", "resource.url", "Resource.URL");
+    Map<String, Object> expected = ImmutableMap.of(//
+        "_list", ImmutableList.of(ImmutableMap.of("id", "Id1"), ImmutableMap.of("id", "Id2"), ImmutableMap.of("id", "Id3")), //
+        "resource.id", "Resource.id", //
+        "resource.url", "Resource.URL"//
+    );
     assertThat(paq.collectListFieldValues(mapList)).containsAllEntriesOf(expected);
   }
 

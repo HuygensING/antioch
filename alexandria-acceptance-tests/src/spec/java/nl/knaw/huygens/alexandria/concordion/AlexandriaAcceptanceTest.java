@@ -65,6 +65,8 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerGraphService;
 import nl.knaw.huygens.alexandria.service.TinkerPopService;
 import nl.knaw.huygens.alexandria.storage.Storage;
+import nl.knaw.huygens.alexandria.textgraph.ParseResult;
+import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 import nl.knaw.huygens.cat.RestExtension;
 import nl.knaw.huygens.cat.RestFixture;
 
@@ -97,7 +99,7 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     return new Storage(TinkerGraph.open());
   }
 
-  private static AlexandriaConfiguration testConfiguration() {
+  protected static AlexandriaConfiguration testConfiguration() {
     return new AlexandriaConfiguration() {
       @Override
       public URI getBaseURI() {
@@ -122,6 +124,11 @@ public class AlexandriaAcceptanceTest extends RestFixture {
       @Override
       public String getAdminKey() {
         return "whatever";
+      }
+
+      @Override
+      public Boolean asynchronousEndpointsAllowed() {
+        return false;
       }
     };
   }
@@ -163,8 +170,22 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     service.setStorage(tinkerGraphStorage());
   }
 
+  public void wait5seconds() {
+    try {
+      Thread.sleep(5000l);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+
   public void resourceExists(String resId) {
     service.createOrUpdateResource(fromString(resId), aRef(), aProvenance(), CONFIRMED);
+  }
+
+  public void resourceHasText(String resId, String xml) {
+    final AlexandriaResource resource = theResource(fromString(resId));
+    ParseResult result = TextGraphUtil.parse(xml);
+    service().storeTextGraph(UUID.fromString(resId), result);
   }
 
   protected AlexandriaService service() {

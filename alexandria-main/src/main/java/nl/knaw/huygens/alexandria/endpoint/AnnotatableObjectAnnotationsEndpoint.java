@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.endpoint;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -86,7 +86,7 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
         .map((AlexandriaAnnotation a) -> AnnotationEntity.of(a).withLocationBuilder(locationBuilder))//
         .collect(toSet());
     Map<String, Set<AnnotationEntity>> entity = ImmutableMap.of("annotations", annotationEntities);
-    return Response.ok(entity).build();
+    return ok(entity);
   }
 
   @POST
@@ -97,7 +97,7 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
     prototype.setState(AlexandriaState.TENTATIVE);
     AnnotationCreationRequest request = getAnnotationCreationRequestBuilder().build(prototype);
     AlexandriaAnnotation annotation = request.execute(service);
-    return Response.created(locationBuilder.locationOf(annotation)).build();
+    return created(locationBuilder.locationOf(annotation));
   }
 
   private void validateLocator(AnnotationPrototype prototype) {

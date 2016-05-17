@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.client;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -27,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -40,6 +41,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.squarespace.jersey2.guice.BootstrapUtils;
 
+import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
+import nl.knaw.huygens.alexandria.client.model.AnnotationPrototype;
+import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.jersey.AlexandriaApplication;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -73,9 +77,14 @@ public abstract class AlexandriaClientTest extends AlexandriaTest {
     public String getAdminKey() {
       return "adminkey";
     }
+
+    @Override
+    public Boolean asynchronousEndpointsAllowed() {
+      return true;
+    }
   };
 
-  AlexandriaClient client = new AlexandriaClient(testURI);
+  static AlexandriaClient client;
 
   @BeforeClass
   public static void startTestServer() {
@@ -84,11 +93,13 @@ public abstract class AlexandriaClientTest extends AlexandriaTest {
     final ResourceConfig resourceConfig = new AlexandriaApplication();
     ((TinkerPopService) service).setStorage(new Storage(TinkerGraph.open()));
     testServer = GrizzlyHttpServerFactory.createHttpServer(testURI, resourceConfig, locator);
+    client = new AlexandriaClient(testURI);
   }
 
   @AfterClass
   public static void stopTestServer() {
     testServer.shutdown();
+    client.close();
   }
 
   void assertRequestSucceeded(RestResult<?> result) {
@@ -97,6 +108,40 @@ public abstract class AlexandriaClientTest extends AlexandriaTest {
         .as("Request went OK")//
         .withFailMessage("request failed: %s", result.getFailureCause().orElse("something you should never see"))//
         .isFalse();
+  }
+
+  protected UUID createResource(String resourceRef) {
+    ResourcePrototype resource = new ResourcePrototype().setRef(resourceRef);
+    UUID resourceUuid = UUID.randomUUID();
+    RestResult<Void> result = client.setResource(resourceUuid, resource);
+    assertRequestSucceeded(result);
+    return resourceUuid;
+  }
+
+  protected TextImportStatus setResourceText(UUID resourceUuid, String xml) {
+    RestResult<URI> result = client.setResourceText(resourceUuid, xml);
+    assertThat(result).isNotNull();
+    assertThat(result.hasFailed()).isFalse();
+
+    TextImportStatus textGraphImportStatus = null;
+    boolean goOn = true;
+    while (goOn) {
+      RestResult<TextImportStatus> result2 = client.getTextImportStatus(resourceUuid);
+      assertThat(result2.hasFailed()).isFalse();
+      textGraphImportStatus = result2.get();
+      goOn = !textGraphImportStatus.isDone();
+    }
+    return textGraphImportStatus;
+  }
+
+  protected UUID annotateResource(UUID resourceUuid, String annotationType, String annotationValue) {
+    AnnotationPrototype annotationPrototype = new AnnotationPrototype()//
+        .setType(annotationType)//
+        .setValue(annotationValue);
+    RestResult<UUID> result = client.annotateResource(resourceUuid, annotationPrototype);
+    assertRequestSucceeded(result);
+    UUID annotationUuid = result.get();
+    return annotationUuid;
   }
 
   private static ServiceLocator createServiceLocator() {
