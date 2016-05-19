@@ -2,12 +2,13 @@ package nl.knaw.huygens.alexandria.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
 
 import java.net.URI;
 
 import javax.net.ssl.SSLContext;
 
+import org.glassfish.jersey.SslConfigurator;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import nl.knaw.huygens.Log;
@@ -37,18 +38,24 @@ public class InitializationTest {
     }
   }
 
-  // @Ignore
+  @Ignore
   @Test
-  public void testHttpsConnectionWorks() {
-    SSLContext sslContext = mock(SSLContext.class);
-    AlexandriaClient client = new AlexandriaClient(URI.create(INSTANCE_HTTPS), sslContext);
+  public void testHttpsConnectionWorks() throws Exception {
+    // System.setProperty("javax.net.debug", "ssl");
+    SSLContext sslContext = SslConfigurator.newInstance()//
+        .keyStoreFile("../keystore.jks")//
+        .keyPassword("secret")//
+        .trustStoreFile("../truststore.jks")//
+        .trustStorePassword("secret")//
+        .createSSLContext();
+    AlexandriaClient client = new AlexandriaClient(URI.create("https://acc.alexandria.huygens.knaw.nl"), sslContext);
     client.setAutoConfirm(true);
     RestResult<AboutEntity> aboutResult = client.getAbout();
     Log.info("result={}", aboutResult);
     client.close();
-    // assertThat(aboutResult.hasFailed()).isFalse();
-    // AboutEntity aboutEntity = aboutResult.get();
-    // Log.info("about={}", aboutEntity);
+    assertThat(aboutResult.hasFailed()).isFalse();
+    AboutEntity aboutEntity = aboutResult.get();
+    Log.info("about={}", aboutEntity);
   }
 
 }
