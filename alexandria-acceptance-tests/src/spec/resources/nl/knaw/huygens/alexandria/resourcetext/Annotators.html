@@ -1,0 +1,444 @@
+<!--
+  #%L
+  alexandria-acceptance-tests
+  =======
+  Copyright (C) 2015 - 2016 Huygens ING (KNAW)
+  =======
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/gpl-3.0.html>.
+  #L%
+  -->
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+
+<title>Annotators</title>
+
+<body data-desc="Annotators">
+
+<div id="annotator"
+     data-desc="Annotators">
+Given an internal resource, i.e. a resource with text stored in Alexandria, one can annotate fragments of the text.
+Such text annotations always have a responsibility attached to them.
+The agent (tool or person) responsible for the annotation is called the annotator. In XML we use the attribute @resp for specifying the annotator.
+The value of this attribute must be the code of an annotator that has been stored before the text annotation can be processed.
+<br/>
+Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users must confirm to this convention.
+</div>
+
+
+<div id="create-annotator" c:execute="clearStorage()"
+     data-desc="How do I create an annotator and retrieve its content?">
+
+	Given a confirmed resource
+	with id <code c:set="#uuid">00000000-0000-0000-0000-000000000001</code>
+	<span c:execute="resourceExists(#uuid)">exists</span>.<br/>
+
+  <h:request>
+    When I <h:put>/resources/$uuid/annotators/abc</h:put>
+    the body:
+    <h:jsonBody>
+			{
+			  "annotator" : {
+			    "description" : "Annotator description"
+			} }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>201 Created</h:status></li>
+      <li>and the response body is <h:responseBody/></li>
+    </ul>
+  </h:request>
+ 
+   <h:request>
+    Next, when I <h:get>/resources/$uuid/annotators/abc</h:get>
+    then I should receive
+    <ul>
+      <li>status <h:status>200 OK</h:status></li>
+      <li>and body
+        <h:jsonResponse>
+	      {
+	        "annotator" : {
+					  "code" : "abc",
+					  "description" : "Annotator description",
+					  "^resource" : "/resources/$uuid"
+	      } }
+        </h:jsonResponse>
+      </li>
+    </ul>
+  </h:request>
+</div>
+
+
+<div id="create-annotator-with-empty-body" c:execute="clearStorage()"
+     data-desc="What happens when I put an empty body?">
+
+  Given a confirmed resource
+  with id <code c:set="#uuid">00000000-0000-0000-0000-000000000002</code>
+  <span c:execute="resourceExists(#uuid)">exists</span>.<br/>
+
+  <h:request>
+    When I <h:put>/resources/$uuid/annotators/abc</h:put>
+    the empty body:
+    <h:requestBody>
+    </h:requestBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>400 Bad Request</h:status></li>
+      <li>and the response body is 
+        <h:jsonResponse>
+				[ {
+				  "message" : "Request body may not be null."
+				} ]
+				</h:jsonResponse>
+      </li>
+    </ul>
+  </h:request>
+</div>
+
+
+<div id="create-annotator-with-code-mismatch" c:execute="clearStorage()"
+     data-desc="What happens when I create an annotator with a code that does not match the URL?">
+
+  Given a confirmed resource
+  with id <code c:set="#uuid">00000000-0000-0000-0000-000000000003</code>
+  <span c:execute="resourceExists(#uuid)">exists</span>.<br/>
+
+  <h:request>
+    When I <h:put>/resources/$uuid/annotators/abc</h:put>
+    the body:
+    <h:jsonBody>
+      {
+        "annotator" : {
+				  "code" : "def",
+				  "description" : "Annotator description"
+      } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>400 Bad Request</h:status></li>
+      <li>and the response body is 
+        <h:jsonResponse>
+				[ {
+				  "message" : "Entity 'code' must match the one used in the URL."
+				} ]
+        </h:jsonResponse>
+      </li>
+    </ul>
+  </h:request>
+</div>
+
+
+<div id="update-annotator" c:execute="clearStorage()"
+     data-desc="What happens when I update the description of an annotator?">
+
+  Given a confirmed resource
+  with id <code c:set="#uuid">00000000-0000-0000-0000-000000000004</code>
+  <span c:execute="resourceExists(#uuid)">exists</span>.<br/>
+
+  <h:request>
+    Given that I have
+    <h:success>successfully</h:success>
+    set annotator <code>abc</code>
+    by <h:put>/resources/$uuid/annotators/abc</h:put>
+    the body:
+    <h:jsonBody>
+      {
+        "annotator" : {
+          "description" : "Annotator description"
+      } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>
+  </h:request>
+  
+  <h:request>
+    When I <h:put>/resources/$uuid/annotators/abc</h:put>
+    the body:
+    <h:jsonBody>
+      {
+        "annotator" : {
+          "description" : "Another annotator description"
+      } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>204 No Content</h:status></li>
+      <li>and the response body is <h:responseBody/></li>
+    </ul>
+  </h:request>
+ 
+  <h:request>
+    Next, when I <h:get>/resources/$uuid/annotators/abc</h:get>
+    then I should receive
+    <ul>
+      <li>status <h:status>200 OK</h:status></li>
+      <li>and body
+        <h:jsonResponse>
+        {
+          "annotator" : {
+            "code" : "abc",
+            "description" : "Another annotator description",
+            "^resource" : "/resources/$uuid"
+        } }
+        </h:jsonResponse>
+      </li>
+    </ul>
+  </h:request>
+</div>
+
+
+<div id="get-annotators" c:execute="clearStorage()"
+     data-desc="How can I retrieve all annotators of a resource?">
+
+  Given a confirmed resource
+  with id <code c:set="#uuid">00000000-0000-0000-0000-000000000005</code>
+  <span c:execute="resourceExists(#uuid)">exists</span>.<br/>
+
+  <h:request>
+    When I <h:get>/resources/$uuid/annotators</h:get>
+    then I should receive
+    <ul>
+      <li>status <h:status>200 OK</h:status></li>
+      <li>and body
+        <h:jsonResponse>
+        []
+        </h:jsonResponse>
+      </li>
+    </ul>
+  </h:request>
+ 
+  <h:request>
+    Next, given that I have
+    <h:success>successfully</h:success>
+    set annotator <code>abc</code>
+    by <h:put>/resources/$uuid/annotators/abc</h:put>
+    the body:
+    <h:jsonBody>
+      {
+        "annotator" : {
+          "description" : "Annotator abc"
+      } }
+    </h:jsonBody>
+  </h:request>
+ 
+  <h:request>
+    Now, when I <h:get>/resources/$uuid/annotators</h:get>
+    then I should receive
+    <ul>
+      <li>status <h:status>200 OK</h:status></li>
+      <li>and body
+        <h:jsonResponse>
+				[ {
+				  "code" : "abc",
+				  "description" : "Annotator abc",
+				  "^resource" : "/resources/$uuid"
+				} ]
+        </h:jsonResponse>
+      </li>
+    </ul>
+  </h:request>
+ 
+  <h:request>
+    Next, given that I have
+    <h:success>successfully</h:success>
+    set annotator <code>def</code>
+    by <h:put>/resources/$uuid/annotators/def</h:put>
+    the body:
+    <h:jsonBody>
+      {
+        "annotator" : {
+          "description" : "Annotator def"
+      } }
+    </h:jsonBody>
+  </h:request>
+ 
+  <h:request>
+    Now, when I <h:get>/resources/$uuid/annotators</h:get>
+    then I should receive
+    <ul>
+      <li>status <h:status>200 OK</h:status></li>
+      <li>and body
+        <h:jsonResponse>
+				[ {
+				  "code" : "abc",
+				  "description" : "Annotator abc",
+				  "^resource" : "/resources/$uuid"
+				}, {
+				  "code" : "def",
+				  "description" : "Annotator def",
+				  "^resource" : "/resources/$uuid"
+				} ]
+        </h:jsonResponse>
+      </li>
+    </ul>
+    Note that the order of the annotators is (as yet) unspecified.
+  </h:request>
+</div>
+
+
+<div id="annotator-defined-on-parent-resource" c:execute="clearStorage()"
+     data-desc="Can I use an annotator defined on a parent resource?">
+
+  Yes, annotators are valid for all subresource of the resource for which they are defined.<br/>
+  <br/>
+  Given a confirmed resource
+  with id <code c:set="#uuid">00000000-0000-0000-0000-000000000006</code>
+  <span c:execute="resourceExists(#uuid)">exists</span>,<br/>
+  and confirmed subresource
+  with id <code c:set="#uuid2">00000000-0000-0000-0000-000000000007</code>
+  <span c:execute="resourceExists(#uuid2)">exists</span>,<br/>
+
+  <h:request>
+    Given that I have
+    <h:success>successfully</h:success>
+    set annotator <code>abc</code>
+    by <h:put>/resources/$uuid/annotators/abc</h:put>
+    the body:
+    <h:jsonBody>
+      {
+        "annotator" : {
+          "description" : "Annotator abc"
+      } }
+    </h:jsonBody>
+  </h:request>
+ 
+  <h:request>
+    Now, when I <h:get>/resources/$uuid2/annotators</h:get>
+    then I should receive
+    <ul>
+      <li>status <h:status>200 OK</h:status></li>
+      <li>and body
+        <h:jsonResponse>
+        [ {
+          "code" : "abc",
+          "description" : "Annotator abc",
+          "^resource" : "/resources/$uuid"
+        } ]
+        </h:jsonResponse>
+      </li>
+    </ul>
+  </h:request>
+ 
+  <h:request>
+    Next, given that I have
+    <h:success>successfully</h:success>
+    set annotator <code>def</code>
+    by <h:put>/resources/$uuid2/annotators/def</h:put>
+    the body:
+    <h:jsonBody>
+      {
+        "annotator" : {
+          "description" : "Annotator def"
+      } }
+    </h:jsonBody>
+  </h:request>
+
+  <h:request>
+    Now, when I <h:get>/resources/$uuid2/annotators</h:get>
+    then I should receive
+    <ul>
+      <li>status <h:status>200 OK</h:status></li>
+      <li>and body
+        <h:jsonResponse>
+				[ {
+				  "code" : "abc",
+				  "description" : "Annotator abc",
+				  "^resource" : "/resources/$uuid"
+				}, {
+				  "code" : "def",
+				  "description" : "Annotator def",
+				  "^resource" : "/resources/$uuid2"
+				} ]
+        </h:jsonResponse>
+      </li>
+    </ul>
+  Note that the order of the annotators is (as yet) unspecified.
+  </h:request>
+</div>
+
+
+<div id="annotator-defined-on-subresource" c:execute="clearStorage()"
+     data-desc="Can I use an annotator defined on a subresource?">
+No, annotators are only valid for subresources of the resource for which they are defined.
+ 
+Given that I have a confirmed resource with UUID $uuid1.
+Given that I have a confirmed resource with UUID $uuid2 that is a subresource of $uuid1.
+Given that I have succesfully PUT to /resources/$uuid2/annotators/abc the body
+{
+  "description" : "Annotator abc"
+}
+ 
+When I GET /resources/$uuid1/annotators
+then I should receive a status "200 OK" and a response body
+[ ]
+</div>
+
+
+<div id="override-definition" c:execute="clearStorage()"
+     data-desc="Can I override the definition of an annotator in a subresource of the resource on which it is defined?">
+No, annotators are defined by their code and these must be unique in a chain of (sub)resources.
+ 
+Given that I have a confirmed resource with UUID $uuid1.
+Given that I have a confirmed resource with UUID $uuid2 that is a subresource of $uuid1.
+Given that I have succesfully PUT to /resources/$uuid1/annotators/abc the body
+{
+  "description" : "Annotator abc"
+}
+ 
+When PUT to /resources/$uuid2/annotators/abc the body
+{
+  "description" : "Annotator abc"
+}
+then I should receive a status "409 Conflict" and a response body
+[ {
+  "message" : "Annotator 'code' already defined in (sub)resource chain."
+} ]
+</div>
+
+
+<div id="define-annotator-with-used-code" c:execute="clearStorage()"
+     data-desc="Can I define annotators with the same code in unrelated resources?">
+
+Yes you can. This allows you, for instance, to use a generic code for
+the editor of a collections of letters, provides it is doen at the proper level
+in the resource hierarchy.
+ 
+Given that I have a confirmed resource with UUID $uuid1.
+Given that I have a confirmed resource with UUID $uuid2a that is a subresource of $uuid1.
+Given that I have a confirmed resource with UUID $uuid2b that is a subresource of $uuid1.
+Given that I have succesfully PUT to /resources/$uuid2a/annotators/ed the body
+{
+  "description" : "Editor of 2a"
+}
+ 
+When PUT to /resources/$uuid2b/annotators/ed the body
+{
+  "description" : "Editor of 2b"
+}
+then I should receive a status "201 Created" and an empty response body.
+</div>
+
+</body>
+</html>
