@@ -58,6 +58,10 @@ public abstract class ResourceVF extends AlexandriaVF {
   @Edge(PART_OF)
   public abstract List<ResourceVF> getSubResources();
 
+  @In
+  @Edge(AnnotatorVF.HAS_RESOURCE)
+  public abstract List<AnnotatorVF> getAnnotators();
+
   @Out
   @Edge(PART_OF)
   public abstract ResourceVF getParentResource();
@@ -69,6 +73,5 @@ public abstract class ResourceVF extends AlexandriaVF {
   public boolean isSubresource() {
     return getParentResource() != null;
   }
-
 
 }

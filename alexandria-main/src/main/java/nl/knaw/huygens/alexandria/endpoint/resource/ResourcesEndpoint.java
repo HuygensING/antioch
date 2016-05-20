@@ -21,6 +21,8 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+import static nl.knaw.huygens.alexandria.api.EndpointPaths.ANNOTATIONS;
+import static nl.knaw.huygens.alexandria.api.EndpointPaths.ANNOTATORS;
 import static nl.knaw.huygens.alexandria.api.EndpointPaths.RESOURCES;
 import static nl.knaw.huygens.alexandria.api.EndpointPaths.SUBRESOURCES;
 import static nl.knaw.huygens.alexandria.api.EndpointPaths.TEXT;
@@ -156,13 +158,20 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   @Path("{uuid}/" + SUBRESOURCES)
   public Class<SubResourcesEndpoint> getSubResourcesEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
+    assertResourceIsConfirmed(uuidParam);
     return SubResourcesEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }
 
-  @Path("{uuid}/annotations")
+  @Path("{uuid}/" + ANNOTATIONS)
   public Class<ResourceAnnotationsEndpoint> getAnnotationsEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
     assertResourceIsConfirmed(uuidParam);
     return ResourceAnnotationsEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
+  }
+
+  @Path("{uuid}/" + ANNOTATORS)
+  public Class<ResourceAnnotatorsEndpoint> getAnnotatorsEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
+    assertResourceIsConfirmed(uuidParam);
+    return ResourceAnnotatorsEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }
 
   @Path("{uuid}/" + TEXT)

@@ -50,6 +50,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.api.model.CommandResponse;
 import nl.knaw.huygens.alexandria.api.model.StatePrototype;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
@@ -116,7 +117,7 @@ public class AlexandriaClient implements AutoCloseable {
 
   /**
    * When autoConfirm is true (default), a resource/annotation made with POST will be automatically confirmed.
-   * 
+   *
    * @param autoConfirm
    */
   public void setAutoConfirm(final boolean autoConfirm) {
@@ -200,6 +201,25 @@ public class AlexandriaClient implements AutoCloseable {
 
   public RestResult<Void> confirmAnnotation(final UUID annotationUuid) {
     return confirm(EndpointPaths.ANNOTATIONS, annotationUuid);
+  }
+
+  public RestResult<URI> setAnnotator(UUID resourceUUID, String code, Annotator annotator) {
+    final Entity<Annotator> entity = Entity.json(annotator);
+    final WebTarget path = annotatorsTarget(resourceUUID, code);
+    final Supplier<Response> responseSupplier = authorizedPut(path, entity);
+    final RestRequester<URI> requester = RestRequester.withResponseSupplier(responseSupplier);
+    return requester//
+        .onStatus(Status.CREATED, this::uriFromLocationHeader)//
+        .getResult();
+  }
+
+  public RestResult<Annotator> getAnnotator(UUID resourceUUID, String code) {
+    final WebTarget path = annotatorsTarget(resourceUUID, code);
+    final Supplier<Response> responseSupplier = anonymousGet(path);
+    final RestRequester<Annotator> requester = RestRequester.withResponseSupplier(responseSupplier);
+    return requester//
+        .onStatus(Status.OK, this::toAnnotatorRestResult)//
+        .getResult();
   }
 
   public RestResult<URI> setResourceText(final UUID resourceUUID, final String xml) {
@@ -381,6 +401,10 @@ public class AlexandriaClient implements AutoCloseable {
     return toEntityRestResult(response, SubResourcePojo.class);
   }
 
+  private RestResult<Annotator> toAnnotatorRestResult(final Response response) {
+    return toEntityRestResult(response, Annotator.class);
+  }
+
   private RestResult<AnnotationPojo> toAnnotationPojoRestResult(final Response response) {
     return toEntityRestResult(response, AnnotationPojo.class);
   }
@@ -462,6 +486,12 @@ public class AlexandriaClient implements AutoCloseable {
     return requester//
         .onStatus(Status.OK, this::toAnnotationPojoRestResult)//
         .getResult();
+  }
+
+  private WebTarget annotatorsTarget(UUID resourceUUID, String code) {
+    return resourceTarget(resourceUUID)//
+        .path(EndpointPaths.ANNOTATORS)//
+        .path(code);
   }
 
 }

@@ -50,6 +50,7 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
+import nl.knaw.huygens.alexandria.storage.frames.VF;
 import peapod.FramedGraph;
 import peapod.FramedGraphTraversal;
 
@@ -149,7 +150,7 @@ public class Storage {
     return find(vfClass, uuid).tryNext().isPresent();
   }
 
-  public <A extends AlexandriaVF> A createVF(final Class<A> vfClass) {
+  public <A extends VF> A createVF(final Class<A> vfClass) {
     assertInTransaction();
     assertClass(vfClass);
     return framedGraph.addVertex(vfClass);
@@ -179,8 +180,7 @@ public class Storage {
   }
 
   public GraphTraversal<Vertex, Vertex> getResourceVertexTraversal(Object... vertexIds) {
-    assertInTransaction();
-    return graph.traversal().V(vertexIds).has(T.label, "Resource");
+    return getVertexTraversal(vertexIds).has(T.label, "Resource");
   }
 
   // graph methods
@@ -320,7 +320,7 @@ public class Storage {
     Preconditions.checkState(getTransactionIsOpen(), "We should be in open transaction at this point, use runInTransaction()!");
   }
 
-  private void assertClass(final Class<? extends AlexandriaVF> clazz) {
+  private void assertClass(final Class<? extends VF> clazz) {
     Preconditions.checkState(//
         clazz.getAnnotationsByType(peapod.annotations.Vertex.class).length > 0, //
         "Class " + clazz + " has no peapod @Vertex annotation, are you sure it's the correct class?"//

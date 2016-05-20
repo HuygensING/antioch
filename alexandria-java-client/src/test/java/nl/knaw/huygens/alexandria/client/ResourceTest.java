@@ -37,6 +37,7 @@ import nl.knaw.huygens.alexandria.client.model.SubResourcePojo;
 import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
 
 public class ResourceTest extends AlexandriaClientTest {
+
   @Test
   public void testAddResourceReturnsValidUUID() {
     client.setAuthKey(AUTHKEY);

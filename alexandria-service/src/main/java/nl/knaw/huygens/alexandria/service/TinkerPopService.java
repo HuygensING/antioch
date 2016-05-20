@@ -49,6 +49,7 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.jooq.lambda.Unchecked;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -63,6 +64,7 @@ import com.google.common.collect.Sets;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
@@ -84,6 +86,7 @@ import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
+import nl.knaw.huygens.alexandria.storage.frames.AnnotatorVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import nl.knaw.huygens.alexandria.textgraph.ParseResult;
 import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
@@ -273,6 +276,34 @@ public class TinkerPopService implements AlexandriaService {
     return resourcevf.getSubResources().stream()//
         .map(this::deframeResource)//
         .collect(toSet());
+  }
+
+  @Override
+  public void setResourceAnnotator(UUID resourceUUID, Annotator annotator) {
+    storage.runInTransaction(() -> {
+      // remove existing annotator for this resource with the same annotator code
+      storage.getResourceVertexTraversal()//
+          .has(Storage.IDENTIFIER_PROPERTY, resourceUUID.toString())//
+          .in(AnnotatorVF.HAS_RESOURCE)//
+          .has("code", annotator.getCode())//
+          .toList()//
+          .forEach(Vertex::remove);
+      AnnotatorVF avf = frameAnnotator(annotator);
+      ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
+      avf.setResource(resourceVF);
+      Log.info("avf.resource={}", avf.getResource().getUuid());
+    });
+
+  }
+
+  @Override
+  public Optional<Annotator> readResourceAnnotator(UUID uuid, String code) {
+    ResourceVF resourcevf = storage.runInTransaction(() -> storage.readVF(ResourceVF.class, uuid))//
+        .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
+    return resourcevf.getAnnotators().stream()//
+        .map(this::deframeAnnotator)//
+        .filter(a -> code.equals(a.getCode()))//
+        .findFirst();
   }
 
   @Override
@@ -677,6 +708,12 @@ public class TinkerPopService implements AlexandriaService {
     return avf;
   }
 
+  AnnotatorVF frameAnnotator(Annotator annotator) {
+    AnnotatorVF avf = storage.createVF(AnnotatorVF.class);
+    avf.setCode(annotator.getCode());
+    avf.setDescription(annotator.getDescription());
+    return avf;
+  }
   // - private methods -//
 
   private String serializeTextViewMap(Map<String, TextView> textViewMap) throws JsonProcessingException {
@@ -741,6 +778,13 @@ public class TinkerPopService implements AlexandriaService {
     rvf.getSubResources().stream()//
         .forEach(vf -> resource.addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
     return resource;
+  }
+
+  private Annotator deframeAnnotator(AnnotatorVF avf) {
+    return new Annotator()//
+        .setCode(avf.getCode())//
+        .setDescription(avf.getDescription())//
+        .setResourceURI(locationBuilder.locationOf(AlexandriaResource.class, avf.getResource().getUuid()));
   }
 
   private void setTextViews(ResourceVF rvf, AlexandriaResource resource) {

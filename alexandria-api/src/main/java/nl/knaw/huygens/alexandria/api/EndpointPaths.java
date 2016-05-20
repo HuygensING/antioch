@@ -40,6 +40,8 @@ public final class EndpointPaths {
 
   public static final String RESULTPAGES = "pages";
 
+  public static final String ANNOTATORS = "annotators";
+
   private EndpointPaths() {
     throw new AssertionError("Paths shall not be instantiated");
   }
