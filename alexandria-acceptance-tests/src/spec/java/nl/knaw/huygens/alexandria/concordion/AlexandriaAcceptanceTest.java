@@ -182,6 +182,12 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     service.createOrUpdateResource(fromString(resId), aRef(), aProvenance(), CONFIRMED);
   }
 
+  public String hasSubresource(String id) {
+    final UUID subId = service().createSubResource(randomUUID(), fromString(id), aSub(), aProvenance()).getId();
+    service().confirmResource(subId);
+    return subId.toString();
+  }
+
   public void resourceHasText(String resId, String xml) {
     final AlexandriaResource resource = theResource(fromString(resId));
     ParseResult result = TextGraphUtil.parse(xml);

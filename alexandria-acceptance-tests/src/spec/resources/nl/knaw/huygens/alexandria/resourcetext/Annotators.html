@@ -303,26 +303,30 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
 
   Yes, annotators are valid for all subresource of the resource for which they are defined.<br/>
   <br/>
-  Given a confirmed resource
-  with id <code c:set="#uuid">00000000-0000-0000-0000-000000000006</code>
-  <span c:execute="resourceExists(#uuid)">exists</span>,<br/>
-  and confirmed subresource
-  with id <code c:set="#uuid2">00000000-0000-0000-0000-000000000007</code>
-  <span c:execute="resourceExists(#uuid2)">exists</span>,<br/>
-
-  <h:request>
-    Given that I have
-    <h:success>successfully</h:success>
-    set annotator <code>abc</code>
-    by <h:put>/resources/$uuid/annotators/abc</h:put>
-    the body:
-    <h:jsonBody>
-      {
-        "annotator" : {
-          "description" : "Annotator abc"
-      } }
-    </h:jsonBody>
-  </h:request>
+  Given:
+  <ul>
+    <li c:execute="resourceExists(#uuid)">
+        a (confirmed parent) resource exists with uuid: <code c:set="#uuid">00000000-0000-0000-0000-000000000006</code>
+    </li>
+    <li c:execute="#uuid2 = hasSubresource(#uuid)">
+        this resource has a confirmed subresource: <code c:echo="#uuid2"></code>
+    </li>
+    <li>
+		  <h:request>
+		    I have
+		    <h:success>successfully</h:success>
+		    set annotator <code>abc</code>
+		    by <h:put>/resources/$uuid/annotators/abc</h:put>
+		    the body:
+		    <h:jsonBody>
+		      {
+		        "annotator" : {
+		          "description" : "Annotator abc"
+		      } }
+		    </h:jsonBody>
+		  </h:request>
+    </li>
+  </ul>
  
   <h:request>
     Now, when I <h:get>/resources/$uuid2/annotators</h:get>
@@ -342,7 +346,7 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
   </h:request>
  
   <h:request>
-    Next, given that I have
+    Next, I
     <h:success>successfully</h:success>
     set annotator <code>def</code>
     by <h:put>/resources/$uuid2/annotators/def</h:put>
@@ -381,63 +385,155 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
 
 <div id="annotator-defined-on-subresource" c:execute="clearStorage()"
      data-desc="Can I use an annotator defined on a subresource?">
-No, annotators are only valid for subresources of the resource for which they are defined.
+
+  No, annotators are only valid for subresources of the resource for which they are defined.<br/>
  
-Given that I have a confirmed resource with UUID $uuid1.
-Given that I have a confirmed resource with UUID $uuid2 that is a subresource of $uuid1.
-Given that I have succesfully PUT to /resources/$uuid2/annotators/abc the body
-{
-  "description" : "Annotator abc"
-}
- 
-When I GET /resources/$uuid1/annotators
-then I should receive a status "200 OK" and a response body
-[ ]
+  Given:
+  <ul>
+    <li c:execute="resourceExists(#uuid)">
+        a (confirmed parent) resource exists with uuid: <code c:set="#uuid">00000000-0000-0000-0000-000000000007</code>
+    </li>
+    <li c:execute="#uuid2 = hasSubresource(#uuid)">
+        this resource has a confirmed subresource: <code c:echo="#uuid2"></code>
+    </li>
+    <li>
+      <h:request>
+        I have
+        <h:success>successfully</h:success>
+        set annotator <code>abc</code>
+        by <h:put>/resources/$uuid/annotators/abc</h:put>
+        the body:
+        <h:jsonBody>
+          {
+            "annotator" : {
+              "description" : "Annotator abc"
+          } }
+        </h:jsonBody>
+      </h:request>
+    </li>
+  </ul>
+
+  <h:request>
+    Now, when I <h:get>/resources/$uuid/annotators</h:get>
+    then I should receive
+    <ul>
+      <li>status <h:status>200 OK</h:status></li>
+      <li>and body
+        <h:jsonResponse>
+        [ ]
+        </h:jsonResponse>
+      </li>
+    </ul>
+  </h:request>
 </div>
 
 
 <div id="override-definition" c:execute="clearStorage()"
      data-desc="Can I override the definition of an annotator in a subresource of the resource on which it is defined?">
-No, annotators are defined by their code and these must be unique in a chain of (sub)resources.
+
+  No, annotators are defined by their code and these must be unique in a chain of (sub)resources.<br/>
  
-Given that I have a confirmed resource with UUID $uuid1.
-Given that I have a confirmed resource with UUID $uuid2 that is a subresource of $uuid1.
-Given that I have succesfully PUT to /resources/$uuid1/annotators/abc the body
-{
-  "description" : "Annotator abc"
-}
- 
-When PUT to /resources/$uuid2/annotators/abc the body
-{
-  "description" : "Annotator abc"
-}
-then I should receive a status "409 Conflict" and a response body
-[ {
-  "message" : "Annotator 'code' already defined in (sub)resource chain."
-} ]
+  Given:
+  <ul>
+    <li c:execute="resourceExists(#uuid)">
+        a (confirmed parent) resource exists with uuid: <code c:set="#uuid">00000000-0000-0000-0000-000000000008</code>
+    </li>
+    <li c:execute="#uuid2 = hasSubresource(#uuid)">
+        this resource has a confirmed subresource: <code c:echo="#uuid2"></code>
+    </li>
+    <li>
+      <h:request>
+        I have
+        <h:success>successfully</h:success>
+        set annotator <code>abc</code>
+        by <h:put>/resources/$uuid/annotators/abc</h:put>
+        the body:
+        <h:jsonBody>
+          {
+            "annotator" : {
+              "description" : "Annotator abc"
+          } }
+        </h:jsonBody>
+      </h:request>
+    </li>
+  </ul>
+
+  <h:request>
+    When I
+    <h:put>/resources/$uuid2/annotators/abc</h:put>
+    the body:
+    <h:jsonBody>
+      {
+        "annotator" : {
+          "description" : "Annotator abc"
+      } }
+    </h:jsonBody>
+    then I should receive
+    <ul>
+      <li>status <h:status>409 Conflict</h:status></li>
+      <li>and body
+        <h:jsonResponse>
+				[ {
+				  "message" : "Annotator 'code' already defined in (sub)resource chain."
+				} ]
+        </h:jsonResponse>
+      </li>
+    </ul>
+  </h:request>
 </div>
 
 
 <div id="define-annotator-with-used-code" c:execute="clearStorage()"
      data-desc="Can I define annotators with the same code in unrelated resources?">
 
-Yes you can. This allows you, for instance, to use a generic code for
-the editor of a collections of letters, provides it is doen at the proper level
-in the resource hierarchy.
+	Yes you can. This allows you, for instance, to use a generic code for
+	the editor of a collections of letters, provides it is doen at the proper level
+	in the resource hierarchy.<br/>
  
-Given that I have a confirmed resource with UUID $uuid1.
-Given that I have a confirmed resource with UUID $uuid2a that is a subresource of $uuid1.
-Given that I have a confirmed resource with UUID $uuid2b that is a subresource of $uuid1.
-Given that I have succesfully PUT to /resources/$uuid2a/annotators/ed the body
-{
-  "description" : "Editor of 2a"
-}
- 
-When PUT to /resources/$uuid2b/annotators/ed the body
-{
-  "description" : "Editor of 2b"
-}
-then I should receive a status "201 Created" and an empty response body.
+  Given:
+  <ul>
+    <li c:execute="resourceExists(#uuid)">
+        a (confirmed parent) resource exists with uuid: <code c:set="#uuid">00000000-0000-0000-0000-000000000009</code>
+    </li>
+    <li c:execute="#uuid2 = hasSubresource(#uuid)">
+        this resource has a confirmed subresource A: <code c:echo="#uuid2"></code>
+    </li>
+    <li c:execute="#uuid3 = hasSubresource(#uuid)">
+        and another confirmed subresource B: <code c:echo="#uuid3"></code>
+    </li>
+    <li>
+      <h:request>
+        I have
+        <h:success>successfully</h:success>
+        set annotator <code>ed</code> on A
+        by <h:put>/resources/$uuid2/annotators/ed</h:put>
+        the body:
+        <h:jsonBody>
+          {
+            "annotator" : {
+              "description" : "Editor of 2a"
+          } }
+        </h:jsonBody>
+      </h:request>
+    </li>
+  </ul>
+
+  <h:request>
+    When I set annotator <code>ed</code> on B by
+    <h:put>/resources/$uuid3/annotators/ed</h:put>
+    the body:
+    <h:jsonBody>
+      {
+        "annotator" : {
+          "description" : "Editor of 2b"
+      } }
+    </h:jsonBody>
+    then I should receive
+    <ul>
+      <li>status <h:status>201 Created</h:status></li>
+      <li>and an empty response body <h:responseBody/></li>
+    </ul>
+  </h:request>
 </div>
 
 </body>
