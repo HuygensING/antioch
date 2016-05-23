@@ -27,6 +27,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import nl.knaw.huygens.alexandria.api.model.ErrorEntity;
+
 public class TentativeObjectException extends WebApplicationException {
   private static final long serialVersionUID = 1L;
   static final ErrorEntity DEFAULT_ENTITY = ErrorEntityBuilder.build("Object is tentative");

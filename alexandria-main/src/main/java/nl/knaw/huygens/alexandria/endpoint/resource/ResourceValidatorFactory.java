@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -71,31 +71,37 @@ public class ResourceValidatorFactory {
       return resource;
     }
 
-    public AlexandriaResource notTentative() {
+    public ResourceValidator notTentative() {
       if (resource.getState() == AlexandriaState.TENTATIVE) {
         throw resourceIsTentativeException(resource.getId());
       }
-      return resource;
+      return this;
     }
 
-    public AlexandriaResource inState(AlexandriaState requiredState) {
+    public ResourceValidator inState(AlexandriaState requiredState) {
       final AlexandriaState actualState = resource.getState();
       if (actualState != requiredState) {
         throw new ConflictException("Object not in state " + requiredState + " but in state " + actualState);
       }
 
-      return resource;
+      return this;
     }
 
-    public AlexandriaResource notInState(AlexandriaState requiredState) {
+    public ResourceValidator notInState(AlexandriaState requiredState) {
       final AlexandriaState actualState = resource.getState();
       if (actualState == requiredState) {
         throw new ConflictException("Object should not be in state " + requiredState + " but is.");
       }
 
-      return resource;
+      return this;
     }
 
+    public ResourceValidator hasText() {
+      if (!resource.hasText()) {
+        throw new ConflictException("Resource should have a text, but doesn't.");
+      }
+      return this;
+    }
   }
 
 }

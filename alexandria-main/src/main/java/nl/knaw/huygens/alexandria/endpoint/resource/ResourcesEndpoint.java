@@ -175,9 +175,9 @@ public class ResourcesEndpoint extends JSONEndpoint {
   }
 
   @Path("{uuid}/" + TEXT)
-  public Class<ResourceTextGraphEndpoint> getResourceTextGraphEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
+  public Class<ResourceTextEndpoint> getResourceTextEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
     assertResourceIsConfirmed(uuidParam);
-    return ResourceTextGraphEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
+    return ResourceTextEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }
 
   @Path("{uuid}/provenance")

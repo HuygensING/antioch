@@ -56,6 +56,7 @@ import nl.knaw.huygens.alexandria.api.model.CommandResponse;
 import nl.knaw.huygens.alexandria.api.model.StatePrototype;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
+import nl.knaw.huygens.alexandria.api.model.text.ResourceTextAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
 import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
@@ -276,6 +277,18 @@ public class AlexandriaClient implements AutoCloseable {
   public RestResult<String> getTextAsDot(final UUID uuid) {
     WebTarget path = resourceTextTarget(uuid).path("dot");
     return stringResult(path);
+  }
+
+  public RestResult<URI> setResourceTextAnnotation(UUID resourceUuid, ResourceTextAnnotation textAnnotation) {
+    final Entity<ResourceTextAnnotation> entity = Entity.json(textAnnotation);
+    WebTarget path = resourceTextTarget(resourceUuid)//
+        .path(EndpointPaths.ANNOTATIONS)//
+        .path(textAnnotation.getId().toString());
+    final Supplier<Response> responseSupplier = authorizedPut(path, entity);
+    final RestRequester<URI> requester = RestRequester.withResponseSupplier(responseSupplier);
+    return requester//
+        .onStatus(Status.CREATED, this::uriFromLocationHeader)//
+        .getResult();
   }
 
   public RestResult<URI> setResourceTextView(final UUID resourceUUID, final String textViewName, final TextViewDefinition textView) {

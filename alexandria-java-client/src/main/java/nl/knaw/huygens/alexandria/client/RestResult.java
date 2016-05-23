@@ -29,6 +29,8 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import nl.knaw.huygens.alexandria.api.model.ErrorEntity;
+
 public class RestResult<T> {
   private boolean failure = false;
   private T cargo;
@@ -40,6 +42,12 @@ public class RestResult<T> {
     RestResult<T> result = new RestResult<>();
     result.setFail(true);
     result.setResponse(response);
+    try {
+      ErrorEntity errorEntity = response.readEntity(ErrorEntity.class);
+      result.setErrorMessage(errorEntity.getMessage());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     return result;
   }
 

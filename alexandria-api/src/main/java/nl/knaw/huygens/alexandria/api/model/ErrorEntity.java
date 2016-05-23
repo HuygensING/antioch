@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.exception;
+package nl.knaw.huygens.alexandria.api.model;
 
 /*
  * #%L
@@ -25,13 +25,19 @@ package nl.knaw.huygens.alexandria.exception;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import nl.knaw.huygens.alexandria.api.JsonTypeNames;
-import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 
 @JsonTypeName(JsonTypeNames.ERROR)
 public class ErrorEntity extends JsonWrapperObject {
   private String message;
 
+  public ErrorEntity() {
+  }
+
   public ErrorEntity(String message) {
+    this.setMessage(message);
+  }
+
+  public void setMessage(String message) {
     this.message = message;
   }
 

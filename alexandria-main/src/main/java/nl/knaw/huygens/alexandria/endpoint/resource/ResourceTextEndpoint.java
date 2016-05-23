@@ -47,7 +47,7 @@ import nl.knaw.huygens.alexandria.textgraph.TextGraphImportTask;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphTaskStatusMap;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 
-public class ResourceTextGraphEndpoint extends JSONEndpoint {
+public class ResourceTextEndpoint extends JSONEndpoint {
   private final AlexandriaService service;
   private final UUID resourceId;
   private final AlexandriaResource resource;
@@ -58,7 +58,7 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
   private ResourceTextFactory textFactory;
 
   @Inject
-  public ResourceTextGraphEndpoint(AlexandriaService service, //
+  public ResourceTextEndpoint(AlexandriaService service, //
       AlexandriaConfiguration config,//
       ResourceValidatorFactory validatorFactory, //
       ExecutorService executorService, //
@@ -72,7 +72,7 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
     this.locationBuilder = locationBuilder;
     this.textFactory = resourceTextFactory;
     this.taskStatusMap = taskStatusMap;
-    this.resource = validatorFactory.validateExistingResource(uuidParam).notTentative();
+    this.resource = validatorFactory.validateExistingResource(uuidParam).notTentative().get();
     this.resourceId = resource.getId();
   }
 
@@ -159,6 +159,11 @@ public class ResourceTextGraphEndpoint extends JSONEndpoint {
     assertResourceHasText();
     String dot = DotFactory.createDot(service, resourceId);
     return ok(dot);
+  }
+
+  @Path(EndpointPaths.ANNOTATIONS)
+  public Class<ResourceTextAnnotationEndpoint> getResourceTextAnnotationEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
+    return ResourceTextAnnotationEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }
 
   /* private methods */

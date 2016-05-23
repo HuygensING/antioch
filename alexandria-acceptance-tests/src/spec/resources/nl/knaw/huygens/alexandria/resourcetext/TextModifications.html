@@ -225,17 +225,16 @@
 		When I <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000004</h:put>
 		the body:
 		<h:jsonBody> 
-		{
-		  "position" : {
-  		  "xml:id" : "p-1", 
-		    "offset" : "5", 
-		    "length" : "2"
-		  },
-		  "element": { 
-		    "name" : "word",
-        "responsibility" : "resp", 
-		    "attributes" : { 
-		      "resp" : "#ed"
+    {
+      "textAnnotation" : { 
+        "position" : {
+	  		  "xml:id" : "p-1", 
+			    "offset" : "5", 
+			    "length" : "2"
+			  },
+			  "element": { 
+			    "name" : "word",
+	        "resp-value" : "#ed"
 		} } }
 		</h:jsonBody>
     using
@@ -265,17 +264,16 @@
     When I <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000004</h:put>
     the body:
     <h:jsonBody> 
-    {
-      "position" : {
+    { 
+      "textAnnotation" : { 
+        "position" : {
         "xml:id" : "undefined", 
         "offset" : "5", 
         "length" : "2"
       },
       "element": { 
         "name" : "word",
-        "responsibility" : "resp", 
-        "attributes" : { 
-          "resp" : "#ed"
+        "resp-value" : "#ed"
     } } }
     </h:jsonBody>
     using
@@ -312,16 +310,15 @@
     the body:
     <h:jsonBody> 
     {
-      "position" : {
-        "xml:id" : "p-1", 
-        "offset" : "-1", 
-        "length" : "2"
-      },
-      "element": { 
-        "name" : "word",
-        "responsibility" : "resp", 
-        "attributes" : { 
-          "resp" : "#ed"
+      "textAnnotation" : { 
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : "-1", 
+	        "length" : "2"
+	      },
+	      "element": { 
+	        "name" : "word",
+	        "resp-value" : "#ed"
     } } }
     </h:jsonBody>
     using
@@ -358,16 +355,15 @@
     the body:
     <h:jsonBody> 
     {
-      "position" : {
-        "xml:id" : "p-1", 
-        "offset" : "5", 
-        "length" : "100"
-      },
-      "element": { 
-        "name" : "word",
-        "responsibility" : "resp", 
-        "attributes" : { 
-          "resp" : "#ed"
+      "textAnnotation" : { 
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : "5", 
+	        "length" : "100"
+	      },
+	      "element": { 
+	        "name" : "word",
+	        "resp-value" : "#ed"
     } } }
     </h:jsonBody>
     using
@@ -404,16 +400,15 @@
     the body:
     <h:jsonBody> 
     {
-      "position" : {
-        "xml:id" : "p-1", 
-        "offset" : "5", 
-        "length" : "2"
-      },
-      "element": { 
-        "name" : "!@#$%^&amp;*", 
-        "responsibility" : "resp", 
-        "attributes" : { 
-          "resp" : "#ed"
+      "textAnnotation" : { 
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : "5", 
+	        "length" : "2"
+	      },
+	      "element": { 
+	        "name" : "!@#$%^&amp;*", 
+	        "resp-value" : "#ed"
     } } }
     </h:jsonBody>
     using
@@ -448,18 +443,17 @@
   <h:request>
     When I <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000004</h:put>
     the body:
-    <h:jsonBody> 
+    <h:jsonBody>
     {
-      "position" : {
-        "xml:id" : "p-1", 
-        "offset" : "5", 
-        "length" : "2"
-      },
-      "element": { 
-        "name" : "word", 
-        "responsibility" : "resp", 
-        "attributes" : { 
-          "!@#$%^&amp;*" : "#ed"
+      "textAnnotation" : { 
+	      "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : "5", 
+	        "length" : "2"
+	      },
+	      "element": { 
+	        "name" : "word", 
+	        "resp-value" : "#ed"
     } } }
     </h:jsonBody>
     using
@@ -497,16 +491,15 @@
     the body:
     <h:jsonBody> 
     {
-      "position" : {
-        "xml:id" : "p-1", 
-        "offset" : "5", 
-        "length" : "2"
-      },
-      "element": { 
-        "name" : "word", 
-        "responsibility" : "resp", 
-        "attributes" : { 
-          "resp" : "!@#$%^&amp;*"
+      "textAnnotation" : { 
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : "5", 
+	        "length" : "2"
+	      },
+	      "element": { 
+	        "name" : "word", 
+	        "resp-value" : "!@#$%^&amp;*"
     } } }
     </h:jsonBody>
     using
@@ -543,16 +536,15 @@
     the body:
     <h:jsonBody> 
     {
-      "position" : {
-        "xml:id" : "p-1", 
-        "offset" : "5", 
-        "length" : "2"
-      },
-      "element": { 
-        "name" : "word", 
-        "responsibility" : "resp", 
-        "attributes" : { 
-          "resp" : ""
+      "textAnnotation" : { 
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : "5", 
+	        "length" : "2"
+	      },
+	      "element": { 
+	        "name" : "word", 
+	        "resp-value" : ""
     } } }
     </h:jsonBody>
     using
@@ -589,16 +581,15 @@
     the body:
     <h:jsonBody> 
     {
-      "position" : {
-        "xml:id" : "p-1", 
-        "offset" : "5", 
-        "length" : "2"
-      },
-      "element": { 
-        "name" : "word", 
-        "responsibility" : "resp", 
-        "attributes" : { 
-          "resp" : "#ed"
+      "textAnnotation" : { 
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : "5", 
+	        "length" : "2"
+	      },
+	      "element": { 
+	        "name" : "word", 
+	        "resp-value" : "#ed"
     } } }
     </h:jsonBody>
     using
@@ -660,16 +651,15 @@
     the body:
     <h:jsonBody> 
     {
-      "position" : {
-        "xml:id" : "p-1", 
-        "offset" : "5", 
-        "length" : "2"
-      },
-      "element": { 
-        "name" : "word", 
-        "responsibility" : "resp", 
-        "attributes" : { 
-          "resp" : "#ed"
+      "textAnnotation" : { 
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : "5", 
+	        "length" : "2"
+	      },
+	      "element": { 
+	        "name" : "word", 
+	        "resp-value" : "#ed"
     } } }
     </h:jsonBody>
     using
@@ -686,16 +676,15 @@
     the body:
     <h:jsonBody> 
     {
-      "position" : {
-        "xml:id" : "p-1", 
-        "offset" : "8", 
-        "length" : "1"
-      },
-      "element": { 
-        "name" : "word", 
-        "responsibility" : "resp", 
-        "attributes" : { 
-          "resp" : "#ed"
+      "textAnnotation" : { 
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : "8", 
+	        "length" : "1"
+	      },
+	      "element": { 
+	        "name" : "word", 
+	        "resp-value" : "#ed"
     } } }
     </h:jsonBody>
     using
@@ -723,16 +712,15 @@
     the body:
     <h:jsonBody> 
     {
-      "position" : {
-        "xml:id" : "p-1", 
-        "offset" : "5", 
-        "length" : "2"
-      },
-      "element": { 
-        "name" : "word", 
-        "responsibility" : "resp", 
-        "attributes" : { 
-          "resp" : "#ed"
+      "textAnnotation" : { 
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : "5", 
+	        "length" : "2"
+	      },
+	      "element": { 
+	        "name" : "word", 
+	        "resp-value" : "#ed"
     } } }
     </h:jsonBody>
     using
@@ -749,16 +737,15 @@
     the body:
     <h:jsonBody> 
     {
-      "position" : {
-        "xml:id" : "p-1", 
-        "offset" : "6", 
-        "length" : "1"
-      },
-      "element": { 
-        "name" : "word", 
-        "responsibility" : "resp", 
-        "attributes" : { 
-          "resp" : "#ed"
+      "textAnnotation" : { 
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : "6", 
+	        "length" : "1"
+	      },
+	      "element": { 
+	        "name" : "word", 
+          "resp-value" : "#ed"
     } } }
     </h:jsonBody>
     using
@@ -783,16 +770,15 @@
     the body:
     <h:jsonBody> 
     {
-      "position" : {
-        "xml:id" : "p-1", 
-        "offset" : "6", 
-        "length" : "1"
-      },
-      "element": { 
-        "name" : "word", 
-        "responsibility" : "resp", 
-        "attributes" : { 
-          "resp" : "#ed1"
+      "textAnnotation" : { 
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : "6", 
+	        "length" : "1"
+	      },
+	      "element": { 
+	        "name" : "word", 
+          "resp-value" : "#ed1"
     } } }
     </h:jsonBody>
     using

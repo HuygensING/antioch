@@ -40,7 +40,7 @@ public class ResourceAnnotatorsEndpoint extends JSONEndpoint {
       @PathParam("uuid") final UUIDParam uuidParam) {
     this.service = service;
     this.locationBuilder = locationBuilder;
-    this.resource = validatorFactory.validateExistingResource(uuidParam).notTentative();
+    this.resource = validatorFactory.validateExistingResource(uuidParam).notTentative().get();
   }
 
   @GET

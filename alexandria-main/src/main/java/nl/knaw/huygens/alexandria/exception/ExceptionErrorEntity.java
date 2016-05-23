@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.exception;
 
+import nl.knaw.huygens.alexandria.api.model.ErrorEntity;
+
 /*
  * #%L
  * alexandria-main

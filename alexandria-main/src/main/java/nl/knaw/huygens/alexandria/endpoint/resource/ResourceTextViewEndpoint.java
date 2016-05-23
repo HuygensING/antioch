@@ -47,7 +47,7 @@ public class ResourceTextViewEndpoint extends JSONEndpoint {
     this.service = service;
     this.locationBuilder = locationBuilder;
     this.textFactory = textFactory;
-    AlexandriaResource resource = validatorFactory.validateExistingResource(uuidParam).notTentative();
+    AlexandriaResource resource = validatorFactory.validateExistingResource(uuidParam).notTentative().get();
     this.resourceId = resource.getId();
   }
 
