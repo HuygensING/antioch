@@ -58,7 +58,6 @@ public class AnnotatorsTest extends AlexandriaClientTest {
     Annotator annotator = annotatorList2.get(0);
     assertThat(annotator.getCode()).isEqualTo(code);
     assertThat(annotator.getDescription()).isEqualTo(description);
-
   }
 
   private AnnotatorList getAnnotatorList(UUID resourceUUID) {

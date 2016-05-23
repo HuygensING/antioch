@@ -481,9 +481,11 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
       <li>status <h:status>409 Conflict</h:status></li>
       <li>and body
         <h:jsonResponse>
-				[ {
-				  "message" : "Annotator 'code' already defined in (sub)resource chain."
-				} ]
+				{
+				  "error" : {
+				    "message" : "Annotator 'abc' already defined in (sub)resource chain."
+				  }
+				}
         </h:jsonResponse>
       </li>
     </ul>
