@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -46,7 +45,7 @@ public class ResourceAnnotatorsEndpoint extends JSONEndpoint {
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation("set annotator")
   public Response setAnnotator(@PathParam("code") final String code, //
-      @NotNull @Valid Annotator annotator) {
+      @NotNull @ValidAnnotator Annotator annotator) {
     annotator.setCode(code);
     Optional<Annotator> existingAnnotator = service.readResourceAnnotator(resource.getId(), code);
     service.setResourceAnnotator(resource.getId(), annotator);
