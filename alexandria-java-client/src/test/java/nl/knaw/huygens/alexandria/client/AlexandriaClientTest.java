@@ -44,6 +44,7 @@ import com.squarespace.jersey2.guice.BootstrapUtils;
 import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.client.model.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
+import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.jersey.AlexandriaApplication;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -116,6 +117,14 @@ public abstract class AlexandriaClientTest extends AlexandriaTest {
     RestResult<Void> result = client.setResource(resourceUuid, resource);
     assertRequestSucceeded(result);
     return resourceUuid;
+  }
+
+  protected UUID createSubResource(UUID resourceUuid, String ref) {
+    SubResourcePrototype subresource = new SubResourcePrototype().setSub(ref);
+    RestResult<UUID> result = client.addSubResource(resourceUuid, subresource);
+    assertRequestSucceeded(result);
+    UUID subresourceUuid = result.get();
+    return subresourceUuid;
   }
 
   protected TextImportStatus setResourceText(UUID resourceUuid, String xml) {

@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
+import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
@@ -124,6 +125,8 @@ public interface AlexandriaService {
   void setResourceAnnotator(UUID resourceUUID, Annotator annotator);
 
   Optional<Annotator> readResourceAnnotator(UUID resourceUUID, String annotatorCode);
+
+  AnnotatorList readResourceAnnotators(UUID id);
 
   void setTextView(UUID resourceUUID, String viewId, TextView textView, TextViewDefinition textViewDefinition);
 

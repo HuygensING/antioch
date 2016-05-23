@@ -251,9 +251,11 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
       <li>and body
         <h:jsonResponse>
 				[ {
-				  "code" : "abc",
-				  "description" : "Annotator abc",
-				  "^resource" : "https://{host}/resources/$uuid"
+				  "annotator" : {
+				    "code" : "abc",
+				    "description" : "Annotator abc",
+				    "^resource" : "https://{host}/resources/00000000-0000-0000-0000-000000000005"
+				  }
 				} ]
         </h:jsonResponse>
       </li>
@@ -281,15 +283,15 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
       <li>status <h:status>200 OK</h:status></li>
       <li>and body
         <h:jsonResponse>
-				[ {
-				  "code" : "abc",
-				  "description" : "Annotator abc",
-				  "^resource" : "https://{host}/resources/$uuid"
-				}, {
-				  "code" : "def",
-				  "description" : "Annotator def",
-				  "^resource" : "https://{host}/resources/$uuid"
-				} ]
+				[ { "annotator" : {
+				      "code" : "abc",
+				      "description" : "Annotator abc",
+				      "^resource" : "https://{host}/resources/$uuid"
+				}}, { "annotator" : {
+						  "code" : "def",
+						  "description" : "Annotator def",
+						  "^resource" : "https://{host}/resources/$uuid"
+				}} ]
         </h:jsonResponse>
       </li>
     </ul>
@@ -336,10 +338,12 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
       <li>and body
         <h:jsonResponse>
         [ {
-          "code" : "abc",
-          "description" : "Annotator abc",
-          "^resource" : "https://{host}/resources/$uuid"
-        } ]
+				  "annotator" : {
+				    "code" : "abc",
+				    "description" : "Annotator abc",
+				    "^resource" : "https://{host}/resources/$uuid"
+				  }
+				} ]
         </h:jsonResponse>
       </li>
     </ul>
@@ -367,13 +371,17 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
       <li>and body
         <h:jsonResponse>
 				[ {
-				  "code" : "abc",
-				  "description" : "Annotator abc",
-				  "^resource" : "https://{host}/resources/$uuid"
+				  "annotator" : {
+				    "code" : "def",
+				    "description" : "Annotator def",
+				    "^resource" : "https://{host}/resources/$uuid2"
+				  }
 				}, {
-				  "code" : "def",
-				  "description" : "Annotator def",
-				  "^resource" : "https://{host}/resources/$uuid2"
+				  "annotator" : {
+				    "code" : "abc",
+				    "description" : "Annotator abc",
+				    "^resource" : "https://{host}/resources/$uuid"
+				  }
 				} ]
         </h:jsonResponse>
       </li>
@@ -401,7 +409,7 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
         I have
         <h:success>successfully</h:success>
         set annotator <code>abc</code>
-        by <h:put>/resources/$uuid/annotators/abc</h:put>
+        by <h:put>/resources/$uuid2/annotators/abc</h:put>
         the body:
         <h:jsonBody>
           {

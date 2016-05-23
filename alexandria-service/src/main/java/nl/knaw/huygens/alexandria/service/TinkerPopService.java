@@ -62,9 +62,11 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import jersey.repackaged.com.google.common.collect.Lists;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
+import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
@@ -271,8 +273,7 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Set<AlexandriaResource> readSubResources(UUID uuid) {
-    ResourceVF resourcevf = storage.runInTransaction(() -> storage.readVF(ResourceVF.class, uuid))//
-        .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
+    ResourceVF resourcevf = readExisitingResourceVF(uuid);
     return resourcevf.getSubResources().stream()//
         .map(this::deframeResource)//
         .collect(toSet());
@@ -298,12 +299,35 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Optional<Annotator> readResourceAnnotator(UUID uuid, String code) {
-    ResourceVF resourcevf = storage.runInTransaction(() -> storage.readVF(ResourceVF.class, uuid))//
-        .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
+    ResourceVF resourcevf = readExisitingResourceVF(uuid);
     return resourcevf.getAnnotators().stream()//
         .map(this::deframeAnnotator)//
         .filter(a -> code.equals(a.getCode()))//
         .findFirst();
+  }
+
+  @Override
+  public AnnotatorList readResourceAnnotators(UUID uuid) {
+    List<AnnotatorVF> annotatorVFs = storage.runInTransaction(() -> {
+      ResourceVF resourceVF = readExisitingResourceVF(uuid);
+      List<AnnotatorVF> annotatorVFList = Lists.newArrayList();
+      do {
+        annotatorVFList.addAll(resourceVF.getAnnotators());
+        resourceVF = resourceVF.getParentResource();
+      } while (resourceVF != null);
+
+      return annotatorVFList;
+    });
+    AnnotatorList annotators = new AnnotatorList();
+    Set<String> codes = Sets.newHashSet();
+    annotatorVFs.stream().map(this::deframeAnnotator)//
+        .forEach(a -> {
+          if (!codes.contains(a.getCode())) {
+            codes.add(a.getCode());
+            annotators.add(a);
+          }
+        });
+    return annotators;
   }
 
   @Override
@@ -925,6 +949,12 @@ public class TinkerPopService implements AlexandriaService {
     List<Map<String, Object>> results = mapStream//
         .collect(toList());
     return results;
+  }
+
+  private ResourceVF readExisitingResourceVF(UUID uuid) {
+    ResourceVF resourcevf = storage.runInTransaction(() -> storage.readVF(ResourceVF.class, uuid))//
+        .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
+    return resourcevf;
   }
 
 }

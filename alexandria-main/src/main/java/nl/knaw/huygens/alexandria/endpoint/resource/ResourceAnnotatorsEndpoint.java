@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response;
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
+import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
@@ -39,6 +40,13 @@ public class ResourceAnnotatorsEndpoint extends JSONEndpoint {
     this.locationBuilder = locationBuilder;
     this.resource = validatorFactory.validateExistingResource(uuidParam).notTentative();
   }
+
+  @GET
+  @ApiOperation("get annotators")
+  public Response getAnnotators() {
+    return ok(readAllAnnotatorsForResource());
+  }
+
 
   @PUT
   @Path("{code}")
@@ -66,6 +74,10 @@ public class ResourceAnnotatorsEndpoint extends JSONEndpoint {
 
   private Annotator readExisitingAnnotator(String code) {
     return service.readResourceAnnotator(resource.getId(), code).orElseThrow(annotatorNotFoundForCode(code));
+  }
+
+  private AnnotatorList readAllAnnotatorsForResource() {
+    return service.readResourceAnnotators(resource.getId());
   }
 
   private Supplier<NotFoundException> annotatorNotFoundForCode(String code) {

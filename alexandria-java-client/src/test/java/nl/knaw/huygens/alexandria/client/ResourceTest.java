@@ -34,7 +34,6 @@ import nl.knaw.huygens.alexandria.client.model.ProvenancePojo;
 import nl.knaw.huygens.alexandria.client.model.ResourcePojo;
 import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 import nl.knaw.huygens.alexandria.client.model.SubResourcePojo;
-import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
 
 public class ResourceTest extends AlexandriaClientTest {
 
@@ -77,17 +76,15 @@ public class ResourceTest extends AlexandriaClientTest {
     client.setAutoConfirm(true);
 
     UUID resourceUuid = createResource("corpus");
-    SubResourcePrototype subresource = new SubResourcePrototype().setSub("/some/sub/path");
-    RestResult<UUID> result = client.addSubResource(resourceUuid, subresource);
-    assertRequestSucceeded(result);
-    UUID subresourceUuid = result.get();
+    String ref = "/some/sub/path";
+    UUID subresourceUuid = createSubResource(resourceUuid, ref);
 
     // retrieve the resource again
     RestResult<SubResourcePojo> result4 = client.getSubResource(subresourceUuid);
     assertRequestSucceeded(result4);
     SubResourcePojo resourcePojo2 = result4.get();
     softly.assertThat(resourcePojo2).isNotNull();
-    softly.assertThat(resourcePojo2.getSub()).as("sub").isEqualTo("/some/sub/path");
+    softly.assertThat(resourcePojo2.getSub()).as("sub").isEqualTo(ref);
     softly.assertThat(resourcePojo2.getState().getValue()).as("state").isEqualTo(AlexandriaState.CONFIRMED);
   }
 

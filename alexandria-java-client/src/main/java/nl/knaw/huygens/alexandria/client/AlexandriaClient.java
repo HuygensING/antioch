@@ -51,6 +51,7 @@ import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
+import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
 import nl.knaw.huygens.alexandria.api.model.CommandResponse;
 import nl.knaw.huygens.alexandria.api.model.StatePrototype;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
@@ -219,6 +220,17 @@ public class AlexandriaClient implements AutoCloseable {
     final RestRequester<Annotator> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
         .onStatus(Status.OK, this::toAnnotatorRestResult)//
+        .getResult();
+  }
+
+  public RestResult<AnnotatorList> getAnnotators(UUID resourceUUID) {
+    final WebTarget path = resourceTarget(resourceUUID)//
+        .path(EndpointPaths.ANNOTATORS);
+
+    final Supplier<Response> responseSupplier = anonymousGet(path);
+    final RestRequester<AnnotatorList> requester = RestRequester.withResponseSupplier(responseSupplier);
+    return requester//
+        .onStatus(Status.OK, this::toAnnotatorListRestResult)//
         .getResult();
   }
 
@@ -403,6 +415,10 @@ public class AlexandriaClient implements AutoCloseable {
 
   private RestResult<Annotator> toAnnotatorRestResult(final Response response) {
     return toEntityRestResult(response, Annotator.class);
+  }
+
+  private RestResult<AnnotatorList> toAnnotatorListRestResult(final Response response) {
+    return toEntityRestResult(response, AnnotatorList.class);
   }
 
   private RestResult<AnnotationPojo> toAnnotationPojoRestResult(final Response response) {
