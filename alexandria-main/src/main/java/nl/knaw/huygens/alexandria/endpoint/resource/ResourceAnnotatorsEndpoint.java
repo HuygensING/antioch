@@ -2,6 +2,7 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import java.net.URI;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
@@ -21,6 +22,7 @@ import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
+import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -47,7 +49,6 @@ public class ResourceAnnotatorsEndpoint extends JSONEndpoint {
     return ok(readAllAnnotatorsForResource());
   }
 
-
   @PUT
   @Path("{code}")
   @Consumes(MediaType.APPLICATION_JSON)
@@ -55,6 +56,7 @@ public class ResourceAnnotatorsEndpoint extends JSONEndpoint {
   public Response setAnnotator(@PathParam("code") final String code, //
       @NotNull @ValidAnnotator Annotator annotator) {
     annotator.setCode(code);
+    verifyAnnotatorCodeNotInUseByAncestorResource(code);
     Optional<Annotator> existingAnnotator = service.readResourceAnnotator(resource.getId(), code);
     service.setResourceAnnotator(resource.getId(), annotator);
     if (existingAnnotator.isPresent()) {
@@ -63,6 +65,19 @@ public class ResourceAnnotatorsEndpoint extends JSONEndpoint {
 
     URI uri = locationBuilder.locationOf(resource, EndpointPaths.ANNOTATORS, code);
     return created(uri);
+  }
+
+  private void verifyAnnotatorCodeNotInUseByAncestorResource(String code) {
+    UUID resourceUUID = resource.getId();
+    AnnotatorList resourceAnnotators = service.readResourceAnnotators(resourceUUID);
+    Optional<Annotator> ancestorAnnotator = resourceAnnotators.stream()//
+        .filter(a -> a.getCode().equals(code))//
+        .filter(a -> !a.getResourceURI().toString().contains(resourceUUID.toString()))//
+        .findAny();
+    if (ancestorAnnotator.isPresent()) {
+      throw new ConflictException("Annotator '" + code + "' already defined in (sub)resource chain.");
+    }
+
   }
 
   @GET
