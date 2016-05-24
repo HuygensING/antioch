@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -19,11 +20,14 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.commons.lang3.StringUtils;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.api.model.text.ResourceTextAnnotation;
-import nl.knaw.huygens.alexandria.api.model.text.ResourceTextAnnotation.Element;
 import nl.knaw.huygens.alexandria.api.model.text.ResourceTextAnnotation.Position;
+import nl.knaw.huygens.alexandria.api.model.text.ResourceTextAnnotationInfo;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
@@ -59,9 +63,10 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
       @NotNull ResourceTextAnnotation textAnnotation//
   ) {
     String xml = getXML();
-    validateTextAnnotation(textAnnotation, xml);
+    String annotated = validateTextAnnotation(textAnnotation, xml);
     URI location = locationBuilder.locationOf(resource, EndpointPaths.TEXT, EndpointPaths.ANNOTATIONS, uuidParam.getValue().toString());
-    return created(location);
+    ResourceTextAnnotationInfo info = new ResourceTextAnnotationInfo().setAnnotates(annotated);
+    return Response.created(location).entity(info).build();
   }
 
   private String getXML() {
@@ -79,23 +84,45 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
     return xml;
   }
 
-  private void validateTextAnnotation(ResourceTextAnnotation textAnnotation, String xml) {
-    validatePosition(textAnnotation.getPosition(), xml);
-    validateElement(textAnnotation.getElement());
+  private String validateTextAnnotation(ResourceTextAnnotation textAnnotation, String xml) {
+    String annotated = validatePosition(textAnnotation.getPosition(), xml);
+    validateName(textAnnotation.getName());
+    validateAnnotator(textAnnotation.getAnnotator());
+    return annotated;
   }
 
-  private void validatePosition(Position position, String xml) {
+  private void validateAnnotator(String annotator) {
+    if (StringUtils.isEmpty(annotator)) {
+      throw new BadRequestException("No annotator specified.");
+    }
+    Optional<String> validAnnotator = service.readResourceAnnotators(resourceId).stream()//
+        .map(Annotator::getCode)//
+        .filter(annotator::equals)//
+        .findFirst();
+    if (!validAnnotator.isPresent()) {
+      throw new BadRequestException("Resource has no annotator with code '" + annotator + "'.");
+    }
+  }
+
+  private String validatePosition(Position position, String xml) {
     QueryableDocument qDocument = QueryableDocument.createFromXml(xml, true);
     validate(qDocument, //
         "count(//*[@xml:id='" + position.getXmlId() + "'])", //
         1d, //
         "The text does not contain an element with the specified xml:id."//
     );
+    String xpath = "substring(//*[@xml:id='" + position.getXmlId() + "']," + position.getOffset() + "," + position.getLength() + ")";
     validate(qDocument, //
-        "string-length(substring(//*[@xml:id='" + position.getXmlId() + "']," + position.getOffset() + "," + position.getLength() + "))", //
+        "string-length(" + xpath + ")", //
         new Double(position.getLength()), //
         "The specified offset/length is illegal."//
     );
+    try {
+      return qDocument.evaluateXPathToString(xpath);
+    } catch (XPathExpressionException e) {
+      e.printStackTrace();
+      return "";
+    }
   }
 
   private void validate(QueryableDocument qDocument, String xpath, Double expectation, String errorMessage) {
@@ -113,8 +140,8 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
     }
   }
 
-  private void validateElement(Element element) {
-    List<String> validationErrors = XMLUtil.validateElementName(element.getName());
+  private void validateName(String elementName) {
+    List<String> validationErrors = XMLUtil.validateElementName(elementName);
     if (!validationErrors.isEmpty()) {
       throw new BadRequestException("The specified annotation name is illegal.");
     }

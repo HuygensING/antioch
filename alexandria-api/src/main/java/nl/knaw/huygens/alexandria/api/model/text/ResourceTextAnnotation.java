@@ -47,38 +47,12 @@ public class ResourceTextAnnotation extends JsonWrapperObject {
       this.length = length;
       return this;
     }
-
-  }
-
-  public static class Element {
-    String name;
-
-    @JsonProperty("resp-value")
-    String respValue;
-
-    public String getName() {
-      return name;
-    }
-
-    public Element setName(String name) {
-      this.name = name;
-      return this;
-    }
-
-    public String getRespValue() {
-      return respValue;
-    }
-
-    public Element setRespValue(String respValue) {
-      this.respValue = respValue;
-      return this;
-    }
-
   }
 
   private UUID uuid;
+  private String name;
+  private String annotator;
   private Position position;
-  private Element element;
 
   public ResourceTextAnnotation setId(UUID uuid) {
     this.uuid = uuid;
@@ -89,8 +63,22 @@ public class ResourceTextAnnotation extends JsonWrapperObject {
     return uuid;
   }
 
-  public Position getPosition() {
-    return position;
+  public ResourceTextAnnotation setName(String name) {
+    this.name = name;
+    return this;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public ResourceTextAnnotation setAnnotator(String annotator) {
+    this.annotator = annotator;
+    return this;
+  }
+
+  public String getAnnotator() {
+    return annotator;
   }
 
   public ResourceTextAnnotation setPosition(Position position) {
@@ -98,13 +86,8 @@ public class ResourceTextAnnotation extends JsonWrapperObject {
     return this;
   }
 
-  public Element getElement() {
-    return element;
-  }
-
-  public ResourceTextAnnotation setElement(Element element) {
-    this.element = element;
-    return this;
+  public Position getPosition() {
+    return position;
   }
 
 }

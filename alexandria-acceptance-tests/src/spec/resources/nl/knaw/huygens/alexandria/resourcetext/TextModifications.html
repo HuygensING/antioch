@@ -217,6 +217,9 @@
   with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
   <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
   which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
   <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
     <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a simple paragraph.&lt;/p&gt;&lt;/text&gt;</code>
   </span>,<br/>
@@ -226,16 +229,15 @@
 		the body:
 		<h:jsonBody> 
     {
-      "textAnnotation" : { 
+      "textAnnotation" : {
+        "name" : "word",
+        "annotator" : "ed",
         "position" : {
 	  		  "xml:id" : "p-1", 
-			    "offset" : 5, 
+			    "offset" : 6, 
 			    "length" : 2
-			  },
-			  "element": { 
-			    "name" : "word",
-	        "resp-value" : "#ed"
-		} } }
+			  }
+		} }
 		</h:jsonBody>
     using
     <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
@@ -245,7 +247,14 @@
       <li>location header
           <h:location>https://{host}/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000004</h:location>
       </li>
-      <li>and the response body is <h:responseBody/></li>
+      <li>and the response body is
+      <h:jsonResponse>
+      {
+        "textAnnotationInfo" : {
+          "annotates" : "is"
+      } }
+      </h:jsonResponse> 
+      </li>
     </ul>
   </h:request>
 </div>
@@ -266,15 +275,14 @@
     <h:jsonBody> 
     { 
       "textAnnotation" : { 
-        "position" : {
-        "xml:id" : "undefined", 
-        "offset" : 5, 
-        "length" : 2
-      },
-      "element": { 
         "name" : "word",
-        "resp-value" : "#ed"
-    } } }
+        "annotator" : "ed",
+        "position" : {
+	        "xml:id" : "undefined", 
+	        "offset" : 5, 
+	        "length" : 2
+	      }
+    } }
     </h:jsonBody>
     using
     <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
@@ -311,15 +319,14 @@
     <h:jsonBody> 
     {
       "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "ed",
         "position" : {
 	        "xml:id" : "p-1", 
 	        "offset" : -1, 
 	        "length" : 2
-	      },
-	      "element": { 
-	        "name" : "word",
-	        "resp-value" : "#ed"
-    } } }
+	      }
+    } }
     </h:jsonBody>
     using
     <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
@@ -356,15 +363,14 @@
     <h:jsonBody> 
     {
       "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "ed",
         "position" : {
 	        "xml:id" : "p-1", 
 	        "offset" : 5, 
 	        "length" : 100
-	      },
-	      "element": { 
-	        "name" : "word",
-	        "resp-value" : "#ed"
-    } } }
+	      }
+    } }
     </h:jsonBody>
     using
     <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
@@ -400,16 +406,15 @@
     the body:
     <h:jsonBody> 
     {
-      "textAnnotation" : { 
+      "textAnnotation" : {
+        "name" : "!@#$%^&amp;*",
+        "annotator" : "ed", 
         "position" : {
 	        "xml:id" : "p-1", 
 	        "offset" : 5, 
 	        "length" : 2
-	      },
-	      "element": { 
-	        "name" : "!@#$%^&amp;*", 
-	        "resp-value" : "#ed"
-    } } }
+	      }
+    } }
     </h:jsonBody>
     using
     <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
@@ -445,16 +450,15 @@
     the body:
     <h:jsonBody> 
     {
-      "textAnnotation" : { 
+      "textAnnotation" : {
+        "name" : "word",
+        "annotator" : "!@#$%^&amp;*",
         "position" : {
 	        "xml:id" : "p-1", 
 	        "offset" : 5, 
 	        "length" : 2
-	      },
-	      "element": { 
-	        "name" : "word", 
-	        "resp-value" : "!@#$%^&amp;*"
-    } } }
+	      }
+    } }
     </h:jsonBody>
     using
     <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
@@ -491,15 +495,14 @@
     <h:jsonBody> 
     {
       "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "", 
         "position" : {
 	        "xml:id" : "p-1", 
 	        "offset" : 5, 
 	        "length" : 2
-	      },
-	      "element": { 
-	        "name" : "word", 
-	        "resp-value" : ""
-    } } }
+	      }
+    } }
     </h:jsonBody>
     using
     <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
@@ -536,15 +539,14 @@
     <h:jsonBody> 
     {
       "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "ed",
         "position" : {
 	        "xml:id" : "p-1", 
 	        "offset" : 5, 
 	        "length" : 2
-	      },
-	      "element": { 
-	        "name" : "word", 
-	        "resp-value" : "#ed"
-    } } }
+	      }
+    } }
     </h:jsonBody>
     using
     <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
@@ -606,15 +608,14 @@
     <h:jsonBody> 
     {
       "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "ed",
         "position" : {
 	        "xml:id" : "p-1", 
 	        "offset" : 5, 
 	        "length" : 2
-	      },
-	      "element": { 
-	        "name" : "word", 
-	        "resp-value" : "#ed"
-    } } }
+	      }
+    } }
     </h:jsonBody>
     using
     <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
@@ -631,15 +632,14 @@
     <h:jsonBody> 
     {
       "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "ed",
         "position" : {
 	        "xml:id" : "p-1", 
 	        "offset" : 8, 
 	        "length" : 1
-	      },
-	      "element": { 
-	        "name" : "word", 
-	        "resp-value" : "#ed"
-    } } }
+	      }
+    } }
     </h:jsonBody>
     using
     <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
@@ -667,15 +667,14 @@
     <h:jsonBody> 
     {
       "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "ed",
         "position" : {
 	        "xml:id" : "p-1", 
 	        "offset" : 5, 
 	        "length" : 2
-	      },
-	      "element": { 
-	        "name" : "word", 
-	        "resp-value" : "#ed"
-    } } }
+	      }
+    } }
     </h:jsonBody>
     using
     <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
@@ -692,15 +691,14 @@
     <h:jsonBody> 
     {
       "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "ed",
         "position" : {
 	        "xml:id" : "p-1", 
 	        "offset" : 6, 
 	        "length" : 1
-	      },
-	      "element": { 
-	        "name" : "word", 
-          "resp-value" : "#ed"
-    } } }
+	      }
+    } }
     </h:jsonBody>
     using
     <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
@@ -725,15 +723,14 @@
     <h:jsonBody> 
     {
       "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "ed1",
         "position" : {
 	        "xml:id" : "p-1", 
 	        "offset" : 6, 
 	        "length" : 1
-	      },
-	      "element": { 
-	        "name" : "word", 
-          "resp-value" : "#ed1"
-    } } }
+	      }
+    } }
     </h:jsonBody>
     using
     <h:setHeader name="Content-Type">application/json</h:setHeader><br/>

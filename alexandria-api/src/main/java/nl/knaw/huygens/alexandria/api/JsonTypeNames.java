@@ -10,6 +10,7 @@ public class JsonTypeNames {
   public static final String ANNOTATOR = "annotator";
   public static final String RESOURCETEXT = "resourceText";
   public static final String TEXTANNOTATION = "textAnnotation";
+  public static final String TEXTANNOTATIONINFO = "textAnnotationInfo";
   public static final String TEXTVIEW = "textView";
   public static final String TEXTIMPORTSTATUS = "textImportStatus";
   public static final String QUERY = "query";

@@ -52,6 +52,7 @@ import com.google.inject.Module;
 import com.google.inject.Scopes;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -189,9 +190,16 @@ public class AlexandriaAcceptanceTest extends RestFixture {
   }
 
   public void resourceHasText(String resId, String xml) {
-    final AlexandriaResource resource = theResource(fromString(resId));
     ParseResult result = TextGraphUtil.parse(xml);
     service().storeTextGraph(UUID.fromString(resId), result);
+  }
+
+  public void resourceHasAnnotator(String resId, String code, String description) {
+    service().setResourceAnnotator(UUID.fromString(resId), anAnnotator(code, description));
+  }
+
+  private Annotator anAnnotator(String code, String description) {
+    return new Annotator().setCode(code).setDescription(description);
   }
 
   protected AlexandriaService service() {

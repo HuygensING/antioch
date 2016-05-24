@@ -57,6 +57,7 @@ import nl.knaw.huygens.alexandria.api.model.StatePrototype;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
 import nl.knaw.huygens.alexandria.api.model.text.ResourceTextAnnotation;
+import nl.knaw.huygens.alexandria.api.model.text.ResourceTextAnnotationInfo;
 import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
 import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
@@ -279,15 +280,15 @@ public class AlexandriaClient implements AutoCloseable {
     return stringResult(path);
   }
 
-  public RestResult<URI> setResourceTextAnnotation(UUID resourceUuid, ResourceTextAnnotation textAnnotation) {
+  public RestResult<ResourceTextAnnotationInfo> setResourceTextAnnotation(UUID resourceUuid, ResourceTextAnnotation textAnnotation) {
     final Entity<ResourceTextAnnotation> entity = Entity.json(textAnnotation);
     WebTarget path = resourceTextTarget(resourceUuid)//
         .path(EndpointPaths.ANNOTATIONS)//
         .path(textAnnotation.getId().toString());
     final Supplier<Response> responseSupplier = authorizedPut(path, entity);
-    final RestRequester<URI> requester = RestRequester.withResponseSupplier(responseSupplier);
+    final RestRequester<ResourceTextAnnotationInfo> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.CREATED, this::uriFromLocationHeader)//
+        .onStatus(Status.CREATED, this::toResourceTextAnnotationInfoRestResult)//
         .getResult();
   }
 
@@ -456,6 +457,10 @@ public class AlexandriaClient implements AutoCloseable {
 
   private RestResult<CommandResponse> toCommandResponseRestResult(final Response response) {
     return toEntityRestResult(response, CommandResponse.class);
+  }
+
+  private RestResult<ResourceTextAnnotationInfo> toResourceTextAnnotationInfoRestResult(final Response response) {
+    return toEntityRestResult(response, ResourceTextAnnotationInfo.class);
   }
 
   private <E> RestResult<E> toEntityRestResult(final Response response, final Class<E> entityClass) {
