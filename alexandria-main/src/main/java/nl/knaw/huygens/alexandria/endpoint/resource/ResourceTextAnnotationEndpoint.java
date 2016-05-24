@@ -21,6 +21,7 @@ import javax.xml.xpath.XPathExpressionException;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.text.ResourceTextAnnotation;
+import nl.knaw.huygens.alexandria.api.model.text.ResourceTextAnnotation.Position;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
@@ -77,24 +78,31 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
 
   private void validateTextAnnotation(ResourceTextAnnotation textAnnotation, String xml) {
     QueryableDocument qDocument = QueryableDocument.createFromXml(xml, true);
+    Position position = textAnnotation.getPosition();
     validate(qDocument, //
-        "count(//*[@xml:id='" + textAnnotation.getPosition().getXmlId() + "'])", //
+        "count(//*[@xml:id='" + position.getXmlId() + "'])", //
+        1d, //
         "The text does not contain an element with the specified xml:id."//
+    );
+    validate(qDocument, //
+        "string-length(substring(//*[@xml:id='" + position.getXmlId() + "']," + position.getOffset() + "," + position.getLength() + "))", //
+        new Double(position.getLength()), //
+        "The specified offset/length is illegal."//
     );
   }
 
-  private void validate(QueryableDocument qDocument, String xpath, String message) {
+  private void validate(QueryableDocument qDocument, String xpath, Double expectation, String errorMessage) {
     Log.info("xpath = '{}'", xpath);
     try {
       Double evaluation = qDocument.evaluateXPathToDouble(xpath);
-      if (evaluation != 1d) {
-        throw new BadRequestException(message);
-      }
       Log.info("evaluation = {}", evaluation);
+      if (!evaluation.equals(expectation)) {
+        throw new BadRequestException(errorMessage);
+      }
 
     } catch (XPathExpressionException e) {
       e.printStackTrace();
-      throw new BadRequestException(message);
+      throw new BadRequestException(errorMessage);
     }
   }
 }
