@@ -31,103 +31,106 @@
 <a class="jxr_linenumber" name="L23" href="#L23">23</a>  <em class="jxr_comment"> */</em>
 <a class="jxr_linenumber" name="L24" href="#L24">24</a>  
 <a class="jxr_linenumber" name="L25" href="#L25">25</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.assertj.core.api.Assertions.assertThat;
-<a class="jxr_linenumber" name="L26" href="#L26">26</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.mockito.Mockito.mock;
-<a class="jxr_linenumber" name="L27" href="#L27">27</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.mockito.Mockito.when;
-<a class="jxr_linenumber" name="L28" href="#L28">28</a>  
-<a class="jxr_linenumber" name="L29" href="#L29">29</a>  <strong class="jxr_keyword">import</strong> java.time.Instant;
-<a class="jxr_linenumber" name="L30" href="#L30">30</a>  <strong class="jxr_keyword">import</strong> java.util.Optional;
-<a class="jxr_linenumber" name="L31" href="#L31">31</a>  <strong class="jxr_keyword">import</strong> java.util.UUID;
-<a class="jxr_linenumber" name="L32" href="#L32">32</a>  <strong class="jxr_keyword">import</strong> java.util.function.Supplier;
-<a class="jxr_linenumber" name="L33" href="#L33">33</a>  
-<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <strong class="jxr_keyword">import</strong> org.apache.tinkerpop.gremlin.structure.Graph;
-<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <strong class="jxr_keyword">import</strong> org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
-<a class="jxr_linenumber" name="L36" href="#L36">36</a>  <strong class="jxr_keyword">import</strong> org.junit.Before;
-<a class="jxr_linenumber" name="L37" href="#L37">37</a>  <strong class="jxr_keyword">import</strong> org.junit.Ignore;
-<a class="jxr_linenumber" name="L38" href="#L38">38</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
-<a class="jxr_linenumber" name="L39" href="#L39">39</a>  <strong class="jxr_keyword">import</strong> org.mockito.Matchers;
-<a class="jxr_linenumber" name="L40" href="#L40">40</a>  
-<a class="jxr_linenumber" name="L41" href="#L41">41</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.Log;
-<a class="jxr_linenumber" name="L42" href="#L42">42</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.api.model.AlexandriaState;
-<a class="jxr_linenumber" name="L43" href="#L43">43</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.config.MockConfiguration;
-<a class="jxr_linenumber" name="L44" href="#L44">44</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
-<a class="jxr_linenumber" name="L45" href="#L45">45</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
-<a class="jxr_linenumber" name="L46" href="#L46">46</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.Accountable;
-<a class="jxr_linenumber" name="L47" href="#L47">47</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
-<a class="jxr_linenumber" name="L48" href="#L48">48</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
-<a class="jxr_linenumber" name="L49" href="#L49">49</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaResource;
-<a class="jxr_linenumber" name="L50" href="#L50">50</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.IdentifiablePointer;
-<a class="jxr_linenumber" name="L51" href="#L51">51</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
-<a class="jxr_linenumber" name="L52" href="#L52">52</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.service.TinkerPopService;
-<a class="jxr_linenumber" name="L53" href="#L53">53</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
-<a class="jxr_linenumber" name="L54" href="#L54">54</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.text.InMemoryTextService;
-<a class="jxr_linenumber" name="L55" href="#L55">55</a>  
-<a class="jxr_linenumber" name="L56" href="#L56">56</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/storage/TinkerpopAlexandriaServiceTest.html">TinkerpopAlexandriaServiceTest</a> {
-<a class="jxr_linenumber" name="L57" href="#L57">57</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> Storage mockStorage = mock(Storage.<strong class="jxr_keyword">class</strong>);
-<a class="jxr_linenumber" name="L58" href="#L58">58</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> TinkerPopService service = <strong class="jxr_keyword">new</strong> TinkerPopService(mockStorage, <strong class="jxr_keyword">new</strong> LocationBuilder(<strong class="jxr_keyword">new</strong> <a href="../../../../../nl/knaw/huygens/alexandria/config/MockConfiguration.html">MockConfiguration</a>(), <strong class="jxr_keyword">new</strong> EndpointPathResolver()), <strong class="jxr_keyword">new</strong> InMemoryTextService());
-<a class="jxr_linenumber" name="L59" href="#L59">59</a>  
-<a class="jxr_linenumber" name="L60" href="#L60">60</a>    @SuppressWarnings(<span class="jxr_string">"unchecked"</span>)
-<a class="jxr_linenumber" name="L61" href="#L61">61</a>    @Before
-<a class="jxr_linenumber" name="L62" href="#L62">62</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> before() {
-<a class="jxr_linenumber" name="L63" href="#L63">63</a>      when(mockStorage.runInTransaction(Matchers.any(Supplier.<strong class="jxr_keyword">class</strong>))).thenCallRealMethod();<em class="jxr_comment">//</em>
-<a class="jxr_linenumber" name="L64" href="#L64">64</a>    }
-<a class="jxr_linenumber" name="L65" href="#L65">65</a>  
-<a class="jxr_linenumber" name="L66" href="#L66">66</a>    @Ignore
-<a class="jxr_linenumber" name="L67" href="#L67">67</a>    @Test
-<a class="jxr_linenumber" name="L68" href="#L68">68</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> test() {
-<a class="jxr_linenumber" name="L69" href="#L69">69</a>      Graph g = TinkerGraph.open();
-<a class="jxr_linenumber" name="L70" href="#L70">70</a>      Log.info(<span class="jxr_string">"graph features: {}"</span>, g.features());
-<a class="jxr_linenumber" name="L71" href="#L71">71</a>      TentativeAlexandriaProvenance provenance = <strong class="jxr_keyword">new</strong> TentativeAlexandriaProvenance(<span class="jxr_string">"who"</span>, Instant.ofEpochSecond(1000000), <span class="jxr_string">"why"</span>);
-<a class="jxr_linenumber" name="L72" href="#L72">72</a>      UUID uuid = <strong class="jxr_keyword">new</strong> UUID(1L, 1L);
-<a class="jxr_linenumber" name="L73" href="#L73">73</a>      String ref = <span class="jxr_string">"ref"</span>;
-<a class="jxr_linenumber" name="L74" href="#L74">74</a>      AlexandriaState state = AlexandriaState.CONFIRMED;
-<a class="jxr_linenumber" name="L75" href="#L75">75</a>      <strong class="jxr_keyword">boolean</strong> created = service.createOrUpdateResource(uuid, ref, provenance, state);
-<a class="jxr_linenumber" name="L76" href="#L76">76</a>      assertThat(created).isTrue();
-<a class="jxr_linenumber" name="L77" href="#L77">77</a>    }
-<a class="jxr_linenumber" name="L78" href="#L78">78</a>  
-<a class="jxr_linenumber" name="L79" href="#L79">79</a>    @Ignore
-<a class="jxr_linenumber" name="L80" href="#L80">80</a>    @Test
-<a class="jxr_linenumber" name="L81" href="#L81">81</a>    <em class="jxr_comment">// TODO: fix test</em>
-<a class="jxr_linenumber" name="L82" href="#L82">82</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testDereferenceWithExistingAnnotation() {
-<a class="jxr_linenumber" name="L83" href="#L83">83</a>      UUID id = UUID.randomUUID();
-<a class="jxr_linenumber" name="L84" href="#L84">84</a>      AlexandriaAnnotationBody body = mock(AlexandriaAnnotationBody.<strong class="jxr_keyword">class</strong>);
-<a class="jxr_linenumber" name="L85" href="#L85">85</a>      TentativeAlexandriaProvenance provenance = <strong class="jxr_keyword">new</strong> TentativeAlexandriaProvenance(<span class="jxr_string">"who"</span>, Instant.now(), <span class="jxr_string">"why"</span>);
-<a class="jxr_linenumber" name="L86" href="#L86">86</a>      AnnotationVF annotationVF = mock(AnnotationVF.<strong class="jxr_keyword">class</strong>);
-<a class="jxr_linenumber" name="L87" href="#L87">87</a>      when(annotationVF.getUuid()).thenReturn(id.toString());
-<a class="jxr_linenumber" name="L88" href="#L88">88</a>      when(annotationVF.getProvenanceWhen()).thenReturn(Instant.now().toString());
-<a class="jxr_linenumber" name="L89" href="#L89">89</a>      when(mockStorage.readVF(AnnotationVF.<strong class="jxr_keyword">class</strong>, id)).thenReturn(Optional.of(annotationVF));
-<a class="jxr_linenumber" name="L90" href="#L90">90</a>      IdentifiablePointer&lt;AlexandriaAnnotation&gt; ap = <strong class="jxr_keyword">new</strong> IdentifiablePointer&lt;&gt;(AlexandriaAnnotation.<strong class="jxr_keyword">class</strong>, id.toString());
-<a class="jxr_linenumber" name="L91" href="#L91">91</a>  
-<a class="jxr_linenumber" name="L92" href="#L92">92</a>      Optional&lt;? <strong class="jxr_keyword">extends</strong> Accountable&gt; optional = service.dereference(ap);
-<a class="jxr_linenumber" name="L93" href="#L93">93</a>      assertThat(optional.isPresent());
-<a class="jxr_linenumber" name="L94" href="#L94">94</a>      AlexandriaAnnotation annotation = (AlexandriaAnnotation) optional.get();
-<a class="jxr_linenumber" name="L95" href="#L95">95</a>      assertThat(annotation.getId()).isEqualTo(id);
-<a class="jxr_linenumber" name="L96" href="#L96">96</a>    }
-<a class="jxr_linenumber" name="L97" href="#L97">97</a>  
-<a class="jxr_linenumber" name="L98" href="#L98">98</a>    @Test
-<a class="jxr_linenumber" name="L99" href="#L99">99</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testDereferenceWithNonExistingAnnotation() {
-<a class="jxr_linenumber" name="L100" href="#L100">100</a>     UUID id = UUID.randomUUID();
-<a class="jxr_linenumber" name="L101" href="#L101">101</a>     when(mockStorage.readVF(AnnotationVF.<strong class="jxr_keyword">class</strong>, id)).thenReturn(Optional.empty());
-<a class="jxr_linenumber" name="L102" href="#L102">102</a>     IdentifiablePointer&lt;AlexandriaAnnotation&gt; ap = <strong class="jxr_keyword">new</strong> IdentifiablePointer&lt;&gt;(AlexandriaAnnotation.<strong class="jxr_keyword">class</strong>, id.toString());
-<a class="jxr_linenumber" name="L103" href="#L103">103</a> 
-<a class="jxr_linenumber" name="L104" href="#L104">104</a>     Optional&lt;? <strong class="jxr_keyword">extends</strong> Accountable&gt; optional = service.dereference(ap);
-<a class="jxr_linenumber" name="L105" href="#L105">105</a>     assertThat(optional.isPresent()).isFalse();
-<a class="jxr_linenumber" name="L106" href="#L106">106</a>   }
-<a class="jxr_linenumber" name="L107" href="#L107">107</a> 
-<a class="jxr_linenumber" name="L108" href="#L108">108</a>   @Ignore
-<a class="jxr_linenumber" name="L109" href="#L109">109</a>   @Test
-<a class="jxr_linenumber" name="L110" href="#L110">110</a>   <em class="jxr_comment">// TODO: fix test</em>
-<a class="jxr_linenumber" name="L111" href="#L111">111</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testDereferenceWithExistingResource() {
-<a class="jxr_linenumber" name="L112" href="#L112">112</a>     UUID id = UUID.randomUUID();
-<a class="jxr_linenumber" name="L113" href="#L113">113</a>     TentativeAlexandriaProvenance provenance = <strong class="jxr_keyword">new</strong> TentativeAlexandriaProvenance(<span class="jxr_string">"who"</span>, Instant.now(), <span class="jxr_string">"why"</span>);
-<a class="jxr_linenumber" name="L114" href="#L114">114</a>     <em class="jxr_comment">// when(mockStorage.readResource(id)).thenReturn(Optional.of(new AlexandriaResource(id, provenance)));</em>
-<a class="jxr_linenumber" name="L115" href="#L115">115</a>     IdentifiablePointer&lt;AlexandriaResource&gt; ap = <strong class="jxr_keyword">new</strong> IdentifiablePointer&lt;&gt;(AlexandriaResource.<strong class="jxr_keyword">class</strong>, id.toString());
-<a class="jxr_linenumber" name="L116" href="#L116">116</a> 
-<a class="jxr_linenumber" name="L117" href="#L117">117</a>     Optional&lt;? <strong class="jxr_keyword">extends</strong> Accountable&gt; optional = service.dereference(ap);
-<a class="jxr_linenumber" name="L118" href="#L118">118</a>     assertThat(optional.isPresent());
-<a class="jxr_linenumber" name="L119" href="#L119">119</a>     AlexandriaResource annotation = (AlexandriaResource) optional.get();
-<a class="jxr_linenumber" name="L120" href="#L120">120</a>     assertThat(annotation.getId()).isEqualTo(id);
-<a class="jxr_linenumber" name="L121" href="#L121">121</a>   }
-<a class="jxr_linenumber" name="L122" href="#L122">122</a> }
+<a class="jxr_linenumber" name="L26" href="#L26">26</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.mockito.Mockito.doCallRealMethod;
+<a class="jxr_linenumber" name="L27" href="#L27">27</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.mockito.Mockito.mock;
+<a class="jxr_linenumber" name="L28" href="#L28">28</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.mockito.Mockito.when;
+<a class="jxr_linenumber" name="L29" href="#L29">29</a>  
+<a class="jxr_linenumber" name="L30" href="#L30">30</a>  <strong class="jxr_keyword">import</strong> java.time.Instant;
+<a class="jxr_linenumber" name="L31" href="#L31">31</a>  <strong class="jxr_keyword">import</strong> java.util.Optional;
+<a class="jxr_linenumber" name="L32" href="#L32">32</a>  <strong class="jxr_keyword">import</strong> java.util.UUID;
+<a class="jxr_linenumber" name="L33" href="#L33">33</a>  <strong class="jxr_keyword">import</strong> java.util.function.Supplier;
+<a class="jxr_linenumber" name="L34" href="#L34">34</a>  
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <strong class="jxr_keyword">import</strong> org.apache.tinkerpop.gremlin.structure.Graph;
+<a class="jxr_linenumber" name="L36" href="#L36">36</a>  <strong class="jxr_keyword">import</strong> org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+<a class="jxr_linenumber" name="L37" href="#L37">37</a>  <strong class="jxr_keyword">import</strong> org.junit.Before;
+<a class="jxr_linenumber" name="L38" href="#L38">38</a>  <strong class="jxr_keyword">import</strong> org.junit.Ignore;
+<a class="jxr_linenumber" name="L39" href="#L39">39</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a class="jxr_linenumber" name="L40" href="#L40">40</a>  <strong class="jxr_keyword">import</strong> org.mockito.Mockito;
+<a class="jxr_linenumber" name="L41" href="#L41">41</a>  
+<a class="jxr_linenumber" name="L42" href="#L42">42</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.Log;
+<a class="jxr_linenumber" name="L43" href="#L43">43</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+<a class="jxr_linenumber" name="L44" href="#L44">44</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.config.MockConfiguration;
+<a class="jxr_linenumber" name="L45" href="#L45">45</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
+<a class="jxr_linenumber" name="L46" href="#L46">46</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+<a class="jxr_linenumber" name="L47" href="#L47">47</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.Accountable;
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+<a class="jxr_linenumber" name="L49" href="#L49">49</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaResource;
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.IdentifiablePointer;
+<a class="jxr_linenumber" name="L52" href="#L52">52</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
+<a class="jxr_linenumber" name="L53" href="#L53">53</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.service.TinkerPopService;
+<a class="jxr_linenumber" name="L54" href="#L54">54</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
+<a class="jxr_linenumber" name="L55" href="#L55">55</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.text.InMemoryTextService;
+<a class="jxr_linenumber" name="L56" href="#L56">56</a>  
+<a class="jxr_linenumber" name="L57" href="#L57">57</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/storage/TinkerpopAlexandriaServiceTest.html">TinkerpopAlexandriaServiceTest</a> {
+<a class="jxr_linenumber" name="L58" href="#L58">58</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> Storage mockStorage = mock(Storage.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> TinkerPopService service = <strong class="jxr_keyword">new</strong> TinkerPopService(mockStorage, <strong class="jxr_keyword">new</strong> LocationBuilder(<strong class="jxr_keyword">new</strong> <a href="../../../../../nl/knaw/huygens/alexandria/config/MockConfiguration.html">MockConfiguration</a>(), <strong class="jxr_keyword">new</strong> EndpointPathResolver()), <strong class="jxr_keyword">new</strong> InMemoryTextService());
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>  
+<a class="jxr_linenumber" name="L61" href="#L61">61</a>    @SuppressWarnings(<span class="jxr_string">"unchecked"</span>)
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>    @Before
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> before() {
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>      when(mockStorage.runInTransaction(Mockito.any(Supplier.<strong class="jxr_keyword">class</strong>))).thenCallRealMethod();<em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L65" href="#L65">65</a>      when(mockStorage.getTransactionIsOpen()).thenCallRealMethod();
+<a class="jxr_linenumber" name="L66" href="#L66">66</a>      doCallRealMethod().when(mockStorage).setTransactionIsOpen(Mockito.any(Boolean.<strong class="jxr_keyword">class</strong>));
+<a class="jxr_linenumber" name="L67" href="#L67">67</a>    }
+<a class="jxr_linenumber" name="L68" href="#L68">68</a>  
+<a class="jxr_linenumber" name="L69" href="#L69">69</a>    @Ignore
+<a class="jxr_linenumber" name="L70" href="#L70">70</a>    @Test
+<a class="jxr_linenumber" name="L71" href="#L71">71</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> test() {
+<a class="jxr_linenumber" name="L72" href="#L72">72</a>      Graph g = TinkerGraph.open();
+<a class="jxr_linenumber" name="L73" href="#L73">73</a>      Log.info(<span class="jxr_string">"graph features: {}"</span>, g.features());
+<a class="jxr_linenumber" name="L74" href="#L74">74</a>      TentativeAlexandriaProvenance provenance = <strong class="jxr_keyword">new</strong> TentativeAlexandriaProvenance(<span class="jxr_string">"who"</span>, Instant.ofEpochSecond(1000000), <span class="jxr_string">"why"</span>);
+<a class="jxr_linenumber" name="L75" href="#L75">75</a>      UUID uuid = <strong class="jxr_keyword">new</strong> UUID(1L, 1L);
+<a class="jxr_linenumber" name="L76" href="#L76">76</a>      String ref = <span class="jxr_string">"ref"</span>;
+<a class="jxr_linenumber" name="L77" href="#L77">77</a>      AlexandriaState state = AlexandriaState.CONFIRMED;
+<a class="jxr_linenumber" name="L78" href="#L78">78</a>      <strong class="jxr_keyword">boolean</strong> created = service.createOrUpdateResource(uuid, ref, provenance, state);
+<a class="jxr_linenumber" name="L79" href="#L79">79</a>      assertThat(created).isTrue();
+<a class="jxr_linenumber" name="L80" href="#L80">80</a>    }
+<a class="jxr_linenumber" name="L81" href="#L81">81</a>  
+<a class="jxr_linenumber" name="L82" href="#L82">82</a>    @Ignore
+<a class="jxr_linenumber" name="L83" href="#L83">83</a>    @Test
+<a class="jxr_linenumber" name="L84" href="#L84">84</a>    <em class="jxr_comment">// TODO: fix test</em>
+<a class="jxr_linenumber" name="L85" href="#L85">85</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testDereferenceWithExistingAnnotation() {
+<a class="jxr_linenumber" name="L86" href="#L86">86</a>      UUID id = UUID.randomUUID();
+<a class="jxr_linenumber" name="L87" href="#L87">87</a>      AlexandriaAnnotationBody body = mock(AlexandriaAnnotationBody.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L88" href="#L88">88</a>      TentativeAlexandriaProvenance provenance = <strong class="jxr_keyword">new</strong> TentativeAlexandriaProvenance(<span class="jxr_string">"who"</span>, Instant.now(), <span class="jxr_string">"why"</span>);
+<a class="jxr_linenumber" name="L89" href="#L89">89</a>      AnnotationVF annotationVF = mock(AnnotationVF.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L90" href="#L90">90</a>      when(annotationVF.getUuid()).thenReturn(id.toString());
+<a class="jxr_linenumber" name="L91" href="#L91">91</a>      when(annotationVF.getProvenanceWhen()).thenReturn(Instant.now().toString());
+<a class="jxr_linenumber" name="L92" href="#L92">92</a>      when(mockStorage.readVF(AnnotationVF.<strong class="jxr_keyword">class</strong>, id)).thenReturn(Optional.of(annotationVF));
+<a class="jxr_linenumber" name="L93" href="#L93">93</a>      IdentifiablePointer&lt;AlexandriaAnnotation&gt; ap = <strong class="jxr_keyword">new</strong> IdentifiablePointer&lt;&gt;(AlexandriaAnnotation.<strong class="jxr_keyword">class</strong>, id.toString());
+<a class="jxr_linenumber" name="L94" href="#L94">94</a>  
+<a class="jxr_linenumber" name="L95" href="#L95">95</a>      Optional&lt;? <strong class="jxr_keyword">extends</strong> Accountable&gt; optional = service.dereference(ap);
+<a class="jxr_linenumber" name="L96" href="#L96">96</a>      assertThat(optional.isPresent());
+<a class="jxr_linenumber" name="L97" href="#L97">97</a>      AlexandriaAnnotation annotation = (AlexandriaAnnotation) optional.get();
+<a class="jxr_linenumber" name="L98" href="#L98">98</a>      assertThat(annotation.getId()).isEqualTo(id);
+<a class="jxr_linenumber" name="L99" href="#L99">99</a>    }
+<a class="jxr_linenumber" name="L100" href="#L100">100</a> 
+<a class="jxr_linenumber" name="L101" href="#L101">101</a>   @Test
+<a class="jxr_linenumber" name="L102" href="#L102">102</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testDereferenceWithNonExistingAnnotation() {
+<a class="jxr_linenumber" name="L103" href="#L103">103</a>     UUID id = UUID.randomUUID();
+<a class="jxr_linenumber" name="L104" href="#L104">104</a>     when(mockStorage.readVF(AnnotationVF.<strong class="jxr_keyword">class</strong>, id)).thenReturn(Optional.empty());
+<a class="jxr_linenumber" name="L105" href="#L105">105</a>     IdentifiablePointer&lt;AlexandriaAnnotation&gt; ap = <strong class="jxr_keyword">new</strong> IdentifiablePointer&lt;&gt;(AlexandriaAnnotation.<strong class="jxr_keyword">class</strong>, id.toString());
+<a class="jxr_linenumber" name="L106" href="#L106">106</a> 
+<a class="jxr_linenumber" name="L107" href="#L107">107</a>     Optional&lt;? <strong class="jxr_keyword">extends</strong> Accountable&gt; optional = service.dereference(ap);
+<a class="jxr_linenumber" name="L108" href="#L108">108</a>     assertThat(optional.isPresent()).isFalse();
+<a class="jxr_linenumber" name="L109" href="#L109">109</a>   }
+<a class="jxr_linenumber" name="L110" href="#L110">110</a> 
+<a class="jxr_linenumber" name="L111" href="#L111">111</a>   @Ignore
+<a class="jxr_linenumber" name="L112" href="#L112">112</a>   @Test
+<a class="jxr_linenumber" name="L113" href="#L113">113</a>   <em class="jxr_comment">// TODO: fix test</em>
+<a class="jxr_linenumber" name="L114" href="#L114">114</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testDereferenceWithExistingResource() {
+<a class="jxr_linenumber" name="L115" href="#L115">115</a>     UUID id = UUID.randomUUID();
+<a class="jxr_linenumber" name="L116" href="#L116">116</a>     TentativeAlexandriaProvenance provenance = <strong class="jxr_keyword">new</strong> TentativeAlexandriaProvenance(<span class="jxr_string">"who"</span>, Instant.now(), <span class="jxr_string">"why"</span>);
+<a class="jxr_linenumber" name="L117" href="#L117">117</a>     <em class="jxr_comment">// when(mockStorage.readResource(id)).thenReturn(Optional.of(new AlexandriaResource(id, provenance)));</em>
+<a class="jxr_linenumber" name="L118" href="#L118">118</a>     IdentifiablePointer&lt;AlexandriaResource&gt; ap = <strong class="jxr_keyword">new</strong> IdentifiablePointer&lt;&gt;(AlexandriaResource.<strong class="jxr_keyword">class</strong>, id.toString());
+<a class="jxr_linenumber" name="L119" href="#L119">119</a> 
+<a class="jxr_linenumber" name="L120" href="#L120">120</a>     Optional&lt;? <strong class="jxr_keyword">extends</strong> Accountable&gt; optional = service.dereference(ap);
+<a class="jxr_linenumber" name="L121" href="#L121">121</a>     assertThat(optional.isPresent());
+<a class="jxr_linenumber" name="L122" href="#L122">122</a>     AlexandriaResource annotation = (AlexandriaResource) optional.get();
+<a class="jxr_linenumber" name="L123" href="#L123">123</a>     assertThat(annotation.getId()).isEqualTo(id);
+<a class="jxr_linenumber" name="L124" href="#L124">124</a>   }
+<a class="jxr_linenumber" name="L125" href="#L125">125</a> }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2015&#x2013;2016 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
