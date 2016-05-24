@@ -265,6 +265,9 @@
   with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
   <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
   which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
   <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
     <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a simple paragraph.&lt;/p&gt;&lt;/text&gt;</code>
   </span>,<br/>
@@ -309,6 +312,9 @@
   with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
   <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
   which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
   <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
     <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a simple paragraph.&lt;/p&gt;&lt;/text&gt;</code>
   </span>,<br/>
@@ -353,6 +359,9 @@
   with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
   <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
   which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
   <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
     <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a simple paragraph.&lt;/p&gt;&lt;/text&gt;</code>
   </span>,<br/>
@@ -397,6 +406,9 @@
   with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
   <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
   which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
   <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
     <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a simple paragraph.&lt;/p&gt;&lt;/text&gt;</code>
   </span>,<br/>
@@ -441,6 +453,9 @@
   with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
   <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
   which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
   <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
     <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a simple paragraph.&lt;/p&gt;&lt;/text&gt;</code>
   </span>,<br/>
@@ -469,7 +484,7 @@
         <h:jsonResponse>
         { 
           "error" : { 
-            "message" : "'!@#$%^&amp;*' is not a valid responsiblity value."
+            "message" : "Resource has no annotator with code '!@#$%^&amp;*'."
           } 
         } 
         </h:jsonResponse>
@@ -485,6 +500,9 @@
   with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
   <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
   which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
   <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
     <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a simple paragraph.&lt;/p&gt;&lt;/text&gt;</code>
   </span>,<br/>
@@ -513,7 +531,7 @@
         <h:jsonResponse>
         { 
           "error" : { 
-            "message" : "'' is not a valid responsibility value."
+            "message" : "No annotator specified."
           } 
         } 
         </h:jsonResponse>
@@ -529,6 +547,9 @@
   with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
   <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
   which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
   <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
     <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a paragraph.&lt;/p&gt;&lt;/text&gt;</code>
   </span>,<br/>
@@ -543,7 +564,7 @@
         "annotator" : "ed",
         "position" : {
 	        "xml:id" : "p-1", 
-	        "offset" : 5, 
+	        "offset" : 6, 
 	        "length" : 2
 	      }
     } }
@@ -553,7 +574,14 @@
     then I should receive
     <ul>
       <li>status <h:status>201 Created</h:status></li>
-      <li>and response body <h:responseBody/></li>
+      <li>and the response body is
+      <h:jsonResponse>
+      {
+        "textAnnotationInfo" : {
+          "annotates" : "is"
+      } }
+      </h:jsonResponse> 
+      </li>
     </ul>
   </h:request>
   <br/>
@@ -598,6 +626,9 @@
   with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
   <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
   which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
   <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
     <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a paragraph.&lt;/p&gt;&lt;/text&gt;</code>
   </span>,<br/>
@@ -612,7 +643,7 @@
         "annotator" : "ed",
         "position" : {
 	        "xml:id" : "p-1", 
-	        "offset" : 5, 
+	        "offset" : 6, 
 	        "length" : 2
 	      }
     } }
@@ -622,7 +653,14 @@
     then I should receive
     <ul>
       <li>status <h:status>201 Created</h:status></li>
-      <li>and response body <h:responseBody/></li>
+      <li>and the response body is
+      <h:jsonResponse>
+      {
+        "textAnnotationInfo" : {
+          "annotates" : "is"
+      } }
+      </h:jsonResponse> 
+      </li>
     </ul>
   </h:request>
   <br/>
@@ -636,7 +674,7 @@
         "annotator" : "ed",
         "position" : {
 	        "xml:id" : "p-1", 
-	        "offset" : 8, 
+	        "offset" : 9, 
 	        "length" : 1
 	      }
     } }
@@ -646,7 +684,14 @@
     then I should receive
     <ul>
       <li>status <h:status>201 Created</h:status></li>
-      <li>and response body <h:responseBody/></li>
+      <li>and the response body is
+      <h:jsonResponse>
+      {
+        "textAnnotationInfo" : {
+          "annotates" : "a"
+      } }
+      </h:jsonResponse> 
+      </li>
     </ul>
   </h:request>
 </div>
@@ -657,6 +702,12 @@
   with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
   <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
   which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed1</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode2,#annotatorDescription2)">an annotator
+  with code <code c:set="#annotatorCode2">ed2</code> and description <code c:set="#annotatorDescription2">Mrs. Ed</code>  
+  </span>, and
   <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
     <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a paragraph.&lt;/p&gt;&lt;/text&gt;</code>
   </span>,<br/>
@@ -668,10 +719,10 @@
     {
       "textAnnotation" : { 
         "name" : "word",
-        "annotator" : "ed",
+        "annotator" : "ed1",
         "position" : {
 	        "xml:id" : "p-1", 
-	        "offset" : 5, 
+	        "offset" : 6, 
 	        "length" : 2
 	      }
     } }
@@ -681,7 +732,14 @@
     then I should receive
     <ul>
       <li>status <h:status>201 Created</h:status></li>
-      <li>and response body <h:responseBody/></li>
+      <li>and the response body is
+      <h:jsonResponse>
+      {
+        "textAnnotationInfo" : {
+          "annotates" : "is"
+      } }
+      </h:jsonResponse> 
+      </li>
     </ul>
   </h:request>
   <br/>
@@ -692,10 +750,10 @@
     {
       "textAnnotation" : { 
         "name" : "word",
-        "annotator" : "ed",
+        "annotator" : "ed1",
         "position" : {
 	        "xml:id" : "p-1", 
-	        "offset" : 6, 
+	        "offset" : 7, 
 	        "length" : 1
 	      }
     } }
@@ -724,10 +782,10 @@
     {
       "textAnnotation" : { 
         "name" : "word",
-        "annotator" : "ed1",
+        "annotator" : "ed2",
         "position" : {
 	        "xml:id" : "p-1", 
-	        "offset" : 6, 
+	        "offset" : 7, 
 	        "length" : 1
 	      }
     } }
@@ -738,7 +796,14 @@
     then I should receive
     <ul>
       <li>status <h:status>201 Created</h:status></li>
-      <li>and response body <h:responseBody/></li>
+      <li>and the response body is
+      <h:jsonResponse>
+      {
+        "textAnnotationInfo" : {
+          "annotates" : "s"
+      } }
+      </h:jsonResponse> 
+      </li>
     </ul>
   </h:request>
 </div>
