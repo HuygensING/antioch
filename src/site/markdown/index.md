@@ -1,17 +1,31 @@
-Lorem ipsum
------------
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed dapibus enim dolor, non blandit libero lobortis id.
-Phasellus dui odio, rutrum ut turpis vitae, pretium pulvinar elit. Fusce dapibus ultrices est quis pellentesque.
-Maecenas nec odio a tortor cursus auctor id ut neque. Morbi luctus semper erat at pulvinar.
-Sed ac augue sit amet risus rutrum lobortis. Maecenas in finibus sem.
-Maecenas elit neque, sagittis et rhoncus dignissim, convallis sed nunc.
-Nunc lobortis id ligula at viverra. Duis vestibulum maximus ultricies. Donec interdum mollis lorem sed sagittis.
+# Features
 
-Loremelior ipsumior
--------------------
-Pellentesque quis lobortis tortor. Vivamus sodales sapien at scelerisque laoreet. Aliquam non ullamcorper libero.
-Ut ut imperdiet erat, varius facilisis magna. Duis scelerisque eu diam a bibendum. Nunc id condimentum orci.
-Etiam tempor scelerisque sagittis. In aliquam pulvinar orci. Curabitur convallis mollis feugiat.
-Aliquam vitae accumsan nisi, nec pharetra nibh. Aliquam blandit dictum lectus id tristique.
-Quisque dui odio, egestas nec nibh vel, interdum bibendum mauris. Morbi consequat aliquam nibh,
-nec fringilla purus faucibus id. Integer vestibulum dui et convallis vestibulum. Integer ac rutrum enim.
+* add annotation(s)
+* versioning of annotations, 
+* annotation on annotation, 
+* provenance, 
+* remote resources, 
+* sub-resources
+
+# Architecture
+
+* RESTful service
+* graph database backend
+* various export formats
+* own query language
+
+# Texts as Graphs: Research/ Bibliography
+
+* Andrews, Tara Lee; Macé, Caroline (2013). Beyond the tree of texts: Building an empirical model of 
+  scribal variation through graph analysis of texts and stemmata. Literary and Linguistic
+  Computing, 28(4), pp. 504-521. Oxford University Press.
+  [10.1093/llc/fqt032](http://dx.doi.org/10.1093/llc/fqt032)
+  
+* Schmidt, D. and Colomb, R. ‘A data structure for representing multi-version texts online’. 
+  International Journal of Human-Computer Studies. 67.6: 2009, 497-514. 
+  [doi:10.1016/j.ijhcs.2009.02.001](http://dx.doi.org/10.1016/j.ijhcs.2009.02.001).
+  
+* C. M. Sperberg-McQueen 1 and Claus Huitfeldt: GODDAG: A Data Structure for Overlapping Hierarchies.
+  DDEP-PODDP 2000, ed. P. King and E.V. Munson, Lecture Notes in Computer Science 2023 (Berlin: Springer, 2004). 
+  pp. 139-160.
+  [Online preprint](http://cmsmcq.com/2000/poddp2000.html)
