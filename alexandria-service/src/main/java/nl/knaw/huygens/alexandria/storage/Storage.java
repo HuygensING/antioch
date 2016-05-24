@@ -62,7 +62,7 @@ public class Storage {
   private boolean supportsTransactions;
   private boolean supportsPersistence;
 
-  private boolean transactionOpen = false;
+  private ThreadLocal<Boolean> transactionOpen;
 
   public Storage(final Graph graph) {
     setGraph(graph);
@@ -90,7 +90,7 @@ public class Storage {
   // framedGraph methods
 
   public <T> T runInTransaction(Supplier<T> supplier) {
-    boolean inOpenTransaction = transactionOpen;
+    boolean inOpenTransaction = getTransactionIsOpen();
     if (!inOpenTransaction) {
       startTransaction();
     }
@@ -108,14 +108,30 @@ public class Storage {
     }
   }
 
+  Boolean getTransactionIsOpen() {
+    return getTransactionOpen().get();
+  }
+
+  private ThreadLocal<Boolean> getTransactionOpen() {
+    if (transactionOpen == null) {
+      transactionOpen = new ThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+          return false;
+        }
+      };
+    }
+    return transactionOpen;
+  }
+
   public void runInTransaction(Runnable runner) {
-    boolean inOpenTransaction = transactionOpen;
-    if (!inOpenTransaction) {
+    boolean startedInOpenTransaction = getTransactionIsOpen();
+    if (!startedInOpenTransaction) {
       startTransaction();
     }
     try {
       runner.run();
-      if (!inOpenTransaction) {
+      if (!startedInOpenTransaction) {
         commitTransaction();
       }
 
@@ -264,7 +280,11 @@ public class Storage {
     if (supportsTransactions()) {
       framedGraph.tx().rollback();
     }
-    transactionOpen = true;
+    setTransactionIsOpen(true);
+  }
+
+  void setTransactionIsOpen(Boolean b) {
+    getTransactionOpen().set(b);
   }
 
   private void commitTransaction() {
@@ -276,7 +296,7 @@ public class Storage {
     if (!supportsPersistence()) {
       saveToDisk(getDumpFile());
     }
-    transactionOpen = false;
+    setTransactionIsOpen(false);
   }
 
   private void rollbackTransaction() {
@@ -287,11 +307,11 @@ public class Storage {
     } else {
       Log.error("rollback called, but transactions are not supported by graph {}", graph);
     }
-    transactionOpen = false;
+    setTransactionIsOpen(false);
   }
 
   private void assertInTransaction() {
-    Preconditions.checkState(transactionOpen, "We should be in open transaction at this point, use runInTransaction()!");
+    Preconditions.checkState(getTransactionIsOpen(), "We should be in open transaction at this point, use runInTransaction()!");
   }
 
   private void assertClass(final Class<? extends AlexandriaVF> clazz) {
@@ -302,11 +322,16 @@ public class Storage {
   }
 
   private void assertTransactionIsClosed() {
-    Preconditions.checkState(!transactionOpen, "We're already inside an open transaction!");
+    Preconditions.checkState(!getTransactionIsOpen(), "We're already inside an open transaction!");
   }
 
   private void assertTransactionIsOpen() {
-    Preconditions.checkState(transactionOpen, "We're not in an open transaction!");
+    Preconditions.checkState(getTransactionIsOpen(), "We're not in an open transaction!");
+  }
+
+  public Vertex addVertex(Object... keyValues) {
+    assertInTransaction();
+    return graph.addVertex(keyValues);
   }
 
 }
