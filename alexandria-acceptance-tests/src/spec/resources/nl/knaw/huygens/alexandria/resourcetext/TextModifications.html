@@ -430,52 +430,6 @@
 </div>
 
 
-<div id="annotate-text-6" c:execute="clearStorage()"
-     data-desc="What happens when I use an invalid responsibility name when creating a text annotation?">
-  Given a resource
-  with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
-  <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
-  which has
-  <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
-    <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a simple paragraph.&lt;/p&gt;&lt;/text&gt;</code>
-  </span>,<br/>
-  <br/>
-  <h:request>
-    When I <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000004</h:put>
-    the body:
-    <h:jsonBody>
-    {
-      "textAnnotation" : { 
-	      "position" : {
-	        "xml:id" : "p-1", 
-	        "offset" : 5, 
-	        "length" : 2
-	      },
-	      "element": { 
-	        "name" : "word", 
-	        "resp-value" : "#ed"
-    } } }
-    </h:jsonBody>
-    using
-    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
-    then I should receive
-    <ul>
-      <li>status <h:status>400 Bad Request</h:status></li>
-      <li>and the response body contains:
-        <h:jsonResponse>
-        { 
-          "error" : { 
-            "message" : "'!@#$%^&amp;*' is not a valid attribute name.",
-            "message" : "responsibility attribute 'resp' is missing."
-          } 
-        } 
-        </h:jsonResponse>
-      </li>
-    </ul>
-  </h:request>
-</div>
-
-
 <div id="annotate-text-7" c:execute="clearStorage()"
      data-desc="What happens when I use an invalid responsibility value when creating a text annotation?">
   Given a resource
