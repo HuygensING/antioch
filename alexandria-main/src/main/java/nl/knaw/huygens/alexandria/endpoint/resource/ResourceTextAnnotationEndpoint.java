@@ -3,6 +3,7 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -21,6 +22,7 @@ import javax.xml.xpath.XPathExpressionException;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.text.ResourceTextAnnotation;
+import nl.knaw.huygens.alexandria.api.model.text.ResourceTextAnnotation.Element;
 import nl.knaw.huygens.alexandria.api.model.text.ResourceTextAnnotation.Position;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -28,6 +30,7 @@ import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
+import nl.knaw.huygens.alexandria.util.XMLUtil;
 import nl.knaw.huygens.tei.QueryableDocument;
 
 public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
@@ -77,8 +80,12 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
   }
 
   private void validateTextAnnotation(ResourceTextAnnotation textAnnotation, String xml) {
+    validatePosition(textAnnotation.getPosition(), xml);
+    validateElement(textAnnotation.getElement());
+  }
+
+  private void validatePosition(Position position, String xml) {
     QueryableDocument qDocument = QueryableDocument.createFromXml(xml, true);
-    Position position = textAnnotation.getPosition();
     validate(qDocument, //
         "count(//*[@xml:id='" + position.getXmlId() + "'])", //
         1d, //
@@ -105,4 +112,13 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
       throw new BadRequestException(errorMessage);
     }
   }
+
+  private void validateElement(Element element) {
+    List<String> validationErrors = XMLUtil.validateElementName(element.getName());
+    if (!validationErrors.isEmpty()) {
+      throw new BadRequestException("The specified annotation name is illegal.");
+    }
+
+  }
+
 }

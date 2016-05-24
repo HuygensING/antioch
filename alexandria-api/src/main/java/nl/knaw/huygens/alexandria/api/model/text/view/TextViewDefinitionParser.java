@@ -19,6 +19,7 @@ import com.google.common.base.Splitter;
 
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeFunction;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode;
+import nl.knaw.huygens.alexandria.util.XMLUtil;
 
 public class TextViewDefinitionParser {
 
@@ -50,7 +51,10 @@ public class TextViewDefinitionParser {
     ElementViewDefinition defaultElementViewDefinition = elementViewDefinitions.get(TextViewDefinition.DEFAULT_ATTRIBUTENAME);
     for (final Entry<String, ElementViewDefinition> entry : elementViewDefinitions.entrySet()) {
       final String elementName = entry.getKey();
-      validateElementName(elementName);
+      if (!TextViewDefinition.DEFAULT_ATTRIBUTENAME.equals(elementName)) {
+        errors.addAll(XMLUtil.validateElementName(elementName));
+      }
+
       final ElementView elementView = parseElementViewDefinition(elementName, entry.getValue());
       if (elementView.getElementMode() == null) {
         elementView.setElementMode(defaultElementViewDefinition.getElementMode().get());
@@ -60,28 +64,6 @@ public class TextViewDefinitionParser {
         elementView.setAttributeMode(AttributeMode.valueOf(modeString));
       }
       textView.putElementView(elementName, elementView);
-    }
-  }
-
-  static final Pattern ELEMENTNAME_PATTERN1 = Pattern.compile("[_a-zA-Z].*");
-  static final Pattern ELEMENTNAME_PATTERN2 = Pattern.compile("[\\w-\\.:]+");
-
-  private void validateElementName(final String elementName) {
-    if (TextViewDefinition.DEFAULT_ATTRIBUTENAME.equals(elementName)) {
-      return;
-    }
-    final String prefix = "\"" + elementName + "\" is not a valid element name: element names ";
-    if (elementName.contains(" ")) {
-      errors.add(prefix + "cannot contain spaces.");
-
-    } else if (elementName.toLowerCase().startsWith("xml")) {
-      errors.add(prefix + "cannot start with the letters xml (or XML, or Xml, etc).");
-
-    } else if (!ELEMENTNAME_PATTERN1.matcher(elementName).matches()) {
-      errors.add(prefix + "must start with a letter or underscore.");
-
-    } else if (!ELEMENTNAME_PATTERN2.matcher(elementName).matches()) {
-      errors.add(prefix + "can only contain letters, digits, hyphens, underscores, and periods.");
     }
   }
 
