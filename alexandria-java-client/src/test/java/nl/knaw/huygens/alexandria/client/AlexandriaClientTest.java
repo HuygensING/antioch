@@ -24,12 +24,24 @@ package nl.knaw.huygens.alexandria.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.apache.tinkerpop.shaded.minlog.Log;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
@@ -37,6 +49,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.squarespace.jersey2.guice.BootstrapUtils;
@@ -87,12 +100,15 @@ public abstract class AlexandriaClientTest extends AlexandriaTest {
 
   static AlexandriaClient client;
 
+  private static TinkerPopService tinkerpopService;
+
   @BeforeClass
   public static void startTestServer() {
     final ServiceLocator locator = createServiceLocator();
     final AlexandriaService service = locator.getService(AlexandriaService.class);
     final ResourceConfig resourceConfig = new AlexandriaApplication();
-    ((TinkerPopService) service).setStorage(new Storage(TinkerGraph.open()));
+    tinkerpopService = ((TinkerPopService) service);
+    tinkerpopService.setStorage(new Storage(TinkerGraph.open()));
     testServer = GrizzlyHttpServerFactory.createHttpServer(testURI, resourceConfig, locator);
     client = new AlexandriaClient(testURI);
   }
@@ -166,4 +182,58 @@ public abstract class AlexandriaClientTest extends AlexandriaTest {
     return locator;
   }
 
+  void dumpDb() {
+    Log.info("dumping server graph as graphSON:");
+    try {
+      ByteArrayOutputStream outputstream = new ByteArrayOutputStream();
+      tinkerpopService.dumpToGraphSON(outputstream);
+      outputstream.flush();
+      outputstream.close();
+      String[] lines = outputstream.toString("UTF8").split("\n");
+      ObjectMapper mapper = new ObjectMapper();
+      for (String json : lines) {
+        Object object = mapper.readValue(json, Object.class);
+        System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(object));
+      }
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    Log.info("dumping done");
+  }
+
+  void dumpDb1() {
+    Log.info("dumping server graph as graphML:");
+    try {
+      ByteArrayOutputStream outputstream = new ByteArrayOutputStream();
+      tinkerpopService.dumpToGraphML(outputstream);
+      outputstream.flush();
+      outputstream.close();
+      System.out.println(prettyFormat(outputstream.toString()));
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    Log.info("dumping done");
+  }
+
+  static String prettyFormat(String input, int indent) {
+    try {
+      Source xmlInput = new StreamSource(new StringReader(input));
+      StringWriter stringWriter = new StringWriter();
+      StreamResult xmlOutput = new StreamResult(stringWriter);
+      TransformerFactory transformerFactory = TransformerFactory.newInstance();
+      // transformerFactory.setAttribute("indent-number", indent);
+      Transformer transformer = transformerFactory.newTransformer();
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      transformer.transform(xmlInput, xmlOutput);
+      return xmlOutput.getWriter().toString();
+    } catch (Exception e) {
+      throw new RuntimeException(e); // simple exception handling, please review it
+    }
+  }
+
+  static String prettyFormat(String input) {
+    return prettyFormat(input, 2);
+  }
 }

@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -31,6 +32,7 @@ import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
+import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
@@ -42,7 +44,7 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
   private LocationBuilder locationBuilder;
   private AlexandriaService service;
   private AlexandriaResource resource;
-  private UUID resourceId;
+  private UUID resourceUUID;
 
   @Inject
   public ResourceTextAnnotationEndpoint(AlexandriaService service, //
@@ -52,25 +54,36 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
     this.service = service;
     this.locationBuilder = locationBuilder;
     this.resource = validatorFactory.validateExistingResource(uuidParam).notTentative().hasText().get();
-    this.resourceId = resource.getId();
+    this.resourceUUID = resource.getId();
   }
 
   @PUT
-  @Path("{uuid}")
+  @Path("{annotationUUID}")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response setAnnotation(//
-      @PathParam("uuid") final UUIDParam uuidParam, //
-      @NotNull TextRangeAnnotation textAnnotation//
+      @PathParam("annotationUUID") final UUIDParam uuidParam, //
+      @NotNull TextRangeAnnotation textRangeAnnotation//
   ) {
+    textRangeAnnotation.setId(uuidParam.getValue());
+    service.setTextRangeAnnotation(resourceUUID, textRangeAnnotation);
     String xml = getXML();
-    String annotated = validateTextAnnotation(textAnnotation, xml);
+    String annotated = validateTextRangeAnnotation(textRangeAnnotation, xml);
     URI location = locationBuilder.locationOf(resource, EndpointPaths.TEXT, EndpointPaths.ANNOTATIONS, uuidParam.getValue().toString());
     TextRangeAnnotationInfo info = new TextRangeAnnotationInfo().setAnnotates(annotated);
     return Response.created(location).entity(info).build();
   }
 
+  @GET
+  @Path("{annotationUUID}")
+  public Response getAnnotation(@PathParam("annotationUUID") final UUIDParam uuidParam) {
+    UUID annotationUUID = uuidParam.getValue();
+    TextRangeAnnotation textRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, annotationUUID)//
+        .orElseThrow(() -> new NotFoundException("No annotation found for this resource with id " + annotationUUID));
+    return ok(textRangeAnnotation);
+  }
+
   private String getXML() {
-    StreamingOutput outputstream = TextGraphUtil.streamXML(service, resourceId);
+    StreamingOutput outputstream = TextGraphUtil.streamXML(service, resourceUUID);
     ByteArrayOutputStream output = new ByteArrayOutputStream();
     String xml = null;
     try {
@@ -84,7 +97,7 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
     return xml;
   }
 
-  private String validateTextAnnotation(TextRangeAnnotation textAnnotation, String xml) {
+  private String validateTextRangeAnnotation(TextRangeAnnotation textAnnotation, String xml) {
     String annotated = validatePosition(textAnnotation.getPosition(), xml);
     validateName(textAnnotation.getName());
     validateAnnotator(textAnnotation.getAnnotator());
@@ -95,7 +108,7 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
     if (StringUtils.isEmpty(annotator)) {
       throw new BadRequestException("No annotator specified.");
     }
-    Optional<String> validAnnotator = service.readResourceAnnotators(resourceId).stream()//
+    Optional<String> validAnnotator = service.readResourceAnnotators(resourceUUID).stream()//
         .map(Annotator::getCode)//
         .filter(annotator::equals)//
         .findFirst();

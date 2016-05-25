@@ -334,6 +334,25 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
+  public void setTextRangeAnnotation(UUID resourceUUID, TextRangeAnnotation annotation) {
+    storage.runInTransaction(() -> {
+      TextRangeAnnotationVF vf = storage.readVF(TextRangeAnnotationVF.class, annotation.getId())//
+          .orElseGet(() -> storage.createVF(TextRangeAnnotationVF.class));
+      updateTextRangeAnnotation(vf, annotation);
+      vf.setResource(storage.readVF(ResourceVF.class, resourceUUID).get());
+    });
+  }
+
+  @Override
+  public Optional<TextRangeAnnotation> readTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID) {
+    return storage.runInTransaction(() -> getOptionalTextRangeAnnotation(resourceUUID, annotationUUID));
+  }
+
+  private Optional<TextRangeAnnotation> getOptionalTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID) {
+    return storage.readVF(TextRangeAnnotationVF.class, annotationUUID).map(this::deframeTextRangeAnnotation);
+  }
+
+  @Override
   public AlexandriaAnnotation deprecateAnnotation(UUID annotationId, AlexandriaAnnotation updatedAnnotation) {
     AnnotationVF annotationVF = storage.runInTransaction(() -> deprecateAnnotationVF(annotationId, updatedAnnotation));
     return deframeAnnotation(annotationVF);
@@ -802,16 +821,14 @@ public class TinkerPopService implements AlexandriaService {
         .setResourceURI(locationBuilder.locationOf(AlexandriaResource.class, avf.getResource().getUuid()));
   }
 
-  private TextRangeAnnotationVF frameTextRangeAnnotation(TextRangeAnnotation annotation) {
-    TextRangeAnnotationVF tavf = storage.createVF(TextRangeAnnotationVF.class);
-    tavf.setId(annotation.getId().toString());
-    tavf.setName(annotation.getName());
-    tavf.setAnnotatorCode(annotation.getAnnotator());
+  private void updateTextRangeAnnotation(TextRangeAnnotationVF vf, TextRangeAnnotation annotation) {
+    vf.setUuid(annotation.getId().toString());
+    vf.setName(annotation.getName());
+    vf.setAnnotatorCode(annotation.getAnnotator());
     Position position = annotation.getPosition();
-    tavf.setXmlId(position.getXmlId());
-    tavf.setOffset(position.getOffset());
-    tavf.setLength(position.getLength());
-    return tavf;
+    vf.setXmlId(position.getXmlId());
+    vf.setOffset(position.getOffset());
+    vf.setLength(position.getLength());
   }
 
   private TextRangeAnnotation deframeTextRangeAnnotation(TextRangeAnnotationVF vf) {
@@ -820,7 +837,7 @@ public class TinkerPopService implements AlexandriaService {
         .setOffset(vf.getOffset())//
         .setLength(vf.getLength());
     return new TextRangeAnnotation()//
-        .setId(UUID.fromString(vf.getId()))//
+        .setId(UUID.fromString(vf.getUuid()))//
         .setName(vf.getName())//
         .setAnnotator(vf.getAnnotatorCode())//
         .setPosition(position);

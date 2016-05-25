@@ -144,7 +144,7 @@ public class Storage {
     }
   }
 
-  public boolean existsVF(final Class<? extends AlexandriaVF> vfClass, final UUID uuid) {
+  public boolean existsVF(final Class<? extends VF> vfClass, final UUID uuid) {
     assertInTransaction();
     assertClass(vfClass);
     return find(vfClass, uuid).tryNext().isPresent();
@@ -156,7 +156,7 @@ public class Storage {
     return framedGraph.addVertex(vfClass);
   }
 
-  public <A extends AlexandriaVF> Optional<A> readVF(final Class<A> vfClass, final UUID uuid) {
+  public <A extends VF> Optional<A> readVF(final Class<A> vfClass, final UUID uuid) {
     assertInTransaction();
     assertClass(vfClass);
     return firstOrEmpty(find(vfClass, uuid).toList());
@@ -168,7 +168,7 @@ public class Storage {
     return firstOrEmpty(find(vfClass, uuid, revision).toList());
   }
 
-  public <A extends AlexandriaVF> FramedGraphTraversal<Object, A> find(Class<A> vfClass) {
+  public <A extends VF> FramedGraphTraversal<Object, A> find(Class<A> vfClass) {
     assertInTransaction();
     assertClass(vfClass);
     return framedGraph.V(vfClass);
@@ -261,11 +261,11 @@ public class Storage {
   }
   // - private methods - //
 
-  private <A extends AlexandriaVF> FramedGraphTraversal<Object, A> find(final Class<A> vfClass, final UUID uuid) {
+  private <A extends VF> FramedGraphTraversal<Object, A> find(final Class<A> vfClass, final UUID uuid) {
     return find(vfClass).has(IDENTIFIER_PROPERTY, uuid.toString());
   }
 
-  private <A extends AlexandriaVF> FramedGraphTraversal<Object, A> find(final Class<A> vfClass, final UUID uuid, final Integer revision) {
+  private <A extends VF> FramedGraphTraversal<Object, A> find(final Class<A> vfClass, final UUID uuid, final Integer revision) {
     return find(vfClass).has(IDENTIFIER_PROPERTY, uuid.toString() + "." + revision);
   }
 

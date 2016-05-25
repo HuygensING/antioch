@@ -9,45 +9,51 @@ import org.junit.Before;
 import org.junit.Test;
 
 import nl.knaw.huygens.alexandria.api.model.Annotator;
+import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
-import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 
-public class ResourceTextAnnotationTest extends AlexandriaClientTest {
+public class TextRangeAnnotationTest extends AlexandriaClientTest {
   @Before
   public void before() {
     client.setAuthKey(AUTHKEY);
   }
 
   @Test
-  public void testSetResourceTextAnnotation() {
+  public void testSetTextRangeAnnotation() {
     String xml = singleQuotesToDouble("<text><p xml:id='p-1'>This is a simple paragraph.</p></text>");
-    UUID resourceUuid = createResourceWithText(xml);
-    RestResult<URI> result = client.setAnnotator(resourceUuid, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
+    UUID resourceUUID = createResourceWithText(xml);
+    RestResult<URI> result = client.setAnnotator(resourceUUID, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
     assertRequestSucceeded(result);
 
-    UUID uuid = UUID.randomUUID();
+    UUID annotationUUID = UUID.randomUUID();
     Position position = new Position()//
         .setXmlId("p-1")//
         .setOffset(6)//
         .setLength(2);
-    TextRangeAnnotation textAnnotation = new TextRangeAnnotation()//
-        .setId(uuid)//
+    TextRangeAnnotation textRangeAnnotation0 = new TextRangeAnnotation()//
+        .setId(annotationUUID)//
         .setName("word")//
         .setAnnotator("ed")//
         .setPosition(position);
-    RestResult<TextRangeAnnotationInfo> putResult = client.setResourceTextAnnotation(resourceUuid, textAnnotation);
+    RestResult<TextRangeAnnotationInfo> putResult = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation0);
     assertRequestSucceeded(putResult);
     TextRangeAnnotationInfo info = putResult.get();
     assertThat(info.getAnnotates()).isEqualTo("is");
+    dumpDb();
+
+    RestResult<TextRangeAnnotation> getResult = client.getResourceTextRangeAnnotation(resourceUUID, annotationUUID);
+    assertRequestSucceeded(getResult);
+    TextRangeAnnotation textRangeAnnotation1 = getResult.get();
+    assertThat(textRangeAnnotation1).isEqualToComparingFieldByFieldRecursively(textRangeAnnotation0);
   }
 
   @Test
-  public void testSetResourceTextAnnotationWithInvalidXmlId() {
+  public void testSetTextRangeAnnotationWithInvalidXmlId() {
     String xml = singleQuotesToDouble("<text><p xml:id='p-1'>This is a simple paragraph.</p></text>");
-    UUID resourceUuid = createResourceWithText(xml);
-    RestResult<URI> result = client.setAnnotator(resourceUuid, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
+    UUID resourceUUID = createResourceWithText(xml);
+    RestResult<URI> result = client.setAnnotator(resourceUUID, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
     assertRequestSucceeded(result);
 
     UUID uuid = UUID.randomUUID();
@@ -60,18 +66,18 @@ public class ResourceTextAnnotationTest extends AlexandriaClientTest {
         .setName("word")//
         .setAnnotator("ed")//
         .setPosition(position);
-    RestResult<TextRangeAnnotationInfo> putResult = client.setResourceTextAnnotation(resourceUuid, textAnnotation);
+    RestResult<TextRangeAnnotationInfo> putResult = client.setResourceTextRangeAnnotation(resourceUUID, textAnnotation);
     assertThat(putResult.hasFailed()).isTrue();
     assertThat(putResult.getErrorMessage().get()).isEqualTo("The text does not contain an element with the specified xml:id.");
   }
 
   private UUID createResourceWithText(String xml) {
     String resourceRef = "test";
-    UUID resourceUuid = createResource(resourceRef);
-    TextImportStatus textGraphImportStatus = setResourceText(resourceUuid, xml);
-    URI expectedURI = URI.create("http://localhost:2016/resources/" + resourceUuid + "/text/xml");
+    UUID resourceUUID = createResource(resourceRef);
+    TextImportStatus textGraphImportStatus = setResourceText(resourceUUID, xml);
+    URI expectedURI = URI.create("http://localhost:2016/resources/" + resourceUUID + "/text/xml");
     assertThat(textGraphImportStatus.getTextURI()).isEqualTo(expectedURI);
-    return resourceUuid;
+    return resourceUUID;
   }
 
 }

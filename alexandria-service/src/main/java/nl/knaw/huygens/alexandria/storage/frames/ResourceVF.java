@@ -63,6 +63,10 @@ public abstract class ResourceVF extends AlexandriaVF implements FramedVertex<Re
   @Edge(AnnotatorVF.HAS_RESOURCE)
   public abstract List<AnnotatorVF> getAnnotators();
 
+  @In
+  @Edge(TextRangeAnnotationVF.HAS_RESOURCE)
+  public abstract List<TextRangeAnnotationVF> getTextRangeAnnotations();
+
   @Out
   @Edge(PART_OF)
   public abstract ResourceVF getParentResource();

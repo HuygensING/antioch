@@ -1,12 +1,14 @@
 package nl.knaw.huygens.alexandria.storage.frames;
 
+import nl.knaw.huygens.alexandria.storage.VertexLabels;
 import peapod.FramedVertex;
+import peapod.annotations.Edge;
+import peapod.annotations.Out;
+import peapod.annotations.Vertex;
 
-public abstract class TextRangeAnnotationVF extends HasResourceVF implements FramedVertex<TextRangeAnnotationVF> {
-
-  public abstract String getId();
-
-  public abstract void setId(String id);
+@Vertex(VertexLabels.TEXTRANGEANNOTATION)
+public abstract class TextRangeAnnotationVF extends IdentifiableVF implements FramedVertex<TextRangeAnnotationVF> {
+  public static final String HAS_RESOURCE = "textrangeannotation_has_resource";
 
   public abstract String getName();
 
@@ -27,5 +29,13 @@ public abstract class TextRangeAnnotationVF extends HasResourceVF implements Fra
   public abstract Integer getLength();
 
   public abstract void setLength(Integer length);
+
+  @Out
+  @Edge(HAS_RESOURCE)
+  public abstract void setResource(ResourceVF resource);
+
+  @Out
+  @Edge(HAS_RESOURCE)
+  public abstract ResourceVF getResource();
 
 }

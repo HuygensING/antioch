@@ -49,7 +49,9 @@ public class TextRangeAnnotation extends JsonWrapperObject {
     }
   }
 
+  @JsonProperty("id")
   private UUID uuid;
+
   private String name;
   private String annotator;
   private Position position;
