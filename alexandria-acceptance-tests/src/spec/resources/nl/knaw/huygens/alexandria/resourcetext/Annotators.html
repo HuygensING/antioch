@@ -14,7 +14,6 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
   
-  You should have received a copy of the GNU General Public
   License along with this program.  If not, see
   <http://www.gnu.org/licenses/gpl-3.0.html>.
   #L%
@@ -303,7 +302,7 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
 <div id="annotator-defined-on-parent-resource" c:execute="clearStorage()"
      data-desc="Can I use an annotator defined on a parent resource?">
 
-  Yes, annotators are valid for all subresource of the resource for which they are defined.<br/>
+  Yes, annotators are valid for all subresources of the resource for which they are defined.<br/>
   <br/>
   Given:
   <ul>
@@ -497,7 +496,7 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
      data-desc="Can I define annotators with the same code in unrelated resources?">
 
 	Yes you can. This allows you, for instance, to use a generic code for
-	the editor of a collections of letters, provides it is doen at the proper level
+	the editor of a collections of letters, provides it is done at the proper level
 	in the resource hierarchy.<br/>
  
   Given:
@@ -521,7 +520,7 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
         <h:jsonBody>
           {
             "annotator" : {
-              "description" : "Editor of 2a"
+              "description" : "Editor of A"
           } }
         </h:jsonBody>
       </h:request>
@@ -535,7 +534,7 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
     <h:jsonBody>
       {
         "annotator" : {
-          "description" : "Editor of 2b"
+          "description" : "Editor of B"
       } }
     </h:jsonBody>
     then I should receive
