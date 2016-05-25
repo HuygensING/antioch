@@ -59,10 +59,10 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import jersey.repackaged.com.google.common.collect.Lists;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
@@ -99,6 +99,8 @@ import nl.knaw.huygens.alexandria.textgraph.TextGraphSegment;
 import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorFactory;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorParseException;
+import nl.knaw.huygens.alexandria.util.StreamIterator;
+import peapod.FramedGraphTraversal;
 
 public class TinkerPopService implements AlexandriaService {
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new Jdk8Module());
@@ -350,6 +352,32 @@ public class TinkerPopService implements AlexandriaService {
 
   private Optional<TextRangeAnnotation> getOptionalTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID) {
     return storage.readVF(TextRangeAnnotationVF.class, annotationUUID).map(this::deframeTextRangeAnnotation);
+  }
+
+  @Override
+  public boolean overlapsWithExisitingTextRangeAnnotationForResource(TextRangeAnnotation annotation, UUID resourceUUID) {
+    return storage.runInTransaction(() -> {
+      boolean overlaps = false;
+      Optional<ResourceVF> oResourceVF = storage.readVF(ResourceVF.class, resourceUUID);
+      if (oResourceVF.isPresent()) {
+        FramedGraphTraversal<ResourceVF, Vertex> traversal = oResourceVF.get().start()//
+            .in(TextRangeAnnotationVF.HAS_RESOURCE)//
+            .has("name", annotation.getName())//
+            .has("annotatorCode", annotation.getAnnotator());
+        Integer start1 = annotation.getPosition().getOffset();
+        Integer end1 = start1 + annotation.getPosition().getLength();
+        Predicate<Vertex> overlapsWithAnnotation = t -> {
+          Integer start2 = (Integer) t.property("offset").value();
+          Integer end2 = start2 + (Integer) t.property("length").value();
+          return start1 <= end2 && start2 <= end1;
+        };
+        overlaps = StreamIterator.stream(traversal)//
+            .filter(overlapsWithAnnotation)//
+            .findFirst()//
+            .isPresent();
+      }
+      return overlaps;
+    });
   }
 
   @Override

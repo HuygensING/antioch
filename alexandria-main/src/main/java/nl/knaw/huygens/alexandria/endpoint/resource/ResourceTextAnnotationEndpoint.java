@@ -32,6 +32,7 @@ import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
+import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -65,9 +66,10 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
       @NotNull TextRangeAnnotation textRangeAnnotation//
   ) {
     textRangeAnnotation.setId(uuidParam.getValue());
-    service.setTextRangeAnnotation(resourceUUID, textRangeAnnotation);
     String xml = getXML();
     String annotated = validateTextRangeAnnotation(textRangeAnnotation, xml);
+
+    service.setTextRangeAnnotation(resourceUUID, textRangeAnnotation);
     URI location = locationBuilder.locationOf(resource, EndpointPaths.TEXT, EndpointPaths.ANNOTATIONS, uuidParam.getValue().toString());
     TextRangeAnnotationInfo info = new TextRangeAnnotationInfo().setAnnotates(annotated);
     return Response.created(location).entity(info).build();
@@ -101,6 +103,9 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
     String annotated = validatePosition(textAnnotation.getPosition(), xml);
     validateName(textAnnotation.getName());
     validateAnnotator(textAnnotation.getAnnotator());
+    if (service.overlapsWithExisitingTextRangeAnnotationForResource(textAnnotation, resourceUUID)) {
+      throw new ConflictException("Overlapping annotations with the same name and responsibility.");
+    }
     return annotated;
   }
 
@@ -130,12 +135,15 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
         new Double(position.getLength()), //
         "The specified offset/length is illegal."//
     );
+
+    String annotated = "";
     try {
-      return qDocument.evaluateXPathToString(xpath);
+      annotated = qDocument.evaluateXPathToString(xpath);
     } catch (XPathExpressionException e) {
       e.printStackTrace();
-      return "";
     }
+
+    return annotated;
   }
 
   private void validate(QueryableDocument qDocument, String xpath, Double expectation, String errorMessage) {
