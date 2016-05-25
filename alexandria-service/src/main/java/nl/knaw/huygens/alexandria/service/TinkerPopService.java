@@ -722,38 +722,6 @@ public class TinkerPopService implements AlexandriaService {
     vf.setStateSince(Instant.now().getEpochSecond());
   }
 
-  AnnotationVF frameAnnotation(AlexandriaAnnotation newAnnotation) {
-    AnnotationVF avf = storage.createVF(AnnotationVF.class);
-    setAlexandriaVFProperties(avf, newAnnotation);
-    avf.setRevision(newAnnotation.getRevision());
-    if (newAnnotation.getLocator() != null) {
-      avf.setLocator(newAnnotation.getLocator().toString());
-    }
-    UUID bodyId = newAnnotation.getBody().getId();
-    AnnotationBodyVF bodyVF = storage.readVF(AnnotationBodyVF.class, bodyId).get();
-    avf.setBody(bodyVF);
-    return avf;
-  }
-
-  AnnotatorVF frameAnnotator(Annotator annotator) {
-    AnnotatorVF avf = storage.createVF(AnnotatorVF.class);
-    avf.setCode(annotator.getCode());
-    avf.setDescription(annotator.getDescription());
-    return avf;
-  }
-
-  TextRangeAnnotationVF frameResourceTextAnnotation(TextRangeAnnotation annotation) {
-    TextRangeAnnotationVF tavf = storage.createVF(TextRangeAnnotationVF.class);
-    tavf.setId(annotation.getId().toString());
-    tavf.setName(annotation.getName());
-    tavf.setAnnotatorCode(annotation.getAnnotator());
-    Position position = annotation.getPosition();
-    tavf.setXmlId(position.getXmlId());
-    tavf.setOffset(position.getOffset());
-    tavf.setLength(position.getLength());
-    return tavf;
-  }
-
   // - private methods -//
 
   private String serializeTextViewMap(Map<String, TextView> textViewMap) throws JsonProcessingException {
@@ -820,11 +788,42 @@ public class TinkerPopService implements AlexandriaService {
     return resource;
   }
 
+  private AnnotatorVF frameAnnotator(Annotator annotator) {
+    AnnotatorVF avf = storage.createVF(AnnotatorVF.class);
+    avf.setCode(annotator.getCode());
+    avf.setDescription(annotator.getDescription());
+    return avf;
+  }
+
   private Annotator deframeAnnotator(AnnotatorVF avf) {
     return new Annotator()//
         .setCode(avf.getCode())//
         .setDescription(avf.getDescription())//
         .setResourceURI(locationBuilder.locationOf(AlexandriaResource.class, avf.getResource().getUuid()));
+  }
+
+  private TextRangeAnnotationVF frameTextRangeAnnotation(TextRangeAnnotation annotation) {
+    TextRangeAnnotationVF tavf = storage.createVF(TextRangeAnnotationVF.class);
+    tavf.setId(annotation.getId().toString());
+    tavf.setName(annotation.getName());
+    tavf.setAnnotatorCode(annotation.getAnnotator());
+    Position position = annotation.getPosition();
+    tavf.setXmlId(position.getXmlId());
+    tavf.setOffset(position.getOffset());
+    tavf.setLength(position.getLength());
+    return tavf;
+  }
+
+  private TextRangeAnnotation deframeTextRangeAnnotation(TextRangeAnnotationVF vf) {
+    Position position = new Position()//
+        .setXmlId(vf.getXmlId())//
+        .setOffset(vf.getOffset())//
+        .setLength(vf.getLength());
+    return new TextRangeAnnotation()//
+        .setId(UUID.fromString(vf.getId()))//
+        .setName(vf.getName())//
+        .setAnnotator(vf.getAnnotatorCode())//
+        .setPosition(position);
   }
 
   private void setTextViews(ResourceVF rvf, AlexandriaResource resource) {
@@ -853,6 +852,19 @@ public class TinkerPopService implements AlexandriaService {
     TextView textView = entry.getValue();
     textView.setName(entry.getKey());
     return textView;
+  }
+
+  AnnotationVF frameAnnotation(AlexandriaAnnotation newAnnotation) {
+    AnnotationVF avf = storage.createVF(AnnotationVF.class);
+    setAlexandriaVFProperties(avf, newAnnotation);
+    avf.setRevision(newAnnotation.getRevision());
+    if (newAnnotation.getLocator() != null) {
+      avf.setLocator(newAnnotation.getLocator().toString());
+    }
+    UUID bodyId = newAnnotation.getBody().getId();
+    AnnotationBodyVF bodyVF = storage.readVF(AnnotationBodyVF.class, bodyId).get();
+    avf.setBody(bodyVF);
+    return avf;
   }
 
   private AlexandriaAnnotation deframeAnnotation(AnnotationVF annotationVF) {
