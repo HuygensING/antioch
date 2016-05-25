@@ -11,7 +11,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Edge;
@@ -97,8 +96,7 @@ public class TextGraphService {
         return next;
       }
     };
-    Iterable<Vertex> iterable = () -> textAnnotationIterator;
-    return StreamSupport.stream(iterable.spliterator(), false)//
+    return StreamUtil.stream(textAnnotationIterator)//
         .map(this::toTextAnnotation);
   }
 
@@ -239,8 +237,7 @@ public class TextGraphService {
   }
 
   private List<TextAnnotation> getTextAnnotations(Vertex textSegment, String edgeLabel) {
-    Iterable<Vertex> iterable = () -> textSegment.vertices(Direction.IN, edgeLabel);
-    return StreamSupport.stream(iterable.spliterator(), false)//
+    return StreamUtil.stream(textSegment.vertices(Direction.IN, edgeLabel))//
         .filter(v -> v.label().equals(VertexLabels.TEXTANNOTATION))// this filter should not be necessary
         .map(this::toTextAnnotation)//
         .sorted(BY_INCREASING_DEPTH)//
