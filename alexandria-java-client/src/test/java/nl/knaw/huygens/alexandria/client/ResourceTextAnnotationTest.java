@@ -24,7 +24,8 @@ public class ResourceTextAnnotationTest extends AlexandriaClientTest {
   public void testSetResourceTextAnnotation() {
     String xml = singleQuotesToDouble("<text><p xml:id='p-1'>This is a simple paragraph.</p></text>");
     UUID resourceUuid = createResourceWithText(xml);
-    client.setAnnotator(resourceUuid, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
+    RestResult<URI> result = client.setAnnotator(resourceUuid, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
+    assertRequestSucceeded(result);
 
     UUID uuid = UUID.randomUUID();
     Position position = new Position()//
@@ -46,7 +47,8 @@ public class ResourceTextAnnotationTest extends AlexandriaClientTest {
   public void testSetResourceTextAnnotationWithInvalidXmlId() {
     String xml = singleQuotesToDouble("<text><p xml:id='p-1'>This is a simple paragraph.</p></text>");
     UUID resourceUuid = createResourceWithText(xml);
-    client.setAnnotator(resourceUuid, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
+    RestResult<URI> result = client.setAnnotator(resourceUuid, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
+    assertRequestSucceeded(result);
 
     UUID uuid = UUID.randomUUID();
     Position position = new Position()//
