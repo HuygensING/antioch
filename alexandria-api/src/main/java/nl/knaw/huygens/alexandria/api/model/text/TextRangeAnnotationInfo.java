@@ -9,11 +9,11 @@ import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 
 @JsonTypeName(JsonTypeNames.TEXTANNOTATIONINFO)
 @JsonInclude(Include.NON_NULL)
-public class ResourceTextAnnotationInfo extends JsonWrapperObject {
+public class TextRangeAnnotationInfo extends JsonWrapperObject {
 
   private String annotates;
 
-  public ResourceTextAnnotationInfo setAnnotates(String annotates) {
+  public TextRangeAnnotationInfo setAnnotates(String annotates) {
     this.annotates = annotates;
     return this;
   }

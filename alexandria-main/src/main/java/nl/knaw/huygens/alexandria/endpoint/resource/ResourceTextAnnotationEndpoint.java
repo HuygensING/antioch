@@ -25,9 +25,9 @@ import org.apache.commons.lang3.StringUtils;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
-import nl.knaw.huygens.alexandria.api.model.text.ResourceTextAnnotation;
-import nl.knaw.huygens.alexandria.api.model.text.ResourceTextAnnotation.Position;
-import nl.knaw.huygens.alexandria.api.model.text.ResourceTextAnnotationInfo;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
@@ -60,12 +60,12 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
   @Consumes(MediaType.APPLICATION_JSON)
   public Response setAnnotation(//
       @PathParam("uuid") final UUIDParam uuidParam, //
-      @NotNull ResourceTextAnnotation textAnnotation//
+      @NotNull TextRangeAnnotation textAnnotation//
   ) {
     String xml = getXML();
     String annotated = validateTextAnnotation(textAnnotation, xml);
     URI location = locationBuilder.locationOf(resource, EndpointPaths.TEXT, EndpointPaths.ANNOTATIONS, uuidParam.getValue().toString());
-    ResourceTextAnnotationInfo info = new ResourceTextAnnotationInfo().setAnnotates(annotated);
+    TextRangeAnnotationInfo info = new TextRangeAnnotationInfo().setAnnotates(annotated);
     return Response.created(location).entity(info).build();
   }
 
@@ -84,7 +84,7 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
     return xml;
   }
 
-  private String validateTextAnnotation(ResourceTextAnnotation textAnnotation, String xml) {
+  private String validateTextAnnotation(TextRangeAnnotation textAnnotation, String xml) {
     String annotated = validatePosition(textAnnotation.getPosition(), xml);
     validateName(textAnnotation.getName());
     validateAnnotator(textAnnotation.getAnnotator());

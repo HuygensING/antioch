@@ -25,13 +25,14 @@ package nl.knaw.huygens.alexandria.storage.frames;
 import java.util.List;
 
 import nl.knaw.huygens.alexandria.storage.VertexLabels;
+import peapod.FramedVertex;
 import peapod.annotations.Edge;
 import peapod.annotations.In;
 import peapod.annotations.Out;
 import peapod.annotations.Vertex;
 
 @Vertex(VertexLabels.RESOURCE)
-public abstract class ResourceVF extends AlexandriaVF {
+public abstract class ResourceVF extends AlexandriaVF implements FramedVertex<ResourceVF> {
   public static final String PART_OF = "part_of";
 
   public abstract String getCargo();

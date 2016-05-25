@@ -68,6 +68,8 @@ import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -90,6 +92,7 @@ import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotatorVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
+import nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF;
 import nl.knaw.huygens.alexandria.textgraph.ParseResult;
 import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphSegment;
@@ -738,6 +741,19 @@ public class TinkerPopService implements AlexandriaService {
     avf.setDescription(annotator.getDescription());
     return avf;
   }
+
+  TextRangeAnnotationVF frameResourceTextAnnotation(TextRangeAnnotation annotation) {
+    TextRangeAnnotationVF tavf = storage.createVF(TextRangeAnnotationVF.class);
+    tavf.setId(annotation.getId().toString());
+    tavf.setName(annotation.getName());
+    tavf.setAnnotatorCode(annotation.getAnnotator());
+    Position position = annotation.getPosition();
+    tavf.setXmlId(position.getXmlId());
+    tavf.setOffset(position.getOffset());
+    tavf.setLength(position.getLength());
+    return tavf;
+  }
+
   // - private methods -//
 
   private String serializeTextViewMap(Map<String, TextView> textViewMap) throws JsonProcessingException {

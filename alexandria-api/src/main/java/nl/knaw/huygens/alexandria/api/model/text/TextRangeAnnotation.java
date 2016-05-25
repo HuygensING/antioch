@@ -12,7 +12,7 @@ import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 
 @JsonTypeName(JsonTypeNames.TEXTANNOTATION)
 @JsonInclude(Include.NON_NULL)
-public class ResourceTextAnnotation extends JsonWrapperObject {
+public class TextRangeAnnotation extends JsonWrapperObject {
 
   public static class Position {
     @JsonProperty("xml:id")
@@ -54,7 +54,7 @@ public class ResourceTextAnnotation extends JsonWrapperObject {
   private String annotator;
   private Position position;
 
-  public ResourceTextAnnotation setId(UUID uuid) {
+  public TextRangeAnnotation setId(UUID uuid) {
     this.uuid = uuid;
     return this;
   }
@@ -63,7 +63,7 @@ public class ResourceTextAnnotation extends JsonWrapperObject {
     return uuid;
   }
 
-  public ResourceTextAnnotation setName(String name) {
+  public TextRangeAnnotation setName(String name) {
     this.name = name;
     return this;
   }
@@ -72,7 +72,7 @@ public class ResourceTextAnnotation extends JsonWrapperObject {
     return name;
   }
 
-  public ResourceTextAnnotation setAnnotator(String annotator) {
+  public TextRangeAnnotation setAnnotator(String annotator) {
     this.annotator = annotator;
     return this;
   }
@@ -81,7 +81,7 @@ public class ResourceTextAnnotation extends JsonWrapperObject {
     return annotator;
   }
 
-  public ResourceTextAnnotation setPosition(Position position) {
+  public TextRangeAnnotation setPosition(Position position) {
     this.position = position;
     return this;
   }

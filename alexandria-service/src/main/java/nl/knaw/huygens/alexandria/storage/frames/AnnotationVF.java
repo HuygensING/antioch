@@ -25,13 +25,14 @@ package nl.knaw.huygens.alexandria.storage.frames;
 import java.util.List;
 
 import nl.knaw.huygens.alexandria.storage.VertexLabels;
+import peapod.FramedVertex;
 import peapod.annotations.Edge;
 import peapod.annotations.In;
 import peapod.annotations.Out;
 import peapod.annotations.Vertex;
 
 @Vertex(VertexLabels.ANNOTATION)
-public abstract class AnnotationVF extends AlexandriaVF {
+public abstract class AnnotationVF extends AlexandriaVF implements FramedVertex<AnnotationVF> {
   public static final String NO_VALUE = ":null";
 
   // TODO: double-check if (update of) peapod supports outgoing edges with the same label to different types of VF

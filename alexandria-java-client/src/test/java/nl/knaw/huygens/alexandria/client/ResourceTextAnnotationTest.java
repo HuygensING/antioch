@@ -9,9 +9,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import nl.knaw.huygens.alexandria.api.model.Annotator;
-import nl.knaw.huygens.alexandria.api.model.text.ResourceTextAnnotation;
-import nl.knaw.huygens.alexandria.api.model.text.ResourceTextAnnotation.Position;
-import nl.knaw.huygens.alexandria.api.model.text.ResourceTextAnnotationInfo;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
 import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 
 public class ResourceTextAnnotationTest extends AlexandriaClientTest {
@@ -32,14 +32,14 @@ public class ResourceTextAnnotationTest extends AlexandriaClientTest {
         .setXmlId("p-1")//
         .setOffset(6)//
         .setLength(2);
-    ResourceTextAnnotation textAnnotation = new ResourceTextAnnotation()//
+    TextRangeAnnotation textAnnotation = new TextRangeAnnotation()//
         .setId(uuid)//
         .setName("word")//
         .setAnnotator("ed")//
         .setPosition(position);
-    RestResult<ResourceTextAnnotationInfo> putResult = client.setResourceTextAnnotation(resourceUuid, textAnnotation);
+    RestResult<TextRangeAnnotationInfo> putResult = client.setResourceTextAnnotation(resourceUuid, textAnnotation);
     assertRequestSucceeded(putResult);
-    ResourceTextAnnotationInfo info = putResult.get();
+    TextRangeAnnotationInfo info = putResult.get();
     assertThat(info.getAnnotates()).isEqualTo("is");
   }
 
@@ -55,12 +55,12 @@ public class ResourceTextAnnotationTest extends AlexandriaClientTest {
         .setXmlId("undefined")//
         .setOffset(6)//
         .setLength(2);
-    ResourceTextAnnotation textAnnotation = new ResourceTextAnnotation()//
+    TextRangeAnnotation textAnnotation = new TextRangeAnnotation()//
         .setId(uuid)//
         .setName("word")//
         .setAnnotator("ed")//
         .setPosition(position);
-    RestResult<ResourceTextAnnotationInfo> putResult = client.setResourceTextAnnotation(resourceUuid, textAnnotation);
+    RestResult<TextRangeAnnotationInfo> putResult = client.setResourceTextAnnotation(resourceUuid, textAnnotation);
     assertThat(putResult.hasFailed()).isTrue();
     assertThat(putResult.getErrorMessage().get()).isEqualTo("The text does not contain an element with the specified xml:id.");
   }

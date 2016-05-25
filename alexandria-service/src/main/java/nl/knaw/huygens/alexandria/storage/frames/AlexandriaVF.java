@@ -24,7 +24,7 @@ package nl.knaw.huygens.alexandria.storage.frames;
 
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 
-public abstract class AlexandriaVF extends VF {
+public abstract class AlexandriaVF implements VF {
 
   public abstract String getUuid();
 
