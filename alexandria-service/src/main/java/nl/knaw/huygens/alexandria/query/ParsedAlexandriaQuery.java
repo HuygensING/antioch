@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -38,13 +37,11 @@ import com.google.common.collect.Maps;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
+import nl.knaw.huygens.alexandria.util.StreamUtil;
 
 public class ParsedAlexandriaQuery {
   // this is just a container class for the results of processing the AlexandriaQuery parameters
-  private static final Function<Storage, Stream<AnnotationVF>> DEFAULT_ANNOTATIONVF_FINDER = storage -> {
-    Iterable<AnnotationVF> iterable = () -> storage.find(AnnotationVF.class);
-    return StreamSupport.stream(iterable.spliterator(), false);
-  };
+  private static final Function<Storage, Stream<AnnotationVF>> DEFAULT_ANNOTATIONVF_FINDER = storage -> StreamUtil.stream(storage.find(AnnotationVF.class));
 
   private Class<? extends AlexandriaVF> vfClazz;
   private Boolean distinct;

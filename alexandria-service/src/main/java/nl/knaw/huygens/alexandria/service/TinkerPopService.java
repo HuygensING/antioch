@@ -99,7 +99,7 @@ import nl.knaw.huygens.alexandria.textgraph.TextGraphSegment;
 import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorFactory;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorParseException;
-import nl.knaw.huygens.alexandria.util.StreamIterator;
+import nl.knaw.huygens.alexandria.util.StreamUtil;
 import peapod.FramedGraphTraversal;
 
 public class TinkerPopService implements AlexandriaService {
@@ -371,7 +371,7 @@ public class TinkerPopService implements AlexandriaService {
           Integer end2 = start2 + (Integer) t.property("length").value();
           return start1 <= end2 && start2 <= end1;
         };
-        overlaps = StreamIterator.stream(traversal)//
+        overlaps = StreamUtil.stream(traversal)//
             .filter(overlapsWithAnnotation)//
             .findFirst()//
             .isPresent();

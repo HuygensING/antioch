@@ -28,6 +28,7 @@ import nl.knaw.huygens.alexandria.textgraph.ParseResult;
 import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphSegment;
 import nl.knaw.huygens.alexandria.textgraph.XmlAnnotation;
+import nl.knaw.huygens.alexandria.util.StreamUtil;
 
 public class TextGraphService {
   private Storage storage;
@@ -70,8 +71,8 @@ public class TextGraphService {
         return next;
       }
     };
-    Iterable<Vertex> iterable = () -> textSegmentIterator;
-    return StreamSupport.stream(iterable.spliterator(), false)//
+
+    return StreamUtil.stream(textSegmentIterator)//
         .map(this::toTextGraphSegment);
   }
 
