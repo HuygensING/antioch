@@ -113,10 +113,10 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
     if (StringUtils.isEmpty(annotator)) {
       throw new BadRequestException("No annotator specified.");
     }
-    Optional<String> validAnnotator = service.readResourceAnnotators(resourceUUID).stream()//
+    Optional<String> validAnnotator = service.readResourceAnnotators(resourceUUID).parallelStream()//
         .map(Annotator::getCode)//
         .filter(annotator::equals)//
-        .findFirst();
+        .findAny();
     if (!validAnnotator.isPresent()) {
       throw new BadRequestException("Resource has no annotator with code '" + annotator + "'.");
     }

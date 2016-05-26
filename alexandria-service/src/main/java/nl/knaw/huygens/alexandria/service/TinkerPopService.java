@@ -269,11 +269,11 @@ public class TinkerPopService implements AlexandriaService {
         () -> storage.find(ResourceVF.class)//
             .has("cargo", sub)//
             .toList()//
-            .stream()//
+            .parallelStream()//
             .filter(r -> r.getParentResource() != null//
                 && r.getParentResource().getUuid().equals(parentId.toString()))//
             .map(this::deframeResource)//
-            .findFirst());
+            .findAny());
   }
 
   @Override
@@ -305,10 +305,10 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public Optional<Annotator> readResourceAnnotator(UUID uuid, String code) {
     ResourceVF resourcevf = readExisitingResourceVF(uuid);
-    return resourcevf.getAnnotators().stream()//
+    return resourcevf.getAnnotators().parallelStream()//
         .map(this::deframeAnnotator)//
         .filter(a -> code.equals(a.getCode()))//
-        .findFirst();
+        .findAny();
   }
 
   @Override
@@ -371,9 +371,9 @@ public class TinkerPopService implements AlexandriaService {
           Integer end2 = start2 + (Integer) t.property("length").value();
           return start1 <= end2 && start2 <= end1;
         };
-        overlaps = StreamUtil.stream(traversal)//
+        overlaps = StreamUtil.parallelStream(traversal)//
             .filter(overlapsWithAnnotation)//
-            .findFirst()//
+            .findAny()//
             .isPresent();
       }
       return overlaps;

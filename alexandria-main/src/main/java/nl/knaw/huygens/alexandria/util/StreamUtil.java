@@ -9,7 +9,7 @@ public class StreamUtil {
     return stream(input, false);
   }
 
-  public static <S> Stream<S> parallelstream(Iterator<S> input) {
+  public static <S> Stream<S> parallelStream(Iterator<S> input) {
     return stream(input, true);
   }
 
@@ -22,7 +22,7 @@ public class StreamUtil {
     return stream(input, false);
   }
 
-  public static <S> Stream<S> parallelstream(Iterable<S> input) {
+  public static <S> Stream<S> parallelStream(Iterable<S> input) {
     return stream(input, true);
   }
 
