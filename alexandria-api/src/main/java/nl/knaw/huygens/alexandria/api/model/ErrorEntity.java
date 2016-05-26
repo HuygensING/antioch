@@ -1,5 +1,8 @@
 package nl.knaw.huygens.alexandria.api.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 /*
  * #%L
  * alexandria-main
@@ -27,8 +30,10 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import nl.knaw.huygens.alexandria.api.JsonTypeNames;
 
 @JsonTypeName(JsonTypeNames.ERROR)
+@JsonInclude(Include.NON_EMPTY)
 public class ErrorEntity extends JsonWrapperObject {
   private String message;
+//  private String exception;
 
   public ErrorEntity() {
   }
@@ -44,5 +49,13 @@ public class ErrorEntity extends JsonWrapperObject {
   public String getMessage() {
     return message;
   }
+
+//  public String getException() {
+//    return exception;
+//  }
+//
+//  public void setException(String exception) {
+//    this.exception = exception;
+//  }
 
 }

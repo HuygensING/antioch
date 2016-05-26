@@ -13,6 +13,7 @@ import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 @JsonTypeName(JsonTypeNames.TEXTANNOTATION)
 @JsonInclude(Include.NON_NULL)
 public class TextRangeAnnotation extends JsonWrapperObject {
+  public static final String RESPONSIBILITY_ATTRIBUTE = "resp";
 
   public static class Position {
     @JsonProperty("xml:id")

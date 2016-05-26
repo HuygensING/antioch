@@ -9,6 +9,7 @@ import peapod.annotations.Vertex;
 @Vertex(VertexLabels.TEXTRANGEANNOTATION)
 public abstract class TextRangeAnnotationVF extends IdentifiableVF implements FramedVertex<TextRangeAnnotationVF> {
   public static final String HAS_RESOURCE = "textrangeannotation_has_resource";
+  public static final String HAS_TEXTANNOTATION = "has_textannotation";
 
   public abstract String getName();
 

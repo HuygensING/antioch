@@ -341,6 +341,7 @@ public class TinkerPopService implements AlexandriaService {
       TextRangeAnnotationVF vf = storage.readVF(TextRangeAnnotationVF.class, annotation.getId())//
           .orElseGet(() -> storage.createVF(TextRangeAnnotationVF.class));
       updateTextRangeAnnotation(vf, annotation);
+      textGraphService.updateTextAnnotationLink(vf, annotation, resourceUUID);
       vf.setResource(storage.readVF(ResourceVF.class, resourceUUID).get());
     });
   }
