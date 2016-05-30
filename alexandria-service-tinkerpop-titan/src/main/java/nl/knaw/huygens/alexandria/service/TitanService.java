@@ -68,7 +68,7 @@ public class TitanService extends TinkerPopService {
   enum VertexCompositeIndex {
     IDX_ANY_STATE(null, PROP_STATE, !UNIQUE), //
     IDX_RESOURCE_UUID("Resource", Storage.IDENTIFIER_PROPERTY, UNIQUE), //
-    IDX_RESOURCE_CARGO("Resource", PROP_CARGO, !UNIQUE), //
+    // IDX_RESOURCE_CARGO("Resource", PROP_CARGO, !UNIQUE), //
     IDX_ANNOTATION_UUID("Annotation", Storage.IDENTIFIER_PROPERTY, UNIQUE), //
     IDX_ANNOTATION_WHO("Annotation", PROP_WHO, !UNIQUE), //
     IDX_ANNOTATIONBODY_UUID("AnnotationBody", Storage.IDENTIFIER_PROPERTY, UNIQUE), //

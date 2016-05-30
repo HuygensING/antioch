@@ -259,6 +259,16 @@ public class Storage {
     }
     // Log.info("destroy done");
   }
+
+  public Vertex addVertex(Object... keyValues) {
+    assertInTransaction();
+    return graph.addVertex(keyValues);
+  }
+
+  public <A extends VF> A frameVertex(Vertex v, Class<A> vfClass) {
+    return framedGraph.frame(v, vfClass);
+  }
+
   // - private methods - //
 
   private <A extends VF> FramedGraphTraversal<Object, A> find(final Class<A> vfClass, final UUID uuid) {
@@ -333,11 +343,6 @@ public class Storage {
 
   private void assertTransactionIsOpen() {
     Preconditions.checkState(getTransactionIsOpen(), "We're not in an open transaction!");
-  }
-
-  public Vertex addVertex(Object... keyValues) {
-    assertInTransaction();
-    return graph.addVertex(keyValues);
   }
 
 }

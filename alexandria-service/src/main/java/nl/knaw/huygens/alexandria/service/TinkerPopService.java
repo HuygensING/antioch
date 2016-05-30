@@ -263,17 +263,16 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Optional<AlexandriaResource> findSubresourceWithSubAndParentId(String sub, UUID parentId) {
-    // TODO: find the gremlin way to do this in one:
-    // in cypher: match (r:Resource{uuid:parentId})<-[:PART_OF]-(s:Resource{cargo:sub}) return s.uuid
     return storage.runInTransaction(//
-        () -> storage.find(ResourceVF.class)//
+        () -> storage.getResourceVertexTraversal()//
+            .has(Storage.IDENTIFIER_PROPERTY, parentId.toString())//
+            .in(ResourceVF.PART_OF)//
             .has("cargo", sub)//
             .toList()//
             .parallelStream()//
-            .filter(r -> r.getParentResource() != null//
-                && r.getParentResource().getUuid().equals(parentId.toString()))//
             .map(this::deframeResource)//
-            .findAny());
+            .findAny()//
+    );
   }
 
   @Override
@@ -804,6 +803,11 @@ public class TinkerPopService implements AlexandriaService {
     AlexandriaAnnotation alexandriaAnnotation = createAnnotation(annotationbody, provenance);
     alexandriaAnnotation.setLocator(textLocator);
     return alexandriaAnnotation;
+  }
+
+  private AlexandriaResource deframeResource(Vertex v) {
+    ResourceVF rvf = storage.frameVertex(v, ResourceVF.class);
+    return deframeResource(rvf);
   }
 
   private AlexandriaResource deframeResource(ResourceVF rvf) {
