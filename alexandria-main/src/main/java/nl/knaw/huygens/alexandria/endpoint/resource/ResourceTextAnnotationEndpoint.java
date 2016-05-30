@@ -1,7 +1,5 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +13,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
@@ -40,7 +37,7 @@ import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 import nl.knaw.huygens.alexandria.util.XMLUtil;
 import nl.knaw.huygens.tei.QueryableDocument;
 
-class ResourceTextAnnotationEndpoint extends JSONEndpoint {
+public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
 
   private LocationBuilder locationBuilder;
   private AlexandriaService service;
