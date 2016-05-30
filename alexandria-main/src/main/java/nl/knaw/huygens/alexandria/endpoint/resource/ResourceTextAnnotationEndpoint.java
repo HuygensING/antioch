@@ -40,7 +40,7 @@ import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 import nl.knaw.huygens.alexandria.util.XMLUtil;
 import nl.knaw.huygens.tei.QueryableDocument;
 
-public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
+class ResourceTextAnnotationEndpoint extends JSONEndpoint {
 
   private LocationBuilder locationBuilder;
   private AlexandriaService service;
@@ -85,18 +85,8 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
   }
 
   private String getXML() {
-    StreamingOutput outputstream = TextGraphUtil.streamXML(service, resourceUUID);
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
-    String xml = null;
-    try {
-      outputstream.write(output);
-      output.close();
-      xml = output.toString();
-    } catch (WebApplicationException | IOException e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
-    }
-    return xml;
+    StreamingOutput outputStream = TextGraphUtil.streamXML(service, resourceUUID);
+    return TextGraphUtil.asString(outputStream);
   }
 
   private String validateTextRangeAnnotation(TextRangeAnnotation textAnnotation, String xml) {

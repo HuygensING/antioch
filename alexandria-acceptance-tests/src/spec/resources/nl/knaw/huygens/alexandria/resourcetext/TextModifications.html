@@ -603,16 +603,16 @@
   <br/>
   <h:request>
     Then a
-    <h:get>/resources/$resourceId/text/xml?view=$view</h:get><br/>
+      <h:get>/resources/$resourceId/text/xml?view=$view</h:get><br/>
     using
     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
     <h:success>successfully</h:success>
     yields response body:
     <h:xmlResponse>
 <![CDATA[
-<text> 
-  <p xml:id="p-1">This <word resp="#ed">is</word> a paragraph.</p> 
-</text> 
+<text>
+  <p xml:id="p-1">This <word resp="#ed">is</word> a paragraph.</p>
+</text>
 ]]>
      </h:xmlResponse>
      <small>(formatting added for increased readability)</small><br/>

@@ -1,32 +1,22 @@
 package nl.knaw.huygens.alexandria.textgraph;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Stack;
-import java.util.UUID;
-import java.util.function.Consumer;
-
-import javax.ws.rs.core.StreamingOutput;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-
 import nl.knaw.huygens.alexandria.api.model.text.view.AttributePreCondition;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView;
-import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
-import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.ElementMode;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.tei.Document;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.StreamingOutput;
+import java.io.*;
+import java.util.*;
+import java.util.function.Consumer;
 
 public class TextGraphUtil {
   private static Multimap<Integer, Integer> openBeforeText = ArrayListMultimap.create();
@@ -42,12 +32,11 @@ public class TextGraphUtil {
   }
 
   public static StreamingOutput streamXML(AlexandriaService service, UUID resourceId) {
-    StreamingOutput outputstream = output -> {
+    return output -> {
       Writer writer = createBufferedUTF8OutputStreamWriter(output);
       Consumer<TextGraphSegment> action = segment -> streamTextGraphSegment(writer, segment);
       stream(service, resourceId, writer, action);
     };
-    return outputstream;
   }
 
   public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment) {
@@ -77,13 +66,26 @@ public class TextGraphUtil {
   }
 
   public static StreamingOutput streamTextViewXML(AlexandriaService service, UUID resourceId, TextView textView) {
-    StreamingOutput outputstream = output -> {
+    return output -> {
       Writer writer = createBufferedUTF8OutputStreamWriter(output);
       TextViewContext textViewContext = new TextViewContext(textView);
       Consumer<TextGraphSegment> action = segment -> streamTextGraphSegment(writer, segment, textViewContext);
       stream(service, resourceId, writer, action);
     };
-    return outputstream;
+  }
+
+  public static String asString(StreamingOutput outputStream) {
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    String xml;
+    try {
+      outputStream.write(output);
+      output.close();
+      xml = output.toString();
+    } catch (WebApplicationException | IOException e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
+    return xml;
   }
 
   protected static class TextViewContext {
@@ -116,13 +118,13 @@ public class TextGraphUtil {
         List<String> values = attributePreCondition.getValues();
         String actualValue = attributes.get(attribute);
         switch (attributePreCondition.getFunction()) {
-        case is:
-          return values.contains(actualValue);
-        case isNot:
-          return !values.contains(actualValue);
-        case firstOf:
-          // TODO
-          break;
+          case is:
+            return values.contains(actualValue);
+          case isNot:
+            return !values.contains(actualValue);
+          case firstOf:
+            // TODO
+            break;
         }
 
       }
@@ -136,30 +138,30 @@ public class TextGraphUtil {
       AttributeMode attributeMode = elementView.getAttributeMode();
 
       switch (attributeMode) {
-      case showAll:
-        return allAttributes;
+        case showAll:
+          return allAttributes;
 
-      case hideAll:
-        break;
+        case hideAll:
+          break;
 
-      case showOnly:
-        allAttributes.forEach((k, v) -> {
-          if (elementView.getRelevantAttributes().contains(k)) {
-            attributesToInclude.put(k, v);
-          }
-        });
-        break;
+        case showOnly:
+          allAttributes.forEach((k, v) -> {
+            if (elementView.getRelevantAttributes().contains(k)) {
+              attributesToInclude.put(k, v);
+            }
+          });
+          break;
 
-      case hideOnly:
-        allAttributes.forEach((k, v) -> {
-          if (!elementView.getRelevantAttributes().contains(k)) {
-            attributesToInclude.put(k, v);
-          }
-        });
-        break;
+        case hideOnly:
+          allAttributes.forEach((k, v) -> {
+            if (!elementView.getRelevantAttributes().contains(k)) {
+              attributesToInclude.put(k, v);
+            }
+          });
+          break;
 
-      default:
-        throw new RuntimeException("unexpected attributemode: " + attributeMode);
+        default:
+          throw new RuntimeException("unexpected attributemode: " + attributeMode);
       }
       return attributesToInclude;
     }
@@ -179,7 +181,7 @@ public class TextGraphUtil {
       Optional<AttributePreCondition> preCondition = elementView.getPreCondition();
       boolean preConditionIsMet = preConditionIsMet(preCondition, textAnnotation.getAttributes());
       boolean hideThisElement = elementMode.equals(ElementMode.hide);
-      if (!preConditionIsMet){
+      if (!preConditionIsMet) {
         hideThisElement = defaultElementMode.equals(ElementMode.hide);
       }
       return hideThisElement;
@@ -282,14 +284,11 @@ public class TextGraphUtil {
   /* private methods */
 
   private static Writer createBufferedUTF8OutputStreamWriter(OutputStream output) throws UnsupportedEncodingException {
-    Writer writer = new BufferedWriter(new OutputStreamWriter(output, "UTF-8"));
-    return writer;
+    return new BufferedWriter(new OutputStreamWriter(output, "UTF-8"));
   }
 
   private static void stream(AlexandriaService service, UUID resourceId, Writer writer, Consumer<TextGraphSegment> action) throws IOException {
-    service.runInTransaction(() -> {
-      service.getTextGraphSegmentStream(resourceId).forEach(action);
-    });
+    service.runInTransaction(() -> service.getTextGraphSegmentStream(resourceId).forEach(action));
     writer.flush();
   }
 
@@ -304,18 +303,18 @@ public class TextGraphUtil {
     for (int i = 0; i < n; i++) {
       char c = value.charAt(i);
       switch (c) {
-      case '<':
-        builder.append("&lt;");
-        break;
-      case '>':
-        builder.append("&gt;");
-        break;
-      case '&':
-        builder.append("&amp;");
-        break;
-      default:
-        builder.append(c);
-        break;
+        case '<':
+          builder.append("&lt;");
+          break;
+        case '>':
+          builder.append("&gt;");
+          break;
+        case '&':
+          builder.append("&amp;");
+          break;
+        default:
+          builder.append(c);
+          break;
       }
     }
   }
