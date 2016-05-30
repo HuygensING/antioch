@@ -351,10 +351,13 @@ public class TextGraphService {
     }
 
     private void insertNewBeforeCurrent(Vertex currentVertex, Vertex newVertex) {
-      Edge prevEdge = currentVertex.edges(Direction.IN, EdgeLabels.NEXT).next();
-      Vertex prevVertex = prevEdge.outVertex();
-      prevEdge.remove();
-      prevVertex.addEdge(EdgeLabels.NEXT, newVertex);
+      Iterator<Edge> edges = currentVertex.edges(Direction.IN, EdgeLabels.NEXT);
+      if (edges.hasNext()) {
+        Edge prevEdge = edges.next();
+        Vertex prevVertex = prevEdge.outVertex();
+        prevEdge.remove();
+        prevVertex.addEdge(EdgeLabels.NEXT, newVertex);
+      }
       newVertex.addEdge(EdgeLabels.NEXT, currentVertex);
     }
 
