@@ -60,44 +60,49 @@ public class AlexandriaQuery extends JsonWrapperObject implements Prototype {
     return find;
   }
 
-  public void setFind(String find) {
+  public AlexandriaQuery setFind(String find) {
     this.find = find;
+    return this;
   }
 
   public String getWhere() {
     return where;
   }
 
-  public void setWhere(String where) {
+  public AlexandriaQuery setWhere(String where) {
     this.where = where;
     String state = QueryField.state.name();
     if (!(where.startsWith(state + ":") || where.contains(") " + state + ":"))) {
       this.where += " " + state + ":" + QueryFunction.eq.name() + "(\"" + AlexandriaState.CONFIRMED.name() + "\")";
     }
+    return this;
   }
 
   public String getSort() {
     return sort;
   }
 
-  public void setSort(String sort) {
+  public AlexandriaQuery setSort(String sort) {
     this.sort = sort;
+    return this;
   }
 
   public String getFields() {
     return fields;
   }
 
-  public void setFields(String fields) {
+  public AlexandriaQuery setFields(String fields) {
     this.fields = fields;
+    return this;
   }
 
   public Boolean isDistinct() {
     return distinct;
   }
 
-  public void setDistinct(Boolean distinct) {
+  public AlexandriaQuery setDistinct(Boolean distinct) {
     this.distinct = distinct;
+    return this;
   }
 
   public int getPageSize() {

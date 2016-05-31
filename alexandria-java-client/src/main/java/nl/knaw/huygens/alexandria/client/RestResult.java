@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.client;
 
+import java.time.Duration;
+
 /*
  * #%L
  * alexandria-java-client
@@ -37,6 +39,7 @@ public class RestResult<T> {
   private Response response;
   private Exception exception;
   private String errorMessage;
+  private Duration turnaroundTime;
 
   public static <T extends Object> RestResult<T> failingResult(Response response) {
     RestResult<T> result = new RestResult<>();
@@ -121,8 +124,18 @@ public class RestResult<T> {
     return Optional.ofNullable(cause);
   }
 
+  public Duration getTurnaroundTime() {
+    return turnaroundTime;
+  }
+
+  public RestResult<T> setTurnaroundTime(Duration processingTime) {
+    this.turnaroundTime = processingTime;
+    return this;
+  }
+
   @Override
   public String toString() {
     return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
+
 }

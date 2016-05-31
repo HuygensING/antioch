@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
+import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
 
@@ -31,16 +32,17 @@ public class SearchTest extends AlexandriaClientTest {
 
   @Test
   public void testAddSearchWorks() {
-    AlexandriaQuery query = new AlexandriaQuery();
-    query.setFind("annotation");
-    query.setWhere("type:eq(\"type 1\")");
-    query.setFields("id, resource.id");
+    AlexandriaQuery query = new AlexandriaQuery()// t
+        .setFind("annotation")//
+        .setWhere("type:eq(\"type 1\")")//
+        .setFields("id, resource.id");
     RestResult<UUID> result = client.addSearch(query);
     assertRequestSucceeded(result);
 
     UUID searchId = result.get();
     RestResult<SearchResultPage> pageResult = client.getSearchResultPage(searchId);
     assertRequestSucceeded(pageResult);
+    Log.info("search took {} ms", pageResult.getTurnaroundTime().toMillis());
     SearchResultPage searchResultPage = pageResult.get();
     List<Map<String, Object>> records = searchResultPage.getRecords();
     assertThat(records).hasSize(1);
