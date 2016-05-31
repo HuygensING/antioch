@@ -180,11 +180,19 @@ public class AlexandriaAcceptanceTest extends RestFixture {
   }
 
   public void resourceExists(String resId) {
-    service.createOrUpdateResource(fromString(resId), aRef(), aProvenance(), CONFIRMED);
+    resourceExists(resId, aRef());
   }
 
-  public String hasSubresource(String id) {
-    final UUID subId = service().createSubResource(randomUUID(), fromString(id), aSub(), aProvenance()).getId();
+  public void resourceExists(String resId, String ref) {
+    service.createOrUpdateResource(fromString(resId), ref, aProvenance(), CONFIRMED);
+  }
+
+  public String hasSubresource(String parentUUID) {
+    return hasSubresource(parentUUID, aSub());
+  }
+
+  public String hasSubresource(String parentUUID, String sub) {
+    final UUID subId = service().createSubResource(randomUUID(), fromString(parentUUID), sub, aProvenance()).getId();
     service().confirmResource(subId);
     return subId.toString();
   }

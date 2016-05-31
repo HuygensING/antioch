@@ -191,12 +191,11 @@ public class AlexandriaQueryParser {
       return AnnotationVF.class;
 
     case "resource":
-      parseErrors.add("find: type 'resource' not supported yet");
+      // parseErrors.add("find: type 'resource' not supported yet");
       return ResourceVF.class;
 
     default:
-      parseErrors.add("find: unknown type '" + find + "', should be 'annotation'");
-      // parseErrors.add("unknown type '" + find + "' in find, should be 'annotation' or 'resource'");
+      parseErrors.add("find: unknown type '" + find + "', should be 'annotation' or 'resource'");
       return null;
     }
   }

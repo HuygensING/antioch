@@ -327,7 +327,7 @@ public class Storage {
   }
 
   private void assertInTransaction() {
-    Preconditions.checkState(getTransactionIsOpen(), "We should be in open transaction at this point, use runInTransaction()!");
+    Preconditions.checkState(getTransactionIsOpen(), "We should be in an open transaction at this point, use runInTransaction()!");
   }
 
   private void assertClass(final Class<? extends VF> clazz) {
