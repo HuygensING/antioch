@@ -164,7 +164,7 @@ public class TextGraphService {
 
   public void updateTextAnnotationLink(TextRangeAnnotationVF vf, TextRangeAnnotation textRangeAnnotation, UUID resourceId) {
     // if the TextRangeAnnotationVF is already linked to a TextAnnotation, remove that TextAnnotation
-    FramedGraphTraversal<TextRangeAnnotationVF, Vertex> traversal = vf.out(TextRangeAnnotationVF.HAS_TEXTANNOTATION);
+    FramedGraphTraversal<TextRangeAnnotationVF, Vertex> traversal = vf.out(nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF.EdgeLabels.HAS_TEXTANNOTATION);
     if (traversal.hasNext()) {
       traversal.next().remove();
     }
@@ -213,7 +213,7 @@ public class TextGraphService {
     Vertex newTextAnnotationVertex = toVertex(newTextAnnotation);
 
     // link TextAnnotation to TextRangeAnnotation
-    textRangeAnnotationVF.vertex().addEdge(TextRangeAnnotationVF.HAS_TEXTANNOTATION, newTextAnnotationVertex);
+    textRangeAnnotationVF.vertex().addEdge(nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF.EdgeLabels.HAS_TEXTANNOTATION, newTextAnnotationVertex);
     return newTextAnnotationVertex;
   }
 

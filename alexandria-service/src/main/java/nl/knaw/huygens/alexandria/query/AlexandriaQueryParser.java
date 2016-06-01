@@ -137,6 +137,7 @@ public class AlexandriaQueryParser {
     // TODO extend use of resource queries, current implementation only for implementation of nla-264 case
     return (storage) -> {
       GraphTraversal<Vertex, Vertex> traversal = storage.getResourceVertexTraversal();
+
       Optional<String> rootResourceUUID = resourceWhereTokens.stream()//
           .filter(t -> t.getProperty().equals(QueryField.resource_id)//
               && t.getFunction().equals(QueryFunction.eq))//
@@ -146,6 +147,7 @@ public class AlexandriaQueryParser {
       if (rootResourceUUID.isPresent()) {
         traversal = traversal.has(Storage.IDENTIFIER_PROPERTY, rootResourceUUID.get());
       }
+
       Optional<String> sub = resourceWhereTokens.stream()//
           .filter(t -> t.getProperty().equals(QueryField.subresource_sub)//
               && t.getFunction().equals(QueryFunction.eq))//
@@ -154,20 +156,10 @@ public class AlexandriaQueryParser {
           .findFirst();
       if (sub.isPresent()) {
         traversal = traversal//
-            .until(__.has("cargo", sub.get()))//
-            .repeat(__.in(ResourceVF.PART_OF));
+            .until(__.has(ResourceVF.Properties.CARGO, sub.get()))//
+            .repeat(__.in(ResourceVF.EdgeLabels.PART_OF));
       }
 
-      // for (WhereToken t : resourceWhereTokens) {
-      // if (t.getProperty().equals(QueryField.subresource_sub)//
-      // && t.getFunction().equals(QueryFunction.eq)) {
-      // traversal = traversal.has("cargo", t.getParameters().get(0));
-      // }
-      // if () {
-      // traversal = traversal.has("cargo", t.getParameters().get(0));
-      // }
-      //
-      // }
       Stream<Map<String, Object>> stream = StreamUtil.stream(traversal)//
           .map(v -> storage.frameVertex(v, ResourceVF.class))//
           .map(this::toResultMap);

@@ -63,7 +63,6 @@ public class TitanService extends TinkerPopService {
   private static final String PROP_TYPE = "type";
   private static final String PROP_WHO = "who";
   private static final String PROP_STATE = "state";
-  private static final String PROP_CARGO = "cargo";
 
   enum VertexCompositeIndex {
     IDX_ANY_STATE(null, PROP_STATE, !UNIQUE), //

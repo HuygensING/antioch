@@ -25,6 +25,7 @@ package nl.knaw.huygens.alexandria.storage.frames;
 import java.util.List;
 
 import nl.knaw.huygens.alexandria.storage.VertexLabels;
+import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF.EdgeLabels;
 import peapod.FramedVertex;
 import peapod.annotations.Edge;
 import peapod.annotations.In;
@@ -41,7 +42,7 @@ public abstract class AnnotationBodyVF extends AlexandriaVF implements FramedVer
   public abstract String getValue();
 
   @In
-  @Edge(AnnotationVF.HAS_BODY)
+  @Edge(EdgeLabels.HAS_BODY)
   public abstract List<AnnotationVF> getOfAnnotationList();
 
 }

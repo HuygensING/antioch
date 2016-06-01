@@ -8,7 +8,9 @@ import peapod.annotations.Vertex;
 
 @Vertex(VertexLabels.ANNOTATOR)
 public abstract class AnnotatorVF implements VF, FramedVertex<AnnotatorVF> {
-  public static final String HAS_RESOURCE = "annotator_has_resource";
+  public static class EdgeLabels {
+    public static final String HAS_RESOURCE = "annotator_has_resource";
+  }
 
   public abstract void setCode(String code);
 
@@ -19,11 +21,11 @@ public abstract class AnnotatorVF implements VF, FramedVertex<AnnotatorVF> {
   public abstract String getDescription();
 
   @Out
-  @Edge(HAS_RESOURCE)
+  @Edge(EdgeLabels.HAS_RESOURCE)
   public abstract void setResource(ResourceVF resource);
 
   @Out
-  @Edge(HAS_RESOURCE)
+  @Edge(EdgeLabels.HAS_RESOURCE)
   public abstract ResourceVF getResource();
 
 }

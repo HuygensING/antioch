@@ -33,7 +33,13 @@ import peapod.annotations.Vertex;
 
 @Vertex(VertexLabels.RESOURCE)
 public abstract class ResourceVF extends AlexandriaVF implements FramedVertex<ResourceVF> {
-  public static final String PART_OF = "part_of";
+  public static class Properties {
+    public static final String CARGO = "cargo";
+  }
+
+  public static class EdgeLabels {
+    public static final String PART_OF = "part_of";
+  }
 
   public abstract String getCargo();
 
@@ -52,27 +58,27 @@ public abstract class ResourceVF extends AlexandriaVF implements FramedVertex<Re
   public abstract String getSerializedTextViewDefinitionMap();
 
   @In
-  @Edge(AnnotationVF.ANNOTATES_RESOURCE)
+  @Edge(nl.knaw.huygens.alexandria.storage.frames.AnnotationVF.EdgeLabels.ANNOTATES_RESOURCE)
   public abstract List<AnnotationVF> getAnnotatedBy();
 
   @In
-  @Edge(PART_OF)
+  @Edge(EdgeLabels.PART_OF)
   public abstract List<ResourceVF> getSubResources();
 
   @In
-  @Edge(AnnotatorVF.HAS_RESOURCE)
+  @Edge(nl.knaw.huygens.alexandria.storage.frames.AnnotatorVF.EdgeLabels.HAS_RESOURCE)
   public abstract List<AnnotatorVF> getAnnotators();
 
   @In
-  @Edge(TextRangeAnnotationVF.HAS_RESOURCE)
+  @Edge(nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF.EdgeLabels.HAS_RESOURCE)
   public abstract List<TextRangeAnnotationVF> getTextRangeAnnotations();
 
   @Out
-  @Edge(PART_OF)
+  @Edge(EdgeLabels.PART_OF)
   public abstract ResourceVF getParentResource();
 
   @Out
-  @Edge(PART_OF)
+  @Edge(EdgeLabels.PART_OF)
   public abstract void setParentResource(ResourceVF resourceVF);
 
   public boolean isSubresource() {

@@ -89,6 +89,7 @@ import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotatorVF;
+import nl.knaw.huygens.alexandria.storage.frames.AnnotatorVF.EdgeLabels;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF;
 import nl.knaw.huygens.alexandria.textgraph.ParseResult;
@@ -264,8 +265,8 @@ public class TinkerPopService implements AlexandriaService {
     return storage.runInTransaction(//
         () -> storage.getResourceVertexTraversal()//
             .has(Storage.IDENTIFIER_PROPERTY, parentId.toString())//
-            .in(ResourceVF.PART_OF)//
-            .has("cargo", sub)//
+            .in(ResourceVF.EdgeLabels.PART_OF)//
+            .has(ResourceVF.Properties.CARGO, sub)//
             .toList()//
             .parallelStream()//
             .map(this::deframeResource)//
@@ -287,7 +288,7 @@ public class TinkerPopService implements AlexandriaService {
       // remove existing annotator for this resource with the same annotator code
       storage.getResourceVertexTraversal()//
           .has(Storage.IDENTIFIER_PROPERTY, resourceUUID.toString())//
-          .in(AnnotatorVF.HAS_RESOURCE)//
+          .in(EdgeLabels.HAS_RESOURCE)//
           .has("code", annotator.getCode())//
           .toList()//
           .forEach(Vertex::remove);
@@ -359,7 +360,7 @@ public class TinkerPopService implements AlexandriaService {
       Optional<ResourceVF> oResourceVF = storage.readVF(ResourceVF.class, resourceUUID);
       if (oResourceVF.isPresent()) {
         FramedGraphTraversal<ResourceVF, Vertex> traversal = oResourceVF.get().start()//
-            .in(TextRangeAnnotationVF.HAS_RESOURCE)//
+            .in(nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF.EdgeLabels.HAS_RESOURCE)//
             .has("name", annotation.getName())//
             .has("annotatorCode", annotation.getAnnotator());
         Integer start1 = annotation.getPosition().getOffset();
