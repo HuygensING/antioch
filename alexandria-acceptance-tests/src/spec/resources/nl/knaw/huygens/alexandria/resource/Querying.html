@@ -141,19 +141,28 @@
       and ref: <code c:set="#ref0">Corpus</code>  
     </li>
     <li c:execute="#uuid1 = hasSubresource(#uuid0,#sub1)">
-        this resource has a confirmed subresource 1
-        with sub: <code c:set="#sub1">Sub 1</code>
-        and uuid: <code c:echo="#uuid1"></code>
+      this resource has a confirmed subresource 1
+      with sub: <code c:set="#sub1">Sub 1</code>
+      and uuid: <code c:echo="#uuid1"></code>
     </li>
     <li c:execute="#uuid2 = hasSubresource(#uuid0,#sub2)">
-        and confirmed subresource 2, 
-        with sub: <code c:set="#sub2">Sub 2</code>
-        and uuid: <code c:echo="#uuid2"></code>
+      and confirmed subresource 2, 
+      with sub: <code c:set="#sub2">Sub 2</code>
+      and uuid: <code c:echo="#uuid2"></code>
     </li>
-        <li c:execute="#uuid21 = hasSubresource(#uuid2,#sub21)">
-        and subresource 2 has its own confirmed subresource 2.1,
-        with sub: <code c:set="#sub21">Sub 2.1</code>
-        and uuid: <code c:echo="#uuid21"></code>
+    <li c:execute="#uuid21 = hasSubresource(#uuid2,#sub21)">
+      which has its own confirmed subresource 2.1,
+      with sub: <code c:set="#sub21">Sub 2.1</code>
+      and uuid: <code c:echo="#uuid21"></code>
+    </li>
+    <li c:execute="resourceExists(#uuid1,#ref1)">
+      and finally a different (confirmed parent) resource exists with uuid: <code c:set="#uuid1">00000000-0000-0000-0000-000000000005</code>
+      and ref: <code c:set="#ref1">Corpus2</code>  
+    </li>
+    <li c:execute="#uuid3 = hasSubresource(#uuid1,#sub21)">
+      with confirmed subresource
+      with sub: <code c:set="#sub3">Sub 2.1</code>
+      and uuid: <code c:echo="#uuid3"></code>
     </li>
   </ul>
   
