@@ -32,7 +32,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -40,7 +39,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -1004,16 +1002,8 @@ public class TinkerPopService implements AlexandriaService {
   private List<Map<String, Object>> processQuery(AlexandriaQuery query) {
     ParsedAlexandriaQuery pQuery = alexandriaQueryParser.parse(query);
 
-    Predicate<AnnotationVF> predicate = pQuery.getPredicate();
-    Comparator<AnnotationVF> comparator = pQuery.getResultComparator();
-    Function<AnnotationVF, Map<String, Object>> mapper = pQuery.getResultMapper();
+    Stream<Map<String, Object>> mapStream = pQuery.getResultStreamMapper().apply(storage);
 
-    Stream<AnnotationVF> stream = pQuery.getAnnotationVFFinder().apply(storage);
-
-    Stream<Map<String, Object>> mapStream = stream//
-        .filter(predicate)//
-        .sorted(comparator)//
-        .map(mapper);
     if (pQuery.isDistinct()) {
       mapStream = mapStream.distinct();
     }

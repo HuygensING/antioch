@@ -53,6 +53,8 @@ public class ParsedAlexandriaQuery {
   private Function<AnnotationVF, Map<String, Object>> mapper;
   private Function<Storage, Stream<AnnotationVF>> annotationVFFinder = DEFAULT_ANNOTATIONVF_FINDER;
 
+  private Function<Storage, Stream<Map<String, Object>>> resultStreamMapper;
+
   public ParsedAlexandriaQuery setVFClass(Class<? extends AlexandriaVF> vfClass) {
     this.vfClazz = vfClass;
     return this;
@@ -153,4 +155,20 @@ public class ParsedAlexandriaQuery {
     }
     return null;
   }
+
+  public Function<Storage, Stream<Map<String, Object>>> getResultStreamMapper() {
+    if (vfClazz == AnnotationVF.class) {
+      return (storage) -> annotationVFFinder//
+          .apply(storage).filter(predicate)//
+          .sorted(comparator)//
+          .map(mapper);
+    }
+
+    return resultStreamMapper;
+  }
+
+  public void setResultStreamMapper(Function<Storage, Stream<Map<String, Object>>> resultStreamMapper) {
+    this.resultStreamMapper = resultStreamMapper;
+  }
+
 }

@@ -29,6 +29,7 @@ import static java.util.stream.Collectors.toSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,6 +48,9 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -69,6 +73,7 @@ import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
+import nl.knaw.huygens.alexandria.util.StreamUtil;
 
 public class AlexandriaQueryParser {
   static final String ALLOWED_FIELDS = ", available fields: " + Joiner.on(", ").join(QueryField.ALL_EXTERNAL_NAMES);
@@ -111,17 +116,70 @@ public class AlexandriaQueryParser {
 
     // any tokens with resource.id or subresource.id need to be filtered out and lead to an annotationVFFinder
     List<WhereToken> resourceWhereTokens = filterResourceWhereTokens(tokens);
-    if (!resourceWhereTokens.isEmpty()) {
-      Function<Storage, Stream<AnnotationVF>> annotationVFFinder = createAnnotationVFFinder(resourceWhereTokens);
-      if (annotationVFFinder != null) {
-        paq.setAnnotationVFFinder(annotationVFFinder);
-      }
-    }
-
     tokens.removeAll(resourceWhereTokens);
+    if (ResourceVF.class == paq.getVFClass()) {
+      paq.setResultStreamMapper(createResultStreamMapper(resourceWhereTokens));
 
-    // create a predicate for filtering the annotationVF stream based on the remaining tokens
-    paq.setPredicate(createPredicate(tokens));
+    } else {
+      if (!resourceWhereTokens.isEmpty()) {
+        Function<Storage, Stream<AnnotationVF>> annotationVFFinder = createAnnotationVFFinder(resourceWhereTokens);
+        if (annotationVFFinder != null) {
+          paq.setAnnotationVFFinder(annotationVFFinder);
+        }
+      }
+
+      // create a predicate for filtering the annotationVF stream based on the remaining tokens
+      paq.setPredicate(createPredicate(tokens));
+    }
+  }
+
+  private Function<Storage, Stream<Map<String, Object>>> createResultStreamMapper(List<WhereToken> resourceWhereTokens) {
+    // TODO extend use of resource queries, current implementation only for implementation of nla-264 case
+    return (storage) -> {
+      GraphTraversal<Vertex, Vertex> traversal = storage.getResourceVertexTraversal();
+      Optional<String> rootResourceUUID = resourceWhereTokens.stream()//
+          .filter(t -> t.getProperty().equals(QueryField.resource_id)//
+              && t.getFunction().equals(QueryFunction.eq))//
+          .map(t -> t.getParameters().get(0))//
+          .map(String.class::cast)//
+          .findFirst();
+      if (rootResourceUUID.isPresent()) {
+        traversal = traversal.has(Storage.IDENTIFIER_PROPERTY, rootResourceUUID.get());
+      }
+      Optional<String> sub = resourceWhereTokens.stream()//
+          .filter(t -> t.getProperty().equals(QueryField.subresource_sub)//
+              && t.getFunction().equals(QueryFunction.eq))//
+          .map(t -> t.getParameters().get(0))//
+          .map(String.class::cast)//
+          .findFirst();
+      if (sub.isPresent()) {
+        traversal = traversal//
+            .until(__.has("cargo", sub.get()))//
+            .repeat(__.in(ResourceVF.PART_OF));
+      }
+
+      // for (WhereToken t : resourceWhereTokens) {
+      // if (t.getProperty().equals(QueryField.subresource_sub)//
+      // && t.getFunction().equals(QueryFunction.eq)) {
+      // traversal = traversal.has("cargo", t.getParameters().get(0));
+      // }
+      // if () {
+      // traversal = traversal.has("cargo", t.getParameters().get(0));
+      // }
+      //
+      // }
+      Stream<Map<String, Object>> stream = StreamUtil.stream(traversal)//
+          .map(v -> storage.frameVertex(v, ResourceVF.class))//
+          .map(this::toResultMap);
+      return stream;
+    };
+  }
+
+  private Map<String, Object> toResultMap(ResourceVF rvf) {
+    Map<String, Object> map = new HashMap<>();
+    map.put(QueryField.subresource_id.externalName(), rvf.getUuid().toString());
+    // map.put(QueryField.subresource_sub.externalName(), rvf.getCargo());
+    return map;
   }
 
   private void addDefaultStateTokenWhenNeeded(List<WhereToken> tokens) {

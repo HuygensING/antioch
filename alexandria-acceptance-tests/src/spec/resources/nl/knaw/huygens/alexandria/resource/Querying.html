@@ -160,7 +160,7 @@
       and ref: <code c:set="#ref1">Corpus2</code>  
     </li>
     <li c:execute="#uuid3 = hasSubresource(#uuid1,#sub21)">
-      with confirmed subresource
+      with confirmed subresource 3
       with sub: <code c:set="#sub3">Sub 2.1</code>
       and uuid: <code c:echo="#uuid3"></code>
     </li>
@@ -175,7 +175,7 @@
       "query": {
         "find": "resource",
         "where": "subresource.sub:eq(\"$sub21\") resource.id:eq(\"$uuid0\")",
-        "return": "subresource.id,subresource.sub"
+        "return": "subresource.id"
     } }
     </h:jsonBody>
   </h:request>
@@ -193,11 +193,11 @@
     { "searchResultPage": {
         "records": [
 	        {
-		        "resource.id": "$uuid21",
-		        "resource.sub": "$sub21"
+		        "subresource.id": "$uuid21"
 	        }
     ] } }
     </h:jsonResponse>
+    <small>notice that subresource 3 is not included in the results</small>
   </h:request>
 
 </div>
