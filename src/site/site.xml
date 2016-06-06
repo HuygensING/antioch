@@ -55,11 +55,11 @@
       <item name="Release notes" href="release-notes.html"/>
     </menu>
     <menu name="Download" inherit="top">
-      <item name="Download" href="skin/index.html#Usage"/>
+      <item name="Download" href="download.html"/>
       <item name="License" href="license.html"/>
     </menu>
     <menu name="Documentation" inherit="bottom">
-      <item name="Early REST discussion" href="REST.html"/>
+<!--       <item name="Early REST discussion" href="REST.html"/>  -->
       <item name="REST Acceptance Tests"
             href="alexandria-acceptance-tests/concordion/nl/knaw/huygens/alexandria/Alexandria.html"/>
     </menu>
