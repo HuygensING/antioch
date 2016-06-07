@@ -29,3 +29,6 @@
   DDEP-PODDP 2000, ed. P. King and E.V. Munson, Lecture Notes in Computer Science 2023 (Berlin: Springer, 2004). 
   pp. 139-160.
   [Online preprint](http://cmsmcq.com/2000/poddp2000.html)
+
+* Nancy Ide, Keith Suderman. GrAF: A Graph-based Format for Linguistic Annotations.
+  [Online](http://aclweb.org/anthology/W/W07/W07-1501.pdf).
