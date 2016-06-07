@@ -47,6 +47,9 @@ public class Server {
   private AlexandriaConfiguration config = new ServerConfiguration();
 
   public static void main(String[] args) throws IOException {
+    System.out.println("-----------------------------");
+    System.out.println("Starting Alexandria server...");
+    System.out.println("-----------------------------");
     new Server().run();
   }
 
@@ -54,6 +57,10 @@ public class Server {
     URI uri = getBaseURI();
     final HttpServer httpServer = startServer(uri);
     Log.info("Jersey app started with WADL available at {}/application.wadl\n", uri);
+    System.out.println("-----------------------------");
+    System.out.println("Alexandria server started at " + uri);
+    System.out.println("press Ctrl-c to stop");
+    System.out.println("-----------------------------");
 
     Runtime.getRuntime().addShutdownHook(new Thread(() -> shutdown(httpServer)));
 
@@ -61,13 +68,16 @@ public class Server {
       try {
         Thread.sleep(ONE_HOUR);
       } catch (InterruptedException e) {
+        System.out.println("-----------------------------");
+        System.out.println("Stopping Alexandria server...");
+        System.out.println("-----------------------------");
         shutdown(httpServer);
+        System.out.println("bye!");
       }
     }
   }
 
   private void shutdown(final HttpServer httpServer) {
-    Log.info("Stopping HTTP server");
     httpServer.shutdown();
   }
 

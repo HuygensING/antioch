@@ -57,4 +57,43 @@
     </dependency>
 
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>gh-pages</id>
+      <build>
+        <plugins>
+          <plugin>
+          <!--  mvn -pl alexandria-java-client -am package -P gh-pages -->
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>${maven-shade.version}</version>
+            <configuration>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+            </configuration>
+            <executions>
+              <execution>
+                <id>shade</id>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+                <configuration>
+                  <outputFile>../src/site/resources/alexandria-client-shaded.jar</outputFile>
+                  <filters>
+                    <filter>
+                      <artifact>*:*</artifact>
+                      <excludes>
+                        <exclude>META-INF/*.SF</exclude>
+                        <exclude>META-INF/*.DSA</exclude>
+                        <exclude>META-INF/*.RSA</exclude>
+                      </excludes>
+                    </filter>
+                  </filters>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
