@@ -97,6 +97,7 @@ public class ServerConfiguration extends AbstractAlexandriaConfigurationUsingAle
   private void initFromFile() {
     Properties properties = new Properties();
     try (InputStream in = new FileInputStream(ALEXANDRIA_PROPERTIES_FILE)) {
+      System.out.println("Reading properties from " + ALEXANDRIA_PROPERTIES_FILE);
       properties.load(in);
       baseURI = properties.getProperty(PROPERTY_BASE_URI);
       storageDirectory = properties.getProperty(PROPERTY_STORAGE_DIRECTORY);

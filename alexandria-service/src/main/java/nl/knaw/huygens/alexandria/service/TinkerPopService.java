@@ -1026,4 +1026,8 @@ public class TinkerPopService implements AlexandriaService {
     return resourcevf;
   }
 
+  public Storage storage() {
+    return storage;
+  }
+
 }
