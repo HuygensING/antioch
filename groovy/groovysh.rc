@@ -1,3 +1,6 @@
 import nl.knaw.huygens.alexandria.api.model.*
+import nl.knaw.huygens.alexandria.api.model.search.*
+import nl.knaw.huygens.alexandria.api.model.text.*
+import nl.knaw.huygens.alexandria.api.model.text.view.*
 import nl.knaw.huygens.alexandria.client.*
 import nl.knaw.huygens.alexandria.client.model.*
