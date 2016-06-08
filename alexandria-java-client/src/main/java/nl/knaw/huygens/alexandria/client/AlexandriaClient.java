@@ -24,6 +24,8 @@ package nl.knaw.huygens.alexandria.client;
 
 import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 import java.util.UUID;
@@ -39,6 +41,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.io.FileUtils;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 
@@ -234,6 +237,10 @@ public class AlexandriaClient implements AutoCloseable {
     return requester//
         .onStatus(Status.OK, this::toAnnotatorListRestResult)//
         .getResult();
+  }
+
+  public RestResult<URI> setResourceText(final UUID resourceUUID, final File file) throws IOException {
+    return setResourceText(resourceUUID, FileUtils.readFileToString(file));
   }
 
   public RestResult<URI> setResourceText(final UUID resourceUUID, final String xml) {
