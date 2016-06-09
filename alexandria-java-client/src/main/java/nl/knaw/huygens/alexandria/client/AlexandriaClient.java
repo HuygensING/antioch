@@ -150,6 +150,7 @@ public class AlexandriaClient implements AutoCloseable {
 
     return requester//
         .onStatus(Status.CREATED, (response) -> new RestResult<>())//
+        .onStatus(Status.NO_CONTENT, (response) -> new RestResult<>())//
         .getResult();
   }
 
@@ -181,6 +182,20 @@ public class AlexandriaClient implements AutoCloseable {
       confirmResource(addResult.get());
     }
     return addResult;
+  }
+
+  public RestResult<UUID> setSubResource(final UUID parentResourceId, final UUID subResourceId, final SubResourcePrototype subresource) {
+    final Entity<SubResourcePrototype> entity = Entity.json(subresource);
+    final WebTarget path = resourceTarget(parentResourceId)//
+        .path(EndpointPaths.SUBRESOURCES)//
+        .path(subResourceId.toString());
+    final Supplier<Response> responseSupplier = authorizedPut(path, entity);
+    final RestRequester<UUID> requester = RestRequester.withResponseSupplier(responseSupplier);
+    final RestResult<UUID> setResult = requester//
+        .onStatus(Status.CREATED, this::uuidFromLocationHeader)//
+        .onStatus(Status.NO_CONTENT, (response) -> new RestResult<UUID>().setCargo(subResourceId))//
+        .getResult();
+    return setResult;
   }
 
   public RestResult<ResourcePojo> getResource(final UUID uuid) {
@@ -522,6 +537,7 @@ public class AlexandriaClient implements AutoCloseable {
 
   private SyncInvoker authorizedRequest(final WebTarget target) {
     return target.request()//
+        // .accept(MediaType.APPLICATION_JSON_TYPE)//
         .header(HEADER_AUTH, authHeader);
   }
 

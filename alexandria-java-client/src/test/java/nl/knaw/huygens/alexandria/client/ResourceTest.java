@@ -34,6 +34,7 @@ import nl.knaw.huygens.alexandria.client.model.ProvenancePojo;
 import nl.knaw.huygens.alexandria.client.model.ResourcePojo;
 import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 import nl.knaw.huygens.alexandria.client.model.SubResourcePojo;
+import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
 
 public class ResourceTest extends AlexandriaClientTest {
 
@@ -80,12 +81,47 @@ public class ResourceTest extends AlexandriaClientTest {
     UUID subresourceUuid = createSubResource(resourceUuid, ref);
 
     // retrieve the resource again
-    RestResult<SubResourcePojo> result4 = client.getSubResource(subresourceUuid);
-    assertRequestSucceeded(result4);
-    SubResourcePojo resourcePojo2 = result4.get();
-    softly.assertThat(resourcePojo2).isNotNull();
-    softly.assertThat(resourcePojo2.getSub()).as("sub").isEqualTo(ref);
-    softly.assertThat(resourcePojo2.getState().getValue()).as("state").isEqualTo(AlexandriaState.CONFIRMED);
+    RestResult<SubResourcePojo> getResult1 = client.getSubResource(subresourceUuid);
+    assertRequestSucceeded(getResult1);
+    SubResourcePojo subResourcePojo1 = getResult1.get();
+    softly.assertThat(subResourcePojo1).isNotNull();
+    softly.assertThat(subResourcePojo1.getSub()).as("sub").isEqualTo(ref);
+    softly.assertThat(subResourcePojo1.getState().getValue()).as("state").isEqualTo(AlexandriaState.CONFIRMED);
+  }
+
+  @Test
+  public void testSetSubResourceReturnsGivenUUID() {
+    client.setAuthKey(AUTHKEY);
+    client.setAutoConfirm(true);
+
+    UUID resourceUuid = createResource("corpus");
+    UUID subresourceUUID = UUID.randomUUID();
+    String ref = "/some/sub/path";
+    SubResourcePrototype subresource = new SubResourcePrototype().setSub(ref);
+    RestResult<UUID> setResult1 = client.setSubResource(resourceUuid, subresourceUUID, subresource);
+    assertRequestSucceeded(setResult1);
+
+    // retrieve the resource again
+    RestResult<SubResourcePojo> getResult1 = client.getSubResource(subresourceUUID);
+    assertRequestSucceeded(getResult1);
+    SubResourcePojo subResourcePojo1 = getResult1.get();
+    softly.assertThat(subResourcePojo1).isNotNull();
+    softly.assertThat(subResourcePojo1.getSub()).as("sub").isEqualTo(ref);
+    softly.assertThat(subResourcePojo1.getState().getValue()).as("state").isEqualTo(AlexandriaState.CONFIRMED);
+
+    // update the subresource
+    String ref2 = "/some/other/sub/path";
+    SubResourcePrototype newSubresource = new SubResourcePrototype().setSub(ref2);
+    RestResult<UUID> setResult2 = client.setSubResource(resourceUuid, subresourceUUID, newSubresource);
+    assertRequestSucceeded(setResult2);
+    softly.assertThat(setResult2.get()).isEqualTo(subresourceUUID);
+
+    RestResult<SubResourcePojo> getResult2 = client.getSubResource(subresourceUUID);
+    assertRequestSucceeded(getResult2);
+    SubResourcePojo subResourcePojo2 = getResult2.get();
+    softly.assertThat(subResourcePojo2).isNotNull();
+    softly.assertThat(subResourcePojo2.getSub()).as("sub").isEqualTo(ref2);
+    softly.assertThat(subResourcePojo2.getState().getValue()).as("state").isEqualTo(AlexandriaState.CONFIRMED);
   }
 
   @Test

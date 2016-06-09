@@ -34,6 +34,8 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -55,10 +57,10 @@ public class SubResourcesEndpoint extends JSONEndpoint {
 
   @Inject
   public SubResourcesEndpoint(AlexandriaService service, //
-                              LocationBuilder locationBuilder, //
-                              ResourceCreationRequestBuilder requestBuilder, //
-                              ResourceValidatorFactory validatorFactory, //
-                              @PathParam("uuid") final UUIDParam uuidParam) {
+      LocationBuilder locationBuilder, //
+      ResourceCreationRequestBuilder requestBuilder, //
+      ResourceValidatorFactory validatorFactory, //
+      @PathParam("uuid") final UUIDParam uuidParam) {
     this.service = service;
     this.locationBuilder = locationBuilder;
     this.requestBuilder = requestBuilder;
@@ -78,6 +80,23 @@ public class SubResourcesEndpoint extends JSONEndpoint {
   @ApiOperation("add subresource")
   public Response addSubResource(@NotNull @Valid SubResourcePrototype prototype) {
     prototype.setState(AlexandriaState.TENTATIVE);
+    SubResourceCreationRequest request = requestBuilder.build(parentId, prototype);
+    AlexandriaResource resource = request.execute(service);
+    URI subresourceLocation = locationBuilder.locationOf(resource);
+    if (request.newResourceWasCreated()) {
+      return created(subresourceLocation);
+    } else {
+      return Response.noContent().header("Location", subresourceLocation).build();
+    }
+  }
+
+  @PUT
+  @Path("{subuuid}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @ApiOperation("set subresource")
+  public Response setSubResource(@PathParam("subuuid") final UUIDParam subUuidParam, @NotNull @Valid SubResourcePrototype prototype) {
+    prototype.setState(AlexandriaState.CONFIRMED);
+    prototype.setId(subUuidParam);
     SubResourceCreationRequest request = requestBuilder.build(parentId, prototype);
     AlexandriaResource resource = request.execute(service);
     URI subresourceLocation = locationBuilder.locationOf(resource);

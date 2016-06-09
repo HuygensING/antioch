@@ -70,8 +70,9 @@ public class RestResult<T> {
     return result;
   }
 
-  public void setCargo(T cargo) {
+  public RestResult<T> setCargo(T cargo) {
     this.cargo = cargo;
+    return this;
   }
 
   public T get() {
