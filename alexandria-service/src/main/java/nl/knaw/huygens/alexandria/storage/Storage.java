@@ -218,16 +218,25 @@ public class Storage {
   }
 
   public void readGraph(DumpFormat format, String filename) throws IOException {
+    nonGryoWarning(format);
     graph.io(format.builder).readGraph(filename);
   }
 
   public void writeGraph(DumpFormat format, String filename) throws IOException {
+    nonGryoWarning(format);
     graph.io(format.builder).writeGraph(filename);
+  }
+
+  private void nonGryoWarning(DumpFormat format) {
+    if (!DumpFormat.gryo.equals(format)) {
+      Log.warn("restoring from " + format.name() + " may lead to duplicate id errors, use gryo if possible");
+    }
   }
 
   public void loadFromDisk(final String file) {
     try {
-      graph.io(IoCore.graphml()).readGraph(file);
+      System.out.println("loading db from " + file + "...");
+      graph.io(IoCore.gryo()).readGraph(file);
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
@@ -236,7 +245,7 @@ public class Storage {
   public void saveToDisk(final String file) {
     if (file != null) {
       try {
-        graph.io(IoCore.graphml()).writeGraph(file);
+        graph.io(IoCore.gryo()).writeGraph(file);
       } catch (final IOException e) {
         throw new RuntimeException(e);
       }
