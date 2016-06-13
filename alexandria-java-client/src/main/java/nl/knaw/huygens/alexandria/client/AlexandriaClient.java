@@ -27,6 +27,7 @@ import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -255,7 +256,7 @@ public class AlexandriaClient implements AutoCloseable {
   }
 
   public RestResult<URI> setResourceText(final UUID resourceUUID, final File file) throws IOException {
-    return setResourceText(resourceUUID, FileUtils.readFileToString(file));
+    return setResourceText(resourceUUID, FileUtils.readFileToString(file, StandardCharsets.UTF_8));
   }
 
   public RestResult<URI> setResourceText(final UUID resourceUUID, final String xml) {
