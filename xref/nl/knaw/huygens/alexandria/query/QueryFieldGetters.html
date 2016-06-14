@@ -35,7 +35,7 @@
 <a class="jxr_linenumber" name="L27" href="#L27">27</a>  
 <a class="jxr_linenumber" name="L28" href="#L28">28</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.ImmutableMap;
 <a class="jxr_linenumber" name="L29" href="#L29">29</a>  
-<a class="jxr_linenumber" name="L30" href="#L30">30</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.search.QueryField;
+<a class="jxr_linenumber" name="L30" href="#L30">30</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.api.model.search.QueryField;
 <a class="jxr_linenumber" name="L31" href="#L31">31</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 <a class="jxr_linenumber" name="L32" href="#L32">32</a>  
 <a class="jxr_linenumber" name="L33" href="#L33">33</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/query/QueryFieldGetters.html">QueryFieldGetters</a> {
@@ -56,7 +56,7 @@
 <a class="jxr_linenumber" name="L48" href="#L48">48</a>        .put(QueryField.subresource_sub, AlexandriaQueryParser::getSubResourceSub)<em class="jxr_comment">//</em>
 <a class="jxr_linenumber" name="L49" href="#L49">49</a>        .build();
 <a class="jxr_linenumber" name="L50" href="#L50">50</a>  
-<a class="jxr_linenumber" name="L51" href="#L51">51</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> Function&lt;AnnotationVF, Object&gt; get(<a href="../../../../../nl/knaw/huygens/alexandria/model/search/QueryField.html">QueryField</a> queryField) {
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> Function&lt;AnnotationVF, Object&gt; get(<a href="../../../../../nl/knaw/huygens/alexandria/api/model/search/QueryField.html">QueryField</a> queryField) {
 <a class="jxr_linenumber" name="L52" href="#L52">52</a>      <strong class="jxr_keyword">return</strong> getterMap.get(queryField);
 <a class="jxr_linenumber" name="L53" href="#L53">53</a>    }
 <a class="jxr_linenumber" name="L54" href="#L54">54</a>  }

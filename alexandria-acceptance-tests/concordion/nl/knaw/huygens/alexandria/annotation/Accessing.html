@@ -163,11 +163,9 @@ ins {
 }
 </style><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 
-<title>Accessing Annotations</title>
+<title>Alexandria: Accessing Annotations</title>
 
-<link type="text/css" rel="stylesheet" href="../../../../../codemirror/codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/enable-codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/merge.css" /><script type="text/javascript" src="../../../../../codemirror/codemirror.js"></script><script type="text/javascript" src="../../../../../codemirror/javascript.js"></script><script type="text/javascript" src="../../../../../codemirror/diff_match_patch.js"></script><script type="text/javascript" src="../../../../../codemirror/merge.js"></script><script type="text/javascript" src="../../../../../codemirror/enable-codemirror.js"></script><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/bootstrap.css" /><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/enable-bootstrap.css" /><script type="text/javascript" src="../../../../../jquery/jquery.min.js"></script><script type="text/javascript" src="../../../../../bootstrap/bootstrap.min.js"></script></head><body><span class="breadcrumbs"><a href="../Alexandria.html">Alexandria</a> &gt; <a href="Annotation.html">Annotations</a> &gt;</span>
-
-
+<link type="text/css" rel="stylesheet" href="../../../../../codemirror/codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/enable-codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/merge.css" /><script type="text/javascript" src="../../../../../codemirror/codemirror.js"></script><script type="text/javascript" src="../../../../../codemirror/javascript.js"></script><script type="text/javascript" src="../../../../../codemirror/diff_match_patch.js"></script><script type="text/javascript" src="../../../../../codemirror/merge.js"></script><script type="text/javascript" src="../../../../../codemirror/enable-codemirror.js"></script><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/bootstrap.css" /><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/enable-bootstrap.css" /><script type="text/javascript" src="../../../../../jquery/jquery.min.js"></script><script type="text/javascript" src="../../../../../bootstrap/bootstrap.min.js"></script></head><body><span class="breadcrumbs"><a href="../Alexandria.html">Alexandria</a> &gt; <a href="Annotation.html">Alexandria: Annotations</a> &gt;</span>
 
 
 
@@ -176,7 +174,9 @@ ins {
 
 
 
-<div class="container"><div class="jumbotron"><h1>Accessing annotations</h1></div><div class="row"><div class="col-md-3"><ul class="nav nav-pills nav-stacked"><li class="active"><a href="#get-non-existent" data-toggle="tab">What happens when I GET a non-existent annotation?</a></li><li><a href="#add-annotation" data-toggle="tab">How can I create an annotation?</a></li><li><a href="#get-annotation" data-toggle="tab">How can I retrieve annotations?</a></li><li><a href="#try-cheat-state-of-confirmed" data-toggle="tab">Can I cheat a CONFIRMED annotation back to TENTATIVE?</a></li><li><a href="#try-cheat-state-of-deleted" data-toggle="tab">Can I cheat a DELETED annotation back to CONFIRMED?</a></li></ul></div><div class="col-md-9"><div class="tab-content"><div id="get-non-existent" class="tab-pane fade active in"><div class="panel panel-default"><div class="panel-heading"><strong>What happens when I GET a non-existent annotation?</strong></div><div class="panel-body">
+
+
+<div class="container"><div class="jumbotron"><h1>Accessing annotations</h1></div><div class="row"><div class="col-md-3"><ul class="nav nav-pills nav-stacked"><li class="active"><a href="#get-non-existent" data-toggle="tab">1) What happens when I GET a non-existent annotation?</a></li><li><a href="#add-annotation" data-toggle="tab">2) How can I create an annotation?</a></li><li><a href="#get-annotation" data-toggle="tab">3) How can I retrieve annotations?</a></li><li><a href="#try-cheat-state-of-confirmed" data-toggle="tab">4) Can I cheat a CONFIRMED annotation back to TENTATIVE?</a></li><li><a href="#try-cheat-state-of-deleted" data-toggle="tab">5) Can I cheat a DELETED annotation back to CONFIRMED?</a></li></ul></div><div class="col-md-9"><div class="tab-content"><div id="get-non-existent" class="tab-pane fade active in"><div class="panel panel-default"><div class="panel-heading"><strong>1) What happens when I GET a non-existent annotation?</strong></div><div class="panel-body">
     Given that no annotation exists with ID <code>1dccfd5a-2ec1-11e5-ae97-0360c65ad001</code>
     <div h:request="">
         When I
@@ -190,13 +190,13 @@ ins {
   }
 }</pre>
     </div>
-</div></div></div><div id="add-annotation" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>How can I create an annotation?</strong></div><div class="panel-body">
+</div></div></div><div id="add-annotation" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>2) How can I create an annotation?</strong></div><div class="panel-body">
     <div h:request="">
         Given I have
         <span h:success="" class="success">successfully</span>
         <code class="put">/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</code>
         the following body:
-        <pre h:jsonBody="" class="json">{
+        <pre class="json">{
   "resource" : {
     "id" : "6e56c868-c0a9-11e4-a762-cb9a664afc01",
     "ref" : "http://www.example.com/titles/path/to/title/resource"
@@ -208,7 +208,7 @@ ins {
         When I
         <code class="post">/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/annotations</code>
         the following body:
-        <pre h:jsonBody="" class="json">{
+        <pre class="json">{
   "annotation" : {
     "type" : "emotion",
     "value" : "happy"
@@ -230,7 +230,7 @@ ins {
             </li>
         </ul>
     </div>
-</div></div></div><div id="get-annotation" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>How can I retrieve annotations?</strong></div><div class="panel-body">
+</div></div></div><div id="get-annotation" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>3) How can I retrieve annotations?</strong></div><div class="panel-body">
     Annotations can be found both via <code>GET</code> on the object they are annotating,
     or via the <code>/searches</code> endpoint using a query. Here we show how the state
     of an annotation influences when it shows up. Annotations are always in one of four states:
@@ -261,13 +261,13 @@ ins {
                 <span h:success="" class="success">add</span>
                 an annotation via
                 <code class="post">/resources/6cf02b7a-7244-11e5-a68b-ab226ffa3019/annotations</code>
-                <pre h:jsonBody="" class="json">{
+                <pre class="json">{
   "annotation" : {
     "value" : "a tentative annotation"
   }
 }</pre>
             </div>
-            <div c:execute="#tentativeId=uuid()">which gets id <code c:echo="#tentativeId">1b1e5a92-5539-43cf-8efa-eb026ab51cf2</code></div>
+            <div c:execute="#tentativeId=uuid()">which gets id <code c:echo="#tentativeId">55398191-766a-478c-b4c1-e98197387e3b</code></div>
             We leave this annotation in its <code>TENTATIVE</code> state.
         </li>
 
@@ -276,18 +276,18 @@ ins {
                 <span h:success="" class="success">add</span>
                 an annotation via
                 <code class="post">/resources/6cf02b7a-7244-11e5-a68b-ab226ffa3019/annotations</code>
-                <pre h:jsonBody="" class="json">{
+                <pre class="json">{
   "annotation" : {
     "value" : "a confirmed annotation"
   }
 }</pre>
             </div>
-            <div c:execute="#confirmedId=uuid()">which gets id <code c:echo="#confirmedId">b826f8d5-3f66-4f5f-814c-58349620c96c</code></div>
+            <div c:execute="#confirmedId=uuid()">which gets id <code c:echo="#confirmedId">2a2d249d-4d8b-4e85-9158-100bba4854f0</code></div>
             <div h:request="">We
                 <span h:success="" class="success">confirm</span>
                 it
-                <code class="put">/annotations/b826f8d5-3f66-4f5f-814c-58349620c96c/state</code>
-                <pre h:jsonBody="" class="json">{
+                <code class="put">/annotations/2a2d249d-4d8b-4e85-9158-100bba4854f0/state</code>
+                <pre class="json">{
   "state" : "CONFIRMED"
 }</pre>
             </div>
@@ -298,17 +298,17 @@ ins {
                 <span h:success="" class="success">add</span>
                 an annotation via
                 <code class="post">/resources/6cf02b7a-7244-11e5-a68b-ab226ffa3019/annotations</code>
-                <pre h:jsonBody="" class="json">{
+                <pre class="json">{
   "annotation" : {
     "value" : "a deleted-before-confirmation annotation"
   }
 }</pre>
             </div>
-            <div c:execute="#delBeforeConfirmId=uuid()">which gets id <code c:echo="#delBeforeConfirmId">8c749b3b-fdee-47dc-aa4c-2965d176ceb0</code></div>
+            <div c:execute="#delBeforeConfirmId=uuid()">which gets id <code c:echo="#delBeforeConfirmId">08c0c7af-08b5-4e69-958b-37e930e31921</code></div>
             <div h:request="">We then
                 <span h:success="" class="success">delete</span>
                 it via
-                <code class="delete">/annotations/8c749b3b-fdee-47dc-aa4c-2965d176ceb0</code>
+                <code class="delete">/annotations/08c0c7af-08b5-4e69-958b-37e930e31921</code>
                 before having confirmed it.
             </div>
             <div class="alert alert-warning sm">
@@ -322,25 +322,25 @@ ins {
                 <span h:success="" class="success">add</span>
                 an annotation via
                 <code class="post">/resources/6cf02b7a-7244-11e5-a68b-ab226ffa3019/annotations</code>
-                <pre h:jsonBody="" class="json">{
+                <pre class="json">{
   "annotation" : {
     "value" : "a deleted-after-confirmation annotation"
   }
 }</pre>
             </div>
-            <div c:execute="#delAfterConfirmId=uuid()">which gets id <code c:echo="#delAfterConfirmId">ff2e0343-a801-438a-acae-4af02698e365</code></div>
+            <div c:execute="#delAfterConfirmId=uuid()">which gets id <code c:echo="#delAfterConfirmId">ea244cd0-48f0-42d2-9272-63a08344437a</code></div>
             <div h:request="">We
                 <span h:success="" class="success">confirm</span>
                 it:
-                <code class="put">/annotations/ff2e0343-a801-438a-acae-4af02698e365/state</code>
-                <pre h:jsonBody="" class="json">{
+                <code class="put">/annotations/ea244cd0-48f0-42d2-9272-63a08344437a/state</code>
+                <pre class="json">{
   "state" : "CONFIRMED"
 }</pre>
             </div>
             <div h:request="">We then
                 <span h:success="" class="success">delete</span>
                 it via
-                <code class="delete">/annotations/ff2e0343-a801-438a-acae-4af02698e365</code>
+                <code class="delete">/annotations/ea244cd0-48f0-42d2-9272-63a08344437a</code>
             </div>
         </li>
 
@@ -349,26 +349,26 @@ ins {
                 <span h:success="" class="success">add</span>
                 an annotation via
                 <code class="post">/resources/6cf02b7a-7244-11e5-a68b-ab226ffa3019/annotations</code>
-                <pre h:jsonBody="" class="json">{
+                <pre class="json">{
   "annotation" : {
     "value" : "an annotation to be deprecated"
   }
 }</pre>
             </div>
-            <div c:execute="#deprecatedId=uuid()">which gets id <code c:echo="#deprecatedId">1ab7771b-7160-4ee1-b315-abc8553e9b14</code></div>
+            <div c:execute="#deprecatedId=uuid()">which gets id <code c:echo="#deprecatedId">accb7ce3-1748-411d-807b-ea6e65d464fe</code></div>
             <div h:request="">We
                 <span h:success="" class="success">confirm</span>
                 it:
-                <code class="put">/annotations/1ab7771b-7160-4ee1-b315-abc8553e9b14/state</code>
-                <pre h:jsonBody="" class="json">{
+                <code class="put">/annotations/accb7ce3-1748-411d-807b-ea6e65d464fe/state</code>
+                <pre class="json">{
   "state" : "CONFIRMED"
 }</pre>
             </div>
             <div h:request="">We
                 <span h:success="" class="success">deprecate</span>
                 it:
-                <code class="put">/annotations/1ab7771b-7160-4ee1-b315-abc8553e9b14</code>
-                <pre h:jsonBody="" class="json">{
+                <code class="put">/annotations/accb7ce3-1748-411d-807b-ea6e65d464fe</code>
+                <pre class="json">{
   "annotation" : {
     "value" : "the annotation value after deprecation"
   }
@@ -387,7 +387,7 @@ ins {
         <pre class="json rest-success">{
   "resource" : {
     "id" : "6cf02b7a-7244-11e5-a68b-ab226ffa3019",
-    "^annotations" : [ "https://{host}/annotations/1b1e5a92-5539-43cf-8efa-eb026ab51cf2", "https://{host}/annotations/b826f8d5-3f66-4f5f-814c-58349620c96c", "https://{host}/annotations/ff2e0343-a801-438a-acae-4af02698e365", "https://{host}/annotations/1ab7771b-7160-4ee1-b315-abc8553e9b14" ]
+    "^annotations" : [ "https://{host}/annotations/55398191-766a-478c-b4c1-e98197387e3b", "https://{host}/annotations/2a2d249d-4d8b-4e85-9158-100bba4854f0", "https://{host}/annotations/ea244cd0-48f0-42d2-9272-63a08344437a", "https://{host}/annotations/accb7ce3-1748-411d-807b-ea6e65d464fe" ]
   }
 }</pre>
     </div>
@@ -397,7 +397,7 @@ ins {
     <div h:request="">We
         <span h:success="" class="success">successfully</span>
         <code class="post">/searches</code>
-        <pre h:jsonBody="" class="json">{
+        <pre class="json">{
   "query" : {
     "find" : "annotation",
     "where" : "who:eq(\"nederlab\")",
@@ -406,7 +406,7 @@ ins {
 }</pre>
     </div>
 
-    <div c:execute="#searchId=uuid()">which gets id <code c:echo="#searchId">5a053174-dea7-41f3-b6c0-a3332bbb1ac6</code></div>
+    <div c:execute="#searchId=uuid()">which gets id <code c:echo="#searchId">37a70082-adb7-4560-accd-b53f1785fc47</code></div>
     <br />
 
     <div class="alert alert-info sm">
@@ -417,14 +417,14 @@ ins {
     </div>
 
     <div h:request="">We
-        <code class="get">/searches/5a053174-dea7-41f3-b6c0-a3332bbb1ac6</code>,
+        <code class="get">/searches/37a70082-adb7-4560-accd-b53f1785fc47</code>,
         inspect the number of results and the <code>where</code> clause of our query in <code>searchInfo</code>
         and find the expected annotation URLs and values:
         <pre class="json rest-success">{
   "searchResultPage" : {
     "pageNumber" : 1,
     "searchInfo" : {
-      "id" : "5a053174-dea7-41f3-b6c0-a3332bbb1ac6",
+      "id" : "37a70082-adb7-4560-accd-b53f1785fc47",
       "query" : {
         "where" : "who:eq(\"nederlab\") state:eq(\"CONFIRMED\")"
       },
@@ -432,10 +432,10 @@ ins {
     },
     "records" : [ {
       "value" : "a confirmed annotation",
-      "url" : "https://{host}/annotations/b826f8d5-3f66-4f5f-814c-58349620c96c"
+      "url" : "https://{host}/annotations/2a2d249d-4d8b-4e85-9158-100bba4854f0"
     }, {
       "value" : "the annotation value after deprecation",
-      "url" : "https://{host}/annotations/1ab7771b-7160-4ee1-b315-abc8553e9b14"
+      "url" : "https://{host}/annotations/accb7ce3-1748-411d-807b-ea6e65d464fe"
     } ]
   }
 }</pre>
@@ -446,7 +446,7 @@ ins {
     <div h:request="">We
         <span h:success="" class="success">successfully</span>
         <code class="post">/searches</code>
-        <pre h:jsonBody="" class="json">{
+        <pre class="json">{
   "query" : {
     "where" : "who:eq(\"nederlab\") state:inSet(\"TENTATIVE\", \"DELETED\")",
     "return" : "state,value,url"
@@ -454,18 +454,18 @@ ins {
 }</pre>
     </div>
 
-    <div c:execute="#searchId=uuid()">which gets id <code c:echo="#searchId">872b4c51-fa6e-4bc5-aa42-398ac1e6d767</code></div>
+    <div c:execute="#searchId=uuid()">which gets id <code c:echo="#searchId">36ef6750-43ac-4a21-8cae-7be3e36456c6</code></div>
 
     <br />
 
     <div h:request="">We
         <span h:success="" class="success">successfully</span>
-        <code class="get">/searches/872b4c51-fa6e-4bc5-aa42-398ac1e6d767</code>
+        <code class="get">/searches/36ef6750-43ac-4a21-8cae-7be3e36456c6</code>
         and verify the body
         <pre class="json rest-success">{
   "searchResultPage" : {
     "searchInfo" : {
-      "id" : "872b4c51-fa6e-4bc5-aa42-398ac1e6d767",
+      "id" : "36ef6750-43ac-4a21-8cae-7be3e36456c6",
       "query" : {
         "where" : "who:eq(\"nederlab\") state:inSet(\"TENTATIVE\", \"DELETED\")"
       },
@@ -474,17 +474,17 @@ ins {
     "records" : [ {
       "state" : "TENTATIVE",
       "value" : "a tentative annotation",
-      "url" : "https://{host}/annotations/1b1e5a92-5539-43cf-8efa-eb026ab51cf2"
+      "url" : "https://{host}/annotations/55398191-766a-478c-b4c1-e98197387e3b"
     }, {
       "state" : "DELETED",
       "value" : "a deleted-after-confirmation annotation",
-      "url" : "https://{host}/annotations/ff2e0343-a801-438a-acae-4af02698e365"
+      "url" : "https://{host}/annotations/ea244cd0-48f0-42d2-9272-63a08344437a"
     } ]
   }
 }</pre>
     </div>
 
-</div></div></div><div id="try-cheat-state-of-confirmed" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>Can I cheat a CONFIRMED annotation back to TENTATIVE?</strong></div><div class="panel-body">
+</div></div></div><div id="try-cheat-state-of-confirmed" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>4) Can I cheat a CONFIRMED annotation back to TENTATIVE?</strong></div><div class="panel-body">
 
     <div c:execute="resourceExists(#resId)">
         Assume a resource exists with uuid: <code c:set="#resId">c11d2b34-8208-11e5-8d69-dbd854dc9546</code>
@@ -494,7 +494,7 @@ ins {
         <span h:success="" class="success">successfully</span>
         <code class="post">/resources/c11d2b34-8208-11e5-8d69-dbd854dc9546/annotations</code>
         the body
-        <pre h:jsonBody="" class="json">{
+        <pre class="json">{
   "annotation" : {
     "value" : "an annotation value"
   }
@@ -502,23 +502,23 @@ ins {
     </div>
 
     <div c:execute="#annoId = uuid()">
-        this annotation has id: <code c:echo="#annoId">503c1abf-d2fc-4546-bb24-b5a1c10724c5</code>
+        this annotation has id: <code c:echo="#annoId">6f69cba1-ef64-45d8-a2ce-9fffa8511877</code>
     </div>
 
     <div h:request="">We
         <span h:success="" class="success">confirm</span>
         by
-        <code class="put">/annotations/503c1abf-d2fc-4546-bb24-b5a1c10724c5/state</code>
+        <code class="put">/annotations/6f69cba1-ef64-45d8-a2ce-9fffa8511877/state</code>
         the body
-        <pre h:jsonBody="" class="json">{
+        <pre class="json">{
   "state" : "CONFIRMED"
 }</pre>
     </div>
 
     <div h:request="">Now if we try to reset the state to <code>TENTATIVE</code>
-        <code class="put">/annotations/503c1abf-d2fc-4546-bb24-b5a1c10724c5/state</code>
+        <code class="put">/annotations/6f69cba1-ef64-45d8-a2ce-9fffa8511877/state</code>
         the body
-        <pre h:jsonBody="" class="json">{
+        <pre class="json">{
   "state" : "TENTATIVE"
 }</pre>
         We observe
@@ -530,7 +530,7 @@ ins {
   }
 }</pre>
     </div>
-</div></div></div><div id="try-cheat-state-of-deleted" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>Can I cheat a DELETED annotation back to CONFIRMED?</strong></div><div class="panel-body">
+</div></div></div><div id="try-cheat-state-of-deleted" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>5) Can I cheat a DELETED annotation back to CONFIRMED?</strong></div><div class="panel-body">
 
     <div c:execute="resourceExists(#resId)">
         Assume a resource exists with uuid: <code c:set="#resId">c11d2b34-8208-11e5-8d69-dbd854dc9546</code>
@@ -540,7 +540,7 @@ ins {
         <span h:success="" class="success">successfully</span>
         <code class="post">/resources/c11d2b34-8208-11e5-8d69-dbd854dc9546/annotations</code>
         the body
-        <pre h:jsonBody="" class="json">{
+        <pre class="json">{
   "annotation" : {
     "value" : "an annotation value"
   }
@@ -548,15 +548,15 @@ ins {
     </div>
 
     <div c:execute="#annoId = uuid()">
-        this annotation has id: <code c:echo="#annoId">9ead4460-175a-4ead-992a-740511d1ee1a</code>
+        this annotation has id: <code c:echo="#annoId">d638aded-32cf-4c95-a515-653204590773</code>
     </div>
 
     <div h:request="">We
         <span h:success="" class="success">confirm</span>
         it
-        <code class="put">/annotations/9ead4460-175a-4ead-992a-740511d1ee1a/state</code>
+        <code class="put">/annotations/d638aded-32cf-4c95-a515-653204590773/state</code>
         the body
-        <pre h:jsonBody="" class="json">{
+        <pre class="json">{
   "state" : "CONFIRMED"
 }</pre>
     </div>
@@ -564,13 +564,13 @@ ins {
     <div h:request="">We
         <span h:success="" class="success">delete</span>
         it
-        <code class="delete">/annotations/9ead4460-175a-4ead-992a-740511d1ee1a</code>
+        <code class="delete">/annotations/d638aded-32cf-4c95-a515-653204590773</code>
     </div>
 
     <div h:request="">Now if we try to reset the state to <code>CONFIRMED</code>
-        <code class="put">/annotations/9ead4460-175a-4ead-992a-740511d1ee1a/state</code>
+        <code class="put">/annotations/d638aded-32cf-4c95-a515-653204590773/state</code>
         the body
-        <pre h:jsonBody="" class="json">{
+        <pre class="json">{
   "state" : "CONFIRMED"
 }</pre>
         We observe
@@ -582,5 +582,5 @@ ins {
   }
 }</pre>
     </div>
-</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 722 ms on 08-Jun-2016 at 11:50:31 CEST</div></div></body>
+</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 708 ms on 14-Jun-2016 at 11:44:54 CEST</div></div></body>
 </html>

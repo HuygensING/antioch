@@ -1,2 +1,6 @@
 nl.knaw.huygens.alexandria.api
 nl.knaw.huygens.alexandria.api.model
+nl.knaw.huygens.alexandria.api.model.search
+nl.knaw.huygens.alexandria.api.model.text
+nl.knaw.huygens.alexandria.api.model.text.view
+nl.knaw.huygens.alexandria.util
