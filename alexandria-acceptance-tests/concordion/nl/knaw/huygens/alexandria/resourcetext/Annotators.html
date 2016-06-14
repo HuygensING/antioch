@@ -439,7 +439,7 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
         a (confirmed parent) resource exists with uuid: <code c:set="#uuid">00000000-0000-0000-0000-000000000006</code>
     </li>
     <li c:execute="#uuid2 = hasSubresource(#uuid)">
-        this resource has a confirmed subresource: <code c:echo="#uuid2">9b08172c-e764-4595-b539-ac0a725ad76f</code>
+        this resource has a confirmed subresource: <code c:echo="#uuid2">5cdb9de0-43df-40a2-b599-0727ba408203</code>
     </li>
     <li>
 		  <div h:request="">
@@ -458,7 +458,7 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
   </ul>
  
   <div h:request="">
-    Now, when I <code class="get">/resources/9b08172c-e764-4595-b539-ac0a725ad76f/annotators</code>
+    Now, when I <code class="get">/resources/5cdb9de0-43df-40a2-b599-0727ba408203/annotators</code>
     then I should receive
     <ul>
       <li>status <code h:status="" class="success">200 OK</code></li>
@@ -478,7 +478,7 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
     Next, I
     <span h:success="" class="success">successfully</span>
     set annotator <code>def</code>
-    by <code class="put">/resources/9b08172c-e764-4595-b539-ac0a725ad76f/annotators/def</code>
+    by <code class="put">/resources/5cdb9de0-43df-40a2-b599-0727ba408203/annotators/def</code>
     the body:
     <pre class="json">{
   "annotator" : {
@@ -488,7 +488,7 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
   </div>
 
   <div h:request="">
-    Now, when I <code class="get">/resources/9b08172c-e764-4595-b539-ac0a725ad76f/annotators</code>
+    Now, when I <code class="get">/resources/5cdb9de0-43df-40a2-b599-0727ba408203/annotators</code>
     then I should receive
     <ul>
       <li>status <code h:status="" class="success">200 OK</code></li>
@@ -497,7 +497,7 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
   "annotator" : {
     "code" : "def",
     "description" : "Annotator def",
-    "^resource" : "https://{host}/resources/9b08172c-e764-4595-b539-ac0a725ad76f"
+    "^resource" : "https://{host}/resources/5cdb9de0-43df-40a2-b599-0727ba408203"
   }
 }, {
   "annotator" : {
@@ -520,14 +520,14 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
         a (confirmed parent) resource exists with uuid: <code c:set="#uuid">00000000-0000-0000-0000-000000000007</code>
     </li>
     <li c:execute="#uuid2 = hasSubresource(#uuid)">
-        this resource has a confirmed subresource: <code c:echo="#uuid2">aa9c752b-3e61-4c56-825c-e2902fafc5ca</code>
+        this resource has a confirmed subresource: <code c:echo="#uuid2">2329baca-04c8-4fec-a529-63065f571594</code>
     </li>
     <li>
       <div h:request="">
         I have
         <span h:success="" class="success">successfully</span>
         set annotator <code>abc</code>
-        by <code class="put">/resources/aa9c752b-3e61-4c56-825c-e2902fafc5ca/annotators/abc</code>
+        by <code class="put">/resources/2329baca-04c8-4fec-a529-63065f571594/annotators/abc</code>
         the body:
         <pre class="json">{
   "annotator" : {
@@ -558,7 +558,7 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
         a (confirmed parent) resource exists with uuid: <code c:set="#uuid">00000000-0000-0000-0000-000000000008</code>
     </li>
     <li c:execute="#uuid2 = hasSubresource(#uuid)">
-        this resource has a confirmed subresource: <code c:echo="#uuid2">fef3e9dd-3ece-4ec8-a069-a2ac01c940b2</code>
+        this resource has a confirmed subresource: <code c:echo="#uuid2">6e5ceba5-e0dd-4d27-ab4a-2c8e0b08b362</code>
     </li>
     <li>
       <div h:request="">
@@ -578,7 +578,7 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
 
   <div h:request="">
     When I
-    <code class="put">/resources/fef3e9dd-3ece-4ec8-a069-a2ac01c940b2/annotators/abc</code>
+    <code class="put">/resources/6e5ceba5-e0dd-4d27-ab4a-2c8e0b08b362/annotators/abc</code>
     the body:
     <pre class="json">{
   "annotator" : {
@@ -609,17 +609,17 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
         a (confirmed parent) resource exists with uuid: <code c:set="#uuid">00000000-0000-0000-0000-000000000009</code>
     </li>
     <li c:execute="#uuid2 = hasSubresource(#uuid)">
-        this resource has a confirmed subresource A: <code c:echo="#uuid2">5d7863e4-cb07-4320-a05f-a4e25ed3ea86</code>
+        this resource has a confirmed subresource A: <code c:echo="#uuid2">29374b4c-5700-42b4-a717-89126908ed41</code>
     </li>
     <li c:execute="#uuid3 = hasSubresource(#uuid)">
-        and another confirmed subresource B: <code c:echo="#uuid3">3861d28b-74c9-4021-ae59-3428471adab3</code>
+        and another confirmed subresource B: <code c:echo="#uuid3">69c65c5b-9e7b-4239-83de-20f3ea0827a7</code>
     </li>
     <li>
       <div h:request="">
         I have
         <span h:success="" class="success">successfully</span>
         set annotator <code>ed</code> on A
-        by <code class="put">/resources/5d7863e4-cb07-4320-a05f-a4e25ed3ea86/annotators/ed</code>
+        by <code class="put">/resources/29374b4c-5700-42b4-a717-89126908ed41/annotators/ed</code>
         the body:
         <pre class="json">{
   "annotator" : {
@@ -632,7 +632,7 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
 
   <div h:request="">
     When I set annotator <code>ed</code> on B by
-    <code class="put">/resources/3861d28b-74c9-4021-ae59-3428471adab3/annotators/ed</code>
+    <code class="put">/resources/69c65c5b-9e7b-4239-83de-20f3ea0827a7/annotators/ed</code>
     the body:
     <pre class="json">{
   "annotator" : {
@@ -645,5 +645,5 @@ Note: The name "resp" is used by TEI. The name is hardcoded in Alexandria. Users
       <li>and an empty response body <code h:responseBody="" class="empty success"> </code></li>
     </ul>
   </div>
-</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 470 ms on 14-Jun-2016 at 12:15:11 CEST</div></div></body>
+</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 610 ms on 14-Jun-2016 at 13:05:12 CEST</div></div></body>
 </html>
