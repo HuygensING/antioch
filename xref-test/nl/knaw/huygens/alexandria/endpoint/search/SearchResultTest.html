@@ -42,11 +42,11 @@
 <a class="jxr_linenumber" name="L34" href="#L34">34</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.ImmutableMap;
 <a class="jxr_linenumber" name="L35" href="#L35">35</a>  
 <a class="jxr_linenumber" name="L36" href="#L36">36</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.api.EndpointPaths;
-<a class="jxr_linenumber" name="L37" href="#L37">37</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
-<a class="jxr_linenumber" name="L38" href="#L38">38</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
-<a class="jxr_linenumber" name="L39" href="#L39">39</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.config.MockConfiguration;
-<a class="jxr_linenumber" name="L40" href="#L40">40</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
-<a class="jxr_linenumber" name="L41" href="#L41">41</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+<a class="jxr_linenumber" name="L37" href="#L37">37</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+<a class="jxr_linenumber" name="L38" href="#L38">38</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.config.MockConfiguration;
+<a class="jxr_linenumber" name="L39" href="#L39">39</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
+<a class="jxr_linenumber" name="L40" href="#L40">40</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+<a class="jxr_linenumber" name="L41" href="#L41">41</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
 <a class="jxr_linenumber" name="L42" href="#L42">42</a>  
 <a class="jxr_linenumber" name="L43" href="#L43">43</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/search/SearchResultTest.html">SearchResultTest</a> {
 <a class="jxr_linenumber" name="L44" href="#L44">44</a>    @Test
@@ -61,7 +61,7 @@
 <a class="jxr_linenumber" name="L53" href="#L53">53</a>      sr.setId(id);
 <a class="jxr_linenumber" name="L54" href="#L54">54</a>      assertThat(sr.getTotalResults()).isEqualTo(11);
 <a class="jxr_linenumber" name="L55" href="#L55">55</a>      assertThat(sr.getTotalPages()).isEqualTo(2);
-<a class="jxr_linenumber" name="L56" href="#L56">56</a>      String expected = config.getBaseURI() + EndpointPaths.SEARCHES + <span class="jxr_string">"/"</span> + id + <span class="jxr_string">"/"</span> + EndpointPaths.RESULTPAGES + <span class="jxr_string">"/1"</span>;
+<a class="jxr_linenumber" name="L56" href="#L56">56</a>      String expected = config.getBaseURI() + EndpointPaths.SEARCHES + <span class="jxr_string">"/"</span> + id + <span class="jxr_string">"/"</span> + SearchEndpoint.RESULTPAGES + <span class="jxr_string">"/1"</span>;
 <a class="jxr_linenumber" name="L57" href="#L57">57</a>      assertThat(sr.getFirstResultPage()).hasToString(expected);
 <a class="jxr_linenumber" name="L58" href="#L58">58</a>    }
 <a class="jxr_linenumber" name="L59" href="#L59">59</a>  

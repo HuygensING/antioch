@@ -163,7 +163,7 @@ ins {
 }
 </style><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 
-<title>Alexandria: Nederlab Scenarios</title>
+<title>Nederlab Scenarios</title>
 
 <link type="text/css" rel="stylesheet" href="../../../../../codemirror/codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/enable-codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/merge.css" /><script type="text/javascript" src="../../../../../codemirror/codemirror.js"></script><script type="text/javascript" src="../../../../../codemirror/javascript.js"></script><script type="text/javascript" src="../../../../../codemirror/diff_match_patch.js"></script><script type="text/javascript" src="../../../../../codemirror/merge.js"></script><script type="text/javascript" src="../../../../../codemirror/enable-codemirror.js"></script><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/bootstrap.css" /><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/enable-bootstrap.css" /><script type="text/javascript" src="../../../../../jquery/jquery.min.js"></script><script type="text/javascript" src="../../../../../bootstrap/bootstrap.min.js"></script></head><body><span class="breadcrumbs"><a href="../Alexandria.html">Alexandria</a> &gt;</span>
 
@@ -191,7 +191,7 @@ ins {
 
 
 
-<div class="container"><div class="jumbotron"><h1>Nederlab Scenarios</h1></div><div class="row"><div class="col-md-3"><ul class="nav nav-pills nav-stacked"><li class="active"><a href="#dia-400" data-toggle="tab">1) When can I expect a 400 Bad Request?</a></li><li><a href="#dia-404" data-toggle="tab">2) When can I expect a 404 Not Found?</a></li><li><a href="#dia-406" data-toggle="tab">3) When can I expect a 406 Not Acceptable?</a></li><li><a href="#dia-415" data-toggle="tab">4) When can I expect a 415 Unsupported Media Type?</a></li><li><a href="#use-before-confirm" data-toggle="tab">5) When can I expect a 409 Conflict?</a></li></ul></div><div class="col-md-9"><div class="tab-content"><div id="dia-400" c:execute="clearStorage()" class="tab-pane fade active in"><div class="panel panel-default"><div class="panel-heading"><strong>1) When can I expect a 400 Bad Request?</strong></div><div class="panel-body">
+<div class="container"><div class="jumbotron"><h1>Nederlab Scenarios</h1></div><div class="row"><div class="col-md-3"><ul class="nav nav-pills nav-stacked"><li class="active"><a href="#dia-400" data-toggle="tab">When can I expect a 400 Bad Request?</a></li><li><a href="#dia-404" data-toggle="tab">When can I expect a 404 Not Found?</a></li><li><a href="#dia-406" data-toggle="tab">When can I expect a 406 Not Acceptable?</a></li><li><a href="#dia-415" data-toggle="tab">When can I expect a 415 Unsupported Media Type?</a></li><li><a href="#use-before-confirm" data-toggle="tab">When can I expect a 409 Conflict?</a></li></ul></div><div class="col-md-9"><div class="tab-content"><div id="dia-400" c:execute="clearStorage()" class="tab-pane fade active in"><div class="panel panel-default"><div class="panel-heading"><strong>When can I expect a 400 Bad Request?</strong></div><div class="panel-body">
     <div class="alert alert-warning sm">
         In general, whenever there is "something wrong" with the client side of the request, you will
         get a <code>400 Bad Request</code>.
@@ -223,7 +223,7 @@ ins {
             <code><del>/resource/</del></code> instead of <code>/resources/</code>
         </li>
     </ul>
-</div></div></div><div id="dia-404" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>2) When can I expect a 404 Not Found?</strong></div><div class="panel-body">
+</div></div></div><div id="dia-404" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>When can I expect a 404 Not Found?</strong></div><div class="panel-body">
     <ul>
         <li>
             <h4>Accessing a non-existent resource at the correct endpoint</h4>
@@ -245,7 +245,7 @@ ins {
             <code>provenance</code> objects, etc.
         </div>
     </ul>
-</div></div></div><div id="dia-406" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>3) When can I expect a 406 Not Acceptable?</strong></div><div class="panel-body">
+</div></div></div><div id="dia-406" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>When can I expect a 406 Not Acceptable?</strong></div><div class="panel-body">
     <div class="alert alert-warning sm">
         All endpoints produce <code>application/json</code> results. Setting the HTTP <code>Accept</code>
         header to something that does not allow <code>application/json</code> will yield a HTTP 406 status code.
@@ -258,7 +258,7 @@ ins {
         we observe
         <code h:status="" class="success">406 Not Acceptable</code>
     </div>
-</div></div></div><div id="dia-415" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>4) When can I expect a 415 Unsupported Media Type?</strong></div><div class="panel-body">
+</div></div></div><div id="dia-415" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>When can I expect a 415 Unsupported Media Type?</strong></div><div class="panel-body">
     <div class="alert alert-warning sm">
         All endpoints consume data in <code>application/json</code> format. Setting the HTTP <code>Content-type</code>
         header to something other than <code>application/json</code> will yield a HTTP 415 status code.
@@ -268,7 +268,7 @@ ins {
         <code name="Content-type" h:setHeader="" class="set-header">text/plain</code>
         and try to
         <code class="post">/resources</code>
-        <pre class="json">{
+        <pre h:jsonBody="" class="json">{
   "resource" : {
     "ref" : "some value"
   }
@@ -276,7 +276,7 @@ ins {
         we observe
         <code h:status="" class="success">415 Unsupported Media Type</code>
     </div>
-</div></div></div><div id="use-before-confirm" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>5) When can I expect a 409 Conflict?</strong></div><div class="panel-body">
+</div></div></div><div id="use-before-confirm" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>When can I expect a 409 Conflict?</strong></div><div class="panel-body">
     This has to do with implementing the
     <a href="../transactions/Transactions.html">try-confirm-cancel</a> pattern.
 
@@ -297,5 +297,5 @@ ins {
             </li>
         </ul>
     </div>
-</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 84 ms on 15-Jun-2016 at 10:10:13 CEST</div></div></body>
+</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 91 ms on 15-Jun-2016 at 17:29:28 CEST</div></div></body>
 </html>

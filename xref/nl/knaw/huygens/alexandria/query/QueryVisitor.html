@@ -39,8 +39,8 @@
 <a class="jxr_linenumber" name="L31" href="#L31">31</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.antlr.AQLBaseVisitor;
 <a class="jxr_linenumber" name="L32" href="#L32">32</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.antlr.AQLParser.ParameterContext;
 <a class="jxr_linenumber" name="L33" href="#L33">33</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.antlr.AQLParser.SubQueryContext;
-<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.api.model.search.QueryField;
-<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.api.model.search.QueryFunction;
+<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.search.QueryField;
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.search.QueryFunction;
 <a class="jxr_linenumber" name="L36" href="#L36">36</a>  
 <a class="jxr_linenumber" name="L37" href="#L37">37</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/query/QueryVisitor.html">QueryVisitor</a> <strong class="jxr_keyword">extends</strong> AQLBaseVisitor&lt;Void&gt; {
 <a class="jxr_linenumber" name="L38" href="#L38">38</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String QUOTE = String.valueOf('&quot;');
@@ -53,8 +53,8 @@
 <a class="jxr_linenumber" name="L45" href="#L45">45</a>          .map(ParameterContext::getText)<em class="jxr_comment">//</em>
 <a class="jxr_linenumber" name="L46" href="#L46">46</a>          .map(QueryVisitor::parseParameterString)<em class="jxr_comment">//</em>
 <a class="jxr_linenumber" name="L47" href="#L47">47</a>          .collect(toList());
-<a class="jxr_linenumber" name="L48" href="#L48">48</a>      <a href="../../../../../nl/knaw/huygens/alexandria/api/model/search/QueryFunction.html">QueryFunction</a> function = QueryFunction.valueOf(ctx.FUNCTION().getText());
-<a class="jxr_linenumber" name="L49" href="#L49">49</a>      <a href="../../../../../nl/knaw/huygens/alexandria/api/model/search/QueryField.html">QueryField</a> property = QueryField.fromExternalName(ctx.FIELD_NAME().getText());
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>      <a href="../../../../../nl/knaw/huygens/alexandria/model/search/QueryFunction.html">QueryFunction</a> function = QueryFunction.valueOf(ctx.FUNCTION().getText());
+<a class="jxr_linenumber" name="L49" href="#L49">49</a>      <a href="../../../../../nl/knaw/huygens/alexandria/model/search/QueryField.html">QueryField</a> property = QueryField.fromExternalName(ctx.FIELD_NAME().getText());
 <a class="jxr_linenumber" name="L50" href="#L50">50</a>      <a href="../../../../../nl/knaw/huygens/alexandria/query/WhereToken.html">WhereToken</a> wToken = <strong class="jxr_keyword">new</strong> <a href="../../../../../nl/knaw/huygens/alexandria/query/WhereToken.html">WhereToken</a>(property, function, parameters);
 <a class="jxr_linenumber" name="L51" href="#L51">51</a>      whereTokens.add(wToken);
 <a class="jxr_linenumber" name="L52" href="#L52">52</a>      <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">null</strong>;

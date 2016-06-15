@@ -163,7 +163,7 @@ ins {
 }
 </style><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 
-<title>Alexandria: Nederlab Scenarios</title>
+<title>Nederlab Scenarios</title>
 
 <link type="text/css" rel="stylesheet" href="../../../../../codemirror/codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/enable-codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/merge.css" /><script type="text/javascript" src="../../../../../codemirror/codemirror.js"></script><script type="text/javascript" src="../../../../../codemirror/javascript.js"></script><script type="text/javascript" src="../../../../../codemirror/diff_match_patch.js"></script><script type="text/javascript" src="../../../../../codemirror/merge.js"></script><script type="text/javascript" src="../../../../../codemirror/enable-codemirror.js"></script><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/bootstrap.css" /><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/enable-bootstrap.css" /><script type="text/javascript" src="../../../../../jquery/jquery.min.js"></script><script type="text/javascript" src="../../../../../bootstrap/bootstrap.min.js"></script></head><body><span class="breadcrumbs"><a href="../Alexandria.html">Alexandria</a> &gt;</span>
 
@@ -194,7 +194,7 @@ ins {
 
 
 
-<div class="container"><div class="jumbotron"><h1>Nederlab Scenarios</h1></div><div class="row"><div class="col-md-3"><ul class="nav nav-pills nav-stacked"><li class="active"><a href="#create-tag" data-toggle="tab">1) How can I create a tag?</a></li><li><a href="#modify-tag" data-toggle="tab">2) How can I modify a tag?</a></li><li><a href="#delete-tag" data-toggle="tab">3) How can I delete a tag?</a></li><li><a href="#show-tags-for-user" data-toggle="tab">4) How can I show the tags for a specific user?</a></li><li><a href="#show-distinct-resource-id-for-user" data-toggle="tab">5) How can I show the distinct ids of resources annotated by a specific user?</a></li><li><a href="#show-grouped-annotation-ids" data-toggle="tab">6) How can I group annotation values by resource.id?</a></li></ul></div><div class="col-md-9"><div class="tab-content"><div id="create-tag" c:execute="clearStorage()" class="tab-pane fade active in"><div class="panel panel-default"><div class="panel-heading"><strong>1) How can I create a tag?</strong></div><div class="panel-body">
+<div class="container"><div class="jumbotron"><h1>Nederlab Scenarios</h1></div><div class="row"><div class="col-md-3"><ul class="nav nav-pills nav-stacked"><li class="active"><a href="#create-tag" data-toggle="tab">How can I create a tag?</a></li><li><a href="#modify-tag" data-toggle="tab">How can I modify a tag?</a></li><li><a href="#delete-tag" data-toggle="tab">How can I delete a tag?</a></li><li><a href="#show-tags-for-user" data-toggle="tab">How can I show the tags for a specific user?</a></li><li><a href="#show-distinct-resource-id-for-user" data-toggle="tab">How can I show the distinct ids of resources annotated by a specific user?</a></li><li><a href="#show-grouped-annotation-ids" data-toggle="tab">How can I group annotation values by resource.id?</a></li></ul></div><div class="col-md-9"><div class="tab-content"><div id="create-tag" c:execute="clearStorage()" class="tab-pane fade active in"><div class="panel panel-default"><div class="panel-heading"><strong>How can I create a tag?</strong></div><div class="panel-body">
     <h4>Register the resource at Alexandria
         <small>(once per resource)</small>
     </h4>
@@ -205,7 +205,7 @@ ins {
                 We
                 <code class="put">/resources/e480f748-3a9d-11e5-abc7-339c977c9f7e</code>
                 the body
-                <pre class="json">{
+                <pre h:jsonBody="" class="json">{
   "resource" : {
     "ref" : "http://www.example.com/titles/path/to/title/resource",
     "provenance" : {
@@ -231,7 +231,7 @@ ins {
                 To register, we
                 <code class="post">/resources/e480f748-3a9d-11e5-abc7-339c977c9f7e/subresources</code>
                 the body
-                <pre class="json">{
+                <pre h:jsonBody="" class="json">{
   "subresource" : {
     "sub" : "/some/folia/expression/marker"
   }
@@ -246,14 +246,14 @@ ins {
             </div>
         </li>
         <div c:execute="#uuid = uuid()">In this case the generated uuid happened to be:
-            <strong c:echo="#uuid">04d886a7-6f1e-4e0f-9bda-1e6341ef2f4b</strong>.
+            <strong c:echo="#uuid">246c03ff-e72c-4230-b5c5-f601ec81a7cc</strong>.
         </div>
         <li>
             <div h:request="">
                 To confirm our subresource, we
-                <code class="put">/resources/04d886a7-6f1e-4e0f-9bda-1e6341ef2f4b/state</code>
+                <code class="put">/resources/246c03ff-e72c-4230-b5c5-f601ec81a7cc/state</code>
                 the body
-                <pre class="json">{
+                <pre h:jsonBody="" class="json">{
   "state" : "CONFIRMED"
 }</pre>
                 and observe status
@@ -267,7 +267,7 @@ ins {
                     Now that we know the subresource already exists, if we again
                     <code class="post">/resources/e480f748-3a9d-11e5-abc7-339c977c9f7e/subresources</code>
                     the body
-                    <pre class="json">{
+                    <pre h:jsonBody="" class="json">{
   "subresource" : {
     "sub" : "/some/folia/expression/marker"
   }
@@ -276,7 +276,7 @@ ins {
                     <code h:status="" class="success">204 No Content</code>
                     (instead of <code>201 Created</code>)
                     with the <strong>same</strong> location header:
-                    <code class="location success">https://{host}/resources/04d886a7-6f1e-4e0f-9bda-1e6341ef2f4b</code>
+                    <code class="location success">https://{host}/resources/246c03ff-e72c-4230-b5c5-f601ec81a7cc</code>
                 </div>
             </div>
         </li>
@@ -288,9 +288,9 @@ ins {
         <li>
             <div h:request="">
                 To register, we
-                <code class="post">/resources/04d886a7-6f1e-4e0f-9bda-1e6341ef2f4b/annotations</code>
+                <code class="post">/resources/246c03ff-e72c-4230-b5c5-f601ec81a7cc/annotations</code>
                 the body
-                <pre class="json">{
+                <pre h:jsonBody="" class="json">{
   "annotation" : {
     "type" : "emotion",
     "value" : "happy"
@@ -300,14 +300,14 @@ ins {
                 <code h:status="" class="success">201 Created</code>
             </div>
         </li>
-        <div c:execute="#anno = uuid()">In this case we got uuid <strong c:echo="#anno">f90d110c-5051-4bba-99d4-a738a7bb286a</strong> as the uuid
+        <div c:execute="#anno = uuid()">In this case we got uuid <strong c:echo="#anno">ff14f93d-a50f-4642-9e3a-e6b4fa59c17a</strong> as the uuid
             for the annotation we just created.
         </div>
         <li>
             <div h:request="">
                 <strong>(verification)</strong>
                 We
-                <code class="get">/annotations/f90d110c-5051-4bba-99d4-a738a7bb286a</code>
+                <code class="get">/annotations/ff14f93d-a50f-4642-9e3a-e6b4fa59c17a</code>
                 and observe status
                 <code h:status="" class="success">200 OK</code>
                 and body:
@@ -315,12 +315,12 @@ ins {
   "annotation" : {
     "value" : "happy",
     "type" : "emotion",
-    "id" : "f90d110c-5051-4bba-99d4-a738a7bb286a",
+    "id" : "ff14f93d-a50f-4642-9e3a-e6b4fa59c17a",
     "state" : {
       "value" : "TENTATIVE",
       "since" : "{date.beforeNow}"
     },
-    "^annotates" : "https://{host}/resources/04d886a7-6f1e-4e0f-9bda-1e6341ef2f4b",
+    "^annotates" : "https://{host}/resources/246c03ff-e72c-4230-b5c5-f601ec81a7cc",
     "^annotations" : [ ]
   }
 }</pre>
@@ -332,9 +332,9 @@ ins {
         <li>
             <div h:request="">
                 To confirm, we
-                <code class="put">/annotations/f90d110c-5051-4bba-99d4-a738a7bb286a/state</code>
+                <code class="put">/annotations/ff14f93d-a50f-4642-9e3a-e6b4fa59c17a/state</code>
                 the body
-                <pre class="json">{
+                <pre h:jsonBody="" class="json">{
   "state" : "CONFIRMED"
 }</pre>
                 and observe status
@@ -345,7 +345,7 @@ ins {
             <div h:request="">
                 <strong>(verification)</strong>
                 We
-                <code class="get">/annotations/f90d110c-5051-4bba-99d4-a738a7bb286a</code>
+                <code class="get">/annotations/ff14f93d-a50f-4642-9e3a-e6b4fa59c17a</code>
                 and observe status
                 <code h:status="" class="success">200 OK</code>
                 and body <span class="text-muted">(only relevant fields shown for brevity)</span>
@@ -353,8 +353,8 @@ ins {
   "annotation" : {
     "value" : "happy",
     "type" : "emotion",
-    "id" : "f90d110c-5051-4bba-99d4-a738a7bb286a",
-    "^annotates" : "https://{host}/resources/04d886a7-6f1e-4e0f-9bda-1e6341ef2f4b"
+    "id" : "ff14f93d-a50f-4642-9e3a-e6b4fa59c17a",
+    "^annotates" : "https://{host}/resources/246c03ff-e72c-4230-b5c5-f601ec81a7cc"
   }
 }</pre>
                 <div class="alert alert-info sm">
@@ -366,14 +366,14 @@ ins {
             <div h:request="">
                 <strong>(verification)</strong>
                 We
-                <code class="get">/resources/04d886a7-6f1e-4e0f-9bda-1e6341ef2f4b</code>
+                <code class="get">/resources/246c03ff-e72c-4230-b5c5-f601ec81a7cc</code>
                 and observe status
                 <code h:status="" class="success">200 OK</code>
                 and body <span class="text-muted">(again, only relevant fields shown for brevity)</span>
                 <pre class="json rest-success">{
   "subresource" : {
-    "id" : "04d886a7-6f1e-4e0f-9bda-1e6341ef2f4b",
-    "^annotations" : [ "https://{host}/annotations/f90d110c-5051-4bba-99d4-a738a7bb286a" ]
+    "id" : "246c03ff-e72c-4230-b5c5-f601ec81a7cc",
+    "^annotations" : [ "https://{host}/annotations/ff14f93d-a50f-4642-9e3a-e6b4fa59c17a" ]
   }
 }</pre>
                 <div class="alert alert-info sm">
@@ -382,7 +382,7 @@ ins {
             </div>
         </li>
     </ul>
-</div></div></div><div id="modify-tag" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>2) How can I modify a tag?</strong></div><div class="panel-body">
+</div></div></div><div id="modify-tag" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>How can I modify a tag?</strong></div><div class="panel-body">
     Given a
     <mark>resource</mark>
     with id <code c:set="#resId">13e53670-3f3f-11e5-96ef-dff0c5cf4b9b</code>
@@ -422,7 +422,7 @@ ins {
     <div h:request="">We
         <code class="post">/searches</code>
         the following body
-        <pre class="json">{
+        <pre h:jsonBody="" class="json">{
   "query" : {
     "find" : "annotation",
     "where" : "who:eq(\"nederlab\") resource.id:eq(\"13e53670-3f3f-11e5-96ef-dff0c5cf4b9b\")",
@@ -432,11 +432,11 @@ ins {
     </div>
 
     <div c:execute="#searchId = uuid()">The uuid for this particular search was:
-        <strong c:echo="#searchId">e9915724-134a-4f39-bc85-1282ff8d1c29</strong>.
+        <strong c:echo="#searchId">9c9c7855-71f6-4357-9830-993b70bf059e</strong>.
     </div>
 
     <div h:request="">We
-        <code class="get">/searches/e9915724-134a-4f39-bc85-1282ff8d1c29/pages/1</code>
+        <code class="get">/searches/9c9c7855-71f6-4357-9830-993b70bf059e/pages/1</code>
         and observe
         <code h:status="" class="success">200 OK</code>
         and the relevant resource and subresource <code>url</code>s in the body
@@ -468,9 +468,9 @@ ins {
         <li>
             <div h:request="">
                 We
-                <code class="put">/annotations/405d0cda-4ec7-4e3d-84b0-4c1a756760e7</code>
+                <code class="put">/annotations/ae26fbf5-dca7-480e-9b50-1be110a0ab11</code>
                 the body
-                <pre class="json">{
+                <pre h:jsonBody="" class="json">{
   "annotation" : {
     "value" : "UPDATED-VALUE"
   }
@@ -482,13 +482,13 @@ ins {
         <li>
             <div h:request="">
                 <strong>(verification)</strong> We
-                <code class="get">/annotations/405d0cda-4ec7-4e3d-84b0-4c1a756760e7</code>
+                <code class="get">/annotations/ae26fbf5-dca7-480e-9b50-1be110a0ab11</code>
                 and observe status
                 <code h:status="" class="success">200 OK</code>
                 and the body
                 <pre class="json rest-success">{
   "annotation" : {
-    "id" : "405d0cda-4ec7-4e3d-84b0-4c1a756760e7",
+    "id" : "ae26fbf5-dca7-480e-9b50-1be110a0ab11",
     "type" : "res-type",
     "value" : "UPDATED-VALUE",
     "state" : {
@@ -496,9 +496,9 @@ ins {
     },
     "revision" : 1,
     "^annotates" : "https://{host}/resources/13e53670-3f3f-11e5-96ef-dff0c5cf4b9b",
-    "^deprecates" : "https://{host}/annotations/405d0cda-4ec7-4e3d-84b0-4c1a756760e7/rev/0",
-    "^current_version" : "https://{host}/annotations/405d0cda-4ec7-4e3d-84b0-4c1a756760e7",
-    "^versioned_self" : "https://{host}/annotations/405d0cda-4ec7-4e3d-84b0-4c1a756760e7/rev/1"
+    "^deprecates" : "https://{host}/annotations/ae26fbf5-dca7-480e-9b50-1be110a0ab11/rev/0",
+    "^current_version" : "https://{host}/annotations/ae26fbf5-dca7-480e-9b50-1be110a0ab11",
+    "^versioned_self" : "https://{host}/annotations/ae26fbf5-dca7-480e-9b50-1be110a0ab11/rev/1"
   }
 }</pre>
             </div>
@@ -524,7 +524,7 @@ ins {
                 <pre class="json rest-success">{
   "resource" : {
     "id" : "13e53670-3f3f-11e5-96ef-dff0c5cf4b9b",
-    "^annotations" : [ "https://{host}/annotations/405d0cda-4ec7-4e3d-84b0-4c1a756760e7" ]
+    "^annotations" : [ "https://{host}/annotations/ae26fbf5-dca7-480e-9b50-1be110a0ab11" ]
   }
 }</pre>
             </div>
@@ -535,11 +535,11 @@ ins {
         <li>
             <div h:request="">
                 <strong>(verification)</strong> We inspect the previous revision of the annotation by
-                <code class="get">/annotations/405d0cda-4ec7-4e3d-84b0-4c1a756760e7/rev/0</code>
+                <code class="get">/annotations/ae26fbf5-dca7-480e-9b50-1be110a0ab11/rev/0</code>
                 and observe the body
                 <pre class="json rest-success">{
   "annotation" : {
-    "id" : "405d0cda-4ec7-4e3d-84b0-4c1a756760e7",
+    "id" : "ae26fbf5-dca7-480e-9b50-1be110a0ab11",
     "revision" : 0,
     "type" : "res-type",
     "value" : "res-value",
@@ -554,7 +554,7 @@ ins {
             </div>
         </li>
     </ul>
-</div></div></div><div id="delete-tag" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>3) How can I delete a tag?</strong></div><div class="panel-body">
+</div></div></div><div id="delete-tag" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>How can I delete a tag?</strong></div><div class="panel-body">
     <h4>Delete the annotation at its REST endpoint</h4>
 
     <ul>
@@ -574,7 +574,7 @@ ins {
                 <pre class="json rest-success">{
   "resource" : {
     "id" : "349103a0-4006-11e5-8889-e3cb0d4e45c3",
-    "^annotations" : [ "https://{host}/annotations/d2f0ce82-41c8-4324-98d0-a745f3094dda" ]
+    "^annotations" : [ "https://{host}/annotations/5fb042ef-96a1-4630-89ed-65472c0fdef1" ]
   }
 }</pre>
             </div>
@@ -583,7 +583,7 @@ ins {
         <li>
             <div h:request="">
                 We
-                <code class="delete">/annotations/d2f0ce82-41c8-4324-98d0-a745f3094dda</code>
+                <code class="delete">/annotations/5fb042ef-96a1-4630-89ed-65472c0fdef1</code>
                 and observe status
                 <code h:status="" class="success">204 No Content</code>
                 and response body
@@ -594,13 +594,13 @@ ins {
         <li>
             <div h:request="">
                 <strong>(verification)</strong> We
-                <code class="get">/annotations/d2f0ce82-41c8-4324-98d0-a745f3094dda</code>
+                <code class="get">/annotations/5fb042ef-96a1-4630-89ed-65472c0fdef1</code>
                 and observe status
                 <code h:status="" class="success">200 OK</code>
                 and body
                 <pre class="json rest-success">{
   "annotation" : {
-    "id" : "d2f0ce82-41c8-4324-98d0-a745f3094dda",
+    "id" : "5fb042ef-96a1-4630-89ed-65472c0fdef1",
     "state" : {
       "value" : "DELETED",
       "since" : "{date.beforeNow}"
@@ -623,7 +623,7 @@ ins {
                 <pre class="json rest-success">{
   "resource" : {
     "id" : "349103a0-4006-11e5-8889-e3cb0d4e45c3",
-    "^annotations" : [ "https://{host}/annotations/d2f0ce82-41c8-4324-98d0-a745f3094dda" ]
+    "^annotations" : [ "https://{host}/annotations/5fb042ef-96a1-4630-89ed-65472c0fdef1" ]
   }
 }</pre>
                 <div class="alert alert-info sm">
@@ -632,7 +632,7 @@ ins {
             </div>
         </li>
     </ul>
-</div></div></div><div id="show-tags-for-user" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>4) How can I show the tags for a specific user?</strong></div><div class="panel-body">
+</div></div></div><div id="show-tags-for-user" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>How can I show the tags for a specific user?</strong></div><div class="panel-body">
     Given the following annotated resources (for brevity, all annotations are considered to be of type 'Tag')
     in order of creation timestamp
     <table class="table" c:execute="resourceExistsWithTagForUserAtInstant(#resId, #value, #who, #when)">
@@ -685,7 +685,7 @@ ins {
         We
         <code class="post">/searches</code>
         the body
-        <pre class="json">{
+        <pre h:jsonBody="" class="json">{
   "query" : {
     "find" : "annotation",
     "where" : "who:eq(\"user-4242\") type:eq(\"Tag\")",
@@ -700,14 +700,14 @@ ins {
     <div c:execute="#searchId = uuid()"> </div>
 
     <div h:request="">We follow the Location header and
-        <code class="get">/searches/a4c189bb-f6f1-42e5-8d30-cc188b6f3f08</code>
+        <code class="get">/searches/09705300-a01c-4e46-a8f8-9d8aa75bd266</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
         <pre class="json rest-success">{
   "searchResultPage" : {
     "searchInfo" : {
-      "id" : "a4c189bb-f6f1-42e5-8d30-cc188b6f3f08",
+      "id" : "09705300-a01c-4e46-a8f8-9d8aa75bd266",
       "query" : {
         "find" : "annotation",
         "where" : "who:eq(\"user-4242\") type:eq(\"Tag\") state:eq(\"CONFIRMED\")",
@@ -717,7 +717,7 @@ ins {
       "totalResults" : 3,
       "totalPages" : 1
     },
-    "^firstPage" : "https://{host}/searches/a4c189bb-f6f1-42e5-8d30-cc188b6f3f08/pages/1"
+    "^firstPage" : "https://{host}/searches/09705300-a01c-4e46-a8f8-9d8aa75bd266/pages/1"
   }
 }</pre>
     </div>
@@ -736,7 +736,7 @@ ins {
     </div>
 
     <div h:request="">We
-        <code class="get">/searches/a4c189bb-f6f1-42e5-8d30-cc188b6f3f08/pages/1</code>
+        <code class="get">/searches/09705300-a01c-4e46-a8f8-9d8aa75bd266/pages/1</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
@@ -776,7 +776,7 @@ ins {
     <div h:request="">
         <code class="post">/searches</code>
         the body
-        <pre class="json">{
+        <pre h:jsonBody="" class="json">{
   "query" : {
     "find" : "annotation",
     "where" : "who:eq(\"user-4242\") type:eq(\"Tag\") value:match(\".*early.*\")",
@@ -791,7 +791,7 @@ ins {
     <div c:execute="#searchId2 = uuid()"> </div>
 
     <div h:request="">We follow the Location header and
-        <code class="get">/searches/bf295b5a-bd39-4899-bdf4-f719ad07c93a</code>
+        <code class="get">/searches/a87a8619-7c30-4672-a618-e360582e9630</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
@@ -801,7 +801,7 @@ ins {
     "searchInfo" : {
       "totalResults" : 2
     },
-    "^firstPage" : "https://{host}/searches/bf295b5a-bd39-4899-bdf4-f719ad07c93a/pages/1",
+    "^firstPage" : "https://{host}/searches/a87a8619-7c30-4672-a618-e360582e9630/pages/1",
     "records" : [ {
       "value" : "An early user comment.",
       "resource.url" : "https://{host}/resources/00000002-3f4e-11e5-91d3-bfea30e2969c",
@@ -832,7 +832,7 @@ ins {
     <div h:request="">
         <code class="post">/searches</code>
         the body
-        <pre class="json">{
+        <pre h:jsonBody="" class="json">{
   "query" : {
     "find" : "annotation",
     "where" : "who:eq(\"user-4242\") type:eq(\"Tag\") value:match(\".*early.*\") when:inRange(\"2015-07-01T00:00:00\",\"2015-07-31T23:59:59\")",
@@ -847,7 +847,7 @@ ins {
     <div c:execute="#searchId3 = uuid()"> </div>
 
     <div h:request="">We follow the Location header and
-        <code class="get">/searches/8bb315ae-2597-42e1-80fa-d878cf1e07f8</code>
+        <code class="get">/searches/f7c24a54-2e0b-4873-a72d-27c8847150f1</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
@@ -857,7 +857,7 @@ ins {
     "searchInfo" : {
       "totalResults" : 1
     },
-    "^firstPage" : "https://{host}/searches/8bb315ae-2597-42e1-80fa-d878cf1e07f8/pages/1",
+    "^firstPage" : "https://{host}/searches/f7c24a54-2e0b-4873-a72d-27c8847150f1/pages/1",
     "records" : [ {
       "value" : "An early user comment.",
       "resource.url" : "https://{host}/resources/00000002-3f4e-11e5-91d3-bfea30e2969c",
@@ -866,7 +866,7 @@ ins {
   }
 }</pre>
     </div>
-</div></div></div><div id="show-distinct-resource-id-for-user" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>5) How can I show the distinct ids of resources annotated by a specific user?</strong></div><div class="panel-body">
+</div></div></div><div id="show-distinct-resource-id-for-user" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>How can I show the distinct ids of resources annotated by a specific user?</strong></div><div class="panel-body">
     Given the following annotated resources (for brevity, all annotations are considered to be of type 'Tag')
     in order of creation timestamp
     <table class="table" c:execute="resourceExistsWithTagForUserAtInstant(#resId, #value, #who, #when)">
@@ -923,7 +923,7 @@ ins {
         We
         <code class="post">/searches</code>
         the body
-        <pre class="json">{
+        <pre h:jsonBody="" class="json">{
   "query" : {
     "find" : "annotation",
     "where" : "who:eq(\"user-4242\") type:eq(\"Tag\")",
@@ -938,14 +938,14 @@ ins {
     <div c:execute="#searchId = uuid()"> </div>
 
     <div h:request="">We follow the Location header and
-        <code class="get">/searches/6d77c9ea-b863-47f5-8242-c1902eeff29b</code>
+        <code class="get">/searches/eb89cd76-64ed-4adc-a0ee-a0e227ee7995</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
         <pre class="json rest-success">{
   "searchResultPage" : {
     "searchInfo" : {
-      "id" : "6d77c9ea-b863-47f5-8242-c1902eeff29b",
+      "id" : "eb89cd76-64ed-4adc-a0ee-a0e227ee7995",
       "query" : {
         "find" : "annotation",
         "where" : "who:eq(\"user-4242\") type:eq(\"Tag\") state:eq(\"CONFIRMED\")",
@@ -955,7 +955,7 @@ ins {
       "totalResults" : 4,
       "totalPages" : 1
     },
-    "^firstPage" : "https://{host}/searches/6d77c9ea-b863-47f5-8242-c1902eeff29b/pages/1"
+    "^firstPage" : "https://{host}/searches/eb89cd76-64ed-4adc-a0ee-a0e227ee7995/pages/1"
   }
 }</pre>
     </div>
@@ -974,7 +974,7 @@ ins {
     </div>
 
     <div h:request="">We
-        <code class="get">/searches/6d77c9ea-b863-47f5-8242-c1902eeff29b/pages/1</code>
+        <code class="get">/searches/eb89cd76-64ed-4adc-a0ee-a0e227ee7995/pages/1</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
@@ -1004,7 +1004,7 @@ ins {
         To make sure each resource.id is returned only once, we add the <code>distinct</code> parameter, we
         <code class="post">/searches</code>
         the body
-        <pre class="json">{
+        <pre h:jsonBody="" class="json">{
   "query" : {
     "find" : "annotation",
     "where" : "who:eq(\"user-4242\") type:eq(\"Tag\")",
@@ -1020,7 +1020,7 @@ ins {
     <div c:execute="#searchId = uuid()"> </div>
     
     <div h:request="">We now can get
-        <code class="get">/searches/6e2f483c-055c-42e2-8c1f-94c930f0901b/pages/1</code>
+        <code class="get">/searches/10c8552f-52fc-40aa-a8d5-d5a542b2bb07/pages/1</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
@@ -1040,7 +1040,7 @@ ins {
   }
 }</pre>
     </div>
-</div></div></div><div id="show-grouped-annotation-ids" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>6) How can I group annotation values by resource.id?</strong></div><div class="panel-body">
+</div></div></div><div id="show-grouped-annotation-ids" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>How can I group annotation values by resource.id?</strong></div><div class="panel-body">
     Given the following annotated resources (for brevity, all annotations are considered to be of type 'Tag')
     in order of creation timestamp
     <table class="table" c:execute="resourceExistsWithTagForUserAtInstant(#resId, #value, #who, #when)">
@@ -1099,7 +1099,7 @@ ins {
         We
         <code class="post">/searches</code>
         the body
-        <pre class="json">{
+        <pre h:jsonBody="" class="json">{
   "query" : {
     "find" : "annotation",
     "where" : "type:eq(\"Tag\") resource.id:inSet(\"00000001-5ba6-11e5-9054-ab0dd746f7f7\",\"00000003-5b7f-11e5-898c-237ee1c6d1d4\") state:eq(\"CONFIRMED\")",
@@ -1114,14 +1114,14 @@ ins {
     <div c:execute="#searchId = uuid()"> </div>
 
     <div h:request="">We follow the Location header and
-        <code class="get">/searches/17038db8-9348-43db-80e6-373aa0ffbf5a</code>
+        <code class="get">/searches/a45d8c1c-87be-46c5-8510-467ff08c56f8</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
         <pre class="json rest-success">{
   "searchResultPage" : {
     "searchInfo" : {
-      "id" : "17038db8-9348-43db-80e6-373aa0ffbf5a",
+      "id" : "a45d8c1c-87be-46c5-8510-467ff08c56f8",
       "query" : {
         "find" : "annotation",
         "where" : "type:eq(\"Tag\") resource.id:inSet(\"00000001-5ba6-11e5-9054-ab0dd746f7f7\",\"00000003-5b7f-11e5-898c-237ee1c6d1d4\") state:eq(\"CONFIRMED\")",
@@ -1131,7 +1131,7 @@ ins {
       "totalResults" : 4,
       "totalPages" : 1
     },
-    "^firstPage" : "https://{host}/searches/17038db8-9348-43db-80e6-373aa0ffbf5a/pages/1"
+    "^firstPage" : "https://{host}/searches/a45d8c1c-87be-46c5-8510-467ff08c56f8/pages/1"
   }
 }</pre>
     </div>
@@ -1150,7 +1150,7 @@ ins {
     </div>
 
     <div h:request="">We
-        <code class="get">/searches/17038db8-9348-43db-80e6-373aa0ffbf5a/pages/1</code>
+        <code class="get">/searches/a45d8c1c-87be-46c5-8510-467ff08c56f8/pages/1</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
@@ -1196,7 +1196,7 @@ ins {
         We
         <code class="post">/searches</code>
         the body
-        <pre class="json">{
+        <pre h:jsonBody="" class="json">{
   "query" : {
     "find" : "annotation",
     "where" : "type:eq(\"Tag\") resource.id:inSet(\"00000001-5ba6-11e5-9054-ab0dd746f7f7\",\"00000003-5b7f-11e5-898c-237ee1c6d1d4\")",
@@ -1211,7 +1211,7 @@ ins {
     <div c:execute="#searchId = uuid()"> </div>
 
     <div h:request="">We follow the Location header and
-        <code class="get">/searches/2a4b38a8-c2aa-4267-81dc-9ef986eadd5d</code>
+        <code class="get">/searches/0bb76d05-0a6d-4967-89b4-9b359b77a92c</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
@@ -1248,5 +1248,5 @@ ins {
     </div>
     
     Note that, due to the grouping, the annotations are only sorted by <code>-when</code> within the group determined by <code>resource.id</code>
-</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 785 ms on 15-Jun-2016 at 10:10:08 CEST</div></div></body>
+</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 754 ms on 15-Jun-2016 at 17:29:28 CEST</div></div></body>
 </html>

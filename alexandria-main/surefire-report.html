@@ -119,7 +119,6 @@
 								<li><a href="#nlknawhuygensalexandriaendpointsearch" title="nl.knaw.huygens.alexandria.endpoint.search">nl.knaw.huygens.alexandria.endpoint.search</a></li>
 								<li><a href="#nlknawhuygensalexandriaendpointparam" title="nl.knaw.huygens.alexandria.endpoint.param">nl.knaw.huygens.alexandria.endpoint.param</a></li>
 								<li><a href="#nlknawhuygensalexandriaendpointabout" title="nl.knaw.huygens.alexandria.endpoint.about">nl.knaw.huygens.alexandria.endpoint.about</a></li>
-								<li><a href="#nlknawhuygensalexandriatextgraph" title="nl.knaw.huygens.alexandria.textgraph">nl.knaw.huygens.alexandria.textgraph</a></li>
 								<li><a href="#nlknawhuygensalexandriatext" title="nl.knaw.huygens.alexandria.text">nl.knaw.huygens.alexandria.text</a></li>
 								<li><a href="#nlknawhuygensalexandriaendpointannotation" title="nl.knaw.huygens.alexandria.endpoint.annotation">nl.knaw.huygens.alexandria.endpoint.annotation</a></li>
 								<li><a href="#nlknawhuygensalexandriaendpointresource" title="nl.knaw.huygens.alexandria.endpoint.resource">nl.knaw.huygens.alexandria.endpoint.resource</a></li>
@@ -134,10 +133,11 @@
 								<!-- Repeat the item, otherwise it is not clickable as the dropdown root -->
 								<li><a href="#Test_Cases" title="Test Cases">Test Cases</a></li>
 								<li class="divider"></li>
-								<li><a href="#AddMissingIdVisitorTest" title="AddMissingIdVisitorTest">AddMissingIdVisitorTest</a></li>
 								<li><a href="#ProvenanceEntityBuilderTest" title="ProvenanceEntityBuilderTest">ProvenanceEntityBuilderTest</a></li>
 								<li><a href="#TextLocatorFactoryTest" title="TextLocatorFactoryTest">TextLocatorFactoryTest</a></li>
-								<li><a href="#TextGraphUtilTest" title="TextGraphUtilTest">TextGraphUtilTest</a></li>
+								<li><a href="#AddMissingBaseLayerIdVisitorTest" title="AddMissingBaseLayerIdVisitorTest">AddMissingBaseLayerIdVisitorTest</a></li>
+								<li><a href="#BaseLayerVisitorTest" title="BaseLayerVisitorTest">BaseLayerVisitorTest</a></li>
+								<li><a href="#TextUtilTest" title="TextUtilTest">TextUtilTest</a></li>
 								<li><a href="#ResourcePrototypeTest" title="ResourcePrototypeTest">ResourcePrototypeTest</a></li>
 								<li><a href="#ProvenanceEntityTest" title="ProvenanceEntityTest">ProvenanceEntityTest</a></li>
 								<li><a href="#UUIDParamTest" title="UUIDParamTest">UUIDParamTest</a></li>
@@ -145,10 +145,11 @@
 								<li><a href="#ResourcesEndpointTest" title="ResourcesEndpointTest">ResourcesEndpointTest</a></li>
 								<li><a href="#SearchResultPageTest" title="SearchResultPageTest">SearchResultPageTest</a></li>
 								<li><a href="#AboutEndpointTest" title="AboutEndpointTest">AboutEndpointTest</a></li>
-								<li><a href="#XmlIdVisitorTest" title="XmlIdVisitorTest">XmlIdVisitorTest</a></li>
 								<li><a href="#SearchResultTest" title="SearchResultTest">SearchResultTest</a></li>
+								<li><a href="#SubresourceElementVisitorTest" title="SubresourceElementVisitorTest">SubresourceElementVisitorTest</a></li>
 								<li><a href="#LocationBuilderTest" title="LocationBuilderTest">LocationBuilderTest</a></li>
 								<li><a href="#AnnotationAnnotationsEndpointTest" title="AnnotationAnnotationsEndpointTest">AnnotationAnnotationsEndpointTest</a></li>
+								<li><a href="#BaseLayerIdVisitorTest" title="BaseLayerIdVisitorTest">BaseLayerIdVisitorTest</a></li>
 								<li><a href="#OmittedOrMatchingTypeTest" title="OmittedOrMatchingTypeTest">OmittedOrMatchingTypeTest</a></li>
 
 							</ul>
@@ -206,12 +207,12 @@ function toggleDisplay(elementId) {
   </thead> 
   <tbody> 
    <tr class="b"> 
-    <td>37</td> 
+    <td>40</td> 
     <td>0</td> 
     <td>0</td> 
     <td>1</td> 
-    <td>97.297%</td> 
-    <td>4.233</td> 
+    <td>97.5%</td> 
+    <td>4.642</td> 
    </tr> 
   </tbody> 
  </table> 
@@ -244,7 +245,7 @@ function toggleDisplay(elementId) {
     <td>0</td> 
     <td>0</td> 
     <td>100%</td> 
-    <td>0.128</td> 
+    <td>0.039</td> 
    </tr> 
    <tr class="a"> 
     <td><a href="#nl.knaw.huygens.alexandria.endpoint.search">nl.knaw.huygens.alexandria.endpoint.search</a></td> 
@@ -253,7 +254,7 @@ function toggleDisplay(elementId) {
     <td>0</td> 
     <td>0</td> 
     <td>100%</td> 
-    <td>0.257</td> 
+    <td>0.289</td> 
    </tr> 
    <tr class="b"> 
     <td><a href="#nl.knaw.huygens.alexandria.endpoint.param">nl.knaw.huygens.alexandria.endpoint.param</a></td> 
@@ -262,7 +263,7 @@ function toggleDisplay(elementId) {
     <td>0</td> 
     <td>0</td> 
     <td>100%</td> 
-    <td>0</td> 
+    <td>0.013</td> 
    </tr> 
    <tr class="a"> 
     <td><a href="#nl.knaw.huygens.alexandria.endpoint.about">nl.knaw.huygens.alexandria.endpoint.about</a></td> 
@@ -271,52 +272,43 @@ function toggleDisplay(elementId) {
     <td>0</td> 
     <td>0</td> 
     <td>100%</td> 
-    <td>0.263</td> 
+    <td>0.296</td> 
    </tr> 
    <tr class="b"> 
-    <td><a href="#nl.knaw.huygens.alexandria.textgraph">nl.knaw.huygens.alexandria.textgraph</a></td> 
-    <td>5</td> 
+    <td><a href="#nl.knaw.huygens.alexandria.text">nl.knaw.huygens.alexandria.text</a></td> 
+    <td>11</td> 
     <td>0</td> 
     <td>0</td> 
     <td>0</td> 
     <td>100%</td> 
-    <td>0.453</td> 
+    <td>0.604</td> 
    </tr> 
    <tr class="a"> 
-    <td><a href="#nl.knaw.huygens.alexandria.text">nl.knaw.huygens.alexandria.text</a></td> 
-    <td>3</td> 
-    <td>0</td> 
-    <td>0</td> 
-    <td>0</td> 
-    <td>100%</td> 
-    <td>0.01</td> 
-   </tr> 
-   <tr class="b"> 
     <td><a href="#nl.knaw.huygens.alexandria.endpoint.annotation">nl.knaw.huygens.alexandria.endpoint.annotation</a></td> 
     <td>4</td> 
     <td>0</td> 
     <td>0</td> 
     <td>0</td> 
     <td>100%</td> 
-    <td>0.234</td> 
+    <td>0.288</td> 
    </tr> 
-   <tr class="a"> 
+   <tr class="b"> 
     <td><a href="#nl.knaw.huygens.alexandria.endpoint.resource">nl.knaw.huygens.alexandria.endpoint.resource</a></td> 
     <td>8</td> 
     <td>0</td> 
     <td>0</td> 
     <td>1</td> 
     <td>87.5%</td> 
-    <td>2.741</td> 
+    <td>2.977</td> 
    </tr> 
-   <tr class="b"> 
+   <tr class="a"> 
     <td><a href="#nl.knaw.huygens.alexandria.endpoint">nl.knaw.huygens.alexandria.endpoint</a></td> 
     <td>5</td> 
     <td>0</td> 
     <td>0</td> 
     <td>0</td> 
     <td>100%</td> 
-    <td>0.147</td> 
+    <td>0.136</td> 
    </tr> 
   </tbody> 
  </table> 
@@ -347,7 +339,7 @@ function toggleDisplay(elementId) {
      <td>0</td> 
      <td>0</td> 
      <td>100%</td> 
-     <td>0.128</td> 
+     <td>0.039</td> 
     </tr> 
    </tbody> 
   </table> 
@@ -377,7 +369,7 @@ function toggleDisplay(elementId) {
      <td>0</td> 
      <td>0</td> 
      <td>100%</td> 
-     <td>0.239</td> 
+     <td>0.273</td> 
     </tr> 
     <tr class="a"> 
      <td><a href="#nl.knaw.huygens.alexandria.endpoint.searchSearchResultTest"><i class="icon-ok"></i></a></td> 
@@ -387,7 +379,7 @@ function toggleDisplay(elementId) {
      <td>0</td> 
      <td>0</td> 
      <td>100%</td> 
-     <td>0.018</td> 
+     <td>0.016</td> 
     </tr> 
    </tbody> 
   </table> 
@@ -417,7 +409,7 @@ function toggleDisplay(elementId) {
      <td>0</td> 
      <td>0</td> 
      <td>100%</td> 
-     <td>0</td> 
+     <td>0.013</td> 
     </tr> 
    </tbody> 
   </table> 
@@ -447,37 +439,7 @@ function toggleDisplay(elementId) {
      <td>0</td> 
      <td>0</td> 
      <td>100%</td> 
-     <td>0.263</td> 
-    </tr> 
-   </tbody> 
-  </table> 
- </div> 
- <div class="section"> 
-  <h3 id="nlknawhuygensalexandriatextgraph">nl.knaw.huygens.alexandria.textgraph</h3> 
-  <a name="nl.knaw.huygens.alexandria.textgraph"></a> 
-  <table border="1" class="bodyTable table table-striped table-hover"> 
-   <thead> 
-    <tr class="a"> 
-     <th></th> 
-     <th>Class</th> 
-     <th>Tests</th> 
-     <th>Errors </th> 
-     <th>Failures</th> 
-     <th>Skipped</th> 
-     <th>Success Rate</th> 
-     <th>Time</th> 
-    </tr> 
-   </thead> 
-   <tbody> 
-    <tr class="b"> 
-     <td><a href="#nl.knaw.huygens.alexandria.textgraphTextGraphUtilTest"><i class="icon-ok"></i></a></td> 
-     <td><a href="#nl.knaw.huygens.alexandria.textgraphTextGraphUtilTest">TextGraphUtilTest</a></td> 
-     <td>5</td> 
-     <td>0</td> 
-     <td>0</td> 
-     <td>0</td> 
-     <td>100%</td> 
-     <td>0.453</td> 
+     <td>0.296</td> 
     </tr> 
    </tbody> 
   </table> 
@@ -500,24 +462,54 @@ function toggleDisplay(elementId) {
    </thead> 
    <tbody> 
     <tr class="b"> 
-     <td><a href="#nl.knaw.huygens.alexandria.textAddMissingIdVisitorTest"><i class="icon-ok"></i></a></td> 
-     <td><a href="#nl.knaw.huygens.alexandria.textAddMissingIdVisitorTest">AddMissingIdVisitorTest</a></td> 
+     <td><a href="#nl.knaw.huygens.alexandria.textAddMissingBaseLayerIdVisitorTest"><i class="icon-ok"></i></a></td> 
+     <td><a href="#nl.knaw.huygens.alexandria.textAddMissingBaseLayerIdVisitorTest">AddMissingBaseLayerIdVisitorTest</a></td> 
      <td>1</td> 
      <td>0</td> 
      <td>0</td> 
      <td>0</td> 
      <td>100%</td> 
-     <td>0.005</td> 
+     <td>0.004</td> 
     </tr> 
     <tr class="a"> 
-     <td><a href="#nl.knaw.huygens.alexandria.textXmlIdVisitorTest"><i class="icon-ok"></i></a></td> 
-     <td><a href="#nl.knaw.huygens.alexandria.textXmlIdVisitorTest">XmlIdVisitorTest</a></td> 
+     <td><a href="#nl.knaw.huygens.alexandria.textBaseLayerVisitorTest"><i class="icon-ok"></i></a></td> 
+     <td><a href="#nl.knaw.huygens.alexandria.textBaseLayerVisitorTest">BaseLayerVisitorTest</a></td> 
+     <td>1</td> 
+     <td>0</td> 
+     <td>0</td> 
+     <td>0</td> 
+     <td>100%</td> 
+     <td>0.072</td> 
+    </tr> 
+    <tr class="b"> 
+     <td><a href="#nl.knaw.huygens.alexandria.textTextUtilTest"><i class="icon-ok"></i></a></td> 
+     <td><a href="#nl.knaw.huygens.alexandria.textTextUtilTest">TextUtilTest</a></td> 
+     <td>5</td> 
+     <td>0</td> 
+     <td>0</td> 
+     <td>0</td> 
+     <td>100%</td> 
+     <td>0.211</td> 
+    </tr> 
+    <tr class="a"> 
+     <td><a href="#nl.knaw.huygens.alexandria.textSubresourceElementVisitorTest"><i class="icon-ok"></i></a></td> 
+     <td><a href="#nl.knaw.huygens.alexandria.textSubresourceElementVisitorTest">SubresourceElementVisitorTest</a></td> 
      <td>2</td> 
      <td>0</td> 
      <td>0</td> 
      <td>0</td> 
      <td>100%</td> 
-     <td>0.005</td> 
+     <td>0.31</td> 
+    </tr> 
+    <tr class="b"> 
+     <td><a href="#nl.knaw.huygens.alexandria.textBaseLayerIdVisitorTest"><i class="icon-ok"></i></a></td> 
+     <td><a href="#nl.knaw.huygens.alexandria.textBaseLayerIdVisitorTest">BaseLayerIdVisitorTest</a></td> 
+     <td>2</td> 
+     <td>0</td> 
+     <td>0</td> 
+     <td>0</td> 
+     <td>100%</td> 
+     <td>0.007</td> 
     </tr> 
    </tbody> 
   </table> 
@@ -547,7 +539,7 @@ function toggleDisplay(elementId) {
      <td>0</td> 
      <td>0</td> 
      <td>100%</td> 
-     <td>0.072</td> 
+     <td>0.076</td> 
     </tr> 
     <tr class="a"> 
      <td><a href="#nl.knaw.huygens.alexandria.endpoint.annotationOmittedOrMatchingTypeTest"><i class="icon-ok"></i></a></td> 
@@ -557,7 +549,7 @@ function toggleDisplay(elementId) {
      <td>0</td> 
      <td>0</td> 
      <td>100%</td> 
-     <td>0.162</td> 
+     <td>0.212</td> 
     </tr> 
    </tbody> 
   </table> 
@@ -587,7 +579,7 @@ function toggleDisplay(elementId) {
      <td>0</td> 
      <td>0</td> 
      <td>100%</td> 
-     <td>0.069</td> 
+     <td>0.055</td> 
     </tr> 
     <tr class="a"> 
      <td><a href="#nl.knaw.huygens.alexandria.endpoint.resourceMatchesPathIdValidatorTest"><i class="icon-ok"></i></a></td> 
@@ -597,7 +589,7 @@ function toggleDisplay(elementId) {
      <td>0</td> 
      <td>0</td> 
      <td>100%</td> 
-     <td>0.261</td> 
+     <td>0.245</td> 
     </tr> 
     <tr class="b"> 
      <td><a href="#nl.knaw.huygens.alexandria.endpoint.resourceResourcesEndpointTest"><i class="icon-warning-sign"></i></a></td> 
@@ -607,7 +599,7 @@ function toggleDisplay(elementId) {
      <td>0</td> 
      <td>1</td> 
      <td>75%</td> 
-     <td>2.411</td> 
+     <td>2.677</td> 
     </tr> 
    </tbody> 
   </table> 
@@ -647,7 +639,7 @@ function toggleDisplay(elementId) {
      <td>0</td> 
      <td>0</td> 
      <td>100%</td> 
-     <td>0.045</td> 
+     <td>0.047</td> 
     </tr> 
     <tr class="b"> 
      <td><a href="#nl.knaw.huygens.alexandria.endpointLocationBuilderTest"><i class="icon-ok"></i></a></td> 
@@ -657,7 +649,7 @@ function toggleDisplay(elementId) {
      <td>0</td> 
      <td>0</td> 
      <td>100%</td> 
-     <td>0.099</td> 
+     <td>0.086</td> 
     </tr> 
    </tbody> 
   </table> 
@@ -668,19 +660,6 @@ function toggleDisplay(elementId) {
  <h2 id="Test_Cases">Test Cases</h2> 
  <a name="Test_Cases"></a> 
  <p>[<a href="#Summary">Summary</a>] [<a href="#Package_List">Package List</a>] [<a href="#Test_Cases">Test Cases</a>]</p> 
- <div class="section"> 
-  <h3 id="AddMissingIdVisitorTest">AddMissingIdVisitorTest</h3> 
-  <a name="nl.knaw.huygens.alexandria.textAddMissingIdVisitorTest"></a> 
-  <table border="1" class="bodyTable table table-striped table-hover"> 
-   <tbody> 
-    <tr class="a"> 
-     <td><i class="icon-ok"></i></td> 
-     <td><a name="TC_nl.knaw.huygens.alexandria.text.AddMissingIdVisitorTest.testVisitor"></a>testVisitor</td> 
-     <td>0.005</td> 
-    </tr> 
-   </tbody> 
-  </table> 
- </div> 
  <div class="section"> 
   <h3 id="ProvenanceEntityBuilderTest">ProvenanceEntityBuilderTest</h3> 
   <a name="nl.knaw.huygens.alexandria.endpointProvenanceEntityBuilderTest"></a> 
@@ -707,45 +686,71 @@ function toggleDisplay(elementId) {
     <tr class="b"> 
      <td><i class="icon-ok"></i></td> 
      <td><a name="TC_nl.knaw.huygens.alexandria.textlocator.TextLocatorFactoryTest.testOffsetPrefixReturnsByOffsetTextLocator"></a>testOffsetPrefixReturnsByOffsetTextLocator</td> 
-     <td>0.094</td> 
+     <td>0.038</td> 
     </tr> 
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
      <td><a name="TC_nl.knaw.huygens.alexandria.textlocator.TextLocatorFactoryTest.testInPrefixReturnsByIdTextLocator"></a>testInPrefixReturnsByIdTextLocator</td> 
-     <td>0.034</td> 
+     <td>0.001</td> 
     </tr> 
    </tbody> 
   </table> 
  </div> 
  <div class="section"> 
-  <h3 id="TextGraphUtilTest">TextGraphUtilTest</h3> 
-  <a name="nl.knaw.huygens.alexandria.textgraphTextGraphUtilTest"></a> 
+  <h3 id="AddMissingBaseLayerIdVisitorTest">AddMissingBaseLayerIdVisitorTest</h3> 
+  <a name="nl.knaw.huygens.alexandria.textAddMissingBaseLayerIdVisitorTest"></a> 
   <table border="1" class="bodyTable table table-striped table-hover"> 
    <tbody> 
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
-     <td><a name="TC_nl.knaw.huygens.alexandria.textgraph.TextGraphUtilTest.testParse"></a>testParse</td> 
-     <td>0.447</td> 
+     <td><a name="TC_nl.knaw.huygens.alexandria.text.AddMissingBaseLayerIdVisitorTest.testVisitor"></a>testVisitor</td> 
+     <td>0.004</td> 
+    </tr> 
+   </tbody> 
+  </table> 
+ </div> 
+ <div class="section"> 
+  <h3 id="BaseLayerVisitorTest">BaseLayerVisitorTest</h3> 
+  <a name="nl.knaw.huygens.alexandria.textBaseLayerVisitorTest"></a> 
+  <table border="1" class="bodyTable table table-striped table-hover"> 
+   <tbody> 
+    <tr class="a"> 
+     <td><i class="icon-ok"></i></td> 
+     <td><a name="TC_nl.knaw.huygens.alexandria.text.BaseLayerVisitorTest.testVisitorForXmlWithSubtextPlaceholders"></a>testVisitorForXmlWithSubtextPlaceholders</td> 
+     <td>0.072</td> 
+    </tr> 
+   </tbody> 
+  </table> 
+ </div> 
+ <div class="section"> 
+  <h3 id="TextUtilTest">TextUtilTest</h3> 
+  <a name="nl.knaw.huygens.alexandria.textTextUtilTest"></a> 
+  <table border="1" class="bodyTable table table-striped table-hover"> 
+   <tbody> 
+    <tr class="a"> 
+     <td><i class="icon-ok"></i></td> 
+     <td><a name="TC_nl.knaw.huygens.alexandria.text.TextUtilTest.testBaseLayerExtractionAddsMissingXmlIdsToBaseElements"></a>testBaseLayerExtractionAddsMissingXmlIdsToBaseElements</td> 
+     <td>0.049</td> 
     </tr> 
     <tr class="b"> 
      <td><i class="icon-ok"></i></td> 
-     <td><a name="TC_nl.knaw.huygens.alexandria.textgraph.TextGraphUtilTest.teststreamTextGraphSegmentWithShowOnlyAttributeMode"></a>teststreamTextGraphSegmentWithShowOnlyAttributeMode</td> 
-     <td>0.006</td> 
+     <td><a name="TC_nl.knaw.huygens.alexandria.text.TextUtilTest.testBaseLayerExtractionWithMilestoneBaseElements"></a>testBaseLayerExtractionWithMilestoneBaseElements</td> 
+     <td>0.018</td> 
     </tr> 
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
-     <td><a name="TC_nl.knaw.huygens.alexandria.textgraph.TextGraphUtilTest.teststreamTextGraphSegmentWithDefaultView"></a>teststreamTextGraphSegmentWithDefaultView</td> 
-     <td>0</td> 
+     <td><a name="TC_nl.knaw.huygens.alexandria.text.TextUtilTest.testBaseLayerExtractionWithNestedSubResourceTexts"></a>testBaseLayerExtractionWithNestedSubResourceTexts</td> 
+     <td>0.033</td> 
     </tr> 
     <tr class="b"> 
      <td><i class="icon-ok"></i></td> 
-     <td><a name="TC_nl.knaw.huygens.alexandria.textgraph.TextGraphUtilTest.teststreamTextGraphSegmentWithHideNoteView"></a>teststreamTextGraphSegmentWithHideNoteView</td> 
-     <td>0</td> 
+     <td><a name="TC_nl.knaw.huygens.alexandria.text.TextUtilTest.testBaseLayerExtraction"></a>testBaseLayerExtraction</td> 
+     <td>0.023</td> 
     </tr> 
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
-     <td><a name="TC_nl.knaw.huygens.alexandria.textgraph.TextGraphUtilTest.teststreamTextGraphSegmentWithHideNoteTagView"></a>teststreamTextGraphSegmentWithHideNoteTagView</td> 
-     <td>0</td> 
+     <td><a name="TC_nl.knaw.huygens.alexandria.text.TextUtilTest.testBaseLayerExtractionFailsOnRootElementNotInBaseLayerDefinition"></a>testBaseLayerExtractionFailsOnRootElementNotInBaseLayerDefinition</td> 
+     <td>0.088</td> 
     </tr> 
    </tbody> 
   </table> 
@@ -758,12 +763,12 @@ function toggleDisplay(elementId) {
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
      <td><a name="TC_nl.knaw.huygens.alexandria.endpoint.resource.ResourcePrototypeTest.testResourcePrototypeFromJson"></a>testResourcePrototypeFromJson</td> 
-     <td>0.061</td> 
+     <td>0.049</td> 
     </tr> 
     <tr class="b"> 
      <td><i class="icon-ok"></i></td> 
      <td><a name="TC_nl.knaw.huygens.alexandria.endpoint.resource.ResourcePrototypeTest.testJsonRepresentation"></a>testJsonRepresentation</td> 
-     <td>0.008</td> 
+     <td>0.006</td> 
     </tr> 
    </tbody> 
   </table> 
@@ -776,7 +781,7 @@ function toggleDisplay(elementId) {
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
      <td><a name="TC_nl.knaw.huygens.alexandria.endpoint.ProvenanceEntityTest.test_provenance_entity_creation"></a>test_provenance_entity_creation</td> 
-     <td>0.045</td> 
+     <td>0.047</td> 
     </tr> 
    </tbody> 
   </table> 
@@ -789,7 +794,7 @@ function toggleDisplay(elementId) {
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
      <td><a name="TC_nl.knaw.huygens.alexandria.endpoint.param.UUIDParamTest.testConstructorRejectsInvalidUUID"></a>testConstructorRejectsInvalidUUID</td> 
-     <td>0</td> 
+     <td>0.012</td> 
     </tr> 
     <tr class="b"> 
      <td><i class="icon-ok"></i></td> 
@@ -799,7 +804,7 @@ function toggleDisplay(elementId) {
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
      <td><a name="TC_nl.knaw.huygens.alexandria.endpoint.param.UUIDParamTest.testParamIsConvertedToValue"></a>testParamIsConvertedToValue</td> 
-     <td>0</td> 
+     <td>0.001</td> 
     </tr> 
     <tr class="b"> 
      <td><i class="icon-ok"></i></td> 
@@ -817,12 +822,12 @@ function toggleDisplay(elementId) {
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
      <td><a name="TC_nl.knaw.huygens.alexandria.endpoint.resource.MatchesPathIdValidatorTest.0_fe944b98-18b1-11e5-9d51-1f35c61c7a23_fe944b98-18b1-11e5-9d51-1f35c61c7a23_true_testValidationOfUUIDinURIShouldMatchUUIDinPrototype"></a>[0] fe944b98-18b1-11e5-9d51-1f35c61c7a23, fe944b98-18b1-11e5-9d51-1f35c61c7a23, true (testValidationOfUUIDinURIShouldMatchUUIDinPrototype)</td> 
-     <td>0.26</td> 
+     <td>0.243</td> 
     </tr> 
     <tr class="b"> 
      <td><i class="icon-ok"></i></td> 
      <td><a name="TC_nl.knaw.huygens.alexandria.endpoint.resource.MatchesPathIdValidatorTest.1_fe944b98-18b1-11e5-9d51-1f35c61c7a23_27947b26-18b2-11e5-be1c-c7fb9bd13f9b_false_testValidationOfUUIDinURIShouldMatchUUIDinPrototype"></a>[1] fe944b98-18b1-11e5-9d51-1f35c61c7a23, 27947b26-18b2-11e5-be1c-c7fb9bd13f9b, false (testValidationOfUUIDinURIShouldMatchUUIDinPrototype)</td> 
-     <td>0.001</td> 
+     <td>0.002</td> 
     </tr> 
    </tbody> 
   </table> 
@@ -835,17 +840,17 @@ function toggleDisplay(elementId) {
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
      <td><a name="TC_nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpointTest.testPost"></a>testPost</td> 
-     <td>1.571</td> 
+     <td>1.728</td> 
     </tr> 
     <tr class="b"> 
      <td><i class="icon-ok"></i></td> 
      <td><a name="TC_nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpointTest.getResourcesRefNoLongerExists"></a>getResourcesRefNoLongerExists</td> 
-     <td>0.281</td> 
+     <td>0.324</td> 
     </tr> 
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
      <td><a name="TC_nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpointTest.testGettingANonExistingResourceGivesANotFoundError"></a>testGettingANonExistingResourceGivesANotFoundError</td> 
-     <td>0.279</td> 
+     <td>0.312</td> 
     </tr> 
     <tr class="b"> 
      <td><a href="#nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpointTest.testTwoPutsWillNotProduceAnError"><i class="icon-warning-sign"></i></a></td> 
@@ -853,7 +858,7 @@ function toggleDisplay(elementId) {
       <div class="detailToggle" style="display:inline"> 
        <a href="javascript:toggleDisplay('nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpointTest.testTwoPutsWillNotProduceAnError');"><span style="display:inline;" id="nlknawhuygensalexandriaendpointresourceResourcesEndpointTesttestTwoPutsWillNotProduceAnErroroff"> + </span><span style="display:none;" id="nlknawhuygensalexandriaendpointresourceResourcesEndpointTesttestTwoPutsWillNotProduceAnErroron"> - </span>[ Detail ]</a> 
       </div></td> 
-     <td>0.28</td> 
+     <td>0.313</td> 
     </tr> 
     <tr class="a"> 
      <td></td> 
@@ -871,7 +876,7 @@ function toggleDisplay(elementId) {
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
      <td><a name="TC_nl.knaw.huygens.alexandria.endpoint.search.SearchResultPageTest.testSecondPageOfThree"></a>testSecondPageOfThree</td> 
-     <td>0.23</td> 
+     <td>0.266</td> 
     </tr> 
     <tr class="b"> 
      <td><i class="icon-ok"></i></td> 
@@ -881,7 +886,7 @@ function toggleDisplay(elementId) {
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
      <td><a name="TC_nl.knaw.huygens.alexandria.endpoint.search.SearchResultPageTest.testLastPageOfSeveral"></a>testLastPageOfSeveral</td> 
-     <td>0.004</td> 
+     <td>0.002</td> 
     </tr> 
    </tbody> 
   </table> 
@@ -894,25 +899,7 @@ function toggleDisplay(elementId) {
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
      <td><a name="TC_nl.knaw.huygens.alexandria.endpoint.about.AboutEndpointTest.test"></a>test</td> 
-     <td>0.263</td> 
-    </tr> 
-   </tbody> 
-  </table> 
- </div> 
- <div class="section"> 
-  <h3 id="XmlIdVisitorTest">XmlIdVisitorTest</h3> 
-  <a name="nl.knaw.huygens.alexandria.textXmlIdVisitorTest"></a> 
-  <table border="1" class="bodyTable table table-striped table-hover"> 
-   <tbody> 
-    <tr class="a"> 
-     <td><i class="icon-ok"></i></td> 
-     <td><a name="TC_nl.knaw.huygens.alexandria.text.XmlIdVisitorTest.testVisitor1"></a>testVisitor1</td> 
-     <td>0.003</td> 
-    </tr> 
-    <tr class="b"> 
-     <td><i class="icon-ok"></i></td> 
-     <td><a name="TC_nl.knaw.huygens.alexandria.text.XmlIdVisitorTest.testVisitor2"></a>testVisitor2</td> 
-     <td>0.002</td> 
+     <td>0.296</td> 
     </tr> 
    </tbody> 
   </table> 
@@ -925,7 +912,25 @@ function toggleDisplay(elementId) {
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
      <td><a name="TC_nl.knaw.huygens.alexandria.endpoint.search.SearchResultTest.testTotalPages"></a>testTotalPages</td> 
-     <td>0.018</td> 
+     <td>0.016</td> 
+    </tr> 
+   </tbody> 
+  </table> 
+ </div> 
+ <div class="section"> 
+  <h3 id="SubresourceElementVisitorTest">SubresourceElementVisitorTest</h3> 
+  <a name="nl.knaw.huygens.alexandria.textSubresourceElementVisitorTest"></a> 
+  <table border="1" class="bodyTable table table-striped table-hover"> 
+   <tbody> 
+    <tr class="a"> 
+     <td><i class="icon-ok"></i></td> 
+     <td><a name="TC_nl.knaw.huygens.alexandria.text.SubresourceElementVisitorTest.testVisitorWithNestedSubresourceElements"></a>testVisitorWithNestedSubresourceElements</td> 
+     <td>0.308</td> 
+    </tr> 
+    <tr class="b"> 
+     <td><i class="icon-ok"></i></td> 
+     <td><a name="TC_nl.knaw.huygens.alexandria.text.SubresourceElementVisitorTest.testVisitor"></a>testVisitor</td> 
+     <td>0.002</td> 
     </tr> 
    </tbody> 
   </table> 
@@ -943,7 +948,7 @@ function toggleDisplay(elementId) {
     <tr class="b"> 
      <td><i class="icon-ok"></i></td> 
      <td><a name="TC_nl.knaw.huygens.alexandria.endpoint.LocationBuilderTest.testGetLocationOfAlexandriaAnnotationWithUUID"></a>testGetLocationOfAlexandriaAnnotationWithUUID</td> 
-     <td>0.097</td> 
+     <td>0.084</td> 
     </tr> 
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
@@ -961,7 +966,25 @@ function toggleDisplay(elementId) {
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
      <td><a name="TC_nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationAnnotationsEndpointTest.testAnnotationURIsAreCorrect"></a>testAnnotationURIsAreCorrect</td> 
-     <td>0.072</td> 
+     <td>0.076</td> 
+    </tr> 
+   </tbody> 
+  </table> 
+ </div> 
+ <div class="section"> 
+  <h3 id="BaseLayerIdVisitorTest">BaseLayerIdVisitorTest</h3> 
+  <a name="nl.knaw.huygens.alexandria.textBaseLayerIdVisitorTest"></a> 
+  <table border="1" class="bodyTable table table-striped table-hover"> 
+   <tbody> 
+    <tr class="a"> 
+     <td><i class="icon-ok"></i></td> 
+     <td><a name="TC_nl.knaw.huygens.alexandria.text.BaseLayerIdVisitorTest.testVisitor1"></a>testVisitor1</td> 
+     <td>0.005</td> 
+    </tr> 
+    <tr class="b"> 
+     <td><i class="icon-ok"></i></td> 
+     <td><a name="TC_nl.knaw.huygens.alexandria.text.BaseLayerIdVisitorTest.testVisitor2"></a>testVisitor2</td> 
+     <td>0.002</td> 
     </tr> 
    </tbody> 
   </table> 
@@ -974,7 +997,7 @@ function toggleDisplay(elementId) {
     <tr class="a"> 
      <td><i class="icon-ok"></i></td> 
      <td><a name="TC_nl.knaw.huygens.alexandria.endpoint.annotation.OmittedOrMatchingTypeTest.testOmittingTypeInPrototypeShouldClassifyAsValid"></a>testOmittingTypeInPrototypeShouldClassifyAsValid</td> 
-     <td>0.16</td> 
+     <td>0.21</td> 
     </tr> 
     <tr class="b"> 
      <td><i class="icon-ok"></i></td> 
@@ -1099,7 +1122,7 @@ function toggleDisplay(elementId) {
 			<div class="span12">
 				<p class="pull-right"><a href="#">Back to top</a></p>
 				<p class="copyright">Copyright &copy;2015-2016 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All Rights Reserved.</p>
-				<p class="version-date"><span class="projectVersion">Version: 2.1.4-SNAPSHOT. </span><span class="publishDate">Last Published: 2016-06-15. </span></p>
+				<p class="version-date"><span class="projectVersion">Version: 1.1. </span><span class="publishDate">Last Published: 2016-06-15. </span></p>
 				<p><a href="http://github.com/andriusvelykis/reflow-maven-skin" title="Reflow Maven skin">Reflow Maven skin</a> by <a href="http://andrius.velykis.lt" target="_blank" title="Andrius Velykis">Andrius Velykis</a>.</p>
 			</div>
 		</div>

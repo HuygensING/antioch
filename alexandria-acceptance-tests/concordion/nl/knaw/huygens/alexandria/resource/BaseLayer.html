@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns:c="http://www.concordion.org/2007/concordion" xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test" xmlns:xsi="http://www.w3.org/1999/xhtml" xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test                           http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd"><head><style>* {
+  font-family: Arial;
+}
+body {
+  padding: 32px;  
+}
+pre {
+  padding: 6px 28px 6px 28px;
+  background-color: #E8EEF7;
+}
+pre, pre *, code, code *, kbd {
+  font-family: Courier New, Courier;
+  font-size: 10pt;
+}
+h1, h1 * {
+  font-size: 24pt;	
+}
+p, td, th, li, .breadcrumbs {
+  font-size: 10pt;
+}
+p, li {
+  line-height: 140%;
+  max-width: 720px;
+}
+table {
+  border-collapse: collapse;
+  empty-cells: show;
+  margin: 8px 0px 8px 0px;
+}
+th, td {
+  border: 1px solid black;
+  padding: 3px;
+}
+td {
+  background-color: white;
+  vertical-align: top;
+}
+th {
+  background-color: #C3D9FF;
+}
+li {
+  margin-top: 6px;
+  margin-bottom: 6px; 
+}
+
+.example {
+  padding: 6px 16px 6px 16px;
+  border: 1px solid #C3D9FF;
+  margin: 6px 0px 28px 0px;
+  background-color: #F5F9FD;
+}
+.example h3 {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  font-size: 12pt;
+}
+
+p.success {
+  padding: 2px;
+}
+.success, .success * {
+  background-color: #afa !important;
+}
+.success pre {
+  background-color: #bbffbb;
+}
+.failure, .failure * {
+  background-color: #ffb0b0;
+  padding: 1px;
+}
+.failure .expected {
+  text-decoration: line-through;
+  color: #bb5050;
+}
+.ignored, .ignored * {
+  background-color: #f0f0f0 !important;	
+}
+
+ins {
+  text-decoration: none;	
+}
+
+.exceptionMessage {
+  background-color: #fdd;
+  font-family: Courier New, Courier, Monospace;
+  font-size: 10pt;
+  display: block;
+  font-weight: normal;
+  padding: 4px;
+  text-decoration: none !important;
+}
+.stackTrace, .stackTrace * {
+  font-weight: normal;
+}
+.stackTrace {
+  display: none;
+  padding: 1px 4px 4px 4px;
+  background-color: #fdd;
+  border-top: 1px dotted black;
+}
+.stackTraceExceptionMessage {
+  display: block;
+  font-family: Courier New, Courier, Monospace;
+  font-size: 8pt;
+  white-space: wrap;
+  padding: 1px 0px 1px 0px;
+}
+.stackTraceEntry {
+  white-space: nowrap;
+  font-family: Courier New, Courier, Monospace;
+  display: block;
+  font-size: 8pt;
+  padding: 1px 0px 1px 32px;
+}
+.stackTraceButton {
+  font-size: 8pt;
+  margin: 2px 8px 2px 0px;
+  font-weight: normal;
+  font-family: Arial;
+}
+
+.special {
+  font-style: italic;
+}
+.missing, .missing * {
+  background-color: #ff9999;
+  color:#bb5050;
+  text-decoration: line-through;
+}
+.surplus, .surplus * {
+  background-color: #ff9999;
+}
+.footer {
+  text-align: right;
+  margin-top: 40px;
+  font-size: 8pt;
+  width: 100%;
+  color: #999;
+}
+.footer .testTime {
+  padding: 2px 10px 0px 0px;
+}
+
+.idea {
+  font-size: 9pt;
+  color: #888;
+  font-style: italic;	
+}
+.tight li {
+  margin-top: 1px;
+  margin-bottom: 1px; 
+}
+.commentary {
+  float: right;
+  width: 200px;
+  background-color: #ffffd0;
+  padding:8px;
+  border: 3px solid #eeeeb0;	 
+  margin: 10px 0px 10px 10px;	 
+}
+.commentary, .commentary * {
+  font-size: 8pt;
+}
+</style><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+<title>Base Layer Definition</title>
+
+<link type="text/css" rel="stylesheet" href="../../../../../codemirror/codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/enable-codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/merge.css" /><script type="text/javascript" src="../../../../../codemirror/codemirror.js"></script><script type="text/javascript" src="../../../../../codemirror/javascript.js"></script><script type="text/javascript" src="../../../../../codemirror/diff_match_patch.js"></script><script type="text/javascript" src="../../../../../codemirror/merge.js"></script><script type="text/javascript" src="../../../../../codemirror/enable-codemirror.js"></script><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/bootstrap.css" /><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/enable-bootstrap.css" /><script type="text/javascript" src="../../../../../jquery/jquery.min.js"></script><script type="text/javascript" src="../../../../../bootstrap/bootstrap.min.js"></script></head><body><span class="breadcrumbs"><a href="../Alexandria.html">Alexandria</a> &gt; <a href="Resource.html">Resources</a> &gt;</span>
+
+
+
+
+
+
+
+<div class="container"><div class="jumbotron"><h1>Base Layer Definition</h1></div><div class="row"><div class="col-md-3"><ul class="nav nav-pills nav-stacked"><li class="active"><a href="#set-baselayer-1" data-toggle="tab">How do I define the base layer for a resource?</a></li><li><a href="#baselayer-for-subresource" data-toggle="tab">How is the base layer defined for a subresource?</a></li></ul></div><div class="col-md-9"><div class="tab-content"><div id="set-baselayer-1" c:execute="clearStorage()" class="tab-pane fade active in"><div class="panel panel-default"><div class="panel-heading"><strong>How do I define the base layer for a resource?</strong></div><div class="panel-body">
+    <div h:request="">
+        Given that I have
+        <span h:success="" class="success">successfully</span>
+        <code class="put">/resources/11111111-1111-1111-1111-111111111111</code>
+        the body:
+        <pre h:jsonBody="" class="json">{
+  "resource" : {
+    "id" : "11111111-1111-1111-1111-111111111111",
+    "ref" : "grotius-3160-v1"
+  }
+}</pre>
+    </div>
+
+    <div h:request="">
+        When I
+        <code class="put">/resources/11111111-1111-1111-1111-111111111111/baselayerdefinition</code>
+        the body:
+        <pre h:jsonBody="" class="json">{
+  "baseLayerDefinition" : {
+    "subresourceElements" : [ "note" ],
+    "baseElements" : [ {
+      "name" : "div",
+      "baseAttributes" : [ "id" ]
+    }, {
+      "name" : "p"
+    } ]
+  }
+}</pre>
+        using
+        <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>
+        Then I should receive
+        <code h:status="" class="success">201 Created</code>
+        and a location header
+        <code class="location success">https://{host}/resources/11111111-1111-1111-1111-111111111111/baselayerdefinition</code>
+        and the response body is
+        <code h:responseBody="" class="empty success"> </code>
+    </div>
+    <br />
+    <div h:request="">
+        When I
+        <code class="get">/resources/11111111-1111-1111-1111-111111111111</code>
+        Then I should receive
+        <ul>
+            <li>status
+                <code h:status="" class="success">200 OK</code>
+            </li>
+            <li>and body
+             <small>(only relevant fields shown for brevity)</small>
+                <pre class="json rest-success">{
+  "resource" : {
+    "^baseLayerDefinition" : "https://{host}/resources/11111111-1111-1111-1111-111111111111/baselayerdefinition"
+  }
+}</pre>
+            </li>
+        </ul>
+    </div>
+    <br />
+    <div h:request="">
+        If I then
+        <code class="get">/resources/11111111-1111-1111-1111-111111111111/baselayerdefinition</code>
+        Then I should receive
+        <ul>
+            <li>status
+                <code h:status="" class="success">200 OK</code>
+            </li>
+            <li>and body
+                <pre class="json rest-success">{
+  "baseElements" : [ {
+    "name" : "div",
+    "baseAttributes" : [ "id" ]
+  }, {
+    "name" : "p"
+  } ]
+}</pre>
+            </li>
+        </ul>
+    </div>
+</div></div></div><div id="baselayer-for-subresource" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>How is the base layer defined for a subresource?</strong></div><div class="panel-body">
+    
+    <ul>
+    <li>
+    <div h:request="">
+        Given the previously made resource with its baselayer definition, 
+        if I add a subresource by  
+        <code class="post">/resources/11111111-1111-1111-1111-111111111111/subresources</code>
+        the body
+        <pre h:jsonBody="" class="json">{
+  "subresource" : {
+    "sub" : "Letter clusius-0012"
+  }
+}</pre>
+        and observe status
+        <code h:status="" class="success">201 Created</code>
+        and a location header starting with
+        <code class="location success">https://{host}/resources/</code>
+        and ending in a generated
+        <code class="location success">well-formed UUID</code>
+        for the newly created subresource.
+    </div>
+
+    <div c:execute="#uuid = uuid()">In this case the generated uuid happened to be:
+        <strong c:echo="#uuid">1eef3c4a-487b-47b2-add9-8465ab983f7c</strong>.
+    </div>
+    </li>
+    <li>
+    <div h:request="">
+        To confirm our subresource, we
+        <code class="put">/resources/1eef3c4a-487b-47b2-add9-8465ab983f7c/state</code>
+        the body
+        <pre h:jsonBody="" class="json">{
+  "state" : "CONFIRMED"
+}</pre>
+        and observe status
+        <code h:status="" class="success">204 No Content</code>
+    </div>
+    </li>
+    <li>
+    <div h:request="">
+        When I
+        <code class="get">/resources/1eef3c4a-487b-47b2-add9-8465ab983f7c</code>
+        Then I should receive
+        <ul>
+            <li>status
+                <code h:status="" class="success">200 OK</code>
+            </li>
+            <li>and body
+             <small>(only relevant fields shown for brevity)</small>
+                <pre class="json rest-success">{
+  "subresource" : {
+    "^baseLayerDefinition" : "https://{host}/resources/11111111-1111-1111-1111-111111111111/baselayerdefinition"
+  }
+}</pre>
+                (The subresource uses the baseLayerDefinition of <strong>its parent</strong> resource)
+            </li>
+        </ul>
+    </div>
+    </li>
+    <li>
+    <div h:request="">
+        To override this baselayer definition, I
+        <code class="put">/resources/1eef3c4a-487b-47b2-add9-8465ab983f7c/baselayerdefinition</code>
+        the body:
+        <pre h:jsonBody="" class="json">{
+  "baseLayerDefinition" : {
+    "subresourceElements" : [ "note" ],
+    "baseElements" : [ {
+      "name" : "div",
+      "baseAttributes" : [ "ref" ]
+    }, {
+      "name" : "p"
+    } ]
+  }
+}</pre>
+        using
+        <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>
+        Then I should receive
+        <code h:status="" class="success">201 Created</code>
+        and a location header
+        <code class="location success">https://{host}/resources/1eef3c4a-487b-47b2-add9-8465ab983f7c/baselayerdefinition</code>
+        and the response body is
+        <code h:responseBody="" class="empty success"> </code>
+    </div>
+    </li>
+    <li>
+    <div h:request="">
+        Now when I
+        <code class="get">/resources/1eef3c4a-487b-47b2-add9-8465ab983f7c</code>
+        Then I should receive
+        <ul>
+            <li>status
+                <code h:status="" class="success">200 OK</code>
+            </li>
+            <li>and body
+             <small>(only relevant fields shown for brevity)</small>
+                <pre class="json rest-success">{
+  "subresource" : {
+    "^baseLayerDefinition" : "https://{host}/resources/1eef3c4a-487b-47b2-add9-8465ab983f7c/baselayerdefinition"
+  }
+}</pre>
+                (The subresource uses <strong>its own</strong> baseLayerDefinition)
+            </li>
+        </ul>
+    </div>
+    </li>
+    </ul>
+</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 604 ms on 15-Jun-2016 at 17:29:19 CEST</div></div></body>
+</html>

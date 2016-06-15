@@ -68,7 +68,7 @@
 <a class="jxr_linenumber" name="L60" href="#L60">60</a>        AlexandriaTextLocator locator = textLocatorFactory.fromString(<span class="jxr_string">"xid:12b"</span>);
 <a class="jxr_linenumber" name="L61" href="#L61">61</a>        fail();
 <a class="jxr_linenumber" name="L62" href="#L62">62</a>      } <strong class="jxr_keyword">catch</strong> (TextLocatorParseException e) {
-<a class="jxr_linenumber" name="L63" href="#L63">63</a>        assertThat(e.getMessage()).isEqualTo(<span class="jxr_string">"The locator prefix 'xid' is not a valid prefix. Valid prefixes: [xpath, offset, id]."</span>);
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>        assertThat(e.getMessage()).isEqualTo(<span class="jxr_string">"The locator prefix 'xid' is not a valid prefix. Valid prefixes: [offset, id]."</span>);
 <a class="jxr_linenumber" name="L64" href="#L64">64</a>      }
 <a class="jxr_linenumber" name="L65" href="#L65">65</a>    }
 <a class="jxr_linenumber" name="L66" href="#L66">66</a>  
