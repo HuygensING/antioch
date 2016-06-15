@@ -26,12 +26,9 @@ import static java.util.UUID.fromString;
 import static java.util.UUID.randomUUID;
 import static nl.knaw.huygens.alexandria.api.model.AlexandriaState.CONFIRMED;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -169,16 +166,6 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     return Iterables.getLast(Splitter.on('/').split(location().orElse("(not set)")));
   }
 
-  public String projectVersion() {
-    final Properties properties = new Properties();
-    try (final InputStream stream = this.getClass().getResourceAsStream("/.properties")) {
-      Log.info("stream={}", stream);
-      properties.load(stream);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return properties.getProperty("project_version");
-  }
 
   public void clearStorage() {
     Log.debug("Clearing Storage");
