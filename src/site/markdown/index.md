@@ -1,20 +1,49 @@
-# Features
+# Alexandria
 
-* add annotation(s)
-* versioning of annotations, 
-* annotation on annotation, 
-* provenance, 
-* remote resources, 
-* sub-resources
+Primarily developed in the context of the [Nederlab project](https://www.nederlab.nl/), Alexandria 
+is a *graph-based text and annotation repository*. While in its primary context, it serves as a store
+for annotations targeted at *linguistic corpora*, Alexandria's conceptual design of texts, annotations
+and their relationships has the potential to be applied in other domains and use cases as well,
+for instance in the field of *literary studies*. This project aims at leveraging Alexandria's
+potential value as a generic storage and query facility for annotated texts by
 
-# Architecture
+1. *abstracting* from Nederlab-specific requirements of linguistic annotation,
+1. *building* a repository software with state-of-the-art, web-based technologies, and
+1. *connecting* Alexandria to similar initiatives by providing a rich set of data interchange options.
 
-* RESTful service
-* graph database backend
-* various export formats
-* own query language
+## Features
 
-# Texts as Graphs: Research/ Bibliography
+Alexandria can
+
+* model texts and annotations on the same level, allowing for the annotation of texts and
+  annotations,
+* *store, retrieve and query* texts/annotations (aka. _resources_),
+* distinguish *versions* of those resources, 
+* provide information about the *provenance* of its stored resources,
+* annotate resources within the same repository as well as *remote resources*, and
+* structure resources hierarchically or as networked entities. 
+
+## Software Architecture
+
+Being a web-based solution, Alexandria 
+
+* is implemented as a *RESTful service*, exposing its functions via HTTP endpoints/resources 
+  on the network,
+* supports several *graph database backends* for the storage of its data, from small, embedded
+  databases to clustered setups for larger datasets,
+* offers various export formats, and
+* has its own, domain-specific query language.
+
+## Download
+
+...
+
+## Texts as Graphs: Research/ Bibliography
+
+Alexandria is part of a larger community interested in the annotation of textual resources. As such
+it draws inspiration from many sources, some of which are:
+
+* W3C Web Annotation Working Group. [Homepage](https://www.w3.org/annotation/)
 
 * Andrews, Tara Lee; Macé, Caroline (2013). Beyond the tree of texts: Building an empirical model of 
   scribal variation through graph analysis of texts and stemmata. Literary and Linguistic
