@@ -5,6 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import com.google.common.collect.Lists;
 
 public class AnnotatorList implements List<Annotator> {
@@ -140,6 +143,11 @@ public class AnnotatorList implements List<Annotator> {
   @Override
   public List<Annotator> subList(int fromIndex, int toIndex) {
     return list.subList(fromIndex, toIndex);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
 
 }

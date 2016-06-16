@@ -2,6 +2,9 @@ package nl.knaw.huygens.alexandria.api.model;
 
 import java.util.List;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import com.google.common.collect.Lists;
 
 public class CommandResponse {
@@ -27,6 +30,11 @@ public class CommandResponse {
 
   public List<String> getErrorLines() {
     return errorLines;
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
 
 }

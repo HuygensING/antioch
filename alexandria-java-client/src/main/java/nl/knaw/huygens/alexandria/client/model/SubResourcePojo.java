@@ -3,6 +3,9 @@ package nl.knaw.huygens.alexandria.client.model;
 import java.net.URI;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /*
@@ -122,6 +125,11 @@ public class SubResourcePojo extends AbstractAccountablePojo<SubResourcePojo> {
 
   public void setState(final StatePojo state) {
     this.state = state;
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
 
 }

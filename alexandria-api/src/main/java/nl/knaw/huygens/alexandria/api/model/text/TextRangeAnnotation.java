@@ -2,6 +2,9 @@ package nl.knaw.huygens.alexandria.api.model.text;
 
 import java.util.UUID;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -48,6 +51,12 @@ public class TextRangeAnnotation extends JsonWrapperObject {
       this.length = length;
       return this;
     }
+
+    @Override
+    public String toString() {
+      return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+    }
+
   }
 
   @JsonProperty("id")
@@ -91,6 +100,11 @@ public class TextRangeAnnotation extends JsonWrapperObject {
 
   public Position getPosition() {
     return position;
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
 
 }
