@@ -1,6 +1,6 @@
 package nl.knaw.huygens.alexandria.client;
 
-public class AlexandriaException extends Exception {
+public class AlexandriaException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
   public AlexandriaException() {
