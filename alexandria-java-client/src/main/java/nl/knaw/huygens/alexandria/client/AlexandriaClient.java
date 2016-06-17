@@ -30,6 +30,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.net.ssl.SSLContext;
@@ -150,8 +151,8 @@ public class AlexandriaClient implements AutoCloseable {
     final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
 
     return requester//
-        .onStatus(Status.CREATED, (response) -> new RestResult<>())//
-        .onStatus(Status.NO_CONTENT, (response) -> new RestResult<>())//
+        .onStatus(Status.CREATED, voidRestResult())//
+        .onStatus(Status.NO_CONTENT, voidRestResult())//
         .getResult();
   }
 
@@ -193,8 +194,8 @@ public class AlexandriaClient implements AutoCloseable {
     final Supplier<Response> responseSupplier = authorizedPut(path, entity);
     final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.CREATED, (response) -> new RestResult<>())//
-        .onStatus(Status.NO_CONTENT, (response) -> new RestResult<>())//
+        .onStatus(Status.CREATED, voidRestResult())//
+        .onStatus(Status.NO_CONTENT, voidRestResult())//
         .getResult();
   }
 
@@ -224,13 +225,14 @@ public class AlexandriaClient implements AutoCloseable {
     return confirm(EndpointPaths.ANNOTATIONS, annotationUuid);
   }
 
-  public RestResult<URI> setAnnotator(UUID resourceUUID, String code, Annotator annotator) {
+  public RestResult<Void> setAnnotator(UUID resourceUUID, String code, Annotator annotator) {
     final Entity<Annotator> entity = Entity.json(annotator);
     final WebTarget path = annotatorsTarget(resourceUUID, code);
     final Supplier<Response> responseSupplier = authorizedPut(path, entity);
-    final RestRequester<URI> requester = RestRequester.withResponseSupplier(responseSupplier);
+    final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.CREATED, this::uriFromLocationHeader)//
+        .onStatus(Status.CREATED, voidRestResult())//
+        .onStatus(Status.NO_CONTENT, voidRestResult())//
         .getResult();
   }
 
@@ -440,7 +442,7 @@ public class AlexandriaClient implements AutoCloseable {
     final Supplier<Response> responseSupplier = authorizedPut(path, confirmation);
     final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.NO_CONTENT, (response) -> new RestResult<>())//
+        .onStatus(Status.NO_CONTENT, voidRestResult())//
         .getResult();
   }
 
@@ -564,6 +566,10 @@ public class AlexandriaClient implements AutoCloseable {
     return resourceTarget(resourceUUID)//
         .path(EndpointPaths.ANNOTATORS)//
         .path(code);
+  }
+
+  private Function<Response, RestResult<Void>> voidRestResult() {
+    return (response) -> new RestResult<>();
   }
 
 }

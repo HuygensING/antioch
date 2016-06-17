@@ -24,7 +24,7 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
   public void testSetTextRangeAnnotation() {
     String xml = singleQuotesToDouble("<text><p xml:id='p-1'>This is a simple paragraph.</p></text>");
     UUID resourceUUID = createResourceWithText(xml);
-    RestResult<URI> result = client.setAnnotator(resourceUUID, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
+    RestResult<Void> result = client.setAnnotator(resourceUUID, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
     assertRequestSucceeded(result);
 
     UUID annotationUUID = UUID.randomUUID();
@@ -53,7 +53,7 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
   public void testSetTextRangeAnnotationWithInvalidXmlId() {
     String xml = singleQuotesToDouble("<text><p xml:id='p-1'>This is a simple paragraph.</p></text>");
     UUID resourceUUID = createResourceWithText(xml);
-    RestResult<URI> result = client.setAnnotator(resourceUUID, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
+    RestResult<Void> result = client.setAnnotator(resourceUUID, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
     assertRequestSucceeded(result);
 
     UUID uuid = UUID.randomUUID();

@@ -120,8 +120,8 @@ public class OptimisticAlexandriaClient {
     unwrap(delegate.confirmAnnotation(annotationUuid));
   }
 
-  public URI setAnnotator(UUID resourceUUID, String code, Annotator annotator) {
-    return unwrap(delegate.setAnnotator(resourceUUID, code, annotator));
+  public void setAnnotator(UUID resourceUUID, String code, Annotator annotator) {
+    unwrap(delegate.setAnnotator(resourceUUID, code, annotator));
   }
 
   public Annotator getAnnotator(UUID resourceUUID, String code) {
