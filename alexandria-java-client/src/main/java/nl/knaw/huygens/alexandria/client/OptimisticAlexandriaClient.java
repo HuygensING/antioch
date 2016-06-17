@@ -30,6 +30,8 @@ import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
 public class OptimisticAlexandriaClient {
   AlexandriaClient delegate;
 
+  // constructors
+
   public OptimisticAlexandriaClient(final URI alexandriaURI) {
     delegate = new AlexandriaClient(alexandriaURI);
   }
@@ -44,6 +46,24 @@ public class OptimisticAlexandriaClient {
 
   public OptimisticAlexandriaClient(final String alexandriaURI, SSLContext sslContext) {
     this(URI.create(alexandriaURI), sslContext);
+  }
+
+  // convenience methods
+
+  public UUID addResource(String ref) {
+    return addResource(resourceWithRef(ref));
+  }
+
+  public void setResource(UUID resourceId, String ref) {
+    setResource(resourceId, resourceWithRef(ref));
+  }
+
+  public UUID addSubResource(UUID parentResourceId, String sub) {
+    return addSubResource(parentResourceId, subResourceWithSub(sub));
+  }
+
+  public void setSubResource(UUID parentResourceId, UUID subResourceId, String sub) {
+    setSubResource(parentResourceId, subResourceId, subResourceWithSub(sub));
   }
 
   // delegated methods
@@ -68,12 +88,12 @@ public class OptimisticAlexandriaClient {
     return unwrap(delegate.getAbout());
   }
 
-  public void setResource(UUID resourceId, ResourcePrototype resource) {
-    unwrap(delegate.setResource(resourceId, resource));
-  }
-
   public UUID addResource(ResourcePrototype resource) {
     return unwrap(delegate.addResource(resource));
+  }
+
+  public void setResource(UUID resourceId, ResourcePrototype resource) {
+    unwrap(delegate.setResource(resourceId, resource));
   }
 
   public UUID addSubResource(UUID parentResourceId, SubResourcePrototype subresource) {
@@ -197,4 +217,11 @@ public class OptimisticAlexandriaClient {
     return restResult.get();
   }
 
+  private ResourcePrototype resourceWithRef(String ref) {
+    return new ResourcePrototype().setRef(ref);
+  }
+
+  private SubResourcePrototype subResourceWithSub(String sub) {
+    return new SubResourcePrototype().setSub(sub);
+  }
 }
