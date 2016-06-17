@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tinkerpop.gremlin.process.traversal.Order;
 import org.apache.tinkerpop.gremlin.process.traversal.Traverser;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
@@ -60,9 +61,9 @@ public class TextGraphService {
   public Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceId) {
     Iterator<Vertex> textSegmentIterator = new Iterator<Vertex>() {
       Vertex textSegment = getVertexTraversalFromResource(resourceId)//
-        .out(EdgeLabels.HAS_TEXTGRAPH)//
-        .out(EdgeLabels.FIRST_TEXT_SEGMENT)//
-        .next();// because there can only be one
+          .out(EdgeLabels.HAS_TEXTGRAPH)//
+          .out(EdgeLabels.FIRST_TEXT_SEGMENT)//
+          .next();// because there can only be one
 
       @Override
       public boolean hasNext() {
@@ -79,7 +80,7 @@ public class TextGraphService {
     };
 
     return StreamUtil.stream(textSegmentIterator)//
-      .map(this::toTextGraphSegment);
+        .map(this::toTextGraphSegment);
   }
 
   public Stream<TextAnnotation> getTextAnnotationStream(UUID resourceId) {
@@ -92,16 +93,15 @@ public class TextGraphService {
 
   private GraphTraversal<Vertex, Vertex> getVertexTraversalFromResource(UUID resourceId) {
     return storage.getResourceVertexTraversal()//
-      .has(Storage.IDENTIFIER_PROPERTY, resourceId.toString());
+        .has(Storage.IDENTIFIER_PROPERTY, resourceId.toString());
   }
-
 
   private Stream<Vertex> getTextAnnotationVertexStream(UUID resourceId) {
     Iterator<Vertex> textAnnotationIterator = new Iterator<Vertex>() {
       Vertex textAnnotationVertex = getVertexTraversalFromResource(resourceId)//
-        .out(EdgeLabels.HAS_TEXTGRAPH)//
-        .out(EdgeLabels.FIRST_ANNOTATION)//
-        .next();// because there can only be one
+          .out(EdgeLabels.HAS_TEXTGRAPH)//
+          .out(EdgeLabels.FIRST_ANNOTATION)//
+          .next();// because there can only be one
 
       @Override
       public boolean hasNext() {
@@ -173,38 +173,33 @@ public class TextGraphService {
 
     TextAnnotationInsertionContext context = new TextAnnotationInsertionContext(newTextAnnotationVertex, textRangeAnnotation);
     List<Vertex> list = getVertexTraversalFromResource(resourceId)//
-      .out(EdgeLabels.HAS_TEXTGRAPH)//
-      .out(EdgeLabels.FIRST_ANNOTATION)//
+        .out(EdgeLabels.HAS_TEXTGRAPH)//
+        .out(EdgeLabels.FIRST_ANNOTATION)//
 
-      // find the TextAnnotation with the xml:id from annotation.position.xmlid
-      .until(__.has(TextAnnotation.Properties.xmlid, textRangeAnnotation.getPosition().getXmlId()))//
-      .repeat(__.out(EdgeLabels.NEXT))//
-      .out(EdgeLabels.FIRST_TEXT_SEGMENT)//
+        // find the TextAnnotation with the xml:id from annotation.position.xmlid
+        .until(__.has(TextAnnotation.Properties.xmlid, textRangeAnnotation.getPosition().getXmlId()))//
+        .repeat(__.out(EdgeLabels.NEXT))//
+        .out(EdgeLabels.FIRST_TEXT_SEGMENT)//
 
-      // find the textsegment where the textrange from annotation.position starts
-      .until(context::rangeStartsInThisTextSegment)//
-      .repeat(__.out(EdgeLabels.NEXT))//
-      // insert the new TextAnnotation after the deepest TextAnnotation that has this as a FIRST_TEXT_SEGMENT
-      .sideEffect(
-        __.in(EdgeLabels.FIRST_TEXT_SEGMENT)//
-          .has(TextAnnotation.Properties.depth) // TODO: find out why there are textAnnotations without properties
-          .order().by(TextAnnotation.Properties.depth, Order.incr)
-          .tail()
-          .sideEffect(context::insertNewTextAnnotationVertex)
-      )
-      .sideEffect(context::processFirstTextSegmentInRange)//
+        // find the textsegment where the textrange from annotation.position starts
+        .until(context::rangeStartsInThisTextSegment)//
+        .repeat(__.out(EdgeLabels.NEXT))//
+        // insert the new TextAnnotation after the deepest TextAnnotation that has this as a FIRST_TEXT_SEGMENT
+        .sideEffect(__.in(EdgeLabels.FIRST_TEXT_SEGMENT)//
+            .has(TextAnnotation.Properties.depth) // TODO: find out why there are textAnnotations without properties
+            .order().by(TextAnnotation.Properties.depth, Order.incr).tail().sideEffect(context::insertNewTextAnnotationVertex))
+        .sideEffect(context::processFirstTextSegmentInRange)//
 
-      // iterate over the next TextSegments until you find the one the textrange from annotation.position ends in
-      .until(context::rangeEndsInThisTextSegment)//
-      .repeat(__.out(EdgeLabels.NEXT))//
-      .sideEffect(context::processLastTextSegmentInRange)//
+        // iterate over the next TextSegments until you find the one the textrange from annotation.position ends in
+        .until(context::rangeEndsInThisTextSegment)//
+        .repeat(__.out(EdgeLabels.NEXT))//
+        .sideEffect(context::processLastTextSegmentInRange)//
 
-      .toList();
+        .toList();
     if (list.size() != 1) {
       Log.error("listsize should be 1, is {}", list.size());
     }
   }
-
 
   private Vertex createNewTextAnnotation(TextRangeAnnotationVF textRangeAnnotationVF, TextRangeAnnotation textRangeAnnotation) {
     // create new TextAnnotation
@@ -238,9 +233,9 @@ public class TextGraphService {
       int depth = getIntValue(deepestTextAnnotationVertex, TextAnnotation.Properties.depth);
       newTextAnnotationVertex.property(TextAnnotation.Properties.depth, depth + 1);
       Vertex nextTextAnnotation = storage.getVertexTraversal(deepestTextAnnotationVertex.id())//
-        .out(EdgeLabels.NEXT).next();
+          .out(EdgeLabels.NEXT).next();
       storage.getVertexTraversal(deepestTextAnnotationVertex.id())//
-        .outE(EdgeLabels.NEXT).next().remove();
+          .outE(EdgeLabels.NEXT).next().remove();
       deepestTextAnnotationVertex.addEdge(EdgeLabels.NEXT, newTextAnnotationVertex);
       newTextAnnotationVertex.addEdge(EdgeLabels.NEXT, nextTextAnnotation);
 
@@ -318,11 +313,11 @@ public class TextGraphService {
       // move LAST_TEXT_SEGMENT edges to tailTextSegment
       insertNewAfterCurrent(textSegment, tailTextSegment);
       StreamUtil.parallelStream(textSegment.edges(Direction.IN, EdgeLabels.LAST_TEXT_SEGMENT))//
-        .forEach(e -> {
-          Vertex textAnnotationVertex = e.outVertex();
-          textAnnotationVertex.addEdge(EdgeLabels.LAST_TEXT_SEGMENT, tailTextSegment);
-          e.remove();
-        });
+          .forEach(e -> {
+            Vertex textAnnotationVertex = e.outVertex();
+            textAnnotationVertex.addEdge(EdgeLabels.LAST_TEXT_SEGMENT, tailTextSegment);
+            e.remove();
+          });
       return tailTextSegment;
     }
 
@@ -337,7 +332,6 @@ public class TextGraphService {
       currentVertex.addEdge(EdgeLabels.NEXT, newVertex);
     }
 
-
     private Vertex detachHead(Vertex textSegment, int tailLength) {
       Preconditions.checkArgument(textSegment.label().equals(VertexLabels.TEXTSEGMENT));
       String text = getStringValue(textSegment, TextSegment.Properties.text);
@@ -350,11 +344,11 @@ public class TextGraphService {
       // move FIRST_TEXT_SEGMENT edges to tailTextSegment
       insertNewBeforeCurrent(textSegment, headTextSegment);
       StreamUtil.parallelStream(textSegment.edges(Direction.IN, EdgeLabels.FIRST_TEXT_SEGMENT))//
-        .forEach(e -> {
-          Vertex textAnnotationVertex = e.outVertex();
-          textAnnotationVertex.addEdge(EdgeLabels.FIRST_TEXT_SEGMENT, headTextSegment);
-          e.remove();
-        });
+          .forEach(e -> {
+            Vertex textAnnotationVertex = e.outVertex();
+            textAnnotationVertex.addEdge(EdgeLabels.FIRST_TEXT_SEGMENT, headTextSegment);
+            e.remove();
+          });
       return headTextSegment;
     }
 
@@ -460,8 +454,23 @@ public class TextGraphService {
     if (textSegment.keys().contains(TextSegment.Properties.text)) {
       textGraphSegment.setTextSegment(textSegment.value(TextSegment.Properties.text));
     }
-    textGraphSegment.setAnnotationsToOpen(getTextAnnotationsToOpen(textSegment));
-    textGraphSegment.setAnnotationsToClose(getTextAnnotationsToClose(textSegment));
+    List<TextAnnotation> textAnnotationsToOpen = getTextAnnotationsToOpen(textSegment);
+    List<TextAnnotation> textAnnotationsToClose = getTextAnnotationsToClose(textSegment);
+
+    if (StringUtils.isEmpty(textGraphSegment.getTextSegment())//
+        && !textAnnotationsToOpen.isEmpty()//
+        && !textAnnotationsToClose.isEmpty()//
+    ) {
+      TextAnnotation lastToOpen = textAnnotationsToOpen.get(textAnnotationsToOpen.size() - 1);
+      TextAnnotation firstToClose = textAnnotationsToClose.get(0);
+      if (lastToOpen.equals(firstToClose)) {
+        textAnnotationsToOpen.remove(lastToOpen);
+        textGraphSegment.setMilestoneAnnotation(lastToOpen);
+        textAnnotationsToClose.remove(firstToClose);
+      }
+    }
+    textGraphSegment.setAnnotationsToOpen(textAnnotationsToOpen);
+    textGraphSegment.setAnnotationsToClose(textAnnotationsToClose);
     return textGraphSegment;
   }
 
@@ -477,18 +486,18 @@ public class TextGraphService {
 
   private List<TextAnnotation> getTextAnnotations(Vertex textSegment, String edgeLabel) {
     return StreamUtil.stream(textSegment.vertices(Direction.IN, edgeLabel))//
-      .filter(v -> v.label().equals(VertexLabels.TEXTANNOTATION))// this filter should not be necessary
-      .map(this::toTextAnnotation)//
-      .sorted(BY_INCREASING_DEPTH)//
-      .collect(toList());
+        .filter(v -> v.label().equals(VertexLabels.TEXTANNOTATION))// this filter should not be necessary
+        .map(this::toTextAnnotation)//
+        .sorted(BY_INCREASING_DEPTH)//
+        .collect(toList());
   }
 
   private TextAnnotation toTextAnnotation(Vertex vertex) {
     Map<String, String> attributes = getAttributeMap(vertex);
     TextAnnotation textAnnotation = new TextAnnotation(//
-      vertex.value(TextAnnotation.Properties.name), //
-      attributes, //
-      vertex.value(TextAnnotation.Properties.depth)//
+        vertex.value(TextAnnotation.Properties.name), //
+        attributes, //
+        vertex.value(TextAnnotation.Properties.depth)//
     );
     textAnnotation.setId(vertex.id());
     return textAnnotation;

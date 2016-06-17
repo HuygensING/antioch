@@ -327,6 +327,26 @@ public class TinkerPopServiceTest extends AlexandriaTest {
   }
 
   @Test
+  public void testMilestoneHandling() throws WebApplicationException, IOException {
+    // given
+    String xml = singleQuotesToDouble("<text>\n"//
+        + "<pb n='1' xml:id='pb-1'></pb>\n"//
+        + "<p><figure><graphic url='beec002jour04ill02.gif'/></figure></p>\n"//
+        + "</text>");
+    String expectedXml = singleQuotesToDouble("<text>\n"//
+        + "<pb n='1' xml:id='pb-1'/>\n"//
+        + "<p><figure><graphic url='beec002jour04ill02.gif'/></figure></p>\n"//
+        + "</text>");
+    UUID resourceId = aResourceUUIDWithXml(xml);
+
+    // when
+    String out = getResourceXml(resourceId);
+
+    // then
+    assertThat(out).isEqualTo(expectedXml);
+  }
+
+  @Test
   public void testWrapContentInElementWorks() throws WebApplicationException, IOException {
     // given
     String xml = singleQuotesToDouble("<text>"//

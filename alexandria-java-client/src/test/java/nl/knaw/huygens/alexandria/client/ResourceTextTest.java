@@ -52,5 +52,17 @@ public class ResourceTextTest extends AlexandriaClientTest {
     assertThat(dot).isEqualTo(expectedDot);
   }
 
+  @Test
+  public void testMilestoneHandling() {
+    UUID resourceUuid = createResource("test");
+    String xml = singleQuotesToDouble("<text><pb n='1' xml:id='pb-1'/><p><figure><graphic url='beec002jour04ill02.gif'/></figure></p></text>");
+    TextImportStatus textGraphImportStatus = setResourceText(resourceUuid, xml);
+    URI expectedURI = URI.create("http://localhost:2016/resources/" + resourceUuid + "/text/xml");
+    assertThat(textGraphImportStatus.getTextURI()).isEqualTo(expectedURI);
 
+    RestResult<String> xmlReadResult = client.getTextAsString(resourceUuid);
+    assertRequestSucceeded(xmlReadResult);
+    String xml2 = xmlReadResult.get();
+    assertThat(xml2).isEqualTo(xml);
+  }
 }

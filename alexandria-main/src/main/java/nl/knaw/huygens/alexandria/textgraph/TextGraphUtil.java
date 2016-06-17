@@ -1,8 +1,24 @@
 package nl.knaw.huygens.alexandria.textgraph;
 
-import com.google.common.collect.ArrayListMultimap;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Stack;
+import java.util.UUID;
+import java.util.function.Consumer;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.StreamingOutput;
+
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
+
 import nl.knaw.huygens.alexandria.api.model.text.view.AttributePreCondition;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode;
@@ -12,15 +28,9 @@ import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.tei.Document;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.StreamingOutput;
-import java.io.*;
-import java.util.*;
-import java.util.function.Consumer;
-
 public class TextGraphUtil {
-  private static Multimap<Integer, Integer> openBeforeText = ArrayListMultimap.create();
-  private static Multimap<Integer, Integer> closeAfterText = ArrayListMultimap.create();
+  // private static Multimap<Integer, Integer> openBeforeText = ArrayListMultimap.create();
+  // private static Multimap<Integer, Integer> closeAfterText = ArrayListMultimap.create();
 
   public static ParseResult parse(String xml) {
     ParseResult result = new ParseResult();
@@ -41,26 +51,29 @@ public class TextGraphUtil {
 
   public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment) {
     try {
-      if (segment.isMilestone()) {
-        TextAnnotation milestone = segment.getMilestone();
-        String name = milestone.getName();
-        String openTag = getMilestoneTag(name, milestone.getAttributes());
+      for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
+        String name = textAnnotation.getName();
+        String openTag = getOpenTag(name, textAnnotation.getAttributes());
         writer.write(openTag);
-
-      } else {
-        for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
-          String name = textAnnotation.getName();
-          String openTag = getOpenTag(name, textAnnotation.getAttributes());
-          writer.write(openTag);
-        }
-        writer.write(segment.getTextSegment());
-        for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
-          String name = textAnnotation.getName();
-          String closeTag = getCloseTag(name);
-          writer.write(closeTag);
-        }
       }
-    } catch (IOException ioe) {
+
+      Optional<TextAnnotation> optionalMilestone = segment.getMilestoneTextAnnotation();
+      if (optionalMilestone.isPresent()) {
+        TextAnnotation milestone = optionalMilestone.get();
+        String milestoneTag = getMilestoneTag(milestone.getName(), milestone.getAttributes());
+        writer.write(milestoneTag);
+      }
+
+      writer.write(segment.getTextSegment());
+
+      for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
+        String name = textAnnotation.getName();
+        String closeTag = getCloseTag(name);
+        writer.write(closeTag);
+      }
+    } catch (
+
+    IOException ioe) {
       throw new RuntimeException(ioe);
     }
   }
@@ -118,13 +131,13 @@ public class TextGraphUtil {
         List<String> values = attributePreCondition.getValues();
         String actualValue = attributes.get(attribute);
         switch (attributePreCondition.getFunction()) {
-          case is:
-            return values.contains(actualValue);
-          case isNot:
-            return !values.contains(actualValue);
-          case firstOf:
-            // TODO
-            break;
+        case is:
+          return values.contains(actualValue);
+        case isNot:
+          return !values.contains(actualValue);
+        case firstOf:
+          // TODO
+          break;
         }
 
       }
@@ -138,30 +151,30 @@ public class TextGraphUtil {
       AttributeMode attributeMode = elementView.getAttributeMode();
 
       switch (attributeMode) {
-        case showAll:
-          return allAttributes;
+      case showAll:
+        return allAttributes;
 
-        case hideAll:
-          break;
+      case hideAll:
+        break;
 
-        case showOnly:
-          allAttributes.forEach((k, v) -> {
-            if (elementView.getRelevantAttributes().contains(k)) {
-              attributesToInclude.put(k, v);
-            }
-          });
-          break;
+      case showOnly:
+        allAttributes.forEach((k, v) -> {
+          if (elementView.getRelevantAttributes().contains(k)) {
+            attributesToInclude.put(k, v);
+          }
+        });
+        break;
 
-        case hideOnly:
-          allAttributes.forEach((k, v) -> {
-            if (!elementView.getRelevantAttributes().contains(k)) {
-              attributesToInclude.put(k, v);
-            }
-          });
-          break;
+      case hideOnly:
+        allAttributes.forEach((k, v) -> {
+          if (!elementView.getRelevantAttributes().contains(k)) {
+            attributesToInclude.put(k, v);
+          }
+        });
+        break;
 
-        default:
-          throw new RuntimeException("unexpected attributemode: " + attributeMode);
+      default:
+        throw new RuntimeException("unexpected attributemode: " + attributeMode);
       }
       return attributesToInclude;
     }
@@ -201,34 +214,36 @@ public class TextGraphUtil {
 
   public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment, TextViewContext textViewContext) {
     try {
-      if (segment.isMilestone()) {
-        TextAnnotation milestone = segment.getMilestone();
-        String name = milestone.getName();
-        if (textViewContext.includeTag(name, milestone.getAttributes())) {
-          String openTag = getMilestoneTag(name, textViewContext.includedAttributes(milestone));
+      for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
+        String name = textAnnotation.getName();
+        if (textViewContext.includeTag(name, textAnnotation.getAttributes())) {
+          String openTag = getOpenTag(name, textViewContext.includedAttributes(textAnnotation));
           writer.write(openTag);
         }
+        textViewContext.pushWhenIgnoring(textAnnotation);
+      }
 
-      } else {
-        for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
-          String name = textAnnotation.getName();
-          if (textViewContext.includeTag(name, textAnnotation.getAttributes())) {
-            String openTag = getOpenTag(name, textViewContext.includedAttributes(textAnnotation));
-            writer.write(openTag);
-          }
-          textViewContext.pushWhenIgnoring(textAnnotation);
+      Optional<TextAnnotation> optionalMilestone = segment.getMilestoneTextAnnotation();
+      if (optionalMilestone.isPresent()) {
+        TextAnnotation milestone = optionalMilestone.get();
+        String name = milestone.getName();
+        if (textViewContext.includeTag(name, milestone.getAttributes())) {
+          String milestoneTag = getMilestoneTag(name, textViewContext.includedAttributes(milestone));
+          writer.write(milestoneTag);
         }
-        if (textViewContext.notInsideIgnoredElement()) {
-          writer.write(segment.getTextSegment());
+      }
+
+      if (textViewContext.notInsideIgnoredElement()) {
+        writer.write(segment.getTextSegment());
+      }
+
+      for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
+        String name = textAnnotation.getName();
+        if (textViewContext.includeTag(name, textAnnotation.getAttributes())) {
+          String closeTag = getCloseTag(name);
+          writer.write(closeTag);
         }
-        for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
-          String name = textAnnotation.getName();
-          if (textViewContext.includeTag(name, textAnnotation.getAttributes())) {
-            String closeTag = getCloseTag(name);
-            writer.write(closeTag);
-          }
-          textViewContext.popWhenIgnoring(textAnnotation);
-        }
+        textViewContext.popWhenIgnoring(textAnnotation);
       }
     } catch (IOException ioe) {
       throw new RuntimeException(ioe);
@@ -303,18 +318,18 @@ public class TextGraphUtil {
     for (int i = 0; i < n; i++) {
       char c = value.charAt(i);
       switch (c) {
-        case '<':
-          builder.append("&lt;");
-          break;
-        case '>':
-          builder.append("&gt;");
-          break;
-        case '&':
-          builder.append("&amp;");
-          break;
-        default:
-          builder.append(c);
-          break;
+      case '<':
+        builder.append("&lt;");
+        break;
+      case '>':
+        builder.append("&gt;");
+        break;
+      case '&':
+        builder.append("&amp;");
+        break;
+      default:
+        builder.append(c);
+        break;
       }
     }
   }
