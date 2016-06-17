@@ -34,8 +34,16 @@ public class OptimisticAlexandriaClient {
     delegate = new AlexandriaClient(alexandriaURI);
   }
 
+  public OptimisticAlexandriaClient(final String alexandriaURI) {
+    this(URI.create(alexandriaURI));
+  }
+
   public OptimisticAlexandriaClient(final URI alexandriaURI, SSLContext sslContext) {
     delegate = new AlexandriaClient(alexandriaURI, sslContext);
+  }
+
+  public OptimisticAlexandriaClient(final String alexandriaURI, SSLContext sslContext) {
+    this(URI.create(alexandriaURI), sslContext);
   }
 
   // delegated methods
@@ -84,12 +92,12 @@ public class OptimisticAlexandriaClient {
     return unwrap(delegate.getSubResource(uuid));
   }
 
-  public Void confirmResource(UUID resourceUUID) {
-    return unwrap(delegate.confirmResource(resourceUUID));
+  public void confirmResource(UUID resourceUUID) {
+    unwrap(delegate.confirmResource(resourceUUID));
   }
 
-  public Void confirmAnnotation(UUID annotationUuid) {
-    return unwrap(delegate.confirmAnnotation(annotationUuid));
+  public void confirmAnnotation(UUID annotationUuid) {
+    unwrap(delegate.confirmAnnotation(annotationUuid));
   }
 
   public URI setAnnotator(UUID resourceUUID, String code, Annotator annotator) {
@@ -168,8 +176,8 @@ public class OptimisticAlexandriaClient {
     return unwrap(delegate.addSearch(query));
   }
 
-  public SearchResultPage getSearchResultPage(UUID searchId) {
-    return unwrap(delegate.getSearchResultPage(searchId));
+  public SearchResultPage getSearchResultPage(UUID uuid) {
+    return unwrap(delegate.getSearchResultPage(uuid));
   }
 
   public SearchResultPage getSearchResultPage(UUID searchId, Integer page) {
