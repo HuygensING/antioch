@@ -69,10 +69,11 @@ public class OptimisticAlexandriaClientTest extends AlexandriaClientTest {
     String qualifiedParameters = Arrays.stream(method.getParameters())//
         .map(this::toQualifiedParameter)//
         .collect(joining(", "));
-    String parameters = Arrays.stream(method.getParameters())//
-        .map(this::toParameterName)//
-        .collect(joining(", "));
     String returnStatement = "void".equals(returnType) ? "" : "return ";
+    String parameters = Arrays.stream(method.getParameters())//
+        .map(this::parameterName)//
+        .collect(joining(", "));
+
     String stub = MessageFormat.format(//
         "public {0} {1}({2}) '{' {3}unwrap(delegate.{4}({5}));'}'", //
         returnType, //
@@ -86,13 +87,15 @@ public class OptimisticAlexandriaClientTest extends AlexandriaClientTest {
   }
 
   String toQualifiedParameter(Parameter parameter) {
-    String type = parameter.getType().getName().replaceFirst(EVERYTHING_UPTO_AND_INCLUDING_THE_LAST_PERIOD_REGEX, "");
-    String name = type.toLowerCase();
-    return type + " " + name;
+    return typeString(parameter) + " " + parameterName(parameter);
   }
 
-  String toParameterName(Parameter parameter) {
-    return parameter.getType().getName().replaceFirst(EVERYTHING_UPTO_AND_INCLUDING_THE_LAST_PERIOD_REGEX, "").toLowerCase();
+  private String typeString(Parameter parameter) {
+    return parameter.getType().getName().replaceFirst(EVERYTHING_UPTO_AND_INCLUDING_THE_LAST_PERIOD_REGEX, "");
+  }
+
+  String parameterName(Parameter parameter) {
+    return typeString(parameter).toLowerCase();
   }
 
 }

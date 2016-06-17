@@ -185,18 +185,17 @@ public class AlexandriaClient implements AutoCloseable {
     return addResult;
   }
 
-  public RestResult<UUID> setSubResource(final UUID parentResourceId, final UUID subResourceId, final SubResourcePrototype subresource) {
+  public RestResult<Void> setSubResource(final UUID parentResourceId, final UUID subResourceId, final SubResourcePrototype subresource) {
     final Entity<SubResourcePrototype> entity = Entity.json(subresource);
     final WebTarget path = resourceTarget(parentResourceId)//
         .path(EndpointPaths.SUBRESOURCES)//
         .path(subResourceId.toString());
     final Supplier<Response> responseSupplier = authorizedPut(path, entity);
-    final RestRequester<UUID> requester = RestRequester.withResponseSupplier(responseSupplier);
-    final RestResult<UUID> setResult = requester//
-        .onStatus(Status.CREATED, this::uuidFromLocationHeader)//
-        .onStatus(Status.NO_CONTENT, (response) -> new RestResult<UUID>().setCargo(subResourceId))//
+    final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
+    return requester//
+        .onStatus(Status.CREATED, (response) -> new RestResult<>())//
+        .onStatus(Status.NO_CONTENT, (response) -> new RestResult<>())//
         .getResult();
-    return setResult;
   }
 
   public RestResult<ResourcePojo> getResource(final UUID uuid) {

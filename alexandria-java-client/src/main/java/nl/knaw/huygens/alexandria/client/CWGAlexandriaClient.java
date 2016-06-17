@@ -13,7 +13,7 @@ import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.search.QueryField;
 import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
 
-public class CWGAlexandriaClient extends AlexandriaClient {
+public class CWGAlexandriaClient extends OptimisticAlexandriaClient {
 
   public CWGAlexandriaClient(URI alexandriaURI) {
     super(alexandriaURI);
@@ -28,23 +28,14 @@ public class CWGAlexandriaClient extends AlexandriaClient {
         .setFind("resource")//
         .setWhere(MessageFormat.format("subresource.sub:eq(\"{0}\") resource.id:eq(\"{1}\")", ref, parentUUID))//
         .setFields(QueryField.subresource_id.toString());
-    RestResult<UUID> result = addSearch(query);
-    if (result.hasFailed()) {
-      throw new AlexandriaException(result.getFailureCause().get());
-    } else {
-      RestResult<SearchResultPage> pageResult = getSearchResultPage(result.get());
-      if (result.hasFailed()) {
-        throw new AlexandriaException(pageResult.getFailureCause().get());
-      } else {
-        SearchResultPage searchResultPage = pageResult.get();
-        return searchResultPage.getRecords()//
-            .stream()//
-            .map(r -> r.get(QueryField.subresource_id.toString()))//
-            .map(String.class::cast)//
-            .map(UUID::fromString)//
-            .collect(toList());
-      }
-    }
+    UUID searchId = addSearch(query);
+    SearchResultPage searchResultPage = getSearchResultPage(searchId);
+    return searchResultPage.getRecords()//
+        .stream()//
+        .map(r -> r.get(QueryField.subresource_id.toString()))//
+        .map(String.class::cast)//
+        .map(UUID::fromString)//
+        .collect(toList());
   }
 
 }

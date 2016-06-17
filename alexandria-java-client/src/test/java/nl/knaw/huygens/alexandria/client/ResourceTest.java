@@ -98,7 +98,7 @@ public class ResourceTest extends AlexandriaClientTest {
     UUID subresourceUUID = UUID.randomUUID();
     String ref = "/some/sub/path";
     SubResourcePrototype subresource = new SubResourcePrototype().setSub(ref);
-    RestResult<UUID> setResult1 = client.setSubResource(resourceUuid, subresourceUUID, subresource);
+    RestResult<Void> setResult1 = client.setSubResource(resourceUuid, subresourceUUID, subresource);
     assertRequestSucceeded(setResult1);
 
     // retrieve the resource again
@@ -112,9 +112,8 @@ public class ResourceTest extends AlexandriaClientTest {
     // update the subresource
     String ref2 = "/some/other/sub/path";
     SubResourcePrototype newSubresource = new SubResourcePrototype().setSub(ref2);
-    RestResult<UUID> setResult2 = client.setSubResource(resourceUuid, subresourceUUID, newSubresource);
+    RestResult<Void> setResult2 = client.setSubResource(resourceUuid, subresourceUUID, newSubresource);
     assertRequestSucceeded(setResult2);
-    softly.assertThat(setResult2.get()).isEqualTo(subresourceUUID);
 
     RestResult<SubResourcePojo> getResult2 = client.getSubResource(subresourceUUID);
     assertRequestSucceeded(getResult2);

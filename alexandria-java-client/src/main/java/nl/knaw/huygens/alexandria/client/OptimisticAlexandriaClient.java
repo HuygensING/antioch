@@ -80,8 +80,8 @@ public class OptimisticAlexandriaClient {
     return unwrap(delegate.addSubResource(parentResourceId, subresource));
   }
 
-  public UUID setSubResource(UUID parentResourceId, UUID subResourceId, SubResourcePrototype subresource) {
-    return unwrap(delegate.setSubResource(parentResourceId, subResourceId, subresource));
+  public void setSubResource(UUID parentResourceId, UUID subResourceId, SubResourcePrototype subresource) {
+    unwrap(delegate.setSubResource(parentResourceId, subResourceId, subresource));
   }
 
   public ResourcePojo getResource(UUID uuid) {
@@ -192,7 +192,7 @@ public class OptimisticAlexandriaClient {
 
   private <T> T unwrap(RestResult<T> restResult) {
     if (restResult.hasFailed()) {
-      throw new AlexandriaException(restResult.getFailureCause().get());
+      throw new AlexandriaException(restResult.getFailureCause().orElse("Unspecified error"));
     }
     return restResult.get();
   }
