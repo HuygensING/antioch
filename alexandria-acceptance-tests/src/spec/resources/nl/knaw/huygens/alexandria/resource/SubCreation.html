@@ -80,7 +80,7 @@
   <span c:execute="resourceExists(#uuid1)">exists</span>.<br/>
 
   <h:request>
-    To add a subresource with <code c:set="#subuuid1">00000000-0000-0000-0000-000000000002</code>
+    To add a subresource with <code c:set="#subuuid1">00000000-0000-0000-0000-000000000002</code>,<br/>
     I <h:put>/resources/$uuid1/subresources/$subuuid1</h:put>
     the body:
     <h:jsonBody>
@@ -97,7 +97,30 @@
       <li>and location header
                 <h:location>https://{host}/resources/$subuuid1</h:location></li>
     </ul>
-    This subresource does not need to be CONFIRMED.
+  </h:request>
+
+  <h:request>
+      To verify the newly created subresource, we<br/>
+      <h:get>/resources/$subuuid1</h:get>
+      and observe status
+      <h:status>200 OK</h:status><br/>
+      with body:
+      <h:jsonResponse>{
+			  "subresource" : {
+			    "sub" : "some/sub/item",
+			    "id" : "$subuuid1",
+			    "state" : {
+			      "value" : "CONFIRMED",
+			      "since" : "{date.beforeNow}"
+			    },
+			    "^partOf" : "https://{host}/resources/$uuid1",
+			    "^subresources" : [ ],
+			    "^annotations" : [ ],
+			    "^provenance" : "https://{host}/resources/$subuuid1/provenance"
+			  }
+			}
+      </h:jsonResponse>
+      Note that the subresource has state CONFIRMED, since we used a PUT to set it.
   </h:request>
 
 </div>
