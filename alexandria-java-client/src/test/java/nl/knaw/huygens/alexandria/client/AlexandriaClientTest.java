@@ -151,6 +151,11 @@ public abstract class AlexandriaClientTest extends AlexandriaTest {
     TextImportStatus textGraphImportStatus = null;
     boolean goOn = true;
     while (goOn) {
+      try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
       RestResult<TextImportStatus> result2 = client.getTextImportStatus(resourceUuid);
       assertThat(result2.hasFailed()).isFalse();
       textGraphImportStatus = result2.get();

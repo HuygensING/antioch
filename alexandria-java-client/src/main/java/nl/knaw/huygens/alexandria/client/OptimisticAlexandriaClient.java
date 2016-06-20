@@ -66,6 +66,16 @@ public class OptimisticAlexandriaClient {
     setSubResource(parentResourceId, subResourceId, subResourceWithSub(sub));
   }
 
+  public TextImportStatus setResourceTextAsynchronously(UUID resourceUUID, File file) throws IOException {
+    unwrap(delegate.setResourceText(resourceUUID, file));
+    return textImportStatusWhenFinished(resourceUUID);
+  }
+
+  public TextImportStatus setResourceTextAsynchronously(UUID resourceUUID, String xml) {
+    unwrap(delegate.setResourceText(resourceUUID, xml));
+    return textImportStatusWhenFinished(resourceUUID);
+  }
+
   // delegated methods
 
   public void close() {
@@ -223,5 +233,20 @@ public class OptimisticAlexandriaClient {
 
   private SubResourcePrototype subResourceWithSub(String sub) {
     return new SubResourcePrototype().setSub(sub);
+  }
+
+  private TextImportStatus textImportStatusWhenFinished(UUID resourceUUID) {
+    TextImportStatus status = null;
+    boolean goOn = true;
+    while (goOn) {
+      try {
+        Thread.sleep(500);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      status = unwrap(delegate.getTextImportStatus(resourceUUID));
+      goOn = !status.isDone();
+    }
+    return status;
   }
 }
