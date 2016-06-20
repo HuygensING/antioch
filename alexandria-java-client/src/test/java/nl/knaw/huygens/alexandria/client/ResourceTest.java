@@ -30,6 +30,9 @@ import org.junit.Test;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.client.model.AnnotationList;
+import nl.knaw.huygens.alexandria.client.model.AnnotationPojo;
+import nl.knaw.huygens.alexandria.client.model.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.client.model.ProvenancePojo;
 import nl.knaw.huygens.alexandria.client.model.ResourcePojo;
 import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
@@ -148,10 +151,36 @@ public class ResourceTest extends AlexandriaClientTest {
     // retrieve the resource
     RestResult<ResourcePojo> result2 = client.getResource(resourceId);
     assertRequestSucceeded(result2);
-    ResourcePojo ResourcePojo = result2.get();
-    softly.assertThat(ResourcePojo).as("entity != null").isNotNull();
-    softly.assertThat(ResourcePojo.getRef()).as("ref").isEqualTo(ref);
-    softly.assertThat(ResourcePojo.getState().getValue()).as("state").isEqualTo(AlexandriaState.CONFIRMED);
+    ResourcePojo resourcePojo = result2.get();
+    softly.assertThat(resourcePojo).as("entity != null").isNotNull();
+    softly.assertThat(resourcePojo.getRef()).as("ref").isEqualTo(ref);
+    softly.assertThat(resourcePojo.getState().getValue()).as("state").isEqualTo(AlexandriaState.CONFIRMED);
   }
 
+  @Test
+  public void testGetAnnotationsFromResourceUUID() {
+    client.setAuthKey(AUTHKEY);
+    String ref = "resource4";
+    ResourcePrototype resource = new ResourcePrototype().setRef(ref).setProvenance(new ProvenancePojo().setWho("test4").setWhy("because test4"));
+    UUID resourceId = UUID.fromString("11111111-1111-1111-1111-111111111112");
+    RestResult<Void> result = client.setResource(resourceId, resource);
+    assertRequestSucceeded(result);
+
+    // add annotations
+    RestResult<UUID> annotateResourceResult1 = client.annotateResource(resourceId, new AnnotationPrototype().setType("typeUno").setValue("valueUno"));
+    assertRequestSucceeded(annotateResourceResult1);
+    AnnotationPojo annotation1 = client.getAnnotation(annotateResourceResult1.get()).get();
+
+    RestResult<UUID> annotateResourceResult2 = client.annotateResource(resourceId, new AnnotationPrototype().setType("typeDos").setValue("valueDos"));
+    assertRequestSucceeded(annotateResourceResult2);
+    AnnotationPojo annotation2 = client.getAnnotation(annotateResourceResult2.get()).get();
+
+    // retrieve the resource
+    RestResult<AnnotationList> annotationsResult = client.getResourceAnnotations(resourceId);
+    assertRequestSucceeded(annotationsResult);
+    AnnotationList annotationList = annotationsResult.get();
+    softly.assertThat(annotationList).as("entity != null").isNotNull();
+    softly.assertThat(annotationList).hasSize(2);
+    softly.assertThat(annotationList).containsExactly(annotation1, annotation2);
+  }
 }
