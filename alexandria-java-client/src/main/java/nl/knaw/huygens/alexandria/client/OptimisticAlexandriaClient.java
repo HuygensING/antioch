@@ -20,10 +20,12 @@ import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
+import nl.knaw.huygens.alexandria.client.model.AnnotationList;
 import nl.knaw.huygens.alexandria.client.model.AnnotationPojo;
 import nl.knaw.huygens.alexandria.client.model.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.client.model.ResourcePojo;
 import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
+import nl.knaw.huygens.alexandria.client.model.SubResourceList;
 import nl.knaw.huygens.alexandria.client.model.SubResourcePojo;
 import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
 
@@ -218,6 +220,17 @@ public class OptimisticAlexandriaClient {
     return unwrap(delegate.addCommand(commandName, parameters));
   }
 
+  public AnnotationList getResourceAnnotations(UUID uuid) {
+    return unwrap(delegate.getResourceAnnotations(uuid));
+  }
+
+  public SubResourceList getSubResources(UUID uuid) {
+    return unwrap(delegate.getSubResources(uuid));
+  }
+
+  public AnnotationList getAnnotationAnnotations(UUID uuid) {
+    return unwrap(delegate.getAnnotationAnnotations(uuid));
+  }
   /////// end delegated methods
 
   private <T> T unwrap(RestResult<T> restResult) {

@@ -11,9 +11,9 @@ import com.google.common.collect.Lists;
 import nl.knaw.huygens.alexandria.api.JsonTypeNames;
 import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 
-@JsonTypeName(JsonTypeNames.ANNOTATIONLIST)
-public class AnnotationList extends JsonWrapperObject implements List<AnnotationPojo> {
-  List<AnnotationPojo> delegate = Lists.newArrayList();
+@JsonTypeName(JsonTypeNames.SUBRESOURCELIST)
+public class SubResourceList extends JsonWrapperObject implements List<SubResourcePojo> {
+  List<SubResourcePojo> delegate = Lists.newArrayList();
 
   // delegated methods
 
@@ -33,7 +33,7 @@ public class AnnotationList extends JsonWrapperObject implements List<Annotation
   }
 
   @Override
-  public Iterator<AnnotationPojo> iterator() {
+  public Iterator<SubResourcePojo> iterator() {
     return delegate.iterator();
   }
 
@@ -48,7 +48,7 @@ public class AnnotationList extends JsonWrapperObject implements List<Annotation
   }
 
   @Override
-  public boolean add(AnnotationPojo e) {
+  public boolean add(SubResourcePojo e) {
     return delegate.add(e);
   }
 
@@ -63,12 +63,12 @@ public class AnnotationList extends JsonWrapperObject implements List<Annotation
   }
 
   @Override
-  public boolean addAll(Collection<? extends AnnotationPojo> c) {
+  public boolean addAll(Collection<? extends SubResourcePojo> c) {
     return delegate.addAll(c);
   }
 
   @Override
-  public boolean addAll(int index, Collection<? extends AnnotationPojo> c) {
+  public boolean addAll(int index, Collection<? extends SubResourcePojo> c) {
     return delegate.addAll(index, c);
   }
 
@@ -98,22 +98,22 @@ public class AnnotationList extends JsonWrapperObject implements List<Annotation
   }
 
   @Override
-  public AnnotationPojo get(int index) {
+  public SubResourcePojo get(int index) {
     return delegate.get(index);
   }
 
   @Override
-  public AnnotationPojo set(int index, AnnotationPojo element) {
+  public SubResourcePojo set(int index, SubResourcePojo element) {
     return delegate.set(index, element);
   }
 
   @Override
-  public void add(int index, AnnotationPojo element) {
+  public void add(int index, SubResourcePojo element) {
     delegate.add(index, element);
   }
 
   @Override
-  public AnnotationPojo remove(int index) {
+  public SubResourcePojo remove(int index) {
     return delegate.remove(index);
   }
 
@@ -128,17 +128,17 @@ public class AnnotationList extends JsonWrapperObject implements List<Annotation
   }
 
   @Override
-  public ListIterator<AnnotationPojo> listIterator() {
+  public ListIterator<SubResourcePojo> listIterator() {
     return delegate.listIterator();
   }
 
   @Override
-  public ListIterator<AnnotationPojo> listIterator(int index) {
+  public ListIterator<SubResourcePojo> listIterator(int index) {
     return delegate.listIterator(index);
   }
 
   @Override
-  public List<AnnotationPojo> subList(int fromIndex, int toIndex) {
+  public List<SubResourcePojo> subList(int fromIndex, int toIndex) {
     return delegate.subList(fromIndex, toIndex);
   }
 

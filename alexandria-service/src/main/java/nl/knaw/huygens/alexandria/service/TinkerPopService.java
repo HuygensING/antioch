@@ -24,7 +24,6 @@ package nl.knaw.huygens.alexandria.service;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -45,7 +44,7 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.jooq.lambda.Unchecked;
@@ -275,12 +274,14 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public Set<AlexandriaResource> readSubResources(UUID uuid) {
+  public List<AlexandriaResource> readSubResources(UUID uuid) {
     ResourceVF resourcevf = readExisitingResourceVF(uuid);
     return resourcevf.getSubResources().stream()//
         .map(this::deframeResource)//
-        .collect(toSet());
+        .sorted()//
+        .collect(toList());
   }
+
 
   @Override
   public void setResourceAnnotator(UUID resourceUUID, Annotator annotator) {
@@ -498,7 +499,7 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Optional<AlexandriaAnnotationBody> readAnnotationBody(UUID uuid) {
-    throw new NotImplementedException();
+    throw new NotImplementedException("readAnnotationBody");
   }
 
   @Override

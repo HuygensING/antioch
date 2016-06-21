@@ -26,7 +26,6 @@ import java.time.temporal.TemporalAmount;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -61,7 +60,7 @@ public interface AlexandriaService {
 
   Optional<AlexandriaResource> readResource(UUID uuid);
 
-  Set<AlexandriaResource> readSubResources(UUID uuid);
+  List<AlexandriaResource> readSubResources(UUID uuid);
 
   AlexandriaAnnotationBody createAnnotationBody(UUID uuid, String type, String value, TentativeAlexandriaProvenance provenance);
 
