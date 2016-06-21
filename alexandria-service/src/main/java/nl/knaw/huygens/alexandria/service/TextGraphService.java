@@ -26,6 +26,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
@@ -142,22 +143,48 @@ public class TextGraphService {
       nextEdge.remove();
       parentVertex.addEdge(EdgeLabels.NEXT, childVertex);
 
-      // increase the depth of the next textannotations as long as they point to the same textsegments
+      // increase the depth of the next textannotations as long as they textrange they annotate overlaps with the textrange of the parent annotation
       Vertex firstTextSegment = firstTextSegment(parentVertex);
       Vertex lastTextSegment = lastTextSegment(parentVertex);
+      Set<Vertex> updatedVertices = Sets.newHashSet();
+      updatedVertices.add(parentVertex);
+      updatedVertices.add(childVertex);
       boolean goOn = true;
+      Vertex textSegment = firstTextSegment;
       while (goOn) {
-        Vertex next = nextTextAnnotation(childVertex);
-        Vertex newFirst = firstTextSegment(next);
-        Vertex newLast = lastTextSegment(next);
-        if (newFirst.equals(firstTextSegment) && newLast.equals(lastTextSegment)) {
-          int currentDepth = getIntValue(next, TextAnnotation.Properties.depth);
-          next.property(TextAnnotation.Properties.depth, currentDepth + 1);
-          childVertex = next;
-          goOn = childVertex.edges(Direction.OUT, EdgeLabels.NEXT).hasNext();
-        } else {
-          goOn = false;
+        StreamUtil.stream(textSegment.vertices(Direction.IN, EdgeLabels.FIRST_TEXT_SEGMENT))//
+            .filter(v -> VertexLabels.TEXTANNOTATION.equals(v.label()))//
+            .filter(v -> !updatedVertices.contains(v))//
+            .forEach(v -> {
+              Log.info("v={}", v);
+              Log.info("updatedVertices={}", updatedVertices);
+              int currentDepth = getIntValue(v, TextAnnotation.Properties.depth);
+              if (currentDepth > existingTextAnnotation.getDepth()) {
+                v.property(TextAnnotation.Properties.depth, currentDepth + 1);
+                updatedVertices.add(v);
+              }
+            });
+        goOn = !(textSegment.equals(lastTextSegment));
+        if (goOn) {
+          Iterator<Vertex> nextTextSegment = textSegment.vertices(Direction.OUT, EdgeLabels.NEXT);
+          if (nextTextSegment.hasNext()) {
+            textSegment = nextTextSegment.next();
+          } else {
+            Log.error("There seems to be something wrong with the graph.");
+            goOn = false;
+          }
         }
+        // Vertex next = nextTextAnnotation(childVertex);
+        // Vertex newFirst = firstTextSegment(next);
+        // Vertex newLast = lastTextSegment(next);
+        // if (newFirst.equals(firstTextSegment) && newLast.equals(lastTextSegment)) {
+        // int currentDepth = getIntValue(next, TextAnnotation.Properties.depth);
+        // next.property(TextAnnotation.Properties.depth, currentDepth + 1);
+        // childVertex = next;
+        // goOn = childVertex.edges(Direction.OUT, EdgeLabels.NEXT).hasNext();
+        // } else {
+        // goOn = false;
+        // }
       }
     }
   }
