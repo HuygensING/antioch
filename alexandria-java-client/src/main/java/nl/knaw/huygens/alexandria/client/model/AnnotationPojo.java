@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.client.model;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -45,6 +46,11 @@ public class AnnotationPojo extends AbstractAccountablePojo<AnnotationPojo> {
   @Override
   public String toString() {
     return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    return EqualsBuilder.reflectionEquals(this, other);
   }
 
 }

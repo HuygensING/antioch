@@ -1,31 +1,10 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
-/*
- * #%L
- * alexandria-main
- * =======
- * Copyright (C) 2015 - 2016 Huygens ING (KNAW)
- * =======
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
-
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toList;
 
 import java.net.URI;
-import java.util.Set;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -40,7 +19,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.google.common.collect.ImmutableMap;
+
 import io.swagger.annotations.ApiOperation;
+import nl.knaw.huygens.alexandria.api.JsonTypeNames;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -70,9 +52,23 @@ public class SubResourcesEndpoint extends JSONEndpoint {
   @GET
   @ApiOperation(value = "get subresources", response = ResourceEntity.class)
   public Response get() {
-    final Set<AlexandriaResource> subresources = service.readSubResources(parentId);
-    final Set<SubResourceEntity> outgoing = subresources.stream().map(this::toEntity).collect(toSet());
-    return ok(outgoing);
+    final List<AlexandriaResource> subresources = service.readSubResources(parentId);
+    return ok(jsonWrap(subresources));
+  }
+
+  private Map<String, List<Map<String, SubResourceEntity>>> jsonWrap(final List<AlexandriaResource> subresources) {
+    Map<String, List<Map<String, SubResourceEntity>>> entity = ImmutableMap.of(//
+        JsonTypeNames.SUBRESOURCELIST,
+        subresources.stream()//
+            .map(this::toEntity)//
+            .map(this::toSubResourceMap)//
+            .collect(toList())//
+    );
+    return entity;
+  }
+
+  private Map<String, SubResourceEntity> toSubResourceMap(SubResourceEntity e) {
+    return ImmutableMap.of(JsonTypeNames.SUBRESOURCE, e);
   }
 
   @POST

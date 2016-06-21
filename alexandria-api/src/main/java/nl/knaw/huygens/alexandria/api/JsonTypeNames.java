@@ -5,7 +5,9 @@ public class JsonTypeNames {
   public static final String PROVENANCE = "provenance";
   public static final String RESOURCE = "resource";
   public static final String SUBRESOURCE = "subresource";
+  public static final String SUBRESOURCELIST = "subresources";
   public static final String ANNOTATION = "annotation";
+  public static final String ANNOTATIONLIST = "annotations";
   public static final String ANNOTATIONBODY = "annotationBody";
   public static final String ANNOTATOR = "annotator";
   public static final String RESOURCETEXT = "resourceText";

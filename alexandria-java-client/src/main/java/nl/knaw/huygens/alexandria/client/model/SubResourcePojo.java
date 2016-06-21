@@ -3,6 +3,7 @@ package nl.knaw.huygens.alexandria.client.model;
 import java.net.URI;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -132,4 +133,8 @@ public class SubResourcePojo extends AbstractAccountablePojo<SubResourcePojo> {
     return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
 
+  @Override
+  public boolean equals(Object other) {
+    return EqualsBuilder.reflectionEquals(this, other, true);
+  }
 }
