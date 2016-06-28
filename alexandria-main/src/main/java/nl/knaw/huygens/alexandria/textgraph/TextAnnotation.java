@@ -29,6 +29,14 @@ public class TextAnnotation {
     this.depth = depth;
   }
 
+  public void setId(Object object) {
+    this.id = object;
+  }
+
+  public Object getId() {
+    return id;
+  }
+
   public String getName() {
     return name;
   }
@@ -42,6 +50,10 @@ public class TextAnnotation {
   }
 
   // TODO:: does this need to be stored?
+  public void setDepth(int newDepth) {
+    this.depth = newDepth;
+  }
+
   public Integer getDepth() {
     return depth;
   }
@@ -61,15 +73,4 @@ public class TextAnnotation {
     return EqualsBuilder.reflectionEquals(this, other, false);
   }
 
-  public Object getId() {
-    return id;
-  }
-
-  public void setId(Object object) {
-    this.id = object;
-  }
-
-  public void setDepth(int newDepth) {
-    this.depth = newDepth;
-  }
 }

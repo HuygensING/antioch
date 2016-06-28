@@ -244,6 +244,7 @@ public class Storage {
 
   public void saveToDisk(final String file) {
     if (file != null) {
+      System.out.println("storing db to " + file + "...");
       try {
         graph.io(IoCore.gryo()).writeGraph(file);
       } catch (final IOException e) {
