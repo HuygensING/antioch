@@ -68,12 +68,12 @@ public class OptimisticAlexandriaClient {
     setSubResource(parentResourceId, subResourceId, subResourceWithSub(sub));
   }
 
-  public TextImportStatus setResourceTextAsynchronously(UUID resourceUUID, File file) throws IOException {
+  public TextImportStatus setResourceTextSynchronously(UUID resourceUUID, File file) throws IOException {
     unwrap(delegate.setResourceText(resourceUUID, file));
     return textImportStatusWhenFinished(resourceUUID);
   }
 
-  public TextImportStatus setResourceTextAsynchronously(UUID resourceUUID, String xml) {
+  public TextImportStatus setResourceTextSynchronously(UUID resourceUUID, String xml) {
     unwrap(delegate.setResourceText(resourceUUID, xml));
     return textImportStatusWhenFinished(resourceUUID);
   }
