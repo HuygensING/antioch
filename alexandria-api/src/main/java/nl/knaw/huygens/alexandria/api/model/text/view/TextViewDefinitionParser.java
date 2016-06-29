@@ -57,10 +57,12 @@ public class TextViewDefinitionParser {
 
       final ElementView elementView = parseElementViewDefinition(elementName, entry.getValue());
       if (elementView.getElementMode() == null) {
-        elementView.setElementMode(defaultElementViewDefinition.getElementMode().get());
+        elementView.setElementMode(defaultElementViewDefinition.getElementMode()//
+            .orElse(ElementViewDefinition.DEFAULT.getElementMode().get()));
       }
       if (elementView.getAttributeMode() == null) {
-        String modeString = defaultElementViewDefinition.getAttributeMode().get();
+        String modeString = defaultElementViewDefinition.getAttributeMode()//
+            .orElse(ElementViewDefinition.DEFAULT.getAttributeMode().get());
         elementView.setAttributeMode(AttributeMode.valueOf(modeString));
       }
       textView.putElementView(elementName, elementView);
