@@ -603,5 +603,113 @@
   </h:request>
 </div>
 
+<div id="set-priority-view" c:execute="clearStorage()"
+     data-desc="How do I define a view which for a given element name only shows the elements where a given attribute has one of several possible values, sorted on priority?">
+
+  Given a resource
+  with id <code c:set="#resourceId5">00000000-0000-0000-0000-000000000005</code>
+  <span c:execute="resourceExists(#resourceId5)">exists</span>,<br/>
+  which has
+  <span c:execute="resourceHasText(#resourceId5,#text4)">text<br/>
+    <code c:set="#text4">&lt;text&gt;
+&lt;p xml:id=&quot;p-1&quot;&gt;&lt;lang resp=&quot;#b&quot; value=&quot;it&quot;&gt;&lt;lang resp=&quot;#a&quot; value=&quot;la&quot;&gt;Maecenas consectetur odio at dolor porttitor.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;
+&lt;p xml:id=&quot;p-2&quot;&gt;&lt;lang resp=&quot;#a&quot; value=&quot;la&quot;&gt;&lt;lang resp=&quot;#b&quot; value=&quot;it&quot;&gt;Aliquam a dapibus massa.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;
+&lt;p xml:id=&quot;p-3&quot;&gt;&lt;lang resp=&quot;#b&quot; value=&quot;en&quot;&gt;&lt;lang resp=&quot;#c&quot; value=&quot;fr&quot;&gt;Aenean efficitur purus ut dui molestie fermentum.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;
+&lt;p xml:id=&quot;p-4&quot;&gt;&lt;lang resp=&quot;#c&quot; value=&quot;fr&quot;&gt;Fusce congue mauris augue.&lt;/lang&gt;&lt;/p&gt;
+&lt;/text&gt;</code>
+  </span><br/>
+  <br/>
+
+  <h:request>
+     Then a
+     <h:get>/resources/$resourceId5/text/xml</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     <h:success>successfully</h:success>
+     yields response body:<br/>
+     <h:xmlResponse>
+<![CDATA[
+<text>
+<p xml:id="p-1"><lang resp="#b" value="it"><lang resp="#a" value="la">Maecenas consectetur odio at dolor porttitor.</lang></lang></p>
+<p xml:id="p-2"><lang resp="#a" value="la"><lang resp="#b" value="it">Aliquam a dapibus massa.</lang></lang></p>
+<p xml:id="p-3"><lang resp="#b" value="en"><lang resp="#c" value="fr">Aenean efficitur purus ut dui molestie fermentum.</lang></lang></p>
+<p xml:id="p-4"><lang resp="#c" value="fr">Fusce congue mauris augue.</lang></p>
+</text>]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+  <br/>
+     
+    <h:request>
+        When I define a view <code c:set="#view">prioritized</code> by
+        <h:put>/resources/$resourceId5/text/views/$view</h:put>
+        the body:
+        <h:jsonBody>
+          {
+            "textView": {
+              "description": "Transcriber A preferred",
+              "elements": {
+                ":default": { "elementMode": "hideTag" },
+                "text":     { "elementMode": "show", "attributeMode" : "showAll" },
+                "p":        { "elementMode": "show", "attributeMode" : "showAll" },
+                "lang":     { "elementMode": "show", "attributeMode" : "showAll", "when" : "attribute(resp).firstOf('#a','#b')" }
+          } } }
+        </h:jsonBody>
+        using
+        <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+        then I should receive
+        <ul>
+          <li>status <h:status>201 Created</h:status></li>
+          <li>location header
+              <h:location>https://{host}/resources/$resourceId5/text/views/$view</h:location>
+          </li>
+          <li>and the response body is <h:responseBody/></li>
+        </ul>
+    </h:request>
+    <br/>
+
+    <h:request>
+        When I
+        <h:get>/resources/$resourceId5/text/views</h:get>,<br/>
+        then I should receive
+        <ul>
+            <li>status
+                <h:status>200 OK</h:status>
+            </li>
+            <li>and body
+             <small>(only relevant fields shown for brevity)</small>
+                <h:jsonResponse>
+                [ {
+                  "id" : "$view",
+                  "^definition" : "https://{host}/resources/$resourceId5/text/views/$view",
+                  "^xml" : "https://{host}/resources/$resourceId5/text/xml?view=$view"
+                } ]
+                </h:jsonResponse>
+            </li>
+        </ul>
+    </h:request>
+    <br/>
+
+  <h:request>
+     Then a
+     <h:get>/resources/$resourceId5/text/xml?view=$view</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     <h:success>successfully</h:success>
+     yields response body:
+     <h:xmlResponse>
+<![CDATA[
+<text>
+  <p xml:id="p-1"><lang resp="#a" value="la">Maecenas consectetur odio at dolor porttitor.</lang></p>
+  <p xml:id="p-2"><lang resp="#a" value="la">Aliquam a dapibus massa.</lang></p>
+  <p xml:id="p-3"><lang resp="#b" value="en">Aenean efficitur purus ut dui molestie fermentum.</lang></p>
+  <p xml:id="p-4">Fusce congue mauris augue.</p>
+</text>]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+</div>
+
+
 </body>
 </html>
