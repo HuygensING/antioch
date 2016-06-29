@@ -14,20 +14,20 @@ public class ElementViewDefinition {
       .setAttributeMode(AttributeMode.showAll.name())//
       .setElementMode(ElementMode.show);
 
-  // # elementMode: (optional, use default settings if absent)
+  // elementMode: (optional, use default settings if absent)
   // # show : show <element> + children
   // # hide : don't show <element> + children
   // # hideTag : don't show <element> tag, show children
   private ElementView.ElementMode elementMode;
 
-  // # attributeMode: (optional, use default settings if absent)
+  // attributeMode: (optional, use default settings if absent)
   // # showAll : show all attributes
   // # showOnly attribute1 attribute2 ... : show only indicated attributes
   // # hideAll : don't show any attribute
   // # hideOnly attribute1 attribute2 ... : show all attributes except the indicated ones
   private String attributeMode;
 
-  // # when (optional, always when 'when' not given)
+  // when (optional, always when 'when' not given)
   // # attribute(rend).is('red')
   // # attribute(rend).isNot('red')
   // # attribute(resp).firstOf('#ed0','#ed1','')
