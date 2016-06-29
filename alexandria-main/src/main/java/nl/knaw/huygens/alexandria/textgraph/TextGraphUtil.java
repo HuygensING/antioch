@@ -1,5 +1,8 @@
 package nl.knaw.huygens.alexandria.textgraph;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
+
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,7 +12,9 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -17,7 +22,9 @@ import java.util.function.Consumer;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import nl.knaw.huygens.alexandria.api.model.text.view.AttributePreCondition;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView;
@@ -51,30 +58,42 @@ public class TextGraphUtil {
 
   public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment) {
     try {
-      for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
-        String name = textAnnotation.getName();
-        String openTag = getOpenTag(name, textAnnotation.getAttributes());
-        writer.write(openTag);
-      }
+      writeOpenTags(writer, segment);
+      writeMilestoneTags(writer, segment);
+      writeText(writer, segment);
+      writeCloseTags(writer, segment);
 
-      Optional<TextAnnotation> optionalMilestone = segment.getMilestoneTextAnnotation();
-      if (optionalMilestone.isPresent()) {
-        TextAnnotation milestone = optionalMilestone.get();
-        String milestoneTag = getMilestoneTag(milestone.getName(), milestone.getAttributes());
-        writer.write(milestoneTag);
-      }
-
-      writer.write(segment.getTextSegment());
-
-      for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
-        String name = textAnnotation.getName();
-        String closeTag = getCloseTag(name);
-        writer.write(closeTag);
-      }
-    } catch (
-
-    IOException ioe) {
+    } catch (IOException ioe) {
       throw new RuntimeException(ioe);
+    }
+  }
+
+  private static void writeOpenTags(Writer writer, TextGraphSegment segment) throws IOException {
+    for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
+      String name = textAnnotation.getName();
+      String openTag = getOpenTag(name, textAnnotation.getAttributes());
+      writer.write(openTag);
+    }
+  }
+
+  private static void writeMilestoneTags(Writer writer, TextGraphSegment segment) throws IOException {
+    Optional<TextAnnotation> optionalMilestone = segment.getMilestoneTextAnnotation();
+    if (optionalMilestone.isPresent()) {
+      TextAnnotation milestone = optionalMilestone.get();
+      String milestoneTag = getMilestoneTag(milestone.getName(), milestone.getAttributes());
+      writer.write(milestoneTag);
+    }
+  }
+
+  private static void writeText(Writer writer, TextGraphSegment segment) throws IOException {
+    writer.write(segment.getTextSegment());
+  }
+
+  private static void writeCloseTags(Writer writer, TextGraphSegment segment) throws IOException {
+    for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
+      String name = textAnnotation.getName();
+      String closeTag = getCloseTag(name);
+      writer.write(closeTag);
     }
   }
 
@@ -104,19 +123,20 @@ public class TextGraphUtil {
   protected static class TextViewContext {
     private Map<String, ElementView> elementViewMap;
     private Stack<TextAnnotation> ignoredAnnotationStack = new Stack<>();
+    private List<TextAnnotation> overruledTextAnnotations = Lists.newArrayList();
 
     public TextViewContext(TextView textView) {
       elementViewMap = textView.getElementViewMap();
     }
 
-    public boolean includeTag(String name, Map<String, String> attributes) {
+    public boolean includeTag(String name, TextAnnotation textAnnotation) {
       ElementView defaultElementView = elementViewMap.get(TextViewDefinition.DEFAULT_ATTRIBUTENAME);
       ElementView elementView = elementViewMap.getOrDefault(name, defaultElementView);
       ElementMode elementMode = elementView.getElementMode();
       ElementMode defaultViewElementMode = defaultElementView.getElementMode();
       Optional<AttributePreCondition> preCondition = elementView.getPreCondition();
       boolean includeAccordingToElementMode = elementMode.equals(ElementMode.show);
-      boolean preConditionIsMet = preConditionIsMet(preCondition, attributes);
+      boolean preConditionIsMet = preConditionIsMet(preCondition, textAnnotation);
       if (!preConditionIsMet) {
         includeAccordingToElementMode = defaultViewElementMode.equals(ElementMode.show);
       }
@@ -124,12 +144,15 @@ public class TextGraphUtil {
       return notInsideIgnoredElement() && includeAccordingToElementMode;
     }
 
-    private boolean preConditionIsMet(Optional<AttributePreCondition> preCondition, Map<String, String> attributes) {
+    private boolean preConditionIsMet(Optional<AttributePreCondition> preCondition, TextAnnotation textAnnotation) {
       if (preCondition.isPresent()) {
+        if (overruledTextAnnotations.contains(textAnnotation)) {
+          return false;
+        }
         AttributePreCondition attributePreCondition = preCondition.get();
         String attribute = attributePreCondition.getAttribute();
         List<String> values = attributePreCondition.getValues();
-        String actualValue = attributes.get(attribute);
+        String actualValue = textAnnotation.getAttributes().get(attribute);
         switch (attributePreCondition.getFunction()) {
         case is:
           return values.contains(actualValue);
@@ -189,7 +212,7 @@ public class TextGraphUtil {
       ElementMode elementMode = elementView.getElementMode();
       ElementMode defaultElementMode = defaultElementView.getElementMode();
       Optional<AttributePreCondition> preCondition = elementView.getPreCondition();
-      boolean preConditionIsMet = preConditionIsMet(preCondition, textAnnotation.getAttributes());
+      boolean preConditionIsMet = preConditionIsMet(preCondition, textAnnotation);
       boolean hideThisElement = elementMode.equals(ElementMode.hide);
       if (!preConditionIsMet) {
         hideThisElement = defaultElementMode.equals(ElementMode.hide);
@@ -207,24 +230,80 @@ public class TextGraphUtil {
     public boolean notInsideIgnoredElement() {
       return ignoredAnnotationStack.isEmpty();
     }
+
+    /**
+     * registers TextAnnotations in segment that:
+     * - annotate the same textrange
+     * - have the same name
+     * - that name is used in a firstOf function in the viewDefinition
+     * So they can be handled properly in includeTag
+     *
+     * @param segment
+     *          the TextGraphSegment to analyze
+     */
+    public void registerCompetingTextAnnotations(TextGraphSegment segment) {
+      List<String> relevantElementNames = elementViewMap.entrySet().stream()//
+          .filter(this::hasFirstOfAttributeFunction)//
+          .map(Entry::getKey)//
+          .collect(toList());
+      Set<TextAnnotation> segmentTextAnnotations = Sets.newHashSet(segment.textAnnotationsToOpen);
+      segmentTextAnnotations.addAll(segment.textAnnotationsToClose);
+      segmentTextAnnotations.removeIf(ta -> !relevantElementNames.contains(ta.getName()));
+      overruledTextAnnotations = segmentTextAnnotations.stream()//
+          .collect(groupingBy(this::textAnnotationGrouping))//
+          .values()//
+          .stream()//
+          .map(this::overruledTextAnnotations)//
+          .flatMap(List::stream)//
+          .collect(toList());
+    }
+    // TODO: handle consecutive milestones
+
+    private boolean hasFirstOfAttributeFunction(Entry<String, ElementView> entry) {
+      Optional<AttributePreCondition> preCondition = entry.getValue().getPreCondition();
+      if (preCondition.isPresent()) {
+        return ElementView.AttributeFunction.firstOf.equals(preCondition.get().getFunction());
+      }
+      return false;
+    }
+
+    private String textAnnotationGrouping(TextAnnotation textAnnotation) {
+      // TODO: include annotated textRange
+      return textAnnotation.getName();
+    }
+
+    private List<TextAnnotation> overruledTextAnnotations(List<TextAnnotation> group) {
+      String elementName = group.get(0).getName();
+      AttributePreCondition attributePreCondition = elementViewMap.get(elementName)//
+          .getPreCondition().get();
+      String attribute = attributePreCondition.getAttribute();
+      List<String> prioritizedValues = Lists.newArrayList(attributePreCondition.getValues());
+      int originalSize = group.size();
+      do {
+        String value = prioritizedValues.remove(0);
+        group.removeIf(ta -> ta.getAttributes().get(attribute).equals(value));
+      } while (group.size() == originalSize && !prioritizedValues.isEmpty());
+      return group;
+    }
   }
 
   public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment, TextViewContext textViewContext) {
     try {
-      handleOpenTags(writer, segment, textViewContext);
-      handleMilestoneTags(writer, segment, textViewContext);
-      handleText(writer, segment, textViewContext);
-      handleCloseTags(writer, segment, textViewContext);
+      textViewContext.registerCompetingTextAnnotations(segment);
+      writeOpenTags(writer, segment, textViewContext);
+      writeMilestoneTags(writer, segment, textViewContext);
+      writeText(writer, segment, textViewContext);
+      writeCloseTags(writer, segment, textViewContext);
 
     } catch (IOException ioe) {
       throw new RuntimeException(ioe);
     }
   }
 
-  private static void handleCloseTags(Writer writer, TextGraphSegment segment, TextViewContext textViewContext) throws IOException {
+  private static void writeCloseTags(Writer writer, TextGraphSegment segment, TextViewContext textViewContext) throws IOException {
     for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
       String name = textAnnotation.getName();
-      if (textViewContext.includeTag(name, textAnnotation.getAttributes())) {
+      if (textViewContext.includeTag(name, textAnnotation)) {
         String closeTag = getCloseTag(name);
         writer.write(closeTag);
       }
@@ -232,28 +311,28 @@ public class TextGraphUtil {
     }
   }
 
-  private static void handleText(Writer writer, TextGraphSegment segment, TextViewContext textViewContext) throws IOException {
+  private static void writeText(Writer writer, TextGraphSegment segment, TextViewContext textViewContext) throws IOException {
     if (textViewContext.notInsideIgnoredElement()) {
-      writer.write(segment.getTextSegment());
+      writeText(writer, segment);
     }
   }
 
-  private static void handleMilestoneTags(Writer writer, TextGraphSegment segment, TextViewContext textViewContext) throws IOException {
+  private static void writeMilestoneTags(Writer writer, TextGraphSegment segment, TextViewContext textViewContext) throws IOException {
     Optional<TextAnnotation> optionalMilestone = segment.getMilestoneTextAnnotation();
     if (optionalMilestone.isPresent()) {
       TextAnnotation milestone = optionalMilestone.get();
       String name = milestone.getName();
-      if (textViewContext.includeTag(name, milestone.getAttributes())) {
+      if (textViewContext.includeTag(name, milestone)) {
         String milestoneTag = getMilestoneTag(name, textViewContext.includedAttributes(milestone));
         writer.write(milestoneTag);
       }
     }
   }
 
-  private static void handleOpenTags(Writer writer, TextGraphSegment segment, TextViewContext textViewContext) throws IOException {
+  private static void writeOpenTags(Writer writer, TextGraphSegment segment, TextViewContext textViewContext) throws IOException {
     for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
       String name = textAnnotation.getName();
-      if (textViewContext.includeTag(name, textAnnotation.getAttributes())) {
+      if (textViewContext.includeTag(name, textAnnotation)) {
         String openTag = getOpenTag(name, textViewContext.includedAttributes(textAnnotation));
         writer.write(openTag);
       }

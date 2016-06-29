@@ -66,8 +66,9 @@ public class ElementView {
     this.precondition = precondition;
   }
 
-  public void setPreCondition(String attribute, AttributeFunction attributeFunction, List<String> parameters) {
+  public ElementView setPreCondition(String attribute, AttributeFunction attributeFunction, List<String> parameters) {
     setPreCondition(new AttributePreCondition(attribute, attributeFunction, parameters));
+    return this;
   }
 
   public Optional<AttributePreCondition> getPreCondition() {

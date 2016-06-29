@@ -611,12 +611,7 @@
   <span c:execute="resourceExists(#resourceId5)">exists</span>,<br/>
   which has
   <span c:execute="resourceHasText(#resourceId5,#text4)">text<br/>
-    <code c:set="#text4">&lt;text&gt;
-&lt;p xml:id=&quot;p-1&quot;&gt;&lt;lang resp=&quot;#b&quot; value=&quot;it&quot;&gt;&lt;lang resp=&quot;#a&quot; value=&quot;la&quot;&gt;Maecenas consectetur odio at dolor porttitor.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;
-&lt;p xml:id=&quot;p-2&quot;&gt;&lt;lang resp=&quot;#a&quot; value=&quot;la&quot;&gt;&lt;lang resp=&quot;#b&quot; value=&quot;it&quot;&gt;Aliquam a dapibus massa.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;
-&lt;p xml:id=&quot;p-3&quot;&gt;&lt;lang resp=&quot;#b&quot; value=&quot;en&quot;&gt;&lt;lang resp=&quot;#c&quot; value=&quot;fr&quot;&gt;Aenean efficitur purus ut dui molestie fermentum.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;
-&lt;p xml:id=&quot;p-4&quot;&gt;&lt;lang resp=&quot;#c&quot; value=&quot;fr&quot;&gt;Fusce congue mauris augue.&lt;/lang&gt;&lt;/p&gt;
-&lt;/text&gt;</code>
+    <code c:set="#text4">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;&lt;lang resp=&quot;#b&quot; value=&quot;it&quot;&gt;&lt;lang resp=&quot;#a&quot; value=&quot;la&quot;&gt;Maecenas consectetur odio at dolor porttitor.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;&lt;p xml:id=&quot;p-2&quot;&gt;&lt;lang resp=&quot;#a&quot; value=&quot;la&quot;&gt;&lt;lang resp=&quot;#b&quot; value=&quot;it&quot;&gt;Aliquam a dapibus massa.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;&lt;p xml:id=&quot;p-3&quot;&gt;&lt;lang resp=&quot;#b&quot; value=&quot;en&quot;&gt;&lt;lang resp=&quot;#c&quot; value=&quot;fr&quot;&gt;Aenean efficitur purus ut dui molestie fermentum.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;&lt;p xml:id=&quot;p-4&quot;&gt;&lt;lang resp=&quot;#c&quot; value=&quot;fr&quot;&gt;Fusce congue mauris augue.&lt;/lang&gt;&lt;/p&gt;&lt;/text&gt;</code>
   </span><br/>
   <br/>
 
@@ -628,12 +623,11 @@
      <h:success>successfully</h:success>
      yields response body:<br/>
      <h:xmlResponse>
-<![CDATA[
-<text>
-<p xml:id="p-1"><lang resp="#b" value="it"><lang resp="#a" value="la">Maecenas consectetur odio at dolor porttitor.</lang></lang></p>
-<p xml:id="p-2"><lang resp="#a" value="la"><lang resp="#b" value="it">Aliquam a dapibus massa.</lang></lang></p>
-<p xml:id="p-3"><lang resp="#b" value="en"><lang resp="#c" value="fr">Aenean efficitur purus ut dui molestie fermentum.</lang></lang></p>
-<p xml:id="p-4"><lang resp="#c" value="fr">Fusce congue mauris augue.</lang></p>
+<![CDATA[<text>
+  <p xml:id="p-1"><lang resp="#b" value="it"><lang resp="#a" value="la">Maecenas consectetur odio at dolor porttitor.</lang></lang></p>
+  <p xml:id="p-2"><lang resp="#a" value="la"><lang resp="#b" value="it">Aliquam a dapibus massa.</lang></lang></p>
+  <p xml:id="p-3"><lang resp="#b" value="en"><lang resp="#c" value="fr">Aenean efficitur purus ut dui molestie fermentum.</lang></lang></p>
+  <p xml:id="p-4"><lang resp="#c" value="fr">Fusce congue mauris augue.</lang></p>
 </text>]]>
      </h:xmlResponse>
      <small>(formatting added for increased readability)</small><br/>
@@ -647,7 +641,7 @@
         <h:jsonBody>
           {
             "textView": {
-              "description": "Transcriber A preferred",
+              "description": "On lang, resp a preferred, b otherwise, not c",
               "elements": {
                 ":default": { "elementMode": "hideTag" },
                 "text":     { "elementMode": "show", "attributeMode" : "showAll" },

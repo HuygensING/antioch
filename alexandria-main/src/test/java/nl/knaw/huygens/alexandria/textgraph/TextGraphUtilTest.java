@@ -14,9 +14,10 @@ import com.google.common.collect.ImmutableMap;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView;
-import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeFunction;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.ElementMode;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil.TextViewContext;
 
@@ -66,7 +67,7 @@ public class TextGraphUtilTest extends AlexandriaTest {
   }
 
   @Test
-  public void teststreamTextGraphSegmentWithDefaultView() {
+  public void testStreamTextGraphSegmentWithDefaultView() {
     TextView textView = new TextView();
     TextGraphSegment segment = new TextGraphSegment();
     TextAnnotation note = new TextAnnotation("note", ImmutableMap.of("xml:id", "note-1"), 0);
@@ -78,7 +79,7 @@ public class TextGraphUtilTest extends AlexandriaTest {
   }
 
   @Test
-  public void teststreamTextGraphSegmentWithHideNoteView() {
+  public void testStreamTextGraphSegmentWithHideNoteView() {
     TextView textView = new TextView();
     textView.putElementView("note", new ElementView().setElementMode(ElementMode.hide));
     TextGraphSegment segment = new TextGraphSegment();
@@ -91,7 +92,7 @@ public class TextGraphUtilTest extends AlexandriaTest {
   }
 
   @Test
-  public void teststreamTextGraphSegmentWithHideNoteTagView() {
+  public void testStreamTextGraphSegmentWithHideNoteTagView() {
     TextView textView = new TextView();
     textView.putElementView("note", new ElementView().setElementMode(ElementMode.hideTag));
     TextGraphSegment segment = new TextGraphSegment();
@@ -104,7 +105,42 @@ public class TextGraphUtilTest extends AlexandriaTest {
   }
 
   @Test
-  public void teststreamTextGraphSegmentWithShowOnlyAttributeMode() {
+  public void testStreamTextGraphSegmentWithOnFirstAttributeFunction1() {
+    ImmutableList<String> respPriority = ImmutableList.of("#a", "#b");
+    String expected = "<note xml:id=\"note-a\" resp=\"#a\">note text</note>";
+    assertFirstOfWorksAsExpected(respPriority, expected);
+  }
+
+  private void assertFirstOfWorksAsExpected(ImmutableList<String> respPriority, String expected) {
+    TextView textView = new TextView();
+    ElementView defaultView = new ElementView()//
+        .setElementMode(ElementMode.hideTag)//
+        .setAttributeMode(AttributeMode.showAll);
+    ElementView elementView = new ElementView()//
+        .setElementMode(ElementMode.show)//
+        .setPreCondition("resp", AttributeFunction.firstOf, respPriority)//
+        .setAttributeMode(AttributeMode.showAll);
+    textView.putElementView(":default", defaultView);
+    textView.putElementView("note", elementView);
+    TextGraphSegment segment = new TextGraphSegment();
+    TextAnnotation noteA = new TextAnnotation("note", ImmutableMap.of("xml:id", "note-a", "resp", "#a"), 0);
+    TextAnnotation noteB = new TextAnnotation("note", ImmutableMap.of("xml:id", "note-b", "resp", "#b"), 0);
+    TextAnnotation noteC = new TextAnnotation("note", ImmutableMap.of("xml:id", "note-c", "resp", "#c"), 0);
+    segment.setAnnotationsToOpen(ImmutableList.of(noteA, noteB, noteC));
+    segment.setTextSegment("note text");
+    segment.setAnnotationsToClose(ImmutableList.of(noteC, noteB, noteA));
+    assertSegmentViewAsExpected(segment, textView, expected);
+  }
+
+  @Test
+  public void testStreamTextGraphSegmentWithOnFirstAttributeFunction2() {
+    ImmutableList<String> respPriority = ImmutableList.of("#b", "#a");
+    String expected = "<note xml:id=\"note-b\" resp=\"#b\">note text</note>";
+    assertFirstOfWorksAsExpected(respPriority, expected);
+  }
+
+  @Test
+  public void testStreamTextGraphSegmentWithShowOnlyAttributeMode() {
     TextView textView = new TextView();
     ElementView elementView = new ElementView()//
         .setElementMode(ElementMode.show)//
