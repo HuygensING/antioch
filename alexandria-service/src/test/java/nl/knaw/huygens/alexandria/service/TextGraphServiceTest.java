@@ -1,5 +1,18 @@
 package nl.knaw.huygens.alexandria.service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.time.Instant;
+import java.util.UUID;
+
+import javax.ws.rs.core.StreamingOutput;
+
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.google.common.collect.ImmutableMap;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
@@ -14,15 +27,6 @@ import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 import nl.knaw.huygens.alexandria.textgraph.DotFactory;
 import nl.knaw.huygens.alexandria.textgraph.ParseResult;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
-import org.junit.Before;
-import org.junit.Test;
-
-import javax.ws.rs.core.StreamingOutput;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.time.Instant;
-import java.util.UUID;
 
 public class TextGraphServiceTest extends AlexandriaTest {
 
@@ -58,28 +62,51 @@ public class TextGraphServiceTest extends AlexandriaTest {
     assertAnnotationCorrectlyInserted(xml, expected);
   }
 
+  @Test
+  public void testUpdateTextAnnotationLink4() {
+    String xml = "<text><p xml:id=\"p-1\">This <i>is</i> a test.</p></text>";
+    String expected = "<text><p xml:id=\"p-1\"><lang value=\"?\" resp=\"#tool\">This <i>is</i> a test.</lang></p></text>";
+    // String xml = "<text><p xml:id=\"p-1\"><i>This</i> is a test.</p></text>";
+    // String expected = "<text><p xml:id=\"p-1\"><lang value=\"?\" resp=\"#tool\"><i>This</i> is a test.</lang></p></text>";
+    TextRangeAnnotation textRangeAnnotation = new TextRangeAnnotation()//
+        .setId(UUID.randomUUID())//
+        .setName("lang")//
+        .setAnnotator("tool")//
+        .setAttributes(ImmutableMap.of("value", "?"))//
+        .setPosition(new Position().setXmlId("p-1").setOffset(1).setLength(15));
+
+    UUID resourceUUID = UUID.randomUUID();
+    Log.info("xml={}", xml);
+    String xmlOut = storage.runInTransaction(() -> {
+      createResourceWithText(resourceUUID, xml);
+      TextRangeAnnotationVF vf = storage.createVF(TextRangeAnnotationVF.class);
+      dumpDot(resourceUUID);
+      tgs.updateTextAnnotationLink(vf, textRangeAnnotation, resourceUUID);
+      dumpDot(resourceUUID);
+      return getXML(resourceUUID);
+    });
+
+    softly.assertThat(xmlOut).isEqualTo(expected);
+  }
+
   private void assertAnnotationCorrectlyInserted(String xml, String expected) {
     String xmlOut = getAnnotatedText(xml);
     softly.assertThat(xmlOut).isEqualTo(expected);
   }
 
   private String getAnnotatedText(String xml) {
-    TextRangeAnnotation textRangeAnnotation = new TextRangeAnnotation()
-      .setId(UUID.randomUUID())
-
-      .setName("word")
-      .setAnnotator("ed")
-      .setPosition(new Position()
-        .setXmlId("p-1")
-        .setOffset(6)
-        .setLength(2));
+    TextRangeAnnotation textRangeAnnotation = new TextRangeAnnotation()//
+        .setId(UUID.randomUUID())//
+        .setName("word")//
+        .setAnnotator("ed")//
+        .setPosition(new Position().setXmlId("p-1").setOffset(6).setLength(2));
     UUID resourceUUID = UUID.randomUUID();
     Log.info("xml={}", xml);
     return storage.runInTransaction(() -> {
       createResourceWithText(resourceUUID, xml);
       TextRangeAnnotationVF vf = storage.createVF(TextRangeAnnotationVF.class);
 
-//      dumpDot(resourceUUID);
+      // dumpDot(resourceUUID);
       tgs.updateTextAnnotationLink(vf, textRangeAnnotation, resourceUUID);
       dumpDot(resourceUUID);
       return getXML(resourceUUID);

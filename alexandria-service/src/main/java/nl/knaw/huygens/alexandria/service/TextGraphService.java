@@ -182,6 +182,7 @@ public class TextGraphService {
     // if the TextRangeAnnotationVF is already linked to a TextAnnotation, remove that TextAnnotation
     FramedGraphTraversal<TextRangeAnnotationVF, Vertex> traversal = vf.out(nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF.EdgeLabels.HAS_TEXTANNOTATION);
     if (traversal.hasNext()) {
+      // TODO: reconnect TextAnnotation chain?
       traversal.next().remove();
     }
 
@@ -203,7 +204,9 @@ public class TextGraphService {
         // insert the new TextAnnotation after the deepest TextAnnotation that has this as a FIRST_TEXT_SEGMENT
         .sideEffect(__.in(EdgeLabels.FIRST_TEXT_SEGMENT)//
             .has(TextAnnotation.Properties.depth) // TODO: find out why there are textAnnotations without properties
-            .order().by(TextAnnotation.Properties.depth, Order.incr).tail().sideEffect(context::insertNewTextAnnotationVertex))
+            .order().by(TextAnnotation.Properties.depth, Order.incr)//
+            .tail()//
+            .sideEffect(context::insertNewTextAnnotationVertex))
         .sideEffect(context::processFirstTextSegmentInRange)//
 
         // iterate over the next TextSegments until you find the one the textrange from annotation.position ends in
@@ -212,6 +215,7 @@ public class TextGraphService {
         .sideEffect(context::processLastTextSegmentInRange)//
 
         .toList();
+    // TODO: insert new textAnnotation only when both firstTextSegment and lastTextSegment have been determined.
     if (list.size() != 1) {
       Log.error("listsize should be 1, is {}", list.size());
     }
@@ -219,7 +223,10 @@ public class TextGraphService {
 
   private Vertex createNewTextAnnotation(TextRangeAnnotationVF textRangeAnnotationVF, TextRangeAnnotation textRangeAnnotation) {
     // create new TextAnnotation
-    Map<String, String> attributes = ImmutableMap.of(TextRangeAnnotation.RESPONSIBILITY_ATTRIBUTE, "#" + textRangeAnnotation.getAnnotator());
+    Map<String, String> attributes = ImmutableMap.<String, String> builder()//
+        .putAll(textRangeAnnotation.getAttributes())//
+        .put(TextRangeAnnotation.RESPONSIBILITY_ATTRIBUTE, "#" + textRangeAnnotation.getAnnotator())//
+        .build();
     TextAnnotation newTextAnnotation = new TextAnnotation(textRangeAnnotation.getName(), attributes, 10);
     Vertex newTextAnnotationVertex = toVertex(newTextAnnotation);
 
@@ -233,13 +240,12 @@ public class TextGraphService {
     private int rangeStart;
     private int rangeEnd;
     private Vertex newTextAnnotationVertex;
-    // private Vertex lastTextSegmentVertex;
 
     public TextAnnotationInsertionContext(Vertex newTextAnnotationVertex, TextRangeAnnotation textRangeAnnotation) {
       this.newTextAnnotationVertex = newTextAnnotationVertex;
       this.textSize = 0;
-      this.rangeStart = textRangeAnnotation.getPosition().getOffset();
-      this.rangeEnd = this.rangeStart + textRangeAnnotation.getPosition().getLength() - 1;
+      this.rangeStart = textRangeAnnotation.getPosition().getOffset().get();
+      this.rangeEnd = this.rangeStart + textRangeAnnotation.getPosition().getLength().get() - 1;
       Log.debug("range = [{},{}]", rangeStart, rangeEnd);
     }
 
@@ -259,33 +265,31 @@ public class TextGraphService {
     }
 
     boolean rangeStartsInThisTextSegment(Traverser<Vertex> t) {
-      Log.debug("rangeStartsInThisTextSegment");
       incTextSize(t);
-      return textSize >= rangeStart;
+      boolean b = textSize >= rangeStart;
+      Log.debug("rangeStartsInThisTextSegment(): {}", b);
+      return b;
     }
 
     void processFirstTextSegmentInRange(Traverser<Vertex> t) {
-      Log.debug("processFirstTextSegmentInRange");
+      Log.debug("processFirstTextSegmentInRange()");
       Vertex textSegmentVertex = t.get();
       checkVertexLabel(textSegmentVertex, VertexLabels.TEXTSEGMENT);
 
       // if needed, split up the textsegment, preserving the TextAnnotation links
       int tailLength = textSize - rangeStart + 1;
       Log.debug("textSize = {}, tailLength = {}", textSize, tailLength);
-      // link the new TextAnnotation to the tail if detaching was necessary, to the firstTextSegment otherwise
-      if (tailLength > 0) {
-        Vertex newTail = detachTail(textSegmentVertex, tailLength);
-        newTextAnnotationVertex.addEdge(EdgeLabels.FIRST_TEXT_SEGMENT, newTail);
+      Vertex tail = detachTail(textSegmentVertex, tailLength);
 
-      } else {
-        newTextAnnotationVertex.addEdge(EdgeLabels.FIRST_TEXT_SEGMENT, textSegmentVertex);
-      }
+      // link the new TextAnnotation to the tail if detaching was necessary, to the firstTextSegment otherwise
+      newTextAnnotationVertex.addEdge(EdgeLabels.FIRST_TEXT_SEGMENT, tail);
     }
 
     boolean rangeEndsInThisTextSegment(Traverser<Vertex> t) {
-      Log.debug("rangeEndsInThisTextSegment");
       incTextSize(t);
-      return textSize >= rangeEnd;
+      boolean b = textSize >= rangeEnd;
+      Log.debug("rangeEndsInThisTextSegment(): {} [textSize={}. rangeEnd={}]", b, textSize, rangeEnd);
+      return b;
     }
 
     void processLastTextSegmentInRange(Traverser<Vertex> t) {
@@ -296,21 +300,17 @@ public class TextGraphService {
       // if needed, split up the textsegment, preserving the TextAnnotation links
       int tailLength = textSize - rangeEnd;
       Log.debug("textSize = {}, tailLength = {}", textSize, tailLength);
+      Vertex head = detachHead(textSegmentVertex, tailLength);
 
       // link the new TextAnnotation to the head if detaching was necessary, to the lastTextSegment otherwise
-      if (tailLength > 0) {
-        Vertex newHead = detachHead(textSegmentVertex, tailLength);
-        newTextAnnotationVertex.addEdge(EdgeLabels.LAST_TEXT_SEGMENT, newHead);
-      } else {
-        newTextAnnotationVertex.addEdge(EdgeLabels.LAST_TEXT_SEGMENT, textSegmentVertex);
-      }
+      newTextAnnotationVertex.addEdge(EdgeLabels.LAST_TEXT_SEGMENT, head);
     }
 
     private void incTextSize(Traverser<Vertex> t) {
       Vertex textSegmentVertex = t.get();
       checkVertexLabel(textSegmentVertex, VertexLabels.TEXTSEGMENT);
       String text = getStringValue(textSegmentVertex, TextSegment.Properties.text);
-      Log.debug("text={}", text);
+      Log.debug("text=\"{}\"", text);
       textSize += text.length();
       // lastTextSegmentVertex = textSegmentVertex;
     }
@@ -323,18 +323,20 @@ public class TextGraphService {
       int headLength = length - tailLength;
       String headText = text.substring(0, headLength);
       String tailText = text.substring(headLength);
-      Log.debug("head = [{}], tail = [{}]", headText, tailText);
-      textSegment.property(TextSegment.Properties.text, headText);
-      Vertex tailTextSegment = newTextSegmentVertex(tailText);
-      // move LAST_TEXT_SEGMENT edges to tailTextSegment
-      insertNewAfterCurrent(textSegment, tailTextSegment);
-      StreamUtil.parallelStream(textSegment.edges(Direction.IN, EdgeLabels.LAST_TEXT_SEGMENT))//
-          .forEach(e -> {
-            Vertex textAnnotationVertex = e.outVertex();
-            textAnnotationVertex.addEdge(EdgeLabels.LAST_TEXT_SEGMENT, tailTextSegment);
-            e.remove();
-          });
-      return tailTextSegment;
+      Log.debug("detachTail(): head = [{}], tail = [{}]", headText, tailText);
+      if (headLength == 0) {
+        // no detachment necessary
+        return textSegment;
+
+      } else {
+        textSegment.property(TextSegment.Properties.text, headText);
+        Vertex tailTextSegment = newTextSegmentVertex(tailText);
+        insertNewAfterCurrent(textSegment, tailTextSegment);
+        // move LAST_TEXT_SEGMENT edges to tailTextSegment
+        StreamUtil.parallelStream(textSegment.edges(Direction.IN, EdgeLabels.LAST_TEXT_SEGMENT))//
+            .forEach(e -> moveEdge(e, EdgeLabels.LAST_TEXT_SEGMENT, tailTextSegment));
+        return tailTextSegment;
+      }
     }
 
     private void insertNewAfterCurrent(Vertex currentVertex, Vertex newVertex) {
@@ -354,18 +356,26 @@ public class TextGraphService {
       int length = text.length();
       String headText = text.substring(0, length - tailLength);
       String tailText = text.substring(length - tailLength);
-      Log.debug("head = [{}], tail = [{}]", headText, tailText);
-      textSegment.property(TextSegment.Properties.text, tailText);
-      Vertex headTextSegment = newTextSegmentVertex(headText);
-      // move FIRST_TEXT_SEGMENT edges to tailTextSegment
-      insertNewBeforeCurrent(textSegment, headTextSegment);
-      StreamUtil.parallelStream(textSegment.edges(Direction.IN, EdgeLabels.FIRST_TEXT_SEGMENT))//
-          .forEach(e -> {
-            Vertex textAnnotationVertex = e.outVertex();
-            textAnnotationVertex.addEdge(EdgeLabels.FIRST_TEXT_SEGMENT, headTextSegment);
-            e.remove();
-          });
-      return headTextSegment;
+      Log.debug("detachHead(): head = [{}], tail = [{}]", headText, tailText);
+      if (tailLength == 0) {
+        // no detachment necessary
+        return textSegment;
+
+      } else {
+        textSegment.property(TextSegment.Properties.text, tailText);
+        Vertex headTextSegment = newTextSegmentVertex(headText);
+        // move FIRST_TEXT_SEGMENT edges to tailTextSegment
+        insertNewBeforeCurrent(textSegment, headTextSegment);
+        StreamUtil.parallelStream(textSegment.edges(Direction.IN, EdgeLabels.FIRST_TEXT_SEGMENT))//
+            .forEach(e -> moveEdge(e, EdgeLabels.FIRST_TEXT_SEGMENT, headTextSegment));
+        return headTextSegment;
+      }
+    }
+
+    private void moveEdge(Edge e, String firstTextSegment, Vertex headTextSegment) {
+      Vertex textAnnotationVertex = e.outVertex();
+      textAnnotationVertex.addEdge(firstTextSegment, headTextSegment);
+      e.remove();
     }
 
     private void insertNewBeforeCurrent(Vertex currentVertex, Vertex newVertex) {

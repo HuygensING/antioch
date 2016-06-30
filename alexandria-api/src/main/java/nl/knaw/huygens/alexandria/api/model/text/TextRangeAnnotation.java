@@ -1,5 +1,8 @@
 package nl.knaw.huygens.alexandria.api.model.text;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -34,8 +37,8 @@ public class TextRangeAnnotation extends JsonWrapperObject {
       return this;
     }
 
-    public Integer getOffset() {
-      return offset;
+    public Optional<Integer> getOffset() {
+      return Optional.ofNullable(offset);
     }
 
     public Position setOffset(Integer offset) {
@@ -43,8 +46,8 @@ public class TextRangeAnnotation extends JsonWrapperObject {
       return this;
     }
 
-    public Integer getLength() {
-      return length;
+    public Optional<Integer> getLength() {
+      return Optional.ofNullable(length);
     }
 
     public Position setLength(Integer length) {
@@ -65,6 +68,7 @@ public class TextRangeAnnotation extends JsonWrapperObject {
   private String name;
   private String annotator;
   private Position position;
+  private Map<String, String> attributes = new HashMap<>();
 
   public TextRangeAnnotation setId(UUID uuid) {
     this.uuid = uuid;
@@ -100,6 +104,15 @@ public class TextRangeAnnotation extends JsonWrapperObject {
 
   public Position getPosition() {
     return position;
+  }
+
+  public TextRangeAnnotation setAttributes(Map<String, String> attributes) {
+    this.attributes = attributes;
+    return this;
+  }
+
+  public Map<String, String> getAttributes() {
+    return attributes;
   }
 
   @Override

@@ -282,7 +282,6 @@ public class TinkerPopService implements AlexandriaService {
         .collect(toList());
   }
 
-
   @Override
   public void setResourceAnnotator(UUID resourceUUID, Annotator annotator) {
     storage.runInTransaction(() -> {
@@ -364,8 +363,8 @@ public class TinkerPopService implements AlexandriaService {
             .in(nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF.EdgeLabels.HAS_RESOURCE)//
             .has("name", annotation.getName())//
             .has("annotatorCode", annotation.getAnnotator());
-        Integer start1 = annotation.getPosition().getOffset();
-        Integer end1 = start1 + annotation.getPosition().getLength();
+        Integer start1 = annotation.getPosition().getOffset().get();
+        Integer end1 = start1 + annotation.getPosition().getLength().get();
         Predicate<Vertex> overlapsWithAnnotation = t -> {
           Integer start2 = (Integer) t.property("offset").value();
           Integer end2 = start2 + (Integer) t.property("length").value();
@@ -860,8 +859,12 @@ public class TinkerPopService implements AlexandriaService {
     vf.setAnnotatorCode(annotation.getAnnotator());
     Position position = annotation.getPosition();
     vf.setXmlId(position.getXmlId());
-    vf.setOffset(position.getOffset());
-    vf.setLength(position.getLength());
+    if (position.getOffset().isPresent()) {
+      vf.setOffset(position.getOffset().get());
+    }
+    if (position.getLength().isPresent()) {
+      vf.setLength(position.getLength().get());
+    }
   }
 
   private TextRangeAnnotation deframeTextRangeAnnotation(TextRangeAnnotationVF vf) {
