@@ -955,6 +955,261 @@
   </h:request>
 
 </div>
+<div id="set-priority-view2" c:execute="clearStorage()"
+     data-desc="Does it matter in which order element annotations are specified?">
+
+  If we start with the same conditions as the previous case, so:
+  Given a resource
+  with id <code c:set="#resourceId7">00000000-0000-0000-0000-000000000007</code>
+  <span c:execute="resourceExists(#resourceId7)">exists</span>,<br/>
+  with annotators
+  <span c:execute="resourceHasAnnotator(#resourceId7,#annotatorCode,#annotatorCode)"><code c:set="#annotatorCode">ckcc</code></span>,
+  <span c:execute="resourceHasAnnotator(#resourceId7,#annotatorCode,#annotatorCode)"><code c:set="#annotatorCode">tool</code></span> and
+  <span c:execute="resourceHasAnnotator(#resourceId7,#annotatorCode,#annotatorCode)"><code c:set="#annotatorCode">dummy</code></span>,
+  and 
+  <span c:execute="resourceHasText(#resourceId7,#text4)">text<br/>
+    <code c:set="#text4">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;Vir clarissime,&lt;/p&gt;&lt;/text&gt;</code>
+  </span><br/>
+  <br/>
+
+  <h:request>
+      To define view <code c:set="#view1">view_ckcc_tool</code>, I
+      <h:put>/resources/$resourceId7/text/views/$view1</h:put>
+      the body:
+      <h:jsonBody>
+        {
+          "textView": {
+            "description": "view_ckcc_tool",
+            "elements": {
+              ":default": { "elementMode": "hideTag" },
+              "text":     { "elementMode": "show", "attributeMode" : "showAll" },
+              "p":        { "elementMode": "show", "attributeMode" : "showAll" },
+              "lang":     { "elementMode": "show", "attributeMode" : "showAll", "when" : "attribute(resp).firstOf('#ckcc','#tool')" }
+        } } }
+      </h:jsonBody>
+      using
+      <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+      which returns
+      <ul>
+        <li>status <h:status>201 Created</h:status></li>
+        <li>location header
+            <h:location>https://{host}/resources/$resourceId7/text/views/$view1</h:location>
+        </li>
+        <li>and the response body is <h:responseBody/></li>
+      </ul>
+  </h:request>
+  <br/>
+
+  <h:request>
+      To define a second view <code c:set="#view2">view_ckcc</code>, I
+      <h:put>/resources/$resourceId7/text/views/$view2</h:put>
+      the body:
+      <h:jsonBody>
+        {
+          "textView": {
+            "description": "view_ckcc",
+            "elements": {
+              ":default": { "elementMode": "hideTag" },
+              "text":     { "elementMode": "show", "attributeMode" : "showAll" },
+              "p":        { "elementMode": "show", "attributeMode" : "showAll" },
+              "lang":     { "elementMode": "show", "attributeMode" : "showAll", "when" : "attribute(resp).firstOf('#ckcc')" }
+        } } }
+      </h:jsonBody>
+      using
+      <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+      which returns
+      <ul>
+        <li>status <h:status>201 Created</h:status></li>
+        <li>location header
+            <h:location>https://{host}/resources/$resourceId7/text/views/$view2</h:location>
+        </li>
+        <li>and the response body is <h:responseBody/></li>
+      </ul>
+  </h:request>
+  <br/>
+
+  <h:request>
+      To define a third view <code c:set="#view3">view_tool</code>, I
+      <h:put>/resources/$resourceId7/text/views/$view3</h:put>
+      the body:
+      <h:jsonBody>
+        {
+          "textView": {
+            "description": "view_tool",
+            "elements": {
+              ":default": { "elementMode": "hideTag" },
+              "text":     { "elementMode": "show", "attributeMode" : "showAll" },
+              "p":        { "elementMode": "show", "attributeMode" : "showAll" },
+              "lang":     { "elementMode": "show", "attributeMode" : "showAll", "when" : "attribute(resp).firstOf('#tool')" }
+        } } }
+      </h:jsonBody>
+      using
+      <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+      which returns
+      <ul>
+        <li>status <h:status>201 Created</h:status></li>
+        <li>location header
+            <h:location>https://{host}/resources/$resourceId7/text/views/$view3</h:location>
+        </li>
+        <li>and the response body is <h:responseBody/></li>
+      </ul>
+  </h:request>
+  <br/>
+
+  <h:request>
+      To define a fourth view <code c:set="#view4">view_dummy</code>, I
+      <h:put>/resources/$resourceId7/text/views/$view4</h:put>
+      the body:
+      <h:jsonBody>
+        {
+          "textView": {
+            "description": "view_dummy",
+            "elements": {
+              ":default": { "elementMode": "hideTag" },
+              "text":     { "elementMode": "show", "attributeMode" : "showAll" },
+              "p":        { "elementMode": "show", "attributeMode" : "showAll" },
+              "lang":     { "elementMode": "show", "attributeMode" : "showAll", "when" : "attribute(resp).firstOf('#dummy')" }
+        } } }
+      </h:jsonBody>
+      using
+      <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+      which returns
+      <ul>
+        <li>status <h:status>201 Created</h:status></li>
+        <li>location header
+            <h:location>https://{host}/resources/$resourceId7/text/views/$view4</h:location>
+        </li>
+        <li>and the response body is <h:responseBody/></li>
+      </ul>
+  </h:request>
+  <br/>
+
+  <h:request>
+    If we now add the same annotations as in the previous case, but in a different order, so:
+    I want to annotate the element with xml:id "p-1" as annotator tool with name lang and value ?,
+    so I <h:success>successfully</h:success> <h:put>/resources/$resourceId7/text/annotations/10000000-0000-0000-0000-000000000000</h:put>
+    the body:
+    <h:jsonBody> 
+    {
+      "textAnnotation" : { 
+        "name" : "lang",
+        "annotator" : "tool",
+        "attributes" : {
+          "value" : "?"
+        },
+        "position" : {
+          "xml:id" : "p-1" 
+        }
+    } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>
+  </h:request>
+  <br/>
+
+  <h:request>
+   When I want to annotate the element with xml:id "p-1" as annotator ckcc with name lang and value la,
+   then I <h:success>successfully</h:success> <h:put>/resources/$resourceId7/text/annotations/2000000-0000-0000-0000-000000000004</h:put>
+   the body:
+   <h:jsonBody> 
+   {
+     "textAnnotation" : { 
+       "name" : "lang",
+       "annotator" : "ckcc",
+       "attributes" : {
+         "value" : "la"
+       },
+       "position" : {
+         "xml:id" : "p-1" 
+       }
+   } }
+   </h:jsonBody>
+   using
+   <h:setHeader name="Content-Type">application/json</h:setHeader>
+ </h:request>
+
+
+  <h:request>
+     Retrieving the text by
+     <h:get>/resources/$resourceId7/text/xml</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     <h:success>successfully</h:success>
+     yields response body:<br/>
+     <h:xmlResponse>
+<![CDATA[<text>
+  <p xml:id="p-1"><lang value="?" resp="#tool"><lang value="la" resp="#ckcc">Vir clarissime,</lang></lang></p>
+</text>]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+  <br/>
+
+  <h:request>
+     I expect the results of using the views to be the same as in the previous case, so:<br/>
+     Using view <code>view_ckcc_tool</code> by
+     <h:get>/resources/$resourceId7/text/xml?view=$view1</h:get>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader>
+     <h:success>successfully</h:success>
+     yields response body:
+     <h:xmlResponse>
+<![CDATA[<text>
+  <p xml:id="p-1"><lang value="la" resp="#ckcc">Vir clarissime,</lang></p>
+</text>]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+  <br/>
+
+  <h:request>
+     Using view <code>view_ckcc</code> by
+     <h:get>/resources/$resourceId7/text/xml?view=$view2</h:get>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader>
+     <h:success>successfully</h:success>
+     yields response body:
+     <h:xmlResponse>
+<![CDATA[<text>
+  <p xml:id="p-1"><lang value="la" resp="#ckcc">Vir clarissime,</lang></p>
+</text>]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+  <br/>
+  
+  <h:request>
+     Using view <code>view_tool</code> by
+     <h:get>/resources/$resourceId7/text/xml?view=$view3</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     <h:success>successfully</h:success>
+     yields response body:
+     <h:xmlResponse>
+<![CDATA[<text>
+  <p xml:id="p-1"><lang value="?" resp="#tool">Vir clarissime,</lang></p>
+</text>]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+  <br/>
+
+  <h:request>
+     Using view <code>view_dummy</code> by
+     <h:get>/resources/$resourceId7/text/xml?view=$view4</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     <h:success>successfully</h:success>
+     yields response body:
+     <h:xmlResponse>
+<![CDATA[<text>
+  <p xml:id="p-1">Vir clarissime,</p>
+</text>]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+
+</div>
 
 </body>
 </html>
