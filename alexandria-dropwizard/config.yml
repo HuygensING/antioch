@@ -1,0 +1,9 @@
+server:
+  applicationConnectors:
+    - type: http
+      port: 9999
+
+baseURI: http://localhost:9999
+storageDirectory: /tmp
+adminKey: nimda
+asynchronousEndpointsAllowed: true

@@ -45,7 +45,7 @@
       <artifactId>dropwizard-guice</artifactId>
       <version>0.8.4.0</version>
     </dependency>
-    <dependency>
+    <dependency><!-- To overrule the version used by titan -->
       <groupId>com.codahale.metrics</groupId>
       <artifactId>metrics-core</artifactId>
       <version>3.0.2</version>
