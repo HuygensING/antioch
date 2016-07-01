@@ -16,22 +16,8 @@
     </dependency>
 
     <dependency>
-      <groupId>io.dropwizard</groupId>
-      <artifactId>dropwizard-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.dropwizard</groupId>
-      <artifactId>dropwizard-assets</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.dropwizard.modules</groupId>
-      <artifactId>dropwizard-java8</artifactId>
-      <version>0.9.0-1</version>
-    </dependency>
-    <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
       <artifactId>jersey-container-grizzly2-http</artifactId>
-      <version>${jersey.version}</version>
     </dependency>
     <dependency>
       <groupId>com.squarespace.jersey2-guice</groupId>
@@ -47,7 +33,6 @@
       <!-- needed for the uberjar: https://github.com/Squarespace/jersey2-guice/issues/30 -->
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-jaxb</artifactId>
-      <version>${jersey.version}</version>
     </dependency>
   </dependencies>
 
@@ -78,7 +63,7 @@
           </execution>
         </executions>
       </plugin>
-            <plugin>
+      <plugin>
         <artifactId>maven-shade-plugin</artifactId>
         <version>${maven-shade.version}</version>
         <configuration>
@@ -113,7 +98,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <!-- <plugin> <groupId>com.github.kongchen</groupId> <artifactId>swagger-maven-plugin</artifactId> 
         <version>${swagger-maven-plugin.version}</version> <configuration> <apiSources> 
         <apiSource> <info> <title>REST api</title> <version>v1</version> <description> 
