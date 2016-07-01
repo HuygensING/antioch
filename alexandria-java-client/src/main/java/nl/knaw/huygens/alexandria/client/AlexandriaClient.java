@@ -274,17 +274,17 @@ public class AlexandriaClient implements AutoCloseable {
         .getResult();
   }
 
-  public RestResult<URI> setResourceText(final UUID resourceUUID, final File file) throws IOException {
+  public RestResult<Void> setResourceText(final UUID resourceUUID, final File file) throws IOException {
     return setResourceText(resourceUUID, FileUtils.readFileToString(file, StandardCharsets.UTF_8));
   }
 
-  public RestResult<URI> setResourceText(final UUID resourceUUID, final String xml) {
+  public RestResult<Void> setResourceText(final UUID resourceUUID, final String xml) {
     final Entity<String> entity = Entity.entity(xml, MediaType.TEXT_XML);
     WebTarget path = resourceTextTarget(resourceUUID);
     final Supplier<Response> responseSupplier = authorizedPut(path, entity);
-    final RestRequester<URI> requester = RestRequester.withResponseSupplier(responseSupplier);
+    final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.ACCEPTED, this::uriFromLocationHeader)//
+        .onStatus(Status.ACCEPTED, voidRestResult())//
         .getResult();
   }
 
@@ -345,15 +345,15 @@ public class AlexandriaClient implements AutoCloseable {
         .getResult();
   }
 
-  public RestResult<URI> setResourceTextView(final UUID resourceUUID, final String textViewName, final TextViewDefinition textView) {
+  public RestResult<Void> setResourceTextView(final UUID resourceUUID, final String textViewName, final TextViewDefinition textView) {
     final Entity<TextViewDefinition> entity = Entity.json(textView);
     final WebTarget path = resourceTextTarget(resourceUUID)//
         .path(EndpointPaths.TEXTVIEWS)//
         .path(textViewName);
     final Supplier<Response> responseSupplier = authorizedPut(path, entity);
-    final RestRequester<URI> requester = RestRequester.withResponseSupplier(responseSupplier);
+    final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.CREATED, this::uriFromLocationHeader)//
+        .onStatus(Status.CREATED, voidRestResult())//
         .getResult();
   }
 

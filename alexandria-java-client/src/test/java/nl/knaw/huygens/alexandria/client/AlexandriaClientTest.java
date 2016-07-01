@@ -144,7 +144,7 @@ public abstract class AlexandriaClientTest extends AlexandriaTest {
   }
 
   protected TextImportStatus setResourceText(UUID resourceUuid, String xml) {
-    RestResult<URI> result = client.setResourceText(resourceUuid, xml);
+    RestResult<Void> result = client.setResourceText(resourceUuid, xml);
     assertThat(result).isNotNull();
     assertThat(result.hasFailed()).isFalse();
 

@@ -144,12 +144,12 @@ public class OptimisticAlexandriaClient {
     return unwrap(delegate.getAnnotators(resourceUUID));
   }
 
-  public URI setResourceText(UUID resourceUUID, File file) throws IOException {
-    return unwrap(delegate.setResourceText(resourceUUID, file));
+  public void setResourceText(UUID resourceUUID, File file) throws IOException {
+    unwrap(delegate.setResourceText(resourceUUID, file));
   }
 
-  public URI setResourceText(UUID resourceUUID, String xml) {
-    return unwrap(delegate.setResourceText(resourceUUID, xml));
+  public void setResourceText(UUID resourceUUID, String xml) {
+    unwrap(delegate.setResourceText(resourceUUID, xml));
   }
 
   public TextImportStatus getTextImportStatus(UUID resourceUUID) {
@@ -180,8 +180,8 @@ public class OptimisticAlexandriaClient {
     return unwrap(delegate.getResourceTextRangeAnnotation(resourceUUID, annotationUUID));
   }
 
-  public URI setResourceTextView(UUID resourceUUID, String textViewName, TextViewDefinition textView) {
-    return unwrap(delegate.setResourceTextView(resourceUUID, textViewName, textView));
+  public void setResourceTextView(UUID resourceUUID, String textViewName, TextViewDefinition textView) {
+    unwrap(delegate.setResourceTextView(resourceUUID, textViewName, textView));
   }
 
   public TextView getResourceTextView(UUID uuid) {
