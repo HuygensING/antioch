@@ -35,13 +35,6 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 @RunWith(ConcordionRunner.class)
 public class AnatomyFixture extends ResourcesBase {
 
-  public String hasSubresource(String id) {
-    final UUID subId = service().createSubResource(randomUUID(), fromString(id), aSub(), aProvenance())
-                                .getId();
-    service().confirmResource(subId);
-    return subId.toString();
-  }
-
   public String hasAnnotation(String id) {
     final UUID resId = fromString(id);
     final UUID annoId = service().annotate(theResource(resId), anAnnotationBody(resId), aProvenance()).getId();

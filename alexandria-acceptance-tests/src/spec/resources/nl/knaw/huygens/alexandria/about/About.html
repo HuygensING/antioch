@@ -20,15 +20,16 @@
   #L%
   -->
 <html xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:c="http://www.concordion.org/2007/concordion"
       xmlns:xsi="http://www.w3.org/1999/xhtml"
       xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
                           http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
 
-<title>About the server</title>
+<title>Alexandria: About the server</title>
 
 <body data-desc="About the server">
 
-<div id="about" data-desc="How can I get information about the Alexandria server?">
+<div id="about" data-desc="How can I get information about the Alexandria server?" c:execute="#version=projectVersion()">
     <h:request>
         When I
         <h:get>/about</h:get>
@@ -41,7 +42,7 @@
             "scmBranch": "{git.validBranch}",
             "startedAt": "{date.beforeNow}",
             "tentativesTTL": "PT24H",
-            "version": "1.1-SNAPSHOT"
+            "version": "$version"
             }
         </h:jsonResponse>
     </h:request>

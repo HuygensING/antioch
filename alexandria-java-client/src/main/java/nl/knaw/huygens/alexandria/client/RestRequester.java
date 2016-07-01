@@ -1,5 +1,8 @@
 package nl.knaw.huygens.alexandria.client;
 
+import java.time.Duration;
+import java.time.Instant;
+
 /*
  * #%L
  * alexandria-java-client
@@ -10,12 +13,12 @@ package nl.knaw.huygens.alexandria.client;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -37,7 +40,7 @@ public class RestRequester<T> {
   Map<Status, Function<Response, RestResult<T>>> statusMappers = new HashMap<>();
   private Function<Response, RestResult<T>> defaultMapper = RestResult::failingResult;
 
-  public static <T extends Object> RestRequester<T> withResponseSupplier(Supplier<Response> responseSupplier) {
+  public static <T> RestRequester<T> withResponseSupplier(Supplier<Response> responseSupplier) {
     RestRequester<T> requester = new RestRequester<>();
     requester.responseSupplier = responseSupplier;
     return requester;
@@ -56,6 +59,7 @@ public class RestRequester<T> {
   public RestResult<T> getResult() {
     int attempt = 0;
     Response response = null;
+    Instant start = Instant.now();
     while (response == null && attempt < retries) {
       attempt++;
       try {
@@ -66,22 +70,30 @@ public class RestRequester<T> {
 
       } catch (Exception e) {
         e.printStackTrace();
-        return RestResult.failingResult(e);
+        return timed(RestResult.failingResult(e), start);
       }
     }
     if (response == null) {
-      return RestResult.failingResult("No response from server after " + retries + " attempts.");
+      return timed(RestResult.failingResult("No response from server after " + retries + " attempts."), start);
     }
 
     Status status = Status.fromStatusCode(response.getStatus());
 
     if (statusMappers.containsKey(status)) {
-      return statusMappers.get(status).apply(response);
+      return timed(statusMappers.get(status).apply(response), start);
 
     } else {
-      return defaultMapper.apply(response);
+      return timed(defaultMapper.apply(response), start);
     }
 
+  }
+
+  private RestResult<T> timed(RestResult<T> restResult, Instant start) {
+    return restResult.setTurnaroundTime(timeSince(start));
+  }
+
+  private Duration timeSince(Instant start) {
+    return Duration.between(start, Instant.now());
   }
 
   public void setRetries(int retries) {

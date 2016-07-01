@@ -34,7 +34,7 @@ import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 
 @Singleton
 public class PersistentTinkerGraphService extends TinkerGraphService {
-  private static final String DUMPFILE = "alexandria.graphml";
+  private static final String DUMPFILE = "alexandria.gryo";
 
   @Inject
   public PersistentTinkerGraphService(AlexandriaConfiguration config, LocationBuilder locationBuilder) {

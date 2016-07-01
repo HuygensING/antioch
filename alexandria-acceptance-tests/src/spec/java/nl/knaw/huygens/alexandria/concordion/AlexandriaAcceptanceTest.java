@@ -52,6 +52,7 @@ import com.google.inject.Module;
 import com.google.inject.Scopes;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -65,6 +66,8 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerGraphService;
 import nl.knaw.huygens.alexandria.service.TinkerPopService;
 import nl.knaw.huygens.alexandria.storage.Storage;
+import nl.knaw.huygens.alexandria.textgraph.ParseResult;
+import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 import nl.knaw.huygens.cat.RestExtension;
 import nl.knaw.huygens.cat.RestFixture;
 
@@ -97,7 +100,7 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     return new Storage(TinkerGraph.open());
   }
 
-  private static AlexandriaConfiguration testConfiguration() {
+  protected static AlexandriaConfiguration testConfiguration() {
     return new AlexandriaConfiguration() {
       @Override
       public URI getBaseURI() {
@@ -122,6 +125,11 @@ public class AlexandriaAcceptanceTest extends RestFixture {
       @Override
       public String getAdminKey() {
         return "whatever";
+      }
+
+      @Override
+      public Boolean asynchronousEndpointsAllowed() {
+        return false;
       }
     };
   }
@@ -158,13 +166,49 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     return Iterables.getLast(Splitter.on('/').split(location().orElse("(not set)")));
   }
 
+
   public void clearStorage() {
     Log.debug("Clearing Storage");
     service.setStorage(tinkerGraphStorage());
   }
 
+  public void wait5seconds() {
+    try {
+      Thread.sleep(5000l);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+
   public void resourceExists(String resId) {
-    service.createOrUpdateResource(fromString(resId), aRef(), aProvenance(), CONFIRMED);
+    resourceExists(resId, aRef());
+  }
+
+  public void resourceExists(String resId, String ref) {
+    service.createOrUpdateResource(fromString(resId), ref, aProvenance(), CONFIRMED);
+  }
+
+  public String hasSubresource(String parentUUID) {
+    return hasSubresource(parentUUID, aSub());
+  }
+
+  public String hasSubresource(String parentUUID, String sub) {
+    final UUID subId = service().createSubResource(randomUUID(), fromString(parentUUID), sub, aProvenance()).getId();
+    service().confirmResource(subId);
+    return subId.toString();
+  }
+
+  public void resourceHasText(String resId, String xml) {
+    ParseResult result = TextGraphUtil.parse(xml);
+    service().storeTextGraph(UUID.fromString(resId), result);
+  }
+
+  public void resourceHasAnnotator(String resId, String code, String description) {
+    service().setResourceAnnotator(UUID.fromString(resId), anAnnotator(code, description));
+  }
+
+  private Annotator anAnnotator(String code, String description) {
+    return new Annotator().setCode(code).setDescription(description);
   }
 
   protected AlexandriaService service() {

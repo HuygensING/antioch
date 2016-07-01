@@ -1,0 +1,812 @@
+<!--
+  #%L
+  alexandria-acceptance-tests
+  =======
+  Copyright (C) 2015 - 2016 Huygens ING (KNAW)
+  =======
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/gpl-3.0.html>.
+  #L%
+  -->
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+
+<title>Alexandria: Modifying the text</title>
+
+<body data-desc="Modifying text annotations">
+
+<div id="annotate-text" c:execute="clearStorage()"
+     data-desc="How can I add unique identifiers to certain elements in certain resource texts?">
+     
+   Given a resource
+   with id <code c:set="#resId1">00000000-0000-0000-0000-000000000001</code>
+   <span c:execute="resourceExists(#resId1)">exists</span>,<br/>
+   which has
+   <span c:execute="resourceHasText(#resId1,#text1)">text<br/>
+     <code c:set="#text1">&lt;body&gt;&lt;div&gt;&lt;p&gt;First paragraph&lt;/p&gt;&lt;/div&gt;&lt;div xml:id=&quot;div-1&quot;&gt;&lt;p&gt;Second paragraph&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</code>
+   </span>,<br/>
+   <br/>
+
+   a second resource
+   with id <code c:set="#resId2">00000000-0000-0000-0000-000000000002</code>
+   <span c:execute="resourceExists(#resId2)">exists</span>,<br/>
+   which has
+   <span c:execute="resourceHasText(#resId2,#text2)">text<br/>
+      <code c:set="#text2">&lt;body&gt;&lt;div&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</code>
+   </span>,<br/>
+   <br/>
+      
+   and a third resource
+   with id <code c:set="#resId3">00000000-0000-0000-0000-000000000003</code>
+   <span c:execute="resourceExists(#resId3)">exists</span>,
+   which has
+   <span c:execute="resourceHasText(#resId3,#text3)">text<br/>
+      <code c:set="#text3">&lt;body&gt;&lt;div&gt;&lt;p&gt;Mei mazim iriure ancillae ut.&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</code>
+   </span>
+  <br/>
+  <br/>
+
+	<h:request>
+	   If i now
+	   <h:post>/commands/add-unique-id</h:post>
+	   the body:
+	   <h:jsonBody>
+	     {
+	       "resourceIds" : ["00000000-0000-0000-0000-000000000001","00000000-0000-0000-0000-000000000002"],
+	       "elements" : ["div","p"]
+	     }
+	   </h:jsonBody>
+	   using
+	   <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+	   then I should receive
+	   <ul>
+	     <li>status <h:status>200 OK</h:status></li>
+	     <li>and the response body is
+	     <h:jsonResponse>
+          {
+            "errorLines" : [ ],
+            "parametersAreValid" : true
+          }
+	     </h:jsonResponse>
+	     </li>
+	   </ul>
+	</h:request>
+	<br/>
+	
+  <h:request>
+     Then a
+     <h:get>/resources/00000000-0000-0000-0000-000000000001/text/xml</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     yields response body:<br/>
+     <h:xmlResponse>
+<![CDATA[
+<body>
+  <div xml:id="div-2"><p xml:id="p-1">First paragraph</p></div>
+  <div xml:id="div-1"><p xml:id="p-2">Second paragraph</p></div>
+</body>
+]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+     Note: elements that already had an xml:id kept this xml:id, and existing xml:ids were not used again. 
+  </h:request>
+  <br/>
+	
+  <h:request>
+     And
+     <h:get>/resources/00000000-0000-0000-0000-000000000002/text/xml</h:get>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     yields response body:<br/>
+     <h:xmlResponse>
+<![CDATA[
+<body>
+  <div xml:id="div-1">
+    <p xml:id="p-1">Lorem ipsum</p>
+  </div>
+</body>
+]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+  <br/>
+     
+  <h:request>
+     Finally,
+     <h:get>/resources/00000000-0000-0000-0000-000000000003/text/xml</h:get>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     yields response body:<br/>
+     <h:xmlResponse>
+<![CDATA[
+<body>
+  <div>
+    <p>Mei mazim iriure ancillae ut.</p>
+  </div>
+</body>
+]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+     (Since this resource was not part of resourceIds, it has not been modified.)
+  </h:request>
+     
+</div>
+
+<div id="add-elements" c:execute="clearStorage()"
+     data-desc="How can I wrap the contents of a text element with a given xml:id in a new element for a set of xml:ids for a given resource text?">
+     
+    Given a resource
+    with id <code c:set="#resId1">00000000-0000-0000-0000-000000000001</code>
+    <span c:execute="resourceExists(#resId1)">exists</span>,<br/>
+    which has
+    <span c:execute="resourceHasText(#resId1,#text1)">text<br/>
+      <code c:set="#text1">&lt;body&gt;&lt;div xml:id=&quot;div-1&quot;&gt;&lt;p xml:id=&quot;p-1&quot;&gt;First paragraph&lt;/p&gt;&lt;/div&gt;&lt;div xml:id=&quot;div-2&quot;&gt;&lt;p xml:id=&quot;p-2&quot;&gt;Second paragraph&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</code>
+    </span>
+    <br/>
+    <br/>
+     
+  <h:request>
+     If i now
+     <h:post>/commands/wrap-content-in-element</h:post>
+     the body:
+     <h:jsonBody>
+       {
+         "resourceIds" : ["00000000-0000-0000-0000-000000000001"],
+         "xmlIds" : ["div-1","p-2"],
+         "element" : {
+           "name" : "hi",
+           "attributes" : {
+             "rend" : "italic"
+           }
+         }
+       }
+     </h:jsonBody>
+     using
+     <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+     then I should receive
+     <ul>
+       <li>status <h:status>200 OK</h:status></li>
+       <li>and the response body is
+       <h:jsonResponse>
+          {
+            "errorLines" : [ ],
+            "parametersAreValid" : true
+          }
+       </h:jsonResponse>
+       </li>
+     </ul>
+  </h:request>
+  <br/>
+
+  <h:request>
+     Then a
+     <h:get>/resources/00000000-0000-0000-0000-000000000001/text/xml</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     yields response body:<br/>
+     <h:xmlResponse>
+<![CDATA[
+<body>
+  <div xml:id="div-1"><hi rend="italic"><p xml:id="p-1">First paragraph</p></hi></div>
+  <div xml:id="div-2"><p xml:id="p-2"><hi rend="italic">Second paragraph</hi></p></div>
+</body>
+]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+  <br/>
+</div>
+
+<div id="annotate-text-1" c:execute="clearStorage()"
+     data-desc="How can I create a text annotation?">
+  Given a resource
+  with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
+  <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
+  which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
+  <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
+    <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a simple paragraph.&lt;/p&gt;&lt;/text&gt;</code>
+  </span>,<br/>
+  <br/>
+  <h:request>
+		When I <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000004</h:put>
+		the body:
+		<h:jsonBody> 
+    {
+      "textAnnotation" : {
+        "name" : "word",
+        "annotator" : "ed",
+        "position" : {
+	  		  "xml:id" : "p-1", 
+			    "offset" : 6, 
+			    "length" : 2
+			  }
+		} }
+		</h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>201 Created</h:status></li>
+      <li>location header
+          <h:location>https://{host}/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000004</h:location>
+      </li>
+      <li>and the response body is
+      <h:jsonResponse>
+      {
+        "textAnnotationInfo" : {
+          "annotates" : "is"
+      } }
+      </h:jsonResponse> 
+      </li>
+    </ul>
+  </h:request>
+</div>
+
+<div id="annotate-text-2" c:execute="clearStorage()"
+     data-desc="What happens when I refer to an undefined xml:id when creating a text annotation?">
+  Given a resource
+  with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
+  <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
+  which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
+  <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
+    <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a simple paragraph.&lt;/p&gt;&lt;/text&gt;</code>
+  </span>,<br/>
+  <br/>
+  <h:request>
+    When I <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000004</h:put>
+    the body:
+    <h:jsonBody> 
+    { 
+      "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "ed",
+        "position" : {
+	        "xml:id" : "undefined", 
+	        "offset" : 5, 
+	        "length" : 2
+	      }
+    } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>400 Bad Request</h:status></li>
+      <li>and the response body contains:
+        <h:jsonResponse>
+        { 
+          "error" : { 
+            "message" : "The text does not contain an element with the specified xml:id." 
+          } 
+				} 
+				</h:jsonResponse>
+      </li>
+    </ul>
+  </h:request>
+</div>
+
+
+<div id="annotate-text-3" c:execute="clearStorage()"
+     data-desc="What happens when I use an invalid offset when creating a text annotation?">
+  Given a resource
+  with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
+  <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
+  which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
+  <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
+    <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a simple paragraph.&lt;/p&gt;&lt;/text&gt;</code>
+  </span>,<br/>
+  <br/>
+  <h:request>
+    When I <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000004</h:put>
+    the body:
+    <h:jsonBody> 
+    {
+      "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "ed",
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : -1, 
+	        "length" : 2
+	      }
+    } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>400 Bad Request</h:status></li>
+      <li>and the response body contains:
+        <h:jsonResponse>
+        { 
+          "error" : { 
+            "message" : "The specified offset/length is illegal." 
+          } 
+        } 
+        </h:jsonResponse>
+      </li>
+    </ul>
+  </h:request>
+</div>
+
+
+<div id="annotate-text-4" c:execute="clearStorage()"
+     data-desc="What happens when I use an invalid offset/length combination when creating a text annotation?">
+  Given a resource
+  with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
+  <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
+  which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
+  <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
+    <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a simple paragraph.&lt;/p&gt;&lt;/text&gt;</code>
+  </span>,<br/>
+  <br/>
+  <h:request>
+    When I <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000004</h:put>
+    the body:
+    <h:jsonBody> 
+    {
+      "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "ed",
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : 5, 
+	        "length" : 100
+	      }
+    } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>400 Bad Request</h:status></li>
+      <li>and the response body contains:
+        <h:jsonResponse>
+        { 
+          "error" : { 
+            "message" : "The specified offset/length is illegal."
+          } 
+        } 
+        </h:jsonResponse>
+      </li>
+    </ul>
+  </h:request>
+</div>
+
+
+<div id="annotate-text-5" c:execute="clearStorage()"
+     data-desc="What happens when I use an invalid annotation name when creating a text annotation?">
+  Given a resource
+  with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
+  <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
+  which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
+  <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
+    <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a simple paragraph.&lt;/p&gt;&lt;/text&gt;</code>
+  </span>,<br/>
+  <br/>
+  <h:request>
+    When I <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000004</h:put>
+    the body:
+    <h:jsonBody> 
+    {
+      "textAnnotation" : {
+        "name" : "!@#$%^&amp;*",
+        "annotator" : "ed", 
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : 5, 
+	        "length" : 2
+	      }
+    } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>400 Bad Request</h:status></li>
+      <li>and the response body contains:
+        <h:jsonResponse>
+        { 
+          "error" : { 
+            "message" : "The specified annotation name is illegal."
+          } 
+        } 
+        </h:jsonResponse>
+      </li>
+    </ul>
+  </h:request>
+</div>
+
+
+<div id="annotate-text-7" c:execute="clearStorage()"
+     data-desc="What happens when I use an invalid responsibility value when creating a text annotation?">
+  Given a resource
+  with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
+  <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
+  which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
+  <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
+    <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a simple paragraph.&lt;/p&gt;&lt;/text&gt;</code>
+  </span>,<br/>
+  <br/>
+  <h:request>
+    When I <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000004</h:put>
+    the body:
+    <h:jsonBody> 
+    {
+      "textAnnotation" : {
+        "name" : "word",
+        "annotator" : "!@#$%^&amp;*",
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : 5, 
+	        "length" : 2
+	      }
+    } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>400 Bad Request</h:status></li>
+      <li>and the response body contains:
+        <h:jsonResponse>
+        { 
+          "error" : { 
+            "message" : "Resource has no annotator with code '!@#$%^&amp;*'."
+          } 
+        } 
+        </h:jsonResponse>
+      </li>
+    </ul>
+  </h:request>
+</div>
+
+
+<div id="annotate-text-8" c:execute="clearStorage()"
+     data-desc="What happens when I fail to specify a responsibility when creating a text annotation?">
+  Given a resource
+  with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
+  <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
+  which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
+  <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
+    <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a simple paragraph.&lt;/p&gt;&lt;/text&gt;</code>
+  </span>,<br/>
+  <br/>
+  <h:request>
+    When I <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000004</h:put>
+    the body:
+    <h:jsonBody> 
+    {
+      "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "", 
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : 5, 
+	        "length" : 2
+	      }
+    } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>400 Bad Request</h:status></li>
+      <li>and the response body contains:
+        <h:jsonResponse>
+        { 
+          "error" : { 
+            "message" : "No annotator specified."
+          } 
+        } 
+        </h:jsonResponse>
+      </li>
+    </ul>
+  </h:request>
+</div>
+
+
+<div id="annotate-text-9" c:execute="clearStorage()"
+     data-desc="How do I retrieve the text with a specific annotation?">
+  Given a resource
+  with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
+  <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
+  which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
+  <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
+    <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a paragraph.&lt;/p&gt;&lt;/text&gt;</code>
+  </span>,<br/>
+  <br/>
+  <h:request>
+    When I <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000004</h:put>
+    the body:
+    <h:jsonBody> 
+    {
+      "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "ed",
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : 6, 
+	        "length" : 2
+	      }
+    } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>201 Created</h:status></li>
+      <li>and the response body is
+      <h:jsonResponse>
+      {
+        "textAnnotationInfo" : {
+          "annotates" : "is"
+      } }
+      </h:jsonResponse> 
+      </li>
+    </ul>
+  </h:request>
+  <br/>
+  <h:request>
+    When I <h:success>successfully</h:success> define a view <code c:set="#view">word-ed</code> by
+    <h:put>/resources/$resourceId/text/views/$view</h:put>
+    the body:
+    <h:jsonBody>
+      {
+        "textView": {
+          "description": "Word annotations with responsibility #ed",
+          "elements": {
+            "word" : { "elementMode": "hideTag", "when" : "attribute(resp).isNot('#ed')" }
+      } } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+  </h:request>
+  <br/>
+  <h:request>
+    Then a
+      <h:get>/resources/$resourceId/text/xml?view=$view</h:get><br/>
+    using
+    <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+    <h:success>successfully</h:success>
+    yields response body:
+    <h:xmlResponse>
+<![CDATA[
+<text>
+  <p xml:id="p-1">This <word resp="#ed">is</word> a paragraph.</p>
+</text>
+]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+</div>
+
+
+<div id="annotate-text-10" c:execute="clearStorage()"
+     data-desc="How do I create a non-overlapping text annotation?">
+  Given a resource
+  with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
+  <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
+  which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
+  <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
+    <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a paragraph.&lt;/p&gt;&lt;/text&gt;</code>
+  </span>,<br/>
+  <br/>
+  <h:request>
+    When I <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000004</h:put>
+    the body:
+    <h:jsonBody> 
+    {
+      "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "ed",
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : 6, 
+	        "length" : 2
+	      }
+    } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>201 Created</h:status></li>
+      <li>and the response body is
+      <h:jsonResponse>
+      {
+        "textAnnotationInfo" : {
+          "annotates" : "is"
+      } }
+      </h:jsonResponse> 
+      </li>
+    </ul>
+  </h:request>
+  <br/>
+  <h:request>
+    When I then <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000005</h:put>
+    the body:
+    <h:jsonBody> 
+    {
+      "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "ed",
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : 9, 
+	        "length" : 1
+	      }
+    } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>201 Created</h:status></li>
+      <li>and the response body is
+      <h:jsonResponse>
+      {
+        "textAnnotationInfo" : {
+          "annotates" : "a"
+      } }
+      </h:jsonResponse> 
+      </li>
+    </ul>
+  </h:request>
+</div>
+
+<div id="annotate-text-11" c:execute="clearStorage()"
+     data-desc="How do I create an overlapping text annotation?">
+  Given a resource
+  with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000003</code>
+  <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
+  which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed1</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode2,#annotatorDescription2)">an annotator
+  with code <code c:set="#annotatorCode2">ed2</code> and description <code c:set="#annotatorDescription2">Mrs. Ed</code>  
+  </span>, and
+  <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
+    <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a paragraph.&lt;/p&gt;&lt;/text&gt;</code>
+  </span>,<br/>
+  <br/>
+  <h:request>
+    When I <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000004</h:put>
+    the body:
+    <h:jsonBody> 
+    {
+      "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "ed1",
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : 6, 
+	        "length" : 2
+	      }
+    } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>201 Created</h:status></li>
+      <li>and the response body is
+      <h:jsonResponse>
+      {
+        "textAnnotationInfo" : {
+          "annotates" : "is"
+      } }
+      </h:jsonResponse> 
+      </li>
+    </ul>
+  </h:request>
+  <br/>
+  <h:request>
+    When I then <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000005</h:put>
+    the body:
+    <h:jsonBody> 
+    {
+      "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "ed1",
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : 7, 
+	        "length" : 1
+	      }
+    } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>409 Conflict</h:status></li>
+      <li>and the response body contains:
+        <h:jsonResponse>
+        { 
+          "error" : { 
+            "message" : "Overlapping annotations with the same name and responsibility."
+          } 
+        } 
+        </h:jsonResponse>
+      </li>
+    </ul>
+  </h:request>
+  <br/>
+  <h:request>
+    However, when I <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000005</h:put>
+    the body:
+    <h:jsonBody> 
+    {
+      "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "ed2",
+        "position" : {
+	        "xml:id" : "p-1", 
+	        "offset" : 7, 
+	        "length" : 1
+	      }
+    } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader><br/>
+    (note that I use a different responsibility),
+    then I should receive
+    <ul>
+      <li>status <h:status>201 Created</h:status></li>
+      <li>and the response body is
+      <h:jsonResponse>
+      {
+        "textAnnotationInfo" : {
+          "annotates" : "s"
+      } }
+      </h:jsonResponse> 
+      </li>
+    </ul>
+  </h:request>
+</div>
+
+</body>
+</html>

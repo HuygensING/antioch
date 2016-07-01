@@ -21,8 +21,11 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
+import static nl.knaw.huygens.alexandria.api.EndpointPaths.ANNOTATIONS;
+import static nl.knaw.huygens.alexandria.api.EndpointPaths.ANNOTATORS;
 import static nl.knaw.huygens.alexandria.api.EndpointPaths.RESOURCES;
+import static nl.knaw.huygens.alexandria.api.EndpointPaths.SUBRESOURCES;
+import static nl.knaw.huygens.alexandria.api.EndpointPaths.TEXT;
 import static nl.knaw.huygens.alexandria.endpoint.resource.ResourceValidatorFactory.resourceNotFoundForId;
 
 import java.util.Optional;
@@ -44,16 +47,13 @@ import javax.ws.rs.core.Response;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinitionPrototype;
 import nl.knaw.huygens.alexandria.api.model.StatePrototype;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
-import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
@@ -120,34 +120,6 @@ public class ResourcesEndpoint extends JSONEndpoint {
     throw new BadRequestException("for now, you can only set the state to CONFIRMED");
   }
 
-  @PUT
-  @Path("{uuid}/" + EndpointPaths.BASELAYERDEFINITION)
-  @Consumes(MediaType.APPLICATION_JSON)
-  @ApiOperation(value = "Set the baselayer definition")
-  public Response setBaseLayerDefinition(@PathParam("uuid") final UUIDParam uuidParam, @NotNull BaseLayerDefinitionPrototype protoType) {
-    Log.trace("protoType=[{}]", protoType);
-    AlexandriaResource resource = readExistingResource(uuidParam);
-    if (!isConfirmed(resource)) {
-      throw new ConflictException("This resource has state " + resource.getState() + "; it needs to be CONFIRMED before the BaseLayerDefinition can be added.");
-    }
-    if (resource.getDirectBaseLayerDefinition().isPresent()) {
-      throw new ConflictException("This resource already has a baselayer definition");
-    }
-    service.setBaseLayerDefinition(uuidParam.getValue(), protoType);
-    return created(locationBuilder.locationOf(resource, EndpointPaths.BASELAYERDEFINITION));
-  }
-
-  @GET
-  @Path("{uuid}/" + EndpointPaths.BASELAYERDEFINITION)
-  @ApiOperation(value = "Get the baselayer definition")
-  public Response getBaseLayerDefinition(@PathParam("uuid") final UUIDParam uuidParam) {
-    AlexandriaResource resource = readExistingResource(uuidParam);
-    if (!resource.getDirectBaseLayerDefinition().isPresent()) {
-      throw new NotFoundException("This resource has no baselayer definition"); // TODO: alternatively, throw redirected to ancestor baselayer definition (if any)
-    }
-    return ok(resource.getDirectBaseLayerDefinition().get());
-  }
-
   @DELETE
   @Path("{uuid}")
   public Response deleteNotSupported(@PathParam("uuid") final UUIDParam paramId) {
@@ -184,21 +156,28 @@ public class ResourcesEndpoint extends JSONEndpoint {
 
   // Sub-resource delegation
 
-  @Path("{uuid}/subresources")
+  @Path("{uuid}/" + SUBRESOURCES)
   public Class<SubResourcesEndpoint> getSubResourcesEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
+    assertResourceIsConfirmed(uuidParam);
     return SubResourcesEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }
 
-  @Path("{uuid}/annotations")
+  @Path("{uuid}/" + ANNOTATIONS)
   public Class<ResourceAnnotationsEndpoint> getAnnotationsEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
     assertResourceIsConfirmed(uuidParam);
     return ResourceAnnotationsEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }
 
-  @Path("{uuid}/text")
-  public Class<ResourceTextGraphEndpoint> getResourceTextGraphEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
+  @Path("{uuid}/" + ANNOTATORS)
+  public Class<ResourceAnnotatorsEndpoint> getAnnotatorsEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
     assertResourceIsConfirmed(uuidParam);
-    return ResourceTextGraphEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
+    return ResourceAnnotatorsEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
+  }
+
+  @Path("{uuid}/" + TEXT)
+  public Class<ResourceTextEndpoint> getResourceTextEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
+    assertResourceIsConfirmed(uuidParam);
+    return ResourceTextEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }
 
   @Path("{uuid}/provenance")

@@ -4,7 +4,7 @@
   <parent>
     <groupId>nl.knaw.huygens.alexandria</groupId>
     <artifactId>alexandria</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
   </parent>
   <artifactId>alexandria-server</artifactId>
 
@@ -78,6 +78,42 @@
           </execution>
         </executions>
       </plugin>
+            <plugin>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>${maven-shade.version}</version>
+        <configuration>
+          <createDependencyReducedPom>false</createDependencyReducedPom>
+        </configuration>
+        <executions>
+          <execution>
+            <id>shade</id>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer
+                  implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>nl.knaw.huygens.alexandria.app.Server</mainClass>
+                </transformer>
+                <transformer
+                  implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+              </transformers>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
       <!-- <plugin> <groupId>com.github.kongchen</groupId> <artifactId>swagger-maven-plugin</artifactId> 
         <version>${swagger-maven-plugin.version}</version> <configuration> <apiSources> 
         <apiSource> <info> <title>REST api</title> <version>v1</version> <description> 

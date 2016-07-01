@@ -1,0 +1,200 @@
+<!--
+  #%L
+  alexandria-acceptance-tests
+  =======
+  Copyright (C) 2015 - 2016 Huygens ING (KNAW)
+  =======
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/gpl-3.0.html>.
+  #L%
+  -->
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+
+<title>Alexandria: Resource Texts</title>
+
+<body data-desc="Resource Texts">
+
+<div id="store-resource-text2" c:execute="clearStorage()"
+     data-desc="How do I submit a text as XML and retrieve it as XML?">
+    <h:request>
+        Given that I have
+        <h:success>successfully</h:success>
+        <h:put>/resources/22222222-2222-2222-2222-222222222222</h:put>
+        the body:
+        <h:jsonBody>{
+            "resource": {
+            "id": "22222222-2222-2222-2222-222222222222",
+            "ref": "grotius-3160-v2"
+            } }
+        </h:jsonBody>
+    </h:request>
+    <br/>
+
+    <h:request>
+        When I
+        <h:put>/resources/22222222-2222-2222-2222-222222222222/text</h:put>
+        the body:
+        <h:xmlBody>&lt;text&gt;&lt;p xml:id=&quot;p-1&quot; lang=&quot;en&quot; auth=&quot;me&quot;&gt;paragraph 1&lt;/p&gt;&lt;p&gt;Párâgràph 2&lt;/p&gt;&lt;/text&gt;</h:xmlBody>
+        using
+        <h:setHeader name="Content-Type">text/xml</h:setHeader>,<br/>
+        then I should receive
+        <ul>
+          <li>status <h:status>202 Accepted</h:status></li>
+          <li>location header
+            <h:location>https://{host}/resources/22222222-2222-2222-2222-222222222222/text/status</h:location>
+          </li>
+          <li>and the response body is <h:responseBody/>
+          </li>
+        </ul>
+    </h:request>
+    <br/>
+
+    <h:request>
+        When I
+        <h:get>/resources/22222222-2222-2222-2222-222222222222/text/status</h:get>
+        then I should receive
+        <ul>
+            <li>status
+                <h:status>200 OK</h:status>
+            </li>
+            <li>and body
+             <small>(only relevant fields shown for brevity)</small>
+                <h:jsonResponse>{
+                  "textImportStatus" : {
+                    "done" : true,
+                    "state" : "done",
+                    "processingTime" : "{duration.anyValid}",
+                    "validationErrors" : [ ],
+                    "startTime" : "{date.beforeNow}",
+                    "expires" : "{date.afterNow}"
+                  }
+                }
+                </h:jsonResponse>
+            </li>
+        </ul>
+        If the status indicates the text is still being processed (done=false, state=processing), we should wait a while before getting the status again.
+    </h:request>
+    <br/>
+
+    <h:request>
+        Since textImportStatus.done == true, and there are no validationErrors,<br/>
+        <h:get>/resources/22222222-2222-2222-2222-222222222222/text/xml</h:get><br/>
+        using
+        <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+        yields response body:<br/>
+        <h:xmlResponse>&lt;text&gt;&lt;p xml:id=&quot;p-1&quot; lang=&quot;en&quot; auth=&quot;me&quot;&gt;paragraph 1&lt;/p&gt;&lt;p&gt;Párâgràph 2&lt;/p&gt;&lt;/text&gt;</h:xmlResponse>
+        (the originally uploaded text)
+        <small>(formatting added for increased readability)</small><br/>
+    </h:request>
+</div>
+
+<div id="store-resource-text3" c:execute="clearStorage()"
+     data-desc="How do I submit a text as octet-stream and retrieve it as XML?">
+    <h:request>
+        Given that I have
+        <h:success>successfully</h:success>
+        <h:put>/resources/33333333-3333-3333-3333-333333333333</h:put>
+        the body:
+        <h:jsonBody>{
+            "resource": {
+            "id": "33333333-3333-3333-3333-333333333333",
+            "ref": "grotius-3160-v3"
+            } }
+        </h:jsonBody>
+    </h:request>
+    <br/>
+
+    <h:request>
+        When I
+        <h:put>/resources/33333333-3333-3333-3333-333333333333/text</h:put>
+        the body:
+        <h:xmlBody>&lt;text&gt;&lt;p&gt;different text&lt;/p&gt;&lt;/text&gt;</h:xmlBody>
+        using
+        <h:setHeader name="Content-Type">application/octet-stream</h:setHeader>
+        Then I should receive
+        <h:status>202 Accepted</h:status>
+        and a location header
+        <h:location>https://{host}/resources/33333333-3333-3333-3333-333333333333/text/status</h:location>
+        and the response body is
+        <h:responseBody/>
+    </h:request>
+    <br/>
+
+    After this, getting the status and the xml is done the same way as when submitting text as XML.
+</div>
+
+<div id="overwrite-resource-text" data-desc="What if I upload a text to a resource that already has a text?">
+    <h:request>
+        Given the resource I made earlier,
+        when I
+        <h:put>/resources/33333333-3333-3333-3333-333333333333/text</h:put>
+        the body:
+        <h:jsonBody>{
+            "resourceText": {
+            "body": "&lt;text&gt;&lt;p&gt;paragraph 1&lt;/p&gt;&lt;p&gt;paragraph 2&lt;/p&gt;&lt;p&gt;paragraph 3&lt;/p&gt;&lt;/text&gt;"
+            } }
+        </h:jsonBody>
+        Then I should receive
+        <ul>
+            <li>status
+                <h:status>409 Conflict</h:status>
+            </li>
+            <li>and body
+                <h:jsonResponse>{
+                    "error" : {
+                    "message" : "This resource already has a text, which cannot be replaced."
+                    }}
+                </h:jsonResponse>
+            </li>
+        </ul>
+
+    </h:request>
+</div>
+
+<div id="dot-output" data-desc="How do I get a representation of the textgraph in DOT?">
+    <h:request>
+        Given the resource I made earlier,
+        when I
+        <h:get>/resources/33333333-3333-3333-3333-333333333333/text/dot</h:get>
+        using
+		    <h:setHeader name="Accept">text/plain</h:setHeader>,
+        then I should receive
+        <ul>
+            <li>status
+                <h:status>200 OK</h:status>
+            </li>
+            <li>and body
+            <pre><h:responseBody>digraph TextGraph {
+  ranksep=1.0
+  t0 [shape=box, label="different text"];
+  a0 [label="text"];
+  a1 [label="p"];
+  a0 -> a1;
+  a1 -> t0 [color="blue"];
+  {rank=same;t0;}
+  {rank=same;a0;}
+  {rank=same;a1;}
+}</h:responseBody></pre>
+            </li>
+        </ul>
+
+    </h:request>
+</div>
+
+</body>
+</html>

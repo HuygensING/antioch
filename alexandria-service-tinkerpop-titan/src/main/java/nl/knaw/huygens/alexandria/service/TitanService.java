@@ -5,7 +5,6 @@ import static java.util.stream.Collectors.toList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.StreamSupport;
 
 /*
  * #%L
@@ -56,6 +55,7 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.storage.Storage;
+import nl.knaw.huygens.alexandria.util.StreamUtil;
 
 @Singleton
 public class TitanService extends TinkerPopService {
@@ -67,6 +67,7 @@ public class TitanService extends TinkerPopService {
   enum VertexCompositeIndex {
     IDX_ANY_STATE(null, PROP_STATE, !UNIQUE), //
     IDX_RESOURCE_UUID("Resource", Storage.IDENTIFIER_PROPERTY, UNIQUE), //
+    // IDX_RESOURCE_CARGO("Resource", PROP_CARGO, !UNIQUE), //
     IDX_ANNOTATION_UUID("Annotation", Storage.IDENTIFIER_PROPERTY, UNIQUE), //
     IDX_ANNOTATION_WHO("Annotation", PROP_WHO, !UNIQUE), //
     IDX_ANNOTATIONBODY_UUID("AnnotationBody", Storage.IDENTIFIER_PROPERTY, UNIQUE), //
@@ -139,13 +140,13 @@ public class TitanService extends TinkerPopService {
   }
 
   private static Storage getStorage(AlexandriaConfiguration configuration) {
-    titanGraph = TitanFactory.open(configuration.getStorageDirectory() + "/titan.properties");
+    titanGraph = TitanFactory.open(String.join(":", "berkeleyje", configuration.getStorageDirectory()));
     setIndexes();
     return new Storage(titanGraph);
   }
 
   private List<IndexInfo> indexInfo(TitanManagement mgmt, Class<? extends Element> elementClass) {
-    return StreamSupport.stream(mgmt.getGraphIndexes(elementClass).spliterator(), false)//
+    return StreamUtil.stream(mgmt.getGraphIndexes(elementClass))//
         .map(IndexInfo::new)//
         .collect(toList());
   }

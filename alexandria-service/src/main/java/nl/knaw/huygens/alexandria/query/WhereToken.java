@@ -24,8 +24,8 @@ package nl.knaw.huygens.alexandria.query;
 
 import java.util.List;
 
-import nl.knaw.huygens.alexandria.model.search.QueryField;
-import nl.knaw.huygens.alexandria.model.search.QueryFunction;
+import nl.knaw.huygens.alexandria.api.model.search.QueryField;
+import nl.knaw.huygens.alexandria.api.model.search.QueryFunction;
 
 class WhereToken {
   private final QueryField property;

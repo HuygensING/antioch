@@ -51,4 +51,9 @@ public interface AlexandriaConfiguration {
    */
   String getAdminKey();
 
+  /**
+   *
+   * @return whether endpoint may be asynchronous (start a thread)
+   */
+  Boolean asynchronousEndpointsAllowed();
 }

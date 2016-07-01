@@ -13,24 +13,45 @@ public class TextAnnotation {
     public static final String attribute_keys = "attribute_keys";
     public static final String attribute_values = "attribute_values";
     public static final String depth = "depth";
+    public static final String xmlid = "xml_id";
   }
 
   private String name;
   private Map<String, String> attributes;
   private int depth;
+  private Object id;
+  private String xmlId;
 
   public TextAnnotation(String name, Map<String, String> attributes, int depth) {
     this.name = name;
     this.attributes = attributes;
+    xmlId = this.attributes.get("xml:id");
     this.depth = depth;
+  }
+
+  public void setId(Object object) {
+    this.id = object;
+  }
+
+  public Object getId() {
+    return id;
   }
 
   public String getName() {
     return name;
   }
 
+  public String getXmlId() {
+    return xmlId;
+  }
+
   public Map<String, String> getAttributes() {
     return attributes;
+  }
+
+  // TODO:: does this need to be stored?
+  public void setDepth(int newDepth) {
+    this.depth = newDepth;
   }
 
   public Integer getDepth() {
@@ -51,4 +72,5 @@ public class TextAnnotation {
   public boolean equals(Object other) {
     return EqualsBuilder.reflectionEquals(this, other, false);
   }
+
 }

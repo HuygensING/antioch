@@ -4,7 +4,7 @@
   <parent>
     <groupId>nl.knaw.huygens.alexandria</groupId>
     <artifactId>alexandria</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
   </parent>
   <artifactId>alexandria-java-client</artifactId>
 
@@ -14,6 +14,7 @@
       <artifactId>alexandria-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-json-jackson</artifactId>
@@ -29,6 +30,16 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-grizzly2-http</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>${commons-io.version}</version>
+    </dependency>
+
 
     <!-- Test dependencies -->
     <dependency>
@@ -49,11 +60,39 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.glassfish.jersey.containers</groupId>
-      <artifactId>jersey-container-grizzly2-http</artifactId>
-      <version>${jersey.version}</version>
-    </dependency>
 
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <!-- mvn -pl alexandria-java-client -am package -->
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>${maven-shade.version}</version>
+        <configuration>
+          <createDependencyReducedPom>false</createDependencyReducedPom>
+        </configuration>
+        <executions>
+          <execution>
+            <id>shade</id>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
