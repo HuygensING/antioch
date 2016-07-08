@@ -270,4 +270,22 @@ function a-gutenberg-import-file {
   a-log "see status at ${location}"
 }
 
-a-use-localip
+function a-import-dump {
+  importfile=$1
+  if [[ ! -e ${importfile} ]]; then
+    echo "importfile ${importfile} not found"
+  else
+    curl -i -H "${authheader}" -X PUT ${be}/admin -H 'Content-type: application/json' \
+    --data-binary "{
+      \"key\" : \"${authkey}\",
+      \"command\" : \"import\",
+      \"parameters\" : {
+        \"format\" : \"gryo\",
+        \"filename\" : \"${importfile}\"
+      }
+    }}"
+  fi
+  
+}
+
+a-use-localhost
