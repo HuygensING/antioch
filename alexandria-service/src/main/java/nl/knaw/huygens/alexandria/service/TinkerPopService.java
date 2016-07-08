@@ -743,8 +743,8 @@ public class TinkerPopService implements AlexandriaService {
   // - package methods -//
 
   Storage clearGraph() {
-    storage.getVertexTraversal()//
-        .forEachRemaining(org.apache.tinkerpop.gremlin.structure.Element::remove);
+    storage.runInTransaction(() -> storage.getVertexTraversal()//
+        .forEachRemaining(org.apache.tinkerpop.gremlin.structure.Element::remove));
     return storage;
   }
 
