@@ -11,7 +11,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>alexandria-service-tinkerpop-titan</artifactId>
+      <artifactId>alexandria-service-tinkerpop-neo4j</artifactId>
       <version>${project.version}</version>
     </dependency>
 

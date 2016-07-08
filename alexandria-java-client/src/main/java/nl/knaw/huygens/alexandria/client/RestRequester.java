@@ -80,10 +80,14 @@ public class RestRequester<T> {
     Status status = Status.fromStatusCode(response.getStatus());
 
     if (statusMappers.containsKey(status)) {
-      return timed(statusMappers.get(status).apply(response), start);
+      RestResult<T> timed = timed(statusMappers.get(status).apply(response), start);
+      timed.setResponse(response);
+      return timed;
 
     } else {
-      return timed(defaultMapper.apply(response), start);
+      RestResult<T> timed = timed(defaultMapper.apply(response), start);
+      timed.setResponse(response);
+      return timed;
     }
 
   }

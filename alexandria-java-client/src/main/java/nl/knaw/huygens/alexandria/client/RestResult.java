@@ -87,7 +87,7 @@ public class RestResult<T> {
     return failure;
   }
 
-  private void setResponse(Response response) {
+  void setResponse(Response response) {
     this.response = response;
   }
 

@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.service;
 
+import java.io.File;
+
 /*
  * #%L
  * alexandria-service-tinkerpop-neo4j
@@ -23,6 +25,7 @@ package nl.knaw.huygens.alexandria.service;
  */
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
 
@@ -30,6 +33,7 @@ import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.storage.Storage;
 
+@Singleton
 public class Neo4JService extends TinkerPopService {
 
   @Inject
@@ -38,8 +42,17 @@ public class Neo4JService extends TinkerPopService {
   }
 
   private static Storage getStorage(AlexandriaConfiguration config) {
-    Neo4jGraph graph = Neo4jGraph.open(config.getStorageDirectory() + "/neo4jdb");
+    String dataDir = config.getStorageDirectory() + "/neo4jdb";
+    createWhenAbsent(dataDir);
+    Neo4jGraph graph = Neo4jGraph.open(dataDir);
     return new Storage(graph);
+  }
+
+  private static void createWhenAbsent(String dataDir) {
+    File file = new File(dataDir);
+    if (!file.isDirectory()) {
+      file.mkdirs();
+    }
   }
 
 }

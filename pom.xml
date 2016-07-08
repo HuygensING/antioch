@@ -34,7 +34,7 @@
     <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
 
     <!-- Software versions -->
-    <assertj.version>3.4.1</assertj.version>
+    <assertj.version>3.5.1</assertj.version>
     <classloader-leak-prevention.version>1.15.2</classloader-leak-prevention.version>
 
     <!-- Concordion Acceptance Test extensions -->
@@ -48,7 +48,8 @@
     <commons-io.version>2.5</commons-io.version>
     <guava.version>19.0</guava.version>
     <guice.version>4.0</guice.version>
-    <jackson.version>2.7.3</jackson.version>
+    <jackson.version>2.8.0</jackson.version>
+    <jackson-datatype-jsr310.version>2.8.0</jackson-datatype-jsr310.version>
     <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
     <jdk.version>1.8</jdk.version>
 
@@ -67,14 +68,13 @@
       endPosTable already set -->
     <maven-compiler.version>3.5.1</maven-compiler.version>
 
-    <mockito.version>2.0.48-beta</mockito.version>
+    <mockito.version>2.0.82-beta</mockito.version>
     <peapod.version>0.3.0</peapod.version>
     <reflections.version>0.9.10</reflections.version>
     <servlet-api.version>4.0.0-b01</servlet-api.version>
 
     <!-- <swagger-maven-plugin.version>3.1.0</swagger-maven-plugin.version> -->
-    <swagger.version>1.5.8</swagger.version>
-    <jackson-datatype-jsr310.version>2.7.3</jackson-datatype-jsr310.version>
+    <swagger.version>1.5.9</swagger.version>
     <tinkerpop.groupId>org.apache.tinkerpop</tinkerpop.groupId>
     <tinkerpop.version>3.0.1-incubating</tinkerpop.version> <!-- can only be updated when titan.version is compatible with the new version -->
     <titan.version>1.0.0</titan.version>
@@ -82,7 +82,7 @@
 
     <!-- neo4j -->
     <neo4j-gremlin.version>3.0.0.M7</neo4j-gremlin.version>
-    <neo4j-tinkerpop-api-impl.version>0.3-2.3.3</neo4j-tinkerpop-api-impl.version>
+    <neo4j-tinkerpop-api-impl.version>0.4-3.0.3</neo4j-tinkerpop-api-impl.version>
 
     <xml-apis.version>1.4.01</xml-apis.version><!-- > 1.4.01 fails some acceptance 
       tests due to missing class -->
@@ -104,7 +104,7 @@
     <maven-project-info-reports.version>2.8.1</maven-project-info-reports.version>
     <maven-shade.version>2.4.3</maven-shade.version>
     <maven-shared-jar.version>1.2</maven-shared-jar.version>
-    <maven-site.version>3.4</maven-site.version><!-- 3.5 messed up out github pages -->
+    <maven-site.version>3.4</maven-site.version><!-- 3.5 messed up our github pages -->
     <maven-surefire.version>2.18.1</maven-surefire.version>
     <maven-surefire-report.version>2.19.1</maven-surefire-report.version>
     <maven-war.version>2.6</maven-war.version>

@@ -33,7 +33,7 @@ import nl.knaw.huygens.alexandria.api.JsonTypeNames;
 @JsonInclude(Include.NON_EMPTY)
 public class ErrorEntity extends JsonWrapperObject {
   private String message;
-//  private String exception;
+  private String exception;
 
   public ErrorEntity() {
   }
@@ -50,12 +50,12 @@ public class ErrorEntity extends JsonWrapperObject {
     return message;
   }
 
-//  public String getException() {
-//    return exception;
-//  }
-//
-//  public void setException(String exception) {
-//    this.exception = exception;
-//  }
+  public String getException() {
+    return exception;
+  }
+
+  public void setException(String exception) {
+    this.exception = exception;
+  }
 
 }

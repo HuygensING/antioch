@@ -43,6 +43,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
@@ -100,6 +101,7 @@ import nl.knaw.huygens.alexandria.textlocator.TextLocatorParseException;
 import nl.knaw.huygens.alexandria.util.StreamUtil;
 import peapod.FramedGraphTraversal;
 
+@Singleton
 public class TinkerPopService implements AlexandriaService {
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new Jdk8Module());
 

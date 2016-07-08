@@ -116,6 +116,11 @@ public class AlexandriaClient implements AutoCloseable {
     client.close();
   }
 
+  public void register(Object component) {
+    client.register(component);
+    rootTarget = client.target(alexandriaURI);
+  }
+
   public void setProperty(final String jerseyClientProperty, final Object value) {
     client.property(jerseyClientProperty, value);
     rootTarget = client.target(alexandriaURI);

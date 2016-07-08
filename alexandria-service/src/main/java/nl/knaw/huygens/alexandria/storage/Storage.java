@@ -32,6 +32,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import javax.inject.Singleton;
+
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Element;
@@ -54,6 +56,7 @@ import nl.knaw.huygens.alexandria.storage.frames.VF;
 import peapod.FramedGraph;
 import peapod.FramedGraphTraversal;
 
+@Singleton
 public class Storage {
   public static final String IDENTIFIER_PROPERTY = "uuid";
 
@@ -316,13 +319,32 @@ public class Storage {
   private void commitTransaction() {
     assertTransactionIsOpen();
     if (supportsTransactions()) {
-      framedGraph.tx().commit();
+      tryCommitting(10);
       // framedGraph.tx().close();
     }
     if (!supportsPersistence()) {
       saveToDisk(getDumpFile());
     }
     setTransactionIsOpen(false);
+  }
+
+  private void tryCommitting(int count) {
+    if (count > 1) {
+      try {
+        framedGraph.tx().commit();
+      } catch (Exception e) {
+        // wait
+        try {
+          Thread.sleep(500);
+        } catch (InterruptedException ie) {
+          ie.printStackTrace();
+        }
+        // try again
+        tryCommitting(count - 1);
+      }
+    } else {
+      framedGraph.tx().commit();
+    }
   }
 
   private void rollbackTransaction() {

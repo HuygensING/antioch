@@ -71,9 +71,7 @@ public class TextViewDefinitionParser {
 
   private ElementView parseElementViewDefinition(final String elementName, final ElementViewDefinition evd) {
     final ElementView elementView = new ElementView();
-    if (evd.getElementMode().isPresent()) {
-      elementView.setElementMode(evd.getElementMode().get());
-    }
+    evd.getElementMode().ifPresent(em -> elementView.setElementMode(em));
     parseAttributeMode(elementName, evd.getAttributeMode(), elementView);
     parseWhen(elementName, evd.getWhen(), elementView);
     return elementView;
@@ -83,8 +81,7 @@ public class TextViewDefinitionParser {
   static final Pattern ATTRIBUTEMODE_HIDEONLY = Pattern.compile(hideOnly.name() + "(.*)");
 
   private void parseAttributeMode(final String elementName, final Optional<String> attributeMode, final ElementView elementView) {
-    if (attributeMode.isPresent()) {
-      final String mode = attributeMode.get();
+    attributeMode.ifPresent(mode -> {
       final String prefix = MessageFormat.format("{0}: \"{1}\" ", elementName, mode);
 
       if (showAll.name().equals(mode)) {
@@ -112,7 +109,7 @@ public class TextViewDefinitionParser {
       }
 
       errors.add(prefix + "is not a valid attributeMode. Valid attributeMode values are: \"showAll\", \"showOnly attribute...\", \"hideAll\", \"hideOnly attribute...\".");
-    }
+    });
   }
 
   private List<String> parseParameters(final String prefix, final String group) {
