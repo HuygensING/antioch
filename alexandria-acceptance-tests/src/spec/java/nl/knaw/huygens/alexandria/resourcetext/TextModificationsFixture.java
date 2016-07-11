@@ -1,7 +1,5 @@
 package nl.knaw.huygens.alexandria.resourcetext;
 
-import org.concordion.api.ExpectedToFail;
-
 /*
  * #%L
  * alexandria-acceptance-tests

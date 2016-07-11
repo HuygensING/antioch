@@ -23,7 +23,6 @@ package nl.knaw.huygens.alexandria.resource;
  */
 
 import static java.util.UUID.fromString;
-import static java.util.UUID.randomUUID;
 
 import java.util.UUID;
 
