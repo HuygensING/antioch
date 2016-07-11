@@ -48,7 +48,6 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.jooq.lambda.Unchecked;
 
@@ -493,7 +492,6 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public void importDb(String format, String filename) {
     storage = clearGraph();
-    // storage.startTransaction();
     storage.runInTransaction(Unchecked.runnable(() -> storage.readGraph(DumpFormat.valueOf(format), filename)));
   }
 
@@ -566,7 +564,8 @@ public class TinkerPopService implements AlexandriaService {
   // - package methods -//
 
   Storage clearGraph() {
-    storage.getVertexTraversal().forEachRemaining(Element::remove);
+    storage.runInTransaction(() -> storage.getVertexTraversal()//
+        .forEachRemaining(org.apache.tinkerpop.gremlin.structure.Element::remove));
     return storage;
   }
 

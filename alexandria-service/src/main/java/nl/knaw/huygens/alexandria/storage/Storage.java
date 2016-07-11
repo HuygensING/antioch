@@ -32,6 +32,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import javax.inject.Singleton;
+
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Element;
@@ -53,6 +55,7 @@ import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import peapod.FramedGraph;
 import peapod.FramedGraphTraversal;
 
+@Singleton
 public class Storage {
   public static final String IDENTIFIER_PROPERTY = "uuid";
 
