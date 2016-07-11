@@ -91,7 +91,7 @@ public class AlexandriaQuery extends JsonWrapperObject implements Prototype {
     return fields;
   }
 
-  public AlexandriaQuery setFields(String fields) {
+  public AlexandriaQuery setReturns(String fields) {
     this.fields = fields;
     return this;
   }

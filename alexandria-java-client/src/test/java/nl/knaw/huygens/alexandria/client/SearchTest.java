@@ -35,7 +35,7 @@ public class SearchTest extends AlexandriaClientTest {
     AlexandriaQuery query = new AlexandriaQuery()// t
         .setFind("annotation")//
         .setWhere("type:eq(\"type 1\")")//
-        .setFields("id, resource.id");
+        .setReturns("id, resource.id");
     RestResult<UUID> result = client.addSearch(query);
     assertRequestSucceeded(result);
 

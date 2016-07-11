@@ -93,7 +93,7 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
   @Test
   public void testUnknownReturnValueThrowsException() {
     AlexandriaQuery aQuery = new AlexandriaQuery();
-    aQuery.setFields("id,huey,dewey,louie");
+    aQuery.setReturns("id,huey,dewey,louie");
     try {
       alexandriaQueryParser.parse(aQuery);
       fail("AlexandriaQueryParseException expected");
@@ -111,7 +111,7 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
   public void testReturnFields() {
     AlexandriaQuery aQuery = new AlexandriaQuery();
     aQuery.setFind("annotation");
-    aQuery.setFields("id, resource.id, subresource.id");
+    aQuery.setReturns("id, resource.id, subresource.id");
     ParsedAlexandriaQuery paq = alexandriaQueryParser.parse(aQuery);
     assertThat(paq.getReturnFields()).containsExactly("id", "resource.id", "subresource.id");
     assertThat(paq.getFieldsToGroup()).isEmpty();
@@ -121,7 +121,7 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
   public void testReturnFieldsWithList() {
     AlexandriaQuery aQuery = new AlexandriaQuery();
     aQuery.setFind("annotation");
-    aQuery.setFields("list(id), resource.id, resource.url");
+    aQuery.setReturns("list(id), resource.id, resource.url");
     ParsedAlexandriaQuery paq = alexandriaQueryParser.parse(aQuery);
     assertThat(paq.getReturnFields()).containsExactly("id", "resource.id", "resource.url");
     assertThat(paq.getFieldsToGroup()).containsExactly("id");
@@ -305,7 +305,7 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
             + " state:eq(\"CONFIRMED\")"//
     );
     aQuery.setSort("when");
-    aQuery.setFields("when,value,resource.id,subresource.id");
+    aQuery.setReturns("when,value,resource.id,subresource.id");
     ParsedAlexandriaQuery paq = alexandriaQueryParser.parse(aQuery);
 
     AnnotationVF passAnnotation = mock(AnnotationVF.class);

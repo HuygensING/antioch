@@ -27,7 +27,7 @@ public class CWGAlexandriaClient extends OptimisticAlexandriaClient {
     AlexandriaQuery query = new AlexandriaQuery()//
         .setFind("resource")//
         .setWhere(MessageFormat.format("subresource.sub:eq(\"{0}\") resource.id:eq(\"{1}\")", ref, parentUUID))//
-        .setFields(QueryField.subresource_id.toString());
+        .setReturns(QueryField.subresource_id.toString());
     UUID searchId = addSearch(query);
     SearchResultPage searchResultPage = getSearchResultPage(searchId);
     return searchResultPage.getRecords()//
