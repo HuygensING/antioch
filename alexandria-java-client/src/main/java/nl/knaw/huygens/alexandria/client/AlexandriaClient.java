@@ -433,6 +433,14 @@ public class AlexandriaClient implements AutoCloseable {
         .getResult();
   }
 
+  public RestResult<Void> deprecateAnnotation(UUID uuid) {
+    WebTarget path = annotationTarget(uuid);
+    final RestRequester<Void> requester = RestRequester.withResponseSupplier(authorizedDelete(path));
+    return requester//
+        .onStatus(Status.NO_CONTENT, voidRestResult())//
+        .getResult();
+  }
+
   // private methods
 
   private RestResult<UUID> annotate(final UUID annotatableUuid, final AnnotationPrototype annotationPrototype, final String annotatablePath) {
@@ -574,6 +582,10 @@ public class AlexandriaClient implements AutoCloseable {
 
   private Supplier<Response> authorizedPost(final WebTarget path, final Entity<?> entity) {
     return () -> authorizedRequest(path).post(entity);
+  }
+
+  private Supplier<Response> authorizedDelete(final WebTarget path) {
+    return () -> authorizedRequest(path).delete();
   }
 
   private SyncInvoker authorizedRequest(final WebTarget target) {

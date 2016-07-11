@@ -231,6 +231,11 @@ public class OptimisticAlexandriaClient {
   public AnnotationList getAnnotationAnnotations(UUID uuid) {
     return unwrap(delegate.getAnnotationAnnotations(uuid));
   }
+
+  public void deprecateAnnotation(UUID uuid) {
+    unwrap(delegate.deprecateAnnotation(uuid));
+  }
+
   /////// end delegated methods
 
   private <T> T unwrap(RestResult<T> restResult) {
