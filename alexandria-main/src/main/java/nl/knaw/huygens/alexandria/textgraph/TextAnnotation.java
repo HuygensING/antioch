@@ -14,6 +14,7 @@ public class TextAnnotation {
     public static final String attribute_values = "attribute_values";
     public static final String depth = "depth";
     public static final String xmlid = "xml_id";
+    public static final String index = "index";
   }
 
   private String name;

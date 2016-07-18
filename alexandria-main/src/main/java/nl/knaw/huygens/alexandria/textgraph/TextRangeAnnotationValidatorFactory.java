@@ -31,7 +31,7 @@ public class TextRangeAnnotationValidatorFactory {
 
   public String validate(TextRangeAnnotation textRangeAnnotation, String xml) {
     String annotated = validatePosition(textRangeAnnotation.getPosition(), xml);
-    if (!textRangeAnnotation.getPosition().getOffset().isPresent()) {
+    if (!textRangeAnnotation.hasOffset()) {
       textRangeAnnotation.getPosition().setOffset(1).setLength(annotated.length());
     }
     validateName(textRangeAnnotation.getName());

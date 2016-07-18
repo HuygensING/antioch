@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.service;
 
+import static java.util.stream.Collectors.joining;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.Instant;
@@ -26,6 +28,7 @@ import nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 import nl.knaw.huygens.alexandria.textgraph.DotFactory;
 import nl.knaw.huygens.alexandria.textgraph.ParseResult;
+import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 
 public class TextGraphServiceTest extends AlexandriaTest {
@@ -66,8 +69,6 @@ public class TextGraphServiceTest extends AlexandriaTest {
   public void testUpdateTextAnnotationLink4() {
     String xml = "<text><p xml:id=\"p-1\">This <i>is</i> a test.</p></text>";
     String expected = "<text><p xml:id=\"p-1\"><lang value=\"?\" resp=\"#tool\">This <i>is</i> a test.</lang></p></text>";
-    // String xml = "<text><p xml:id=\"p-1\"><i>This</i> is a test.</p></text>";
-    // String expected = "<text><p xml:id=\"p-1\"><lang value=\"?\" resp=\"#tool\"><i>This</i> is a test.</lang></p></text>";
     TextRangeAnnotation textRangeAnnotation = new TextRangeAnnotation()//
         .setId(UUID.randomUUID())//
         .setName("lang")//
@@ -87,6 +88,57 @@ public class TextGraphServiceTest extends AlexandriaTest {
     });
 
     softly.assertThat(xmlOut).isEqualTo(expected);
+  }
+
+  @Test
+  public void testUpdateTextAnnotationLink5() {
+    String xml = "<text xml:id=\"text-1\"><p xml:id=\"p-1\"><i>This</i> is a test.</p></text>";
+    String expected = "<text xml:id=\"text-1\"><lang value=\"?\" resp=\"#tool\"><p xml:id=\"p-1\"><i>This</i> is a test.</p></lang></text>";
+    Position position = new Position().setXmlId("text-1").setOffset(1).setLength(15);
+    ImmutableMap<String, String> attributes = ImmutableMap.of("value", "?");
+    UUID resourceUUID = UUID.randomUUID();
+    TextRangeAnnotation textRangeAnnotation = new TextRangeAnnotation()//
+        .setId(resourceUUID)//
+        .setAnnotator("tool")//
+        .setName("lang")//
+        .setAttributes(attributes)//
+        .setUseOffset(false)//
+        .setPosition(position);
+
+    Log.info("xml={}", xml);
+    String xmlOut = storage.runInTransaction(() -> {
+      createResourceWithText(resourceUUID, xml);
+      showTextAnnotationList(resourceUUID);
+      TextRangeAnnotationVF vf = storage.createVF(TextRangeAnnotationVF.class);
+      // dumpDot(resourceUUID);
+      tgs.updateTextAnnotationLink(vf, textRangeAnnotation, resourceUUID);
+      // dumpDot(resourceUUID);
+      showTextAnnotationList(resourceUUID);
+      return getXML(resourceUUID);
+    });
+
+    softly.assertThat(xmlOut).isEqualTo(expected);
+  }
+
+  private void showTextAnnotationList(UUID resourceUUID) {
+    TextGraphService tgs = new TextGraphService(storage);
+
+    String textAnnotations = tgs.getTextAnnotationStream(resourceUUID)//
+        .map(this::logTextAnnotation)//
+        .collect(joining());
+    Log.info("TextAnnotations = {}", textAnnotations);
+  }
+
+  private String logTextAnnotation(TextAnnotation ta) {
+    String string = "<" + ta.getName() + " depth=" + ta.getDepth()
+        + ta.getAttributes()//
+            .entrySet()//
+            .stream()//
+            .map(kv -> " " + kv.getKey() + "='" + kv.getValue() + "'")//
+            .collect(joining(" "))
+        + ">";
+    Log.info(string);
+    return string;
   }
 
   private void assertAnnotationCorrectlyInserted(String xml, String expected) {

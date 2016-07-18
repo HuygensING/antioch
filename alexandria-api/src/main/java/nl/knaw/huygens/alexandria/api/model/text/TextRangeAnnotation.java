@@ -69,6 +69,7 @@ public class TextRangeAnnotation extends JsonWrapperObject {
   private String annotator;
   private Position position;
   private Map<String, String> attributes = new HashMap<>();
+  private Boolean useOffset;
 
   public TextRangeAnnotation setId(UUID uuid) {
     this.uuid = uuid;
@@ -113,6 +114,18 @@ public class TextRangeAnnotation extends JsonWrapperObject {
 
   public Map<String, String> getAttributes() {
     return attributes;
+  }
+
+  public TextRangeAnnotation setUseOffset(boolean useOffset) {
+    this.useOffset = useOffset;
+    return this;
+  }
+
+  public boolean hasOffset() {
+    if (useOffset == null) {
+      useOffset = position.getOffset().isPresent();
+    }
+    return useOffset;
   }
 
   @Override
