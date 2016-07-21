@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tinkerpop.gremlin.process.traversal.Order;
+import org.apache.tinkerpop.gremlin.process.traversal.P;
 import org.apache.tinkerpop.gremlin.process.traversal.Traverser;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
@@ -269,53 +270,109 @@ public class TextGraphService {
     void insertNewTextAnnotationVertex() {
       // Log.info("startingTextSegment:{}", visualizeVertex(startingTextSegment));
       if (useOffset) {
-        GraphTraversal<Vertex, Vertex> tail = storage.getVertexTraversal(startingTextSegment)//
-            .in(EdgeLabels.FIRST_TEXT_SEGMENT)//
-            // .sideEffect(t -> Log.info("1: {}{}", t, t.get().label()))//
-            .hasLabel(VertexLabels.TEXTANNOTATION)//
-            // .has(TextAnnotation.Properties.depth)//
-            // .sideEffect(t -> Log.info("2: {}{}", t, t.get().label()))//
-            .order().by(TextAnnotation.Properties.depth, Order.incr)//
-            // .sideEffect(t -> Log.info("3: {}{}:{}", t, t.get().label(), t.get().property("depth")))//
-            .tail(2l);
-        if (tail.hasNext()) {
-          Vertex deepestTextAnnotationVertex = tail.next();
-          checkVertexLabel(deepestTextAnnotationVertex, VertexLabels.TEXTANNOTATION);
-          int depth = getIntValue(deepestTextAnnotationVertex, TextAnnotation.Properties.depth);
-          newTextAnnotationVertex.property(TextAnnotation.Properties.depth, depth + 1);
-          deepestTextAnnotationVertex.addEdge(EdgeLabels.NEXT, newTextAnnotationVertex);
-          GraphTraversal<Vertex, Edge> nextTraversal = storage.getVertexTraversal(deepestTextAnnotationVertex.id())//
-              .outE(EdgeLabels.NEXT);
-          if (nextTraversal.hasNext()) {
-            Edge next = nextTraversal.next();
-            Vertex nextTextAnnotation = next.inVertex();
-            newTextAnnotationVertex.addEdge(EdgeLabels.NEXT, nextTextAnnotation);
-            next.remove();
-          }
-          // Log.info("deepestTextAnnotationVertex={}", visualizeVertex(deepestTextAnnotationVertex));
-        }
-        // Log.info("newTextAnnotationVertex={}", visualizeVertex(newTextAnnotationVertex));
-        // Log.info("startingTextSegment:{}", visualizeVertex(startingTextSegment));
+        insertUsingOffset();
 
       } else {
         // then straight after the parent annotation
-        Vertex parentVertex = storage.getVertexTraversal(startingTextSegment)//
-            .in(EdgeLabels.FIRST_TEXT_SEGMENT)//
-            .hasLabel(VertexLabels.TEXTANNOTATION)//
-            .has(TextAnnotation.Properties.xmlid, parentXmlId)//
-            .next();
-        Iterator<Edge> edges = parentVertex.edges(Direction.OUT, EdgeLabels.NEXT);
-        if (edges.hasNext()) {
-          Edge oldNextEdge = edges.next();
-          Vertex nextTextAnnotation = oldNextEdge.inVertex();
-          newTextAnnotationVertex.addEdge(EdgeLabels.NEXT, nextTextAnnotation);
-          oldNextEdge.remove();
-        }
-        parentVertex.addEdge(EdgeLabels.NEXT, newTextAnnotationVertex);
-        int parentDepth = getIntValue(parentVertex, TextAnnotation.Properties.depth);
-        newTextAnnotationVertex.property(TextAnnotation.Properties.depth, parentDepth + 1);
-        updateDepths(parentVertex, newTextAnnotationVertex, parentDepth);
+        insertAfterParent();
       }
+    }
+
+    private void insertAfterParent() {
+      Vertex parentVertex = storage.getVertexTraversal(startingTextSegment)//
+          .in(EdgeLabels.FIRST_TEXT_SEGMENT)//
+          .hasLabel(VertexLabels.TEXTANNOTATION)//
+          .has(TextAnnotation.Properties.xmlid, parentXmlId)//
+          .next();
+      Iterator<Edge> edges = parentVertex.edges(Direction.OUT, EdgeLabels.NEXT);
+      if (edges.hasNext()) {
+        Edge oldNextEdge = edges.next();
+        Vertex nextTextAnnotation = oldNextEdge.inVertex();
+        newTextAnnotationVertex.addEdge(EdgeLabels.NEXT, nextTextAnnotation);
+        oldNextEdge.remove();
+      }
+      parentVertex.addEdge(EdgeLabels.NEXT, newTextAnnotationVertex);
+      int parentDepth = getDepth(parentVertex);
+      newTextAnnotationVertex.property(TextAnnotation.Properties.depth, parentDepth + 1);
+      updateDepths(parentVertex, newTextAnnotationVertex, parentDepth);
+    }
+
+    private void insertUsingOffset() {
+      int endingTextSegmentIndex = getIntValue(endingTextSegment, TextAnnotation.Properties.index);
+      GraphTraversal<Vertex, Vertex> tailTraversal = storage.getVertexTraversal(startingTextSegment)//
+          // find TextAnnotations that start here
+          .in(EdgeLabels.FIRST_TEXT_SEGMENT)//
+          .hasLabel(VertexLabels.TEXTANNOTATION)//
+          // that are not the newTextAnnotation
+          .not(__.hasId(newTextAnnotationVertex.id()))//
+          // and that don't end before endingTextSegment
+          .not(__.out(EdgeLabels.LAST_TEXT_SEGMENT).has(TextSegment.Properties.index, P.lt(endingTextSegmentIndex)))//
+          // sort by depth
+          .order().by(TextAnnotation.Properties.depth, Order.incr)//
+          // get the deepest
+          .tail();
+      if (tailTraversal.hasNext()) {
+        Vertex parentTextAnnotationVertex = tailTraversal//
+            .next();
+        int parentDepth = getDepth(parentTextAnnotationVertex);
+        setDepth(newTextAnnotationVertex, parentDepth + 1);
+        Iterator<Edge> nextEdges = parentTextAnnotationVertex.edges(Direction.OUT, EdgeLabels.NEXT);
+        if (nextEdges.hasNext()) {
+          Edge next = nextEdges.next();
+          Vertex nextTextAnnotation = next.inVertex();
+          newTextAnnotationVertex.addEdge(EdgeLabels.NEXT, nextTextAnnotation);
+          next.remove();
+        }
+        parentTextAnnotationVertex.addEdge(EdgeLabels.NEXT, newTextAnnotationVertex);
+
+        Iterator<Vertex> vertices = startingTextSegment.vertices(Direction.IN, EdgeLabels.FIRST_TEXT_SEGMENT);
+        StreamUtil.stream(vertices)//
+            .filter(v -> v.label().equals(VertexLabels.TEXTANNOTATION))//
+            .filter(v -> !v.equals(newTextAnnotationVertex))//
+            .filter(v -> getDepth(v) > parentDepth)//
+            .forEach(this::incrementDepth);
+      }
+    }
+
+    private void incrementDepth(Vertex v) {
+      int currentDepth = getDepth(v);
+      setDepth(v, currentDepth + 1);
+    }
+
+    private VertexProperty<Integer> setDepth(Vertex v, int value) {
+      return v.property(TextAnnotation.Properties.depth, value);
+    }
+
+    private int getDepth(Vertex v) {
+      return getIntValue(v, TextAnnotation.Properties.depth);
+    }
+
+    private void insertUsingOffset0() {
+      // insert after the deepest textannotation that starts at the startingTextSegment, and doesn't end before endingTextSegment
+      // then increase depth of the annotations that are children of the new textannotation
+      GraphTraversal<Vertex, Vertex> tail = storage.getVertexTraversal(startingTextSegment)//
+          .in(EdgeLabels.FIRST_TEXT_SEGMENT)//
+          .hasLabel(VertexLabels.TEXTANNOTATION)//
+          .order().by(TextAnnotation.Properties.depth, Order.incr)//
+          .tail(2l);
+      if (tail.hasNext()) {
+        Vertex deepestTextAnnotationVertex = tail.next();
+        checkVertexLabel(deepestTextAnnotationVertex, VertexLabels.TEXTANNOTATION);
+        int depth = getDepth(deepestTextAnnotationVertex);
+        setDepth(newTextAnnotationVertex, depth + 1);
+        deepestTextAnnotationVertex.addEdge(EdgeLabels.NEXT, newTextAnnotationVertex);
+        GraphTraversal<Vertex, Edge> nextTraversal = storage.getVertexTraversal(deepestTextAnnotationVertex.id())//
+            .outE(EdgeLabels.NEXT);
+        if (nextTraversal.hasNext()) {
+          Edge next = nextTraversal.next();
+          Vertex nextTextAnnotation = next.inVertex();
+          newTextAnnotationVertex.addEdge(EdgeLabels.NEXT, nextTextAnnotation);
+          next.remove();
+        }
+        // Log.info("deepestTextAnnotationVertex={}", visualizeVertex(deepestTextAnnotationVertex));
+      }
+      // Log.info("newTextAnnotationVertex={}", visualizeVertex(newTextAnnotationVertex));
+      // Log.info("startingTextSegment:{}", visualizeVertex(startingTextSegment));
     }
 
     boolean rangeStartsInThisTextSegment(Traverser<Vertex> t) {

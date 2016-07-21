@@ -105,6 +105,27 @@ public class TextGraphServiceTest extends AlexandriaTest {
         .setUseOffset(false)//
         .setPosition(position);
 
+    assertExpectation(xml, expected, resourceUUID, textRangeAnnotation);
+  }
+
+  @Test
+  public void testUpdateTextAnnotationLink6() {
+    String xml = "<text xml:id=\"text-1\"><p xml:id=\"p-1\"><i>This</i> is encroyable.</p></text>";
+    String expected = "<text xml:id=\"text-1\"><p xml:id=\"p-1\"><lang value=\"en\" resp=\"#tool\"><i>This</i> is</lang> encroyable.</p></text>";
+    Position position = new Position().setXmlId("text-1").setOffset(1).setLength(7);
+    ImmutableMap<String, String> attributes = ImmutableMap.of("value", "en");
+    UUID resourceUUID = UUID.randomUUID();
+    TextRangeAnnotation textRangeAnnotation = new TextRangeAnnotation()//
+        .setId(resourceUUID)//
+        .setAnnotator("tool")//
+        .setName("lang")//
+        .setAttributes(attributes)//
+        .setPosition(position);
+
+    assertExpectation(xml, expected, resourceUUID, textRangeAnnotation);
+  }
+
+  private void assertExpectation(String xml, String expected, UUID resourceUUID, TextRangeAnnotation textRangeAnnotation) {
     Log.info("xml={}", xml);
     String xmlOut = storage.runInTransaction(() -> {
       createResourceWithText(resourceUUID, xml);
