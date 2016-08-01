@@ -22,8 +22,9 @@ public class AlexandriaCommandProcessor {
     case Commands.ADD_UNIQUE_ID:
       return new AddUniqueIdCommand(service).runWith(parameterMap);
 
-    case Commands.WRAP_CONTENT_IN_ELEMENT:
-      return new WrapContentInElementCommand(service).runWith(parameterMap);
+    // disable wrap-content-in-element command
+    // case Commands.WRAP_CONTENT_IN_ELEMENT:
+    // return new WrapContentInElementCommand(service).runWith(parameterMap);
 
     default:
       return new CommandResponse().addErrorLine("command '" + command + "' not known.");
