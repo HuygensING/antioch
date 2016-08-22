@@ -264,6 +264,9 @@ public class TextGraphService {
       this.parentXmlId = textRangeAnnotation.getPosition().getXmlId();
       this.rangeStart = textRangeAnnotation.getPosition().getOffset().get();
       this.rangeEnd = this.rangeStart + textRangeAnnotation.getPosition().getLength().get() - 1;
+      if (this.rangeEnd == 0) {
+        this.rangeStart = 0;
+      }
       Log.debug("range = [{},{}]", rangeStart, rangeEnd);
     }
 
@@ -388,7 +391,7 @@ public class TextGraphService {
       checkVertexLabel(textSegmentVertex, VertexLabels.TEXTSEGMENT);
 
       // if needed, split up the textsegment, preserving the TextAnnotation links
-      int tailLength = textSize - rangeStart + 1;
+      int tailLength = Math.min(textSize, textSize - rangeStart + 1);
       Log.debug("textSize = {}, tailLength = {}", textSize, tailLength);
       Vertex tail = detachTail(textSegmentVertex, tailLength);
 

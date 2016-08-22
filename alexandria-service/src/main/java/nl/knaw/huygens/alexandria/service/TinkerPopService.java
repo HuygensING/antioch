@@ -364,13 +364,17 @@ public class TinkerPopService implements AlexandriaService {
         FramedGraphTraversal<ResourceVF, Vertex> traversal = oResourceVF.get().start()//
             .in(nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF.EdgeLabels.HAS_RESOURCE)//
             .has("name", annotation.getName())//
-            .has("annotatorCode", annotation.getAnnotator());
+            .has("annotatorCode", annotation.getAnnotator())//
+        ;
+        String xmlId1 = annotation.getPosition().getXmlId();
         Integer start1 = annotation.getPosition().getOffset().get();
         Integer end1 = start1 + annotation.getPosition().getLength().get();
         Predicate<Vertex> overlapsWithAnnotation = t -> {
+          String xmlId2 = (String) t.property("xmlId").value();
           Integer start2 = (Integer) t.property("offset").value();
           Integer end2 = start2 + (Integer) t.property("length").value();
-          return start1 <= end2 && start2 <= end1;
+          Log.info("start1:{} <= end2:{} && start2:{} <= end1:{}", start1, end2, start2, end1);
+          return xmlId1.equals(xmlId2) && start1 <= end2 && start2 <= end1;
         };
         overlaps = StreamUtil.parallelStream(traversal)//
             .filter(overlapsWithAnnotation)//
