@@ -94,7 +94,8 @@ public class Server {
     Log.info("Starting grizzly at {} ...", uri);
     Scheduler scheduler = locator.getService(Scheduler.class);
     scheduler.scheduleExpiredTentativesRemoval();
-    return GrizzlyHttpServerFactory.createHttpServer(uri, config, locator);
+    URI uri0000 = URI.create("http://0.0.0.0:" + uri.getPort());
+    return GrizzlyHttpServerFactory.createHttpServer(uri0000, config, locator);
   }
 
   private ServiceLocator createServiceLocator() {
