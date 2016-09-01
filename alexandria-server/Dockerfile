@@ -1,8 +1,9 @@
 FROM java:8
 ARG version
+ENV wd=/home/alexandria
 RUN useradd -m alexandria
 USER alexandria
-ADD target/alexandria-server-${version}.jar /alexandria/alexandria-server.jar
-WORKDIR /alexandria
+WORKDIR ${wd}
+ADD target/alexandria-server-${version}.jar ${wd}/alexandria-server.jar
 EXPOSE 2015
-CMD java -jar alexandria-server.jar
+ENTRYPOINT java -jar alexandria-server.jar
