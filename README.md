@@ -14,5 +14,5 @@ See the [generated Maven site](http://huygensING.github.io/alexandria) for docum
 
 where workdir is a local directory to persist the db on, and native_port is the port you want the server to be accessed on.
 
-`huygensing/alexandria` is the image of latest release
+`huygensing/alexandria` is the image of latest release;
 for the development version, use `huygensing/alexandria:develop` 
