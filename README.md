@@ -10,9 +10,7 @@ See the [generated Maven site](http://huygensING.github.io/alexandria) for docum
     mvn clean verify site:site site:stage scm-publish:publish-scm
 
 ###### Alternatively, use the docker image:
-    docker run -v ${workdir}:/home/alexandria/.alexandria -p${native_port}:2015 huygensing/alexandria
+    docker run -v ${workdir}:/home/alexandria/.alexandria -p${native_port}:2015 huygensing/alexandria-server:latest-develop
 
 where workdir is a local directory to persist the db on, and native_port is the port you want the server to be accessed on.
-
-`huygensing/alexandria` is the image of latest release;
-for the development version, use `huygensing/alexandria:develop` 
+ 
