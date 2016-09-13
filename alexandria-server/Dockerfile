@@ -5,4 +5,4 @@ USER alexandria
 WORKDIR ${wd}
 ADD target/alexandria-server.jar ${wd}/
 EXPOSE 2015
-ENTRYPOINT ["java", "-jar alexandria-server.jar"]
+ENTRYPOINT ["java", "-jar", "alexandria-server.jar"]
