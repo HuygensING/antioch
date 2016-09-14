@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 public class CommandResponse {
   private List<String> errorLines = Lists.newArrayList();
   boolean parametersAreValid = false;
+  private Object result;
 
   public CommandResponse addErrorLine(String errorLine) {
     errorLines.add(errorLine);
@@ -35,6 +36,14 @@ public class CommandResponse {
   @Override
   public String toString() {
     return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+  }
+
+  public void setResult(Object result) {
+    this.result = result;
+  }
+
+  public Object getResult() {
+    return result;
   }
 
 }

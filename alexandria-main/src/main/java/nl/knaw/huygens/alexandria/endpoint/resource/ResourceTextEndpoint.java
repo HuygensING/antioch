@@ -24,13 +24,11 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
 import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
-import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewEntity;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
@@ -138,18 +136,10 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @ApiOperation("get textgraph as xml")
   public Response getXML(@QueryParam("view") String view) {
     assertResourceHasText();
-    StreamingOutput outputstream;
-    if (StringUtils.isNotBlank(view)) {
-      TextView textView = service.getTextView(resourceId, view)//
-          .orElseThrow(() -> new NotFoundException("No view '" + view + "' found for this resource."));
-      outputstream = TextGraphUtil.streamTextViewXML(service, resourceId, textView);
-
-    } else {
-      outputstream = TextGraphUtil.streamXML(service, resourceId);
-    }
-
+    StreamingOutput outputstream = TextGraphUtil.xmlOutputStream(service, resourceId, view);
     return ok(outputstream);
   }
+
 
   @GET
   @Path("dot")

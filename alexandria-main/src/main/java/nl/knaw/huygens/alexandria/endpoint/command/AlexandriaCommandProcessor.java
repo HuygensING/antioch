@@ -21,6 +21,8 @@ public class AlexandriaCommandProcessor {
     switch (command) {
     case Commands.ADD_UNIQUE_ID:
       return new AddUniqueIdCommand(service).runWith(parameterMap);
+    case Commands.XPATH:
+      return new XpathCommand(service).runWith(parameterMap);
 
     // disable wrap-content-in-element command
     // case Commands.WRAP_CONTENT_IN_ELEMENT:

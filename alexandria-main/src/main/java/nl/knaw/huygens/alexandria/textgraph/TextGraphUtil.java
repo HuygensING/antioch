@@ -22,6 +22,8 @@ import java.util.function.Consumer;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -32,6 +34,7 @@ import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.ElementMode;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
+import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.tei.Document;
 
@@ -66,6 +69,15 @@ public class TextGraphUtil {
     } catch (IOException ioe) {
       throw new RuntimeException(ioe);
     }
+  }
+
+  public static StreamingOutput xmlOutputStream(AlexandriaService service, UUID resourceId, String view) {
+    if (StringUtils.isNotBlank(view)) {
+      TextView textView = service.getTextView(resourceId, view)//
+          .orElseThrow(() -> new NotFoundException("No view '" + view + "' found for this resource."));
+      return streamTextViewXML(service, resourceId, textView);
+    }
+    return streamXML(service, resourceId);
   }
 
   private static void writeOpenTags(Writer writer, TextGraphSegment segment) throws IOException {

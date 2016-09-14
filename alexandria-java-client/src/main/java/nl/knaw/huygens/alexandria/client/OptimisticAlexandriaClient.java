@@ -216,8 +216,8 @@ public class OptimisticAlexandriaClient {
     return unwrap(delegate.getSearchResultPage(searchId, page));
   }
 
-  public CommandResponse addCommand(String commandName, Map<String, Object> parameters) {
-    return unwrap(delegate.addCommand(commandName, parameters));
+  public CommandResponse doCommand(String commandName, Map<String, Object> parameters) {
+    return unwrap(delegate.doCommand(commandName, parameters));
   }
 
   public AnnotationList getResourceAnnotations(UUID uuid) {

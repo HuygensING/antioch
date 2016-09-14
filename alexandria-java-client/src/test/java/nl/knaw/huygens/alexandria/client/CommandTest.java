@@ -32,7 +32,7 @@ public class CommandTest extends AlexandriaClientTest {
         .put("resourceIds", ImmutableList.of(resourceUuid))//
         .put("elements", ImmutableList.of("text", "p"))//
         .build();
-    RestResult<CommandResponse> result = client.addCommand(Commands.ADD_UNIQUE_ID, parameters);
+    RestResult<CommandResponse> result = client.doCommand(Commands.ADD_UNIQUE_ID, parameters);
     assertRequestSucceeded(result);
     CommandResponse commandResponse = result.get();
     assertThat(commandResponse.success()).isTrue();
@@ -41,6 +41,24 @@ public class CommandTest extends AlexandriaClientTest {
     assertRequestSucceeded(xmlReadResult);
     String xml2 = xmlReadResult.get();
     assertThat(xml2).isEqualTo(expectedXml);
+  }
+
+  @Test
+  public void testXpathCommmandWorks() {
+    UUID resourceUuid = createResource("xml");
+    String xml = "<text xmlns:x=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><x:p>Alinea 1</x:p><x:p>Alinea 2</x:p></text>";
+    String expected = "Alinea 2";
+    setResourceText(resourceUuid, xml);
+    Map<String, Object> parameters = ImmutableMap.<String, Object> builder()//
+        .put("resourceIds", ImmutableList.of(resourceUuid))//
+        .put("xpath", "/text/x:p[2]")//
+        .build();
+    RestResult<CommandResponse> result = client.doCommand(Commands.XPATH, parameters);
+    assertRequestSucceeded(result);
+    CommandResponse commandResponse = result.get();
+    assertThat(commandResponse.success()).isTrue();
+    Map<String, String> result2 = (Map<String, String>) commandResponse.getResult();
+    assertThat(result2.get(resourceUuid.toString())).isEqualTo(expected);
   }
 
   // @Test
@@ -80,7 +98,7 @@ public class CommandTest extends AlexandriaClientTest {
           .put("xmlIds", ImmutableList.of(entry.getKey()))//
           .put("element", element)//
           .build();
-      RestResult<CommandResponse> result = client.addCommand(Commands.WRAP_CONTENT_IN_ELEMENT, parameters);
+      RestResult<CommandResponse> result = client.doCommand(Commands.WRAP_CONTENT_IN_ELEMENT, parameters);
       assertRequestSucceeded(result);
       CommandResponse commandResponse = result.get();
       assertThat(commandResponse.success()).isTrue();
@@ -118,7 +136,7 @@ public class CommandTest extends AlexandriaClientTest {
         .put("xmlIds", ImmutableList.of("p-10"))//
         .put("element", element)//
         .build();
-    RestResult<CommandResponse> result = client.addCommand(Commands.WRAP_CONTENT_IN_ELEMENT, parameters1);
+    RestResult<CommandResponse> result = client.doCommand(Commands.WRAP_CONTENT_IN_ELEMENT, parameters1);
     assertRequestSucceeded(result);
     CommandResponse commandResponse = result.get();
     assertThat(commandResponse.success()).isTrue();

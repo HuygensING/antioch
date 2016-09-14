@@ -423,7 +423,7 @@ public class AlexandriaClient implements AutoCloseable {
         .getResult();
   }
 
-  public RestResult<CommandResponse> addCommand(String commandName, Map<String, Object> parameters) {
+  public RestResult<CommandResponse> doCommand(String commandName, Map<String, Object> parameters) {
     final Entity<Map<String, Object>> entity = Entity.json(parameters);
     final WebTarget path = rootTarget.path(EndpointPaths.COMMANDS).path(commandName);
     final Supplier<Response> responseSupplier = authorizedPost(path, entity);
