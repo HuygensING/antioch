@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableMap;
 
 import nl.knaw.huygens.alexandria.api.model.CommandResponse;
 import nl.knaw.huygens.alexandria.api.model.Commands;
+import nl.knaw.huygens.alexandria.endpoint.command.XpathCommand.XPathResult;
 
 public class CommandTest extends AlexandriaClientTest {
 
@@ -46,19 +47,22 @@ public class CommandTest extends AlexandriaClientTest {
   @Test
   public void testXpathCommmandWorks() {
     UUID resourceUuid = createResource("xml");
-    String xml = "<text xmlns:x=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><x:p>Alinea 1</x:p><x:p>Alinea 2</x:p></text>";
+    String xml = "<text><p>Alinea 1</p><p>Alinea 2</p></text>";
     String expected = "Alinea 2";
     setResourceText(resourceUuid, xml);
     Map<String, Object> parameters = ImmutableMap.<String, Object> builder()//
         .put("resourceIds", ImmutableList.of(resourceUuid))//
-        .put("xpath", "/text/x:p[2]")//
+        .put("xpath", "string(/text/p[2])")//
         .build();
     RestResult<CommandResponse> result = client.doCommand(Commands.XPATH, parameters);
     assertRequestSucceeded(result);
     CommandResponse commandResponse = result.get();
     assertThat(commandResponse.success()).isTrue();
-    Map<String, String> result2 = (Map<String, String>) commandResponse.getResult();
-    assertThat(result2.get(resourceUuid.toString())).isEqualTo(expected);
+    Map<String, Map<String, String>> result2 = (Map<String, Map<String, String>>) commandResponse.getResult();
+    Map<String, String> map = result2.get(resourceUuid.toString());
+    XPathResult returnedXPathResult = new XPathResult(XPathResult.Type.valueOf(map.get("type")), map.get("result"));
+    XPathResult expectedXPathResult = new XPathResult(XPathResult.Type.STRING, expected);
+    assertThat(returnedXPathResult).isEqualToComparingFieldByField(expectedXPathResult);
   }
 
   // @Test
