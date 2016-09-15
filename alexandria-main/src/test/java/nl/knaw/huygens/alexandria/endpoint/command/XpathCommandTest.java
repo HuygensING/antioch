@@ -74,11 +74,18 @@ public class XpathCommandTest extends AlexandriaTest {
     softly.assertThat(result.getResult()).isEqualTo(5.0);
   }
 
-  // @Test
+  @Test
   public void selectTheNumberOfCompanyElements() throws Exception {
     XPathResult result = XpathCommand.testXPath("count(//foo:company)", EXAMPLE);
     softly.assertThat(result.getType()).isEqualTo(Type.NUMBER);
     softly.assertThat(result.getResult()).isEqualTo(7.0);
+  }
+
+  @Test
+  public void selectTheLocalNameOfTheFirstCompanyElement() throws Exception {
+    XPathResult result = XpathCommand.testXPath("local-name(//foo:company[1])", EXAMPLE);
+    softly.assertThat(result.getType()).isEqualTo(Type.STRING);
+    softly.assertThat(result.getResult()).isEqualTo("company");
   }
 
   @Test

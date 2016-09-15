@@ -1,7 +1,6 @@
 package nl.knaw.huygens.alexandria.endpoint.command;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,13 +28,13 @@ import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 import nl.knaw.huygens.alexandria.api.model.CommandResponse;
 import nl.knaw.huygens.alexandria.api.model.Commands;
 import nl.knaw.huygens.alexandria.endpoint.command.XpathCommand.XPathResult.Type;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
+import nl.knaw.huygens.tei.QueryableDocument;
 
 public class XpathCommand extends ResourcesCommand {
   private static final String PARAMETER_XPATH = "xpath";
@@ -85,38 +84,25 @@ public class XpathCommand extends ResourcesCommand {
     return commandResponse;
   }
 
-  private static final XPath XPATH = XPathFactory.newInstance().newXPath();
-
   static XPathResult testXPath(String xpathQuery, String xml) throws XPathExpressionException {
-    XPathExpression xpe = XPATH.compile(xpathQuery);
-    InputSource inputSource = new InputSource(new StringReader(xml));
-
-    // try {
-    // Node node = (Node) xpe.evaluate(inputSource, XPathConstants.NODE);
-    // return new XPathResult(ResultType.NODE, node);
-    // } catch (XPathException e) {
-    // e.printStackTrace();
-    // }
+    QueryableDocument qDoc = QueryableDocument.createFromXml(xml, true);
 
     try {
-      NodeList nodelist = (NodeList) xpe.evaluate(inputSource, XPathConstants.NODESET);
+      NodeList nodelist = qDoc.evaluateXPathToW3CNodeList(xpathQuery);
       return new XPathResult(Type.NODESET, toStringList(nodelist));
     } catch (XPathException e) {
-      // e.printStackTrace();
       if (e.getMessage().contains("#BOOLEAN")) {
-        inputSource = new InputSource(new StringReader(xml));
-        Object b = xpe.evaluate(inputSource, XPathConstants.BOOLEAN);
+        Object b = qDoc.evaluateXPathToBoolean(xpathQuery);
         return new XPathResult(Type.BOOLEAN, b);
       }
       if (e.getMessage().contains("#NUMBER")) {
-        inputSource = new InputSource(new StringReader(xml));
-        Object n = xpe.evaluate(inputSource, XPathConstants.NUMBER);
+        Object n = qDoc.evaluateXPathToDouble(xpathQuery);
         return new XPathResult(Type.NUMBER, n);
       }
     }
 
-    inputSource = new InputSource(new StringReader(xml));
-    return new XPathResult(Type.STRING, xpe.evaluate(inputSource));
+    String string = qDoc.evaluateXPathToString(xpathQuery);
+    return new XPathResult(Type.STRING, string);
   }
 
   private static List<String> toStringList(NodeList nodelist) {
