@@ -2,7 +2,6 @@ package nl.knaw.huygens.alexandria.endpoint.command;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.inject.Inject;
 
@@ -15,7 +14,7 @@ import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
 
 public class WrapContentInElementCommand extends TextAnnotationCommand {
   private static class Parameters {
-    List<UUID> resourceIds;
+    List<ResourceViewId> resourceViewIds;
     List<String> xmlIds;
     TextAnnotation contentWrapper;
   }
@@ -56,14 +55,16 @@ public class WrapContentInElementCommand extends TextAnnotationCommand {
   public CommandResponse runWith(Map<String, Object> parameterMap) {
     Parameters parameters = validateParameters(parameterMap);
     if (commandResponse.parametersAreValid()) {
-      for (UUID resourceId : parameters.resourceIds) {
-        service.runInTransaction(() -> {
-          Context context = new Context(service, parameters);
-          service.getTextAnnotationStream(resourceId)//
-              .filter(context::hasRelevantXmlId)//
-              .forEach(context::wrapContent);
-        });
-      }
+      parameters.resourceViewIds.stream()//
+          .map(ResourceViewId::getResourceId)//
+          .forEach(resourceId -> {
+            service.runInTransaction(() -> {
+              Context context = new Context(service, parameters);
+              service.getTextAnnotationStream(resourceId)//
+                  .filter(context::hasRelevantXmlId)//
+                  .forEach(context::wrapContent);
+            });
+          });
     }
     return commandResponse;
   }
@@ -71,7 +72,7 @@ public class WrapContentInElementCommand extends TextAnnotationCommand {
   @SuppressWarnings("unchecked")
   private Parameters validateParameters(Map<String, Object> parameterMap) {
     Parameters parameters = new Parameters();
-    parameters.resourceIds = validateResourceIds(parameterMap, commandResponse, service);
+    parameters.resourceViewIds = validateResourceViewIds(parameterMap, commandResponse, service);
     boolean valid = (commandResponse.getErrorLines().isEmpty());
 
     try {

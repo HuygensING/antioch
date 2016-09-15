@@ -6,7 +6,6 @@ import static nl.knaw.huygens.alexandria.text.TextUtil.XML_ID;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.inject.Inject;
@@ -22,7 +21,7 @@ public class AddUniqueIdCommand extends TextAnnotationCommand {
   private static final String PARAMETER_ELEMENTS = "elements";
 
   private static class Parameters {
-    List<UUID> resourceIds;
+    List<ResourceViewId> resourceViewIds;
     List<String> elementNames;
   }
 
@@ -62,19 +61,21 @@ public class AddUniqueIdCommand extends TextAnnotationCommand {
   public CommandResponse runWith(Map<String, Object> parameterMap) {
     Parameters parameters = validateParameters(parameterMap);
     if (commandResponse.parametersAreValid()) {
-      for (UUID resourceId : parameters.resourceIds) {
-        service.runInTransaction(() -> {
-          Context context = new Context(service);
-          context.existingIds = service.getTextAnnotationStream(resourceId)//
-              .filter(this::hasXmlId)//
-              .map(this::getXmlId)//
-              .collect(toList());
-          service.getTextAnnotationStream(resourceId)//
-              .filter(ta -> textAnnotationHasRelevantName(parameters, ta))//
-              .filter(ta -> !hasXmlId(ta))//
-              .forEach(context::setXmlId);
-        });
-      }
+      parameters.resourceViewIds.stream()//
+          .map(ResourceViewId::getResourceId)//
+          .forEach(resourceId -> {
+            service.runInTransaction(() -> {
+              Context context = new Context(service);
+              context.existingIds = service.getTextAnnotationStream(resourceId)//
+                  .filter(this::hasXmlId)//
+                  .map(this::getXmlId)//
+                  .collect(toList());
+              service.getTextAnnotationStream(resourceId)//
+                  .filter(ta -> textAnnotationHasRelevantName(parameters, ta))//
+                  .filter(ta -> !hasXmlId(ta))//
+                  .forEach(context::setXmlId);
+            });
+          });
     }
     return commandResponse;
   }
@@ -82,7 +83,7 @@ public class AddUniqueIdCommand extends TextAnnotationCommand {
   @SuppressWarnings("unchecked")
   private Parameters validateParameters(Map<String, Object> parameterMap) {
     final Parameters parameters = new Parameters();
-    parameters.resourceIds = validateResourceIds(parameterMap, commandResponse, service);
+    parameters.resourceViewIds = validateResourceViewIds(parameterMap, commandResponse, service);
     boolean valid = (commandResponse.getErrorLines().isEmpty());
     if (!parameterMap.containsKey(PARAMETER_ELEMENTS)) {
       addElementsError();

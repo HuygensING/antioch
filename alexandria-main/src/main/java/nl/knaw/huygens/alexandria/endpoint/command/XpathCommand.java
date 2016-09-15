@@ -40,7 +40,7 @@ public class XpathCommand extends ResourcesCommand {
   private static final String PARAMETER_XPATH = "xpath";
 
   private static class Parameters {
-    List<UUID> resourceIds;
+    List<ResourceViewId> resourceViewIds;
     String xpath;
   }
 
@@ -62,8 +62,9 @@ public class XpathCommand extends ResourcesCommand {
     Parameters parameters = validateParameters(parameterMap);
     Map<String, XPathResult> resultMap = new HashMap<>();
     if (commandResponse.parametersAreValid()) {
-      for (UUID resourceId : parameters.resourceIds) {
+      for (ResourceViewId resourceViewId : parameters.resourceViewIds) {
         service.runInTransaction(() -> {
+          UUID resourceId = resourceViewId.getResourceId();
           StreamingOutput xmlOutputStream = TextGraphUtil.xmlOutputStream(service, resourceId, "");
           StringBuilderWriter sbWriter = new StringBuilderWriter();
           WriterOutputStream writerOutputStream = new WriterOutputStream(sbWriter);
@@ -150,7 +151,7 @@ public class XpathCommand extends ResourcesCommand {
 
   private Parameters validateParameters(Map<String, Object> parameterMap) {
     final Parameters parameters = new Parameters();
-    parameters.resourceIds = validateResourceIds(parameterMap, commandResponse, service);
+    parameters.resourceViewIds = validateResourceViewIds(parameterMap, commandResponse, service);
     boolean valid = (commandResponse.getErrorLines().isEmpty());
     if (!parameterMap.containsKey(PARAMETER_XPATH)) {
       addXPathError();
