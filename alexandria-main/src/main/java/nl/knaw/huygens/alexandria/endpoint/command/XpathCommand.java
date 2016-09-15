@@ -65,7 +65,8 @@ public class XpathCommand extends ResourcesCommand {
       for (ResourceViewId resourceViewId : parameters.resourceViewIds) {
         service.runInTransaction(() -> {
           UUID resourceId = resourceViewId.getResourceId();
-          StreamingOutput xmlOutputStream = TextGraphUtil.xmlOutputStream(service, resourceId, "");
+          String viewName = resourceViewId.getTextViewName().orElse("");
+          StreamingOutput xmlOutputStream = TextGraphUtil.xmlOutputStream(service, resourceId, viewName);
           StringBuilderWriter sbWriter = new StringBuilderWriter();
           WriterOutputStream writerOutputStream = new WriterOutputStream(sbWriter);
           try {
