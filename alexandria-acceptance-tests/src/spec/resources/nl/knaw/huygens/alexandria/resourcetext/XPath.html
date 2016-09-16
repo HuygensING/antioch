@@ -1,0 +1,138 @@
+<!--
+  #%L
+  alexandria-acceptance-tests
+  =======
+  Copyright (C) 2015 - 2016 Huygens ING (KNAW)
+  =======
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/gpl-3.0.html>.
+  #L%
+  -->
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+
+<title>Alexandria: Xpath queries on text</title>
+
+<body data-desc="XPath querying">
+
+<div id="xpath-1" c:execute="clearStorage()"
+     data-desc="Basic XPath query">
+
+		Given a resource
+		with id <code c:set="#resId1">00000000-0000-0000-0000-000000000001</code>
+		<span c:execute="resourceExists(#resId1)">exists</span>,<br/>
+		which has
+		<span c:execute="resourceHasText(#resId1,#text1)">text<br/>
+		  <code c:set="#text1">&lt;body&gt;&lt;div&gt;&lt;p&gt;First paragraph&lt;/p&gt;&lt;/div&gt;&lt;div xml:id=&quot;div-1&quot;&gt;&lt;p&gt;Second paragraph&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</code>
+		</span>,<br/>
+		<br/>
+		
+		a second resource
+		with id <code c:set="#resId2">00000000-0000-0000-0000-000000000002</code>
+		<span c:execute="resourceExists(#resId2)">exists</span>,<br/>
+		which has
+		<span c:execute="resourceHasText(#resId2,#text2)">text<br/>
+		   <code c:set="#text2">&lt;body&gt;&lt;div&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;</code>
+		</span>,<br/>
+		<br/>
+    
+    <h:request>
+     If i now
+     <h:post>/commands/xpath</h:post>
+     the body:
+     <h:jsonBody>
+       {
+         "resourceIds" : ["00000000-0000-0000-0000-000000000001","00000000-0000-0000-0000-000000000002"],
+         "xpath" : "count(//p)"
+       }
+     </h:jsonBody>
+     using
+     <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+     then I should receive
+     <ul>
+       <li>status <h:status>200 OK</h:status></li>
+       <li>and the response body is
+       <h:jsonResponse>
+          {
+            "errorLines" : [ ],
+            "parametersAreValid" : true,
+            "result" : {
+					    "00000000-0000-0000-0000-000000000001" : {
+					      "result" : 2.0,
+					      "type" : "NUMBER"
+					    },
+					    "00000000-0000-0000-0000-000000000002" : {
+					      "result" : 1.0,
+					      "type" : "NUMBER"
+					    }
+					  }
+          }
+       </h:jsonResponse>
+       </li>
+     </ul>
+  </h:request>
+  <br/>
+    
+</div>
+
+<div id="xpath-2"
+     data-desc="Another XPath example">
+
+    Given the same resource as before,<br/>
+    <br/>
+    
+    <h:request>
+     If I
+     <h:post>/commands/xpath</h:post>
+     the body:
+     <h:jsonBody>
+       {
+         "resourceIds" : ["00000000-0000-0000-0000-000000000001","00000000-0000-0000-0000-000000000002"],
+         "xpath" : "//p"
+       }
+     </h:jsonBody>
+     using
+     <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+     then I should receive
+     <ul>
+       <li>status <h:status>200 OK</h:status></li>
+       <li>and the response body is
+       <h:jsonResponse>
+          {
+            "errorLines" : [ ],
+            "parametersAreValid" : true,
+						"result" : {
+						    "00000000-0000-0000-0000-000000000001" : {
+						      "result" : [ "&lt;p&gt;First paragraph&lt;/p&gt;", "&lt;p&gt;Second paragraph&lt;/p&gt;" ],
+						      "type" : "NODESET"
+						    },
+						    "00000000-0000-0000-0000-000000000002" : {
+						      "result" : [ "&lt;p&gt;Lorem ipsum&lt;/p&gt;" ],
+						      "type" : "NODESET"
+						    }
+						}
+	        }
+       </h:jsonResponse>
+       </li>
+     </ul>
+  </h:request>
+  <br/>
+    
+</div>
+
+</body>
+</html>
