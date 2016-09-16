@@ -10,10 +10,12 @@ public class ResourceViewIdTest {
   public void testFromStringWithViewName() throws Exception {
     String uuidString = "3e8c6332-230c-4fc5-865f-0d51534f4375";
     String viewName = "viewname";
-    ResourceViewId rvi = ResourceViewId.fromString(uuidString + ":" + viewName);
+    String idString = uuidString + ":" + viewName;
+    ResourceViewId rvi = ResourceViewId.fromString(idString);
     assertThat(rvi.getResourceId().toString()).isEqualTo(uuidString);
     assertThat(rvi.getTextViewName()).isPresent();
     assertThat(rvi.getTextViewName().get()).isEqualTo(viewName);
+    assertThat(rvi.toString()).isEqualTo(idString);
   }
 
   @Test
@@ -22,6 +24,7 @@ public class ResourceViewIdTest {
     ResourceViewId rvi = ResourceViewId.fromString(uuidString);
     assertThat(rvi.getResourceId().toString()).isEqualTo(uuidString);
     assertThat(rvi.getTextViewName()).isNotPresent();
+    assertThat(rvi.toString()).isEqualTo(uuidString);
   }
 
 }

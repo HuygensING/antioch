@@ -30,6 +30,11 @@ public class ResourceViewId {
   }
 
   @Override
+  public String toString() {
+    return resourceId.toString() + (textViewName == null ? "" : ":" + textViewName);
+  }
+
+  @Override
   public boolean equals(Object obj) {
     return obj instanceof ResourceViewId //
         && ((ResourceViewId) obj).getTextViewName().equals(getTextViewName()) //

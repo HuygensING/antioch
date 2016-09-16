@@ -74,7 +74,7 @@ public class XpathCommand extends ResourcesCommand {
             writerOutputStream.close();
             String xml = sbWriter.toString();
             XPathResult result = testXPath(parameters.xpath, xml);
-            resultMap.put(resourceId.toString(), result);
+            resultMap.put(resourceViewId.toString(), result);
           } catch (WebApplicationException | IOException | XPathExpressionException e) {
             commandResponse.addErrorLine(resourceId + ": " + e.getMessage());
             e.printStackTrace();
