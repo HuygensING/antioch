@@ -81,6 +81,14 @@ public class LocationBuilder {
     return uriBuilder.build(uuid);
   }
 
+  public URI locationOf(String... subPaths) {
+    UriBuilder uriBuilder = UriBuilder.fromUri(config.getBaseURI());
+    for (String subPath : subPaths) {
+      uriBuilder = uriBuilder.path(subPath);
+    }
+    return uriBuilder.build();
+  }
+
   // -- private methods --//
 
   private String pathOf(Class<? extends Identifiable> identifiableClass, String... subPaths) {

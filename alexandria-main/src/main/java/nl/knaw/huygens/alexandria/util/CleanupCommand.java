@@ -27,15 +27,16 @@ import javax.inject.Inject;
 import com.google.common.base.Preconditions;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.model.ProcessStatusMap;
+import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.alexandria.textgraph.TextGraphTaskStatusMap;
 
 public class CleanupCommand implements Runnable {
   private AlexandriaService service;
-  private TextGraphTaskStatusMap taskStatusMap;
+  private ProcessStatusMap<TextImportStatus> taskStatusMap;
 
   @Inject
-  public CleanupCommand(AlexandriaService service, TextGraphTaskStatusMap taskStatusMap) {
+  public CleanupCommand(AlexandriaService service, ProcessStatusMap<TextImportStatus> taskStatusMap) {
     this.service = service;
     this.taskStatusMap = taskStatusMap;
   }

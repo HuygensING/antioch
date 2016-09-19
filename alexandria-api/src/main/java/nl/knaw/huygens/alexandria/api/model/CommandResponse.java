@@ -11,6 +11,8 @@ public class CommandResponse {
   private List<String> errorLines = Lists.newArrayList();
   boolean parametersAreValid = false;
   private Object result;
+  private boolean async = false;
+  private String statusId;
 
   public CommandResponse addErrorLine(String errorLine) {
     errorLines.add(errorLine);
@@ -44,6 +46,22 @@ public class CommandResponse {
 
   public Object getResult() {
     return result;
+  }
+
+  public void setASync(boolean async) {
+    this.async = async;
+  }
+
+  public boolean isASync() {
+    return async;
+  }
+
+  public void setStatusId(String statusId) {
+    this.statusId = statusId;
+  }
+
+  public String getStatusId() {
+    return statusId;
   }
 
 }

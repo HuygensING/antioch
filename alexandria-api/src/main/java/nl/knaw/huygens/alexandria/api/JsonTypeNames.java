@@ -15,6 +15,7 @@ public class JsonTypeNames {
   public static final String TEXTANNOTATIONINFO = "textAnnotationInfo";
   public static final String TEXTVIEW = "textView";
   public static final String TEXTIMPORTSTATUS = "textImportStatus";
+  public static final String COMMANDSTATUS = "commandStatus";
   public static final String QUERY = "query";
   public static final String SEARCHRESULTPAGE = "searchResultPage";
 }

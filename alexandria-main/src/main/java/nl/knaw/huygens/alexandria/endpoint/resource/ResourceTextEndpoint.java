@@ -27,6 +27,7 @@ import org.apache.commons.io.IOUtils;
 
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.ProcessStatusMap;
 import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
 import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewEntity;
@@ -42,7 +43,6 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.text.TextPrototype;
 import nl.knaw.huygens.alexandria.textgraph.DotFactory;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphImportTask;
-import nl.knaw.huygens.alexandria.textgraph.TextGraphTaskStatusMap;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 
 public class ResourceTextEndpoint extends JSONEndpoint {
@@ -51,7 +51,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   private final AlexandriaResource resource;
   private ExecutorService executorService;
   private final LocationBuilder locationBuilder;
-  private final TextGraphTaskStatusMap taskStatusMap;
+  private final ProcessStatusMap<TextImportStatus> taskStatusMap;
   private AlexandriaConfiguration config;
   private ResourceTextFactory textFactory;
 
@@ -62,7 +62,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
       ExecutorService executorService, //
       LocationBuilder locationBuilder, //
       ResourceTextFactory resourceTextFactory, //
-      TextGraphTaskStatusMap taskStatusMap, //
+      ProcessStatusMap<TextImportStatus> taskStatusMap, //
       @PathParam("uuid") final UUIDParam uuidParam) {
     this.service = service;
     this.config = config;

@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.textgraph;
+package nl.knaw.huygens.alexandria.api.model;
 
 import static java.util.stream.Collectors.toList;
 
@@ -7,19 +7,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.inject.Singleton;
+
 import com.google.common.collect.Maps;
 
-import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
+@Singleton
+public class ProcessStatusMap<T extends ProcessStatus> {
+  private Map<UUID, T> map = Maps.newHashMap();
 
-public class TextGraphTaskStatusMap {
-  private static Map<UUID, TextImportStatus> map = Maps.newHashMap();
-
-  public void put(UUID id, TextImportStatus status) {
+  public void put(UUID id, T status) {
     removeExpiredTasks();
     map.put(id, status);
   }
 
-  public Optional<TextImportStatus> get(UUID id) {
+  public Optional<T> get(UUID id) {
     removeExpiredTasks();
     return Optional.ofNullable(map.get(id));
   }
@@ -30,4 +31,5 @@ public class TextGraphTaskStatusMap {
         .collect(toList());
     expiredEntries.forEach(key -> map.remove(key));
   }
+
 }
