@@ -11,6 +11,7 @@ import org.junit.Test;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.CommandResponse;
 import nl.knaw.huygens.alexandria.api.model.Commands;
 import nl.knaw.huygens.alexandria.endpoint.command.XpathCommand.XPathResult;
@@ -63,6 +64,22 @@ public class CommandTest extends AlexandriaClientTest {
     XPathResult returnedXPathResult = new XPathResult(XPathResult.Type.valueOf(map.get("type")), map.get("result"));
     XPathResult expectedXPathResult = new XPathResult(XPathResult.Type.STRING, expected);
     assertThat(returnedXPathResult).isEqualToComparingFieldByField(expectedXPathResult);
+  }
+
+  @Test
+  public void testAQL2CommmandWorks() {
+    UUID resourceUuid = createResource("xml");
+    String xml = "<text><p>Alinea 1</p><p>Alinea 2</p></text>";
+    setResourceText(resourceUuid, xml);
+    Map<String, Object> parameters = ImmutableMap.<String, Object> builder()//
+        .put("command", "hello('world')")//
+        .build();
+    RestResult<CommandResponse> result = client.doCommand(Commands.AQL2, parameters);
+    assertRequestSucceeded(result);
+    CommandResponse commandResponse = result.get();
+    assertThat(commandResponse.success()).isTrue();
+    Object result2 = commandResponse.getResult();
+    Log.info("{}", result2);
   }
 
   // @Test

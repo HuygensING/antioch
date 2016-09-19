@@ -23,6 +23,8 @@ public class AlexandriaCommandProcessor {
       return new AddUniqueIdCommand(service).runWith(parameterMap);
     case Commands.XPATH:
       return new XpathCommand(service).runWith(parameterMap);
+    case Commands.AQL2:
+      return new AQL2Command(service).runWith(parameterMap);
 
     // disable wrap-content-in-element command
     // case Commands.WRAP_CONTENT_IN_ELEMENT:
