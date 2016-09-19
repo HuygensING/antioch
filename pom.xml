@@ -1,588 +1,591 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>nl.knaw.huygens.alexandria</groupId>
-  <artifactId>alexandria</artifactId>
-  <packaging>pom</packaging>
-  <version>1.2-SNAPSHOT</version>
-  <name>Alexandria Text Repository</name>
-  <url>http://huygensing.github.io/alexandria/</url>
-  <inceptionYear>2015</inceptionYear>
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>nl.knaw.huygens.alexandria</groupId>
+    <artifactId>alexandria</artifactId>
+    <packaging>pom</packaging>
+    <version>1.2-SNAPSHOT</version>
+    <name>Alexandria Text Repository</name>
+    <url>http://huygensing.github.io/alexandria/</url>
+    <inceptionYear>2015</inceptionYear>
 
-  <modules>
-    <module>alexandria-main</module>
-    <module>alexandria-acceptance-tests</module>
-    <module>alexandria-service</module>
-    <module>alexandria-service-tinkerpop-tinkergraph</module>
-    <module>alexandria-service-tinkerpop-titan</module>
-    <module>alexandria-service-tinkerpop-neo4j</module>
-    <module>alexandria-server</module>
-    <module>alexandria-webapp</module>
-    <module>alexandria-test</module>
-    <module>alexandria-aql</module>
-    <module>alexandria-java-client</module>
-    <module>alexandria-api</module>
-  </modules>
+    <modules>
+        <module>alexandria-acceptance-tests</module>
+        <module>alexandria-api</module>
+        <module>alexandria-aql</module>
+        <module>alexandria-aql2</module>
+        <module>alexandria-java-client</module>
+        <module>alexandria-main</module>
+        <module>alexandria-server</module>
+        <module>alexandria-service-tinkerpop-neo4j</module>
+        <module>alexandria-service-tinkerpop-tinkergraph</module>
+        <module>alexandria-service-tinkerpop-titan</module>
+        <module>alexandria-service</module>
+        <module>alexandria-test</module>
+        <module>alexandria-webapp</module>
+    </modules>
 
-  <properties>
-    <!-- Encoding: everything UTF-8, please -->
-    <encoding>UTF-8</encoding>
-    <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
+    <properties>
+        <!-- Encoding: everything UTF-8, please -->
+        <encoding>UTF-8</encoding>
+        <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
 
-    <!-- Timestamp settings for use in properties file -->
-    <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
+        <!-- Timestamp settings for use in properties file -->
+        <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
 
-    <!-- Software versions -->
-    <assertj.version>3.5.2</assertj.version>
-    <classloader-leak-prevention.version>1.15.2</classloader-leak-prevention.version>
+        <!-- Software versions -->
+        <assertj.version>3.5.2</assertj.version>
+        <classloader-leak-prevention.version>1.15.2</classloader-leak-prevention.version>
 
-    <!-- Concordion Acceptance Test extensions -->
-    <cat.version>1.3.6</cat.version>
+        <!-- Concordion Acceptance Test extensions -->
+        <cat.version>1.3.6</cat.version>
 
-    <antlr4.version>4.5.3</antlr4.version>
-    <!-- Generate parse tree visitor interface and base class. -->
-    <antlr4.visitor>true</antlr4.visitor>
+        <antlr4.version>4.5.3</antlr4.version>
+        <!-- Generate parse tree visitor interface and base class. -->
+        <antlr4.visitor>true</antlr4.visitor>
 
-    <commons-lang3.version>3.4</commons-lang3.version>
-    <commons-io.version>2.5</commons-io.version>
-    <guava.version>19.0</guava.version>
-    <guice.version>4.0</guice.version>
-    <jackson.version>2.8.1</jackson.version>
-    <jackson-datatype-jsr310.version>2.8.1</jackson-datatype-jsr310.version>
-    <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
-    <javax.inject.version>1</javax.inject.version>
-    <jdk.version>1.8</jdk.version>
+        <commons-lang3.version>3.4</commons-lang3.version>
+        <commons-io.version>2.5</commons-io.version>
+        <guava.version>19.0</guava.version>
+        <guice.version>4.0</guice.version>
+        <jackson.version>2.8.1</jackson.version>
+        <jackson-datatype-jsr310.version>2.8.1</jackson-datatype-jsr310.version>
+        <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
+        <javax.inject.version>1</javax.inject.version>
+        <jdk.version>1.8</jdk.version>
 
-    <!-- can't update this version until jersey2-guice does -->
-    <jersey.version>2.17</jersey.version>
-    <jersey2-guice.version>0.10</jersey2-guice.version>
+        <!-- can't update this version until jersey2-guice does -->
+        <jersey.version>2.17</jersey.version>
+        <jersey2-guice.version>0.10</jersey2-guice.version>
 
-    <jool.version>0.9.11</jool.version>
-    <junit.version>4.12</junit.version>
-    <junitparams.version>1.0.5</junitparams.version>
-    <log.version>1.1.1</log.version>
-    <validation.version>1.1.0.Final</validation.version>
-    <visitei.version>0.6.2</visitei.version>
+        <jool.version>0.9.11</jool.version>
+        <junit.version>4.12</junit.version>
+        <junitparams.version>1.0.5</junitparams.version>
+        <log.version>1.1.1</log.version>
+        <validation.version>1.1.0.Final</validation.version>
+        <visitei.version>0.6.2</visitei.version>
 
-    <maven-compiler.version>3.5.1</maven-compiler.version>
+        <maven-compiler.version>3.5.1</maven-compiler.version>
 
-    <mockito.version>2.0.99-beta</mockito.version>
-    <peapod.version>0.3.0</peapod.version>
-    <reflections.version>0.9.10</reflections.version>
-    <servlet-api.version>4.0.0-b01</servlet-api.version>
+        <mockito.version>2.0.99-beta</mockito.version>
+        <peapod.version>0.3.0</peapod.version>
+        <reflections.version>0.9.10</reflections.version>
+        <servlet-api.version>4.0.0-b01</servlet-api.version>
 
-    <!-- <swagger-maven-plugin.version>3.1.0</swagger-maven-plugin.version> -->
-    <swagger.version>1.5.9</swagger.version>
-    <tinkerpop.groupId>org.apache.tinkerpop</tinkerpop.groupId>
-    <tinkerpop.version>3.2.1</tinkerpop.version>
+        <!-- <swagger-maven-plugin.version>3.1.0</swagger-maven-plugin.version> -->
+        <swagger.version>1.5.9</swagger.version>
+        <tinkerpop.groupId>org.apache.tinkerpop</tinkerpop.groupId>
+        <tinkerpop.version>3.2.1</tinkerpop.version>
 
-    <!-- titan -->
-    <titan.version>1.0.0</titan.version>
-    <sleepycat.version>5.0.73</sleepycat.version>
+        <!-- titan -->
+        <titan.version>1.0.0</titan.version>
+        <sleepycat.version>5.0.73</sleepycat.version>
 
-    <!-- neo4j -->
-    <neo4j-gremlin.version>3.0.0.M7</neo4j-gremlin.version>
-    <neo4j-tinkerpop-api-impl.version>0.4-3.0.3</neo4j-tinkerpop-api-impl.version>
+        <!-- neo4j -->
+        <neo4j-gremlin.version>3.0.0.M7</neo4j-gremlin.version>
+        <neo4j-tinkerpop-api-impl.version>0.4-3.0.3</neo4j-tinkerpop-api-impl.version>
 
-    <xml-apis.version>1.4.01</xml-apis.version><!-- > 1.4.01 fails some acceptance 
-      tests due to missing class -->
+        <xml-apis.version>1.4.01</xml-apis.version><!-- > 1.4.01 fails some 
+            acceptance tests due to missing class -->
 
-    <!-- maven plugins -->
-    <appassembler-maven.version>1.10</appassembler-maven.version>
-    <bcel-findbugs.version>6.0</bcel-findbugs.version>
-    <build-helper-maven.version>1.10</build-helper-maven.version>
-    <buildnumber-maven.version>1.4</buildnumber-maven.version>
-    <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
-    <maven-antrun.version>1.8</maven-antrun.version>
-    <maven-assembly.version>2.6</maven-assembly.version>
-    <maven-concordion-reporting.version>1.0.2</maven-concordion-reporting.version>
-    <maven-failsafe.version>2.19.1</maven-failsafe.version>
-    <maven-javadoc.version>2.10.3</maven-javadoc.version>
-    <maven-jar.version>2.6</maven-jar.version>
-    <maven-jxr.version>2.5</maven-jxr.version>
-    <maven-license.version>1.8</maven-license.version>
-    <maven-project-info-reports.version>2.8.1</maven-project-info-reports.version>
-    <maven-shade.version>2.4.3</maven-shade.version>
-    <maven-shared-jar.version>1.2</maven-shared-jar.version>
-    <maven-site.version>3.4</maven-site.version><!-- 3.5 messed up our github pages -->
-    <maven-surefire.version>2.18.1</maven-surefire.version>
-    <maven-surefire-report.version>2.19.1</maven-surefire-report.version>
-    <maven-war.version>2.6</maven-war.version>
-    <plugin.scm-publish.version>1.1</plugin.scm-publish.version>
-    <reflow-velocity-tools.version>1.1.1</reflow-velocity-tools.version>
-    <tomcat7-maven.version>2.2</tomcat7-maven.version>
-    <velocity.version>1.7</velocity.version>
-    <wagon-ssh.version>2.7</wagon-ssh.version>
+        <!-- maven plugins -->
+        <appassembler-maven.version>1.10</appassembler-maven.version>
+        <bcel-findbugs.version>6.0</bcel-findbugs.version>
+        <build-helper-maven.version>1.10</build-helper-maven.version>
+        <buildnumber-maven.version>1.4</buildnumber-maven.version>
+        <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
+        <maven-antrun.version>1.8</maven-antrun.version>
+        <maven-assembly.version>2.6</maven-assembly.version>
+        <maven-concordion-reporting.version>1.0.2</maven-concordion-reporting.version>
+        <maven-failsafe.version>2.19.1</maven-failsafe.version>
+        <maven-javadoc.version>2.10.3</maven-javadoc.version>
+        <maven-jar.version>2.6</maven-jar.version>
+        <maven-jxr.version>2.5</maven-jxr.version>
+        <maven-license.version>1.8</maven-license.version>
+        <maven-project-info-reports.version>2.8.1</maven-project-info-reports.version>
+        <maven-shade.version>2.4.3</maven-shade.version>
+        <maven-shared-jar.version>1.2</maven-shared-jar.version>
+        <maven-site.version>3.4</maven-site.version><!-- 3.5 messed up our 
+            github pages -->
+        <maven-surefire.version>2.18.1</maven-surefire.version>
+        <maven-surefire-report.version>2.19.1</maven-surefire-report.version>
+        <maven-war.version>2.6</maven-war.version>
+        <plugin.scm-publish.version>1.1</plugin.scm-publish.version>
+        <reflow-velocity-tools.version>1.1.1</reflow-velocity-tools.version>
+        <tomcat7-maven.version>2.2</tomcat7-maven.version>
+        <velocity.version>1.7</velocity.version>
+        <wagon-ssh.version>2.7</wagon-ssh.version>
 
-    <!-- Concordion settings (move to acceptance-test module?) -->
-    <concordion.reportDir>${project.build.directory}/concordion-reports</concordion.reportDir>
-    <integration.testOutputDir>${project.build.directory}/integration-test-classes</integration.testOutputDir>
-    <site.dir>src/site</site.dir>
-    <site.xhtmlDir>${site.dir}/xhtml</site.xhtmlDir>
-    <spec.dir>src/spec</spec.dir>
-    <spec.docDir>${spec.dir}/resources</spec.docDir>
-    <spec.testSourceDir>${spec.dir}/java</spec.testSourceDir>
+        <!-- Concordion settings (move to acceptance-test module?) -->
+        <concordion.reportDir>${project.build.directory}/concordion-reports</concordion.reportDir>
+        <integration.testOutputDir>${project.build.directory}/integration-test-classes</integration.testOutputDir>
+        <site.dir>src/site</site.dir>
+        <site.xhtmlDir>${site.dir}/xhtml</site.xhtmlDir>
+        <spec.dir>src/spec</spec.dir>
+        <spec.docDir>${spec.dir}/resources</spec.docDir>
+        <spec.testSourceDir>${spec.dir}/java</spec.testSourceDir>
 
-    <!-- Settings for maven-site-plugin -->
-    <port>9000</port>
+        <!-- Settings for maven-site-plugin -->
+        <port>9000</port>
 
-    <!-- Settings for maven-scm-publish-plugin used to publish site to GitHub -->
-    <scmpublish.checkinComment>Publishing Site Docs for
-      ${project.artifactId}:${project.version}</scmpublish.checkinComment>
-    <scmpublish.pubScmUrl>scm:git:git@github.com:huygensING/alexandria.git</scmpublish.pubScmUrl>
-    <scmpublish.scm.branch>gh-pages</scmpublish.scm.branch>
+        <!-- Settings for maven-scm-publish-plugin used to publish site to 
+            GitHub -->
+        <scmpublish.checkinComment>Publishing Site Docs for
+            ${project.artifactId}:${project.version}</scmpublish.checkinComment>
+        <scmpublish.pubScmUrl>scm:git:git@github.com:huygensING/alexandria.git</scmpublish.pubScmUrl>
+        <scmpublish.scm.branch>gh-pages</scmpublish.scm.branch>
 
-    <project.license.name>GNU General Public License</project.license.name>
-    <project.license.url>http://www.gnu.org/licenses/gpl.txt</project.license.url>
-  </properties>
+        <project.license.name>GNU General Public License</project.license.name>
+        <project.license.url>http://www.gnu.org/licenses/gpl.txt</project.license.url>
+    </properties>
 
-  <organization>
-    <name>Huygens ING (KNAW)</name>
-    <url>http://www.huygens.knaw.nl</url>
-  </organization>
+    <organization>
+        <name>Huygens ING (KNAW)</name>
+        <url>http://www.huygens.knaw.nl</url>
+    </organization>
 
-  <licenses>
-    <license>
-      <name>${project.license.name}</name>
-      <url>${project.license.url}</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
+    <licenses>
+        <license>
+            <name>${project.license.name}</name>
+            <url>${project.license.url}</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
-  <developers>
-    <developer>
-      <id>bramb</id>
-      <name>Bram Buitendijk</name>
-      <email>bram.buitendijk@huygens.knaw.nl</email>
-      <url>https://www.huygens.knaw.nl/buitendijk/</url>
-      <roles>
-        <role>developer</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>dekker</id>
-      <name>Ronald Dekker</name>
-      <email>ronald.dekker@huygens.knaw.nl</email>
-      <url>https://www.huygens.knaw.nl/dekker/</url>
-      <roles>
-        <role>architect</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>jong</id>
-      <name>Hayco de Jong</name>
-      <email>hayco.de.jong@huygens.knaw.nl</email>
-      <url>https://www.huygens.knaw.nl/jong-hayco-de/</url>
-      <roles>
-        <role>architect</role>
-        <role>developer</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>gremid</id>
-      <name>Gregor Middell</name>
-      <email>gregor@middell.net</email>
-      <url>http://gregor.middell.net/</url>
-      <roles>
-        <role>developer</role>
-      </roles>
-    </developer>
-  </developers>
+    <developers>
+        <developer>
+            <id>bramb</id>
+            <name>Bram Buitendijk</name>
+            <email>bram.buitendijk@huygens.knaw.nl</email>
+            <url>https://www.huygens.knaw.nl/buitendijk/</url>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>dekker</id>
+            <name>Ronald Dekker</name>
+            <email>ronald.dekker@huygens.knaw.nl</email>
+            <url>https://www.huygens.knaw.nl/dekker/</url>
+            <roles>
+                <role>architect</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>jong</id>
+            <name>Hayco de Jong</name>
+            <email>hayco.de.jong@huygens.knaw.nl</email>
+            <url>https://www.huygens.knaw.nl/jong-hayco-de/</url>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>gremid</id>
+            <name>Gregor Middell</name>
+            <email>gregor@middell.net</email>
+            <url>http://gregor.middell.net/</url>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
 
-  <dependencies>
-    <dependency>
-      <groupId>javax.inject</groupId>
-      <artifactId>javax.inject</artifactId>
-      <version>${javax.inject.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>aopalliance</groupId>
-      <artifactId>aopalliance</artifactId>
-      <version>1.0</version>
-    </dependency>
-  </dependencies>
-
-  <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.glassfish.jersey.core</groupId>
-        <artifactId>jersey-common</artifactId>
-        <version>${jersey.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>aopalliance-repackaged</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
+        <dependency>
+            <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jersey.media</groupId>
-        <artifactId>jersey-media-multipart</artifactId>
-        <version>${jersey.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>javax.inject</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jersey.media</groupId>
-        <artifactId>jersey-media-jaxb</artifactId>
-        <version>${jersey.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>aopalliance-repackaged</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>javax.inject</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jersey.ext</groupId>
-        <artifactId>jersey-bean-validation</artifactId>
-        <version>${jersey.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>javax.inject</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jersey.containers</groupId>
-        <artifactId>jersey-container-grizzly2-http</artifactId>
-        <version>${jersey.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>javax.inject</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
+            <version>${javax.inject.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>aopalliance</groupId>
+            <artifactId>aopalliance</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
-  </dependencyManagement>
 
-  <issueManagement>
-    <system>JIRA</system>
-    <url>http://jira.huygens.knaw.nl/</url>
-  </issueManagement>
-
-  <ciManagement>
-    <system>jenkins</system>
-    <url>http://ci.huygens.knaw.nl/job/alexandria/</url>
-  </ciManagement>
-
-  <distributionManagement>
-    <repository>
-      <id>maven.huygens</id>
-      <name>Huygens Maven Repository</name>
-      <url>${huygens-repo}</url>
-    </repository>
-    <snapshotRepository>
-      <id>maven.huygens.snapshot</id>
-      <name>Huygens Maven Snapshot Repository</name>
-      <url>${huygens-repo}</url>
-      <uniqueVersion>false</uniqueVersion>
-    </snapshotRepository>
-    <site>
-      <id>huygens.site</id>
-      <!-- This is used by maven-scm-publish-plugin -->
-      <url>scm:git:git@github.com:huygensING/alexandria.git</url>
-    </site>
-  </distributionManagement>
-
-  <repositories>
-    <repository>
-      <id>huygens</id>
-      <url>http://maven.huygens.knaw.nl/repository/</url>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-        <checksumPolicy>warn</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-        <checksumPolicy>fail</checksumPolicy>
-      </snapshots>
-    </repository>
-  </repositories>
-
-  <build>
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ssh</artifactId>
-        <version>${wagon-ssh.version}</version>
-      </extension>
-    </extensions>
-    <sourceDirectory>src/main/java</sourceDirectory>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
-    <testSourceDirectory>src/test/java</testSourceDirectory>
-    <testResources>
-      <testResource>
-        <directory>src/test/resources</directory>
-        <filtering>true</filtering>
-      </testResource>
-    </testResources>
-
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>${maven-compiler.version}</version>
-        <configuration>
-          <compilerArgument>-Xlint</compilerArgument>
-          <source>${jdk.version}</source>
-          <target>${jdk.version}</target>
-          <testSource>${jdk.version}</testSource>
-          <testTarget>${jdk.version}</testTarget>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <version>${maven-license.version}</version>
-        <executions>
-          <execution>
-            <phase>verify</phase>
-            <goals>
-              <goal>update-file-header</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <licenseName>gpl_v3</licenseName>
-          <sectionDelimiter>=======</sectionDelimiter>
-          <canUpdateCopyright>true</canUpdateCopyright>
-          <canUpdateDescription>true</canUpdateDescription>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>${maven-site.version}</version>
-
+    <dependencyManagement>
         <dependencies>
-          <dependency>
-            <groupId>lt.velykis.maven.skins</groupId>
-            <artifactId>reflow-velocity-tools</artifactId>
-            <version>${reflow-velocity-tools.version}</version>
-          </dependency>
-
-          <!-- Reflow skin requires Velocity >= 1.7 -->
-          <dependency>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity</artifactId>
-            <version>${velocity.version}</version>
-          </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.core</groupId>
+                <artifactId>jersey-common</artifactId>
+                <version>${jersey.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.glassfish.hk2.external</groupId>
+                        <artifactId>aopalliance-repackaged</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.glassfish.hk2.external</groupId>
+                        <artifactId>javax.inject</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.media</groupId>
+                <artifactId>jersey-media-multipart</artifactId>
+                <version>${jersey.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.glassfish.hk2.external</groupId>
+                        <artifactId>javax.inject</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.media</groupId>
+                <artifactId>jersey-media-jaxb</artifactId>
+                <version>${jersey.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.glassfish.hk2.external</groupId>
+                        <artifactId>aopalliance-repackaged</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.glassfish.hk2.external</groupId>
+                        <artifactId>javax.inject</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.ext</groupId>
+                <artifactId>jersey-bean-validation</artifactId>
+                <version>${jersey.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.glassfish.hk2.external</groupId>
+                        <artifactId>javax.inject</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.containers</groupId>
+                <artifactId>jersey-container-grizzly2-http</artifactId>
+                <version>${jersey.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.glassfish.hk2.external</groupId>
+                        <artifactId>javax.inject</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
         </dependencies>
-      </plugin>
+    </dependencyManagement>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-scm-publish-plugin</artifactId>
-        <version>${plugin.scm-publish.version}</version>
-        <!-- this plugin configuration should apply to POMs which inherit 
-          from this one -->
-        <inherited>true</inherited>
-      </plugin>
+    <issueManagement>
+        <system>JIRA</system>
+        <url>http://jira.huygens.knaw.nl/</url>
+    </issueManagement>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>${maven-project-info-reports.version}</version>
-        <dependencies>
-          <dependency>
-            <groupId>org.apache.maven.shared</groupId>
-            <artifactId>maven-shared-jar</artifactId>
-            <version>${maven-shared-jar.version}</version>
-            <exclusions>
-              <exclusion>
-                <groupId>org.apache.bcel</groupId>
-                <artifactId>bcel</artifactId>
-              </exclusion>
-            </exclusions>
-          </dependency>
-          <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>bcel-findbugs</artifactId>
-            <version>${bcel-findbugs.version}</version>
-          </dependency>
-        </dependencies>
-      </plugin>
+    <ciManagement>
+        <system>jenkins</system>
+        <url>http://ci.huygens.knaw.nl/job/alexandria/</url>
+    </ciManagement>
 
-      <!-- Makes GIT commit id and branch available for use in about.properties -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>buildnumber-maven-plugin</artifactId>
-        <version>${buildnumber-maven.version}</version>
-        <executions>
-          <execution>
-            <phase>validate</phase>
-            <goals>
-              <goal>create</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <doCheck>false</doCheck>
-          <doUpdate>false</doUpdate>
-        </configuration>
-      </plugin>
+    <distributionManagement>
+        <repository>
+            <id>maven.huygens</id>
+            <name>Huygens Maven Repository</name>
+            <url>${huygens-repo}</url>
+        </repository>
+        <snapshotRepository>
+            <id>maven.huygens.snapshot</id>
+            <name>Huygens Maven Snapshot Repository</name>
+            <url>${huygens-repo}</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+        <site>
+            <id>huygens.site</id>
+            <!-- This is used by maven-scm-publish-plugin -->
+            <url>scm:git:git@github.com:huygensING/alexandria.git</url>
+        </site>
+    </distributionManagement>
 
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>${build-helper-maven.version}</version>
-        <executions>
-          <execution>
-            <id>timestamp-property</id>
-            <goals>
-              <goal>timestamp-property</goal>
-            </goals>
-            <configuration>
-              <name>timestamp</name>
-              <pattern>${maven.build.timestamp.format}</pattern>
-              <locale>nl,nl</locale>
-              <timeZone>AMS</timeZone>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+    <repositories>
+        <repository>
+            <id>huygens</id>
+            <url>http://maven.huygens.knaw.nl/repository/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <build>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>${wagon-ssh.version}</version>
+            </extension>
+        </extensions>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler.version}</version>
+                <configuration>
+                    <compilerArgument>-Xlint</compilerArgument>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                    <testSource>${jdk.version}</testSource>
+                    <testTarget>${jdk.version}</testTarget>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>${maven-license.version}</version>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>update-file-header</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <licenseName>gpl_v3</licenseName>
+                    <sectionDelimiter>=======</sectionDelimiter>
+                    <canUpdateCopyright>true</canUpdateCopyright>
+                    <canUpdateDescription>true</canUpdateDescription>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>${maven-site.version}</version>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>lt.velykis.maven.skins</groupId>
+                        <artifactId>reflow-velocity-tools</artifactId>
+                        <version>${reflow-velocity-tools.version}</version>
+                    </dependency>
+
+                    <!-- Reflow skin requires Velocity >= 1.7 -->
+                    <dependency>
+                        <groupId>org.apache.velocity</groupId>
+                        <artifactId>velocity</artifactId>
+                        <version>${velocity.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-publish-plugin</artifactId>
+                <version>${plugin.scm-publish.version}</version>
+                <!-- this plugin configuration should apply to POMs which 
+                    inherit from this one -->
+                <inherited>true</inherited>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>${maven-project-info-reports.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.shared</groupId>
+                        <artifactId>maven-shared-jar</artifactId>
+                        <version>${maven-shared-jar.version}</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>org.apache.bcel</groupId>
+                                <artifactId>bcel</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.google.code.findbugs</groupId>
+                        <artifactId>bcel-findbugs</artifactId>
+                        <version>${bcel-findbugs.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <!-- Makes GIT commit id and branch available for use in about.properties -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>${buildnumber-maven.version}</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <doCheck>false</doCheck>
+                    <doUpdate>false</doUpdate>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${build-helper-maven.version}</version>
+                <executions>
+                    <execution>
+                        <id>timestamp-property</id>
+                        <goals>
+                            <goal>timestamp-property</goal>
+                        </goals>
+                        <configuration>
+                            <name>timestamp</name>
+                            <pattern>${maven.build.timestamp.format}</pattern>
+                            <locale>nl,nl</locale>
+                            <timeZone>AMS</timeZone>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
 
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>${maven-assembly.version}</version>
-        <configuration>
-          <descriptors>
-            <descriptor>src/assembly/server-app.xml</descriptor>
-          </descriptors>
-        </configuration>
-      </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven-assembly.version}</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/server-app.xml</descriptor>
+                    </descriptors>
+                </configuration>
+            </plugin>
 
-    </plugins>
+        </plugins>
 
-    <pluginManagement>
-      <plugins>
-        <!--This plugin's configuration is used to store Eclipse m2e settings 
-          only. It has no influence on the Maven build itself. -->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>${lifecycle-mapping.version}</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>build-helper-maven-plugin</artifactId>
-                    <versionRange>[1.9.1,)</versionRange>
-                    <goals>
-                      <goal>timestamp-property</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse 
+                    m2e settings only. It has no influence on the Maven build itself. -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>${lifecycle-mapping.version}</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.codehaus.mojo</groupId>
+                                        <artifactId>build-helper-maven-plugin</artifactId>
+                                        <versionRange>[1.9.1,)</versionRange>
+                                        <goals>
+                                            <goal>timestamp-property</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
-  <prerequisites>
-    <maven>3.0</maven>
-  </prerequisites>
+    <prerequisites>
+        <maven>3.0</maven>
+    </prerequisites>
 
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>${maven-project-info-reports.version}</version>
-        <configuration>
-          <dependencyDetailsEnabled>true</dependencyDetailsEnabled>
-          <dependencyLocationsEnabled>true</dependencyLocationsEnabled>
-        </configuration>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>index</report>
-              <report>license</report>
-              <report>project-team</report>
-              <report>cim</report>
-              <report>issue-tracking</report>
-              <!--<report>dependencies</report> -->
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>${maven-surefire-report.version}</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jxr-plugin</artifactId>
-        <version>${maven-jxr.version}</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>${maven-javadoc.version}</version>
-        <reportSets>
-          <reportSet>
-            <id>default</id>
-            <reports>
-              <report>javadoc</report>
-            </reports>
-          </reportSet>
-          <reportSet>
-            <id>aggregate</id>
-            <reports>
-              <report>aggregate</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
-      <plugin>
-        <groupId>com.github.bassman5</groupId>
-        <artifactId>maven-concordion-reporting-plugin</artifactId>
-        <version>${maven-concordion-reporting.version}</version>
-        <configuration>
-          <concordionDir>${concordion.reportDir}</concordionDir>
-          <concordionIndexFile>nl/knaw/huygens/alexandria/Alexandria.html</concordionIndexFile>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>${maven-project-info-reports.version}</version>
+                <configuration>
+                    <dependencyDetailsEnabled>true</dependencyDetailsEnabled>
+                    <dependencyLocationsEnabled>true</dependencyLocationsEnabled>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>index</report>
+                            <report>license</report>
+                            <report>project-team</report>
+                            <report>cim</report>
+                            <report>issue-tracking</report>
+                            <!--<report>dependencies</report> -->
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>${maven-surefire-report.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>${maven-jxr.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc.version}</version>
+                <reportSets>
+                    <reportSet>
+                        <id>default</id>
+                        <reports>
+                            <report>javadoc</report>
+                        </reports>
+                    </reportSet>
+                    <reportSet>
+                        <id>aggregate</id>
+                        <reports>
+                            <report>aggregate</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>com.github.bassman5</groupId>
+                <artifactId>maven-concordion-reporting-plugin</artifactId>
+                <version>${maven-concordion-reporting.version}</version>
+                <configuration>
+                    <concordionDir>${concordion.reportDir}</concordionDir>
+                    <concordionIndexFile>nl/knaw/huygens/alexandria/Alexandria.html</concordionIndexFile>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 
-  <scm>
-    <connection>scm:git:git@github.com:huygensING/alexandria.git</connection>
-    <tag>HEAD</tag>
-  </scm>
+    <scm>
+        <connection>scm:git:git@github.com:huygensING/alexandria.git</connection>
+        <tag>HEAD</tag>
+    </scm>
 
 </project>
