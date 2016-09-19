@@ -14,6 +14,11 @@
       <artifactId>alexandria-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>alexandria-aql2</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- VisiTEI -->
     <dependency>

@@ -1,28 +1,11 @@
 grammar AQL2;
 
-root : subQuery ( subQuery )*;
+root : FUNCTION '(' ( parameters ) ')';
 
-subQuery : FIELD_NAME ':' FUNCTION '(' parameters ')';
 
-FIELD_NAME: 'id'
-         | 'url' 
-         | 'type' 
-         | 'value'
-         | 'resource.id' 
-         | 'subresource.id'
-         | 'resource.url' 
-         | 'subresource.url'
-         | 'resource.ref' 
-         | 'subresource.sub'
-         | 'state'
-         | 'who' 
-         | 'when' 
-         | 'why'
-         ;
-
-FUNCTION : 'eq'
-         | 'match'
-         ;
+FUNCTION: 'hello'
+        | 'bye'
+        ;
 
 parameters : parameter ( ',' parameter )*;
 

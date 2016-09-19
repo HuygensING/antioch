@@ -61,6 +61,7 @@ import com.google.common.collect.Ordering;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.antlr.AQLLexer;
 import nl.knaw.huygens.alexandria.antlr.AQLParser;
+import nl.knaw.huygens.alexandria.antlr.QueryErrorListener;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.search.QueryField;

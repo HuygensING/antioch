@@ -72,7 +72,7 @@ public class CommandTest extends AlexandriaClientTest {
     String xml = "<text><p>Alinea 1</p><p>Alinea 2</p></text>";
     setResourceText(resourceUuid, xml);
     Map<String, Object> parameters = ImmutableMap.<String, Object> builder()//
-        .put("command", "hello('world')")//
+        .put("command", "bye(\"world\")")//
         .build();
     RestResult<CommandResponse> result = client.doCommand(Commands.AQL2, parameters);
     assertRequestSucceeded(result);
@@ -80,6 +80,7 @@ public class CommandTest extends AlexandriaClientTest {
     assertThat(commandResponse.success()).isTrue();
     Object result2 = commandResponse.getResult();
     Log.info("{}", result2);
+    assertThat(result2).isEqualTo("Goodbye world!");
   }
 
   // @Test

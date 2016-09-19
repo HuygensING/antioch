@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.query;
+package nl.knaw.huygens.alexandria.antlr;
 
 /*
  * #%L

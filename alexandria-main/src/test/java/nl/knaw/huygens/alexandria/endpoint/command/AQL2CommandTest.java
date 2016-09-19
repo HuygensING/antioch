@@ -19,9 +19,9 @@ public class AQL2CommandTest extends AlexandriaTest {
   public void testRunWith() throws Exception {
     AlexandriaService service = mock(AlexandriaService.class);
     AQL2Command ac = new AQL2Command(service);
-    Map<String, Object> parameterMap = ImmutableMap.of(AQL2Command.COMMAND_PARAMETER, "something or other");
+    Map<String, Object> parameterMap = ImmutableMap.of(AQL2Command.COMMAND_PARAMETER, "hello(\"World\",\"You\")");
     CommandResponse response = ac.runWith(parameterMap);
-    assertThat(response.getResult()).isEqualTo("Command executed: something or other");
+    assertThat(response.getResult()).isEqualTo("Hello and welcome, World!\nHello and welcome, You!");
   }
 
 }
