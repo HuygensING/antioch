@@ -1,6 +1,7 @@
 package nl.knaw.huygens.alexandria.api.model;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -12,7 +13,7 @@ public class CommandResponse {
   boolean parametersAreValid = false;
   private Object result;
   private boolean async = false;
-  private String statusId;
+  private UUID statusId;
 
   public CommandResponse addErrorLine(String errorLine) {
     errorLines.add(errorLine);
@@ -56,11 +57,11 @@ public class CommandResponse {
     return async;
   }
 
-  public void setStatusId(String statusId) {
+  public void setStatusId(UUID statusId) {
     this.statusId = statusId;
   }
 
-  public String getStatusId() {
+  public UUID getStatusId() {
     return statusId;
   }
 

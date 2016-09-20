@@ -1,23 +1,15 @@
 package nl.knaw.huygens.alexandria.endpoint.command;
 
-import static java.util.stream.Collectors.joining;
-
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import javax.inject.Inject;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
-
-import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.antlr.AQL2Lexer;
-import nl.knaw.huygens.alexandria.antlr.AQL2Parser;
-import nl.knaw.huygens.alexandria.antlr.QueryErrorListener;
 import nl.knaw.huygens.alexandria.api.model.CommandResponse;
+import nl.knaw.huygens.alexandria.api.model.CommandStatus;
 import nl.knaw.huygens.alexandria.api.model.Commands;
+import nl.knaw.huygens.alexandria.api.model.ProcessStatusMap;
+import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class AQL2Command extends ResourcesCommand {
@@ -25,10 +17,19 @@ public class AQL2Command extends ResourcesCommand {
   public static final String COMMAND_PARAMETER = "command";
   private CommandResponse commandResponse = new CommandResponse();
   private AlexandriaService service;
+  private final ProcessStatusMap<CommandStatus> commandStatusMap;
+  private AlexandriaConfiguration config;
+  private ExecutorService executorService;
 
   @Inject
-  public AQL2Command(AlexandriaService service) {
+  public AQL2Command(AlexandriaService service, //
+      AlexandriaConfiguration config, //
+      ExecutorService executorService, //
+      ProcessStatusMap<CommandStatus> taskStatusMap) {
     this.service = service;
+    this.config = config;
+    this.executorService = executorService;
+    this.commandStatusMap = taskStatusMap;
   }
 
   @Override
@@ -39,57 +40,26 @@ public class AQL2Command extends ResourcesCommand {
   @Override
   public CommandResponse runWith(Map<String, Object> parameterMap) {
     String aql2Command = (String) parameterMap.get(COMMAND_PARAMETER);
-    String result = process(aql2Command);
-    commandResponse.setResult(result);
+    commandResponse.setASync(true);
+    startCommandProcessing(aql2Command);
+    // String result = process(aql2Command);
+    // commandResponse.setResult(result);
     commandResponse.setParametersAreValid(true);
     return commandResponse;
   }
 
-  private String process(String aql2Command) {
-    QueryErrorListener errorListener = new QueryErrorListener();
-    CharStream stream = new ANTLRInputStream(aql2Command);
-    AQL2Lexer lex = new AQL2Lexer(stream);
-    lex.removeErrorListeners();
-    CommonTokenStream tokenStream = new CommonTokenStream(lex);
-    AQL2Parser parser = new AQL2Parser(tokenStream);
-    parser.removeErrorListeners();
-    parser.addErrorListener(errorListener);
-    parser.setBuildParseTree(true);
-    ParseTree tree = parser.root();
-    Log.info("tree={}", tree.toStringTree(parser));
-    if (errorListener.heardErrors()) {
-      // parseErrors.addAll(errorListener.getParseErrors().stream()//
-      // .map(AlexandriaQueryParser::clarifyParseError)//
-      // .collect(toList()));
-      return "error";
-    }
-
-    QueryVisitor visitor = new QueryVisitor();
-    visitor.visit(tree);
-    // parseErrors.addAll(errorListener.getParseErrors());
-
-    String function = visitor.getFunction();
-    List<Object> parameters = visitor.getParameters();
-
-    switch (function) {
-    case "hello":
-      return parameters.stream().map(this::hello).collect(joining("\n"));
-
-    case "bye":
-      return parameters.stream().map(this::bye).collect(joining("\n"));
-
-    default:
-      return "Unknown Command: " + aql2Command;
+  private void startCommandProcessing(String aql2Command) {
+    AQL2Task task = new AQL2Task(aql2Command);
+    commandResponse.setStatusId(task.getUUID());
+    commandStatusMap.put(task.getUUID(), task.getStatus());
+    if (config.asynchronousEndpointsAllowed()) {
+      executorService.execute(task);
+    } else {
+      // For now, for the acceptance tests.
+      task.run();
     }
 
   }
 
-  public String hello(Object parameter) {
-    return "Hello and welcome, " + parameter + "!";
-  }
-
-  public String bye(Object parameter) {
-    return "Goodbye " + parameter + "!";
-  }
 
 }

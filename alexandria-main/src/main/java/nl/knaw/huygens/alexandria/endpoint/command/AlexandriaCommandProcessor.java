@@ -11,10 +11,13 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 public class AlexandriaCommandProcessor {
 
   private AlexandriaService service;
+  private AQL2Command aql2Command;
 
   @Inject
-  public AlexandriaCommandProcessor(AlexandriaService service) {
+  public AlexandriaCommandProcessor(AlexandriaService service, AQL2Command aql2Command) {
     this.service = service;
+    this.aql2Command = aql2Command;
+
   }
 
   public CommandResponse process(String command, Map<String, Object> parameterMap) {
@@ -24,7 +27,7 @@ public class AlexandriaCommandProcessor {
     case Commands.XPATH:
       return new XpathCommand(service).runWith(parameterMap);
     case Commands.AQL2:
-      return new AQL2Command(service).runWith(parameterMap);
+      return aql2Command.runWith(parameterMap);
 
     // disable wrap-content-in-element command
     // case Commands.WRAP_CONTENT_IN_ELEMENT:

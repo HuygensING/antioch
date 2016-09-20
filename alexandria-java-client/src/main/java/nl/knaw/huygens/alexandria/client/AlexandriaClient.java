@@ -58,6 +58,7 @@ import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
 import nl.knaw.huygens.alexandria.api.model.CommandResponse;
+import nl.knaw.huygens.alexandria.api.model.CommandStatus;
 import nl.knaw.huygens.alexandria.api.model.StatePrototype;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
@@ -430,6 +431,19 @@ public class AlexandriaClient implements AutoCloseable {
     final RestRequester<CommandResponse> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
         .onStatus(Status.OK, this::toCommandResponseRestResult)//
+        .onStatus(Status.ACCEPTED, this::extractCommandStatusId)//
+        .getResult();
+  }
+
+  public RestResult<CommandStatus> getCommandStatus(final String commandName, final UUID resourceUUID) {
+    final WebTarget path = rootTarget.path(EndpointPaths.COMMANDS)//
+        .path(commandName)//
+        .path(resourceUUID.toString())//
+        .path("status");
+    final Supplier<Response> responseSupplier = anonymousGet(path);
+    final RestRequester<CommandStatus> requester = RestRequester.withResponseSupplier(responseSupplier);
+    return requester//
+        .onStatus(Status.OK, this::toCommandStatusRestResult)//
         .getResult();
   }
 
@@ -517,6 +531,10 @@ public class AlexandriaClient implements AutoCloseable {
     return toEntityRestResult(response, TextImportStatus.class);
   }
 
+  private RestResult<CommandStatus> toCommandStatusRestResult(final Response response) {
+    return toEntityRestResult(response, CommandStatus.class);
+  }
+
   private RestResult<TextEntity> toTextEntityRestResult(final Response response) {
     return toEntityRestResult(response, TextEntity.class);
   }
@@ -556,6 +574,16 @@ public class AlexandriaClient implements AutoCloseable {
     return result;
   }
 
+  private RestResult<CommandResponse> extractCommandStatusId(final Response response) {
+    final String location = response.getHeaderString("Location");
+    String[] parts = location.split("/");
+    UUID statusId = UUID.fromString(parts[parts.length - 2]);
+    CommandResponse commandResponse = new CommandResponse();
+    commandResponse.setStatusId(statusId);
+    final RestResult<CommandResponse> result = new RestResult<>();
+    return result.setCargo(commandResponse);
+  }
+
   private RestResult<URI> uriFromLocationHeader(final Response response) {
     final RestResult<URI> result = new RestResult<>();
     final String location = response.getHeaderString("Location");
@@ -590,7 +618,7 @@ public class AlexandriaClient implements AutoCloseable {
 
   private SyncInvoker authorizedRequest(final WebTarget target) {
     return target.request()//
-        // .accept(MediaType.APPLICATION_JSON_TYPE)//
+        .accept(MediaType.APPLICATION_JSON_TYPE)//
         .header(HEADER_AUTH, authHeader);
   }
 

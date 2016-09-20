@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableMap;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.CommandResponse;
+import nl.knaw.huygens.alexandria.api.model.CommandStatus;
 import nl.knaw.huygens.alexandria.api.model.Commands;
 import nl.knaw.huygens.alexandria.endpoint.command.XpathCommand.XPathResult;
 
@@ -76,9 +77,19 @@ public class CommandTest extends AlexandriaClientTest {
         .build();
     RestResult<CommandResponse> result = client.doCommand(Commands.AQL2, parameters);
     assertRequestSucceeded(result);
+
     CommandResponse commandResponse = result.get();
-    assertThat(commandResponse.success()).isTrue();
-    Object result2 = commandResponse.getResult();
+    UUID statusId = commandResponse.getStatusId();
+    Log.info("statusId={}", statusId);
+
+    boolean done = false;
+    RestResult<CommandStatus> statusResult = null;
+    while (!done) {
+      statusResult = client.getCommandStatus(Commands.AQL2, statusId);
+      assertRequestSucceeded(statusResult);
+      done = statusResult.get().isDone();
+    }
+    Object result2 = statusResult.get().getResult();
     Log.info("{}", result2);
     assertThat(result2).isEqualTo("Goodbye world!");
   }

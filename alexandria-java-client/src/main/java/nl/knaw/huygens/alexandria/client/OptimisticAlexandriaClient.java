@@ -12,6 +12,7 @@ import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
 import nl.knaw.huygens.alexandria.api.model.CommandResponse;
+import nl.knaw.huygens.alexandria.api.model.CommandStatus;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
 import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
@@ -218,6 +219,10 @@ public class OptimisticAlexandriaClient {
 
   public CommandResponse doCommand(String commandName, Map<String, Object> parameters) {
     return unwrap(delegate.doCommand(commandName, parameters));
+  }
+
+  public CommandStatus getCommandStatus(String string, UUID uuid) {
+    return unwrap(delegate.getCommandStatus(string, uuid));
   }
 
   public AnnotationList getResourceAnnotations(UUID uuid) {
