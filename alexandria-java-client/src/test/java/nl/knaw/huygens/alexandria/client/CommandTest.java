@@ -68,7 +68,7 @@ public class CommandTest extends AlexandriaClientTest {
   }
 
   @Test
-  public void testAQL2CommmandWorks() {
+  public void testAQL2CommmandWorks() throws InterruptedException {
     UUID resourceUuid = createResource("xml");
     String xml = "<text><p>Alinea 1</p><p>Alinea 2</p></text>";
     setResourceText(resourceUuid, xml);
@@ -85,6 +85,7 @@ public class CommandTest extends AlexandriaClientTest {
     boolean done = false;
     RestResult<CommandStatus> statusResult = null;
     while (!done) {
+      Thread.sleep(1000);
       statusResult = client.getCommandStatus(Commands.AQL2, statusId);
       assertRequestSucceeded(statusResult);
       done = statusResult.get().isDone();

@@ -34,8 +34,16 @@ public class AQL2Task implements Runnable {
   @Override
   public void run() {
     status.setStarted();
-    Object result = process();
-    status.setResult(result);
+    try {
+      Object result = process();
+      status.setResult(result);
+      status.setSuccess(true);
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      status.setSuccess(false);
+      status.setErrorMessage(e.getMessage());
+    }
     status.setDone();
   }
 
