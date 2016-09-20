@@ -3,6 +3,8 @@ package nl.knaw.huygens.alexandria.endpoint.command;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.antlr.v4.runtime.tree.TerminalNode;
+
 import nl.knaw.huygens.alexandria.antlr.AQL2BaseVisitor;
 import nl.knaw.huygens.alexandria.antlr.AQL2Parser.ParameterContext;
 import nl.knaw.huygens.alexandria.antlr.AQL2Parser.RootContext;
@@ -14,7 +16,11 @@ public class QueryVisitor extends AQL2BaseVisitor<Void> {
 
   @Override
   public Void visitRoot(RootContext ctx) {
-    function = ctx.FUNCTION().getText();
+    TerminalNode functionNode = ctx.FUNCTION();
+    if (functionNode == null) {
+      throw new RuntimeException("parse error: no function");
+    }
+    function = functionNode.getText();
     return super.visitRoot(ctx);
   }
 

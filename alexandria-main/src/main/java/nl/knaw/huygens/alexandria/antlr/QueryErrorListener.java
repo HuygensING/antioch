@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.antlr;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -49,7 +49,7 @@ public class QueryErrorListener extends BaseErrorListener {
     Log.warn("exact={}", exact);
     Log.warn("ambigAlts={}", ambigAlts);
     Log.warn("configs={}", configs);
-    parseErrors.add("where: ambiguity at (" + startIndex + ".." + stopIndex + ")");
+    parseErrors.add("ambiguity at (" + startIndex + ".." + stopIndex + ")");
   }
 
   @Override
@@ -61,7 +61,7 @@ public class QueryErrorListener extends BaseErrorListener {
     Log.warn("stopIndex={}", stopIndex);
     Log.warn("prediction={}", prediction);
     Log.warn("configs={}", configs);
-    parseErrors.add("where: contextSensitivity at (" + startIndex + ".." + stopIndex + ")");
+    parseErrors.add("contextSensitivity at (" + startIndex + ".." + stopIndex + ")");
   }
 
   @Override
@@ -73,7 +73,7 @@ public class QueryErrorListener extends BaseErrorListener {
     Log.warn("stopIndex={}", stopIndex);
     Log.warn("conflictingAlts={}", conflictingAlts);
     Log.warn("configs={}", configs);
-    parseErrors.add("where: attemptingFullContext at (" + startIndex + ".." + stopIndex + ")");
+    parseErrors.add("attemptingFullContext at (" + startIndex + ".." + stopIndex + ")");
   }
 
   @Override
@@ -85,7 +85,7 @@ public class QueryErrorListener extends BaseErrorListener {
     Log.warn("charPositionInLine={}", charPositionInLine);
     Log.warn("msg={}", msg);
     // Log.warn("e={}", e);
-    parseErrors.add("where: (" + line + ":" + charPositionInLine + ") " + msg);
+    parseErrors.add("syntax error at (" + line + ":" + charPositionInLine + ") " + msg);
   }
 
   public Collection<String> getParseErrors() {
