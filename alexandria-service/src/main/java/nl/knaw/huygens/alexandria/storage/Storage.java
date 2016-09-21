@@ -213,7 +213,7 @@ public class Storage {
   }
 
   public void dumpToGraphSON(final OutputStream os) throws IOException {
-    graph.io(new GraphSONIo.Builder()).writer().create().writeGraph(os, graph);
+    graph.io(GraphSONIo.build()).writer().create().writeGraph(os, graph);
   }
 
   public void dumpToGraphML(final OutputStream os) throws IOException {

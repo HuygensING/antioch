@@ -195,7 +195,7 @@ public class TinkerPopServiceTest extends AlexandriaTest {
 
   private void logGraph(TinkerGraph graph) throws IOException {
     OutputStream os = new ByteArrayOutputStream();
-    graph.io(new GraphSONIo.Builder()).writer().create().writeGraph(os, graph);
+    graph.io(GraphSONIo.build()).writer().create().writeGraph(os, graph);
     Log.info("graph={}", os.toString());
   }
 
