@@ -177,19 +177,17 @@ public class CommandTest extends AlexandriaClientTest {
   }
 
   private Map<String, Object> attributes(String value) {
-    Map<String, Object> attributes = ImmutableMap.<String, Object> builder()//
+    return ImmutableMap.<String, Object> builder()//
         .put("value", value)//
         .put("resp", "#ckcc")//
         .build();
-    return attributes;
   }
 
   private Map<String, Object> element(String name, Map<String, Object> attributes) {
-    Map<String, Object> element = ImmutableMap.<String, Object> builder()//
+    return ImmutableMap.<String, Object> builder()//
         .put("name", name)//
         .put("attributes", attributes)//
         .build();
-    return element;
   }
 
 }

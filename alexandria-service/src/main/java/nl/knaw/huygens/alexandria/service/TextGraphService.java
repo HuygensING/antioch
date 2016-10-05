@@ -126,8 +126,7 @@ public class TextGraphService {
         return next;
       }
     };
-    Stream<Vertex> stream = StreamUtil.stream(textAnnotationIterator);
-    return stream;
+    return StreamUtil.stream(textAnnotationIterator);
   }
 
   public void updateTextAnnotation(TextAnnotation textAnnotation) {
@@ -357,7 +356,7 @@ public class TextGraphService {
           .in(EdgeLabels.FIRST_TEXT_SEGMENT)//
           .hasLabel(VertexLabels.TEXTANNOTATION)//
           .order().by(TextAnnotation.Properties.depth, Order.incr)//
-          .tail(2l);
+          .tail(2L);
       if (tail.hasNext()) {
         Vertex deepestTextAnnotationVertex = tail.next();
         checkVertexLabel(deepestTextAnnotationVertex, VertexLabels.TEXTANNOTATION);
@@ -509,13 +508,9 @@ public class TextGraphService {
 
     private String visualizeVertex(Vertex v) {
       StringBuilder visualization = new StringBuilder();
-      visualization.append("\n" + vertexRepresentation(v));
-      StreamUtil.stream(v.edges(Direction.IN)).forEach(e -> {
-        visualization.append("\n<-[:" + e.label() + "]-" + vertexRepresentation(e.outVertex()));
-      });
-      StreamUtil.stream(v.edges(Direction.OUT)).forEach(e -> {
-        visualization.append("\n-[:" + e.label() + "]->" + vertexRepresentation(e.inVertex()));
-      });
+      visualization.append("\n").append(vertexRepresentation(v));
+      StreamUtil.stream(v.edges(Direction.IN)).forEach(e -> visualization.append("\n<-[:").append(e.label()).append("]-").append(vertexRepresentation(e.outVertex())));
+      StreamUtil.stream(v.edges(Direction.OUT)).forEach(e -> visualization.append("\n-[:").append(e.label()).append("]->").append(vertexRepresentation(e.inVertex())));
       return visualization.toString();
     }
 
@@ -555,8 +550,7 @@ public class TextGraphService {
 
   private Vertex getTextAnnotationVertex(TextAnnotation textAnnotation) {
     Object id = textAnnotation.getId();
-    Vertex vertex = storage.getVertexTraversal(id).next();
-    return vertex;
+    return storage.getVertexTraversal(id).next();
   }
 
   private List<Vertex> storeTextSegments(List<String> textSegments, Vertex text) {

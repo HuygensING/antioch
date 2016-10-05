@@ -59,8 +59,7 @@ public class OptimisticAlexandriaClientTest extends AlexandriaClientTest {
 
   private Type actualReturnType(Method method) {
     Type genericReturnType = method.getGenericReturnType();
-    Type type = ((ParameterizedType) genericReturnType).getActualTypeArguments()[0];
-    return type;
+    return ((ParameterizedType) genericReturnType).getActualTypeArguments()[0];
   }
 
   String toDelegatedMethodStub(Method method) {
@@ -74,7 +73,7 @@ public class OptimisticAlexandriaClientTest extends AlexandriaClientTest {
         .map(this::parameterName)//
         .collect(joining(", "));
 
-    String stub = MessageFormat.format(//
+    return MessageFormat.format(//
         "public {0} {1}({2}) '{' {3}unwrap(delegate.{4}({5}));'}'", //
         returnType, //
         methodName, //
@@ -83,7 +82,6 @@ public class OptimisticAlexandriaClientTest extends AlexandriaClientTest {
         methodName, //
         parameters//
     );
-    return stub;
   }
 
   String toQualifiedParameter(Parameter parameter) {

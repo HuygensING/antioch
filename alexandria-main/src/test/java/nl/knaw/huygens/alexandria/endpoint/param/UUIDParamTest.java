@@ -43,8 +43,7 @@ public class UUIDParamTest {
 
   @Test
   public void testParamYieldsOriginalValue() {
-    final String expected = A_VALID_UUID;
-    assertEquals(expected, new UUIDParam(A_VALID_UUID).getOriginalParam());
+    assertEquals(A_VALID_UUID, new UUIDParam(A_VALID_UUID).getOriginalParam());
   }
 
   @Test

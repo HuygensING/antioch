@@ -62,8 +62,7 @@ public class AnnotatorsTest extends AlexandriaClientTest {
   private AnnotatorList getAnnotatorList(UUID resourceUUID) {
     RestResult<AnnotatorList> result = client.getAnnotators(resourceUUID);
     assertRequestSucceeded(result);
-    AnnotatorList annotatorList = result.get();
-    return annotatorList;
+    return result.get();
   }
 
 }

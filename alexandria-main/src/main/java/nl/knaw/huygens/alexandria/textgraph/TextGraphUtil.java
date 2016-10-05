@@ -273,10 +273,7 @@ public class TextGraphUtil {
 
     private boolean hasFirstOfAttributeFunction(Entry<String, ElementView> entry) {
       Optional<AttributePreCondition> preCondition = entry.getValue().getPreCondition();
-      if (preCondition.isPresent()) {
-        return ElementView.AttributeFunction.firstOf.equals(preCondition.get().getFunction());
-      }
-      return false;
+      return preCondition.isPresent() && ElementView.AttributeFunction.firstOf.equals(preCondition.get().getFunction());
     }
 
     private String textAnnotationGrouping(TextAnnotation textAnnotation) {

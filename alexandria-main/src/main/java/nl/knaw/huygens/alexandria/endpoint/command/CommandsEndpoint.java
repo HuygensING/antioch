@@ -58,7 +58,7 @@ public class CommandsEndpoint extends JSONEndpoint {
   @Path("{commandName}/{statusId}/status")
   public Response getCommandStatus(@PathParam("commandName") String commandName, @PathParam("statusId") UUID statusId) {
     CommandStatus commandStatus = commandStatusMap.get(statusId)//
-        .orElseThrow(() -> new NotFoundException());
+        .orElseThrow(NotFoundException::new);
     return ok(commandStatus);
   }
 

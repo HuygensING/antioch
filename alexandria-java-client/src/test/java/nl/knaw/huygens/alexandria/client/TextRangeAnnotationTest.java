@@ -93,7 +93,7 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
         .setAnnotator("ed")//
         .setPosition(position);
     RestResult<TextRangeAnnotationInfo> putResult = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation);
-    putResult.getFailureCause().ifPresent(c -> Log.info(c));
+    putResult.getFailureCause().ifPresent(Log::info);
     assertThat(putResult.hasFailed()).isFalse();
     Log.info(putResult.get().toString());
   }
@@ -119,7 +119,7 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
         .setAnnotator("ckcc")//
         .setPosition(position);
     RestResult<TextRangeAnnotationInfo> putResult = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation);
-    putResult.getFailureCause().ifPresent(c -> Log.info(c));
+    putResult.getFailureCause().ifPresent(Log::info);
     assertThat(putResult.hasFailed()).isFalse();
     Log.info(putResult.get().toString());
 
@@ -132,7 +132,7 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
         .setAnnotator("ckcc")//
         .setPosition(position9);
     RestResult<TextRangeAnnotationInfo> putResult9 = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation9);
-    putResult9.getFailureCause().ifPresent(c -> Log.info(c));
+    putResult9.getFailureCause().ifPresent(Log::info);
     assertThat(putResult9.hasFailed()).isFalse();
     Log.info(putResult.get().toString());
   }

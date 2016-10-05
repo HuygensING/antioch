@@ -41,7 +41,7 @@ public class RestResult<T> {
   private String errorMessage;
   private Duration turnaroundTime;
 
-  public static <T extends Object> RestResult<T> failingResult(Response response) {
+  public static <T> RestResult<T> failingResult(Response response) {
     RestResult<T> result = new RestResult<>();
     result.setFail(true);
     result.setResponse(response);
@@ -56,14 +56,14 @@ public class RestResult<T> {
     return result;
   }
 
-  public static <T extends Object> RestResult<T> failingResult(Exception exception) {
+  public static <T> RestResult<T> failingResult(Exception exception) {
     RestResult<T> result = new RestResult<>();
     result.setFail(true);
     result.setException(exception);
     return result;
   }
 
-  public static <T extends Object> RestResult<T> failingResult(String errorMessage) {
+  public static <T> RestResult<T> failingResult(String errorMessage) {
     RestResult<T> result = new RestResult<>();
     result.setFail(true);
     result.setErrorMessage(errorMessage);

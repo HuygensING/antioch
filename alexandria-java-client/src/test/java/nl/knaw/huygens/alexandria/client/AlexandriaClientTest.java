@@ -139,8 +139,7 @@ public abstract class AlexandriaClientTest extends AlexandriaTest {
     SubResourcePrototype subresource = new SubResourcePrototype().setSub(ref);
     RestResult<UUID> result = client.addSubResource(resourceUuid, subresource);
     assertRequestSucceeded(result);
-    UUID subresourceUuid = result.get();
-    return subresourceUuid;
+    return result.get();
   }
 
   protected TextImportStatus setResourceText(UUID resourceUuid, String xml) {
@@ -170,8 +169,7 @@ public abstract class AlexandriaClientTest extends AlexandriaTest {
         .setValue(annotationValue);
     RestResult<UUID> result = client.annotateResource(resourceUuid, annotationPrototype);
     assertRequestSucceeded(result);
-    UUID annotationUuid = result.get();
-    return annotationUuid;
+    return result.get();
   }
 
   private static ServiceLocator createServiceLocator() {

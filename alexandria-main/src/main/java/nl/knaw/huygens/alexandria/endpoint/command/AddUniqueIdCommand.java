@@ -63,19 +63,17 @@ public class AddUniqueIdCommand extends TextAnnotationCommand {
     if (commandResponse.parametersAreValid()) {
       parameters.resourceViewIds.stream()//
           .map(ResourceViewId::getResourceId)//
-          .forEach(resourceId -> {
-            service.runInTransaction(() -> {
-              Context context = new Context(service);
-              context.existingIds = service.getTextAnnotationStream(resourceId)//
-                  .filter(this::hasXmlId)//
-                  .map(this::getXmlId)//
-                  .collect(toList());
-              service.getTextAnnotationStream(resourceId)//
-                  .filter(ta -> textAnnotationHasRelevantName(parameters, ta))//
-                  .filter(ta -> !hasXmlId(ta))//
-                  .forEach(context::setXmlId);
-            });
-          });
+          .forEach(resourceId -> service.runInTransaction(() -> {
+            Context context = new Context(service);
+            context.existingIds = service.getTextAnnotationStream(resourceId)//
+                .filter(this::hasXmlId)//
+                .map(this::getXmlId)//
+                .collect(toList());
+            service.getTextAnnotationStream(resourceId)//
+                .filter(ta -> textAnnotationHasRelevantName(parameters, ta))//
+                .filter(ta -> !hasXmlId(ta))//
+                .forEach(context::setXmlId);
+          }));
     }
     return commandResponse;
   }

@@ -71,7 +71,7 @@ public class TextViewDefinitionParser {
 
   private ElementView parseElementViewDefinition(final String elementName, final ElementViewDefinition evd) {
     final ElementView elementView = new ElementView();
-    evd.getElementMode().ifPresent(em -> elementView.setElementMode(em));
+    evd.getElementMode().ifPresent(elementView::setElementMode);
     parseAttributeMode(elementName, evd.getAttributeMode(), elementView);
     parseWhen(elementName, evd.getWhen(), elementView);
     return elementView;

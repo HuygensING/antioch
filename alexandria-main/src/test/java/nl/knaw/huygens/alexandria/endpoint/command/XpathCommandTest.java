@@ -3,6 +3,7 @@ package nl.knaw.huygens.alexandria.endpoint.command;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -64,7 +65,7 @@ public class XpathCommandTest extends AlexandriaTest {
   public void selectTheTextualValueOfTheSecondEmployeeElement() throws Exception {
     XPathResult result = XpathCommand.testXPath("//employee[2]/text()", EXAMPLE);
     softly.assertThat(result.getType()).isEqualTo(Type.NODESET);
-    softly.assertThat(result.getResult()).isEqualTo(Arrays.asList("Al Pacino"));
+    softly.assertThat(result.getResult()).isEqualTo(Collections.singletonList("Al Pacino"));
   }
 
   @Test

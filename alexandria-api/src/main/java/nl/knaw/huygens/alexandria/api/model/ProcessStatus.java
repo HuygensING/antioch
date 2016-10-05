@@ -36,7 +36,7 @@ public abstract class ProcessStatus extends JsonWrapperObject implements Entity 
     this.done = true;
     this.state = State.done;
     this.processingTime = Duration.between(startTime, Instant.now());
-    this.expires = Instant.now().plus(1l, ChronoUnit.HOURS);
+    this.expires = Instant.now().plus(1L, ChronoUnit.HOURS);
   }
 
   public boolean isDone() {

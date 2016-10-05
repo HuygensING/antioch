@@ -5,7 +5,7 @@ import java.util.Map;
 import nl.knaw.huygens.alexandria.api.model.CommandResponse;
 
 public interface AlexandriaCommand {
-  public String getName();
+  String getName();
 
-  public CommandResponse runWith(Map<String, Object> parameterMap);
+  CommandResponse runWith(Map<String, Object> parameterMap);
 }

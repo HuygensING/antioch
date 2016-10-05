@@ -57,14 +57,13 @@ public class SubResourcesEndpoint extends JSONEndpoint {
   }
 
   private Map<String, List<Map<String, SubResourceEntity>>> jsonWrap(final List<AlexandriaResource> subresources) {
-    Map<String, List<Map<String, SubResourceEntity>>> entity = ImmutableMap.of(//
+    return ImmutableMap.of(//
         JsonTypeNames.SUBRESOURCELIST,
         subresources.stream()//
             .map(this::toEntity)//
             .map(this::toSubResourceMap)//
             .collect(toList())//
     );
-    return entity;
   }
 
   private Map<String, SubResourceEntity> toSubResourceMap(SubResourceEntity e) {

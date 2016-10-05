@@ -19,26 +19,24 @@ public class DotFactory {
     AtomicInteger annotationCounter = new AtomicInteger(0);
     Stack<Integer> openAnnotations = new Stack<>();
     Multimap<Integer, Integer> annotationDepthMap = ArrayListMultimap.create();
-    service.runInTransaction(() -> {
-      service.getTextGraphSegmentStream(resourceId).forEach((s) -> {
-        int tn = textCounter.getAndIncrement();
-        appendTextVertex(stringBuilder, s.getTextSegment(), tn);
-        if (tn > 0) {
-          appendNextTextEdge(stringBuilder, tn);
-        }
-        for (TextAnnotation textAnnotation : s.getTextAnnotationsToOpen()) {
-          int an = annotationCounter.getAndIncrement();
-          appendAnnotationVertex(stringBuilder, an, textAnnotation);
-          appendParentAnnotationEdge(stringBuilder, an, openAnnotations);
-          annotationDepthMap.put(openAnnotations.size(), an);
-          openAnnotations.push(an);
-        }
-        appendAnnotationEdge(stringBuilder, tn, openAnnotations.peek());
-        for (TextAnnotation textAnnotation : s.getTextAnnotationsToClose()) {
-          openAnnotations.pop();
-        }
-      });
-    });
+    service.runInTransaction(() -> service.getTextGraphSegmentStream(resourceId).forEach((s) -> {
+      int tn = textCounter.getAndIncrement();
+      appendTextVertex(stringBuilder, s.getTextSegment(), tn);
+      if (tn > 0) {
+        appendNextTextEdge(stringBuilder, tn);
+      }
+      for (TextAnnotation textAnnotation : s.getTextAnnotationsToOpen()) {
+        int an = annotationCounter.getAndIncrement();
+        appendAnnotationVertex(stringBuilder, an, textAnnotation);
+        appendParentAnnotationEdge(stringBuilder, an, openAnnotations);
+        annotationDepthMap.put(openAnnotations.size(), an);
+        openAnnotations.push(an);
+      }
+      appendAnnotationEdge(stringBuilder, tn, openAnnotations.peek());
+      for (TextAnnotation textAnnotation : s.getTextAnnotationsToClose()) {
+        openAnnotations.pop();
+      }
+    }));
     appendTextHasSameRank(stringBuilder, textCounter.get());
     for (Collection<Integer> values : annotationDepthMap.asMap().values()) {
       appendAnnotationsWithSameRank(stringBuilder, values);
@@ -49,7 +47,7 @@ public class DotFactory {
 
   private static void appendTextVertex(StringBuilder stringBuilder, String textSegment, int n) {
     stringBuilder.append("  t").append(n).append(" [shape=box, label=\"").append(escape(textSegment)).append("\"];\n");
-  };
+  }
 
   private static String escape(String textSegment) {
     return textSegment.replace("\"", "\\\"");

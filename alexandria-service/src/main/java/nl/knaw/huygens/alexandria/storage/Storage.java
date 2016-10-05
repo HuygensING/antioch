@@ -94,13 +94,13 @@ public class Storage {
 
   // framedGraph methods
 
-  public <T> T runInTransaction(Supplier<T> supplier) {
+  public <A> A runInTransaction(Supplier<A> supplier) {
     boolean inOpenTransaction = getTransactionIsOpen();
     if (!inOpenTransaction) {
       startTransaction();
     }
     try {
-      T result = supplier.get();
+      A result = supplier.get();
       if (!inOpenTransaction) {
         commitTransaction();
       }

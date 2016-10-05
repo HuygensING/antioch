@@ -26,15 +26,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -161,16 +153,15 @@ public class AlexandriaQueryParser {
             .repeat(__.in(ResourceVF.EdgeLabels.PART_OF));
       }
 
-      Stream<Map<String, Object>> stream = StreamUtil.stream(traversal)//
+      return StreamUtil.stream(traversal)//
           .map(v -> storage.frameVertex(v, ResourceVF.class))//
           .map(this::toResultMap);
-      return stream;
     };
   }
 
   private Map<String, Object> toResultMap(ResourceVF rvf) {
     Map<String, Object> map = new HashMap<>();
-    map.put(QueryField.subresource_id.externalName(), rvf.getUuid().toString());
+    map.put(QueryField.subresource_id.externalName(), rvf.getUuid());
     // map.put(QueryField.subresource_sub.externalName(), rvf.getCargo());
     return map;
   }
@@ -218,14 +209,14 @@ public class AlexandriaQueryParser {
           .collect(toList());
       return storage -> {
         List<AnnotationVF> annotationList = new ArrayList<>();
-        uuidSet.stream().forEach(uuid -> {
+        uuidSet.forEach(uuid -> {
           Optional<ResourceVF> optionalResource = storage.readVF(ResourceVF.class, uuid);
           if (optionalResource.isPresent()) {
             ResourceVF resourceVF = optionalResource.get();
             annotationList.addAll(resourceVF.getAnnotatedBy());
             annotationList.addAll(resourceVF.getSubResources().stream()//
                 .map(ResourceVF::getAnnotatedBy)//
-                .flatMap(l -> l.stream())//
+                .flatMap(Collection::stream)//
                 .collect(toList()));
           }
         });
@@ -305,7 +296,8 @@ public class AlexandriaQueryParser {
         .reduce(alwaysTrue(), Predicate::and);
   }
 
-  static Set<String> ALL_STATES = Arrays.stream(AlexandriaState.values()).map(AlexandriaState::name).collect(toSet());
+  static Set<String> ALL_STATES = Arrays.stream(AlexandriaState.values())
+     .map(AlexandriaState::name).collect(toSet());
 
   static Predicate<AnnotationVF> toPredicate(WhereToken whereToken) {
     Function<AnnotationVF, Object> getter = QueryFieldGetters.get(whereToken.getProperty());
@@ -361,11 +353,12 @@ public class AlexandriaQueryParser {
     return alwaysTrue();
   }
 
-  static final Predicate<Object> INVALID_STATEVALUE_PREDICATE = stateValue -> !(stateValue instanceof String && ALL_STATES.contains(stateValue));
+  static final Predicate<String> INVALID_STATEVALUE_PREDICATE = stateValue -> !(stateValue instanceof String && ALL_STATES.contains(stateValue));
 
   private static void checkForValidStateParameter(WhereToken whereToken) {
     if (QueryField.state.equals(whereToken.getProperty())) {
-      List<Object> invalidValues = whereToken.getParameters().stream()//
+      List<String> invalidValues = whereToken.getParameters().stream()//
+              .map(String.class::cast)
           .filter(INVALID_STATEVALUE_PREDICATE)//
           .collect(toList());
       if (!invalidValues.isEmpty()) {

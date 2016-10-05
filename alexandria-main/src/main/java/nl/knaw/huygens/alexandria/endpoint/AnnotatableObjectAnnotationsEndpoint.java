@@ -69,13 +69,12 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   }
 
   private Map<String, List<Map<String, AnnotationEntity>>> jsonWrap(final List<AnnotationEntity> annotationEntities) {
-    Map<String, List<Map<String, AnnotationEntity>>> entity = ImmutableMap.of(//
+    return ImmutableMap.of(//
         JsonTypeNames.ANNOTATIONLIST,
         annotationEntities.stream()//
             .map(this::toAnnotationMap)//
             .collect(toList())//
     );
-    return entity;
   }
 
   private Map<String, AnnotationEntity> toAnnotationMap(AnnotationEntity e) {

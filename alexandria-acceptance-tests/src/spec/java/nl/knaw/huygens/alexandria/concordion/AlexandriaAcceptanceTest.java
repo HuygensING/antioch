@@ -174,7 +174,7 @@ public class AlexandriaAcceptanceTest extends RestFixture {
 
   public void wait5seconds() {
     try {
-      Thread.sleep(5000l);
+      Thread.sleep(5000L);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }

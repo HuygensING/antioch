@@ -384,8 +384,7 @@ public class TinkerPopServiceTest extends AlexandriaTest {
   private AlexandriaResource aResource() {
     UUID resourceId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
-    AlexandriaResource resource = new AlexandriaResource(resourceId, provenance);
-    return resource;
+    return new AlexandriaResource(resourceId, provenance);
   }
 
   private UUID aResourceUUIDWithXml(String xml) {

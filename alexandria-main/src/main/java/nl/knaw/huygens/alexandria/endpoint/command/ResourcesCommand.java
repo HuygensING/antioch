@@ -2,12 +2,7 @@ package nl.knaw.huygens.alexandria.endpoint.command;
 
 import static java.util.stream.Collectors.toList;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import com.google.common.base.Splitter;
 
@@ -71,7 +66,7 @@ public abstract class ResourcesCommand implements AlexandriaCommand {
           .collect(toList());
     }
 
-    return Arrays.asList(ResourceViewId.fromString(resourceViewIds));
+    return Collections.singletonList(ResourceViewId.fromString(resourceViewIds));
   }
 
   private CommandResponse addResourceIdsError(CommandResponse commandResponse) {

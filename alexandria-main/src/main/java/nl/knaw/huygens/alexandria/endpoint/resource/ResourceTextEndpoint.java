@@ -126,7 +126,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @Path("status")
   public Response getTextGraphImportStatus() {
     TextImportStatus textGraphImportTaskStatus = taskStatusMap.get(resourceId)//
-        .orElseThrow(() -> new NotFoundException());
+        .orElseThrow(NotFoundException::new);
     return ok(textGraphImportTaskStatus);
   }
 

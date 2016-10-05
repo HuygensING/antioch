@@ -57,14 +57,12 @@ public class WrapContentInElementCommand extends TextAnnotationCommand {
     if (commandResponse.parametersAreValid()) {
       parameters.resourceViewIds.stream()//
           .map(ResourceViewId::getResourceId)//
-          .forEach(resourceId -> {
-            service.runInTransaction(() -> {
-              Context context = new Context(service, parameters);
-              service.getTextAnnotationStream(resourceId)//
-                  .filter(context::hasRelevantXmlId)//
-                  .forEach(context::wrapContent);
-            });
-          });
+          .forEach(resourceId -> service.runInTransaction(() -> {
+            Context context = new Context(service, parameters);
+            service.getTextAnnotationStream(resourceId)//
+                .filter(context::hasRelevantXmlId)//
+                .forEach(context::wrapContent);
+          }));
     }
     return commandResponse;
   }
@@ -86,8 +84,7 @@ public class WrapContentInElementCommand extends TextAnnotationCommand {
       Map<String, Object> elementMap = (Map) parameterMap.get("element");
       String name = (String) elementMap.get("name");
       Map<String, String> attributes = (Map<String, String>) elementMap.get("attributes");
-      TextAnnotation newTextAnnotation = new TextAnnotation(name, attributes, 0);
-      parameters.contentWrapper = newTextAnnotation;
+      parameters.contentWrapper = new TextAnnotation(name, attributes, 0);
 
     } catch (ClassCastException e) {
       commandResponse.addErrorLine("Parameter 'element' should be a single element with name and attributes.");

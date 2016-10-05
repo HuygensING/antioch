@@ -784,8 +784,7 @@ public class TinkerPopService implements AlexandriaService {
     if (StringUtils.isEmpty(json)) {
       return Maps.newHashMap();
     }
-    Map<String, TextView> textViewMap = TEXTVIEW_READER.readValue(json);
-    return textViewMap;
+    return TEXTVIEW_READER.readValue(json);
   }
 
   private String serializeTextViewDefinitionMap(Map<String, TextViewDefinition> textViewDefinitionMap) throws JsonProcessingException {
@@ -796,8 +795,7 @@ public class TinkerPopService implements AlexandriaService {
     if (StringUtils.isEmpty(json)) {
       return Maps.newHashMap();
     }
-    Map<String, TextViewDefinition> textViewDefinitionMap = TEXTVIEWDEFINITION_READER.readValue(json);
-    return textViewDefinitionMap;
+    return TEXTVIEWDEFINITION_READER.readValue(json);
   }
 
   private AlexandriaAnnotation createAnnotation(AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
@@ -900,11 +898,10 @@ public class TinkerPopService implements AlexandriaService {
 
   private List<TextView> deserializeToTextViews(String textViewsJson) throws IOException {
     Map<String, TextView> textViewMap = deserializeToTextViewMap(textViewsJson);
-    List<TextView> textViews = textViewMap.entrySet()//
+    return textViewMap.entrySet()//
         .stream()//
         .map(this::setName)//
         .collect(toList());
-    return textViews;
   }
 
   private TextView setName(Entry<String, TextView> entry) {
@@ -1019,21 +1016,18 @@ public class TinkerPopService implements AlexandriaService {
       mapStream = mapStream.distinct();
     }
     if (pQuery.doGrouping()) {
-      Stream<Map<String, Object>> groupByStream = mapStream//
+      mapStream = mapStream//
           .collect(groupingBy(pQuery::concatenateGroupByFieldsValues))//
           .values().stream()//
           .map(pQuery::collectListFieldValues);
-      mapStream = groupByStream;
     }
-    List<Map<String, Object>> results = mapStream//
+    return mapStream//
         .collect(toList());
-    return results;
   }
 
   private ResourceVF readExisitingResourceVF(UUID uuid) {
-    ResourceVF resourcevf = storage.runInTransaction(() -> storage.readVF(ResourceVF.class, uuid))//
+    return storage.runInTransaction(() -> storage.readVF(ResourceVF.class, uuid))//
         .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
-    return resourcevf;
   }
 
   public Storage storage() {
