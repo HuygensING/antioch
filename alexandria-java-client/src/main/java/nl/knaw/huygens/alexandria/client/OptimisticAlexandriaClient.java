@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.net.ssl.SSLContext;
+import javax.ws.rs.core.Response;
 
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
@@ -245,7 +247,10 @@ public class OptimisticAlexandriaClient {
 
   private <T> T unwrap(RestResult<T> restResult) {
     if (restResult.hasFailed()) {
-      throw new AlexandriaException(restResult.getFailureCause().orElse("Unspecified error"));
+      Optional<Response> response = restResult.getResponse();
+      String status = response.isPresent() ? response.get().getStatus() + ": " : "";
+      String message = status + restResult.getFailureCause().orElse("Unspecified error");
+      throw new AlexandriaException(message);
     }
     return restResult.get();
   }
