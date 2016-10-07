@@ -84,10 +84,10 @@ public class ResourceAnnotatorsEndpoint extends JSONEndpoint {
   @Path("{code}")
   @ApiOperation("get annotator")
   public Response getAnnotator(@PathParam("code") final String code) {
-    return ok(readExisitingAnnotator(code));
+    return ok(readExistingAnnotator(code));
   }
 
-  private Annotator readExisitingAnnotator(String code) {
+  private Annotator readExistingAnnotator(String code) {
     return service.readResourceAnnotator(resource.getId(), code).orElseThrow(annotatorNotFoundForCode(code));
   }
 

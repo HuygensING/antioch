@@ -277,7 +277,7 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public List<AlexandriaResource> readSubResources(UUID uuid) {
-    ResourceVF resourcevf = readExisitingResourceVF(uuid);
+    ResourceVF resourcevf = readExistingResourceVF(uuid);
     return resourcevf.getSubResources().stream()//
         .map(this::deframeResource)//
         .sorted()//
@@ -304,7 +304,7 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Optional<Annotator> readResourceAnnotator(UUID uuid, String code) {
-    ResourceVF resourcevf = readExisitingResourceVF(uuid);
+    ResourceVF resourcevf = readExistingResourceVF(uuid);
     return resourcevf.getAnnotators().parallelStream()//
         .map(this::deframeAnnotator)//
         .filter(a -> code.equals(a.getCode()))//
@@ -314,7 +314,7 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public AnnotatorList readResourceAnnotators(UUID uuid) {
     List<AnnotatorVF> annotatorVFs = storage.runInTransaction(() -> {
-      ResourceVF resourceVF = readExisitingResourceVF(uuid);
+      ResourceVF resourceVF = readExistingResourceVF(uuid);
       List<AnnotatorVF> annotatorVFList = Lists.newArrayList();
       do {
         annotatorVFList.addAll(resourceVF.getAnnotators());
@@ -356,7 +356,7 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public boolean overlapsWithExisitingTextRangeAnnotationForResource(TextRangeAnnotation annotation, UUID resourceUUID) {
+  public boolean overlapsWithExistingTextRangeAnnotationForResource(TextRangeAnnotation annotation, UUID resourceUUID) {
     return storage.runInTransaction(() -> {
       boolean overlaps = false;
       Optional<ResourceVF> oResourceVF = storage.readVF(ResourceVF.class, resourceUUID);
@@ -1025,7 +1025,7 @@ public class TinkerPopService implements AlexandriaService {
         .collect(toList());
   }
 
-  private ResourceVF readExisitingResourceVF(UUID uuid) {
+  private ResourceVF readExistingResourceVF(UUID uuid) {
     return storage.runInTransaction(() -> storage.readVF(ResourceVF.class, uuid))//
         .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
   }

@@ -132,7 +132,7 @@ public interface AlexandriaService {
 
   Optional<TextRangeAnnotation> readTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID);
 
-  boolean overlapsWithExisitingTextRangeAnnotationForResource(TextRangeAnnotation annotation, UUID resourceUUID);
+  boolean overlapsWithExistingTextRangeAnnotationForResource(TextRangeAnnotation annotation, UUID resourceUUID);
 
   void setTextView(UUID resourceUUID, String viewId, TextView textView, TextViewDefinition textViewDefinition);
 

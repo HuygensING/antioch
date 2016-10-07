@@ -36,7 +36,7 @@ public class TextRangeAnnotationValidatorFactory {
     }
     validateName(textRangeAnnotation.getName());
     validateAnnotator(textRangeAnnotation.getAnnotator());
-    if (service.overlapsWithExisitingTextRangeAnnotationForResource(textRangeAnnotation, resourceUUID)) {
+    if (service.overlapsWithExistingTextRangeAnnotationForResource(textRangeAnnotation, resourceUUID)) {
       throw new ConflictException("Overlapping annotations with the same name and responsibility.");
     }
     return annotated;

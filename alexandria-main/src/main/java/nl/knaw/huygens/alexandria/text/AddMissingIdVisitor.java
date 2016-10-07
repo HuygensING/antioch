@@ -39,11 +39,11 @@ import nl.knaw.huygens.tei.handlers.XmlTextHandler;
 
 public class AddMissingIdVisitor extends ExportVisitor {
   private static final String XMLID_MARKER = "-";
-  private static List<String> exisitingBaseElementIds;
+  private static List<String> existingBaseElementIds;
   private static final Map<String, AtomicLong> counters = new HashMap<>();
 
-  public AddMissingIdVisitor(List<String> exisitingBaseElementIds, List<String> baseElementNames) {
-    AddMissingIdVisitor.exisitingBaseElementIds = exisitingBaseElementIds;
+  public AddMissingIdVisitor(List<String> existingBaseElementIds, List<String> baseElementNames) {
+    AddMissingIdVisitor.existingBaseElementIds = existingBaseElementIds;
     setCommentHandler(new DefaultCommentHandler<>());
     setTextHandler(new XmlTextHandler<>());
     setDefaultElementHandler(new RenderElementHandler());
@@ -74,7 +74,7 @@ public class AddMissingIdVisitor extends ExportVisitor {
       counters.putIfAbsent(name, new AtomicLong(0));
       do {
         id = name + XMLID_MARKER + counters.get(name).incrementAndGet();
-      } while (exisitingBaseElementIds.contains(id));
+      } while (existingBaseElementIds.contains(id));
       baseElement.setAttribute(TextUtil.XML_ID, id);
     }
 
