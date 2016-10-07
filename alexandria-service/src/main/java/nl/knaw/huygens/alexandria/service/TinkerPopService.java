@@ -38,6 +38,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -358,17 +359,18 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public boolean overlapsWithExistingTextRangeAnnotationForResource(TextRangeAnnotation annotation, UUID resourceUUID) {
     return storage.runInTransaction(() -> {
-      boolean overlaps = false;
-      Optional<ResourceVF> oResourceVF = storage.readVF(ResourceVF.class, resourceUUID);
-      if (oResourceVF.isPresent()) {
-        FramedGraphTraversal<ResourceVF, Vertex> traversal = oResourceVF.get().start()//
+      AtomicBoolean overlaps = new AtomicBoolean(false);
+      storage.readVF(ResourceVF.class, resourceUUID).ifPresent(resourceVF -> {
+        FramedGraphTraversal<ResourceVF, Vertex> traversal = resourceVF.start()//
             .in(nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF.EdgeLabels.HAS_RESOURCE)//
             .has("name", annotation.getName())//
             .has("annotatorCode", annotation.getAnnotator())//
         ;
-        String xmlId1 = annotation.getPosition().getXmlId();
-        Integer start1 = annotation.getPosition().getOffset().get();
-        Integer end1 = start1 + annotation.getPosition().getLength().get();
+        Position position = annotation.getPosition();
+        String uuid1 = annotation.getId().toString();
+        String xmlId1 = position.getXmlId();
+        Integer start1 = position.getOffset().get();
+        Integer end1 = start1 + position.getLength().get();
         Predicate<Vertex> overlapsWithAnnotation = t -> {
           String xmlId2 = (String) t.property("xmlId").value();
           Integer start2 = (Integer) t.property("offset").value();
@@ -376,12 +378,19 @@ public class TinkerPopService implements AlexandriaService {
           Log.info("start1:{} <= end2:{} && start2:{} <= end1:{}", start1, end2, start2, end1);
           return xmlId1.equals(xmlId2) && start1 <= end2 && start2 <= end1;
         };
-        overlaps = StreamUtil.parallelStream(traversal)//
+        Predicate<Vertex> hasDifferentUUID = t -> {
+          String uuid2 = (String) t.property("uuid").value();
+          return !uuid1.equals(uuid2);
+        };
+        overlaps.set(StreamUtil.parallelStream(traversal)//
+            .filter(hasDifferentUUID)//
             .filter(overlapsWithAnnotation)//
             .findAny()//
-            .isPresent();
-      }
-      return overlaps;
+            .isPresent()//
+        );
+
+      });
+      return overlaps.get();
     });
   }
 

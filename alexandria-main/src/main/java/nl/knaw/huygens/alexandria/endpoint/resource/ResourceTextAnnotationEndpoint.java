@@ -1,6 +1,7 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
 import java.net.URI;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -53,13 +54,23 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
       @PathParam("annotationUUID") final UUIDParam uuidParam, //
       @NotNull TextRangeAnnotation textRangeAnnotation//
   ) {
-    textRangeAnnotation.setId(uuidParam.getValue());
+    UUID annotationUUID = uuidParam.getValue();
+    textRangeAnnotation.setId(annotationUUID);
+    Optional<TextRangeAnnotation> existingTextRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, annotationUUID);
     String xml = getXML();
+    if (existingTextRangeAnnotation.isPresent()) {
+
+      textRangeAnnotationValidator.validate(textRangeAnnotation, xml);
+      service.setTextRangeAnnotation(resourceUUID, textRangeAnnotation);
+      return noContent();
+
+    }
+
     String annotated = textRangeAnnotationValidator.validate(textRangeAnnotation, xml);
+    TextRangeAnnotationInfo info = new TextRangeAnnotationInfo().setAnnotates(annotated);
 
     service.setTextRangeAnnotation(resourceUUID, textRangeAnnotation);
-    URI location = locationBuilder.locationOf(resource, EndpointPaths.TEXT, EndpointPaths.ANNOTATIONS, uuidParam.getValue().toString());
-    TextRangeAnnotationInfo info = new TextRangeAnnotationInfo().setAnnotates(annotated);
+    URI location = locationBuilder.locationOf(resource, EndpointPaths.TEXT, EndpointPaths.ANNOTATIONS, annotationUUID.toString());
     return Response.created(location).entity(info).build();
   }
 
