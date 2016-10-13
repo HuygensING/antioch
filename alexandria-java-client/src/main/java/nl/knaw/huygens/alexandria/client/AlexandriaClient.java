@@ -160,7 +160,7 @@ public class AlexandriaClient implements AutoCloseable {
 
     return requester//
         .onStatus(Status.CREATED, voidRestResult())//
-        .onStatus(Status.NO_CONTENT, voidRestResult())//
+        .onStatus(Status.ACCEPTED, voidRestResult())//
         .getResult();
   }
 
@@ -337,6 +337,7 @@ public class AlexandriaClient implements AutoCloseable {
     final RestRequester<TextRangeAnnotationInfo> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
         .onStatus(Status.CREATED, this::toTextRangeAnnotationInfoRestResult)//
+        .onStatus(Status.NO_CONTENT, this::toTextRangeAnnotationInfoRestResult)//
         .getResult();
   }
 

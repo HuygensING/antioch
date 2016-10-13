@@ -7,22 +7,51 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
+import nl.knaw.huygens.alexandria.api.model.Annotator;
+import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
+import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 
-public class OptimisticAlexandriaClientTest extends AlexandriaClientTest {
+public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer {
 
   private static final String EVERYTHING_UPTO_AND_INCLUDING_THE_LAST_PERIOD_REGEX = ".*\\.";
+  private static OptimisticAlexandriaClient client;
+
+  @BeforeClass
+  public static void startClient() {
+    client = new OptimisticAlexandriaClient("http://localhost:2016/");
+  }
+
+  @AfterClass
+  public static void stopClient() {
+    client.close();
+  }
+
+  @Before
+  public void before() {
+    client.setAuthKey(AUTHKEY);
+    client.setAutoConfirm(true);
+  }
 
   @Test
   public void testAbout() {
-    OptimisticAlexandriaClient c = new OptimisticAlexandriaClient("http://localhost:2016/");
-    AboutEntity about = c.getAbout();
+    AboutEntity about = client.getAbout();
     assertThat(about.getVersion()).isNotEmpty();
   }
 
@@ -37,6 +66,62 @@ public class OptimisticAlexandriaClientTest extends AlexandriaClientTest {
         .collect(joining("\n"));
     Log.info("Methods to add to OptimisticAlexandriaClient:\n{}", stubs);
     assertThat(stubs).isEmpty();
+  }
+
+  @Test
+  public void testChangingAttributesOnTextRangeAnnotationIsAllowedWhenAnnotatorAndPositionIsTheSame() {
+    String xml = singleQuotesToDouble("<text><p xml:id='p-1'>This is a simple paragraph.</p></text>");
+    UUID resourceUUID = createResourceWithText(xml);
+    client.setAnnotator(resourceUUID, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
+
+    UUID annotationUUID = UUID.randomUUID();
+    Map<String, String> attributes1 = new HashMap<>();
+    attributes1.put("key1", "value1");
+    attributes1.put("key2", "value2");
+    Position position = new Position()//
+        .setXmlId("p-1");
+    TextRangeAnnotation textRangeAnnotation = new TextRangeAnnotation()//
+        .setId(annotationUUID)//
+        .setName("tag")//
+        .setAnnotator("ed")//
+        .setPosition(position)//
+        .setAttributes(attributes1);
+    TextRangeAnnotationInfo info = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation);
+    assertThat(info.getAnnotates()).isEqualTo("This is a simple paragraph.");
+
+    String annotatedXML = client.getTextAsString(resourceUUID);
+    String expectation2 = singleQuotesToDouble("<text><p xml:id='p-1'><tag key1='value1' key2='value2' resp='#ed'>This is a simple paragraph.</tag></p></text>");
+    assertThat(annotatedXML).isEqualTo(expectation2);
+
+    // now to change the attributes of this annotation
+    Map<String, String> attributes2 = new HashMap<>();
+    attributes2.put("key1", "something");
+    attributes2.put("key3", "entirely");
+    textRangeAnnotation.setAttributes(attributes2);
+    TextRangeAnnotationInfo info2 = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation);
+    Log.info("{}", info2);
+
+    annotatedXML = client.getTextAsString(resourceUUID);
+    String expectation3 = singleQuotesToDouble("<text><p xml:id='p-1'><tag key1='something' key3='entirely' resp='#ed'>This is a simple paragraph.</tag></p></text>");
+    assertThat(annotatedXML).isEqualTo(expectation3);
+  }
+
+  /// end tests
+
+  private UUID createResourceWithText(String xml) {
+    String resourceRef = "test";
+    UUID resourceUUID = createResource(resourceRef);
+    TextImportStatus textGraphImportStatus = setResourceText(resourceUUID, xml);
+    URI expectedURI = URI.create("http://localhost:2016/resources/" + resourceUUID + "/text/xml");
+    assertThat(textGraphImportStatus.getTextURI()).isEqualTo(expectedURI);
+    return resourceUUID;
+  }
+
+  protected UUID createResource(String resourceRef) {
+    ResourcePrototype resource = new ResourcePrototype().setRef(resourceRef);
+    UUID resourceUuid = UUID.randomUUID();
+    client.setResource(resourceUuid, resource);
+    return resourceUuid;
   }
 
   boolean returnsRestResult(Method method) {
@@ -94,6 +179,10 @@ public class OptimisticAlexandriaClientTest extends AlexandriaClientTest {
 
   String parameterName(Parameter parameter) {
     return typeString(parameter).toLowerCase();
+  }
+
+  protected TextImportStatus setResourceText(UUID resourceUuid, String xml) {
+    return client.setResourceTextSynchronously(resourceUuid, xml);
   }
 
 }
