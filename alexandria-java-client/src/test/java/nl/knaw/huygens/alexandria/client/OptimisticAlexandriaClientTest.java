@@ -2,6 +2,7 @@ package nl.knaw.huygens.alexandria.client;
 
 import static java.util.stream.Collectors.joining;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -69,7 +70,45 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
   }
 
   @Test
-  public void testChangingAttributesOnTextRangeAnnotationIsAllowedWhenAnnotatorAndPositionIsTheSame() {
+  public void testChangingExistingAttributesOnTextRangeAnnotationIsAllowedWhenAnnotatorAndPositionIsTheSame() {
+    String xml = singleQuotesToDouble("<text><p xml:id='p-1'>This is a simple paragraph.</p></text>");
+    UUID resourceUUID = createResourceWithText(xml);
+    client.setAnnotator(resourceUUID, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
+
+    UUID annotationUUID = UUID.randomUUID();
+    Map<String, String> attributes1 = new HashMap<>();
+    attributes1.put("key1", "value1");
+    attributes1.put("key2", "value2");
+    Position position = new Position()//
+        .setXmlId("p-1");
+    TextRangeAnnotation textRangeAnnotation = new TextRangeAnnotation()//
+        .setId(annotationUUID)//
+        .setName("tag")//
+        .setAnnotator("ed")//
+        .setPosition(position)//
+        .setAttributes(attributes1);
+    TextRangeAnnotationInfo info = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation);
+    assertThat(info.getAnnotates()).isEqualTo("This is a simple paragraph.");
+
+    String annotatedXML = client.getTextAsString(resourceUUID);
+    String expectation2 = singleQuotesToDouble("<text><p xml:id='p-1'><tag key1='value1' key2='value2' resp='#ed'>This is a simple paragraph.</tag></p></text>");
+    assertThat(annotatedXML).isEqualTo(expectation2);
+
+    // now to change the attributes of this annotation
+    Map<String, String> attributes2 = new HashMap<>();
+    attributes2.put("key1", "something");
+    attributes2.put("key2", "entirely");
+    textRangeAnnotation.setAttributes(attributes2);
+    TextRangeAnnotationInfo info2 = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation);
+    Log.info("{}", info2);
+
+    annotatedXML = client.getTextAsString(resourceUUID);
+    String expectation3 = singleQuotesToDouble("<text><p xml:id='p-1'><tag key1='something' key2='entirely' resp='#ed'>This is a simple paragraph.</tag></p></text>");
+    assertThat(annotatedXML).isEqualTo(expectation3);
+  }
+
+  @Test
+  public void testAddingAttributesOnTextRangeAnnotationIsNotAllowed() {
     String xml = singleQuotesToDouble("<text><p xml:id='p-1'>This is a simple paragraph.</p></text>");
     UUID resourceUUID = createResourceWithText(xml);
     client.setAnnotator(resourceUUID, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
@@ -98,12 +137,16 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     attributes2.put("key1", "something");
     attributes2.put("key3", "entirely");
     textRangeAnnotation.setAttributes(attributes2);
-    TextRangeAnnotationInfo info2 = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation);
-    Log.info("{}", info2);
+    try {
+      TextRangeAnnotationInfo info2 = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation);
+      Log.info("{}", info2);
+      fail();
+    } catch (AlexandriaException e) {
+      assertThat(e.getMessage()).isEqualTo("400: You're only allowed to change existing attributes [key1, key2]");
+    }
 
     annotatedXML = client.getTextAsString(resourceUUID);
-    String expectation3 = singleQuotesToDouble("<text><p xml:id='p-1'><tag key1='something' key3='entirely' resp='#ed'>This is a simple paragraph.</tag></p></text>");
-    assertThat(annotatedXML).isEqualTo(expectation3);
+    assertThat(annotatedXML).isEqualTo(expectation2);
   }
 
   /// end tests

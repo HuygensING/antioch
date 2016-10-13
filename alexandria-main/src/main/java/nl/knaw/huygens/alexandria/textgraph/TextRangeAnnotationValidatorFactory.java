@@ -2,7 +2,9 @@ package nl.knaw.huygens.alexandria.textgraph;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.ws.rs.BadRequestException;
@@ -36,10 +38,58 @@ public class TextRangeAnnotationValidatorFactory {
     }
     validateName(textRangeAnnotation.getName());
     validateAnnotator(textRangeAnnotation.getAnnotator());
+    validateAttributes(textRangeAnnotation.getAttributes());
     if (service.overlapsWithExistingTextRangeAnnotationForResource(textRangeAnnotation, resourceUUID)) {
       throw new ConflictException("Overlapping annotations with the same name and responsibility.");
     }
     return annotated;
+  }
+
+  public String validate(TextRangeAnnotation newTextRangeAnnotation, TextRangeAnnotation existingTextRangeAnnotation, String xml) {
+    validateNewAttributes(newTextRangeAnnotation, existingTextRangeAnnotation);
+    validateNewName(newTextRangeAnnotation, existingTextRangeAnnotation);
+    validateNewPosition(newTextRangeAnnotation, existingTextRangeAnnotation);
+    validateNewAnnotator(newTextRangeAnnotation, existingTextRangeAnnotation);
+    return validate(newTextRangeAnnotation, xml);
+  }
+
+  private void validateNewPosition(TextRangeAnnotation newTextRangeAnnotation, TextRangeAnnotation existingTextRangeAnnotation) {
+    Position existingPosition = existingTextRangeAnnotation.getPosition();
+    Position newPosition = newTextRangeAnnotation.getPosition();
+    boolean positionsAreEquivalent = newPosition.getXmlId().equals(existingPosition.getXmlId());
+    if (newPosition.getOffset().isPresent()){
+      positionsAreEquivalent = positionsAreEquivalent && newPosition.getOffset().get().equals(existingPosition.getOffset().get());
+    }
+    if (newPosition.getLength().isPresent()) {
+      positionsAreEquivalent = positionsAreEquivalent && newPosition.getLength().get().equals(existingPosition.getLength().get());
+    }
+    if (!positionsAreEquivalent) {
+      throw new BadRequestException("You're not allowed to change the annotation position");
+    }
+  }
+
+  private void validateNewAnnotator(TextRangeAnnotation newTextRangeAnnotation, TextRangeAnnotation existingTextRangeAnnotation) {
+    String existingAnnotator = existingTextRangeAnnotation.getAnnotator();
+    String newAnnotator = newTextRangeAnnotation.getAnnotator();
+    if (!newAnnotator.equals(existingAnnotator)) {
+      throw new BadRequestException("You're not allowed to change the annotator");
+    }
+  }
+
+  private void validateNewName(TextRangeAnnotation newTextRangeAnnotation, TextRangeAnnotation existingTextRangeAnnotation) {
+    String existingName = existingTextRangeAnnotation.getName();
+    String newName = newTextRangeAnnotation.getName();
+    if (!newName.equals(existingName)) {
+      throw new BadRequestException("You're not allowed to change the annotation name");
+    }
+  }
+
+  private void validateNewAttributes(TextRangeAnnotation newTextRangeAnnotation, TextRangeAnnotation existingTextRangeAnnotation) {
+    Set<String> existingAttributeNames = existingTextRangeAnnotation.getAttributes().keySet();
+    Set<String> newAttributeNames = newTextRangeAnnotation.getAttributes().keySet();
+    if (!newAttributeNames.equals(existingAttributeNames)) {
+      throw new BadRequestException("You're only allowed to change existing attributes " + existingAttributeNames);
+    }
   }
 
   private void validateAnnotator(String annotator) {
@@ -96,6 +146,10 @@ public class TextRangeAnnotationValidatorFactory {
       e.printStackTrace();
       throw new BadRequestException(errorMessage);
     }
+  }
+
+  private void validateAttributes(Map<String, String> attributes) {
+    attributes.keySet().forEach(this::validateName);
   }
 
   private void validateName(String elementName) {

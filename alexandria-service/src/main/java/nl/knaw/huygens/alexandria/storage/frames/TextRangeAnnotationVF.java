@@ -33,6 +33,10 @@ public abstract class TextRangeAnnotationVF extends IdentifiableVF implements Fr
 
   public abstract void setLength(Integer length);
 
+  public abstract String getAttributesAsJson();
+
+  public abstract void setAttributesAsJson(String json);
+
   @Out
   @Edge(EdgeLabels.HAS_RESOURCE)
   public abstract void setResource(ResourceVF resource);

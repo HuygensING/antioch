@@ -31,6 +31,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -878,6 +879,13 @@ public class TinkerPopService implements AlexandriaService {
     if (position.getLength().isPresent()) {
       vf.setLength(position.getLength().get());
     }
+    try {
+      String json = new ObjectMapper().writeValueAsString(annotation.getAttributes());
+      vf.setAttributesAsJson(json);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+
   }
 
   private TextRangeAnnotation deframeTextRangeAnnotation(TextRangeAnnotationVF vf) {
@@ -885,11 +893,21 @@ public class TinkerPopService implements AlexandriaService {
         .setXmlId(vf.getXmlId())//
         .setOffset(vf.getOffset())//
         .setLength(vf.getLength());
-    return new TextRangeAnnotation()//
-        .setId(UUID.fromString(vf.getUuid()))//
-        .setName(vf.getName())//
-        .setAnnotator(vf.getAnnotatorCode())//
-        .setPosition(position);
+    Map<String, String> attributes;
+    try {
+      String attributesAsJson = StringUtils.defaultIfBlank(vf.getAttributesAsJson(), "{}");
+      TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {
+      };
+      attributes = new ObjectMapper().readValue(attributesAsJson, typeRef);
+      return new TextRangeAnnotation()//
+          .setId(UUID.fromString(vf.getUuid()))//
+          .setName(vf.getName())//
+          .setAnnotator(vf.getAnnotatorCode())//
+          .setAttributes(attributes)//
+          .setPosition(position);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private void setTextViews(ResourceVF rvf, AlexandriaResource resource) {
