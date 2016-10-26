@@ -14,6 +14,7 @@ import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
 
 public class TextRangeAnnotationTest extends AlexandriaClientTest {
   @Before
@@ -110,6 +111,11 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
     RestResult<Void> result = client.setAnnotator(resourceUUID, "ckcc", new Annotator().setCode("ckcc").setDescription("Cees Kacc"));
     assertRequestSucceeded(result);
 
+    RestResult<TextRangeAnnotationList> restResult = client.getResourceTextRangeAnnotations(resourceUUID);
+    assertThat(restResult.hasFailed()).isFalse();
+    TextRangeAnnotationList list = restResult.get();
+    assertThat(list).hasSize(0);
+
     UUID closer13 = UUID.randomUUID();
     Position position = new Position()//
         .setXmlId("p-13");
@@ -135,6 +141,12 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
     putResult9.getFailureCause().ifPresent(Log::info);
     assertThat(putResult9.hasFailed()).isFalse();
     Log.info(putResult.get().toString());
+
+    // now, receive all textrangeannotations for this text.
+    RestResult<TextRangeAnnotationList> restResult2 = client.getResourceTextRangeAnnotations(resourceUUID);
+    assertThat(restResult2.hasFailed()).isFalse();
+    TextRangeAnnotationList list2 = restResult.get();
+    assertThat(list2).hasSize(0);
   }
 
   private UUID createResourceWithText(String xml) {

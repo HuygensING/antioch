@@ -34,6 +34,7 @@ import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
@@ -129,6 +130,8 @@ public interface AlexandriaService {
   AnnotatorList readResourceAnnotators(UUID id);
 
   void setTextRangeAnnotation(UUID resourceUUID, TextRangeAnnotation annotation);
+
+  TextRangeAnnotationList readTextRangeAnnotations(UUID resourceUUID);
 
   Optional<TextRangeAnnotation> readTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID);
 

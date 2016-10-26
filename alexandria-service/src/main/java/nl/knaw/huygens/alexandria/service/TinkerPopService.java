@@ -70,6 +70,7 @@ import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -349,6 +350,25 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
+  public TextRangeAnnotationList readTextRangeAnnotations(UUID resourceUUID) {
+    return storage.runInTransaction(() -> getTextRangeAnnotationList(resourceUUID));
+  }
+
+  private TextRangeAnnotationList getTextRangeAnnotationList(UUID resourceUUID) {
+    TextRangeAnnotationList list = new TextRangeAnnotationList();
+    storage.readVF(ResourceVF.class, resourceUUID).ifPresent(resourceVF -> {
+      FramedGraphTraversal<ResourceVF, Vertex> traversal = resourceVF.start()//
+          .in(TextRangeAnnotationVF.EdgeLabels.HAS_RESOURCE)//
+      ;
+      StreamUtil.stream(traversal)//
+          .map(v -> storage.frameVertex(v, TextRangeAnnotationVF.class))//
+          .map(this::deframeTextRangeAnnotation)//
+          .forEach(list::add);
+    });
+    return list;
+  }
+
+  @Override
   public Optional<TextRangeAnnotation> readTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID) {
     return storage.runInTransaction(() -> getOptionalTextRangeAnnotation(resourceUUID, annotationUUID));
   }
@@ -363,7 +383,7 @@ public class TinkerPopService implements AlexandriaService {
       AtomicBoolean overlaps = new AtomicBoolean(false);
       storage.readVF(ResourceVF.class, resourceUUID).ifPresent(resourceVF -> {
         FramedGraphTraversal<ResourceVF, Vertex> traversal = resourceVF.start()//
-            .in(nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF.EdgeLabels.HAS_RESOURCE)//
+            .in(TextRangeAnnotationVF.EdgeLabels.HAS_RESOURCE)//
             .has("name", annotation.getName())//
             .has("annotatorCode", annotation.getAnnotator())//
         ;

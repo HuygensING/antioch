@@ -21,6 +21,7 @@ import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
 import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
 import nl.knaw.huygens.alexandria.client.model.AnnotationList;
@@ -243,6 +244,9 @@ public class OptimisticAlexandriaClient {
     unwrap(delegate.deprecateAnnotation(uuid));
   }
 
+  public TextRangeAnnotationList getResourceTextRangeAnnotations(UUID uuid) {
+    return unwrap(delegate.getResourceTextRangeAnnotations(uuid));
+  }
   /////// end delegated methods
 
   private <T> T unwrap(RestResult<T> restResult) {

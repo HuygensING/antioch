@@ -997,5 +997,165 @@
   
 </div>
 
+<div id="get-text-annotations" c:execute="clearStorage()"
+     data-desc="How do I retrieve all text annotations of a resource text?">
+  Given a resource
+  with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000009</code>
+  <span c:execute="resourceExists(#resourceId)">exists</span>,<br/>
+  which has
+  <span c:execute="resourceHasAnnotator(#resourceId,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>, and
+  <span c:execute="resourceHasText(#resourceId,#text)">text<br/>
+    <code c:set="#text">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a paragraph.&lt;/p&gt;&lt;/text&gt;</code>
+  </span>,<br/>
+  <br/>
+  <h:request>
+    If I annotate this text by <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000090</h:put>
+    the body:
+    <h:jsonBody> 
+    {
+      "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "ed",
+        "position" : {
+          "xml:id" : "p-1", 
+          "offset" : 6, 
+          "length" : 2
+        }
+    } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>201 Created</h:status></li>
+      <li>and the response body is
+      <h:jsonResponse>
+      {
+        "textAnnotationInfo" : {
+          "annotates" : "is"
+      } }
+      </h:jsonResponse> 
+      </li>
+    </ul>
+  </h:request>
+  <br/>
+  <h:request>
+    and <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000091</h:put>
+    the body:
+    <h:jsonBody> 
+    {
+      "textAnnotation" : { 
+        "name" : "word",
+        "annotator" : "ed",
+        "position" : {
+          "xml:id" : "p-1", 
+          "offset" : 9, 
+          "length" : 1
+        }
+    } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>201 Created</h:status></li>
+      <li>and the response body is
+      <h:jsonResponse>
+      {
+        "textAnnotationInfo" : {
+          "annotates" : "a"
+      } }
+      </h:jsonResponse> 
+      </li>
+    </ul>
+  </h:request>
+  <h:request>
+    and <h:put>/resources/$resourceId/text/annotations/00000000-0000-0000-0000-000000000092</h:put>
+    the body:
+    <h:jsonBody> 
+    {
+      "textAnnotation" : { 
+        "name" : "sentence",
+        "annotator" : "ed",
+        "position" : {
+          "xml:id" : "p-1" 
+        }
+    } }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>201 Created</h:status></li>
+      <li>and the response body is
+      <h:jsonResponse>
+      {
+        "textAnnotationInfo" : {
+          "annotates" : "This is a paragraph."
+      } }
+      </h:jsonResponse> 
+      </li>
+    </ul>
+  </h:request>
+  
+  <h:request>
+    To get the list of textannotations for this resource text, I
+    <h:get>/resources/$resourceId/text/annotations</h:get>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    and I should receive
+    <ul>
+      <li>status <h:status>200 OK</h:status></li>
+      <li>and the response body is
+      <h:jsonResponse>
+			{
+			  "textAnnotationList" : [ {
+			    "textAnnotation" : {
+			      "name" : "sentence",
+			      "annotator" : "ed",
+			      "position" : {
+			        "offset" : 1,
+			        "length" : 20,
+			        "xml:id" : "p-1"
+			      },
+			      "attributes" : { },
+			      "id" : "00000000-0000-0000-0000-000000000092"
+			    }
+			  }, {
+			    "textAnnotation" : {
+			      "name" : "word",
+			      "annotator" : "ed",
+			      "position" : {
+			        "offset" : 9,
+			        "length" : 1,
+			        "xml:id" : "p-1"
+			      },
+			      "attributes" : { },
+			      "id" : "00000000-0000-0000-0000-000000000091"
+			    }
+			  }, {
+			    "textAnnotation" : {
+			      "name" : "word",
+			      "annotator" : "ed",
+			      "position" : {
+			        "offset" : 6,
+			        "length" : 2,
+			        "xml:id" : "p-1"
+			      },
+			      "attributes" : { },
+			      "id" : "00000000-0000-0000-0000-000000000090"
+			    }
+			  } ]
+			}
+      </h:jsonResponse><br/>
+      Note that for the sentence annotation, the offset and length have been added automatically.
+      </li>
+    </ul>
+  </h:request>
+  
+</div>
+
 </body>
 </html>

@@ -18,6 +18,7 @@ import javax.ws.rs.core.StreamingOutput;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
@@ -45,6 +46,12 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
     this.resource = validatorFactory.validateExistingResource(uuidParam).notTentative().hasText().get();
     this.resourceUUID = resource.getId();
     this.textRangeAnnotationValidator = new TextRangeAnnotationValidatorFactory(service, resourceUUID);
+  }
+
+  @GET
+  public Response getAnnotations() {
+    TextRangeAnnotationList textRangeAnnotations = service.readTextRangeAnnotations(resourceUUID);
+    return ok(textRangeAnnotations);
   }
 
   @PUT
