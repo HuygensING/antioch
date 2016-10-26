@@ -149,6 +149,54 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     assertThat(annotatedXML).isEqualTo(expectation2);
   }
 
+  @Test
+  public void testOverlappingAnnotationsAreNotAllowed() {
+    String xml = singleQuotesToDouble("<text><p xml:id='p-1'>This is a simple paragraph.</p></text>");
+    UUID resourceUUID = createResourceWithText(xml);
+    client.setAnnotator(resourceUUID, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
+
+    UUID annotationUUID = UUID.randomUUID();
+    Map<String, String> attributes1 = new HashMap<>();
+    attributes1.put("key1", "value1");
+    attributes1.put("key2", "value2");
+    Position position = new Position()//
+        .setXmlId("p-1");
+    TextRangeAnnotation textRangeAnnotation = new TextRangeAnnotation()//
+        .setId(annotationUUID)//
+        .setName("tag")//
+        .setAnnotator("ed")//
+        .setPosition(position)//
+        .setAttributes(attributes1);
+    TextRangeAnnotationInfo info = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation);
+    assertThat(info.getAnnotates()).isEqualTo("This is a simple paragraph.");
+
+    String annotatedXML = client.getTextAsString(resourceUUID);
+    String expectation2 = singleQuotesToDouble("<text><p xml:id='p-1'><tag key1='value1' key2='value2' resp='#ed'>This is a simple paragraph.</tag></p></text>");
+    assertThat(annotatedXML).isEqualTo(expectation2);
+
+    // now try another annotation with the same position, name and annotator
+    Map<String, String> attributes2 = new HashMap<>();
+    attributes2.put("key1", "something");
+    attributes2.put("key2", "different");
+    UUID annotationUUID2 = UUID.randomUUID();
+    TextRangeAnnotation textRangeAnnotation2 = new TextRangeAnnotation()//
+        .setId(annotationUUID2)//
+        .setName("tag")//
+        .setAnnotator("ed")//
+        .setPosition(position)//
+        .setAttributes(attributes2);
+    try {
+      TextRangeAnnotationInfo info2 = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation2);
+      Log.info("{}", info2);
+      fail();
+    } catch (AlexandriaException e) {
+      assertThat(e.getMessage()).isEqualTo("409: Overlapping annotations with the same name and responsibility.");
+    }
+
+    annotatedXML = client.getTextAsString(resourceUUID);
+    assertThat(annotatedXML).isEqualTo(expectation2);
+  }
+
   /// end tests
 
   private UUID createResourceWithText(String xml) {
