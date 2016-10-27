@@ -23,18 +23,29 @@ public class TextRangeAnnotation extends JsonWrapperObject {
 
   public static class Position {
     @JsonProperty("xml:id")
-    String xmlId;
+    private String xmlId;
 
-    Integer offset;
-    Integer length;
+    private Integer offset;
+    private Integer length;
 
-    public String getXmlId() {
-      return xmlId;
-    }
+    private UUID targetAnnotationId;
 
     public Position setXmlId(String xmlId) {
       this.xmlId = xmlId;
       return this;
+    }
+
+    public Optional<String> getXmlId() {
+      return Optional.ofNullable(xmlId);
+    }
+
+    public Position setTargetAnnotationId(UUID annotationId) {
+      this.targetAnnotationId = annotationId;
+      return this;
+    }
+
+    public Optional<UUID> getTargetAnnotationId() {
+      return Optional.ofNullable(targetAnnotationId);
     }
 
     public Optional<Integer> getOffset() {

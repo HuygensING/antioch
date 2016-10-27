@@ -389,7 +389,7 @@ public class TinkerPopService implements AlexandriaService {
         ;
         Position position = annotation.getPosition();
         String uuid1 = annotation.getId().toString();
-        String xmlId1 = position.getXmlId();
+        String xmlId1 = position.getXmlId().get();
         Integer start1 = position.getOffset().get();
         Integer end1 = start1 + position.getLength().get();
         Predicate<Vertex> overlapsWithAnnotation = t -> {
@@ -892,13 +892,18 @@ public class TinkerPopService implements AlexandriaService {
     vf.setName(annotation.getName());
     vf.setAnnotatorCode(annotation.getAnnotator());
     Position position = annotation.getPosition();
-    vf.setXmlId(position.getXmlId());
-    if (position.getOffset().isPresent()) {
-      vf.setOffset(position.getOffset().get());
-    }
-    if (position.getLength().isPresent()) {
-      vf.setLength(position.getLength().get());
-    }
+    position.getXmlId().ifPresent(xmlId -> {
+      vf.setXmlId(xmlId);
+      if (position.getOffset().isPresent()) {
+        vf.setOffset(position.getOffset().get());
+      }
+      if (position.getLength().isPresent()) {
+        vf.setLength(position.getLength().get());
+      }
+    });
+    position.getTargetAnnotationId().ifPresent(targetId -> {
+      vf.setTargetAnnotationId(targetId.toString());
+    });
     try {
       String json = new ObjectMapper().writeValueAsString(annotation.getAttributes());
       vf.setAttributesAsJson(json);
@@ -909,7 +914,10 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   private TextRangeAnnotation deframeTextRangeAnnotation(TextRangeAnnotationVF vf) {
+    String targetAnnotationId = vf.getTargetAnnotationId();
+    UUID targetAnnotationUUID = targetAnnotationId == null ? null : UUID.fromString(targetAnnotationId);
     Position position = new Position()//
+        .setTargetAnnotationId(targetAnnotationUUID)//
         .setXmlId(vf.getXmlId())//
         .setOffset(vf.getOffset())//
         .setLength(vf.getLength());

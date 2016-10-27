@@ -108,14 +108,15 @@ public class TextRangeAnnotationValidatorFactory {
 
   static String validatePosition(Position position, String xml) {
     QueryableDocument qDocument = QueryableDocument.createFromXml(xml, true);
+    String xmlId = position.getXmlId().get();
     validate(qDocument, //
-        "count(//*[@xml:id='" + position.getXmlId() + "'])", //
+        "count(//*[@xml:id='" + xmlId + "'])", //
         1d, //
         "The text does not contain an element with the specified xml:id."//
     );
-    String xpath = MessageFormat.format("string(//*[@xml:id=''{0}''])", position.getXmlId());
+    String xpath = MessageFormat.format("string(//*[@xml:id=''{0}''])", xmlId);
     if (position.getOffset().isPresent()) {
-      xpath = "substring(//*[@xml:id='" + position.getXmlId() + "']," + position.getOffset().get() + "," + position.getLength().orElse(-1) + ")";
+      xpath = "substring(//*[@xml:id='" + xmlId + "']," + position.getOffset().get() + "," + position.getLength().orElse(-1) + ")";
       validate(qDocument, //
           "string-length(" + xpath + ")", //
           new Double(position.getLength().get()), //

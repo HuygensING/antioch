@@ -206,7 +206,7 @@ public class TextGraphService {
         .out(EdgeLabels.FIRST_ANNOTATION)//
 
         // find the TextAnnotation with the xml:id from annotation.position.xmlid
-        .until(__.has(TextAnnotation.Properties.xmlid, textRangeAnnotation.getPosition().getXmlId()))//
+        .until(__.has(TextAnnotation.Properties.xmlid, textRangeAnnotation.getPosition().getXmlId().get()))//
         .repeat(__.out(EdgeLabels.NEXT))//
         .out(EdgeLabels.FIRST_TEXT_SEGMENT)//
 
@@ -260,7 +260,7 @@ public class TextGraphService {
       this.newTextAnnotationVertex = newTextAnnotationVertex;
       this.textSize = 0;
       this.useOffset = textRangeAnnotation.hasOffset();
-      this.parentXmlId = textRangeAnnotation.getPosition().getXmlId();
+      this.parentXmlId = textRangeAnnotation.getPosition().getXmlId().get();
       this.rangeStart = textRangeAnnotation.getPosition().getOffset().get();
       this.rangeEnd = this.rangeStart + textRangeAnnotation.getPosition().getLength().get() - 1;
       if (this.rangeEnd == 0) {
