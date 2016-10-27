@@ -53,7 +53,7 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
 
   @Test
   public void testSetTextRangeAnnotationWithInvalidXmlId() {
-    String xml = singleQuotesToDouble("<text><p xml:id='p-1'>This is a simple paragraph.</p></text>");
+    String xml = singleQuotesToDouble("<text><p xml:id='p-1'>This is a simple &amp; short paragraph.</p></text>");
     UUID resourceUUID = createResourceWithText(xml);
     RestResult<Void> result = client.setAnnotator(resourceUUID, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
     assertRequestSucceeded(result);
@@ -75,8 +75,8 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
 
   @Test
   public void testSetTextRangeAnnotationOnElementWithoutText() {
-    String xml = singleQuotesToDouble("<text><p xml:id='p-9'>Ex Musaeo,...</p>\n"//
-        + "<p xml:id='p-10'>Tuus...</p>\n"//
+    String xml = singleQuotesToDouble("<text><p xml:id='p-9'>Ex Musaeo, &amp; ...</p>\n"//
+        + "<p xml:id='p-10'>Tuus ...</p>\n"//
         + "<p xml:id='p-11'>Prenez ...</p>\n"//
         + "<p xml:id='p-12'>Je vous ....</p>\n"//
         + "<p xml:id='p-13'>A <placeName key='se:saumur.fra'>Saumur</placeName>.</p>\n"//

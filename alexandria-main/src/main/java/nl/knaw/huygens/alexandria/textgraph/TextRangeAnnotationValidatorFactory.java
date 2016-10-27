@@ -58,7 +58,7 @@ public class TextRangeAnnotationValidatorFactory {
     Position existingPosition = existingTextRangeAnnotation.getPosition();
     Position newPosition = newTextRangeAnnotation.getPosition();
     boolean positionsAreEquivalent = newPosition.getXmlId().equals(existingPosition.getXmlId());
-    if (newPosition.getOffset().isPresent()){
+    if (newPosition.getOffset().isPresent()) {
       positionsAreEquivalent = positionsAreEquivalent && newPosition.getOffset().get().equals(existingPosition.getOffset().get());
     }
     if (newPosition.getLength().isPresent()) {
@@ -106,8 +106,11 @@ public class TextRangeAnnotationValidatorFactory {
     }
   }
 
+  private static String AMPERSAND_PLACEHOLDER = "☢";
+
   static String validatePosition(Position position, String xml) {
-    QueryableDocument qDocument = QueryableDocument.createFromXml(xml, true);
+    String processedXml = xml.replace("&", AMPERSAND_PLACEHOLDER);
+    QueryableDocument qDocument = QueryableDocument.createFromXml(processedXml, true);
     validate(qDocument, //
         "count(//*[@xml:id='" + position.getXmlId() + "'])", //
         1d, //
@@ -131,7 +134,7 @@ public class TextRangeAnnotationValidatorFactory {
       e.printStackTrace();
     }
 
-    return annotated;
+    return annotated.replace(AMPERSAND_PLACEHOLDER, "&");
   }
 
   private static void validate(QueryableDocument qDocument, String xpath, Double expectation, String errorMessage) {
