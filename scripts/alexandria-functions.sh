@@ -321,4 +321,21 @@ function a-import-graphson-dump {
   fi
 }
 
+function a-get-web-annotation {
+  uuid=$1
+  curl -i \
+    -H 'Accept: application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"' \
+    ${be}/webannotations/${uuid}
+}
+
+function a-add-web-annotation {
+  curl -i \
+    -H "${authheader}" \
+    -H 'Accept: application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"' \
+    -H 'Content-type: application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"' \
+    --data-binary "$1" \
+    ${be}/webannotations
+}
+
+
 a-use-localhost
