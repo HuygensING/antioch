@@ -156,6 +156,57 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
     assertThat(list2).hasSize(0);
   }
 
+  @Test
+  public void testSetNonOverlappingAdjacentTextRangeAnnotations() {
+    String xml = singleQuotesToDouble("<text><p xml:id='p-1'>... Patri M. MersennoR. Descartes S.D...</p></text>");
+    UUID resourceUUID = createResourceWithText(xml);
+    RestResult<Void> result = client.setAnnotator(resourceUUID, "ckcc", new Annotator().setCode("ckcc").setDescription("Co Koccu"));
+    assertRequestSucceeded(result);
+
+    RestResult<TextRangeAnnotationList> restResult = client.getResourceTextRangeAnnotations(resourceUUID);
+    assertThat(restResult.hasFailed()).isFalse();
+    TextRangeAnnotationList list = restResult.get();
+    assertThat(list).hasSize(0);
+
+    UUID persName1 = UUID.randomUUID();
+    Position position1 = new Position()//
+        .setXmlId("p-1")//
+        .setOffset(5)//
+        .setLength(17);
+    TextRangeAnnotation textRangeAnnotation = new TextRangeAnnotation()//
+        .setId(persName1)//
+        .setName("persName")//
+        .setAnnotator("ckcc")//
+        .setPosition(position1);
+    RestResult<TextRangeAnnotationInfo> putResult1 = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation);
+    putResult1.getFailureCause().ifPresent(Log::info);
+    assertThat(putResult1.hasFailed()).isFalse();
+    assertThat(putResult1.get().getAnnotates()).isEqualTo("Patri M. Mersenno");
+    Log.info(putResult1.get().toString());
+
+    UUID persName2 = UUID.randomUUID();
+    Position position2 = new Position()//
+        .setXmlId("p-1")//
+        .setOffset(22)//
+        .setLength(17);
+    TextRangeAnnotation textRangeAnnotation2 = new TextRangeAnnotation()//
+        .setId(persName2)//
+        .setName("persName")//
+        .setAnnotator("ckcc")//
+        .setPosition(position2);
+    RestResult<TextRangeAnnotationInfo> putResult2 = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation2);
+    putResult2.getFailureCause().ifPresent(Log::info);
+    assertThat(putResult2.hasFailed()).isFalse();
+    assertThat(putResult2.get().getAnnotates()).isEqualTo("R. Descartes S.D.");
+    Log.info(putResult2.get().toString());
+
+    // now, receive all textrangeannotations for this text.
+    RestResult<TextRangeAnnotationList> restResult2 = client.getResourceTextRangeAnnotations(resourceUUID);
+    assertThat(restResult2.hasFailed()).isFalse();
+    TextRangeAnnotationList list2 = restResult.get();
+    assertThat(list2).hasSize(0);
+  }
+
   private UUID createResourceWithText(String xml) {
     String resourceRef = "test";
     UUID resourceUUID = createResource(resourceRef);
