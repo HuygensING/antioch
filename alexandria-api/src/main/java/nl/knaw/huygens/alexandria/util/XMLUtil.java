@@ -12,7 +12,10 @@ public class XMLUtil {
   public static List<String> validateElementName(final String elementName) {
     List<String> validationErrors = Lists.newArrayList();
     final String prefix = "\"" + elementName + "\" is not a valid element name: element names ";
-    if (elementName.contains(" ")) {
+    if (elementName == null) {
+      validationErrors.add("name is missing.");
+
+    } else if (elementName.contains(" ")) {
       validationErrors.add(prefix + "cannot contain spaces.");
 
     } else if (elementName.toLowerCase().startsWith("xml")) {

@@ -58,7 +58,7 @@ public class TextRangeAnnotationValidatorFactory {
     Position existingPosition = existingTextRangeAnnotation.getPosition();
     Position newPosition = newTextRangeAnnotation.getPosition();
     boolean positionsAreEquivalent = newPosition.getXmlId().equals(existingPosition.getXmlId());
-    if (newPosition.getOffset().isPresent()){
+    if (newPosition.getOffset().isPresent()) {
       positionsAreEquivalent = positionsAreEquivalent && newPosition.getOffset().get().equals(existingPosition.getOffset().get());
     }
     if (newPosition.getLength().isPresent()) {
@@ -97,7 +97,7 @@ public class TextRangeAnnotationValidatorFactory {
     if (StringUtils.isEmpty(annotator)) {
       throw new BadRequestException("No annotator specified.");
     }
-    Optional<String> validAnnotator = service.readResourceAnnotators(resourceUUID).parallelStream()//
+    Optional<String> validAnnotator = service.readResourceAnnotators(resourceUUID).stream()//
         .map(Annotator::getCode)//
         .filter(annotator::equals)//
         .findAny();
@@ -106,8 +106,11 @@ public class TextRangeAnnotationValidatorFactory {
     }
   }
 
+  private static String AMPERSAND_PLACEHOLDER = "☢";
+
   static String validatePosition(Position position, String xml) {
-    QueryableDocument qDocument = QueryableDocument.createFromXml(xml, true);
+    String processedXml = xml.replace("&", AMPERSAND_PLACEHOLDER);
+    QueryableDocument qDocument = QueryableDocument.createFromXml(processedXml, true);
     String xmlId = position.getXmlId().get();
     validate(qDocument, //
         "count(//*[@xml:id='" + xmlId + "'])", //
@@ -132,7 +135,7 @@ public class TextRangeAnnotationValidatorFactory {
       e.printStackTrace();
     }
 
-    return annotated;
+    return annotated.replace(AMPERSAND_PLACEHOLDER, "&");
   }
 
   private static void validate(QueryableDocument qDocument, String xpath, Double expectation, String errorMessage) {
