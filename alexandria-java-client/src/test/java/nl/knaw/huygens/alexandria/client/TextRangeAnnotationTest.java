@@ -174,6 +174,7 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
     RestResult<TextRangeAnnotationInfo> putResult1 = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation);
     putResult1.getFailureCause().ifPresent(Log::info);
     assertThat(putResult1.hasFailed()).isFalse();
+    assertThat(putResult1.get().getAnnotates()).isEqualTo("Patri M. Mersenno");
     Log.info(putResult1.get().toString());
 
     UUID persName2 = UUID.randomUUID();
@@ -189,6 +190,7 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
     RestResult<TextRangeAnnotationInfo> putResult2 = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation2);
     putResult2.getFailureCause().ifPresent(Log::info);
     assertThat(putResult2.hasFailed()).isFalse();
+    assertThat(putResult2.get().getAnnotates()).isEqualTo("R. Descartes S.D.");
     Log.info(putResult2.get().toString());
 
     // now, receive all textrangeannotations for this text.
