@@ -396,8 +396,8 @@ public class TinkerPopService implements AlexandriaService {
           String xmlId2 = (String) t.property("xmlId").value();
           Integer start2 = (Integer) t.property("offset").value();
           Integer end2 = start2 + (Integer) t.property("length").value();
-          Log.info("start1:{} <= end2:{} && start2:{} <= end1:{}", start1, end2, start2, end1);
-          return xmlId1.equals(xmlId2) && start1 <= end2 && start2 <= end1;
+          Log.info("start1:{} < end2:{} && start2:{} < end1:{}", start1, end2, start2, end1);
+          return xmlId1.equals(xmlId2) && start1 < end2 && start2 < end1;
         };
         Predicate<Vertex> hasDifferentUUID = t -> {
           String uuid2 = (String) t.property("uuid").value();
