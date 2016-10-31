@@ -5,14 +5,16 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.google.common.collect.Maps;
 
+@JsonPropertyOrder({ "@context", "id", "created", "modified" })
 public class WebAnnotationPrototype {
 
   // required/fixed part
   @JsonProperty("@context")
   private String context;
-  private String target;
+
   private String id;
   private String created;
   private String modified;
@@ -20,21 +22,13 @@ public class WebAnnotationPrototype {
   // variable part
   private Map<String, Object> variablePart = Maps.newHashMap();
 
-  public String getContext() {
-    return context;
-  }
-
-  public void setContext(String context) {
-    this.context = context;
-  }
-
-  public String getTarget() {
-    return target;
-  }
-
-  public void setTarget(String target) {
-    this.target = target;
-  }
+  // public String getContext() {
+  // return context;
+  // }
+  //
+  // public void setContext(String context) {
+  // this.context = context;
+  // }
 
   public WebAnnotationPrototype setId(String id) {
     this.id = id;
