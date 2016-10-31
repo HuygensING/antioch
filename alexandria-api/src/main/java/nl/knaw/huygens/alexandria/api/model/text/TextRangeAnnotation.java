@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -73,12 +74,56 @@ public class TextRangeAnnotation extends JsonWrapperObject {
 
   }
 
+  public static class AbsolutePosition {
+    private String xmlId;
+
+    private Integer offset;
+    private Integer length;
+
+    public AbsolutePosition setXmlId(String xmlId) {
+      this.xmlId = xmlId;
+      return this;
+    }
+
+    public String getXmlId() {
+      return xmlId;
+    }
+
+    public Integer getOffset() {
+      return offset;
+    }
+
+    public AbsolutePosition setOffset(Integer offset) {
+      this.offset = offset;
+      return this;
+    }
+
+    public Integer getLength() {
+      return length;
+    }
+
+    public AbsolutePosition setLength(Integer length) {
+      this.length = length;
+      return this;
+    }
+
+    @Override
+    public String toString() {
+      return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+    }
+
+  }
+
   @JsonProperty("id")
   private UUID uuid;
 
   private String name;
   private String annotator;
-  private Position position;
+  private Position position; // may contain targetAnnotatioId, or doesn't contain offset/length
+
+  @JsonIgnore
+  private AbsolutePosition absolutePosition; // always has xmlId + (calculated) offset/length
+
   private Map<String, String> attributes = new HashMap<>();
   private Boolean useOffset;
 
@@ -116,6 +161,15 @@ public class TextRangeAnnotation extends JsonWrapperObject {
 
   public Position getPosition() {
     return position;
+  }
+
+  public TextRangeAnnotation setAbsolutePosition(AbsolutePosition position) {
+    this.absolutePosition = position;
+    return this;
+  }
+
+  public AbsolutePosition getAbsolutePosition() {
+    return absolutePosition;
   }
 
   public TextRangeAnnotation setAttributes(Map<String, String> attributes) {

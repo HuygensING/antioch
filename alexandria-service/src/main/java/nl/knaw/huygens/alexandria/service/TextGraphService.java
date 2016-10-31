@@ -260,9 +260,9 @@ public class TextGraphService {
       this.newTextAnnotationVertex = newTextAnnotationVertex;
       this.textSize = 0;
       this.useOffset = textRangeAnnotation.hasOffset();
-      this.parentXmlId = textRangeAnnotation.getPosition().getXmlId().get();
-      this.rangeStart = textRangeAnnotation.getPosition().getOffset().get();
-      this.rangeEnd = this.rangeStart + textRangeAnnotation.getPosition().getLength().get() - 1;
+      this.parentXmlId = textRangeAnnotation.getAbsolutePosition().getXmlId();
+      this.rangeStart = textRangeAnnotation.getAbsolutePosition().getOffset();
+      this.rangeEnd = this.rangeStart + textRangeAnnotation.getAbsolutePosition().getLength() - 1;
       if (this.rangeEnd == 0) {
         this.rangeStart = 0;
       }

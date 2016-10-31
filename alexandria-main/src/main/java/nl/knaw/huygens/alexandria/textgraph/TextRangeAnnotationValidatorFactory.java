@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.AbsolutePosition;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -31,11 +32,33 @@ public class TextRangeAnnotationValidatorFactory {
     this.resourceUUID = resourceUUID;
   }
 
+  public void calculateAbsolutePosition(TextRangeAnnotation newTextRangeAnnotation) {
+    Position relativePosition = newTextRangeAnnotation.getPosition();
+    AbsolutePosition absolutePosition = new AbsolutePosition();
+    if (relativePosition.getXmlId().isPresent()) {
+      absolutePosition.setXmlId(relativePosition.getXmlId().get())//
+          .setOffset(relativePosition.getOffset().orElse(1))//
+          .setLength(relativePosition.getLength().orElse(1));
+    } else {
+      UUID targetAnnotationUUID = relativePosition.getTargetAnnotationId()//
+          .orElseThrow(() -> new BadRequestException("Position has neither xmlId nor targetAnnotationId, it needs one or the other."));
+      TextRangeAnnotation targetTextRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, targetAnnotationUUID)//
+          .orElseThrow(() -> new BadRequestException("targetAnnotationId " + targetAnnotationUUID + " does not refer to an existing annotation on resource " + resourceUUID + "."));
+      AbsolutePosition targetAbsolutePosition = targetTextRangeAnnotation.getAbsolutePosition();
+      absolutePosition.setXmlId(targetAbsolutePosition.getXmlId())//
+          .setOffset(targetAbsolutePosition.getOffset())//
+          .setLength(targetAbsolutePosition.getLength())//
+      ;
+
+    }
+    newTextRangeAnnotation.setAbsolutePosition(absolutePosition);
+  }
+
   public String validate(TextRangeAnnotation textRangeAnnotation, String xml) {
     String annotated = validatePosition(textRangeAnnotation.getPosition(), xml);
     boolean hasNoOffset = !textRangeAnnotation.hasOffset();
     if (hasNoOffset) {
-      textRangeAnnotation.getPosition().setOffset(1).setLength(annotated.length());
+      textRangeAnnotation.getAbsolutePosition().setOffset(1).setLength(annotated.length());
     }
     validateName(textRangeAnnotation.getName());
     validateAnnotator(textRangeAnnotation.getAnnotator());

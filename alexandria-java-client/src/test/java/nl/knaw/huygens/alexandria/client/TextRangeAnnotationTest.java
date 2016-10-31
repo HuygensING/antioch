@@ -12,6 +12,7 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.AbsolutePosition;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
@@ -34,11 +35,16 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
         .setXmlId("p-1")//
         .setOffset(6)//
         .setLength(2);
+    AbsolutePosition absolutePosition = new AbsolutePosition()//
+        .setXmlId(position.getXmlId().get())//
+        .setOffset(position.getOffset().get())//
+        .setLength(position.getLength().get());
     TextRangeAnnotation textRangeAnnotation0 = new TextRangeAnnotation()//
         .setId(annotationUUID)//
         .setName("word")//
         .setAnnotator("ed")//
-        .setPosition(position);
+        .setPosition(position)//
+        .setAbsolutePosition(absolutePosition);
     RestResult<TextRangeAnnotationInfo> putResult = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation0);
     assertRequestSucceeded(putResult);
     TextRangeAnnotationInfo info = putResult.get();
@@ -48,6 +54,7 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
     RestResult<TextRangeAnnotation> getResult = client.getResourceTextRangeAnnotation(resourceUUID, annotationUUID);
     assertRequestSucceeded(getResult);
     TextRangeAnnotation textRangeAnnotation1 = getResult.get();
+    textRangeAnnotation0.setAbsolutePosition(null);
     assertThat(textRangeAnnotation1).isEqualToComparingFieldByFieldRecursively(textRangeAnnotation0);
   }
 

@@ -63,14 +63,13 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
   ) {
     UUID annotationUUID = uuidParam.getValue();
     newTextRangeAnnotation.setId(annotationUUID);
+    textRangeAnnotationValidator.calculateAbsolutePosition(newTextRangeAnnotation);
     Optional<TextRangeAnnotation> existingTextRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, annotationUUID);
     String xml = getXML();
     if (existingTextRangeAnnotation.isPresent()) {
-
       textRangeAnnotationValidator.validate(newTextRangeAnnotation, existingTextRangeAnnotation.get(), xml);
       service.setTextRangeAnnotation(resourceUUID, newTextRangeAnnotation);
       return noContent();
-
     }
 
     String annotated = textRangeAnnotationValidator.validate(newTextRangeAnnotation, xml);
@@ -94,5 +93,6 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
     StreamingOutput outputStream = TextGraphUtil.streamXML(service, resourceUUID);
     return TextGraphUtil.asString(outputStream);
   }
+
 
 }
