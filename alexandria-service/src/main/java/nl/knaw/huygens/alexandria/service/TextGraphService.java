@@ -448,7 +448,7 @@ public class TextGraphService {
         Vertex tailTextSegment = newTextSegmentVertex(tailText);
         insertNewAfterCurrent(textSegment, tailTextSegment);
         // move LAST_TEXT_SEGMENT edges to tailTextSegment
-        StreamUtil.parallelStream(textSegment.edges(Direction.IN, EdgeLabels.LAST_TEXT_SEGMENT))//
+        StreamUtil.stream(textSegment.edges(Direction.IN, EdgeLabels.LAST_TEXT_SEGMENT))//
             .forEach(e -> moveEdge(e, EdgeLabels.LAST_TEXT_SEGMENT, tailTextSegment));
         reindexNeeded = true;
         return tailTextSegment;
@@ -482,7 +482,7 @@ public class TextGraphService {
         Vertex headTextSegment = newTextSegmentVertex(headText);
         // move FIRST_TEXT_SEGMENT edges to tailTextSegment
         insertNewBeforeCurrent(textSegment, headTextSegment);
-        StreamUtil.parallelStream(textSegment.edges(Direction.IN, EdgeLabels.FIRST_TEXT_SEGMENT))//
+        StreamUtil.stream(textSegment.edges(Direction.IN, EdgeLabels.FIRST_TEXT_SEGMENT))//
             .forEach(e -> moveEdge(e, EdgeLabels.FIRST_TEXT_SEGMENT, headTextSegment));
         reindexNeeded = true;
         return headTextSegment;

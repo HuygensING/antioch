@@ -97,7 +97,7 @@ public class TextRangeAnnotationValidatorFactory {
     if (StringUtils.isEmpty(annotator)) {
       throw new BadRequestException("No annotator specified.");
     }
-    Optional<String> validAnnotator = service.readResourceAnnotators(resourceUUID).parallelStream()//
+    Optional<String> validAnnotator = service.readResourceAnnotators(resourceUUID).stream()//
         .map(Annotator::getCode)//
         .filter(annotator::equals)//
         .findAny();

@@ -272,7 +272,7 @@ public class TinkerPopService implements AlexandriaService {
             .in(ResourceVF.EdgeLabels.PART_OF)//
             .has(ResourceVF.Properties.CARGO, sub)//
             .toList()//
-            .parallelStream()//
+            .stream()//
             .map(this::deframeResource)//
             .findAny()//
     );
@@ -308,7 +308,7 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public Optional<Annotator> readResourceAnnotator(UUID uuid, String code) {
     ResourceVF resourcevf = readExistingResourceVF(uuid);
-    return resourcevf.getAnnotators().parallelStream()//
+    return resourcevf.getAnnotators().stream()//
         .map(this::deframeAnnotator)//
         .filter(a -> code.equals(a.getCode()))//
         .findAny();
@@ -403,7 +403,7 @@ public class TinkerPopService implements AlexandriaService {
           String uuid2 = (String) t.property("uuid").value();
           return !uuid1.equals(uuid2);
         };
-        overlaps.set(StreamUtil.parallelStream(traversal)//
+        overlaps.set(StreamUtil.stream(traversal)//
             .filter(hasDifferentUUID)//
             .filter(overlapsWithAnnotation)//
             .findAny()//
