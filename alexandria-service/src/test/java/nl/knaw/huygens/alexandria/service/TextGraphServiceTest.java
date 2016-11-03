@@ -129,11 +129,11 @@ public class TextGraphServiceTest extends AlexandriaTest {
   @Test
   public void testUpdateTextAnnotationLinkNLA318() {
     String xml = //
-        singleQuotesToDouble("<p xml:id='p-1'>...epousé mad<sup>le</sup> "//
+        singleQuotesToDouble("<p xml:id='p-1'>...epouse mad<sup>le</sup> "//
             + "de <sic>Gendrin</sic>"//
             + " soeur du feu archevesque de Sens...</p>");
     String expected = //
-        singleQuotesToDouble("<p xml:id='p-1'>...epousé mad<sup>le</sup> "//
+        singleQuotesToDouble("<p xml:id='p-1'>...epouse mad<sup>le</sup> "//
             + "<persName key='S0328208' resp='#ckcc'>de <sic>Gendrin</sic></persName>"//
             + " soeur du feu archevesque de Sens...</p>");
     Position position1 = new Position()//
