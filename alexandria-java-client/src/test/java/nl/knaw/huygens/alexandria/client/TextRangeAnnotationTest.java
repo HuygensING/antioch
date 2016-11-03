@@ -3,10 +3,13 @@ package nl.knaw.huygens.alexandria.client;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableMap;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
@@ -198,6 +201,74 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
     assertThat(restResult2.hasFailed()).isFalse();
     TextRangeAnnotationList list2 = restResult.get();
     assertThat(list2).hasSize(0);
+  }
+
+  @Test
+  public void testNLA318() {
+    String xml = singleQuotesToDouble("<p xml:id='p-1'>...epousé mad<sup>le</sup> de <sic>Gendrin</sic> soeur du feu archevesque de Sens...</p>");
+    UUID resourceUUID = createResourceWithText(xml);
+    RestResult<Void> result = client.setAnnotator(resourceUUID, "ckcc", new Annotator().setCode("ckcc").setDescription("Co Koccu"));
+    assertRequestSucceeded(result);
+
+    UUID persName1 = UUID.randomUUID();
+    Position position1 = new Position()//
+        .setXmlId("p-1")//
+        .setOffset(17)//
+        .setLength(10);
+    Map<String, String> attributes = ImmutableMap.of("key", "S0328208");
+    TextRangeAnnotation textRangeAnnotation = new TextRangeAnnotation()//
+        .setId(persName1)//
+        .setName("persName")//
+        .setAnnotator("ckcc")//
+        .setPosition(position1)//
+        .setAttributes(attributes);
+    RestResult<TextRangeAnnotationInfo> putResult1 = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation);
+    putResult1.getFailureCause().ifPresent(Log::info);
+    assertThat(putResult1.hasFailed()).isFalse();
+    assertThat(putResult1.get().getAnnotates()).isEqualTo("de Gendrin");
+    Log.info(putResult1.get().toString());
+    String dot = client.getTextAsDot(resourceUUID).get();
+    Log.info("dot=\n{}", dot);
+
+    RestResult<String> textResult = client.getTextAsString(resourceUUID);
+    assertRequestSucceeded(textResult);
+    String xml2 = textResult.get();
+    String expected = "<p xml:id=\"p-1\">...epousé mad<sup>le</sup> <persName key=\"S0328208\" resp=\"#ckcc\">de <sic>Gendrin</sic></persName> soeur du feu archevesque de Sens...</p>";
+    assertThat(xml2).isEqualTo(expected);
+  }
+
+  @Test
+  public void testNLA318a() {
+    String xml = singleQuotesToDouble("<p xml:id='p-1'>A B <y>de</y> <sic>C</sic> D <x>E</x></p>");
+    UUID resourceUUID = createResourceWithText(xml);
+    RestResult<Void> result = client.setAnnotator(resourceUUID, "ckcc", new Annotator().setCode("ckcc").setDescription("Co Koccu"));
+    assertRequestSucceeded(result);
+    client.getTextAsDot(resourceUUID).get();
+
+    UUID persName1 = UUID.randomUUID();
+    Position position1 = new Position()//
+        .setXmlId("p-1")//
+        .setOffset(3)//
+        .setLength(6);
+    Map<String, String> attributes = ImmutableMap.of("key", "VALUE");
+    TextRangeAnnotation textRangeAnnotation = new TextRangeAnnotation()//
+        .setId(persName1)//
+        .setName("persName")//
+        .setAnnotator("ckcc")//
+        .setPosition(position1)//
+        .setAttributes(attributes);
+    RestResult<TextRangeAnnotationInfo> putResult1 = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation);
+    putResult1.getFailureCause().ifPresent(Log::info);
+    assertThat(putResult1.hasFailed()).isFalse();
+    assertThat(putResult1.get().getAnnotates()).isEqualTo("B de C");
+    Log.info(putResult1.get().toString());
+    client.getTextAsDot(resourceUUID).get();
+
+    RestResult<String> textResult = client.getTextAsString(resourceUUID);
+    assertRequestSucceeded(textResult);
+    String xml2 = textResult.get();
+    String expected = "<p xml:id=\"p-1\">A <persName key=\"VALUE\" resp=\"#ckcc\">B <y>de</y> <sic>C</sic></persName> D <x>E</x></p>";
+    assertThat(xml2).isEqualTo(expected);
   }
 
   private UUID createResourceWithText(String xml) {
