@@ -205,7 +205,7 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
 
   @Test
   public void testNLA318() {
-    String xml = singleQuotesToDouble("<p xml:id='p-1'>...epousé mad<sup>le</sup> de <sic>Gendrin</sic> soeur du feu archevesque de Sens...</p>");
+    String xml = singleQuotesToDouble("<p xml:id='p-1'>...epouse mad<sup>le</sup> de <sic>Gendrin</sic> soeur du feu archevesque de Sens...</p>");
     UUID resourceUUID = createResourceWithText(xml);
     RestResult<Void> result = client.setAnnotator(resourceUUID, "ckcc", new Annotator().setCode("ckcc").setDescription("Co Koccu"));
     assertRequestSucceeded(result);
@@ -233,7 +233,7 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
     RestResult<String> textResult = client.getTextAsString(resourceUUID);
     assertRequestSucceeded(textResult);
     String xml2 = textResult.get();
-    String expected = "<p xml:id=\"p-1\">...epousé mad<sup>le</sup> <persName key=\"S0328208\" resp=\"#ckcc\">de <sic>Gendrin</sic></persName> soeur du feu archevesque de Sens...</p>";
+    String expected = "<p xml:id=\"p-1\">...epouse mad<sup>le</sup> <persName key=\"S0328208\" resp=\"#ckcc\">de <sic>Gendrin</sic></persName> soeur du feu archevesque de Sens...</p>";
     assertThat(xml2).isEqualTo(expected);
   }
 
