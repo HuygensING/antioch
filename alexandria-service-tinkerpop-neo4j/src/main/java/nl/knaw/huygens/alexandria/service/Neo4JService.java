@@ -6,7 +6,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 
+import jline.internal.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.storage.Storage;
@@ -36,6 +38,8 @@ import nl.knaw.huygens.alexandria.storage.Storage;
 @Singleton
 public class Neo4JService extends TinkerPopService {
 
+  private static Neo4jGraph graph;
+
   @Inject
   public Neo4JService(AlexandriaConfiguration config, LocationBuilder locationBuilder) {
     super(getStorage(config), locationBuilder);
@@ -44,29 +48,44 @@ public class Neo4JService extends TinkerPopService {
   private static Storage getStorage(AlexandriaConfiguration config) {
     String dataDir = config.getStorageDirectory() + "/neo4jdb";
     createWhenAbsent(dataDir);
-    Neo4jGraph graph = Neo4jGraph.open(dataDir);
-    // setIndexes(graph);
+    try {
+      graph = Neo4jGraph.open(dataDir);
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new RuntimeException("There was an error starting up the Neo4J graph; If this was caused by an interrupted indexing job, restarting the server might help.");
+    }
+    setIndexes();
     return new Storage(graph);
   }
 
-  private static void setIndexes(Neo4jGraph graph) {
+  private static void setIndexes() {
     System.out.print("updating 5 indexes: .");
-    setUniqueIndex(graph, "Resource", Storage.IDENTIFIER_PROPERTY);
+    setUniqueIndex("Resource", Storage.IDENTIFIER_PROPERTY);
     System.out.print(".");
-    setUniqueIndex(graph, "Annotation", Storage.IDENTIFIER_PROPERTY);
+    setUniqueIndex("Annotation", Storage.IDENTIFIER_PROPERTY);
     System.out.print(".");
-    setUniqueIndex(graph, "AnnotationBody", Storage.IDENTIFIER_PROPERTY);
+    setUniqueIndex("AnnotationBody", Storage.IDENTIFIER_PROPERTY);
     System.out.print(".");
-    graph.cypher("create index on :Annotation(who)");
+    runCypher("create index on :Annotation(who)");
     System.out.print(".");
-    graph.cypher("create index on :AnnotationBody(type)");
-    System.out.println(" done!");
+    runCypher("create index on :AnnotationBody(type)");
+    graph.tx().commit();
+    System.out.println(" indexing started!");
+    System.out.println("It might take a while to finish, but you can use the server right away.");
   }
 
-  private static void setUniqueIndex(Neo4jGraph graph, String label, String property) {
-    graph.cypher("create constraint on (r:" + label + ") assert r." + property + " is unique");
-    graph.cypher("create index on :" + label + "(state)");
+  private static void setUniqueIndex(String label, String property) {
+    runCypher("create constraint on (r:" + label + ") assert r." + property + " is unique");
+    runCypher("create index on :" + label + "(state)");
   }
+
+  private static void runCypher(String cypher) {
+    GraphTraversal<Object, Object> traversal = graph.cypher(cypher);
+    if (traversal.hasNext()) {
+      Object next = traversal.next();
+      Log.info("next={}", next);
+    }
+  };
 
   private static void createWhenAbsent(String dataDir) {
     File file = new File(dataDir);
