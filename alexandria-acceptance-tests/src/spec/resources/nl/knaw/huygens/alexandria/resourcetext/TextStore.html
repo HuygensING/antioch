@@ -181,7 +181,7 @@
             <li>and body
             <pre><h:responseBody>digraph TextGraph {
   ranksep=1.0
-  t0 [shape=box, label="different&#9251;text"];
+  t0 [shape=box, label="different&blank;text"];
   a0 [label="text"];
   a1 [label="p"];
   a0 -> a1;
@@ -190,7 +190,7 @@
   {rank=same;a0;}
   {rank=same;a1;}
 }</h:responseBody></pre>
-(notice how spaces in the text have been replaced by &#9251; for clarity)
+(notice how spaces in the text have been replaced by <pre>&blank;</pre> for clarity)
             </li>
         </ul>
 
