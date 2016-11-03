@@ -1,13 +1,15 @@
 package nl.knaw.huygens.alexandria.service;
 
-import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
-import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
-import nl.knaw.huygens.alexandria.storage.Storage;
-import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
+import java.io.File;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.File;
+
+import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
+
+import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+import nl.knaw.huygens.alexandria.storage.Storage;
 
 /*
  * #%L
@@ -43,16 +45,22 @@ public class Neo4JService extends TinkerPopService {
     String dataDir = config.getStorageDirectory() + "/neo4jdb";
     createWhenAbsent(dataDir);
     Neo4jGraph graph = Neo4jGraph.open(dataDir);
-    setIndexes(graph);
+    // setIndexes(graph);
     return new Storage(graph);
   }
 
   private static void setIndexes(Neo4jGraph graph) {
+    System.out.print("updating 5 indexes: .");
     setUniqueIndex(graph, "Resource", Storage.IDENTIFIER_PROPERTY);
+    System.out.print(".");
     setUniqueIndex(graph, "Annotation", Storage.IDENTIFIER_PROPERTY);
+    System.out.print(".");
     setUniqueIndex(graph, "AnnotationBody", Storage.IDENTIFIER_PROPERTY);
+    System.out.print(".");
     graph.cypher("create index on :Annotation(who)");
+    System.out.print(".");
     graph.cypher("create index on :AnnotationBody(type)");
+    System.out.println(" done!");
   }
 
   private static void setUniqueIndex(Neo4jGraph graph, String label, String property) {
