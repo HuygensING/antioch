@@ -69,6 +69,7 @@ import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.AbsolutePosition;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
@@ -387,15 +388,16 @@ public class TinkerPopService implements AlexandriaService {
             .has("name", annotation.getName())//
             .has("annotatorCode", annotation.getAnnotator())//
         ;
-        Position position = annotation.getPosition();
+        AbsolutePosition absolutePosition = annotation.getAbsolutePosition();
         String uuid1 = annotation.getId().toString();
-        String xmlId1 = position.getXmlId();
-        Integer start1 = position.getOffset().get();
-        Integer end1 = start1 + position.getLength().get();
+        String xmlId1 = absolutePosition.getXmlId();
+        Integer start1 = absolutePosition.getOffset();
+        Integer end1 = start1 + absolutePosition.getLength();
         Predicate<Vertex> overlapsWithAnnotation = t -> {
-          String xmlId2 = (String) t.property("xmlId").value();
-          Integer start2 = (Integer) t.property("offset").value();
-          Integer end2 = start2 + (Integer) t.property("length").value();
+          Log.info("t.keys={}", t.keys());
+          String xmlId2 = (String) t.property("absoluteXmlId").value();
+          Integer start2 = (Integer) t.property("absoluteOffset").value();
+          Integer end2 = start2 + (Integer) t.property("absoluteLength").value();
           Log.info("start1:{} < end2:{} && start2:{} < end1:{}", start1, end2, start2, end1);
           return xmlId1.equals(xmlId2) && start1 < end2 && start2 < end1;
         };
@@ -892,13 +894,22 @@ public class TinkerPopService implements AlexandriaService {
     vf.setName(annotation.getName());
     vf.setAnnotatorCode(annotation.getAnnotator());
     Position position = annotation.getPosition();
-    vf.setXmlId(position.getXmlId());
-    if (position.getOffset().isPresent()) {
-      vf.setOffset(position.getOffset().get());
-    }
-    if (position.getLength().isPresent()) {
-      vf.setLength(position.getLength().get());
-    }
+    position.getXmlId().ifPresent(xmlId -> {
+      vf.setXmlId(xmlId);
+      if (position.getOffset().isPresent()) {
+        vf.setOffset(position.getOffset().get());
+      }
+      if (position.getLength().isPresent()) {
+        vf.setLength(position.getLength().get());
+      }
+    });
+    position.getTargetAnnotationId().ifPresent(targetId -> {
+      vf.setTargetAnnotationId(targetId.toString());
+    });
+    AbsolutePosition absolutePosition = annotation.getAbsolutePosition();
+    vf.setAbsoluteXmlId(absolutePosition.getXmlId());
+    vf.setAbsoluteOffset(absolutePosition.getOffset());
+    vf.setAbsoluteLength(absolutePosition.getLength());
     try {
       String json = new ObjectMapper().writeValueAsString(annotation.getAttributes());
       vf.setAttributesAsJson(json);
@@ -909,10 +920,17 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   private TextRangeAnnotation deframeTextRangeAnnotation(TextRangeAnnotationVF vf) {
+    String targetAnnotationId = vf.getTargetAnnotationId();
+    UUID targetAnnotationUUID = targetAnnotationId == null ? null : UUID.fromString(targetAnnotationId);
     Position position = new Position()//
+        .setTargetAnnotationId(targetAnnotationUUID)//
         .setXmlId(vf.getXmlId())//
         .setOffset(vf.getOffset())//
         .setLength(vf.getLength());
+    AbsolutePosition absolutePosition = new AbsolutePosition()//
+        .setXmlId(vf.getAbsoluteXmlId())//
+        .setOffset(vf.getAbsoluteOffset())//
+        .setLength(vf.getAbsoluteLength());
     Map<String, String> attributes;
     try {
       String attributesAsJson = StringUtils.defaultIfBlank(vf.getAttributesAsJson(), "{}");
@@ -924,7 +942,8 @@ public class TinkerPopService implements AlexandriaService {
           .setName(vf.getName())//
           .setAnnotator(vf.getAnnotatorCode())//
           .setAttributes(attributes)//
-          .setPosition(position);
+          .setPosition(position)//
+          .setAbsolutePosition(absolutePosition);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

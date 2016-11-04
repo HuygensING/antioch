@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableMap;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.AbsolutePosition;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
 import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
@@ -76,7 +77,7 @@ public class TextGraphServiceTest extends AlexandriaTest {
         .setAnnotator("tool")//
         .setAttributes(ImmutableMap.of("value", "?"))//
         .setPosition(new Position().setXmlId("p-1").setOffset(1).setLength(15));
-
+    setAbsolutePosition(textRangeAnnotation);
     UUID resourceUUID = UUID.randomUUID();
     Log.info("xml={}", xml);
     String xmlOut = storage.runInTransaction(() -> {
@@ -194,6 +195,7 @@ public class TextGraphServiceTest extends AlexandriaTest {
 
   private void assertExpectation(String xml, String expected, UUID resourceUUID, TextRangeAnnotation textRangeAnnotation) {
     Log.info("xml={}", xml);
+    setAbsolutePosition(textRangeAnnotation);
     String xmlOut = storage.runInTransaction(() -> {
       createResourceWithText(resourceUUID, xml);
       showTextAnnotationList(resourceUUID);
@@ -240,6 +242,7 @@ public class TextGraphServiceTest extends AlexandriaTest {
         .setName("word")//
         .setAnnotator("ed")//
         .setPosition(new Position().setXmlId("p-1").setOffset(6).setLength(2));
+    setAbsolutePosition(textRangeAnnotation);
     UUID resourceUUID = UUID.randomUUID();
     Log.info("xml={}", xml);
     return storage.runInTransaction(() -> {
@@ -251,6 +254,17 @@ public class TextGraphServiceTest extends AlexandriaTest {
       dumpDot(resourceUUID);
       return getXML(resourceUUID);
     });
+  }
+
+  private void setAbsolutePosition(TextRangeAnnotation textRangeAnnotation) {
+    Position position = textRangeAnnotation.getPosition();
+    AbsolutePosition absolutePosition = new AbsolutePosition()//
+        .setXmlId(position.getXmlId().get())//
+        .setOffset(position.getOffset().get())//
+        .setLength(position.getLength().get())//
+    ;
+    textRangeAnnotation.setAbsolutePosition(absolutePosition);
+
   }
 
   private String getXML(UUID resourceUUID) {

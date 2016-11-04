@@ -15,6 +15,7 @@ import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.AbsolutePosition;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
@@ -37,11 +38,16 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
         .setXmlId("p-1")//
         .setOffset(6)//
         .setLength(2);
+    AbsolutePosition absolutePosition = new AbsolutePosition()//
+        .setXmlId(position.getXmlId().get())//
+        .setOffset(position.getOffset().get())//
+        .setLength(position.getLength().get());
     TextRangeAnnotation textRangeAnnotation0 = new TextRangeAnnotation()//
         .setId(annotationUUID)//
         .setName("word")//
         .setAnnotator("ed")//
-        .setPosition(position);
+        .setPosition(position)//
+        .setAbsolutePosition(absolutePosition);
     RestResult<TextRangeAnnotationInfo> putResult = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation0);
     assertRequestSucceeded(putResult);
     TextRangeAnnotationInfo info = putResult.get();
@@ -51,6 +57,7 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
     RestResult<TextRangeAnnotation> getResult = client.getResourceTextRangeAnnotation(resourceUUID, annotationUUID);
     assertRequestSucceeded(getResult);
     TextRangeAnnotation textRangeAnnotation1 = getResult.get();
+    textRangeAnnotation0.setAbsolutePosition(null);
     assertThat(textRangeAnnotation1).isEqualToComparingFieldByFieldRecursively(textRangeAnnotation0);
   }
 
@@ -268,6 +275,52 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
     assertRequestSucceeded(textResult);
     String xml2 = textResult.get();
     String expected = "<p xml:id=\"p-1\">A <persName key=\"VALUE\" resp=\"#ckcc\">B <y>de</y> <sic>C</sic></persName> D <x>E</x></p>";
+    assertThat(xml2).isEqualTo(expected);
+  }
+
+  @Test
+  public void testNLA312() {
+    String xml = singleQuotesToDouble("<p xml:id='p-1'>Willie Wortel vindt uit.</p>");
+    UUID resourceUUID = createResourceWithText(xml);
+    RestResult<Void> result = client.setAnnotator(resourceUUID, "ckcc", new Annotator().setCode("ckcc").setDescription("Co Koccu"));
+    assertRequestSucceeded(result);
+
+    UUID persNameUUID = UUID.randomUUID();
+    Position position1 = new Position()//
+        .setXmlId("p-1")//
+        .setOffset(1)//
+        .setLength(13);
+    TextRangeAnnotation textRangeAnnotation = new TextRangeAnnotation()//
+        .setId(persNameUUID)//
+        .setName("persName")//
+        .setAnnotator("ckcc")//
+        .setPosition(position1);
+    RestResult<TextRangeAnnotationInfo> putResult1 = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation);
+    putResult1.getFailureCause().ifPresent(Log::info);
+    assertThat(putResult1.hasFailed()).isFalse();
+    assertThat(putResult1.get().getAnnotates()).isEqualTo("Willie Wortel");
+    Log.info(putResult1.get().toString());
+
+    UUID persIdUUID = UUID.randomUUID();
+    Position position2 = new Position()//
+        .setTargetAnnotationId(persNameUUID);
+    Map<String, String> attributes = ImmutableMap.of("id", "W. Wortel (1934-)");
+    TextRangeAnnotation textRangeAnnotation2 = new TextRangeAnnotation()//
+        .setId(persIdUUID)//
+        .setName("persName_id")//
+        .setAnnotator("ckcc")//
+        .setPosition(position2)//
+        .setAttributes(attributes);
+    RestResult<TextRangeAnnotationInfo> putResult2 = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation2);
+    putResult2.getFailureCause().ifPresent(Log::info);
+    assertThat(putResult2.hasFailed()).isFalse();
+    // assertThat(putResult2.get().getAnnotates()).isEqualTo("Willie Wortel");
+    Log.info(putResult2.get().toString());
+
+    RestResult<String> textResult = client.getTextAsString(resourceUUID);
+    assertRequestSucceeded(textResult);
+    String xml2 = textResult.get();
+    String expected = singleQuotesToDouble("<p xml:id='p-1'><persName_id id='W. Wortel (1934-)' resp='#ckcc'><persName resp='#ckcc'>Willie Wortel</persName></persName_id> vindt uit.</p>");
     assertThat(xml2).isEqualTo(expected);
   }
 

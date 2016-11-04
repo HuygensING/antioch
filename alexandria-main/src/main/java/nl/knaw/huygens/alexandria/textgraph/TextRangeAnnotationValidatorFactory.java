@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.ws.rs.BadRequestException;
 import javax.xml.xpath.XPathExpressionException;
@@ -15,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.AbsolutePosition;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -31,27 +33,82 @@ public class TextRangeAnnotationValidatorFactory {
     this.resourceUUID = resourceUUID;
   }
 
-  public String validate(TextRangeAnnotation textRangeAnnotation, String xml) {
-    String annotated = validatePosition(textRangeAnnotation.getPosition(), xml);
-    boolean hasNoOffset = !textRangeAnnotation.hasOffset();
-    if (hasNoOffset) {
-      textRangeAnnotation.getPosition().setOffset(1).setLength(annotated.length());
+  public void calculateAbsolutePosition(TextRangeAnnotation newTextRangeAnnotation, String annotatedText) {
+    Position relativePosition = newTextRangeAnnotation.getPosition();
+    AbsolutePosition absolutePosition = new AbsolutePosition();
+    if (relativePosition.getXmlId().isPresent()) {
+      absolutePosition.setXmlId(relativePosition.getXmlId().get())//
+          .setOffset(relativePosition.getOffset().orElse(1))//
+          .setLength(relativePosition.getLength().orElse(annotatedText.length()));
+    } else {
+      Log.info("relpos={}", relativePosition);
+      UUID targetAnnotationUUID = relativePosition.getTargetAnnotationId()//
+          .orElseThrow(() -> new BadRequestException("Position has neither xmlId nor targetAnnotationId, it needs one or the other."));
+      TextRangeAnnotation targetTextRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, targetAnnotationUUID)//
+          .orElseThrow(() -> new BadRequestException("targetAnnotationId " + targetAnnotationUUID + " does not refer to an existing annotation on resource " + resourceUUID + "."));
+      AbsolutePosition targetAbsolutePosition = targetTextRangeAnnotation.getAbsolutePosition();
+      absolutePosition.setXmlId(targetAbsolutePosition.getXmlId())//
+          .setOffset(targetAbsolutePosition.getOffset())//
+          .setLength(targetAbsolutePosition.getLength())//
+      ;
+
     }
+    Log.info("absolutePosition={}", absolutePosition);
+    newTextRangeAnnotation.setAbsolutePosition(absolutePosition);
+  }
+
+  public void validate(TextRangeAnnotation textRangeAnnotation, String xml) {
+    // String annotated = getAnnotatedText(textRangeAnnotation.getPosition(), xml);
+    // boolean hasNoOffset = !textRangeAnnotation.hasOffset();
+    // if (hasNoOffset) {
+    // textRangeAnnotation.getAbsolutePosition().setOffset(1).setLength(annotated.length());
+    // }
     validateName(textRangeAnnotation.getName());
     validateAnnotator(textRangeAnnotation.getAnnotator());
     validateAttributes(textRangeAnnotation.getAttributes());
     if (service.overlapsWithExistingTextRangeAnnotationForResource(textRangeAnnotation, resourceUUID)) {
       throw new ConflictException("Overlapping annotations with the same name and responsibility.");
     }
-    return annotated;
+    // return annotated;
   }
 
-  public String validate(TextRangeAnnotation newTextRangeAnnotation, TextRangeAnnotation existingTextRangeAnnotation, String xml) {
+  public void validate(TextRangeAnnotation newTextRangeAnnotation, TextRangeAnnotation existingTextRangeAnnotation, String xml) {
     validateNewAttributes(newTextRangeAnnotation, existingTextRangeAnnotation);
     validateNewName(newTextRangeAnnotation, existingTextRangeAnnotation);
     validateNewPosition(newTextRangeAnnotation, existingTextRangeAnnotation);
     validateNewAnnotator(newTextRangeAnnotation, existingTextRangeAnnotation);
-    return validate(newTextRangeAnnotation, xml);
+    validate(newTextRangeAnnotation, xml);
+  }
+
+  public static String getAnnotatedText(Position position, String xml) {
+    String processedXml = xml.replace("&", AMPERSAND_PLACEHOLDER);
+    QueryableDocument qDocument = QueryableDocument.createFromXml(processedXml, true);
+    AtomicReference<String> annotated = new AtomicReference<>("");
+    position.getXmlId().ifPresent(xmlId -> {
+      validate(qDocument, //
+          "count(//*[@xml:id='" + xmlId + "'])", //
+          1d, //
+          "The text does not contain an element with the specified xml:id."//
+      );
+      String xpath = MessageFormat.format("string(//*[@xml:id=''{0}''])", xmlId);
+      if (position.getOffset().isPresent()) {
+        xpath = "substring(//*[@xml:id='" + xmlId + "']," + position.getOffset().get() + "," + position.getLength().orElse(-1) + ")";
+        validate(qDocument, //
+            "string-length(" + xpath + ")", //
+            new Double(position.getLength().get()), //
+            "The specified offset/length is illegal."//
+        );
+      }
+
+      try {
+        Log.debug("xpath = {}", xpath);
+        annotated.set(qDocument.evaluateXPathToString(xpath));
+      } catch (XPathExpressionException e) {
+        e.printStackTrace();
+      }
+
+    });
+    return annotated.get().replace(AMPERSAND_PLACEHOLDER, "&");
   }
 
   private void validateNewPosition(TextRangeAnnotation newTextRangeAnnotation, TextRangeAnnotation existingTextRangeAnnotation) {
@@ -107,35 +164,6 @@ public class TextRangeAnnotationValidatorFactory {
   }
 
   private static String AMPERSAND_PLACEHOLDER = "☢";
-
-  static String validatePosition(Position position, String xml) {
-    String processedXml = xml.replace("&", AMPERSAND_PLACEHOLDER);
-    QueryableDocument qDocument = QueryableDocument.createFromXml(processedXml, true);
-    validate(qDocument, //
-        "count(//*[@xml:id='" + position.getXmlId() + "'])", //
-        1d, //
-        "The text does not contain an element with the specified xml:id."//
-    );
-    String xpath = MessageFormat.format("string(//*[@xml:id=''{0}''])", position.getXmlId());
-    if (position.getOffset().isPresent()) {
-      xpath = "substring(//*[@xml:id='" + position.getXmlId() + "']," + position.getOffset().get() + "," + position.getLength().orElse(-1) + ")";
-      validate(qDocument, //
-          "string-length(" + xpath + ")", //
-          new Double(position.getLength().get()), //
-          "The specified offset/length is illegal."//
-      );
-    }
-
-    String annotated = "";
-    try {
-      Log.debug("xpath = {}", xpath);
-      annotated = qDocument.evaluateXPathToString(xpath);
-    } catch (XPathExpressionException e) {
-      e.printStackTrace();
-    }
-
-    return annotated.replace(AMPERSAND_PLACEHOLDER, "&");
-  }
 
   private static void validate(QueryableDocument qDocument, String xpath, Double expectation, String errorMessage) {
     Log.info("xpath = '{}'", xpath);

@@ -192,6 +192,7 @@ public class TextGraphService {
   }
 
   public void updateTextAnnotationLink(TextRangeAnnotationVF vf, TextRangeAnnotation textRangeAnnotation, UUID resourceUUID) {
+    Log.info("textRangeAnnotation={}", textRangeAnnotation);
     // if the TextRangeAnnotationVF is already linked to a TextAnnotation, remove that TextAnnotation
     FramedGraphTraversal<TextRangeAnnotationVF, Vertex> traversal = vf.out(nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF.EdgeLabels.HAS_TEXTANNOTATION);
     if (traversal.hasNext()) {
@@ -200,6 +201,7 @@ public class TextGraphService {
     }
 
     Vertex newTextAnnotationVertex = createNewTextAnnotation(vf, textRangeAnnotation);
+    Log.info("textRangeAnnotation={}", textRangeAnnotation);
 
     TextAnnotationInsertionContext context = new TextAnnotationInsertionContext(newTextAnnotationVertex, textRangeAnnotation);
     List<Vertex> list = getVertexTraversalFromResource(resourceUUID)//
@@ -207,7 +209,7 @@ public class TextGraphService {
         .out(EdgeLabels.FIRST_ANNOTATION)//
 
         // find the TextAnnotation with the xml:id from annotation.position.xmlid
-        .until(__.has(TextAnnotation.Properties.xmlid, textRangeAnnotation.getPosition().getXmlId()))//
+        .until(__.has(TextAnnotation.Properties.xmlid, textRangeAnnotation.getAbsolutePosition().getXmlId()))//
         .repeat(__.out(EdgeLabels.NEXT))//
         .out(EdgeLabels.FIRST_TEXT_SEGMENT)//
 
@@ -259,11 +261,12 @@ public class TextGraphService {
 
     public TextAnnotationInsertionContext(Vertex newTextAnnotationVertex, TextRangeAnnotation textRangeAnnotation) {
       this.newTextAnnotationVertex = newTextAnnotationVertex;
+      Log.info("textRangeAnnotation={}", textRangeAnnotation);
       this.textSize = 0;
       this.useOffset = textRangeAnnotation.hasOffset();
-      this.parentXmlId = textRangeAnnotation.getPosition().getXmlId();
-      this.rangeStart = textRangeAnnotation.getPosition().getOffset().get();
-      this.rangeEnd = this.rangeStart + textRangeAnnotation.getPosition().getLength().get() - 1;
+      this.parentXmlId = textRangeAnnotation.getAbsolutePosition().getXmlId();
+      this.rangeStart = textRangeAnnotation.getAbsolutePosition().getOffset();
+      this.rangeEnd = this.rangeStart + textRangeAnnotation.getAbsolutePosition().getLength() - 1;
       if (this.rangeEnd == 0) {
         this.rangeStart = 0;
       }
