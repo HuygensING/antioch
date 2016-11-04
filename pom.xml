@@ -45,12 +45,12 @@
         <!-- Generate parse tree visitor interface and base class. -->
         <antlr4.visitor>true</antlr4.visitor>
 
-        <commons-lang3.version>3.4</commons-lang3.version>
+        <commons-lang3.version>3.5</commons-lang3.version>
         <commons-io.version>2.5</commons-io.version>
-        <guava.version>19.0</guava.version>
+        <guava.version>20.0</guava.version>
         <guice.version>4.0</guice.version>
-        <jackson.version>2.8.3</jackson.version>
-        <jackson-datatype-jsr310.version>2.8.1</jackson-datatype-jsr310.version>
+        <jackson.version>2.8.4</jackson.version>
+        <jackson-datatype-jsr310.version>2.8.4</jackson-datatype-jsr310.version>
         <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
         <javax.inject.version>1</javax.inject.version>
         <jdk.version>1.8</jdk.version>
@@ -68,7 +68,7 @@
 
         <maven-compiler.version>3.5.1</maven-compiler.version>
 
-        <mockito.version>2.1.0-RC.1</mockito.version>
+        <mockito.version>2.2.10</mockito.version>
         <peapod.version>0.3.2</peapod.version>
         <reflections.version>0.9.10</reflections.version>
         <servlet-api.version>4.0.0-b01</servlet-api.version>

@@ -157,6 +157,7 @@ public class TextGraphService {
   }
 
   private static void updateDepths(Vertex parentVertex, Vertex childVertex, int parentDepth) {
+    // TODO: use start/end textSegmentIndex to determine the relevant annotations to adjust.
     Vertex firstTextSegment = firstTextSegment(parentVertex);
     Vertex lastTextSegment = lastTextSegment(parentVertex);
     Set<Vertex> updatedVertices = Sets.newHashSet();
@@ -300,40 +301,51 @@ public class TextGraphService {
     }
 
     private void insertUsingOffset() {
+      int startingTextSegmentIndex = getIntValue(startingTextSegment, TextAnnotation.Properties.index);
       int endingTextSegmentIndex = getIntValue(endingTextSegment, TextAnnotation.Properties.index);
-      GraphTraversal<Vertex, Vertex> tailTraversal = storage.getVertexTraversal(startingTextSegment)//
-          // find TextAnnotations that start here
-          .in(EdgeLabels.FIRST_TEXT_SEGMENT)//
-          .hasLabel(VertexLabels.TEXTANNOTATION)//
-          // that are not the newTextAnnotation
-          .not(__.hasId(newTextAnnotationVertex.id()))//
-          // and that don't end before endingTextSegment
-          .not(__.out(EdgeLabels.LAST_TEXT_SEGMENT).has(TextSegment.Properties.index, P.lt(endingTextSegmentIndex)))//
-          // sort by depth
-          .order().by(TextAnnotation.Properties.depth, Order.incr)//
-          // get the deepest
-          .tail();
-      if (tailTraversal.hasNext()) {
-        Vertex parentTextAnnotationVertex = tailTraversal//
-            .next();
-        int parentDepth = getDepth(parentTextAnnotationVertex);
-        setDepth(newTextAnnotationVertex, parentDepth + 1);
-        Iterator<Edge> nextEdges = parentTextAnnotationVertex.edges(Direction.OUT, EdgeLabels.NEXT);
-        if (nextEdges.hasNext()) {
-          Edge next = nextEdges.next();
-          Vertex nextTextAnnotation = next.inVertex();
-          newTextAnnotationVertex.addEdge(EdgeLabels.NEXT, nextTextAnnotation);
-          next.remove();
+      Log.info("startIndex,endIndex=({},{})", startingTextSegmentIndex, endingTextSegmentIndex);
+      Vertex parentTextAnnotationVertex = null;
+      Vertex textSegment = startingTextSegment;
+      while (parentTextAnnotationVertex == null) {
+        GraphTraversal<Vertex, Vertex> tailTraversal = storage.getVertexTraversal(textSegment)//
+            // find TextAnnotations that start here
+            .in(EdgeLabels.FIRST_TEXT_SEGMENT)//
+            .hasLabel(VertexLabels.TEXTANNOTATION)//
+            // that are not the newTextAnnotation
+            .not(__.hasId(newTextAnnotationVertex.id()))//
+            // and that don't end before endingTextSegment
+            .not(__.out(EdgeLabels.LAST_TEXT_SEGMENT).has(TextSegment.Properties.index, P.lt(endingTextSegmentIndex)))//
+            // sort by depth
+            .order().by(TextAnnotation.Properties.depth, Order.incr)//
+            // get the deepest
+            .tail();
+        if (tailTraversal.hasNext()) {
+          // We found the parent!
+          parentTextAnnotationVertex = tailTraversal.next();
+        }else{
+          // go to the previous textSegment, and start over
+          textSegment = textSegment.vertices(Direction.IN, EdgeLabels.NEXT).next();
         }
-        parentTextAnnotationVertex.addEdge(EdgeLabels.NEXT, newTextAnnotationVertex);
-
-        Iterator<Vertex> vertices = startingTextSegment.vertices(Direction.IN, EdgeLabels.FIRST_TEXT_SEGMENT);
-        StreamUtil.stream(vertices)//
-            .filter(v -> v.label().equals(VertexLabels.TEXTANNOTATION))//
-            .filter(v -> !v.equals(newTextAnnotationVertex))//
-            .filter(v -> getDepth(v) > parentDepth)//
-            .forEach(this::incrementDepth);
       }
+
+      int parentDepth = getDepth(parentTextAnnotationVertex);
+      setDepth(newTextAnnotationVertex, parentDepth + 1);
+      updateDepths(parentTextAnnotationVertex, newTextAnnotationVertex, parentDepth);
+      // Iterator<Edge> nextEdges = parentTextAnnotationVertex.edges(Direction.OUT, EdgeLabels.NEXT);
+      // if (nextEdges.hasNext()) {
+      // Edge next = nextEdges.next();
+      // Vertex nextTextAnnotation = next.inVertex();
+      // newTextAnnotationVertex.addEdge(EdgeLabels.NEXT, nextTextAnnotation);
+      // next.remove();
+      // }
+      // parentTextAnnotationVertex.addEdge(EdgeLabels.NEXT, newTextAnnotationVertex);
+      //
+      // Iterator<Vertex> vertices = startingTextSegment.vertices(Direction.IN, EdgeLabels.FIRST_TEXT_SEGMENT);
+      // StreamUtil.stream(vertices)//
+      // .filter(v -> v.label().equals(VertexLabels.TEXTANNOTATION))//
+      // .filter(v -> !v.equals(newTextAnnotationVertex))//
+      // .filter(v -> getDepth(v) > parentDepth)//
+      // .forEach(this::incrementDepth);
     }
 
     private void incrementDepth(Vertex v) {
@@ -634,8 +646,6 @@ public class TextGraphService {
     return textGraphSegment;
   }
 
-  private static final Comparator<TextAnnotation> BY_INCREASING_DEPTH = (e1, e2) -> e1.getDepth().compareTo(e2.getDepth());
-
   private List<TextAnnotation> getTextAnnotationsToOpen(Vertex textSegment) {
     return getTextAnnotations(textSegment, EdgeLabels.FIRST_TEXT_SEGMENT);
   }
@@ -643,6 +653,8 @@ public class TextGraphService {
   private List<TextAnnotation> getTextAnnotationsToClose(Vertex textSegment) {
     return Lists.reverse(getTextAnnotations(textSegment, EdgeLabels.LAST_TEXT_SEGMENT));
   }
+
+  private static final Comparator<TextAnnotation> BY_INCREASING_DEPTH = (e1, e2) -> e1.getDepth().compareTo(e2.getDepth());
 
   private List<TextAnnotation> getTextAnnotations(Vertex textSegment, String edgeLabel) {
     return StreamUtil.stream(textSegment.vertices(Direction.IN, edgeLabel))//

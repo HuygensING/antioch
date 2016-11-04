@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.joining;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.ws.rs.core.StreamingOutput;
@@ -124,6 +125,72 @@ public class TextGraphServiceTest extends AlexandriaTest {
         .setPosition(position);
 
     assertExpectation(xml, expected, resourceUUID, textRangeAnnotation);
+  }
+
+  @Test
+  public void testUpdateTextAnnotationLinkNLA318() {
+    String xml = //
+        singleQuotesToDouble("<p xml:id='p-1'>...epouse mad<sup>le</sup> "//
+            + "de <sic>Gendrin</sic>"//
+            + " soeur du feu archevesque de Sens...</p>");
+    String expected = //
+        singleQuotesToDouble("<p xml:id='p-1'>...epouse mad<sup>le</sup> "//
+            + "<persName key='S0328208' resp='#ckcc'>de <sic>Gendrin</sic></persName>"//
+            + " soeur du feu archevesque de Sens...</p>");
+    Position position1 = new Position()//
+        .setXmlId("p-1")//
+        .setOffset(17)//
+        .setLength(10);
+    Map<String, String> attributes = ImmutableMap.of("key", "S0328208");
+    UUID annotationUUID = UUID.randomUUID();
+    TextRangeAnnotation textRangeAnnotation = new TextRangeAnnotation()//
+        .setId(annotationUUID)//
+        .setName("persName")//
+        .setAnnotator("ckcc")//
+        .setPosition(position1)//
+        .setAttributes(attributes);
+
+    assertExpectation(xml, expected, annotationUUID, textRangeAnnotation);
+  }
+
+  @Test
+  public void testUpdateTextAnnotationLinkNLA318a() {
+    String xml = //
+        singleQuotesToDouble("<ae xml:id='a-1'>A <be>B <c>C</c> D <e>E</e></be></ae>");
+    String expected = //
+        singleQuotesToDouble("<ae xml:id='a-1'>A <be>B <cd resp='#ckcc'><c>C</c> D</cd> <e>E</e></be></ae>");
+    Position position1 = new Position()//
+        .setXmlId("a-1")//
+        .setOffset(5)//
+        .setLength(3);
+    UUID annotationUUID = UUID.randomUUID();
+    TextRangeAnnotation textRangeAnnotation = new TextRangeAnnotation()//
+        .setId(annotationUUID)//
+        .setName("cd")//
+        .setAnnotator("ckcc")//
+        .setPosition(position1);
+
+    assertExpectation(xml, expected, annotationUUID, textRangeAnnotation);
+  }
+
+  @Test
+  public void testUpdateTextAnnotationLinkbNLA318a() {
+    String xml = //
+        singleQuotesToDouble("<ae xml:id='a-1'>A <be>B <c>C</c> D <e>E</e></be></ae>");
+    String expected = //
+        singleQuotesToDouble("<ae xml:id='a-1'>A <be><bd resp='#ckcc'>B <c>C</c> D</bd> <e>E</e></be></ae>");
+    Position position1 = new Position()//
+        .setXmlId("a-1")//
+        .setOffset(3)//
+        .setLength(5);
+    UUID annotationUUID = UUID.randomUUID();
+    TextRangeAnnotation textRangeAnnotation = new TextRangeAnnotation()//
+        .setId(annotationUUID)//
+        .setName("bd")//
+        .setAnnotator("ckcc")//
+        .setPosition(position1);
+
+    assertExpectation(xml, expected, annotationUUID, textRangeAnnotation);
   }
 
   private void assertExpectation(String xml, String expected, UUID resourceUUID, TextRangeAnnotation textRangeAnnotation) {
