@@ -13,7 +13,7 @@ public class TextRangeAnnotationValidatorFactoryTest extends AlexandriaTest {
     public void testValidateNewPositionWithoutOffsetAndLength() throws Exception {
       Position position = new Position().setXmlId("p-1");
       String xml = singleQuotesToDouble("<text><p xml:id='p-1'>bladiebla</p><p xml:id='p-2'>etc.</p></text>");
-      String annotated = TextRangeAnnotationValidatorFactory.validatePosition(position, xml);
+      String annotated = TextRangeAnnotationValidatorFactory.getAnnotatedText(position, xml);
       assertThat(annotated).isEqualTo("bladiebla");
     }
 
@@ -21,7 +21,7 @@ public class TextRangeAnnotationValidatorFactoryTest extends AlexandriaTest {
     public void testValidateNewPositionWithOffsetAndLength() throws Exception {
       Position position = new Position().setXmlId("p-1").setOffset(4).setLength(3);
       String xml = singleQuotesToDouble("<text><p xml:id='p-1'>bladiebla</p><p xml:id='p-2'>etc.</p></text>");
-      String annotated = TextRangeAnnotationValidatorFactory.validatePosition(position, xml);
+      String annotated = TextRangeAnnotationValidatorFactory.getAnnotatedText(position, xml);
       assertThat(annotated).isEqualTo("die");
     }
 

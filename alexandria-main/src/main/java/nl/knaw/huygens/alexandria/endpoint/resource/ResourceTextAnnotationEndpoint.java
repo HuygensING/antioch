@@ -57,22 +57,26 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
   @PUT
   @Path("{annotationUUID}")
   @Consumes(MediaType.APPLICATION_JSON)
+  // TODO: clean this up, some concerns need seperation
   public Response setAnnotation(//
       @PathParam("annotationUUID") final UUIDParam uuidParam, //
       @NotNull TextRangeAnnotation newTextRangeAnnotation//
   ) {
     UUID annotationUUID = uuidParam.getValue();
     newTextRangeAnnotation.setId(annotationUUID);
-    textRangeAnnotationValidator.calculateAbsolutePosition(newTextRangeAnnotation);
-    Optional<TextRangeAnnotation> existingTextRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, annotationUUID);
+
     String xml = getXML();
+    String annotated = TextRangeAnnotationValidatorFactory.getAnnotatedText(newTextRangeAnnotation.getPosition(), xml);
+    textRangeAnnotationValidator.calculateAbsolutePosition(newTextRangeAnnotation, annotated);
+
+    Optional<TextRangeAnnotation> existingTextRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, annotationUUID);
     if (existingTextRangeAnnotation.isPresent()) {
       textRangeAnnotationValidator.validate(newTextRangeAnnotation, existingTextRangeAnnotation.get(), xml);
       service.setTextRangeAnnotation(resourceUUID, newTextRangeAnnotation);
       return noContent();
     }
 
-    String annotated = textRangeAnnotationValidator.validate(newTextRangeAnnotation, xml);
+    textRangeAnnotationValidator.validate(newTextRangeAnnotation, xml);
     TextRangeAnnotationInfo info = new TextRangeAnnotationInfo().setAnnotates(annotated);
 
     service.setTextRangeAnnotation(resourceUUID, newTextRangeAnnotation);
@@ -93,6 +97,5 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
     StreamingOutput outputStream = TextGraphUtil.streamXML(service, resourceUUID);
     return TextGraphUtil.asString(outputStream);
   }
-
 
 }

@@ -314,13 +314,13 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
     RestResult<TextRangeAnnotationInfo> putResult2 = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation2);
     putResult2.getFailureCause().ifPresent(Log::info);
     assertThat(putResult2.hasFailed()).isFalse();
-    assertThat(putResult2.get().getAnnotates()).isEqualTo("Willie Wortel");
+    // assertThat(putResult2.get().getAnnotates()).isEqualTo("Willie Wortel");
     Log.info(putResult2.get().toString());
 
     RestResult<String> textResult = client.getTextAsString(resourceUUID);
     assertRequestSucceeded(textResult);
     String xml2 = textResult.get();
-    String expected = "<p xml:id=\"p-1\">A <persName key=\"VALUE\" resp=\"#ckcc\">B <y>de</y> <sic>C</sic></persName> D <x>E</x></p>";
+    String expected = singleQuotesToDouble("<p xml:id='p-1'><persName_id id='W. Wortel (1934-)' resp='#ckcc'><persName resp='#ckcc'>Willie Wortel</persName></persName_id> vindt uit.</p>");
     assertThat(xml2).isEqualTo(expected);
   }
 
