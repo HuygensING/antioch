@@ -207,7 +207,7 @@ public class TextGraphService {
         .out(EdgeLabels.FIRST_ANNOTATION)//
 
         // find the TextAnnotation with the xml:id from annotation.position.xmlid
-        .until(__.has(TextAnnotation.Properties.xmlid, textRangeAnnotation.getPosition().getXmlId().get()))//
+        .until(__.has(TextAnnotation.Properties.xmlid, textRangeAnnotation.getAbsolutePosition().getXmlId()))//
         .repeat(__.out(EdgeLabels.NEXT))//
         .out(EdgeLabels.FIRST_TEXT_SEGMENT)//
 

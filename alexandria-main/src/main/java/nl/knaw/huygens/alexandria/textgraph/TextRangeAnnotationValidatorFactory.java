@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.ws.rs.BadRequestException;
 import javax.xml.xpath.XPathExpressionException;
@@ -134,31 +135,32 @@ public class TextRangeAnnotationValidatorFactory {
   static String validatePosition(Position position, String xml) {
     String processedXml = xml.replace("&", AMPERSAND_PLACEHOLDER);
     QueryableDocument qDocument = QueryableDocument.createFromXml(processedXml, true);
-    String xmlId = position.getXmlId().get();
-    validate(qDocument, //
-        "count(//*[@xml:id='" + xmlId + "'])", //
-        1d, //
-        "The text does not contain an element with the specified xml:id."//
-    );
-    String xpath = MessageFormat.format("string(//*[@xml:id=''{0}''])", xmlId);
-    if (position.getOffset().isPresent()) {
-      xpath = "substring(//*[@xml:id='" + xmlId + "']," + position.getOffset().get() + "," + position.getLength().orElse(-1) + ")";
+    AtomicReference<String> annotated = new AtomicReference<>("");
+    position.getXmlId().ifPresent(xmlId -> {
       validate(qDocument, //
-          "string-length(" + xpath + ")", //
-          new Double(position.getLength().get()), //
-          "The specified offset/length is illegal."//
+          "count(//*[@xml:id='" + xmlId + "'])", //
+          1d, //
+          "The text does not contain an element with the specified xml:id."//
       );
-    }
+      String xpath = MessageFormat.format("string(//*[@xml:id=''{0}''])", xmlId);
+      if (position.getOffset().isPresent()) {
+        xpath = "substring(//*[@xml:id='" + xmlId + "']," + position.getOffset().get() + "," + position.getLength().orElse(-1) + ")";
+        validate(qDocument, //
+            "string-length(" + xpath + ")", //
+            new Double(position.getLength().get()), //
+            "The specified offset/length is illegal."//
+        );
+      }
 
-    String annotated = "";
-    try {
-      Log.debug("xpath = {}", xpath);
-      annotated = qDocument.evaluateXPathToString(xpath);
-    } catch (XPathExpressionException e) {
-      e.printStackTrace();
-    }
+      try {
+        Log.debug("xpath = {}", xpath);
+        annotated.set(qDocument.evaluateXPathToString(xpath));
+      } catch (XPathExpressionException e) {
+        e.printStackTrace();
+      }
 
-    return annotated.replace(AMPERSAND_PLACEHOLDER, "&");
+    });
+    return annotated.get().replace(AMPERSAND_PLACEHOLDER, "&");
   }
 
   private static void validate(QueryableDocument qDocument, String xpath, Double expectation, String errorMessage) {
