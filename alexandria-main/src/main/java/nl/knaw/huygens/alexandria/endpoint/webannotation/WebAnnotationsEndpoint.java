@@ -13,6 +13,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 
 import io.swagger.annotations.Api;
+import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
@@ -89,6 +91,14 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
         .tag(webAnnotation.eTag())//
         .allow(ALLOWED_METHODS)//
         .build();
+  }
+
+  @GET
+  @Path("search")
+  @Produces(JSONLD_MEDIATYPE)
+  public Response getSearchResults(@QueryParam("uri") String uri) {
+    Log.info("uri={}", uri);
+    return Response.ok().build();
   }
 
   // private methods

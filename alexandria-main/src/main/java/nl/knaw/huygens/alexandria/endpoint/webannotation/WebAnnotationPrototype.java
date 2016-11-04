@@ -4,31 +4,20 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.google.common.collect.Maps;
 
 @JsonPropertyOrder({ "@context", "id", "created", "modified" })
 public class WebAnnotationPrototype {
+  // for this phase, only accept the json-ld mirador uses.
 
   // required/fixed part
-  @JsonProperty("@context")
-  private String context;
-
   private String id;
   private String created;
   private String modified;
 
   // variable part
   private Map<String, Object> variablePart = Maps.newHashMap();
-
-  // public String getContext() {
-  // return context;
-  // }
-  //
-  // public void setContext(String context) {
-  // this.context = context;
-  // }
 
   public WebAnnotationPrototype setId(String id) {
     this.id = id;
