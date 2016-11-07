@@ -12,21 +12,12 @@ public class WebAnnotationPrototype {
   // for this phase, only accept the json-ld mirador uses.
 
   // required/fixed part
-  private String id;
   private String created;
   private String modified;
 
   // variable part
   private Map<String, Object> variablePart = Maps.newHashMap();
 
-  public WebAnnotationPrototype setId(String id) {
-    this.id = id;
-    return this;
-  }
-
-  public String getId() {
-    return id;
-  }
 
   public WebAnnotationPrototype setCreated(String created) {
     this.created = created;

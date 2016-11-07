@@ -26,7 +26,16 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -186,8 +195,9 @@ public class AlexandriaQueryParser {
   }
 
   private Function<Storage, Stream<AnnotationVF>> createAnnotationVFFinder(List<WhereToken> resourceWhereTokens) {
+    // TODo: refactor
     WhereToken resourceWhereToken = resourceWhereTokens.get(0);
-    if (resourceWhereTokens.size() == 1 && resourceWhereToken.getFunction().equals(QueryFunction.eq)) {
+    if (resourceWhereTokens.size() == 1 && resourceWhereToken.getFunction().equals(QueryFunction.eq) && resourceWhereToken.getProperty().equals(QueryField.resource_id)) {
       String uuid = (String) resourceWhereToken.getParameters().get(0);
       return storage -> {
         Optional<ResourceVF> optionalResource = storage.readVF(ResourceVF.class, UUID.fromString(uuid));
@@ -202,29 +212,49 @@ public class AlexandriaQueryParser {
         return ImmutableList.<AnnotationVF> of().stream();
       };
 
+    } else if (resourceWhereTokens.size() == 1 && resourceWhereToken.getFunction().equals(QueryFunction.eq) && resourceWhereToken.getProperty().equals(QueryField.resource_ref)) {
+      return storage -> {
+        Object cargo = resourceWhereToken.getParameters().get(0);
+        Log.info("cargo={}", cargo);
+        List<ResourceVF> resourceVFs = storage.find(ResourceVF.class)//
+            .has(ResourceVF.Properties.CARGO, cargo)//
+            .toList();
+
+        List<UUID> resourceUUIDs = resourceVFs.stream()//
+            .map(ResourceVF::getUuid)//
+            .map(UUID::fromString)//
+            .collect(toList());
+        Log.info("resourceUUIDs={}", resourceUUIDs);
+        return toAnnotationVFStream(resourceUUIDs, storage);
+      };
+
     } else if (resourceWhereToken.getFunction().equals(QueryFunction.inSet)) {
       List<UUID> uuidSet = resourceWhereToken.getParameters().stream()//
           .map(String.class::cast)//
           .map(UUID::fromString)//
           .collect(toList());
       return storage -> {
-        List<AnnotationVF> annotationList = new ArrayList<>();
-        uuidSet.forEach(uuid -> {
-          Optional<ResourceVF> optionalResource = storage.readVF(ResourceVF.class, uuid);
-          if (optionalResource.isPresent()) {
-            ResourceVF resourceVF = optionalResource.get();
-            annotationList.addAll(resourceVF.getAnnotatedBy());
-            annotationList.addAll(resourceVF.getSubResources().stream()//
-                .map(ResourceVF::getAnnotatedBy)//
-                .flatMap(Collection::stream)//
-                .collect(toList()));
-          }
-        });
-        return annotationList.stream();
+        return toAnnotationVFStream(uuidSet, storage);
       };
 
     }
     return null;
+  }
+
+  private Stream<AnnotationVF> toAnnotationVFStream(List<UUID> uuidSet, Storage storage) {
+    List<AnnotationVF> annotationList = new ArrayList<>();
+    for (UUID uuid : uuidSet) {
+      Optional<ResourceVF> optionalResource = storage.readVF(ResourceVF.class, uuid);
+      optionalResource.ifPresent(resourceVF -> {
+        annotationList.addAll(resourceVF.getAnnotatedBy());
+        annotationList.addAll(resourceVF.getSubResources().stream()//
+            .map(ResourceVF::getAnnotatedBy)//
+            .flatMap(Collection::stream)//
+            .collect(toList()));
+      });
+    }
+    Log.info("annotationList={}", annotationList);
+    return annotationList.stream();
   }
 
   private Class<? extends AlexandriaVF> parseFind(final String find) {
@@ -296,8 +326,7 @@ public class AlexandriaQueryParser {
         .reduce(alwaysTrue(), Predicate::and);
   }
 
-  static Set<String> ALL_STATES = Arrays.stream(AlexandriaState.values())
-     .map(AlexandriaState::name).collect(toSet());
+  static Set<String> ALL_STATES = Arrays.stream(AlexandriaState.values()).map(AlexandriaState::name).collect(toSet());
 
   static Predicate<AnnotationVF> toPredicate(WhereToken whereToken) {
     Function<AnnotationVF, Object> getter = QueryFieldGetters.get(whereToken.getProperty());
@@ -358,8 +387,7 @@ public class AlexandriaQueryParser {
   private static void checkForValidStateParameter(WhereToken whereToken) {
     if (QueryField.state.equals(whereToken.getProperty())) {
       List<String> invalidValues = whereToken.getParameters().stream()//
-              .map(String.class::cast)
-          .filter(INVALID_STATEVALUE_PREDICATE)//
+          .map(String.class::cast).filter(INVALID_STATEVALUE_PREDICATE)//
           .collect(toList());
       if (!invalidValues.isEmpty()) {
         String message = ((invalidValues.size() == 1)//

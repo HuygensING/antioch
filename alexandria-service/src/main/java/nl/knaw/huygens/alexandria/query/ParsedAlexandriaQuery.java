@@ -159,7 +159,8 @@ public class ParsedAlexandriaQuery {
   public Function<Storage, Stream<Map<String, Object>>> getResultStreamMapper() {
     if (vfClazz == AnnotationVF.class) {
       return (storage) -> annotationVFFinder//
-          .apply(storage).filter(predicate)//
+          .apply(storage)//
+          .filter(predicate)//
           .sorted(comparator)//
           .map(mapper);
     }

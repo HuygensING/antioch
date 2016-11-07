@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -18,6 +19,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,18 +29,23 @@ import com.github.jsonldjava.core.JsonLdProcessor;
 import com.github.jsonldjava.utils.JsonUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import io.swagger.annotations.Api;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.api.model.search.QueryField;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationDeprecationRequestBuilder;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
+import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
+import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
@@ -107,11 +114,9 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
   @Consumes(JSONLD_MEDIATYPE)
   @Produces(JSONLD_MEDIATYPE)
   public Response addWebAnnotation(WebAnnotationPrototype prototype) {
-    UUID uuid = UUID.randomUUID();
-    prototype.setId("http://localhost:2015/webannotations/" + uuid)//
-        .setCreated(Instant.now().toString());
-    WebAnnotation webAnnotation = validate(prototype);
-    return Response.created(URI.create(prototype.getId()))//
+    prototype.setCreated(Instant.now().toString());
+    WebAnnotation webAnnotation = validateAndStore(prototype);
+    return Response.created(webAnnotationURI(webAnnotation.getId()))//
         .link(RESOURCE_TYPE_URI, "type")//
         .link(ANNOTATION_TYPE_URI, "type")//
         .tag(webAnnotation.eTag())//
@@ -125,7 +130,6 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
   @Produces(JSONLD_MEDIATYPE)
   public Response getWebAnnotation(@PathParam("uuid") UUIDParam uuidParam) {
     WebAnnotation webAnnotation = readExistingWebAnnotation(uuidParam);
-    // WebAnnotation webAnnotation = asWebAnnotation(null);
     return Response.ok(webAnnotation.json())//
         .link(RESOURCE_TYPE_URI, "type")//
         .link(ANNOTATION_TYPE_URI, "type")//
@@ -139,43 +143,98 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
   @Produces(JSONLD_MEDIATYPE)
   public Response getSearchResults(@QueryParam("uri") String uri) {
     Log.info("uri={}", uri);
-    return Response.ok().build();
+    AlexandriaQuery query = new AlexandriaQuery()//
+        .setPageSize(1000)//
+        .setFind("annotation")//
+        .setWhere("type:eq(\"" + WEBANNOTATION_TYPE + "\") resource.ref:eq(\"" + uri + "\")")//
+        .setReturns("value");
+
+    SearchResult result = service.execute(query);
+    List<Object> webannotations = Lists.newArrayList();
+    result.getResults().forEach(resultMap -> {
+      String json = (String) resultMap.get("value");
+      try {
+        Map<String, Object> map = new ObjectMapper().readValue(json, Map.class);
+        webannotations.add(map);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    });
+    return Response.ok(webannotations).build();
   }
 
   // private methods
 
-  private WebAnnotation validate(WebAnnotationPrototype prototype) {
-    String json = "";
+  private WebAnnotation validateAndStore(WebAnnotationPrototype prototype) {
     try {
-      json = new ObjectMapper().writeValueAsString(prototype);
+      String json = new ObjectMapper().writeValueAsString(prototype);
       Map<String, Object> jsonObject = (Map<String, Object>) JsonUtils.fromString(json);
-      Map context = new HashMap<>();
-      JsonLdOptions options = new JsonLdOptions();
-      Map<String, Object> compacted = JsonLdProcessor.compact(jsonObject, context, options);
-      Map<String, Object> target = (Map<String, Object>) compacted.get(OA_HAS_TARGET_IRI);
-      Map<String, Object> source = (Map<String, Object>) target.get(OA_HAS_SOURCE_IRI);
-      String resourceRef = (String) source.get("@id");
-      UUID resourceUUID = UUID.randomUUID();
-      // TODO: use information from prototype to create provenance
-      TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(ThreadContext.getUserName(), Instant.now(), AlexandriaProvenance.DEFAULT_WHY);
-      // TODO: first see if there's already a resource with this ref, if so, use this.
-      service.createOrUpdateResource(resourceUUID, resourceRef, provenance, AlexandriaState.CONFIRMED);
-      AlexandriaResource alexandriaResource = service.readResource(resourceUUID).get();
 
-      UUID annotationBodyUUID = UUID.randomUUID();
-      AlexandriaAnnotationBody annotationBody = service.createAnnotationBody(annotationBodyUUID, WEBANNOTATION_TYPE, json, provenance);
-      AlexandriaAnnotation annotation = service.annotate(alexandriaResource, annotationBody, provenance);
+      String resourceRef = extractResourceRef(jsonObject);
+      AlexandriaResource alexandriaResource = extractAlexandriaResource(resourceRef);
+      AlexandriaAnnotation annotation = createWebAnnotation(json, alexandriaResource);
 
-      jsonObject.put("@id", config.getBaseURI() + "/" + EndpointPaths.WEB_ANNOTATIONS + "/" + annotation.getId());
+      jsonObject.put("@id", webAnnotationURI(annotation.getId()));
       String json2 = new ObjectMapper().writeValueAsString(jsonObject);
-      return new WebAnnotation()//
+      return new WebAnnotation(annotation.getId())//
           .setJson(json2)//
           .setETag(String.valueOf(prototype.getModified().hashCode()));
 
     } catch (IOException | JsonLdError e) {
-      throw new RuntimeException(e);
+      throw new BadRequestException(e.getMessage());
     }
 
+  }
+
+  private AlexandriaAnnotation createWebAnnotation(String json, AlexandriaResource alexandriaResource) {
+    UUID annotationBodyUUID = UUID.randomUUID();
+    // TODO: use information from prototype to create provenance
+    TentativeAlexandriaProvenance annotationProvenance = new TentativeAlexandriaProvenance(ThreadContext.getUserName(), Instant.now(), AlexandriaProvenance.DEFAULT_WHY);
+    AlexandriaAnnotationBody annotationBody = service.createAnnotationBody(annotationBodyUUID, WEBANNOTATION_TYPE, json, annotationProvenance);
+    AlexandriaAnnotation annotation = service.annotate(alexandriaResource, annotationBody, annotationProvenance);
+    service.confirmAnnotation(annotation.getId());
+    return annotation;
+  }
+
+  private String extractResourceRef(Map<String, Object> jsonObject) throws JsonLdError {
+    Map<Object, Object> context = new HashMap<>();
+    JsonLdOptions options = new JsonLdOptions();
+    Map<String, Object> compacted = JsonLdProcessor.compact(jsonObject, context, options);
+    Map<String, Object> target = (Map<String, Object>) compacted.get(OA_HAS_TARGET_IRI);
+    Map<String, Object> source = (Map<String, Object>) target.get(OA_HAS_SOURCE_IRI);
+    String resourceRef = (String) source.get("@id");
+    return resourceRef;
+  }
+
+  private AlexandriaResource extractAlexandriaResource(String resourceRef) {
+    TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(ThreadContext.getUserName(), Instant.now(), AlexandriaProvenance.DEFAULT_WHY);
+    // first see if there's already a resource with this ref, if so, use this.
+    UUID resourceUUID;
+    AlexandriaQuery query = new AlexandriaQuery()//
+        .setPageSize(2)//
+        .setFind("annotation")//
+        .setWhere("resource.ref:eq(\"" + resourceRef + "\")")//
+        .setReturns(QueryField.resource_id.externalName());
+
+    List<Map<String, Object>> results = service.execute(query).getResults();
+    if (results.isEmpty()) {
+      resourceUUID = UUID.randomUUID();
+      service.createOrUpdateResource(resourceUUID, resourceRef, provenance, AlexandriaState.CONFIRMED);
+
+    } else {
+      String resourceId = (String) results.get(0).get(QueryField.resource_id.externalName());
+      resourceUUID = UUID.fromString(resourceId);
+    }
+
+    AlexandriaResource alexandriaResource = service.readResource(resourceUUID).get();
+    return alexandriaResource;
+  }
+
+  private URI webAnnotationURI(UUID annotationUUID) {
+    return UriBuilder.fromUri(config.getBaseURI())//
+        .path(EndpointPaths.WEB_ANNOTATIONS)//
+        .path(annotationUUID.toString())//
+        .build();
   }
 
   private WebAnnotation readExistingWebAnnotation(UUIDParam uuidParam) {
@@ -191,7 +250,7 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
     String json = "";
     Instant when = alexandriaAnnotation.getProvenance().getWhen();
     if (WEBANNOTATION_TYPE.equals(type)) {
-      json = value;
+      json = addIdToValue(alexandriaAnnotation, value);
 
     } else {
       Map<String, Object> webAnnotationMap = Maps.newHashMap();
@@ -209,9 +268,22 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
         throw new RuntimeException(e);
       }
     }
-    return new WebAnnotation()//
+    return new WebAnnotation(alexandriaAnnotation.getId())//
         .setJson(json)//
         .setETag(String.valueOf(when.hashCode()));
+  }
+
+  private String addIdToValue(AlexandriaAnnotation alexandriaAnnotation, String value) {
+    String json;
+    json = value;
+    try {
+      Map<String, Object> webAnnotationMap = new ObjectMapper().readValue(json, Map.class);
+      webAnnotationMap.put("id", webAnnotationURI(alexandriaAnnotation.getId()));
+      json = new ObjectMapper().writeValueAsString(webAnnotationMap);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return json;
   }
 
   static Supplier<NotFoundException> annotationNotFoundForId(Object id) {
