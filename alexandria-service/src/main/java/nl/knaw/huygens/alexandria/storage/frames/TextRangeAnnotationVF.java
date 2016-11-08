@@ -52,6 +52,10 @@ public abstract class TextRangeAnnotationVF extends IdentifiableVF implements Fr
 
   public abstract void setAbsoluteLength(Integer length);
 
+  public abstract void setUseOffset(Boolean useOffset);
+
+  public abstract Boolean getUseOffset();
+
   // Position elements: end
 
   public abstract String getAttributesAsJson();

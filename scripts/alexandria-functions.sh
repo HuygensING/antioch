@@ -53,7 +53,7 @@ function a-test {
   a-generate-resource-with-uuid $id
   url=$(a-annotate-resource "$id" "Tag" "Test annotation for resource $id" | a-location)
   a-confirm $url
-  a-delete $url  
+  a-delete $url
 }
 
 function a-generate-resource-with-uuid {

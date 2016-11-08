@@ -22,36 +22,6 @@ package nl.knaw.huygens.alexandria.service;
  * #L%
  */
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.TemporalAmount;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.apache.commons.lang3.NotImplementedException;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.jooq.lambda.Unchecked;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -62,7 +32,6 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
@@ -78,24 +47,13 @@ import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
-import nl.knaw.huygens.alexandria.model.Accountable;
-import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
-import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
-import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
-import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
-import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
+import nl.knaw.huygens.alexandria.model.*;
 import nl.knaw.huygens.alexandria.query.AlexandriaQueryParser;
 import nl.knaw.huygens.alexandria.query.ParsedAlexandriaQuery;
 import nl.knaw.huygens.alexandria.storage.DumpFormat;
 import nl.knaw.huygens.alexandria.storage.Storage;
-import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
-import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
-import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
-import nl.knaw.huygens.alexandria.storage.frames.AnnotatorVF;
+import nl.knaw.huygens.alexandria.storage.frames.*;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotatorVF.EdgeLabels;
-import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
-import nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF;
 import nl.knaw.huygens.alexandria.textgraph.ParseResult;
 import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphSegment;
@@ -103,7 +61,29 @@ import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorFactory;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorParseException;
 import nl.knaw.huygens.alexandria.util.StreamUtil;
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.jooq.lambda.Unchecked;
 import peapod.FramedGraphTraversal;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.TemporalAmount;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 @Singleton
 public class TinkerPopService implements AlexandriaService {
@@ -910,6 +890,7 @@ public class TinkerPopService implements AlexandriaService {
     vf.setAbsoluteXmlId(absolutePosition.getXmlId());
     vf.setAbsoluteOffset(absolutePosition.getOffset());
     vf.setAbsoluteLength(absolutePosition.getLength());
+    vf.setUseOffset(annotation.getUseOffset());
     try {
       String json = new ObjectMapper().writeValueAsString(annotation.getAttributes());
       vf.setAttributesAsJson(json);

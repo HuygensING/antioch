@@ -1,16 +1,6 @@
 package nl.knaw.huygens.alexandria.client;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.net.URI;
-import java.util.Map;
-import java.util.UUID;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import com.google.common.collect.ImmutableMap;
-
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
@@ -19,6 +9,14 @@ import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.AbsolutePos
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.net.URI;
+import java.util.Map;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TextRangeAnnotationTest extends AlexandriaClientTest {
   @Before
@@ -320,7 +318,7 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
     RestResult<String> textResult = client.getTextAsString(resourceUUID);
     assertRequestSucceeded(textResult);
     String xml2 = textResult.get();
-    String expected = singleQuotesToDouble("<p xml:id='p-1'><persName_id id='W. Wortel (1934-)' resp='#ckcc'><persName resp='#ckcc'>Willie Wortel</persName></persName_id> vindt uit.</p>");
+    String expected = singleQuotesToDouble("<p xml:id='p-1'><persName resp='#ckcc'><persName_id id='W. Wortel (1934-)' resp='#ckcc'>Willie Wortel</persName_id></persName> vindt uit.</p>");
     assertThat(xml2).isEqualTo(expected);
   }
 
