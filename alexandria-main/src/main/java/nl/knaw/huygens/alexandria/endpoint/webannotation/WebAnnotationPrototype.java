@@ -1,11 +1,12 @@
 package nl.knaw.huygens.alexandria.endpoint.webannotation;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.google.common.collect.Maps;
+
+import java.util.Map;
 
 @JsonPropertyOrder({ "@context", "id", "created", "modified" })
 public class WebAnnotationPrototype {
@@ -27,6 +28,7 @@ public class WebAnnotationPrototype {
     return this;
   }
 
+  @JsonProperty("http://purl.org/dc/terms/created")
   public String getCreated() {
     return created;
   }
@@ -35,6 +37,7 @@ public class WebAnnotationPrototype {
     this.modified = modified;
   }
 
+  @JsonProperty("http://purl.org/dc/terms/modified")
   public String getModified() {
     return modified;
   }

@@ -1,26 +1,5 @@
 package nl.knaw.huygens.alexandria.endpoint.webannotation;
 
-import java.io.IOException;
-import java.net.URI;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Supplier;
-
-import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jsonldjava.core.JsonLdError;
@@ -31,7 +10,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import io.swagger.annotations.Api;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
@@ -48,12 +26,19 @@ import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
-import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
-import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
-import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
-import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
+import nl.knaw.huygens.alexandria.model.*;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+
+import javax.inject.Inject;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import java.io.IOException;
+import java.net.URI;
+import java.time.Instant;
+import java.util.*;
+import java.util.function.Supplier;
 
 @Path(EndpointPaths.WEB_ANNOTATIONS)
 @Api("webannotations")
@@ -125,6 +110,15 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
         .build();
   }
 
+  // for mirador
+  @POST
+  @Path("create")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(JSONLD_MEDIATYPE)
+  public Response addWebAnnotationCreate(WebAnnotationPrototype prototype) {
+    return addWebAnnotation(prototype);
+  }
+
   @GET
   @Path("{uuid}")
   @Produces(JSONLD_MEDIATYPE)
@@ -147,20 +141,27 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
         .setPageSize(1000)//
         .setFind("annotation")//
         .setWhere("type:eq(\"" + WEBANNOTATION_TYPE + "\") resource.ref:eq(\"" + uri + "\")")//
-        .setReturns("value");
+        .setReturns("id,value");
 
     SearchResult result = service.execute(query);
     List<Object> webannotations = Lists.newArrayList();
     result.getResults().forEach(resultMap -> {
       String json = (String) resultMap.get("value");
+      UUID uuid = UUID.fromString((String) resultMap.get("id"));
       try {
-        Map<String, Object> map = new ObjectMapper().readValue(json, Map.class);
+        Map<String, Object> map = enrichJson(json);
+        map.put("@id",webAnnotationURI(uuid));
         webannotations.add(map);
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
     });
     return Response.ok(webannotations).build();
+  }
+
+  private Map<String, Object> enrichJson(String json) throws IOException {
+    Map map = new ObjectMapper().readValue(json, Map.class);
+    return map;
   }
 
   // private methods
@@ -255,7 +256,7 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
     } else {
       Map<String, Object> webAnnotationMap = Maps.newHashMap();
       webAnnotationMap.put("@context", "http://www.w3.org/ns/anno.jsonld");
-      webAnnotationMap.put("id", locationBuilder.locationOf(alexandriaAnnotation));
+      webAnnotationMap.put("@id", locationBuilder.locationOf(alexandriaAnnotation));
       webAnnotationMap.put("type", "Annotation");
       webAnnotationMap.put("created", when.toString());
       Map<String, String> bodyMap = ImmutableMap.of("type", "TextualBody", "value", type + ": " + value);
@@ -274,11 +275,10 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
   }
 
   private String addIdToValue(AlexandriaAnnotation alexandriaAnnotation, String value) {
-    String json;
-    json = value;
+    String json = value;
     try {
-      Map<String, Object> webAnnotationMap = new ObjectMapper().readValue(json, Map.class);
-      webAnnotationMap.put("id", webAnnotationURI(alexandriaAnnotation.getId()));
+      Map<String, Object> webAnnotationMap = enrichJson(json);
+      webAnnotationMap.put("@id", webAnnotationURI(alexandriaAnnotation.getId()));
       json = new ObjectMapper().writeValueAsString(webAnnotationMap);
     } catch (IOException e) {
       throw new RuntimeException(e);
