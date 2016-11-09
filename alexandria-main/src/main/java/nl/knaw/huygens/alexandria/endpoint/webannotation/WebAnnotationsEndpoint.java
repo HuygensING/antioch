@@ -1,5 +1,30 @@
 package nl.knaw.huygens.alexandria.endpoint.webannotation;
 
+import java.io.IOException;
+import java.net.URI;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.inject.Inject;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jsonldjava.core.JsonLdError;
@@ -10,6 +35,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import io.swagger.annotations.Api;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
@@ -26,19 +52,12 @@ import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
-import nl.knaw.huygens.alexandria.model.*;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
+import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-
-import javax.inject.Inject;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import java.io.IOException;
-import java.net.URI;
-import java.time.Instant;
-import java.util.*;
-import java.util.function.Supplier;
 
 @Path(EndpointPaths.WEB_ANNOTATIONS)
 @Api("webannotations")
@@ -46,6 +65,7 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
   private static final String WEBANNOTATION_TYPE = "alexandria:webannotation";
   private static final String OA_HAS_TARGET_IRI = "http://www.w3.org/ns/oa#hasTarget";
   private static final String OA_HAS_SOURCE_IRI = "http://www.w3.org/ns/oa#hasSource";
+  private static final String DEFAULT_PROFILE = "http://www.w3.org/ns/anno.jsonld";
   // private static final String JSONLD_MEDIATYPE = "application/ld+json; profile=\"http://www.w3.org/ns/anno.jsonld\"";
   private static final String JSONLD_MEDIATYPE = "application/ld+json";
   private static final String RESOURCE_TYPE_URI = "http://www.w3.org/ns/ldp#Resource";
@@ -81,20 +101,6 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
     this.requestBuilder = requestBuilder;
   }
 
-  @GET
-  @Produces(JSONLD_MEDIATYPE)
-  public Response getWebAnnotations() {
-    // WebAnnotation webAnnotation = readExistingWebAnnotation(uuidParam);
-    // WebAnnotation webAnnotation = asWebAnnotation(null);
-    // return Response.ok(webAnnotations)//
-    // .link(RESOURCE_TYPE_URI, "type")//
-    // .link(ANNOTATION_TYPE_URI, "type")//
-    // .tag(webAnnotation.eTag())//
-    // .allow(ALLOWED_METHODS)//
-    // .build();
-    return Response.ok().build();
-  }
-
   @POST
   @Consumes(JSONLD_MEDIATYPE)
   @Produces(JSONLD_MEDIATYPE)
@@ -110,19 +116,13 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
         .build();
   }
 
-  // for mirador
-  @POST
-  @Path("create")
-  @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(JSONLD_MEDIATYPE)
-  public Response addWebAnnotationCreate(WebAnnotationPrototype prototype) {
-    return addWebAnnotation(prototype);
-  }
-
   @GET
   @Path("{uuid}")
   @Produces(JSONLD_MEDIATYPE)
-  public Response getWebAnnotation(@PathParam("uuid") UUIDParam uuidParam) {
+  public Response getWebAnnotation(@PathParam("uuid") UUIDParam uuidParam, @HeaderParam("Accept") String acceptHeader) {
+    Log.info("accept={}", acceptHeader);
+    String profile = extractProfile(acceptHeader);
+    Log.info("profile={}", profile);
     WebAnnotation webAnnotation = readExistingWebAnnotation(uuidParam);
     return Response.ok(webAnnotation.json())//
         .link(RESOURCE_TYPE_URI, "type")//
@@ -130,6 +130,31 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
         .tag(webAnnotation.eTag())//
         .allow(ALLOWED_METHODS)//
         .build();
+  }
+
+  @DELETE
+  @Path("{uuid}")
+  public Response deleteWebAnnotation(@PathParam("uuid") UUIDParam uuidParam) {
+    UUID annotationUUID = uuidParam.getValue();
+    AlexandriaAnnotation annotation = service.readAnnotation(annotationUUID)//
+        .orElseThrow(() -> new NotFoundException());
+    service.deleteAnnotation(annotation);
+    return Response.noContent().build();
+  }
+
+  @GET
+  @Produces(JSONLD_MEDIATYPE)
+  public Response getWebAnnotations() {
+    // TODO
+    // WebAnnotation webAnnotation = readExistingWebAnnotation(uuidParam);
+    // WebAnnotation webAnnotation = asWebAnnotation(null);
+    // return Response.ok(webAnnotations)//
+    // .link(RESOURCE_TYPE_URI, "type")//
+    // .link(ANNOTATION_TYPE_URI, "type")//
+    // .tag(webAnnotation.eTag())//
+    // .allow(ALLOWED_METHODS)//
+    // .build();
+    return Response.ok().build();
   }
 
   @GET
@@ -150,7 +175,7 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
       UUID uuid = UUID.fromString((String) resultMap.get("id"));
       try {
         Map<String, Object> map = enrichJson(json);
-        map.put("@id",webAnnotationURI(uuid));
+        map.put("@id", webAnnotationURI(uuid));
         webannotations.add(map);
       } catch (IOException e) {
         throw new RuntimeException(e);
@@ -159,12 +184,21 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
     return Response.ok(webannotations).build();
   }
 
+  // private methods
   private Map<String, Object> enrichJson(String json) throws IOException {
-    Map map = new ObjectMapper().readValue(json, Map.class);
+    Map<String, Object> map = new ObjectMapper().readValue(json, Map.class);
     return map;
   }
 
-  // private methods
+  private static final Pattern PROFILE_PATTERN = Pattern.compile(".*profile=\"(.*?)\".*");
+
+  private String extractProfile(String accept) {
+    Matcher matcher = PROFILE_PATTERN.matcher(accept);
+    if (matcher.matches()) {
+      return matcher.group(1);
+    }
+    return DEFAULT_PROFILE;
+  }
 
   private WebAnnotation validateAndStore(WebAnnotationPrototype prototype) {
     try {
