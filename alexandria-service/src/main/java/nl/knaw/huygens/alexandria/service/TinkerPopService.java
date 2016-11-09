@@ -22,36 +22,6 @@ package nl.knaw.huygens.alexandria.service;
  * #L%
  */
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.TemporalAmount;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.apache.commons.lang3.NotImplementedException;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.jooq.lambda.Unchecked;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -62,13 +32,13 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.AbsolutePosition;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
@@ -77,24 +47,13 @@ import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
-import nl.knaw.huygens.alexandria.model.Accountable;
-import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
-import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
-import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
-import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
-import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
+import nl.knaw.huygens.alexandria.model.*;
 import nl.knaw.huygens.alexandria.query.AlexandriaQueryParser;
 import nl.knaw.huygens.alexandria.query.ParsedAlexandriaQuery;
 import nl.knaw.huygens.alexandria.storage.DumpFormat;
 import nl.knaw.huygens.alexandria.storage.Storage;
-import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
-import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
-import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
-import nl.knaw.huygens.alexandria.storage.frames.AnnotatorVF;
+import nl.knaw.huygens.alexandria.storage.frames.*;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotatorVF.EdgeLabels;
-import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
-import nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF;
 import nl.knaw.huygens.alexandria.textgraph.ParseResult;
 import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphSegment;
@@ -102,7 +61,29 @@ import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorFactory;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorParseException;
 import nl.knaw.huygens.alexandria.util.StreamUtil;
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.jooq.lambda.Unchecked;
 import peapod.FramedGraphTraversal;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.TemporalAmount;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 @Singleton
 public class TinkerPopService implements AlexandriaService {
@@ -272,7 +253,7 @@ public class TinkerPopService implements AlexandriaService {
             .in(ResourceVF.EdgeLabels.PART_OF)//
             .has(ResourceVF.Properties.CARGO, sub)//
             .toList()//
-            .parallelStream()//
+            .stream()//
             .map(this::deframeResource)//
             .findAny()//
     );
@@ -308,7 +289,7 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public Optional<Annotator> readResourceAnnotator(UUID uuid, String code) {
     ResourceVF resourcevf = readExistingResourceVF(uuid);
-    return resourcevf.getAnnotators().parallelStream()//
+    return resourcevf.getAnnotators().stream()//
         .map(this::deframeAnnotator)//
         .filter(a -> code.equals(a.getCode()))//
         .findAny();
@@ -387,23 +368,24 @@ public class TinkerPopService implements AlexandriaService {
             .has("name", annotation.getName())//
             .has("annotatorCode", annotation.getAnnotator())//
         ;
-        Position position = annotation.getPosition();
+        AbsolutePosition absolutePosition = annotation.getAbsolutePosition();
         String uuid1 = annotation.getId().toString();
-        String xmlId1 = position.getXmlId();
-        Integer start1 = position.getOffset().get();
-        Integer end1 = start1 + position.getLength().get();
+        String xmlId1 = absolutePosition.getXmlId();
+        Integer start1 = absolutePosition.getOffset();
+        Integer end1 = start1 + absolutePosition.getLength();
         Predicate<Vertex> overlapsWithAnnotation = t -> {
-          String xmlId2 = (String) t.property("xmlId").value();
-          Integer start2 = (Integer) t.property("offset").value();
-          Integer end2 = start2 + (Integer) t.property("length").value();
-          Log.info("start1:{} <= end2:{} && start2:{} <= end1:{}", start1, end2, start2, end1);
-          return xmlId1.equals(xmlId2) && start1 <= end2 && start2 <= end1;
+          Log.info("t.keys={}", t.keys());
+          String xmlId2 = (String) t.property("absoluteXmlId").value();
+          Integer start2 = (Integer) t.property("absoluteOffset").value();
+          Integer end2 = start2 + (Integer) t.property("absoluteLength").value();
+          Log.info("start1:{} < end2:{} && start2:{} < end1:{}", start1, end2, start2, end1);
+          return xmlId1.equals(xmlId2) && start1 < end2 && start2 < end1;
         };
         Predicate<Vertex> hasDifferentUUID = t -> {
           String uuid2 = (String) t.property("uuid").value();
           return !uuid1.equals(uuid2);
         };
-        overlaps.set(StreamUtil.parallelStream(traversal)//
+        overlaps.set(StreamUtil.stream(traversal)//
             .filter(hasDifferentUUID)//
             .filter(overlapsWithAnnotation)//
             .findAny()//
@@ -892,13 +874,23 @@ public class TinkerPopService implements AlexandriaService {
     vf.setName(annotation.getName());
     vf.setAnnotatorCode(annotation.getAnnotator());
     Position position = annotation.getPosition();
-    vf.setXmlId(position.getXmlId());
-    if (position.getOffset().isPresent()) {
-      vf.setOffset(position.getOffset().get());
-    }
-    if (position.getLength().isPresent()) {
-      vf.setLength(position.getLength().get());
-    }
+    position.getXmlId().ifPresent(xmlId -> {
+      vf.setXmlId(xmlId);
+      if (position.getOffset().isPresent()) {
+        vf.setOffset(position.getOffset().get());
+      }
+      if (position.getLength().isPresent()) {
+        vf.setLength(position.getLength().get());
+      }
+    });
+    position.getTargetAnnotationId().ifPresent(targetId -> {
+      vf.setTargetAnnotationId(targetId.toString());
+    });
+    AbsolutePosition absolutePosition = annotation.getAbsolutePosition();
+    vf.setAbsoluteXmlId(absolutePosition.getXmlId());
+    vf.setAbsoluteOffset(absolutePosition.getOffset());
+    vf.setAbsoluteLength(absolutePosition.getLength());
+    vf.setUseOffset(annotation.getUseOffset());
     try {
       String json = new ObjectMapper().writeValueAsString(annotation.getAttributes());
       vf.setAttributesAsJson(json);
@@ -909,10 +901,17 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   private TextRangeAnnotation deframeTextRangeAnnotation(TextRangeAnnotationVF vf) {
+    String targetAnnotationId = vf.getTargetAnnotationId();
+    UUID targetAnnotationUUID = targetAnnotationId == null ? null : UUID.fromString(targetAnnotationId);
     Position position = new Position()//
+        .setTargetAnnotationId(targetAnnotationUUID)//
         .setXmlId(vf.getXmlId())//
         .setOffset(vf.getOffset())//
         .setLength(vf.getLength());
+    AbsolutePosition absolutePosition = new AbsolutePosition()//
+        .setXmlId(vf.getAbsoluteXmlId())//
+        .setOffset(vf.getAbsoluteOffset())//
+        .setLength(vf.getAbsoluteLength());
     Map<String, String> attributes;
     try {
       String attributesAsJson = StringUtils.defaultIfBlank(vf.getAttributesAsJson(), "{}");
@@ -924,7 +923,8 @@ public class TinkerPopService implements AlexandriaService {
           .setName(vf.getName())//
           .setAnnotator(vf.getAnnotatorCode())//
           .setAttributes(attributes)//
-          .setPosition(position);
+          .setPosition(position)//
+          .setAbsolutePosition(absolutePosition);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

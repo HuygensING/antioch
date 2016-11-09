@@ -11,6 +11,7 @@ public abstract class TextRangeAnnotationVF extends IdentifiableVF implements Fr
   public static class EdgeLabels {
     public static final String HAS_RESOURCE = "textrangeannotation_has_resource";
     public static final String HAS_TEXTANNOTATION = "has_textannotation";
+    public static final String ANNOTATES_TEXTRANGE_ANNOTATION = "annotates_textrange_annotation";
   }
 
   public abstract String getName();
@@ -20,6 +21,12 @@ public abstract class TextRangeAnnotationVF extends IdentifiableVF implements Fr
   public abstract String getAnnotatorCode();
 
   public abstract void setAnnotatorCode(String annotatorCode);
+
+  // Position elements: begin
+
+  public abstract String getTargetAnnotationId();
+
+  public abstract void setTargetAnnotationId(String xmlId);
 
   public abstract String getXmlId();
 
@@ -33,6 +40,24 @@ public abstract class TextRangeAnnotationVF extends IdentifiableVF implements Fr
 
   public abstract void setLength(Integer length);
 
+  public abstract String getAbsoluteXmlId();
+
+  public abstract void setAbsoluteXmlId(String xmlId);
+
+  public abstract Integer getAbsoluteOffset();
+
+  public abstract void setAbsoluteOffset(Integer offset);
+
+  public abstract Integer getAbsoluteLength();
+
+  public abstract void setAbsoluteLength(Integer length);
+
+  public abstract void setUseOffset(Boolean useOffset);
+
+  public abstract Boolean getUseOffset();
+
+  // Position elements: end
+
   public abstract String getAttributesAsJson();
 
   public abstract void setAttributesAsJson(String json);
@@ -44,5 +69,13 @@ public abstract class TextRangeAnnotationVF extends IdentifiableVF implements Fr
   @Out
   @Edge(EdgeLabels.HAS_RESOURCE)
   public abstract ResourceVF getResource();
+
+  @Out
+  @Edge(EdgeLabels.ANNOTATES_TEXTRANGE_ANNOTATION)
+  public abstract void setTargetTextRangeAnnotation(TextRangeAnnotationVF targetTextRangeAnnotation);
+
+  @Out
+  @Edge(EdgeLabels.ANNOTATES_TEXTRANGE_ANNOTATION)
+  public abstract TextRangeAnnotationVF getTargetTextRangeAnnotation();
 
 }

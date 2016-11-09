@@ -1,20 +1,19 @@
 package nl.knaw.huygens.alexandria.api.model.text;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-
 import nl.knaw.huygens.alexandria.api.JsonTypeNames;
 import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 @JsonTypeName(JsonTypeNames.TEXTANNOTATION)
 @JsonInclude(Include.NON_NULL)
@@ -23,18 +22,29 @@ public class TextRangeAnnotation extends JsonWrapperObject {
 
   public static class Position {
     @JsonProperty("xml:id")
-    String xmlId;
+    private String xmlId;
 
-    Integer offset;
-    Integer length;
+    private Integer offset;
+    private Integer length;
 
-    public String getXmlId() {
-      return xmlId;
-    }
+    private UUID targetAnnotationId;
 
     public Position setXmlId(String xmlId) {
       this.xmlId = xmlId;
       return this;
+    }
+
+    public Optional<String> getXmlId() {
+      return Optional.ofNullable(xmlId);
+    }
+
+    public Position setTargetAnnotationId(UUID annotationId) {
+      this.targetAnnotationId = annotationId;
+      return this;
+    }
+
+    public Optional<UUID> getTargetAnnotationId() {
+      return Optional.ofNullable(targetAnnotationId);
     }
 
     public Optional<Integer> getOffset() {
@@ -62,12 +72,56 @@ public class TextRangeAnnotation extends JsonWrapperObject {
 
   }
 
+  public static class AbsolutePosition {
+    private String xmlId;
+
+    private Integer offset;
+    private Integer length;
+
+    public AbsolutePosition setXmlId(String xmlId) {
+      this.xmlId = xmlId;
+      return this;
+    }
+
+    public String getXmlId() {
+      return xmlId;
+    }
+
+    public Integer getOffset() {
+      return offset;
+    }
+
+    public AbsolutePosition setOffset(Integer offset) {
+      this.offset = offset;
+      return this;
+    }
+
+    public Integer getLength() {
+      return length;
+    }
+
+    public AbsolutePosition setLength(Integer length) {
+      this.length = length;
+      return this;
+    }
+
+    @Override
+    public String toString() {
+      return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+    }
+
+  }
+
   @JsonProperty("id")
   private UUID uuid;
 
   private String name;
   private String annotator;
-  private Position position;
+  private Position position; // may contain targetAnnotatioId, or doesn't contain offset/length
+
+  @JsonIgnore
+  private AbsolutePosition absolutePosition; // always has xmlId + (calculated) offset/length
+
   private Map<String, String> attributes = new HashMap<>();
   private Boolean useOffset;
 
@@ -107,6 +161,15 @@ public class TextRangeAnnotation extends JsonWrapperObject {
     return position;
   }
 
+  public TextRangeAnnotation setAbsolutePosition(AbsolutePosition position) {
+    this.absolutePosition = position;
+    return this;
+  }
+
+  public AbsolutePosition getAbsolutePosition() {
+    return absolutePosition;
+  }
+
   public TextRangeAnnotation setAttributes(Map<String, String> attributes) {
     this.attributes = attributes;
     return this;
@@ -121,7 +184,7 @@ public class TextRangeAnnotation extends JsonWrapperObject {
     return this;
   }
 
-  public boolean hasOffset() {
+  public boolean getUseOffset() {
     if (useOffset == null) {
       useOffset = position.getOffset().isPresent();
     }
