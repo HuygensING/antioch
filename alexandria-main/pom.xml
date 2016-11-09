@@ -45,7 +45,6 @@
     <dependency>
       <groupId>org.glassfish.jersey.ext</groupId>
       <artifactId>jersey-bean-validation</artifactId>
-      <version>${jersey.version}</version>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
@@ -75,6 +74,11 @@
       <groupId>org.jooq</groupId>
       <artifactId>jool</artifactId>
       <version>${jool.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.jsonld-java</groupId>
+      <artifactId>jsonld-java</artifactId>
+      <version>0.8.3</version>
     </dependency>
     <dependency>
       <groupId>io.swagger</groupId>

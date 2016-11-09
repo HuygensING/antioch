@@ -22,22 +22,21 @@ package nl.knaw.huygens.alexandria.jersey;
  * #L%
  */
 
-import static java.util.logging.Logger.getAnonymousLogger;
-
-import java.time.Instant;
-
-import javax.ws.rs.ApplicationPath;
-
-import org.glassfish.jersey.filter.LoggingFilter;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.server.ServerProperties;
-import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
-
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.JsonConfiguration;
 import nl.knaw.huygens.alexandria.config.ValidationConfigurationContextResolver;
 import nl.knaw.huygens.alexandria.jaxrs.AuthenticationRequestFilter;
 import nl.knaw.huygens.alexandria.jaxrs.AuthorizationRequestFilter;
+import nl.knaw.huygens.alexandria.jaxrs.CORSFilter;
+import org.glassfish.jersey.filter.LoggingFilter;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.ServerProperties;
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
+
+import javax.ws.rs.ApplicationPath;
+import java.time.Instant;
+
+import static java.util.logging.Logger.getAnonymousLogger;
 
 @ApplicationPath("/")
 public class AlexandriaApplication extends ResourceConfig {
@@ -57,6 +56,7 @@ public class AlexandriaApplication extends ResourceConfig {
     register(AuthenticationRequestFilter.class);
     register(AuthorizationRequestFilter.class);
     register(RolesAllowedDynamicFeature.class);
+    register(CORSFilter.class);
 
     // Validation configuration
     register(ValidationConfigurationContextResolver.class);

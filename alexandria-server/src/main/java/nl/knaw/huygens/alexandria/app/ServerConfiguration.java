@@ -1,11 +1,17 @@
 package nl.knaw.huygens.alexandria.app;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.config.AbstractAlexandriaConfigurationUsingAlexandriaProperties;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.net.URI;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Scanner;
 
 /*
  * #%L
@@ -28,19 +34,6 @@ import java.io.OutputStream;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
-import java.net.URI;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Scanner;
-
-import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.config.AbstractAlexandriaConfigurationUsingAlexandriaProperties;
 
 public class ServerConfiguration extends AbstractAlexandriaConfigurationUsingAlexandriaProperties {
   private static final File ALEXANDRIA_ROOT = new File(System.getProperty("user.home"), ".alexandria");
