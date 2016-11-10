@@ -1,25 +1,30 @@
 package nl.knaw.huygens.alexandria.api.model.text;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import nl.knaw.huygens.alexandria.api.JsonTypeNames;
-import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
+import nl.knaw.huygens.alexandria.api.JsonTypeNames;
+import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
+
 @JsonTypeName(JsonTypeNames.TEXTANNOTATION)
-@JsonInclude(Include.NON_NULL)
+@JsonInclude(Include.NON_EMPTY)
+@JsonPropertyOrder({ "id", "name" })
 public class TextRangeAnnotation extends JsonWrapperObject {
   public static final String RESPONSIBILITY_ATTRIBUTE = "resp";
 
+  @JsonInclude(Include.NON_EMPTY)
   public static class Position {
     @JsonProperty("xml:id")
     private String xmlId;
