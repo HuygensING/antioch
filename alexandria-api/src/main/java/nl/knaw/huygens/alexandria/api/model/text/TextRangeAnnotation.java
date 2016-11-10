@@ -129,6 +129,7 @@ public class TextRangeAnnotation extends JsonWrapperObject {
   private AbsolutePosition absolutePosition; // always has xmlId + (calculated) offset/length
 
   private Map<String, String> attributes = new HashMap<>();
+  @JsonIgnore
   private Boolean useOffset;
 
   public TextRangeAnnotation setId(UUID uuid) {
