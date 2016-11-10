@@ -1,5 +1,35 @@
 package nl.knaw.huygens.alexandria.service;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.TemporalAmount;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.jooq.lambda.Unchecked;
+
 /*
  * #%L
  * alexandria-service
@@ -32,6 +62,7 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
@@ -47,13 +78,25 @@ import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
-import nl.knaw.huygens.alexandria.model.*;
+import nl.knaw.huygens.alexandria.model.Accountable;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
+import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
+import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.query.AlexandriaQueryParser;
 import nl.knaw.huygens.alexandria.query.ParsedAlexandriaQuery;
 import nl.knaw.huygens.alexandria.storage.DumpFormat;
 import nl.knaw.huygens.alexandria.storage.Storage;
-import nl.knaw.huygens.alexandria.storage.frames.*;
+import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
+import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
+import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
+import nl.knaw.huygens.alexandria.storage.frames.AnnotatorVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotatorVF.EdgeLabels;
+import nl.knaw.huygens.alexandria.storage.frames.IdentifiableVF;
+import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
+import nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF;
 import nl.knaw.huygens.alexandria.textgraph.ParseResult;
 import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphSegment;
@@ -61,29 +104,7 @@ import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorFactory;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorParseException;
 import nl.knaw.huygens.alexandria.util.StreamUtil;
-import org.apache.commons.lang3.NotImplementedException;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.jooq.lambda.Unchecked;
 import peapod.FramedGraphTraversal;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.TemporalAmount;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
 
 @Singleton
 public class TinkerPopService implements AlexandriaService {
@@ -335,6 +356,45 @@ public class TinkerPopService implements AlexandriaService {
     return storage.runInTransaction(() -> getTextRangeAnnotationList(resourceUUID));
   }
 
+  @Override
+  public void deprecateTextRangeAnnotation(UUID annotationUUID, TextRangeAnnotation newTextRangeAnnotation) {
+    storage.runInTransaction(() -> {
+      Log.info("1");
+      TextRangeAnnotationVF oldVF = storage.readVF(TextRangeAnnotationVF.class, annotationUUID)//
+          .orElseThrow(() -> new NotFoundException());
+      Log.info("2");
+      Integer revision = oldVF.getRevision();
+      Log.info("3");
+      oldVF.setUuid(annotationUUID.toString() + "." + revision);
+      Log.info("4");
+      ResourceVF resourceVF = oldVF.getResource();
+      Log.info("5");
+      oldVF.setResource(null);
+      Log.info("6");
+      FramedGraphTraversal<TextRangeAnnotationVF, Vertex> traversal = oldVF.out(nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF.EdgeLabels.HAS_TEXTANNOTATION);
+      Log.info("7");
+      if (traversal.hasNext()) {
+        traversal.next().remove();
+      }
+
+      Log.info("8");
+      TextRangeAnnotationVF newVF = storage.createVF(TextRangeAnnotationVF.class);
+      Log.info("9");
+      newTextRangeAnnotation.setRevision(revision + 1);
+      Log.info("10");
+      updateTextRangeAnnotation(newVF, newTextRangeAnnotation);
+      Log.info("11");
+      UUID resourceUUID = UUID.fromString(resourceVF.getUuid());
+      Log.info("12");
+      textGraphService.updateTextAnnotationLink(newVF, newTextRangeAnnotation, resourceUUID);
+      Log.info("13");
+      newVF.setResource(resourceVF);
+      Log.info("14");
+      newVF.setDeprecatedAnnotation(oldVF);
+      Log.info("15");
+    });
+  }
+
   private TextRangeAnnotationList getTextRangeAnnotationList(UUID resourceUUID) {
     TextRangeAnnotationList list = new TextRangeAnnotationList();
     storage.readVF(ResourceVF.class, resourceUUID).ifPresent(resourceVF -> {
@@ -352,6 +412,24 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public Optional<TextRangeAnnotation> readTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID) {
     return storage.runInTransaction(() -> getOptionalTextRangeAnnotation(resourceUUID, annotationUUID));
+  }
+
+  @Override
+  public Optional<TextRangeAnnotation> readTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID, Integer revision) {
+    return storage.runInTransaction(() -> {
+      Optional<TextRangeAnnotationVF> versionedAnnotation = storage.readVF(TextRangeAnnotationVF.class, annotationUUID, revision);
+      if (versionedAnnotation.isPresent()) {
+        return versionedAnnotation.map(this::deframeTextRangeAnnotation);
+
+      } else {
+        Optional<TextRangeAnnotationVF> currentAnnotation = storage.readVF(TextRangeAnnotationVF.class, annotationUUID);
+        if (currentAnnotation.isPresent() && currentAnnotation.get().getRevision().equals(revision)) {
+          return currentAnnotation.map(this::deframeTextRangeAnnotation);
+        } else {
+          return Optional.empty();
+        }
+      }
+    });
   }
 
   private Optional<TextRangeAnnotation> getOptionalTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID) {
@@ -871,6 +949,7 @@ public class TinkerPopService implements AlexandriaService {
 
   private void updateTextRangeAnnotation(TextRangeAnnotationVF vf, TextRangeAnnotation annotation) {
     vf.setUuid(annotation.getId().toString());
+    vf.setRevision(annotation.getRevision());
     vf.setName(annotation.getName());
     vf.setAnnotatorCode(annotation.getAnnotator());
     Position position = annotation.getPosition();
@@ -919,7 +998,8 @@ public class TinkerPopService implements AlexandriaService {
       };
       attributes = new ObjectMapper().readValue(attributesAsJson, typeRef);
       return new TextRangeAnnotation()//
-          .setId(UUID.fromString(vf.getUuid()))//
+          .setId(getUUID(vf))//
+          .setRevision(vf.getRevision())//
           .setName(vf.getName())//
           .setAnnotator(vf.getAnnotatorCode())//
           .setAttributes(attributes)//
@@ -1050,7 +1130,7 @@ public class TinkerPopService implements AlexandriaService {
     return new BadRequestException("annotation " + oldAnnotationId + " is " + string);
   }
 
-  private UUID getUUID(AlexandriaVF vf) {
+  private UUID getUUID(IdentifiableVF vf) {
     return UUID.fromString(vf.getUuid().replaceFirst("\\..$", "")); // remove revision suffix for deprecated annotations
   }
 

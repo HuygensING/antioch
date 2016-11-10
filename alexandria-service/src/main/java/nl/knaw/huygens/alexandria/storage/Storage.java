@@ -50,7 +50,7 @@ import com.google.common.collect.Maps;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
+import nl.knaw.huygens.alexandria.storage.frames.IdentifiableVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import nl.knaw.huygens.alexandria.storage.frames.VF;
 import peapod.FramedGraph;
@@ -165,7 +165,7 @@ public class Storage {
     return firstOrEmpty(find(vfClass, uuid).toList());
   }
 
-  public <A extends AlexandriaVF> Optional<A> readVF(final Class<A> vfClass, final UUID uuid, final Integer revision) {
+  public <A extends IdentifiableVF> Optional<A> readVF(final Class<A> vfClass, final UUID uuid, final Integer revision) {
     assertInTransaction();
     assertClass(vfClass);
     return firstOrEmpty(find(vfClass, uuid, revision).toList());

@@ -3,6 +3,7 @@ package nl.knaw.huygens.alexandria.storage.frames;
 import nl.knaw.huygens.alexandria.storage.VertexLabels;
 import peapod.FramedVertex;
 import peapod.annotations.Edge;
+import peapod.annotations.In;
 import peapod.annotations.Out;
 import peapod.annotations.Vertex;
 
@@ -12,7 +13,12 @@ public abstract class TextRangeAnnotationVF extends IdentifiableVF implements Fr
     public static final String HAS_RESOURCE = "textrangeannotation_has_resource";
     public static final String HAS_TEXTANNOTATION = "has_textannotation";
     public static final String ANNOTATES_TEXTRANGE_ANNOTATION = "annotates_textrange_annotation";
+    public static final String DEPRECATES = "deprecates";
   }
+
+  public abstract void setRevision(Integer revision);
+
+  public abstract Integer getRevision();
 
   public abstract String getName();
 
@@ -77,5 +83,17 @@ public abstract class TextRangeAnnotationVF extends IdentifiableVF implements Fr
   @Out
   @Edge(EdgeLabels.ANNOTATES_TEXTRANGE_ANNOTATION)
   public abstract TextRangeAnnotationVF getTargetTextRangeAnnotation();
+
+  @Out
+  @Edge(EdgeLabels.DEPRECATES)
+  public abstract void setDeprecatedAnnotation(TextRangeAnnotationVF annotationToDeprecate);
+
+  @Out
+  @Edge(EdgeLabels.DEPRECATES)
+  public abstract TextRangeAnnotationVF getDeprecatedAnnotation();
+
+  @In
+  @Edge(EdgeLabels.DEPRECATES)
+  public abstract TextRangeAnnotationVF getDeprecatedBy();
 
 }

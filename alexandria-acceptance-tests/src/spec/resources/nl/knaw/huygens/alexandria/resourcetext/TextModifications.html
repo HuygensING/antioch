@@ -995,6 +995,48 @@
   </h:request>
   <br/>
   
+  <h:request>
+    Retrieving the text annotation by 
+    <h:get>/resources/$resId1/text/annotations/00000000-0000-0000-0000-000000000042</h:get>
+    gives me
+    <h:jsonResponse>
+    {
+      "textAnnotation" : {
+        "id" : "00000000-0000-0000-0000-000000000042",
+        "revision" : 1,
+        "name" : "hi",
+        "annotator" : "ed",
+        "position" : {
+          "xml:id" : "div-1" 
+        },
+        "attributes" : {
+          "rend" : "bold"
+        }
+    } }
+    </h:jsonResponse>
+  </h:request>
+  <br/>
+  
+  <h:request>
+    The previous version, while not active, can still be retrieved by 
+    <h:get>/resources/$resId1/text/annotations/00000000-0000-0000-0000-000000000042/rev/0</h:get>,
+    which gives
+    <h:jsonResponse>
+    {
+      "textAnnotation" : {
+        "id" : "00000000-0000-0000-0000-000000000042",
+        "revision" : 0,
+        "name" : "hi",
+        "annotator" : "ed",
+        "position" : {
+          "xml:id" : "div-1" 
+        },
+        "attributes" : {
+          "rend" : "italic"
+        }
+    } }
+    </h:jsonResponse>
+  </h:request>
 </div>
 
 <div id="get-text-annotations" c:execute="clearStorage()"
@@ -1113,37 +1155,37 @@
 			{
 			  "textAnnotationList" : [ {
 			    "textAnnotation" : {
+            "id" : "00000000-0000-0000-0000-000000000092",
+			      "revision" : 0,
 			      "name" : "sentence",
 			      "annotator" : "ed",
 			      "position" : {
 			        "xml:id" : "p-1"
-			      },
-			      "attributes" : { },
-			      "id" : "00000000-0000-0000-0000-000000000092"
+			      }
 			    }
 			  }, {
 			    "textAnnotation" : {
+            "id" : "00000000-0000-0000-0000-000000000091",
+            "revision" : 0,
 			      "name" : "word",
 			      "annotator" : "ed",
 			      "position" : {
 			        "offset" : 9,
 			        "length" : 1,
 			        "xml:id" : "p-1"
-			      },
-			      "attributes" : { },
-			      "id" : "00000000-0000-0000-0000-000000000091"
+			      }
 			    }
 			  }, {
 			    "textAnnotation" : {
+            "id" : "00000000-0000-0000-0000-000000000090",
+            "revision" : 0,
 			      "name" : "word",
 			      "annotator" : "ed",
 			      "position" : {
 			        "offset" : 6,
 			        "length" : 2,
 			        "xml:id" : "p-1"
-			      },
-			      "attributes" : { },
-			      "id" : "00000000-0000-0000-0000-000000000090"
+			      }
 			    }
 			  } ]
 			}

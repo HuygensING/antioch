@@ -133,7 +133,11 @@ public interface AlexandriaService {
 
   TextRangeAnnotationList readTextRangeAnnotations(UUID resourceUUID);
 
+  void deprecateTextRangeAnnotation(UUID annotationUUID, TextRangeAnnotation newTextRangeAnnotation);
+
   Optional<TextRangeAnnotation> readTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID);
+
+  Optional<TextRangeAnnotation> readTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID, Integer revision);
 
   boolean overlapsWithExistingTextRangeAnnotationForResource(TextRangeAnnotation annotation, UUID resourceUUID);
 
