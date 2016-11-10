@@ -1,5 +1,20 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
+import java.net.URI;
+import java.util.Optional;
+import java.util.UUID;
+
+import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
@@ -12,16 +27,6 @@ import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 import nl.knaw.huygens.alexandria.textgraph.TextRangeAnnotationValidatorFactory;
-
-import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-import java.net.URI;
-import java.util.Optional;
-import java.util.UUID;
 
 public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
 
@@ -66,16 +71,19 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
 
     Optional<TextRangeAnnotation> existingTextRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, annotationUUID);
     if (existingTextRangeAnnotation.isPresent()) {
-      textRangeAnnotationValidator.validate(newTextRangeAnnotation, existingTextRangeAnnotation.get(), xml);
-      service.setTextRangeAnnotation(resourceUUID, newTextRangeAnnotation);
+      TextRangeAnnotation oldTextRangeAnnotation = existingTextRangeAnnotation.get();
+      textRangeAnnotationValidator.validate(newTextRangeAnnotation, oldTextRangeAnnotation, xml);
+      service.deprecateTextRangeAnnotation(annotationUUID, newTextRangeAnnotation);
+      // newTextRangeAnnotation.setRevision(oldTextRangeAnnotation.getRevision() + 1);
+      // service.setTextRangeAnnotation(resourceUUID, newTextRangeAnnotation);
       return noContent();
     }
 
     textRangeAnnotationValidator.validate(newTextRangeAnnotation, xml);
-    TextRangeAnnotationInfo info = new TextRangeAnnotationInfo().setAnnotates(annotated);
-
     service.setTextRangeAnnotation(resourceUUID, newTextRangeAnnotation);
+
     URI location = locationBuilder.locationOf(resource, EndpointPaths.TEXT, EndpointPaths.ANNOTATIONS, annotationUUID.toString());
+    TextRangeAnnotationInfo info = new TextRangeAnnotationInfo().setAnnotates(annotated);
     return Response.created(location).entity(info).build();
   }
 
@@ -84,6 +92,15 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
   public Response getAnnotation(@PathParam("annotationUUID") final UUIDParam uuidParam) {
     UUID annotationUUID = uuidParam.getValue();
     TextRangeAnnotation textRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, annotationUUID)//
+        .orElseThrow(() -> new NotFoundException("No annotation found for this resource with id " + annotationUUID));
+    return ok(textRangeAnnotation);
+  }
+
+  @GET
+  @Path("{annotationUUID}/rev/{revision}")
+  public Response getAnnotationRevision(@PathParam("annotationUUID") final UUIDParam uuidParam, @PathParam("revision") final Integer revision) {
+    UUID annotationUUID = uuidParam.getValue();
+    TextRangeAnnotation textRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, annotationUUID, revision)//
         .orElseThrow(() -> new NotFoundException("No annotation found for this resource with id " + annotationUUID));
     return ok(textRangeAnnotation);
   }

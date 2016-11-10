@@ -120,6 +120,7 @@ public class TextRangeAnnotation extends JsonWrapperObject {
   @JsonProperty("id")
   private UUID uuid;
 
+  private Integer revision;
   private String name;
   private String annotator;
   private Position position; // may contain targetAnnotatioId, or doesn't contain offset/length
@@ -194,6 +195,18 @@ public class TextRangeAnnotation extends JsonWrapperObject {
       useOffset = position.getOffset().isPresent();
     }
     return useOffset;
+  }
+
+  public TextRangeAnnotation setRevision(Integer revision) {
+    this.revision = revision;
+    return this;
+  }
+
+  public Integer getRevision() {
+    if (revision == null) {
+      return 0;
+    }
+    return revision;
   }
 
   @Override
