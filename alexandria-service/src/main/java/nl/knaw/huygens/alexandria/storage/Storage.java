@@ -335,6 +335,7 @@ public class Storage {
       } catch (Exception e) {
         // wait
         try {
+          Log.info("exception={}", e);
           Thread.sleep(500);
         } catch (InterruptedException ie) {
           ie.printStackTrace();

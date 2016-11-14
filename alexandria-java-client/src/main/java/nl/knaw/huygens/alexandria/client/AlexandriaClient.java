@@ -162,6 +162,7 @@ public class AlexandriaClient implements AutoCloseable {
     return requester//
         .onStatus(Status.CREATED, voidRestResult())//
         .onStatus(Status.ACCEPTED, voidRestResult())//
+        .onStatus(Status.NO_CONTENT, voidRestResult())//
         .getResult();
   }
 

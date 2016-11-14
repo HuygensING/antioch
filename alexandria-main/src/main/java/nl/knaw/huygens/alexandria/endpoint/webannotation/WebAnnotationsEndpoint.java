@@ -108,8 +108,8 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
   @Path("{uuid}")
   @Produces(JSONLD_MEDIATYPE)
   public Response getWebAnnotation(//
-      @PathParam("uuid") UUIDParam uuidParam, //
-      @HeaderParam("Accept") String acceptHeader//
+      @HeaderParam("Accept") String acceptHeader, //
+      @PathParam("uuid") UUIDParam uuidParam //
   ) {
     String expectedProfile = extractProfile(acceptHeader);
     AlexandriaAnnotation alexandriaAnnotation = service.readAnnotation(uuidParam.getValue()) //
@@ -133,16 +133,38 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
   @Consumes(JSONLD_MEDIATYPE)
   @Produces(JSONLD_MEDIATYPE)
   public Response updateWebAnnotation(//
+      @HeaderParam("Accept") String acceptHeader, //
       @PathParam("uuid") UUIDParam uuidParam, //
       WebAnnotationPrototype prototype//
   ) {
-    prototype.setModified(Instant.now().toString());
-    validateAndUpdate(uuidParam, prototype);
-    return Response.ok().build();
-  }
+    // TODO: what if the resource changes?
+    String expectedProfile = extractProfile(acceptHeader);
+    Instant modificationInstant = Instant.now();
+    prototype.setModified(modificationInstant.toString());
+    UUID annotationUuid = uuidParam.getValue();
+    AlexandriaAnnotation alexandriaAnnotation = service.readAnnotation(annotationUuid) //
+        .orElseThrow(annotationNotFoundForId(uuidParam));
+    try {
+      String json = new ObjectMapper().writeValueAsString(prototype);
+      TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(ThreadContext.getUserName(), modificationInstant, AlexandriaProvenance.DEFAULT_WHY);
+      AlexandriaAnnotationBody body = service.findAnnotationBodyWithTypeAndValue(WEBANNOTATION_TYPE, json)//
+          .orElseGet(() -> new AlexandriaAnnotationBody(UUID.randomUUID(), WEBANNOTATION_TYPE, json, provenance));
+      AlexandriaAnnotation newAnnotation = new AlexandriaAnnotation(annotationUuid, body, provenance);
+      alexandriaAnnotation = service.deprecateAnnotation(annotationUuid, newAnnotation);
+      WebAnnotation webAnnotation = asWebAnnotation(alexandriaAnnotation);
+      String profiledWebAnnotation = profile(webAnnotation.json(), expectedProfile);
+      return Response.ok(profiledWebAnnotation)//
+          .link(RESOURCE_TYPE_URI, "type")//
+          .link(ANNOTATION_TYPE_URI, "type")//
+          .tag(webAnnotation.eTag())//
+          .allow(ALLOWED_METHODS)//
+          .build();
 
-  private void validateAndUpdate(UUIDParam uuidParam, WebAnnotationPrototype prototype) {
-    // TODO
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
+
   }
 
   @DELETE
