@@ -1,32 +1,5 @@
 package nl.knaw.huygens.alexandria.endpoint.webannotation;
 
-import java.io.IOException;
-import java.net.URI;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Supplier;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jsonldjava.core.JsonLdError;
@@ -37,7 +10,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import io.swagger.annotations.Api;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
@@ -52,12 +24,21 @@ import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.jaxrs.ThreadContext;
-import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
-import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
-import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
-import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
+import nl.knaw.huygens.alexandria.model.*;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+
+import javax.inject.Inject;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import java.io.IOException;
+import java.net.URI;
+import java.time.Instant;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Path(EndpointPaths.WEB_ANNOTATIONS)
 @Api("webannotations")
@@ -69,7 +50,7 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
   private static final String JSONLD_MEDIATYPE = "application/ld+json";
   private static final String RESOURCE_TYPE_URI = "http://www.w3.org/ns/ldp#Resource";
   private static final String ANNOTATION_TYPE_URI = "http://www.w3.org/ns/oa#Annotation";
-  private static final Set<String> ALLOWED_METHODS = ImmutableSet.<String> of("PUT", "GET", "OPTIONS", "HEAD", "DELETE");
+  private static final Set<String> ALLOWED_METHODS = ImmutableSet.<String>of("PUT", "GET", "OPTIONS", "HEAD", "DELETE");
 
   private final AlexandriaService service;
   private LocationBuilder locationBuilder;
@@ -77,8 +58,8 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
 
   @Inject
   public WebAnnotationsEndpoint(AlexandriaService service, //
-      LocationBuilder locationBuilder, //
-      AlexandriaConfiguration config) {
+                                LocationBuilder locationBuilder, //
+                                AlexandriaConfiguration config) {
     this.service = service;
     this.locationBuilder = locationBuilder;
     this.config = config;
@@ -88,32 +69,32 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
   @Consumes(JSONLD_MEDIATYPE)
   @Produces(JSONLD_MEDIATYPE)
   public Response addWebAnnotation(//
-      @HeaderParam("Accept") String acceptHeader, //
-      WebAnnotationPrototype prototype//
+                                   @HeaderParam("Accept") String acceptHeader, //
+                                   WebAnnotationPrototype prototype//
   ) {
     String expectedProfile = extractProfile(acceptHeader);
     prototype.setCreated(Instant.now().toString());
     WebAnnotation webAnnotation = validateAndStore(prototype);
     String profiledWebAnnotation = profile(webAnnotation.json(), expectedProfile);
     return Response.created(webAnnotationURI(webAnnotation.getId()))//
-        .link(RESOURCE_TYPE_URI, "type")//
-        .link(ANNOTATION_TYPE_URI, "type")//
-        .tag(webAnnotation.eTag())//
-        .allow(ALLOWED_METHODS)//
-        .entity(profiledWebAnnotation)//
-        .build();
+      .link(RESOURCE_TYPE_URI, "type")//
+      .link(ANNOTATION_TYPE_URI, "type")//
+      .tag(webAnnotation.eTag())//
+      .allow(ALLOWED_METHODS)//
+      .entity(profiledWebAnnotation)//
+      .build();
   }
 
   @GET
   @Path("{uuid}")
   @Produces(JSONLD_MEDIATYPE)
   public Response getWebAnnotation(//
-      @HeaderParam("Accept") String acceptHeader, //
-      @PathParam("uuid") UUIDParam uuidParam //
+                                   @HeaderParam("Accept") String acceptHeader, //
+                                   @PathParam("uuid") UUIDParam uuidParam //
   ) {
     String expectedProfile = extractProfile(acceptHeader);
     AlexandriaAnnotation alexandriaAnnotation = service.readAnnotation(uuidParam.getValue()) //
-        .orElseThrow(annotationNotFoundForId(uuidParam));
+      .orElseThrow(annotationNotFoundForId(uuidParam));
     if (alexandriaAnnotation.getState().equals(AlexandriaState.DELETED)) {
       return Response.status(Status.GONE).build();
     }
@@ -121,11 +102,11 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
     WebAnnotation webAnnotation = asWebAnnotation(alexandriaAnnotation);
     String profiledWebAnnotation = profile(webAnnotation.json(), expectedProfile);
     return Response.ok(profiledWebAnnotation)//
-        .link(RESOURCE_TYPE_URI, "type")//
-        .link(ANNOTATION_TYPE_URI, "type")//
-        .tag(webAnnotation.eTag())//
-        .allow(ALLOWED_METHODS)//
-        .build();
+      .link(RESOURCE_TYPE_URI, "type")//
+      .link(ANNOTATION_TYPE_URI, "type")//
+      .tag(webAnnotation.eTag())//
+      .allow(ALLOWED_METHODS)//
+      .build();
   }
 
   @PUT
@@ -133,9 +114,9 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
   @Consumes(JSONLD_MEDIATYPE)
   @Produces(JSONLD_MEDIATYPE)
   public Response updateWebAnnotation(//
-      @HeaderParam("Accept") String acceptHeader, //
-      @PathParam("uuid") UUIDParam uuidParam, //
-      WebAnnotationPrototype prototype//
+                                      @HeaderParam("Accept") String acceptHeader, //
+                                      @PathParam("uuid") UUIDParam uuidParam, //
+                                      WebAnnotationPrototype prototype//
   ) {
     // TODO: what if the resource changes?
     String expectedProfile = extractProfile(acceptHeader);
@@ -143,22 +124,22 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
     prototype.setModified(modificationInstant.toString());
     UUID annotationUuid = uuidParam.getValue();
     AlexandriaAnnotation alexandriaAnnotation = service.readAnnotation(annotationUuid) //
-        .orElseThrow(annotationNotFoundForId(uuidParam));
+      .orElseThrow(annotationNotFoundForId(uuidParam));
     try {
       String json = new ObjectMapper().writeValueAsString(prototype);
       TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(ThreadContext.getUserName(), modificationInstant, AlexandriaProvenance.DEFAULT_WHY);
       AlexandriaAnnotationBody body = service.findAnnotationBodyWithTypeAndValue(WEBANNOTATION_TYPE, json)//
-          .orElseGet(() -> new AlexandriaAnnotationBody(UUID.randomUUID(), WEBANNOTATION_TYPE, json, provenance));
+        .orElseGet(() -> new AlexandriaAnnotationBody(UUID.randomUUID(), WEBANNOTATION_TYPE, json, provenance));
       AlexandriaAnnotation newAnnotation = new AlexandriaAnnotation(annotationUuid, body, provenance);
       alexandriaAnnotation = service.deprecateAnnotation(annotationUuid, newAnnotation);
       WebAnnotation webAnnotation = asWebAnnotation(alexandriaAnnotation);
       String profiledWebAnnotation = profile(webAnnotation.json(), expectedProfile);
       return Response.ok(profiledWebAnnotation)//
-          .link(RESOURCE_TYPE_URI, "type")//
-          .link(ANNOTATION_TYPE_URI, "type")//
-          .tag(webAnnotation.eTag())//
-          .allow(ALLOWED_METHODS)//
-          .build();
+        .link(RESOURCE_TYPE_URI, "type")//
+        .link(ANNOTATION_TYPE_URI, "type")//
+        .tag(webAnnotation.eTag())//
+        .allow(ALLOWED_METHODS)//
+        .build();
 
     } catch (JsonProcessingException e) {
       e.printStackTrace();
@@ -172,7 +153,7 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
   public Response deleteWebAnnotation(@PathParam("uuid") UUIDParam uuidParam) {
     UUID annotationUUID = uuidParam.getValue();
     AlexandriaAnnotation annotation = service.readAnnotation(annotationUUID)//
-        .orElseThrow(() -> new NotFoundException());
+      .orElseThrow(() -> new NotFoundException());
     service.deleteAnnotation(annotation);
     return Response.noContent().build();
   }
@@ -206,8 +187,8 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
       jsonObject.put("@id", webAnnotationURI(annotation.getId()));
       String json2 = new ObjectMapper().writeValueAsString(jsonObject);
       return new WebAnnotation(annotation.getId())//
-          .setJson(json2)//
-          .setETag(String.valueOf(prototype.getModified().hashCode()));
+        .setJson(json2)//
+        .setETag(String.valueOf(prototype.getModified().hashCode()));
 
     } catch (IOException | JsonLdError e) {
       throw new BadRequestException(e.getMessage());
@@ -231,10 +212,10 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
 
   private List<Object> findWebAnnotationsAbout(String uri) {
     AlexandriaQuery query = new AlexandriaQuery()//
-        .setPageSize(1000)//
-        .setFind("annotation")//
-        .setWhere("type:eq(\"" + WEBANNOTATION_TYPE + "\") resource.ref:eq(\"" + uri + "\")")//
-        .setReturns("id,value");
+      .setPageSize(1000)//
+      .setFind("annotation")//
+      .setWhere("type:eq(\"" + WEBANNOTATION_TYPE + "\") resource.ref:eq(\"" + uri + "\")")//
+      .setReturns("id,value");
 
     SearchResult result = service.execute(query);
     List<Object> webannotations = Lists.newArrayList();
@@ -284,14 +265,14 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
     Map<String, Object> compacted = JsonLdProcessor.compact(jsonObject, context, options);
     Log.info("compacted={}", jsonObject);
     Map<String, Object> target = (Map<String, Object>) compacted.get(OA_HAS_TARGET_IRI);
+    String resourceRef = "";
     if (target.containsKey("@id")) {
-      return (String) target.get("@id");
-    }
-    if (target.containsKey(OA_HAS_SOURCE_IRI)) {
+      resourceRef = (String) target.get("@id");
+    } else if (target.containsKey(OA_HAS_SOURCE_IRI)) {
       Map<String, Object> source = (Map<String, Object>) target.get(OA_HAS_SOURCE_IRI);
-      String resourceRef = (String) source.get("@id");
+      resourceRef = (String) source.get("@id");
     }
-    return "";
+    return resourceRef;
   }
 
   private AlexandriaResource extractAlexandriaResource(String resourceRef) {
@@ -299,10 +280,10 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
     // first see if there's already a resource with this ref, if so, use this.
     UUID resourceUUID;
     AlexandriaQuery query = new AlexandriaQuery()//
-        .setPageSize(2)//
-        .setFind("annotation")//
-        .setWhere("resource.ref:eq(\"" + resourceRef + "\")")//
-        .setReturns(QueryField.resource_id.externalName());
+      .setPageSize(2)//
+      .setFind("annotation")//
+      .setWhere("resource.ref:eq(\"" + resourceRef + "\")")//
+      .setReturns(QueryField.resource_id.externalName());
 
     List<Map<String, Object>> results = service.execute(query).getResults();
     if (results.isEmpty()) {
@@ -320,9 +301,9 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
 
   private URI webAnnotationURI(UUID annotationUUID) {
     return UriBuilder.fromUri(config.getBaseURI())//
-        .path(EndpointPaths.WEB_ANNOTATIONS)//
-        .path(annotationUUID.toString())//
-        .build();
+      .path(EndpointPaths.WEB_ANNOTATIONS)//
+      .path(annotationUUID.toString())//
+      .build();
   }
 
   private WebAnnotation asWebAnnotation(AlexandriaAnnotation alexandriaAnnotation) {
@@ -351,8 +332,8 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
       }
     }
     return new WebAnnotation(alexandriaAnnotation.getId())//
-        .setJson(json)//
-        .setETag(String.valueOf(when.hashCode()));
+      .setJson(json)//
+      .setETag(String.valueOf(when.hashCode()));
   }
 
   private String addIdToValue(AlexandriaAnnotation alexandriaAnnotation, String value) {
