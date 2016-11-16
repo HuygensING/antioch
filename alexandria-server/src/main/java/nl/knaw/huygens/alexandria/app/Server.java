@@ -37,6 +37,7 @@ import com.squarespace.jersey2.guice.BootstrapUtils;
 
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+import nl.knaw.huygens.alexandria.config.PropertiesConfiguration;
 import nl.knaw.huygens.alexandria.jersey.AlexandriaApplication;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.AlexandriaServletModule;
@@ -45,10 +46,15 @@ import nl.knaw.huygens.alexandria.util.Scheduler;
 public class Server {
   private static final long ONE_HOUR = Duration.ofHours(1).toMillis();
   private AlexandriaConfiguration config = new ServerConfiguration();
+  private static final String PROPERTIES_FILE = "about.properties";
 
   public static void main(String[] args) throws IOException {
     System.out.println("-----------------------------");
     System.out.println("Starting Alexandria server...");
+    PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration(PROPERTIES_FILE, true);
+    System.out.println("version  : " + propertiesConfiguration.getProperty("version").get());
+    System.out.println("buildDate: " + propertiesConfiguration.getProperty("buildDate").get());
+    System.out.println("commitId : " + propertiesConfiguration.getProperty("commitId").get());
     System.out.println("-----------------------------");
     new Server().run();
   }

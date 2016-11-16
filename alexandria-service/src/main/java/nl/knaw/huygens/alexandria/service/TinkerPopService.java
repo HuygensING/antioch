@@ -504,6 +504,7 @@ public class TinkerPopService implements AlexandriaService {
       body = newBody;
     }
 
+    // update the uuid of the (to be) deprecated annotation, so the annotationuuid can be used for the new annotation
     oldAnnotationVF.setUuid(oldAnnotationVF.getUuid() + "." + oldAnnotationVF.getRevision());
 
     AlexandriaProvenance tmpProvenance = updatedAnnotation.getProvenance();
