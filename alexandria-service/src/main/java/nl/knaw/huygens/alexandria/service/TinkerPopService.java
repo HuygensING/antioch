@@ -504,6 +504,8 @@ public class TinkerPopService implements AlexandriaService {
       body = newBody;
     }
 
+    oldAnnotationVF.setUuid(oldAnnotationVF.getUuid() + "." + oldAnnotationVF.getRevision());
+
     AlexandriaProvenance tmpProvenance = updatedAnnotation.getProvenance();
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(tmpProvenance.getWho(), tmpProvenance.getWhen(), tmpProvenance.getWhy());
     AlexandriaAnnotation newAnnotation = new AlexandriaAnnotation(updatedAnnotation.getId(), body, provenance);
@@ -522,7 +524,6 @@ public class TinkerPopService implements AlexandriaService {
 
     oldAnnotationVF.setAnnotatedAnnotation(null);
     oldAnnotationVF.setAnnotatedResource(null);
-    oldAnnotationVF.setUuid(oldAnnotationVF.getUuid() + "." + oldAnnotationVF.getRevision());
     updateState(oldAnnotationVF, AlexandriaState.DEPRECATED);
     return newAnnotationVF;
   }
