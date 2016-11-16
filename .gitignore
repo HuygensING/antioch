@@ -17,3 +17,4 @@ dump.xml
 /alexandria-server.jar
 /alexandria-data*
 /alexandria-server/*.flightcontrol
+*.jfr
