@@ -1,6 +1,16 @@
 package nl.knaw.huygens.alexandria.client;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.net.URI;
+import java.util.Map;
+import java.util.UUID;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import com.google.common.collect.ImmutableMap;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
@@ -9,14 +19,6 @@ import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.AbsolutePos
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.net.URI;
-import java.util.Map;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class TextRangeAnnotationTest extends AlexandriaClientTest {
   @Before
@@ -320,6 +322,95 @@ public class TextRangeAnnotationTest extends AlexandriaClientTest {
     String xml2 = textResult.get();
     String expected = singleQuotesToDouble("<p xml:id='p-1'><persName resp='#ckcc'><persName_id id='W. Wortel (1934-)' resp='#ckcc'>Willie Wortel</persName_id></persName> vindt uit.</p>");
     assertThat(xml2).isEqualTo(expected);
+  }
+
+  @Test
+  public void testNLA307() {
+    String xml = //
+        singleQuotesToDouble("<text>\n"//
+            + "<p xml:id='p-1'>prologue</p>\n"//
+            + "<p xml:id='p-2'>hello</p>\n"//
+            + "<p xml:id='p-3'>goodbye</p>\n"//
+            + "<p xml:id='p-4'>epilogue</p>\n"//
+            + "</text>");
+
+    UUID resourceUUID = createResourceWithText(xml);
+    Log.info("xml 0: {}", xml);
+    Annotator annotator = new Annotator().setCode("ckcc").setDescription("something");
+    client.setAnnotator(resourceUUID, "ckcc", annotator);
+
+    // set first annotation (bad value, should be "opener"
+    UUID annotationUUID1 = UUID.randomUUID();
+    Position position1 = new Position()//
+        .setXmlId("p-2");
+    Map<String, String> badProperties = ImmutableMap.of("value", "closer");
+    TextRangeAnnotation textRangeAnnotation = new TextRangeAnnotation()//
+        .setId(annotationUUID1)//
+        .setName("p_type")//
+        .setAnnotator("ckcc")//
+        .setPosition(position1)//
+        .setAttributes(badProperties);
+
+    String xmlOut = applyAnnotation(resourceUUID, textRangeAnnotation);
+    String expectation = //
+        singleQuotesToDouble("<text>\n"//
+            + "<p xml:id='p-1'>prologue</p>\n"//
+            + "<p xml:id='p-2'><p_type value='closer' resp='#ckcc'>hello</p_type></p>\n"//
+            + "<p xml:id='p-3'>goodbye</p>\n"//
+            + "<p xml:id='p-4'>epilogue</p>\n"//
+            + "</text>");
+    assertThat(xmlOut).isEqualTo(expectation);
+
+    // correct first annotation
+    Map<String, String> goodProperties = ImmutableMap.of("value", "opener");
+    TextRangeAnnotation textRangeAnnotation2 = new TextRangeAnnotation()//
+        .setId(annotationUUID1)//
+        .setName("p_type")//
+        .setAnnotator("ckcc")//
+        .setPosition(position1)//
+        .setAttributes(goodProperties);
+
+    xmlOut = applyAnnotation(resourceUUID, textRangeAnnotation2);
+    expectation = //
+        singleQuotesToDouble("<text>\n"//
+            + "<p xml:id='p-1'>prologue</p>\n"//
+            + "<p xml:id='p-2'><p_type value='opener' resp='#ckcc'>hello</p_type></p>\n"//
+            + "<p xml:id='p-3'>goodbye</p>\n"//
+            + "<p xml:id='p-4'>epilogue</p>\n"//
+            + "</text>");
+    assertThat(xmlOut).isEqualTo(expectation);
+
+    // set second annotation
+    UUID annotationUUID2 = UUID.randomUUID();
+    Position position2 = new Position()//
+        .setXmlId("p-3");
+    Map<String, String> properties = ImmutableMap.of("value", "closer");
+    TextRangeAnnotation textRangeAnnotation3 = new TextRangeAnnotation()//
+        .setId(annotationUUID2)//
+        .setName("p_type")//
+        .setAnnotator("ckcc")//
+        .setPosition(position2)//
+        .setAttributes(properties);
+
+    xmlOut = applyAnnotation(resourceUUID, textRangeAnnotation3);
+    expectation = //
+        singleQuotesToDouble("<text>\n"//
+            + "<p xml:id='p-1'>prologue</p>\n"//
+            + "<p xml:id='p-2'><p_type value='opener' resp='#ckcc'>hello</p_type></p>\n"//
+            + "<p xml:id='p-3'><p_type value='closer' resp='#ckcc'>goodbye</p_type></p>\n"//
+            + "<p xml:id='p-4'>epilogue</p>\n"//
+            + "</text>");
+    assertThat(xmlOut).isEqualTo(expectation);
+  }
+
+  private String applyAnnotation(UUID resourceUUID, TextRangeAnnotation textRangeAnnotation) {
+    RestResult<TextRangeAnnotationInfo> putResult2 = client.setResourceTextRangeAnnotation(resourceUUID, textRangeAnnotation);
+    putResult2.getFailureCause().ifPresent(Log::info);
+    assertThat(putResult2.hasFailed()).isFalse();
+
+    RestResult<String> textResult = client.getTextAsString(resourceUUID);
+    assertRequestSucceeded(textResult);
+    return textResult.get();
   }
 
   private UUID createResourceWithText(String xml) {

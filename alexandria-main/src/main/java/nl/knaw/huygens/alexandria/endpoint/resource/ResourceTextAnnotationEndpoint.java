@@ -74,8 +74,6 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
       TextRangeAnnotation oldTextRangeAnnotation = existingTextRangeAnnotation.get();
       textRangeAnnotationValidator.validate(newTextRangeAnnotation, oldTextRangeAnnotation, xml);
       service.deprecateTextRangeAnnotation(annotationUUID, newTextRangeAnnotation);
-      // newTextRangeAnnotation.setRevision(oldTextRangeAnnotation.getRevision() + 1);
-      // service.setTextRangeAnnotation(resourceUUID, newTextRangeAnnotation);
       return noContent();
     }
 

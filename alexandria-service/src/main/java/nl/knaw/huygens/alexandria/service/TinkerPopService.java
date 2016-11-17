@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,6 +28,8 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tinkerpop.gremlin.structure.Direction;
+import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.jooq.lambda.Unchecked;
 
@@ -359,40 +362,68 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public void deprecateTextRangeAnnotation(UUID annotationUUID, TextRangeAnnotation newTextRangeAnnotation) {
     storage.runInTransaction(() -> {
-      Log.info("1");
       TextRangeAnnotationVF oldVF = storage.readVF(TextRangeAnnotationVF.class, annotationUUID)//
           .orElseThrow(() -> new NotFoundException());
-      Log.info("2");
       Integer revision = oldVF.getRevision();
-      Log.info("3");
       oldVF.setUuid(annotationUUID.toString() + "." + revision);
-      Log.info("4");
       ResourceVF resourceVF = oldVF.getResource();
-      Log.info("5");
       oldVF.setResource(null);
-      Log.info("6");
-      FramedGraphTraversal<TextRangeAnnotationVF, Vertex> traversal = oldVF.out(nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF.EdgeLabels.HAS_TEXTANNOTATION);
-      Log.info("7");
-      if (traversal.hasNext()) {
-        traversal.next().remove();
+
+      removeTextAnnotationFromChain(oldVF);
+
+      TextRangeAnnotationVF newVF = storage.createVF(TextRangeAnnotationVF.class);
+
+      newTextRangeAnnotation.setRevision(revision + 1);
+      updateTextRangeAnnotation(newVF, newTextRangeAnnotation);
+      UUID resourceUUID = UUID.fromString(resourceVF.getUuid());
+      textGraphService.updateTextAnnotationLink(newVF, newTextRangeAnnotation, resourceUUID);
+      newVF.setResource(resourceVF);
+      newVF.setDeprecatedAnnotation(oldVF);
+    });
+  }
+
+  private void removeTextAnnotationFromChain(TextRangeAnnotationVF oldVF) {
+    FramedGraphTraversal<TextRangeAnnotationVF, Vertex> traversal = oldVF.out(TextRangeAnnotationVF.EdgeLabels.HAS_TEXTANNOTATION);
+
+    // remove the old textAnnotationVertex without breaking the chain.
+    if (traversal.hasNext()) {
+      Vertex textAnnotationVertex = traversal.next();
+      Vertex leftVertex = null; // in the annotation chain, the vertex to the left of this textAnnotationVertex; there is always a left vertex
+      String leftEdgeLabel = null;
+      Vertex rightVertex = null; // in the annotation chain, the vertex to the right of this textAnnotationVertex; there might not be a right vertex
+      // it might be the first in the chain, so it has an incoming FIRST_ANNOTATION edge
+      Iterator<Edge> incomingFirstAnnotationEdgeIterator = textAnnotationVertex.edges(Direction.IN, nl.knaw.huygens.alexandria.storage.EdgeLabels.FIRST_ANNOTATION);
+      if (incomingFirstAnnotationEdgeIterator.hasNext()) {
+        // in that case, remove the edge, and reconnect the chain.
+        Edge incomingEdge = incomingFirstAnnotationEdgeIterator.next();
+        leftVertex = incomingEdge.outVertex();
+        leftEdgeLabel = nl.knaw.huygens.alexandria.storage.EdgeLabels.FIRST_ANNOTATION;
+        incomingEdge.remove();
+
+      } else {
+        // otherwise, it's a NEXT edge
+        Iterator<Edge> incomingNextEdgeIterator = textAnnotationVertex.edges(Direction.IN, nl.knaw.huygens.alexandria.storage.EdgeLabels.NEXT);
+        if (incomingNextEdgeIterator.hasNext()) {
+          Edge incomingNextEdge = incomingNextEdgeIterator.next();
+          leftVertex = incomingNextEdge.outVertex();
+          incomingNextEdge.remove();
+        }
+        leftEdgeLabel = nl.knaw.huygens.alexandria.storage.EdgeLabels.NEXT;
       }
 
-      Log.info("8");
-      TextRangeAnnotationVF newVF = storage.createVF(TextRangeAnnotationVF.class);
-      Log.info("9");
-      newTextRangeAnnotation.setRevision(revision + 1);
-      Log.info("10");
-      updateTextRangeAnnotation(newVF, newTextRangeAnnotation);
-      Log.info("11");
-      UUID resourceUUID = UUID.fromString(resourceVF.getUuid());
-      Log.info("12");
-      textGraphService.updateTextAnnotationLink(newVF, newTextRangeAnnotation, resourceUUID);
-      Log.info("13");
-      newVF.setResource(resourceVF);
-      Log.info("14");
-      newVF.setDeprecatedAnnotation(oldVF);
-      Log.info("15");
-    });
+      Iterator<Edge> outgoingNextEdgeIterator = textAnnotationVertex.edges(Direction.OUT, nl.knaw.huygens.alexandria.storage.EdgeLabels.NEXT);
+      if (outgoingNextEdgeIterator.hasNext()) {
+        Edge outgoingNextEdge = outgoingNextEdgeIterator.next();
+        rightVertex = outgoingNextEdge.inVertex();
+        outgoingNextEdge.remove();
+      }
+
+      if (rightVertex != null) {
+        leftVertex.addEdge(leftEdgeLabel, rightVertex);
+      }
+
+      textAnnotationVertex.remove();
+    }
   }
 
   private TextRangeAnnotationList getTextRangeAnnotationList(UUID resourceUUID) {

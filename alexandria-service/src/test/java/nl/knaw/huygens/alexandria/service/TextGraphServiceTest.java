@@ -193,6 +193,7 @@ public class TextGraphServiceTest extends AlexandriaTest {
     assertExpectation(xml, expected, annotationUUID, textRangeAnnotation);
   }
 
+
   private void assertExpectation(String xml, String expected, UUID resourceUUID, TextRangeAnnotation textRangeAnnotation) {
     Log.info("xml={}", xml);
     setAbsolutePosition(textRangeAnnotation);
@@ -257,14 +258,17 @@ public class TextGraphServiceTest extends AlexandriaTest {
   }
 
   private void setAbsolutePosition(TextRangeAnnotation textRangeAnnotation) {
+    setAbsolutePosition(textRangeAnnotation, 1);
+  }
+
+  private void setAbsolutePosition(TextRangeAnnotation textRangeAnnotation, int length) {
     Position position = textRangeAnnotation.getPosition();
     AbsolutePosition absolutePosition = new AbsolutePosition()//
         .setXmlId(position.getXmlId().get())//
-        .setOffset(position.getOffset().get())//
-        .setLength(position.getLength().get())//
+        .setOffset(position.getOffset().orElse(1))//
+        .setLength(position.getLength().orElse(length))//
     ;
     textRangeAnnotation.setAbsolutePosition(absolutePosition);
-
   }
 
   private String getXML(UUID resourceUUID) {
