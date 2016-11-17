@@ -1,5 +1,18 @@
 package nl.knaw.huygens.alexandria.textgraph;
 
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+
+import javax.ws.rs.BadRequestException;
+import javax.xml.xpath.XPathExpressionException;
+
+import org.apache.commons.lang3.StringUtils;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
@@ -9,13 +22,6 @@ import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.util.XMLUtil;
 import nl.knaw.huygens.tei.QueryableDocument;
-import org.apache.commons.lang3.StringUtils;
-
-import javax.ws.rs.BadRequestException;
-import javax.xml.xpath.XPathExpressionException;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class TextRangeAnnotationValidatorFactory {
 
@@ -125,7 +131,7 @@ public class TextRangeAnnotationValidatorFactory {
     String existingAnnotator = existingTextRangeAnnotation.getAnnotator();
     String newAnnotator = newTextRangeAnnotation.getAnnotator();
     if (!newAnnotator.equals(existingAnnotator)) {
-      throw new BadRequestException("You're not allowed to change the annotator");
+      throw new BadRequestException("You're not allowed to change the annotator '" + existingAnnotator + "'");
     }
   }
 
@@ -133,7 +139,7 @@ public class TextRangeAnnotationValidatorFactory {
     String existingName = existingTextRangeAnnotation.getName();
     String newName = newTextRangeAnnotation.getName();
     if (!newName.equals(existingName)) {
-      throw new BadRequestException("You're not allowed to change the annotation name");
+      throw new BadRequestException("You're not allowed to change the annotation name '" + existingName + "'");
     }
   }
 
