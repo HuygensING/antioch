@@ -695,7 +695,20 @@ public class TinkerPopService implements AlexandriaService {
             .filter(e -> e.getKey().equals(view))//
             .map(this::setName)//
             .collect(toList());
-        return textViews.isEmpty() ? null : textViews.get(0);
+
+        if (textViews.isEmpty()) {
+          ResourceVF parentResourceVF = resourceVF.getParentResource();
+          if (parentResourceVF != null) {
+            UUID parentUUID = UUID.fromString(parentResourceVF.getUuid());
+            return getTextView(parentUUID, view).orElse(null);
+          } else {
+            return null;
+          }
+
+        }else{
+          return textViews.get(0);
+        }
+
       } catch (Exception e) {
         e.printStackTrace();
         throw new RuntimeException(e);

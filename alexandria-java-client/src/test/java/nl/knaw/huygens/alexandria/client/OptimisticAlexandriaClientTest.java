@@ -27,6 +27,9 @@ import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.ElementMode;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementViewDefinition;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
 import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 
 public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer {
@@ -195,6 +198,31 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
 
     annotatedXML = client.getTextAsString(resourceUUID);
     assertThat(annotatedXML).isEqualTo(expectation2);
+  }
+
+  @Test
+  public void testBugNLA324() {
+    String rootXml = singleQuotesToDouble("<text><p xml:id='p-1'>I AM ROOT</p><ignore>this</ignore></text>");
+    UUID rootResourceUUID = createResourceWithText(rootXml);
+
+    ElementViewDefinition evd = new ElementViewDefinition()//
+        .setElementMode(ElementMode.hide);
+    TextViewDefinition textView = new TextViewDefinition()//
+        .setDescription("ignore")//
+        .setElementViewDefinition("ignore", evd);
+    client.setResourceTextView(rootResourceUUID, "view1", textView);
+
+    String rootView = client.getTextAsString(rootResourceUUID, "view1");
+    Log.info("rootView = {}", rootView);
+
+    UUID letterUUID = client.addSubResource(rootResourceUUID, "letter01");
+    String letterXml = singleQuotesToDouble("<text><p xml:id='p-1'>show this.</p><ignore>ignore this</ignore></text>");
+    client.setResourceTextSynchronously(letterUUID, letterXml);
+
+    String letterView = client.getTextAsString(letterUUID, "view1");
+    Log.info("letterView = {}", rootView);
+    String expected = singleQuotesToDouble("<text><p xml:id='p-1'>show this.</p></text>");
+    assertThat(letterView).isEqualTo(expected);
   }
 
   /// end tests
