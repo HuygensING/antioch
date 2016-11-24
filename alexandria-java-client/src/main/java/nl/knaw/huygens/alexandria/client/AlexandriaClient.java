@@ -44,6 +44,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.glassfish.jersey.apache.connector.ApacheClientProperties;
+import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 
@@ -98,14 +101,14 @@ public class AlexandriaClient implements AutoCloseable {
     final JacksonJaxbJsonProvider jacksonProvider = new JacksonJaxbJsonProvider();
     jacksonProvider.setMapper(objectMapper);
 
-    // PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
-    // cm.setMaxTotal(50);
-    // cm.setDefaultMaxPerRoute(50);
+    PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+    cm.setMaxTotal(50);
+    cm.setDefaultMaxPerRoute(50);
 
-    // ApacheConnectorProvider connectorProvider = new ApacheConnectorProvider();
+    ApacheConnectorProvider connectorProvider = new ApacheConnectorProvider();
     ClientConfig clientConfig = new ClientConfig(jacksonProvider)//
-        // .connectorProvider(connectorProvider)//
-        // .property(ApacheClientProperties.CONNECTION_MANAGER, cm)//
+        .connectorProvider(connectorProvider)//
+        .property(ApacheClientProperties.CONNECTION_MANAGER, cm)//
         .property(ClientProperties.CONNECT_TIMEOUT, 60000)//
         .property(ClientProperties.READ_TIMEOUT, 60000);
 
@@ -687,7 +690,11 @@ public class AlexandriaClient implements AutoCloseable {
   }
 
   private Function<Response, RestResult<Void>> voidRestResult() {
-    return (response) -> new RestResult<>();
+    return (response) -> {
+      response.bufferEntity(); // to notify connectors, such as the ApacheConnector, that the entity has been "consumed" and that it should release the current connection back into the Apache
+                               // ConnectionManager pool (if being used). https://java.net/jira/browse/JERSEY-3149
+      return new RestResult<>();
+    };
   }
 
 }
