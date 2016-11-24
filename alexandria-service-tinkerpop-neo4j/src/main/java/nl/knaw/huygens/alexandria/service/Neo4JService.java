@@ -12,6 +12,7 @@ import jline.internal.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.storage.Storage;
+import nl.knaw.huygens.alexandria.storage.VertexLabels;
 
 /*
  * #%L
@@ -59,12 +60,14 @@ public class Neo4JService extends TinkerPopService {
   }
 
   private static void setIndexes() {
-    System.out.print("updating 5 indexes: .");
+    System.out.print("updating 6 indexes: .");
     setUniqueIndex("Resource", Storage.IDENTIFIER_PROPERTY);
     System.out.print(".");
     setUniqueIndex("Annotation", Storage.IDENTIFIER_PROPERTY);
     System.out.print(".");
     setUniqueIndex("AnnotationBody", Storage.IDENTIFIER_PROPERTY);
+    System.out.print(".");
+    setUniqueIndex(VertexLabels.TEXTRANGEANNOTATION, Storage.IDENTIFIER_PROPERTY);
     System.out.print(".");
     runCypher("create index on :Annotation(who)");
     System.out.print(".");
