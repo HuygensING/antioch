@@ -44,9 +44,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.glassfish.jersey.apache.connector.ApacheClientProperties;
-import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 
@@ -87,7 +84,6 @@ public class AlexandriaClient implements AutoCloseable {
   private final Client client;
   private final URI alexandriaURI;
   private boolean autoConfirm = true;
-  private ApacheConnectorProvider connectorProvider;
 
   public AlexandriaClient(final URI alexandriaURI) {
     this(alexandriaURI, null);
@@ -102,14 +98,14 @@ public class AlexandriaClient implements AutoCloseable {
     final JacksonJaxbJsonProvider jacksonProvider = new JacksonJaxbJsonProvider();
     jacksonProvider.setMapper(objectMapper);
 
-    PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
-    cm.setMaxTotal(50);
-    cm.setDefaultMaxPerRoute(50);
+    // PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+    // cm.setMaxTotal(50);
+    // cm.setDefaultMaxPerRoute(50);
 
-    connectorProvider = new ApacheConnectorProvider();
+    // ApacheConnectorProvider connectorProvider = new ApacheConnectorProvider();
     ClientConfig clientConfig = new ClientConfig(jacksonProvider)//
-        .connectorProvider(connectorProvider)//
-        .property(ApacheClientProperties.CONNECTION_MANAGER, cm)//
+        // .connectorProvider(connectorProvider)//
+        // .property(ApacheClientProperties.CONNECTION_MANAGER, cm)//
         .property(ClientProperties.CONNECT_TIMEOUT, 60000)//
         .property(ClientProperties.READ_TIMEOUT, 60000);
 
