@@ -68,11 +68,11 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
         Optional<TextRangeAnnotation> existingTextRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, annotationUUID);
         if (existingTextRangeAnnotation.isPresent()) {
           TextRangeAnnotation oldTextRangeAnnotation = existingTextRangeAnnotation.get();
-          textRangeAnnotationValidator.validate(newTextRangeAnnotation, oldTextRangeAnnotation, xml);
+          textRangeAnnotationValidator.validate(newTextRangeAnnotation, oldTextRangeAnnotation);
           service.deprecateTextRangeAnnotation(annotationUUID, newTextRangeAnnotation);
 
         } else {
-          textRangeAnnotationValidator.validate(newTextRangeAnnotation, xml);
+          textRangeAnnotationValidator.validate(newTextRangeAnnotation);
           service.setTextRangeAnnotation(resourceUUID, newTextRangeAnnotation);
         }
       });
@@ -99,12 +99,12 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
       Optional<TextRangeAnnotation> existingTextRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, annotationUUID);
       if (existingTextRangeAnnotation.isPresent()) {
         TextRangeAnnotation oldTextRangeAnnotation = existingTextRangeAnnotation.get();
-        textRangeAnnotationValidator.validate(newTextRangeAnnotation, oldTextRangeAnnotation, xml);
+        textRangeAnnotationValidator.validate(newTextRangeAnnotation, oldTextRangeAnnotation);
         service.deprecateTextRangeAnnotation(annotationUUID, newTextRangeAnnotation);
         return false;
       }
 
-      textRangeAnnotationValidator.validate(newTextRangeAnnotation, xml);
+      textRangeAnnotationValidator.validate(newTextRangeAnnotation);
       service.setTextRangeAnnotation(resourceUUID, newTextRangeAnnotation);
       return true;
     });
