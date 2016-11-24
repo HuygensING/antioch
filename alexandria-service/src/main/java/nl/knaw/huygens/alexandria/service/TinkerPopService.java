@@ -705,7 +705,7 @@ public class TinkerPopService implements AlexandriaService {
             return null;
           }
 
-        }else{
+        } else {
           return textViews.get(0);
         }
 
@@ -781,6 +781,11 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public void runInTransaction(Runnable runner) {
     storage.runInTransaction(runner);
+  }
+
+  @Override
+  public <A> A runInTransaction(Supplier<A> supplier) {
+    return storage.runInTransaction(supplier);
   }
 
   @Override

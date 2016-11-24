@@ -176,6 +176,10 @@ public class OptimisticAlexandriaClient {
     return unwrap(delegate.getTextAsDot(uuid));
   }
 
+  public void addResourceTextRangeAnnotations(UUID resourceUUID, TextRangeAnnotationList textAnnotations) {
+    unwrap(delegate.addResourceTextRangeAnnotations(resourceUUID, textAnnotations));
+  }
+
   public TextRangeAnnotationInfo setResourceTextRangeAnnotation(UUID resourceUUID, TextRangeAnnotation textAnnotation) {
     return unwrap(delegate.setResourceTextRangeAnnotation(resourceUUID, textAnnotation));
   }

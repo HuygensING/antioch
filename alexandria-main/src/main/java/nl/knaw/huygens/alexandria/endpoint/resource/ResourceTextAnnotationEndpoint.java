@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -54,6 +55,31 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
     return ok(textRangeAnnotations);
   }
 
+  @POST
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response addAnnotations(@NotNull TextRangeAnnotationList newTextRangeAnnotationList) {
+    service.runInTransaction(() -> {
+      newTextRangeAnnotationList.forEach(newTextRangeAnnotation -> {
+        String xml = getXML();
+        String annotated = TextRangeAnnotationValidatorFactory.getAnnotatedText(newTextRangeAnnotation.getPosition(), xml);
+        textRangeAnnotationValidator.calculateAbsolutePosition(newTextRangeAnnotation, annotated);
+
+        UUID annotationUUID = newTextRangeAnnotation.getId();
+        Optional<TextRangeAnnotation> existingTextRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, annotationUUID);
+        if (existingTextRangeAnnotation.isPresent()) {
+          TextRangeAnnotation oldTextRangeAnnotation = existingTextRangeAnnotation.get();
+          textRangeAnnotationValidator.validate(newTextRangeAnnotation, oldTextRangeAnnotation, xml);
+          service.deprecateTextRangeAnnotation(annotationUUID, newTextRangeAnnotation);
+
+        } else {
+          textRangeAnnotationValidator.validate(newTextRangeAnnotation, xml);
+          service.setTextRangeAnnotation(resourceUUID, newTextRangeAnnotation);
+        }
+      });
+    });
+    return ok();
+  }
+
   @PUT
   @Path("{annotationUUID}")
   @Consumes(MediaType.APPLICATION_JSON)
@@ -67,22 +93,29 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
 
     String xml = getXML();
     String annotated = TextRangeAnnotationValidatorFactory.getAnnotatedText(newTextRangeAnnotation.getPosition(), xml);
-    textRangeAnnotationValidator.calculateAbsolutePosition(newTextRangeAnnotation, annotated);
+    boolean annotationIsNew = service.runInTransaction(() -> {
+      textRangeAnnotationValidator.calculateAbsolutePosition(newTextRangeAnnotation, annotated);
 
-    Optional<TextRangeAnnotation> existingTextRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, annotationUUID);
-    if (existingTextRangeAnnotation.isPresent()) {
-      TextRangeAnnotation oldTextRangeAnnotation = existingTextRangeAnnotation.get();
-      textRangeAnnotationValidator.validate(newTextRangeAnnotation, oldTextRangeAnnotation, xml);
-      service.deprecateTextRangeAnnotation(annotationUUID, newTextRangeAnnotation);
-      return noContent();
+      Optional<TextRangeAnnotation> existingTextRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, annotationUUID);
+      if (existingTextRangeAnnotation.isPresent()) {
+        TextRangeAnnotation oldTextRangeAnnotation = existingTextRangeAnnotation.get();
+        textRangeAnnotationValidator.validate(newTextRangeAnnotation, oldTextRangeAnnotation, xml);
+        service.deprecateTextRangeAnnotation(annotationUUID, newTextRangeAnnotation);
+        return false;
+      }
+
+      textRangeAnnotationValidator.validate(newTextRangeAnnotation, xml);
+      service.setTextRangeAnnotation(resourceUUID, newTextRangeAnnotation);
+      return true;
+    });
+
+    if (annotationIsNew) {
+      URI location = locationBuilder.locationOf(resource, EndpointPaths.TEXT, EndpointPaths.ANNOTATIONS, annotationUUID.toString());
+      TextRangeAnnotationInfo info = new TextRangeAnnotationInfo().setAnnotates(annotated);
+      return Response.created(location).entity(info).build();
     }
 
-    textRangeAnnotationValidator.validate(newTextRangeAnnotation, xml);
-    service.setTextRangeAnnotation(resourceUUID, newTextRangeAnnotation);
-
-    URI location = locationBuilder.locationOf(resource, EndpointPaths.TEXT, EndpointPaths.ANNOTATIONS, annotationUUID.toString());
-    TextRangeAnnotationInfo info = new TextRangeAnnotationInfo().setAnnotates(annotated);
-    return Response.created(location).entity(info).build();
+    return noContent();
   }
 
   @GET

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
@@ -157,6 +158,8 @@ public interface AlexandriaService {
   Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceId);
 
   void runInTransaction(Runnable runner);
+
+  <A> A runInTransaction(Supplier<A> supplier);
 
   Stream<TextAnnotation> getTextAnnotationStream(UUID resourceId);
 

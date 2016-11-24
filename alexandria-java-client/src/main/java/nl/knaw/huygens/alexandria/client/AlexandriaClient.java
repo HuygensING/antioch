@@ -345,6 +345,17 @@ public class AlexandriaClient implements AutoCloseable {
     return stringResult(path);
   }
 
+  public RestResult<Void> addResourceTextRangeAnnotations(UUID resourceUUID, TextRangeAnnotationList textAnnotations) {
+    final Entity<TextRangeAnnotationList> entity = Entity.json(textAnnotations);
+    WebTarget path = resourceTextTarget(resourceUUID)//
+        .path(EndpointPaths.ANNOTATIONS);
+    final Supplier<Response> responseSupplier = authorizedPost(path, entity);
+    final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
+    return requester//
+        .onStatus(Status.OK, voidRestResult())//
+        .getResult();
+  }
+
   public RestResult<TextRangeAnnotationInfo> setResourceTextRangeAnnotation(UUID resourceUUID, TextRangeAnnotation textAnnotation) {
     final Entity<TextRangeAnnotation> entity = Entity.json(textAnnotation);
     WebTarget path = resourceTextTarget(resourceUUID)//
