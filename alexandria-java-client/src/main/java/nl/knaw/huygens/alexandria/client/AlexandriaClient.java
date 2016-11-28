@@ -87,7 +87,6 @@ public class AlexandriaClient implements AutoCloseable {
   private final Client client;
   private final URI alexandriaURI;
   private boolean autoConfirm = true;
-  private ApacheConnectorProvider connectorProvider;
 
   public AlexandriaClient(final URI alexandriaURI) {
     this(alexandriaURI, null);
@@ -106,7 +105,7 @@ public class AlexandriaClient implements AutoCloseable {
     cm.setMaxTotal(50);
     cm.setDefaultMaxPerRoute(50);
 
-    connectorProvider = new ApacheConnectorProvider();
+    ApacheConnectorProvider connectorProvider = new ApacheConnectorProvider();
     ClientConfig clientConfig = new ClientConfig(jacksonProvider)//
         .connectorProvider(connectorProvider)//
         .property(ApacheClientProperties.CONNECTION_MANAGER, cm)//
@@ -680,7 +679,11 @@ public class AlexandriaClient implements AutoCloseable {
   }
 
   private Function<Response, RestResult<Void>> voidRestResult() {
-    return (response) -> new RestResult<>();
+    return (response) -> {
+      response.bufferEntity(); // to notify connectors, such as the ApacheConnector, that the entity has been "consumed" and that it should release the current connection back into the Apache
+                               // ConnectionManager pool (if being used). https://java.net/jira/browse/JERSEY-3149
+      return new RestResult<>();
+    };
   }
 
 }
