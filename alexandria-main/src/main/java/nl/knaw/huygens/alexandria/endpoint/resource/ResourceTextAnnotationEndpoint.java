@@ -8,7 +8,6 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -53,31 +52,6 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
   public Response getAnnotations() {
     TextRangeAnnotationList textRangeAnnotations = service.readTextRangeAnnotations(resourceUUID);
     return ok(textRangeAnnotations);
-  }
-
-  @POST
-  @Consumes(MediaType.APPLICATION_JSON)
-  public Response addAnnotations(@NotNull TextRangeAnnotationList newTextRangeAnnotationList) {
-    service.runInTransaction(() -> {
-      newTextRangeAnnotationList.forEach(newTextRangeAnnotation -> {
-        String xml = getXML();
-        String annotated = TextRangeAnnotationValidatorFactory.getAnnotatedText(newTextRangeAnnotation.getPosition(), xml);
-        textRangeAnnotationValidator.calculateAbsolutePosition(newTextRangeAnnotation, annotated);
-
-        UUID annotationUUID = newTextRangeAnnotation.getId();
-        Optional<TextRangeAnnotation> existingTextRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, annotationUUID);
-        if (existingTextRangeAnnotation.isPresent()) {
-          TextRangeAnnotation oldTextRangeAnnotation = existingTextRangeAnnotation.get();
-          textRangeAnnotationValidator.validate(newTextRangeAnnotation, oldTextRangeAnnotation);
-          service.deprecateTextRangeAnnotation(annotationUUID, newTextRangeAnnotation);
-
-        } else {
-          textRangeAnnotationValidator.validate(newTextRangeAnnotation);
-          service.setTextRangeAnnotation(resourceUUID, newTextRangeAnnotation);
-        }
-      });
-    });
-    return ok();
   }
 
   @PUT

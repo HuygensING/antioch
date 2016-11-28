@@ -31,6 +31,7 @@ public final class EndpointPaths {
   public static final String TEXTVIEWS = "views";
 
   public static final String ANNOTATIONS = "annotations";
+  public static final String ANNOTATIONBATCH = "annotationbatch";
   public static final String REV = "rev";
   public static final String ANNOTATIONBODIES = "annotationbodies";
 
