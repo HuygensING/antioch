@@ -387,6 +387,7 @@ public class AlexandriaClient implements AutoCloseable {
     final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
         .onStatus(Status.CREATED, voidRestResult())//
+        .onStatus(Status.NO_CONTENT, voidRestResult())//
         .getResult();
   }
 

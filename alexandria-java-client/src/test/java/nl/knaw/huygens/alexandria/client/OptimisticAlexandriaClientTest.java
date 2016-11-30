@@ -220,9 +220,17 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     client.setResourceTextSynchronously(letterUUID, letterXml);
 
     String letterView = client.getTextAsString(letterUUID, "view1");
-    Log.info("letterView = {}", rootView);
+    Log.info("letterView = {}", letterView);
     String expected = singleQuotesToDouble("<text><p xml:id='p-1'>show this.</p></text>");
     assertThat(letterView).isEqualTo(expected);
+
+    textView.setElementViewDefinition("p", evd); // hide <p> as well
+    client.setResourceTextView(rootResourceUUID, "view1", textView);
+
+    String letterView2 = client.getTextAsString(letterUUID, "view1");
+    Log.info("letterView = {}", letterView2);
+    String expected2 = singleQuotesToDouble("<text></text>");
+    assertThat(letterView2).isEqualTo(expected2);
   }
 
   /// end tests
