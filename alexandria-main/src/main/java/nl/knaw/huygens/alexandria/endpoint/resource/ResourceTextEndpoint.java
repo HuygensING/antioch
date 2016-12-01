@@ -1,38 +1,10 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
-import static java.util.stream.Collectors.toList;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-
-import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
-
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.ProcessStatusMap;
 import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
 import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewEntity;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
@@ -49,6 +21,23 @@ import nl.knaw.huygens.alexandria.textgraph.DotFactory;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphImportTask;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 import nl.knaw.huygens.alexandria.textgraph.TextRangeAnnotationValidatorFactory;
+import org.apache.commons.io.Charsets;
+import org.apache.commons.io.IOUtils;
+
+import javax.inject.Inject;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+
+import static java.util.stream.Collectors.toList;
 
 public class ResourceTextEndpoint extends JSONEndpoint {
   private final AlexandriaService service;
@@ -166,27 +155,12 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @Path(EndpointPaths.ANNOTATIONBATCH)
   @Consumes(MediaType.APPLICATION_JSON)
   public Response postAnnotationList(@NotNull TextRangeAnnotationList newTextRangeAnnotationList) {
-    service.runInTransaction(() -> {
-      newTextRangeAnnotationList.forEach(newTextRangeAnnotation -> {
-        String xml = getXML();
-        String annotated = TextRangeAnnotationValidatorFactory.getAnnotatedText(newTextRangeAnnotation.getPosition(), xml);
-        textRangeAnnotationValidator.calculateAbsolutePosition(newTextRangeAnnotation, annotated);
-
-        UUID annotationUUID = newTextRangeAnnotation.getId();
-        Optional<TextRangeAnnotation> existingTextRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, annotationUUID);
-        if (existingTextRangeAnnotation.isPresent()) {
-          TextRangeAnnotation oldTextRangeAnnotation = existingTextRangeAnnotation.get();
-          textRangeAnnotationValidator.validate(newTextRangeAnnotation, oldTextRangeAnnotation);
-          service.deprecateTextRangeAnnotation(annotationUUID, newTextRangeAnnotation);
-
-        } else {
-          textRangeAnnotationValidator.validate(newTextRangeAnnotation);
-          service.setTextRangeAnnotation(resourceUUID, newTextRangeAnnotation);
-        }
-      });
-    });
-    return ok();
+    startAnnotating(newTextRangeAnnotationList);
+    return Response.accepted()//
+      .location(locationBuilder.locationOf(resource, EndpointPaths.TEXT, EndpointPaths.ANNOTATIONBATCH, "status"))//
+      .build();
   }
+
 
   @GET
   @Path(EndpointPaths.ANNOTATIONBATCH + "/status")
@@ -207,6 +181,9 @@ public class ResourceTextEndpoint extends JSONEndpoint {
     }
   }
 
+  private void startAnnotating(TextRangeAnnotationList newTextRangeAnnotationList) {
+  }
+
   private void assertResourceHasText() {
     if (!resource.hasText()) {
       throw new NotFoundException("this resource has no text");
@@ -217,11 +194,6 @@ public class ResourceTextEndpoint extends JSONEndpoint {
     if (resource.hasText()) {
       throw new ConflictException("This resource already has a text, which cannot be replaced.");
     }
-  }
-
-  private String getXML() {
-    StreamingOutput outputStream = TextGraphUtil.streamXML(service, resourceUUID);
-    return TextGraphUtil.asString(outputStream);
   }
 
 }

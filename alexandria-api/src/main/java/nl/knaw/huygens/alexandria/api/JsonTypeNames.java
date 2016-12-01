@@ -19,4 +19,5 @@ public class JsonTypeNames {
   public static final String COMMANDSTATUS = "commandStatus";
   public static final String QUERY = "query";
   public static final String SEARCHRESULTPAGE = "searchResultPage";
+  public static final String TEXTANNOTATIONIMPORTSTATUS = "textAnnotationImportStatus";
 }
