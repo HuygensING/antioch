@@ -1,20 +1,8 @@
 package nl.knaw.huygens.alexandria.client;
 
-import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.api.model.AboutEntity;
-import nl.knaw.huygens.alexandria.api.model.Annotator;
-import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
-import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.ElementMode;
-import nl.knaw.huygens.alexandria.api.model.text.view.ElementViewDefinition;
-import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
-import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static java.util.stream.Collectors.joining;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -27,9 +15,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static java.util.stream.Collectors.joining;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.model.AboutEntity;
+import nl.knaw.huygens.alexandria.api.model.Annotator;
+import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.ElementMode;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementViewDefinition;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
+import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 
 public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer {
 
@@ -223,24 +224,13 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     String expected = singleQuotesToDouble("<text><p xml:id='p-1'>show this.</p></text>");
     assertThat(letterView).isEqualTo(expected);
 
-<<<<<<< HEAD
     // now, change the textview
-    textView.setElementViewDefinition("p",evd); // hide <p>
+    textView.setElementViewDefinition("p", evd); // hide <p>
     client.setResourceTextView(rootResourceUUID, "view1", textView);
     String letterView2 = client.getTextAsString(letterUUID, "view1");
     Log.info("letterView = {}", letterView2);
     String expected2 = singleQuotesToDouble("<text></text>");
     assertThat(letterView).isEqualTo(expected);
-
-=======
-    textView.setElementViewDefinition("p", evd); // hide <p> as well
-    client.setResourceTextView(rootResourceUUID, "view1", textView);
-
-    String letterView2 = client.getTextAsString(letterUUID, "view1");
-    Log.info("letterView = {}", letterView2);
-    String expected2 = singleQuotesToDouble("<text></text>");
-    assertThat(letterView2).isEqualTo(expected2);
->>>>>>> develop
   }
 
   /// end tests
