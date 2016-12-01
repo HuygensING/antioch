@@ -374,9 +374,15 @@ public class AlexandriaClient implements AutoCloseable {
     final Supplier<Response> responseSupplier = authorizedPut(path, entity);
     final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
+<<<<<<< HEAD
       .onStatus(Status.CREATED, voidRestResult())//
       .onStatus(Status.NO_CONTENT, voidRestResult())//
       .getResult();
+=======
+        .onStatus(Status.CREATED, voidRestResult())//
+        .onStatus(Status.NO_CONTENT, voidRestResult())//
+        .getResult();
+>>>>>>> develop
   }
 
   public RestResult<TextView> getResourceTextView(final UUID uuid) {

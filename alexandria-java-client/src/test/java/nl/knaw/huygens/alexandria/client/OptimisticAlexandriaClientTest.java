@@ -223,6 +223,7 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     String expected = singleQuotesToDouble("<text><p xml:id='p-1'>show this.</p></text>");
     assertThat(letterView).isEqualTo(expected);
 
+<<<<<<< HEAD
     // now, change the textview
     textView.setElementViewDefinition("p",evd); // hide <p>
     client.setResourceTextView(rootResourceUUID, "view1", textView);
@@ -231,6 +232,15 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     String expected2 = singleQuotesToDouble("<text></text>");
     assertThat(letterView).isEqualTo(expected);
 
+=======
+    textView.setElementViewDefinition("p", evd); // hide <p> as well
+    client.setResourceTextView(rootResourceUUID, "view1", textView);
+
+    String letterView2 = client.getTextAsString(letterUUID, "view1");
+    Log.info("letterView = {}", letterView2);
+    String expected2 = singleQuotesToDouble("<text></text>");
+    assertThat(letterView2).isEqualTo(expected2);
+>>>>>>> develop
   }
 
   /// end tests
