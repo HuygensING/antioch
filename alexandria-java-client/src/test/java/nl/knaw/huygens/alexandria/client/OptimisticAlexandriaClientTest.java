@@ -23,6 +23,7 @@ import org.junit.Test;
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
+import nl.knaw.huygens.alexandria.api.model.text.TextAnnotationImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
@@ -282,6 +283,13 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
         + "</text>");
     assertThat(annotatedText).isEqualTo(expectedAnnotatedText);
 
+    TextAnnotationImportStatus status = client.getResourceTextRangeAnnotationBatchImportStatus(resourceUUID);
+    assertThat(status.getErrors()).isEmpty();
+    Map<UUID, TextRangeAnnotationInfo> textRangeAnnotationInfoMap = status.getTextRangeAnnotationInfoMap();
+    assertThat(textRangeAnnotationInfoMap).hasSize(3);
+    assertThat(textRangeAnnotationInfoMap.get(annotationUUID1).getAnnotates()).isEqualTo("This is another simple paragraph.");
+    assertThat(textRangeAnnotationInfoMap.get(annotationUUID2).getAnnotates()).isEqualTo("This is another simple paragraph.");
+    assertThat(textRangeAnnotationInfoMap.get(annotationUUID3).getAnnotates()).isEqualTo("And another one.");
   }
 
   /// end tests
