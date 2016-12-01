@@ -230,7 +230,7 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     String letterView2 = client.getTextAsString(letterUUID, "view1");
     Log.info("letterView = {}", letterView2);
     String expected2 = singleQuotesToDouble("<text></text>");
-    assertThat(letterView).isEqualTo(expected);
+    assertThat(letterView2).isEqualTo(expected2);
   }
 
   /// end tests
