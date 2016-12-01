@@ -29,6 +29,7 @@ import org.apache.commons.io.IOUtils;
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.ProcessStatusMap;
+import nl.knaw.huygens.alexandria.api.model.text.TextAnnotationImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
 import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;

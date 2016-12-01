@@ -1,11 +1,10 @@
-package nl.knaw.huygens.alexandria.endpoint.resource;
+package nl.knaw.huygens.alexandria.api.model.text;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.collect.Lists;
 import nl.knaw.huygens.alexandria.api.JsonTypeNames;
 import nl.knaw.huygens.alexandria.api.model.ProcessStatus;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
 
 import java.util.HashMap;
 import java.util.List;

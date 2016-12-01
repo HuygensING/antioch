@@ -17,6 +17,7 @@ import nl.knaw.huygens.alexandria.api.model.CommandResponse;
 import nl.knaw.huygens.alexandria.api.model.CommandStatus;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
+import nl.knaw.huygens.alexandria.api.model.text.TextAnnotationImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
 import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
@@ -32,7 +33,6 @@ import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 import nl.knaw.huygens.alexandria.client.model.SubResourceList;
 import nl.knaw.huygens.alexandria.client.model.SubResourcePojo;
 import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
-import nl.knaw.huygens.alexandria.endpoint.resource.TextAnnotationImportStatus;
 
 public class OptimisticAlexandriaClient {
   AlexandriaClient delegate;

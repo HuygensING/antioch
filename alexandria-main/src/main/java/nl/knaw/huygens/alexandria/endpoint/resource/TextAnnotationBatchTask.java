@@ -7,6 +7,7 @@ import javax.ws.rs.core.StreamingOutput;
 
 import com.google.common.base.Joiner;
 
+import nl.knaw.huygens.alexandria.api.model.text.TextAnnotationImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
