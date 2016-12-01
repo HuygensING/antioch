@@ -80,6 +80,7 @@ import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 import nl.knaw.huygens.alexandria.client.model.SubResourceList;
 import nl.knaw.huygens.alexandria.client.model.SubResourcePojo;
 import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
+import nl.knaw.huygens.alexandria.endpoint.resource.TextAnnotationImportStatus;
 
 public class AlexandriaClient implements AutoCloseable {
   private WebTarget rootTarget;
@@ -347,11 +348,22 @@ public class AlexandriaClient implements AutoCloseable {
   public RestResult<Void> addResourceTextRangeAnnotations(UUID resourceUUID, TextRangeAnnotationList textAnnotations) {
     final Entity<TextRangeAnnotationList> entity = Entity.json(textAnnotations);
     WebTarget path = resourceTextTarget(resourceUUID)//
-        .path(EndpointPaths.ANNOTATIONS);
+        .path(EndpointPaths.ANNOTATIONBATCH);
     final Supplier<Response> responseSupplier = authorizedPost(path, entity);
     final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.OK, voidRestResult())//
+        .onStatus(Status.ACCEPTED, voidRestResult())//
+        .getResult();
+  }
+
+  public RestResult<TextAnnotationImportStatus> getResourceTextRangeAnnotationBatchImportStatus(final UUID resourceUUID) {
+    final WebTarget path = resourceTextTarget(resourceUUID)//
+        .path(EndpointPaths.ANNOTATIONBATCH)//
+        .path("status");
+    final Supplier<Response> responseSupplier = anonymousGet(path);
+    final RestRequester<TextAnnotationImportStatus> requester = RestRequester.withResponseSupplier(responseSupplier);
+    return requester//
+        .onStatus(Status.OK, this::toTextAnnotationImportStatusRestResult)//
         .getResult();
   }
 
@@ -568,6 +580,10 @@ public class AlexandriaClient implements AutoCloseable {
 
   private RestResult<TextImportStatus> toTextImportStatusRestResult(final Response response) {
     return toEntityRestResult(response, TextImportStatus.class);
+  }
+
+  private RestResult<TextAnnotationImportStatus> toTextAnnotationImportStatusRestResult(final Response response) {
+    return toEntityRestResult(response, TextAnnotationImportStatus.class);
   }
 
   private RestResult<CommandStatus> toCommandStatusRestResult(final Response response) {

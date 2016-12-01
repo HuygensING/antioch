@@ -32,6 +32,7 @@ import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 import nl.knaw.huygens.alexandria.client.model.SubResourceList;
 import nl.knaw.huygens.alexandria.client.model.SubResourcePojo;
 import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
+import nl.knaw.huygens.alexandria.endpoint.resource.TextAnnotationImportStatus;
 
 public class OptimisticAlexandriaClient {
   AlexandriaClient delegate;
@@ -80,6 +81,11 @@ public class OptimisticAlexandriaClient {
   public TextImportStatus setResourceTextSynchronously(UUID resourceUUID, String xml) {
     unwrap(delegate.setResourceText(resourceUUID, xml));
     return textImportStatusWhenFinished(resourceUUID);
+  }
+
+  public TextAnnotationImportStatus addResourceTextRangeAnnotationsSynchronously(UUID resourceUUID, TextRangeAnnotationList textAnnotations) {
+    unwrap(delegate.addResourceTextRangeAnnotations(resourceUUID, textAnnotations));
+    return textAnnotationImportStatusWhenFinished(resourceUUID);
   }
 
   // delegated methods
@@ -251,6 +257,10 @@ public class OptimisticAlexandriaClient {
   public TextRangeAnnotationList getResourceTextRangeAnnotations(UUID uuid) {
     return unwrap(delegate.getResourceTextRangeAnnotations(uuid));
   }
+
+  public TextAnnotationImportStatus getResourceTextRangeAnnotationBatchImportStatus(UUID uuid) {
+    return unwrap(delegate.getResourceTextRangeAnnotationBatchImportStatus(uuid));
+  }
   /////// end delegated methods
 
   private <T> T unwrap(RestResult<T> restResult) {
@@ -285,4 +295,20 @@ public class OptimisticAlexandriaClient {
     }
     return status;
   }
+
+  private TextAnnotationImportStatus textAnnotationImportStatusWhenFinished(UUID resourceUUID) {
+    TextAnnotationImportStatus status = null;
+    boolean goOn = true;
+    while (goOn) {
+      try {
+        Thread.sleep(500);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      status = unwrap(delegate.getResourceTextRangeAnnotationBatchImportStatus(resourceUUID));
+      goOn = !status.isDone();
+    }
+    return status;
+  }
+
 }

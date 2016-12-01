@@ -1,5 +1,31 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
+import static java.util.stream.Collectors.toList;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+
+import javax.inject.Inject;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+
+import org.apache.commons.io.Charsets;
+import org.apache.commons.io.IOUtils;
+
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.ProcessStatusMap;
@@ -21,23 +47,6 @@ import nl.knaw.huygens.alexandria.textgraph.DotFactory;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphImportTask;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 import nl.knaw.huygens.alexandria.textgraph.TextRangeAnnotationValidatorFactory;
-import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
-
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-
-import static java.util.stream.Collectors.toList;
 
 public class ResourceTextEndpoint extends JSONEndpoint {
   private final AlexandriaService service;
@@ -46,6 +55,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   private ExecutorService executorService;
   private final LocationBuilder locationBuilder;
   private final ProcessStatusMap<TextImportStatus> taskStatusMap;
+  private final ProcessStatusMap<TextAnnotationImportStatus> annotationTaskStatusMap;
   private AlexandriaConfiguration config;
   private ResourceTextFactory textFactory;
   private TextRangeAnnotationValidatorFactory textRangeAnnotationValidator;
@@ -58,6 +68,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
       LocationBuilder locationBuilder, //
       ResourceTextFactory resourceTextFactory, //
       ProcessStatusMap<TextImportStatus> taskStatusMap, //
+      ProcessStatusMap<TextAnnotationImportStatus> annotationTaskStatusMap, //
       @PathParam("uuid") final UUIDParam uuidParam) {
     this.service = service;
     this.config = config;
@@ -65,6 +76,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
     this.locationBuilder = locationBuilder;
     this.textFactory = resourceTextFactory;
     this.taskStatusMap = taskStatusMap;
+    this.annotationTaskStatusMap = annotationTaskStatusMap;
     this.resource = validatorFactory.validateExistingResource(uuidParam).notTentative().get();
     this.resourceUUID = resource.getId();
     this.textRangeAnnotationValidator = new TextRangeAnnotationValidatorFactory(service, resourceUUID);
@@ -157,15 +169,16 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   public Response postAnnotationList(@NotNull TextRangeAnnotationList newTextRangeAnnotationList) {
     startAnnotating(newTextRangeAnnotationList);
     return Response.accepted()//
-      .location(locationBuilder.locationOf(resource, EndpointPaths.TEXT, EndpointPaths.ANNOTATIONBATCH, "status"))//
-      .build();
+        .location(locationBuilder.locationOf(resource, EndpointPaths.TEXT, EndpointPaths.ANNOTATIONBATCH, "status"))//
+        .build();
   }
-
 
   @GET
   @Path(EndpointPaths.ANNOTATIONBATCH + "/status")
   public Response getAnnotationBatchStatus() {
-    return ok();
+    TextAnnotationImportStatus textAnnotationsImportTaskStatus = annotationTaskStatusMap.get(resourceUUID)//
+        .orElseThrow(NotFoundException::new);
+    return ok(textAnnotationsImportTaskStatus);
   }
 
   /* private methods */
@@ -173,15 +186,22 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   private void startTextProcessing(String xml) {
     TextGraphImportTask task = new TextGraphImportTask(service, locationBuilder, xml, resource);
     taskStatusMap.put(resource.getId(), task.getStatus());
+    runTask(task);
+  }
+
+  private void startAnnotating(TextRangeAnnotationList newTextRangeAnnotationList) {
+    TextAnnotationBatchTask task = new TextAnnotationBatchTask(service, newTextRangeAnnotationList, textRangeAnnotationValidator, resource);
+    annotationTaskStatusMap.put(resource.getId(), task.getStatus());
+    runTask(task);
+  }
+
+  private void runTask(Runnable task) {
     if (config.asynchronousEndpointsAllowed()) {
       executorService.execute(task);
     } else {
       // For now, for the acceptance tests.
       task.run();
     }
-  }
-
-  private void startAnnotating(TextRangeAnnotationList newTextRangeAnnotationList) {
   }
 
   private void assertResourceHasText() {

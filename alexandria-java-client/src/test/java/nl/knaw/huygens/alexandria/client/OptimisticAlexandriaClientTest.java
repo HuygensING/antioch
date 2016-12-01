@@ -27,6 +27,7 @@ import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.ElementMode;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementViewDefinition;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
@@ -231,6 +232,56 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     Log.info("letterView = {}", letterView2);
     String expected2 = singleQuotesToDouble("<text></text>");
     assertThat(letterView2).isEqualTo(expected2);
+  }
+
+  @Test
+  public void testTextRangeAnnotationBatch() {
+    String xml = singleQuotesToDouble("<text><p xml:id='p-1'>This is another simple paragraph.</p><p xml:id='p-2'>And another one.</p></text>");
+    UUID resourceUUID = createResourceWithText(xml);
+    client.setAnnotator(resourceUUID, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
+    client.setAnnotator(resourceUUID, "eddie", new Annotator().setCode("eddie").setDescription("Eddie Christiani"));
+
+    Map<String, String> attributes1 = new HashMap<>();
+    attributes1.put("key1", "value1");
+    attributes1.put("key2", "value2");
+    Position position = new Position().setXmlId("p-1");
+    UUID annotationUUID1 = UUID.randomUUID();
+    TextRangeAnnotation textRangeAnnotation1 = new TextRangeAnnotation()//
+        .setId(annotationUUID1)//
+        .setName("tag")//
+        .setAnnotator("ed")//
+        .setPosition(position)//
+        .setAttributes(attributes1)//
+    ;
+    UUID annotationUUID2 = UUID.randomUUID();
+    TextRangeAnnotation textRangeAnnotation2 = new TextRangeAnnotation()//
+        .setId(annotationUUID2)//
+        .setName("aid")//
+        .setAnnotator("ed")//
+        .setPosition(position)//
+    ;
+    Position position2 = new Position().setXmlId("p-2");
+    UUID annotationUUID3 = UUID.randomUUID();
+    TextRangeAnnotation textRangeAnnotation3 = new TextRangeAnnotation()//
+        .setId(annotationUUID3)//
+        .setName("something")//
+        .setAnnotator("eddie")//
+        .setPosition(position2)//
+    ;
+
+    TextRangeAnnotationList textAnnotations = new TextRangeAnnotationList();
+    textAnnotations.add(textRangeAnnotation1);
+    textAnnotations.add(textRangeAnnotation2);
+    textAnnotations.add(textRangeAnnotation3);
+    client.addResourceTextRangeAnnotationsSynchronously(resourceUUID, textAnnotations);
+
+    String annotatedText = client.getTextAsString(resourceUUID);
+    String expectedAnnotatedText = singleQuotesToDouble("<text>"//
+        + "<p xml:id='p-1'><aid resp='#ed'><tag key1='value1' key2='value2' resp='#ed'>This is another simple paragraph.</tag></aid></p>"//
+        + "<p xml:id='p-2'><something resp='#eddie'>And another one.</something></p>"//
+        + "</text>");
+    assertThat(annotatedText).isEqualTo(expectedAnnotatedText);
+
   }
 
   /// end tests

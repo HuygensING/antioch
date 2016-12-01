@@ -1,34 +1,32 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
+import java.util.Optional;
+import java.util.UUID;
+
+import javax.ws.rs.core.StreamingOutput;
+
 import com.google.common.base.Joiner;
+
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
-import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 import nl.knaw.huygens.alexandria.textgraph.TextRangeAnnotationValidatorFactory;
 
-import javax.ws.rs.core.StreamingOutput;
-import java.util.Optional;
-import java.util.UUID;
-
 public class TextAnnotationBatchTask implements Runnable {
 
   private AlexandriaService service;
-  private LocationBuilder locationBuilder;
-  private AlexandriaResource resource;
   private TextAnnotationImportStatus status;
   private UUID resourceUUID;
   private TextRangeAnnotationList newTextRangeAnnotationList;
   private TextRangeAnnotationValidatorFactory textRangeAnnotationValidator;
 
 
-  public TextAnnotationBatchTask(AlexandriaService service, LocationBuilder locationBuilder, AlexandriaResource resource, TextRangeAnnotationList newTextRangeAnnotationList, TextRangeAnnotationValidatorFactory textRangeAnnotationValidator) {
+  public TextAnnotationBatchTask(AlexandriaService service, TextRangeAnnotationList newTextRangeAnnotationList, TextRangeAnnotationValidatorFactory textRangeAnnotationValidator,
+      AlexandriaResource resource) {
     this.service = service;
-    this.locationBuilder = locationBuilder;
-    this.resource = resource;
     this.resourceUUID = resource.getId();
     this.newTextRangeAnnotationList = newTextRangeAnnotationList;
     this.textRangeAnnotationValidator = textRangeAnnotationValidator;
