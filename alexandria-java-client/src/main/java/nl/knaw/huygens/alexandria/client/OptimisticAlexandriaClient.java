@@ -17,6 +17,7 @@ import nl.knaw.huygens.alexandria.api.model.CommandResponse;
 import nl.knaw.huygens.alexandria.api.model.CommandStatus;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
+import nl.knaw.huygens.alexandria.api.model.text.TextAnnotationImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
 import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
@@ -80,6 +81,11 @@ public class OptimisticAlexandriaClient {
   public TextImportStatus setResourceTextSynchronously(UUID resourceUUID, String xml) {
     unwrap(delegate.setResourceText(resourceUUID, xml));
     return textImportStatusWhenFinished(resourceUUID);
+  }
+
+  public TextAnnotationImportStatus addResourceTextRangeAnnotationsSynchronously(UUID resourceUUID, TextRangeAnnotationList textAnnotations) {
+    unwrap(delegate.addResourceTextRangeAnnotations(resourceUUID, textAnnotations));
+    return textAnnotationImportStatusWhenFinished(resourceUUID);
   }
 
   // delegated methods
@@ -176,6 +182,10 @@ public class OptimisticAlexandriaClient {
     return unwrap(delegate.getTextAsDot(uuid));
   }
 
+  public void addResourceTextRangeAnnotations(UUID resourceUUID, TextRangeAnnotationList textAnnotations) {
+    unwrap(delegate.addResourceTextRangeAnnotations(resourceUUID, textAnnotations));
+  }
+
   public TextRangeAnnotationInfo setResourceTextRangeAnnotation(UUID resourceUUID, TextRangeAnnotation textAnnotation) {
     return unwrap(delegate.setResourceTextRangeAnnotation(resourceUUID, textAnnotation));
   }
@@ -247,6 +257,10 @@ public class OptimisticAlexandriaClient {
   public TextRangeAnnotationList getResourceTextRangeAnnotations(UUID uuid) {
     return unwrap(delegate.getResourceTextRangeAnnotations(uuid));
   }
+
+  public TextAnnotationImportStatus getResourceTextRangeAnnotationBatchImportStatus(UUID uuid) {
+    return unwrap(delegate.getResourceTextRangeAnnotationBatchImportStatus(uuid));
+  }
   /////// end delegated methods
 
   private <T> T unwrap(RestResult<T> restResult) {
@@ -281,4 +295,20 @@ public class OptimisticAlexandriaClient {
     }
     return status;
   }
+
+  private TextAnnotationImportStatus textAnnotationImportStatusWhenFinished(UUID resourceUUID) {
+    TextAnnotationImportStatus status = null;
+    boolean goOn = true;
+    while (goOn) {
+      try {
+        Thread.sleep(500);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      status = unwrap(delegate.getResourceTextRangeAnnotationBatchImportStatus(resourceUUID));
+      goOn = !status.isDone();
+    }
+    return status;
+  }
+
 }

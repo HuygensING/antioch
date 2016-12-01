@@ -67,22 +67,29 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
 
     String xml = getXML();
     String annotated = TextRangeAnnotationValidatorFactory.getAnnotatedText(newTextRangeAnnotation.getPosition(), xml);
-    textRangeAnnotationValidator.calculateAbsolutePosition(newTextRangeAnnotation, annotated);
+    boolean annotationIsNew = service.runInTransaction(() -> {
+      textRangeAnnotationValidator.calculateAbsolutePosition(newTextRangeAnnotation, annotated);
 
-    Optional<TextRangeAnnotation> existingTextRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, annotationUUID);
-    if (existingTextRangeAnnotation.isPresent()) {
-      TextRangeAnnotation oldTextRangeAnnotation = existingTextRangeAnnotation.get();
-      textRangeAnnotationValidator.validate(newTextRangeAnnotation, oldTextRangeAnnotation, xml);
-      service.deprecateTextRangeAnnotation(annotationUUID, newTextRangeAnnotation);
-      return noContent();
+      Optional<TextRangeAnnotation> existingTextRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, annotationUUID);
+      if (existingTextRangeAnnotation.isPresent()) {
+        TextRangeAnnotation oldTextRangeAnnotation = existingTextRangeAnnotation.get();
+        textRangeAnnotationValidator.validate(newTextRangeAnnotation, oldTextRangeAnnotation);
+        service.deprecateTextRangeAnnotation(annotationUUID, newTextRangeAnnotation);
+        return false;
+      }
+
+      textRangeAnnotationValidator.validate(newTextRangeAnnotation);
+      service.setTextRangeAnnotation(resourceUUID, newTextRangeAnnotation);
+      return true;
+    });
+
+    if (annotationIsNew) {
+      URI location = locationBuilder.locationOf(resource, EndpointPaths.TEXT, EndpointPaths.ANNOTATIONS, annotationUUID.toString());
+      TextRangeAnnotationInfo info = new TextRangeAnnotationInfo().setAnnotates(annotated);
+      return Response.created(location).entity(info).build();
     }
 
-    textRangeAnnotationValidator.validate(newTextRangeAnnotation, xml);
-    service.setTextRangeAnnotation(resourceUUID, newTextRangeAnnotation);
-
-    URI location = locationBuilder.locationOf(resource, EndpointPaths.TEXT, EndpointPaths.ANNOTATIONS, annotationUUID.toString());
-    TextRangeAnnotationInfo info = new TextRangeAnnotationInfo().setAnnotates(annotated);
-    return Response.created(location).entity(info).build();
+    return noContent();
   }
 
   @GET

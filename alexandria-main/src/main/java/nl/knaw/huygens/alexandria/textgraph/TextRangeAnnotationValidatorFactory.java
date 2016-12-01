@@ -58,27 +58,21 @@ public class TextRangeAnnotationValidatorFactory {
     newTextRangeAnnotation.setAbsolutePosition(absolutePosition);
   }
 
-  public void validate(TextRangeAnnotation textRangeAnnotation, String xml) {
-    // String annotated = getAnnotatedText(textRangeAnnotation.getPosition(), xml);
-    // boolean hasNoOffset = !textRangeAnnotation.hasOffset();
-    // if (hasNoOffset) {
-    // textRangeAnnotation.getAbsolutePosition().setOffset(1).setLength(annotated.length());
-    // }
+  public void validate(TextRangeAnnotation textRangeAnnotation) {
     validateName(textRangeAnnotation.getName());
     validateAnnotator(textRangeAnnotation.getAnnotator());
     validateAttributes(textRangeAnnotation.getAttributes());
     if (service.overlapsWithExistingTextRangeAnnotationForResource(textRangeAnnotation, resourceUUID)) {
       throw new ConflictException("Overlapping annotations with the same name and responsibility.");
     }
-    // return annotated;
   }
 
-  public void validate(TextRangeAnnotation newTextRangeAnnotation, TextRangeAnnotation existingTextRangeAnnotation, String xml) {
+  public void validate(TextRangeAnnotation newTextRangeAnnotation, TextRangeAnnotation existingTextRangeAnnotation) {
     validateNewAttributes(newTextRangeAnnotation, existingTextRangeAnnotation);
     validateNewName(newTextRangeAnnotation, existingTextRangeAnnotation);
     validateNewPosition(newTextRangeAnnotation, existingTextRangeAnnotation);
     validateNewAnnotator(newTextRangeAnnotation, existingTextRangeAnnotation);
-    validate(newTextRangeAnnotation, xml);
+    validate(newTextRangeAnnotation);
   }
 
   public static String getAnnotatedText(Position position, String xml) {

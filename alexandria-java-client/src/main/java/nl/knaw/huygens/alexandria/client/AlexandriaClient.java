@@ -1,27 +1,5 @@
 package nl.knaw.huygens.alexandria.client;
 
-/*
- * #%L
- * alexandria-java-client
- * =======
- * Copyright (C) 2015 - 2016 Huygens ING (KNAW)
- * =======
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
-
 import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
 
 import java.io.File;
@@ -50,6 +28,28 @@ import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 
+/*
+ * #%L
+ * alexandria-java-client
+ * =======
+ * Copyright (C) 2015 - 2016 Huygens ING (KNAW)
+ * =======
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -65,6 +65,7 @@ import nl.knaw.huygens.alexandria.api.model.CommandStatus;
 import nl.knaw.huygens.alexandria.api.model.StatePrototype;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
+import nl.knaw.huygens.alexandria.api.model.text.TextAnnotationImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
 import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
@@ -344,6 +345,28 @@ public class AlexandriaClient implements AutoCloseable {
     return stringResult(path);
   }
 
+  public RestResult<Void> addResourceTextRangeAnnotations(UUID resourceUUID, TextRangeAnnotationList textAnnotations) {
+    final Entity<TextRangeAnnotationList> entity = Entity.json(textAnnotations);
+    WebTarget path = resourceTextTarget(resourceUUID)//
+        .path(EndpointPaths.ANNOTATIONBATCH);
+    final Supplier<Response> responseSupplier = authorizedPost(path, entity);
+    final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
+    return requester//
+        .onStatus(Status.ACCEPTED, voidRestResult())//
+        .getResult();
+  }
+
+  public RestResult<TextAnnotationImportStatus> getResourceTextRangeAnnotationBatchImportStatus(final UUID resourceUUID) {
+    final WebTarget path = resourceTextTarget(resourceUUID)//
+        .path(EndpointPaths.ANNOTATIONBATCH)//
+        .path("status");
+    final Supplier<Response> responseSupplier = anonymousGet(path);
+    final RestRequester<TextAnnotationImportStatus> requester = RestRequester.withResponseSupplier(responseSupplier);
+    return requester//
+        .onStatus(Status.OK, this::toTextAnnotationImportStatusRestResult)//
+        .getResult();
+  }
+
   public RestResult<TextRangeAnnotationInfo> setResourceTextRangeAnnotation(UUID resourceUUID, TextRangeAnnotation textAnnotation) {
     final Entity<TextRangeAnnotation> entity = Entity.json(textAnnotation);
     WebTarget path = resourceTextTarget(resourceUUID)//
@@ -559,6 +582,10 @@ public class AlexandriaClient implements AutoCloseable {
     return toEntityRestResult(response, TextImportStatus.class);
   }
 
+  private RestResult<TextAnnotationImportStatus> toTextAnnotationImportStatusRestResult(final Response response) {
+    return toEntityRestResult(response, TextAnnotationImportStatus.class);
+  }
+
   private RestResult<CommandStatus> toCommandStatusRestResult(final Response response) {
     return toEntityRestResult(response, CommandStatus.class);
   }
@@ -682,7 +709,7 @@ public class AlexandriaClient implements AutoCloseable {
   private Function<Response, RestResult<Void>> voidRestResult() {
     return (response) -> {
       response.bufferEntity(); // to notify connectors, such as the ApacheConnector, that the entity has been "consumed" and that it should release the current connection back into the Apache
-                               // ConnectionManager pool (if being used). https://java.net/jira/browse/JERSEY-3149
+      // ConnectionManager pool (if being used). https://java.net/jira/browse/JERSEY-3149
       return new RestResult<>();
     };
   }

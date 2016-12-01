@@ -170,8 +170,8 @@ public class TextGraphService {
           .filter(v -> VertexLabels.TEXTANNOTATION.equals(v.label()))//
           .filter(v -> !updatedVertices.contains(v))//
           .forEach(v -> {
-            Log.debug("v={}", v);
-            Log.debug("updatedVertices={}", updatedVertices);
+            // Log.debug("v={}", v);
+            // Log.debug("updatedVertices={}", updatedVertices);
             int currentDepth = getIntValue(v, TextAnnotation.Properties.depth);
             if (currentDepth > parentDepth) {
               v.property(TextAnnotation.Properties.depth, currentDepth + 1);
@@ -192,7 +192,7 @@ public class TextGraphService {
   }
 
   public void updateTextAnnotationLink(TextRangeAnnotationVF vf, TextRangeAnnotation textRangeAnnotation, UUID resourceUUID) {
-    Log.debug("textRangeAnnotation={}", textRangeAnnotation);
+    // Log.debug("textRangeAnnotation={}", textRangeAnnotation);
     // if the TextRangeAnnotationVF is already linked to a TextAnnotation, remove that TextAnnotation
     FramedGraphTraversal<TextRangeAnnotationVF, Vertex> traversal = vf.out(nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF.EdgeLabels.HAS_TEXTANNOTATION);
     if (traversal.hasNext()) {
@@ -200,7 +200,7 @@ public class TextGraphService {
     }
 
     Vertex newTextAnnotationVertex = createNewTextAnnotation(vf, textRangeAnnotation);
-    Log.debug("textRangeAnnotation={}", textRangeAnnotation);
+    // Log.debug("textRangeAnnotation={}", textRangeAnnotation);
 
     TextAnnotationInsertionContext context = new TextAnnotationInsertionContext(newTextAnnotationVertex, textRangeAnnotation);
     List<Vertex> list = getVertexTraversalFromResource(resourceUUID)//
@@ -261,7 +261,7 @@ public class TextGraphService {
 
     public TextAnnotationInsertionContext(Vertex newTextAnnotationVertex, TextRangeAnnotation textRangeAnnotation) {
       this.newTextAnnotationVertex = newTextAnnotationVertex;
-      Log.debug("textRangeAnnotation={}", textRangeAnnotation);
+      // Log.debug("textRangeAnnotation={}", textRangeAnnotation);
       this.textSize = 0;
       this.useOffset = textRangeAnnotation.getUseOffset();
       this.parentXmlId = textRangeAnnotation.getAbsolutePosition().getXmlId();
@@ -270,7 +270,7 @@ public class TextGraphService {
       if (this.rangeEnd == 0) {
         this.rangeStart = 0;
       }
-      Log.debug("range = [{},{}]", rangeStart, rangeEnd);
+      // Log.debug("range = [{},{}]", rangeStart, rangeEnd);
     }
 
     void insertNewTextAnnotationVertex() {
@@ -285,13 +285,13 @@ public class TextGraphService {
     }
 
     private void insertAfterParent() {
-      Log.debug("startingTextSegment={}", visualizeVertex(startingTextSegment));
+      // Log.debug("startingTextSegment={}", visualizeVertex(startingTextSegment));
       Vertex parentVertex = storage.getVertexTraversal(startingTextSegment)//
           .in(EdgeLabels.FIRST_TEXT_SEGMENT)//
           .hasLabel(VertexLabels.TEXTANNOTATION)//
           .has(TextAnnotation.Properties.xmlid, parentXmlId)//
           .next();
-      Log.debug("parentVertex={}", visualizeVertex(parentVertex));
+      // Log.debug("parentVertex={}", visualizeVertex(parentVertex));
       Iterator<Edge> edges = parentVertex.edges(Direction.OUT, EdgeLabels.NEXT);
       if (edges.hasNext()) {
         Edge oldNextEdge = edges.next();
@@ -308,7 +308,7 @@ public class TextGraphService {
     private void insertUsingOffset() {
       int startingTextSegmentIndex = getIntValue(startingTextSegment, TextAnnotation.Properties.index);
       int endingTextSegmentIndex = getIntValue(endingTextSegment, TextAnnotation.Properties.index);
-      Log.debug("startIndex,endIndex=({},{})", startingTextSegmentIndex, endingTextSegmentIndex);
+      // Log.debug("startIndex,endIndex=({},{})", startingTextSegmentIndex, endingTextSegmentIndex);
       Vertex parentTextAnnotationVertex = null;
       Vertex textSegment = startingTextSegment;
       while (parentTextAnnotationVertex == null) {
@@ -397,18 +397,18 @@ public class TextGraphService {
     boolean rangeStartsInThisTextSegment(Traverser<Vertex> t) {
       incTextSize(t);
       boolean b = textSize >= rangeStart;
-      Log.debug("rangeStartsInThisTextSegment(): {}", b);
+      // Log.debug("rangeStartsInThisTextSegment(): {}", b);
       return b;
     }
 
     void processFirstTextSegmentInRange(Traverser<Vertex> t) {
-      Log.debug("processFirstTextSegmentInRange()");
+      // Log.debug("processFirstTextSegmentInRange()");
       Vertex textSegmentVertex = t.get();
       checkVertexLabel(textSegmentVertex, VertexLabels.TEXTSEGMENT);
 
       // if needed, split up the textsegment, preserving the TextAnnotation links
       int tailLength = Math.min(textSize, textSize - rangeStart + 1);
-      Log.debug("textSize = {}, tailLength = {}", textSize, tailLength);
+      // Log.debug("textSize = {}, tailLength = {}", textSize, tailLength);
       Vertex tail = detachTail(textSegmentVertex, tailLength);
 
       // link the new TextAnnotation to the tail if detaching was necessary, to the firstTextSegment otherwise
@@ -419,18 +419,18 @@ public class TextGraphService {
     boolean rangeEndsInThisTextSegment(Traverser<Vertex> t) {
       incTextSize(t);
       boolean b = textSize >= rangeEnd;
-      Log.debug("rangeEndsInThisTextSegment(): {} [textSize={}. rangeEnd={}]", b, textSize, rangeEnd);
+      // Log.debug("rangeEndsInThisTextSegment(): {} [textSize={}. rangeEnd={}]", b, textSize, rangeEnd);
       return b;
     }
 
     void processLastTextSegmentInRange(Traverser<Vertex> t) {
-      Log.debug("processLastTextSegmentInRange");
+      // Log.debug("processLastTextSegmentInRange");
       Vertex textSegmentVertex = t.get();
       checkVertexLabel(textSegmentVertex, VertexLabels.TEXTSEGMENT);
 
       // if needed, split up the textsegment, preserving the TextAnnotation links
       int tailLength = textSize - rangeEnd;
-      Log.debug("textSize = {}, tailLength = {}", textSize, tailLength);
+      // Log.debug("textSize = {}, tailLength = {}", textSize, tailLength);
       Vertex head = detachHead(textSegmentVertex, tailLength);
 
       // link the new TextAnnotation to the head if detaching was necessary, to the lastTextSegment otherwise
@@ -442,7 +442,7 @@ public class TextGraphService {
       Vertex textSegmentVertex = t.get();
       checkVertexLabel(textSegmentVertex, VertexLabels.TEXTSEGMENT);
       String text = getStringValue(textSegmentVertex, TextSegment.Properties.text);
-      Log.debug("text=\"{}\"", text);
+      // Log.debug("text=\"{}\"", text);
       textSize += text.length();
       // lastTextSegmentVertex = textSegmentVertex;
     }
@@ -455,7 +455,7 @@ public class TextGraphService {
       int headLength = length - tailLength;
       String headText = text.substring(0, headLength);
       String tailText = text.substring(headLength);
-      Log.debug("detachTail(): head = [{}], tail = [{}]", headText, tailText);
+      // Log.debug("detachTail(): head = [{}], tail = [{}]", headText, tailText);
       if (headLength == 0) {
         // no detachment necessary
         return textSegment;
@@ -489,7 +489,7 @@ public class TextGraphService {
       int length = text.length();
       String headText = text.substring(0, length - tailLength);
       String tailText = text.substring(length - tailLength);
-      Log.debug("detachHead(): head = [{}], tail = [{}]", headText, tailText);
+      // Log.debug("detachHead(): head = [{}], tail = [{}]", headText, tailText);
       if (tailLength == 0) {
         // no detachment necessary
         return textSegment;
