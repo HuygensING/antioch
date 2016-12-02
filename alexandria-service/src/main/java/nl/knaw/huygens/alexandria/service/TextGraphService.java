@@ -255,7 +255,6 @@ public class TextGraphService {
     int endOffset = 0;
     String text = "";
     Vertex textSegment = firstTextSegmentTraversal.next();
-    Log.info("textSegment={}", context.visualizeVertex(textSegment));
 
     // find the textsegment where the textrange from annotation.position starts
     boolean goOn = true;
@@ -263,35 +262,29 @@ public class TextGraphService {
       text = getStringValue(textSegment, TextSegment.Properties.text);
       int segmentSize = text.length();
       goOn = startOffset + segmentSize < context.rangeStart;
-      Log.debug("segmentSize={}", segmentSize);
       endOffset += segmentSize;
       if (goOn) {
         Iterator<Vertex> nextTextSegments = textSegment.vertices(Direction.OUT, EdgeLabels.NEXT);
         if (nextTextSegments.hasNext()) {
           startOffset += segmentSize;
           textSegment = nextTextSegments.next();
-          Log.info("textSegment={}", context.visualizeVertex(textSegment));
         } else {
           goOn = false;
         }
       }
     }
-    Log.debug("startOffset {}; endOffset {}; rangeStart {}; rangeEnd {}", startOffset, endOffset, context.rangeStart, context.rangeEnd);
     if (startOffset == context.rangeStart) {
-      Log.debug("insertBefore!");
       context.insertNewBeforeCurrent(emptyTextSegment, textSegment);
       StreamUtil.stream(textSegment.edges(Direction.IN, EdgeLabels.FIRST_TEXT_SEGMENT))//
           .forEach(e -> context.moveEdge(e, EdgeLabels.FIRST_TEXT_SEGMENT, emptyTextSegment));
 
     } else if (endOffset == context.rangeEnd) {
-      Log.debug("insertAfter!");
       context.insertNewAfterCurrent(emptyTextSegment, textSegment);
       StreamUtil.stream(textSegment.edges(Direction.IN, EdgeLabels.LAST_TEXT_SEGMENT))//
           .forEach(e -> context.moveEdge(e, EdgeLabels.LAST_TEXT_SEGMENT, emptyTextSegment));
 
     } else {
       // split up textSegment?
-      Log.debug("somewhere inbetween?");
       int headLength = context.rangeStart - startOffset - 1;
       String headText = text.substring(0, headLength);
       String tailText = text.substring(headLength);
@@ -302,7 +295,6 @@ public class TextGraphService {
       context.insertNewAfterCurrent(newTail, textSegment);
       context.insertNewAfterCurrent(emptyTextSegment, textSegment);
     }
-    Log.info("emptyTextSegment={}", context.visualizeVertex(emptyTextSegment));
 
     context.reindexNeeded = true;
   }
