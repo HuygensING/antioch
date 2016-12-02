@@ -52,7 +52,7 @@
         <jackson.version>2.8.4</jackson.version>
         <jackson-datatype-jsr310.version>2.8.4</jackson-datatype-jsr310.version>
         <javaxservlet-api.version>3.0-alpha-1</javaxservlet-api.version>
-        <javax.inject.version>1</javax.inject.version>
+        <javax.inject.version>2.4.0-b10</javax.inject.version>
         <jdk.version>1.8</jdk.version>
 
         <!-- can't update this version until jersey2-guice does -->
@@ -195,7 +195,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>javax.inject</groupId>
+            <groupId>org.glassfish.hk2.external</groupId>
             <artifactId>javax.inject</artifactId>
             <version>${javax.inject.version}</version>
         </dependency>
