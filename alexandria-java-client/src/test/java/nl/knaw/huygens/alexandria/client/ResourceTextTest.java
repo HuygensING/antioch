@@ -42,10 +42,10 @@ public class ResourceTextTest extends AlexandriaClientTest {
     assertRequestSucceeded(dotReadResult);
     String dot = dotReadResult.get();
     String expectedDot = singleQuotesToDouble("digraph TextGraph {\n"//
-        + "  ranksep=1.0\n"//
+        + "  ranksep=1.0\n\n"//
         + "  t0 [shape=box, label='Something'];\n"//
         + "  a0 [label='text'];\n"//
-        + "  a0 -> t0 [color='blue'];\n"//
+        + "  a0 -> t0 [color='blue'];\n\n"//
         + "  {rank=same;t0;}\n"//
         + "  {rank=same;a0;}\n"//
         + "}");

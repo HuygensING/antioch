@@ -204,40 +204,97 @@ public class TextGraphService {
     // Log.debug("textRangeAnnotation={}", textRangeAnnotation);
 
     TextAnnotationInsertionContext context = new TextAnnotationInsertionContext(newTextAnnotationVertex, textRangeAnnotation);
+    GraphTraversal<Vertex, Vertex> firstTextSegmentTraversal = getVertexTraversalFromResource(resourceUUID)//
+        .out(EdgeLabels.HAS_TEXTGRAPH)//
+        .out(EdgeLabels.FIRST_ANNOTATION)//
+
+        // find the TextAnnotation with the xml:id from annotation.position.xmlid
+        .until(__.has(TextAnnotation.Properties.xmlid, textRangeAnnotation.getAbsolutePosition().getXmlId()))//
+        .repeat(__.out(EdgeLabels.NEXT))//
+        .out(EdgeLabels.FIRST_TEXT_SEGMENT);
     if (context.annotationIsMilestone) {
-      // TODO
+      handleMilestoneAnnotation(newTextAnnotationVertex, context, firstTextSegmentTraversal);
+    } else {
+      handleRegularAnnotation(resourceUUID, context, firstTextSegmentTraversal);
+    }
+    if (context.reindexNeeded) {
+      reindex(resourceUUID);
+    }
+    context.insertNewTextAnnotationVertex();
+    reindex(resourceUUID);
+    Log.debug("newTextAnnotationVertex={}", context.visualizeVertex(newTextAnnotationVertex));
+  }
+
+  private void handleRegularAnnotation(UUID resourceUUID, TextAnnotationInsertionContext context, GraphTraversal<Vertex, Vertex> traversal2) {
+    List<Vertex> list = traversal2//
+        // find the textsegment where the textrange from annotation.position starts
+        .until(context::rangeStartsInThisTextSegment)//
+        .repeat(__.out(EdgeLabels.NEXT))//
+        .sideEffect(context::processFirstTextSegmentInRange)//
+
+        // iterate over the next TextSegments until you find the one the textrange from annotation.position ends in
+        .until(context::rangeEndsInThisTextSegment)//
+        .repeat(__.out(EdgeLabels.NEXT))//
+
+        .sideEffect(context::processLastTextSegmentInRange)//
+
+        .toList();
+    if (list.size() != 1) {
+      Log.error("listsize should be 1, is {}", list.size());
+    }
+  }
+
+  private void handleMilestoneAnnotation(Vertex newTextAnnotationVertex, TextAnnotationInsertionContext context, GraphTraversal<Vertex, Vertex> firstTextSegmentTraversal) {
+    // Milestones should be linked to their own empty TextSegment
+    Vertex emptyTextSegment = newTextSegmentVertex("");
+    context.linkTextAnnotationToTextSegment(newTextAnnotationVertex, emptyTextSegment);
+
+    // now we have to fit in this new textSegment
+    int startOffset = 0;
+    int endOffset = 0;
+    Vertex textSegment = firstTextSegmentTraversal.next();
+    Log.info("textSegment={}", context.visualizeVertex(textSegment));
+
+    // find the textsegment where the textrange from annotation.position starts
+    boolean goOn = true;
+    while (goOn) {
+      String text = getStringValue(textSegment, TextSegment.Properties.text);
+      int segmentSize = text.length();
+      goOn = startOffset + segmentSize < context.rangeStart;
+      Log.debug("segmentSize={}", segmentSize);
+      endOffset += segmentSize;
+      if (goOn) {
+        Iterator<Vertex> nextTextSegments = textSegment.vertices(Direction.OUT, EdgeLabels.NEXT);
+        if (nextTextSegments.hasNext()) {
+          startOffset += segmentSize;
+          textSegment = nextTextSegments.next();
+          Log.info("textSegment={}", context.visualizeVertex(textSegment));
+        } else {
+          goOn = false;
+        }
+      }
+    }
+    Log.debug("startOffset {}; endOffset {}; rangeStart {}; rangeEnd {}", startOffset, endOffset, context.rangeStart, context.rangeEnd);
+    if (startOffset == context.rangeStart) {
+      Log.debug("insertBefore!");
+      context.insertNewBeforeCurrent(emptyTextSegment, textSegment);
+      StreamUtil.stream(textSegment.edges(Direction.IN, EdgeLabels.FIRST_TEXT_SEGMENT))//
+          .forEach(e -> context.moveEdge(e, EdgeLabels.FIRST_TEXT_SEGMENT, emptyTextSegment));
+
+    } else if (endOffset == context.rangeEnd) {
+      Log.debug("insertAfter!");
+      context.insertNewAfterCurrent(emptyTextSegment, textSegment);
+      StreamUtil.stream(textSegment.edges(Direction.IN, EdgeLabels.LAST_TEXT_SEGMENT))//
+          .forEach(e -> context.moveEdge(e, EdgeLabels.LAST_TEXT_SEGMENT, emptyTextSegment));
 
     } else {
-      List<Vertex> list = getVertexTraversalFromResource(resourceUUID)//
-          .out(EdgeLabels.HAS_TEXTGRAPH)//
-          .out(EdgeLabels.FIRST_ANNOTATION)//
+      // split up textSegment?
+      Log.debug("somewhere inbetween?");
 
-          // find the TextAnnotation with the xml:id from annotation.position.xmlid
-          .until(__.has(TextAnnotation.Properties.xmlid, textRangeAnnotation.getAbsolutePosition().getXmlId()))//
-          .repeat(__.out(EdgeLabels.NEXT))//
-          .out(EdgeLabels.FIRST_TEXT_SEGMENT)//
-
-          // find the textsegment where the textrange from annotation.position starts
-          .until(context::rangeStartsInThisTextSegment)//
-          .repeat(__.out(EdgeLabels.NEXT))//
-          .sideEffect(context::processFirstTextSegmentInRange)//
-
-          // iterate over the next TextSegments until you find the one the textrange from annotation.position ends in
-          .until(context::rangeEndsInThisTextSegment)//
-          .repeat(__.out(EdgeLabels.NEXT))//
-
-          .sideEffect(context::processLastTextSegmentInRange)//
-
-          .toList();
-      if (list.size() != 1) {
-        Log.error("listsize should be 1, is {}", list.size());
-      }
-      if (context.reindexNeeded) {
-        reindex(resourceUUID);
-      }
-      context.insertNewTextAnnotationVertex();
     }
-    reindex(resourceUUID);
+    Log.info("emptyTextSegment={}", context.visualizeVertex(emptyTextSegment));
+
+    context.reindexNeeded = true;
   }
 
   private Vertex createNewTextAnnotation(TextRangeAnnotationVF textRangeAnnotationVF, TextRangeAnnotation textRangeAnnotation) {
@@ -281,6 +338,13 @@ public class TextGraphService {
       }
       this.annotationIsMilestone = length == 0;
       // Log.debug("range = [{},{}]", rangeStart, rangeEnd);
+    }
+
+    private void linkTextAnnotationToTextSegment(Vertex newTextAnnotationVertex, Vertex emptyTextSegment) {
+      this.startingTextSegment = emptyTextSegment;
+      this.endingTextSegment = emptyTextSegment;
+      newTextAnnotationVertex.addEdge(EdgeLabels.FIRST_TEXT_SEGMENT, this.startingTextSegment);
+      newTextAnnotationVertex.addEdge(EdgeLabels.LAST_TEXT_SEGMENT, this.endingTextSegment);
     }
 
     void insertNewTextAnnotationVertex() {
@@ -468,7 +532,7 @@ public class TextGraphService {
       } else {
         textSegment.property(TextSegment.Properties.text, headText);
         Vertex tailTextSegment = newTextSegmentVertex(tailText);
-        insertNewAfterCurrent(textSegment, tailTextSegment);
+        insertNewAfterCurrent(tailTextSegment, textSegment);
         // move LAST_TEXT_SEGMENT edges to tailTextSegment
         StreamUtil.stream(textSegment.edges(Direction.IN, EdgeLabels.LAST_TEXT_SEGMENT))//
             .forEach(e -> moveEdge(e, EdgeLabels.LAST_TEXT_SEGMENT, tailTextSegment));
@@ -477,7 +541,7 @@ public class TextGraphService {
       }
     }
 
-    private void insertNewAfterCurrent(Vertex currentVertex, Vertex newVertex) {
+    private void insertNewAfterCurrent(Vertex newVertex, Vertex currentVertex) {
       Iterator<Edge> edges = currentVertex.edges(Direction.OUT, EdgeLabels.NEXT);
       if (edges.hasNext()) {
         Edge nextEdge = edges.next();
@@ -503,7 +567,7 @@ public class TextGraphService {
         textSegment.property(TextSegment.Properties.text, tailText);
         Vertex headTextSegment = newTextSegmentVertex(headText);
         // move FIRST_TEXT_SEGMENT edges to tailTextSegment
-        insertNewBeforeCurrent(textSegment, headTextSegment);
+        insertNewBeforeCurrent(headTextSegment, textSegment);
         StreamUtil.stream(textSegment.edges(Direction.IN, EdgeLabels.FIRST_TEXT_SEGMENT))//
             .forEach(e -> moveEdge(e, EdgeLabels.FIRST_TEXT_SEGMENT, headTextSegment));
         reindexNeeded = true;
@@ -517,7 +581,7 @@ public class TextGraphService {
       e.remove();
     }
 
-    private void insertNewBeforeCurrent(Vertex currentVertex, Vertex newVertex) {
+    private void insertNewBeforeCurrent(Vertex newVertex, Vertex currentVertex) {
       Iterator<Edge> edges = currentVertex.edges(Direction.IN, EdgeLabels.NEXT);
       if (edges.hasNext()) {
         Edge prevEdge = edges.next();

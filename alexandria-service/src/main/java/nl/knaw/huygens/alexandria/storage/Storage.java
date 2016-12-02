@@ -108,7 +108,9 @@ public class Storage {
 
     } catch (Exception e) {
       e.printStackTrace();
-      rollbackTransaction();
+      if (getTransactionIsOpen()) {
+        rollbackTransaction();
+      }
       throw e;
     }
   }
@@ -142,7 +144,9 @@ public class Storage {
 
     } catch (Exception e) {
       e.printStackTrace();
-      rollbackTransaction();
+      if (getTransactionIsOpen()) {
+        rollbackTransaction();
+      }
       throw e;
     }
   }

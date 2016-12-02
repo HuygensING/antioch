@@ -1,6 +1,7 @@
 package nl.knaw.huygens.alexandria.textgraph;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Stack;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -14,7 +15,7 @@ public class DotFactory {
   public static String createDot(AlexandriaService service, UUID resourceId) {
     StringBuilder stringBuilder = new StringBuilder();
     stringBuilder.append("digraph TextGraph {\n")//
-        .append("  ranksep=1.0\n");
+        .append("  ranksep=1.0\n\n");
     AtomicInteger textCounter = new AtomicInteger(0);
     AtomicInteger annotationCounter = new AtomicInteger(0);
     Stack<Integer> openAnnotations = new Stack<>();
@@ -25,7 +26,9 @@ public class DotFactory {
       if (tn > 0) {
         appendNextTextEdge(stringBuilder, tn);
       }
-      for (TextAnnotation textAnnotation : s.getTextAnnotationsToOpen()) {
+      List<TextAnnotation> textAnnotationsToOpen = s.getTextAnnotationsToOpen();
+      s.getMilestoneTextAnnotation().ifPresent(textAnnotation -> textAnnotationsToOpen.add(textAnnotation));
+      for (TextAnnotation textAnnotation : textAnnotationsToOpen) {
         int an = annotationCounter.getAndIncrement();
         appendAnnotationVertex(stringBuilder, an, textAnnotation);
         appendParentAnnotationEdge(stringBuilder, an, openAnnotations);
@@ -33,11 +36,16 @@ public class DotFactory {
         openAnnotations.push(an);
       }
       appendAnnotationEdge(stringBuilder, tn, openAnnotations.peek());
-      for (TextAnnotation textAnnotation : s.getTextAnnotationsToClose()) {
+      int numberOftextAnnotationsToClose = s.getTextAnnotationsToClose().size();
+      if (s.getMilestoneTextAnnotation().isPresent()) {
+        numberOftextAnnotationsToClose += 1;
+      }
+      for (int i = 0; i < numberOftextAnnotationsToClose; i++) {
         if (!openAnnotations.isEmpty()) {
           openAnnotations.pop();
         }
       }
+      stringBuilder.append("\n");
     }));
     appendTextHasSameRank(stringBuilder, textCounter.get());
     for (Collection<Integer> values : annotationDepthMap.asMap().values()) {
