@@ -43,8 +43,8 @@ public class TextAnnotationBatchTask implements Runnable {
     status.setStarted();
     try {
       service.runInTransaction(() -> {
+        String xml = getXML(); // only used to determine the annotated text, so no need to refresh after every annotation
         newTextRangeAnnotationList.forEach(newTextRangeAnnotation -> {
-          String xml = getXML();
           String annotated = TextRangeAnnotationValidatorFactory.getAnnotatedText(newTextRangeAnnotation.getPosition(), xml);
           textRangeAnnotationValidator.calculateAbsolutePosition(newTextRangeAnnotation, annotated);
 
