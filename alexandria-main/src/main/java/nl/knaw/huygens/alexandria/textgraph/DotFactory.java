@@ -34,7 +34,9 @@ public class DotFactory {
       }
       appendAnnotationEdge(stringBuilder, tn, openAnnotations.peek());
       for (TextAnnotation textAnnotation : s.getTextAnnotationsToClose()) {
-        openAnnotations.pop();
+        if (!openAnnotations.isEmpty()) {
+          openAnnotations.pop();
+        }
       }
     }));
     appendTextHasSameRank(stringBuilder, textCounter.get());
@@ -58,7 +60,12 @@ public class DotFactory {
   }
 
   private static void appendAnnotationVertex(StringBuilder stringBuilder, int an, TextAnnotation textAnnotation) {
-    stringBuilder.append("  a").append(an).append(" [label=\"").append(escape(textAnnotation.getName())).append("\"];\n");
+    stringBuilder.append("  a")//
+        .append(an)//
+        .append(" [label=\"")//
+        .append(escape(textAnnotation.getName()))//
+        // .append(" (" + textAnnotation.getDepth() + ")")//
+        .append("\"];\n");
   }
 
   private static void appendParentAnnotationEdge(StringBuilder stringBuilder, int an, Stack<Integer> parents) {
