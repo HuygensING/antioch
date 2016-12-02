@@ -170,6 +170,12 @@ public class TextGraphUtil {
           return values.contains(actualValue);
         case isNot:
           return !values.contains(actualValue);
+        case firstOf:
+          // TODO
+          break;
+        default:
+          // TODO
+          break;
         }
 
       }
