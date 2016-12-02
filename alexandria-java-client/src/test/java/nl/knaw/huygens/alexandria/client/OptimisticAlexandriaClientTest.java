@@ -337,15 +337,14 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
 
     TextRangeAnnotationList annotations = new TextRangeAnnotationList();
     annotations.add(startMilestone);
-    // annotations.add(middleMilestone);
+    annotations.add(middleMilestone);
     annotations.add(endMilestone);
     TextAnnotationImportStatus status = client.addResourceTextRangeAnnotationsSynchronously(resourceUUID, annotations);
     assertThat(status.getErrors()).isEmpty();
 
     client.getTextAsDot(resourceUUID);
     String annotatedXML = client.getTextAsString(resourceUUID);
-    // String expectation2 = singleQuotesToDouble("<text><p xml:id='p-1'><milestone-start resp='#ed'/>This<milestone-middle resp='#ed'/> is a simple paragraph.<milestone-end resp='#ed'/></p></text>");
-    String expectation2 = singleQuotesToDouble("<text><p xml:id='p-1'><milestone-start resp='#ed'/>This is a simple paragraph.<milestone-end resp='#ed'/></p></text>");
+    String expectation2 = singleQuotesToDouble("<text><p xml:id='p-1'><milestone-start resp='#ed'/>This<milestone-middle resp='#ed'/> is a simple paragraph.<milestone-end resp='#ed'/></p></text>");
     assertThat(annotatedXML).isEqualTo(expectation2);
   }
 

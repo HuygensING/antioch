@@ -245,6 +245,7 @@ public class TextGraphService {
   }
 
   private void handleMilestoneAnnotation(Vertex newTextAnnotationVertex, TextAnnotationInsertionContext context, GraphTraversal<Vertex, Vertex> firstTextSegmentTraversal) {
+    // TODO: refactor this mess!
     // Milestones should be linked to their own empty TextSegment
     Vertex emptyTextSegment = newTextSegmentVertex("");
     context.linkTextAnnotationToTextSegment(newTextAnnotationVertex, emptyTextSegment);
@@ -252,13 +253,14 @@ public class TextGraphService {
     // now we have to fit in this new textSegment
     int startOffset = 0;
     int endOffset = 0;
+    String text = "";
     Vertex textSegment = firstTextSegmentTraversal.next();
     Log.info("textSegment={}", context.visualizeVertex(textSegment));
 
     // find the textsegment where the textrange from annotation.position starts
     boolean goOn = true;
     while (goOn) {
-      String text = getStringValue(textSegment, TextSegment.Properties.text);
+      text = getStringValue(textSegment, TextSegment.Properties.text);
       int segmentSize = text.length();
       goOn = startOffset + segmentSize < context.rangeStart;
       Log.debug("segmentSize={}", segmentSize);
@@ -290,7 +292,15 @@ public class TextGraphService {
     } else {
       // split up textSegment?
       Log.debug("somewhere inbetween?");
-
+      int headLength = context.rangeStart - startOffset - 1;
+      String headText = text.substring(0, headLength);
+      String tailText = text.substring(headLength);
+      textSegment.property(TextSegment.Properties.text, headText);
+      Vertex newTail = newTextSegmentVertex(tailText);
+      StreamUtil.stream(textSegment.edges(Direction.IN, EdgeLabels.LAST_TEXT_SEGMENT))//
+          .forEach(e -> context.moveEdge(e, EdgeLabels.LAST_TEXT_SEGMENT, newTail));
+      context.insertNewAfterCurrent(newTail, textSegment);
+      context.insertNewAfterCurrent(emptyTextSegment, textSegment);
     }
     Log.info("emptyTextSegment={}", context.visualizeVertex(emptyTextSegment));
 
@@ -556,8 +566,9 @@ public class TextGraphService {
       Preconditions.checkArgument(textSegment.label().equals(VertexLabels.TEXTSEGMENT));
       String text = getStringValue(textSegment, TextSegment.Properties.text);
       int length = text.length();
-      String headText = text.substring(0, length - tailLength);
-      String tailText = text.substring(length - tailLength);
+      int headLength = length - tailLength;
+      String headText = text.substring(0, headLength);
+      String tailText = text.substring(headLength);
       Log.debug("detachHead(): head = [{}], tail = [{}]", headText, tailText);
       if (tailLength == 0) {
         // no detachment necessary
