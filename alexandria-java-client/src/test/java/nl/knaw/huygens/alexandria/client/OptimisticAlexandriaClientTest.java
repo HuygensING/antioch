@@ -292,6 +292,63 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     assertThat(textRangeAnnotationInfoMap.get(annotationUUID3).getAnnotates()).isEqualTo("And another one.");
   }
 
+  @Test
+  public void testBugNLA332() {
+    String xml = singleQuotesToDouble("<text><p xml:id='p-1'>This is a simple paragraph.</p></text>");
+    UUID resourceUUID = createResourceWithText(xml);
+    client.setAnnotator(resourceUUID, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
+    client.getTextAsDot(resourceUUID);
+
+    UUID annotationUUID1 = UUID.randomUUID();
+    Position position1 = new Position()//
+        .setXmlId("p-1")//
+        .setOffset(1)//
+        .setLength(0);
+    TextRangeAnnotation startMilestone = new TextRangeAnnotation()//
+        .setId(annotationUUID1)//
+        .setName("milestone-start")//
+        .setAnnotator("ed")//
+        .setPosition(position1)//
+    ;
+    // assertThat(info.getAnnotates()).isEqualTo("");
+
+    UUID annotationUUID2 = UUID.randomUUID();
+    Position position2 = new Position()//
+        .setXmlId("p-1")//
+        .setOffset(5)//
+        .setLength(0);
+    TextRangeAnnotation middleMilestone = new TextRangeAnnotation()//
+        .setId(annotationUUID2)//
+        .setName("milestone-middle")//
+        .setAnnotator("ed")//
+        .setPosition(position2)//
+    ;
+
+    UUID annotationUUID3 = UUID.randomUUID();
+    Position position3 = new Position()//
+        .setXmlId("p-1")//
+        .setOffset(28)//
+        .setLength(0);
+    TextRangeAnnotation endMilestone = new TextRangeAnnotation()//
+        .setId(annotationUUID3)//
+        .setName("milestone-end")//
+        .setAnnotator("ed")//
+        .setPosition(position3)//
+    ;
+
+    TextRangeAnnotationList annotations = new TextRangeAnnotationList();
+    annotations.add(startMilestone);
+    annotations.add(middleMilestone);
+    annotations.add(endMilestone);
+    TextAnnotationImportStatus status = client.addResourceTextRangeAnnotationsSynchronously(resourceUUID, annotations);
+    assertThat(status.getErrors()).isEmpty();
+
+    client.getTextAsDot(resourceUUID);
+    String annotatedXML = client.getTextAsString(resourceUUID);
+    String expectation2 = singleQuotesToDouble("<text><p xml:id='p-1'><milestone-start resp='#ed'/>This<milestone-middle resp='#ed'/> is a simple paragraph.<milestone-end resp='#ed'/></p></text>");
+    assertThat(annotatedXML).isEqualTo(expectation2);
+  }
+
   /// end tests
 
   private UUID createResourceWithText(String xml) {
