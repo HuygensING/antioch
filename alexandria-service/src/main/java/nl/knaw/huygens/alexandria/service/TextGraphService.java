@@ -204,29 +204,31 @@ public class TextGraphService {
     // Log.debug("textRangeAnnotation={}", textRangeAnnotation);
 
     TextAnnotationInsertionContext context = new TextAnnotationInsertionContext(newTextAnnotationVertex, textRangeAnnotation);
-    GraphTraversal<Vertex, Vertex> firstTextSegmentTraversal = getVertexTraversalFromResource(resourceUUID)//
+    Vertex parentTextAnnotationVertex = getVertexTraversalFromResource(resourceUUID)//
         .out(EdgeLabels.HAS_TEXTGRAPH)//
         .out(EdgeLabels.FIRST_ANNOTATION)//
 
         // find the TextAnnotation with the xml:id from annotation.position.xmlid
         .until(__.has(TextAnnotation.Properties.xmlid, textRangeAnnotation.getAbsolutePosition().getXmlId()))//
         .repeat(__.out(EdgeLabels.NEXT))//
-        .out(EdgeLabels.FIRST_TEXT_SEGMENT);
+        .next();
     if (context.annotationIsMilestone) {
-      handleMilestoneAnnotation(newTextAnnotationVertex, context, firstTextSegmentTraversal);
+      handleMilestoneAnnotation(newTextAnnotationVertex, context, parentTextAnnotationVertex);
     } else {
-      handleRegularAnnotation(resourceUUID, context, firstTextSegmentTraversal);
+      handleRegularAnnotation(resourceUUID, context, parentTextAnnotationVertex);
     }
     if (context.reindexNeeded) {
       reindex(resourceUUID);
     }
     context.insertNewTextAnnotationVertex();
     reindex(resourceUUID);
-    Log.debug("newTextAnnotationVertex={}", context.visualizeVertex(newTextAnnotationVertex));
+    Log.debug("newTextAnnotationVertex={}", visualizeVertex(newTextAnnotationVertex));
   }
 
-  private void handleRegularAnnotation(UUID resourceUUID, TextAnnotationInsertionContext context, GraphTraversal<Vertex, Vertex> traversal2) {
-    List<Vertex> list = traversal2//
+  private void handleRegularAnnotation(UUID resourceUUID, TextAnnotationInsertionContext context, Vertex parentTextAnnotationVertex) {
+    Log.debug("handleMilestoneAnnotation");
+    List<Vertex> list = storage.getVertexTraversal(parentTextAnnotationVertex)//
+        .out(EdgeLabels.FIRST_TEXT_SEGMENT)//
         // find the textsegment where the textrange from annotation.position starts
         .until(context::rangeStartsInThisTextSegment)//
         .repeat(__.out(EdgeLabels.NEXT))//
@@ -244,59 +246,73 @@ public class TextGraphService {
     }
   }
 
-  private void handleMilestoneAnnotation(Vertex newTextAnnotationVertex, TextAnnotationInsertionContext context, GraphTraversal<Vertex, Vertex> firstTextSegmentTraversal) {
+  private void handleMilestoneAnnotation(Vertex newTextAnnotationVertex, TextAnnotationInsertionContext context, Vertex parentTextAnnotationVertex) {
+    Log.debug("handleMilestoneAnnotation");
     // TODO: refactor this mess!
-    // Milestones should be linked to their own empty TextSegment
-    Vertex emptyTextSegment = newTextSegmentVertex("");
-    context.linkTextAnnotationToTextSegment(newTextAnnotationVertex, emptyTextSegment);
 
-    // now we have to fit in this new textSegment
     int startOffset = 0;
     int endOffset = 0;
     String text = "";
-    Vertex textSegment = firstTextSegmentTraversal.next();
+    Vertex textSegment = parentTextAnnotationVertex.vertices(Direction.OUT, EdgeLabels.FIRST_TEXT_SEGMENT).next();
+    Log.debug("first textSegment={}", visualizeVertex(textSegment));
+    boolean parentTextAnnotationIsMilestone = parentTextAnnotationIsMilestone(parentTextAnnotationVertex, textSegment);
 
-    // find the textsegment where the textrange from annotation.position starts
-    boolean goOn = true;
-    while (goOn) {
-      text = getStringValue(textSegment, TextSegment.Properties.text);
-      int segmentSize = text.length();
-      goOn = startOffset + segmentSize < context.rangeStart;
-      endOffset += segmentSize;
-      if (goOn) {
-        Iterator<Vertex> nextTextSegments = textSegment.vertices(Direction.OUT, EdgeLabels.NEXT);
-        if (nextTextSegments.hasNext()) {
-          startOffset += segmentSize;
-          textSegment = nextTextSegments.next();
-        } else {
-          goOn = false;
-        }
-      }
-    }
-    if (startOffset == context.rangeStart) {
-      context.insertNewBeforeCurrent(emptyTextSegment, textSegment);
-      StreamUtil.stream(textSegment.edges(Direction.IN, EdgeLabels.FIRST_TEXT_SEGMENT))//
-          .forEach(e -> context.moveEdge(e, EdgeLabels.FIRST_TEXT_SEGMENT, emptyTextSegment));
-
-    } else if (endOffset == context.rangeEnd) {
-      context.insertNewAfterCurrent(emptyTextSegment, textSegment);
-      StreamUtil.stream(textSegment.edges(Direction.IN, EdgeLabels.LAST_TEXT_SEGMENT))//
-          .forEach(e -> context.moveEdge(e, EdgeLabels.LAST_TEXT_SEGMENT, emptyTextSegment));
+    if (parentTextAnnotationIsMilestone) {
+      context.linkTextAnnotationToTextSegment(newTextAnnotationVertex, textSegment);
 
     } else {
-      // split up textSegment?
-      int headLength = context.rangeStart - startOffset - 1;
-      String headText = text.substring(0, headLength);
-      String tailText = text.substring(headLength);
-      textSegment.property(TextSegment.Properties.text, headText);
-      Vertex newTail = newTextSegmentVertex(tailText);
-      StreamUtil.stream(textSegment.edges(Direction.IN, EdgeLabels.LAST_TEXT_SEGMENT))//
-          .forEach(e -> context.moveEdge(e, EdgeLabels.LAST_TEXT_SEGMENT, newTail));
-      context.insertNewAfterCurrent(newTail, textSegment);
-      context.insertNewAfterCurrent(emptyTextSegment, textSegment);
+      Vertex emptyTextSegment = newTextSegmentVertex("");
+      context.linkTextAnnotationToTextSegment(newTextAnnotationVertex, emptyTextSegment);
+
+      // find the textsegment where the textrange from annotation.position starts
+      boolean goOn = true;
+      while (goOn) {
+        text = getStringValue(textSegment, TextSegment.Properties.text);
+        int segmentSize = text.length();
+        goOn = startOffset + segmentSize < context.rangeStart;
+        endOffset += segmentSize;
+        if (goOn) {
+          Iterator<Vertex> nextTextSegments = textSegment.vertices(Direction.OUT, EdgeLabels.NEXT);
+          if (nextTextSegments.hasNext()) {
+            startOffset += segmentSize;
+            textSegment = nextTextSegments.next();
+          } else {
+            goOn = false;
+          }
+        }
+      }
+      if (startOffset == context.rangeStart) {
+        context.insertNewBeforeCurrent(emptyTextSegment, textSegment);
+        StreamUtil.stream(textSegment.edges(Direction.IN, EdgeLabels.FIRST_TEXT_SEGMENT))//
+            .forEach(e -> context.moveEdge(e, EdgeLabels.FIRST_TEXT_SEGMENT, emptyTextSegment));
+
+      } else if (endOffset == context.rangeEnd) {
+        context.insertNewAfterCurrent(emptyTextSegment, textSegment);
+        StreamUtil.stream(textSegment.edges(Direction.IN, EdgeLabels.LAST_TEXT_SEGMENT))//
+            .forEach(e -> context.moveEdge(e, EdgeLabels.LAST_TEXT_SEGMENT, emptyTextSegment));
+
+      } else {
+        // split up textSegment?
+        int headLength = context.rangeStart - startOffset - 1;
+        String headText = text.substring(0, headLength);
+        String tailText = text.substring(headLength);
+        textSegment.property(TextSegment.Properties.text, headText);
+        Vertex newTail = newTextSegmentVertex(tailText);
+        StreamUtil.stream(textSegment.edges(Direction.IN, EdgeLabels.LAST_TEXT_SEGMENT))//
+            .forEach(e -> context.moveEdge(e, EdgeLabels.LAST_TEXT_SEGMENT, newTail));
+        context.insertNewAfterCurrent(newTail, textSegment);
+        context.insertNewAfterCurrent(emptyTextSegment, textSegment);
+      }
     }
 
     context.reindexNeeded = true;
+  }
+
+  private boolean parentTextAnnotationIsMilestone(Vertex parentTextAnnotationVertex, Vertex textSegment) {
+    Vertex lastTextSegment = parentTextAnnotationVertex.vertices(Direction.OUT, EdgeLabels.LAST_TEXT_SEGMENT).next();
+    String firstText = getStringValue(textSegment, TextSegment.Properties.text);
+    boolean parentTextAnnotationIsMilestone = firstText.isEmpty() && textSegment == lastTextSegment;
+    return parentTextAnnotationIsMilestone;
   }
 
   private Vertex createNewTextAnnotation(TextRangeAnnotationVF textRangeAnnotationVF, TextRangeAnnotation textRangeAnnotation) {
@@ -594,25 +610,6 @@ public class TextGraphService {
       }
       newVertex.addEdge(EdgeLabels.NEXT, currentVertex);
     }
-
-    private String visualizeVertex(Vertex v) {
-      StringBuilder visualization = new StringBuilder();
-      visualization.append("\n").append(vertexRepresentation(v));
-      StreamUtil.stream(v.edges(Direction.IN)).forEach(e -> visualization.append("\n<-[:").append(e.label()).append("]-").append(vertexRepresentation(e.outVertex())));
-      StreamUtil.stream(v.edges(Direction.OUT)).forEach(e -> visualization.append("\n-[:").append(e.label()).append("]->").append(vertexRepresentation(e.inVertex())));
-      return visualization.toString();
-    }
-
-    private String vertexRepresentation(Vertex v) {
-      String props = StreamUtil.stream(v.properties())//
-          .map(this::propertyRepresentation)//
-          .collect(joining());
-      return "(:" + v.label() + "{id:" + v.id() + props + "})";
-    }
-
-    private String propertyRepresentation(VertexProperty<Object> vp) {
-      return ", " + vp.key() + ":\"" + vp.value().toString().replace("\n", "\\n") + "\"";
-    }
   }
 
   // private methods //
@@ -789,6 +786,25 @@ public class TextGraphService {
     AtomicInteger counter = new AtomicInteger(1);
     getTextAnnotationVertexStream(resourceUUID)//
         .forEach(v -> v.property(TextAnnotation.Properties.index, counter.getAndIncrement()));
+  }
+
+  private String visualizeVertex(Vertex v) {
+    StringBuilder visualization = new StringBuilder();
+    visualization.append("\n").append(vertexRepresentation(v));
+    StreamUtil.stream(v.edges(Direction.IN)).forEach(e -> visualization.append("\n<-[:").append(e.label()).append("]-").append(vertexRepresentation(e.outVertex())));
+    StreamUtil.stream(v.edges(Direction.OUT)).forEach(e -> visualization.append("\n-[:").append(e.label()).append("]->").append(vertexRepresentation(e.inVertex())));
+    return visualization.toString();
+  }
+
+  private String vertexRepresentation(Vertex v) {
+    String props = StreamUtil.stream(v.properties())//
+        .map(this::propertyRepresentation)//
+        .collect(joining());
+    return "(:" + v.label() + "{id:" + v.id() + props + "})";
+  }
+
+  private String propertyRepresentation(VertexProperty<Object> vp) {
+    return ", " + vp.key() + ":\"" + vp.value().toString().replace("\n", "\\n") + "\"";
   }
 
 }

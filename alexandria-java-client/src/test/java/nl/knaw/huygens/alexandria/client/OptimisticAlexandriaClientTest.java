@@ -20,6 +20,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableMap;
+
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
@@ -398,6 +400,79 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     client.getTextAsDot(resourceUUID);
     String annotatedXML = client.getTextAsString(resourceUUID);
     String expectation2 = singleQuotesToDouble("<text><p xml:id='p-1'><milestone-start resp='#ed'/>This<milestone-middle resp='#ed'/> is a simple paragraph.<milestone-end resp='#ed'/></p></text>");
+    assertThat(annotatedXML).isEqualTo(expectation2);
+  }
+
+  @Test
+  public void testBugNLA332a() {
+    String xml = singleQuotesToDouble("<TEI>\n"//
+        + "<text lang='la'>\n"//
+        + "<body>\n"//
+        + "<div type='letter'>\n"//
+        + "<p xml:id='p-1'>...  ... Salmurij ...</p>\n"//
+        + "<p xml:id='p-2'><figure><graphic url='beec002jour04ill02.gif'/></figure></p>\n"//
+        + "</div>\n"//
+        + "</body>\n"//
+        + "</text>\n"//
+        + "</TEI>");
+    UUID resourceUUID = createResourceWithText(xml);
+    client.setAnnotator(resourceUUID, "ckcc", new Annotator().setCode("ckcc").setDescription("CKCC project team"));
+    client.setAnnotator(resourceUUID, "nerf", new Annotator().setCode("nerf").setDescription("Something"));
+    client.getTextAsDot(resourceUUID);
+
+    UUID annotationUUID1 = UUID.randomUUID();
+    Position position1 = new Position()//
+        .setXmlId("p-2");
+    Map<String, String> attributes1 = ImmutableMap.of("value", "closer");
+    TextRangeAnnotation closerAnnotation = new TextRangeAnnotation()//
+        .setId(annotationUUID1)//
+        .setName("p_type")//
+        .setAnnotator("ckcc")//
+        .setPosition(position1)//
+        .setAttributes(attributes1);
+    ;
+
+    UUID annotationUUID2 = UUID.randomUUID();
+    Position position2 = new Position()//
+        .setXmlId("p-1")//
+        .setOffset(5)//
+        .setLength(0);
+    TextRangeAnnotation placeNameAnnotation = new TextRangeAnnotation()//
+        .setId(annotationUUID2)//
+        .setName("placeName")//
+        .setAnnotator("ckcc")//
+        .setPosition(position2)//
+    ;
+
+    UUID annotationUUID3 = UUID.randomUUID();
+    Position position3 = new Position()//
+        .setXmlId("p-2");
+    TextRangeAnnotation ptypeAnnotation2 = new TextRangeAnnotation()//
+        .setId(annotationUUID3)//
+        .setName("p_type")//
+        .setAnnotator("nerf")//
+        .setPosition(position3)//
+    ;
+
+    TextRangeAnnotationList annotations = new TextRangeAnnotationList();
+    annotations.add(closerAnnotation);
+    annotations.add(placeNameAnnotation);
+    annotations.add(ptypeAnnotation2);
+    TextAnnotationImportStatus status = client.addResourceTextRangeAnnotationsSynchronously(resourceUUID, annotations);
+    assertThat(status.getErrors()).isEmpty();
+
+    client.getTextAsDot(resourceUUID);
+    String annotatedXML = client.getTextAsString(resourceUUID);
+    String expectation2 = singleQuotesToDouble("<TEI>\n"//
+        + "<text lang='la'>\n"//
+        + "<body>\n"//
+        + "<div type='letter'>\n"//
+        + "<p xml:id='p-1'>... <placeName resp='#ckcc'/> ... Salmurij ...</p>\n"//
+        + "<p xml:id='p-2'><p_type resp='#nerf'><p_type value='closer' resp='#ckcc'><figure><graphic url='beec002jour04ill02.gif'/></figure></p_type></p_type></p>\n"//
+        + "</div>\n"//
+        + "</body>\n"//
+        + "</text>\n"//
+        + "</TEI>");
     assertThat(annotatedXML).isEqualTo(expectation2);
   }
 
