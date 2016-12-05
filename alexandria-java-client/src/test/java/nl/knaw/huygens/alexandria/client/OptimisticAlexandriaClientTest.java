@@ -476,6 +476,123 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     assertThat(annotatedXML).isEqualTo(expectation2);
   }
 
+  @Test
+  public void testBugNLA332b() {
+    String xml = singleQuotesToDouble("<TEI>\n"//
+        + "<teiHeader>\n"//
+        + "<meta type='uuid' value='cd89eced-78d9-4a6a-9fa1-3857011e8ede'/>\n"//
+        + "<meta type='id' value='0001'/>\n"//
+        + "<meta type='date' value='1612-07-18'/>\n"//
+        + "<meta type='sender' value='beeckman.isaac.1588-1637'/>\n"//
+        + "<meta type='senderloc' value='se:saumur.fra'/>\n"//
+        + "<meta type='recipient' value='?'/>\n"//
+        + "<meta type='recipientloc' value='?'/>\n"//
+        + "<meta type='language' value='la'/>\n"//
+        + "</teiHeader>\n"//
+
+        + "<text xml:id='text-1' lang='la'>\n"//
+        + "<body>\n"//
+        + "<div xml:id='div-1' type='letter'>\n"//
+        + "<p xml:id='p-1'>...  ... Salmurij ...</p>\n"//
+        + "<p xml:id='p-2'><figure><graphic url='beec002jour04ill02.gif'/></figure></p>\n"//
+        + "</div>\n"//
+        + "</body>\n"//
+        + "</text>\n"//
+        + "</TEI>");
+    UUID resourceUUID = createResourceWithText(xml);
+    client.setAnnotator(resourceUUID, "ckcc", new Annotator().setCode("ckcc").setDescription("CKCC project team"));
+    client.setAnnotator(resourceUUID, "nerf", new Annotator().setCode("nerf").setDescription("Something"));
+    client.getTextAsDot(resourceUUID);
+
+    UUID annotationUUID1 = UUID.randomUUID();
+    Position position1 = new Position()//
+        .setXmlId("p-2");
+    Map<String, String> attributes1 = ImmutableMap.of("value", "closer");
+    TextRangeAnnotation closerAnnotation = new TextRangeAnnotation()//
+        .setId(annotationUUID1)//
+        .setName("p_type")//
+        .setAnnotator("ckcc")//
+        .setPosition(position1)//
+        .setAttributes(attributes1);
+    ;
+    TextRangeAnnotationInfo info1 = client.setResourceTextRangeAnnotation(resourceUUID, closerAnnotation);
+    assertThat(info1.getAnnotates()).isEqualTo("");
+    String textAfterFirstAnnotation = client.getTextAsString(resourceUUID);
+    String expectation1 = singleQuotesToDouble("<TEI>\n"//
+        + "<teiHeader>\n"//
+        + "<meta type='uuid' value='cd89eced-78d9-4a6a-9fa1-3857011e8ede'/>\n"//
+        + "<meta type='id' value='0001'/>\n"//
+        + "<meta type='date' value='1612-07-18'/>\n"//
+        + "<meta type='sender' value='beeckman.isaac.1588-1637'/>\n"//
+        + "<meta type='senderloc' value='se:saumur.fra'/>\n"//
+        + "<meta type='recipient' value='?'/>\n"//
+        + "<meta type='recipientloc' value='?'/>\n"//
+        + "<meta type='language' value='la'/>\n"//
+        + "</teiHeader>\n"//
+
+        + "<text xml:id='text-1' lang='la'>\n"//
+        + "<body>\n"//
+        + "<div xml:id='div-1' type='letter'>\n"//
+        + "<p xml:id='p-1'>...  ... Salmurij ...</p>\n"//
+        + "<p xml:id='p-2'><p_type value='closer' resp='#ckcc'><figure><graphic url='beec002jour04ill02.gif'/></figure></p_type></p>\n"//
+        + "</div>\n"//
+        + "</body>\n"//
+        + "</text>\n"//
+        + "</TEI>");
+    assertThat(textAfterFirstAnnotation).isEqualTo(expectation1);
+
+    UUID annotationUUID2 = UUID.randomUUID();
+    Position position2 = new Position()//
+        .setXmlId("p-1")//
+        .setOffset(5)//
+        .setLength(0);
+    TextRangeAnnotation placeNameAnnotation = new TextRangeAnnotation()//
+        .setId(annotationUUID2)//
+        .setName("placeName")//
+        .setAnnotator("ckcc")//
+        .setPosition(position2)//
+    ;
+    TextRangeAnnotationInfo info2 = client.setResourceTextRangeAnnotation(resourceUUID, placeNameAnnotation);
+    assertThat(info2.getAnnotates()).isEqualTo("");
+
+    UUID annotationUUID3 = UUID.randomUUID();
+    Position position3 = new Position()//
+        .setXmlId("p-2");
+    TextRangeAnnotation ptypeAnnotation2 = new TextRangeAnnotation()//
+        .setId(annotationUUID3)//
+        .setName("p_type")//
+        .setAnnotator("nerf")//
+        .setPosition(position3)//
+    ;
+    TextRangeAnnotationInfo info3 = client.setResourceTextRangeAnnotation(resourceUUID, ptypeAnnotation2);
+    assertThat(info3.getAnnotates()).isEqualTo("");
+
+    client.getTextAsDot(resourceUUID);
+    String annotatedXML = client.getTextAsString(resourceUUID);
+    String expectation2 = singleQuotesToDouble("<TEI>\n"//
+        + "<teiHeader>\n"//
+        + "<meta type='uuid' value='cd89eced-78d9-4a6a-9fa1-3857011e8ede'/>\n"//
+        + "<meta type='id' value='0001'/>\n"//
+        + "<meta type='date' value='1612-07-18'/>\n"//
+        + "<meta type='sender' value='beeckman.isaac.1588-1637'/>\n"//
+        + "<meta type='senderloc' value='se:saumur.fra'/>\n"//
+        + "<meta type='recipient' value='?'/>\n"//
+        + "<meta type='recipientloc' value='?'/>\n"//
+        + "<meta type='language' value='la'/>\n"//
+        + "</teiHeader>\n"//
+
+        + "<text xml:id='text-1' lang='la'>\n"//
+        + "<body>\n"//
+        + "<div xml:id='div-1' type='letter'>\n"//
+        + "<p xml:id='p-1'>... <placeName resp='#ckcc'/> ... Salmurij ...</p>\n"//
+        + "<p xml:id='p-2'><p_type resp='#nerf'><p_type value='closer' resp='#ckcc'><figure><graphic url='beec002jour04ill02.gif'/></figure></p_type></p_type></p>\n"//
+        + "</div>\n"//
+        + "</body>\n"//
+        + "</text>\n"//
+        + "</TEI>");
+    assertThat(annotatedXML).isEqualTo(expectation2);
+  }
+
   /// end tests
 
   private UUID createResourceWithText(String xml) {
