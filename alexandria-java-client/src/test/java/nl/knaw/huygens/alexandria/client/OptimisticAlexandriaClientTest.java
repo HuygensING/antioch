@@ -13,6 +13,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 import org.junit.AfterClass;
@@ -474,6 +475,42 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
         + "</text>\n"//
         + "</TEI>");
     assertThat(annotatedXML).isEqualTo(expectation2);
+  }
+
+  @Test
+  public void testBugNLA331() {
+    String xml = singleQuotesToDouble("<text><p xml:id='p-1'>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890</p><p xml:id='p-2'>And another one.</p></text>");
+    UUID resourceUUID = createResourceWithText(xml);
+    client.setAnnotator(resourceUUID, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
+
+    int maxOffset = 60;
+    int maxAnnotations = 1000;
+    TextRangeAnnotationList annotations = new TextRangeAnnotationList();
+
+    Random random2 = new Random();
+
+    for (int i = 0; i < maxAnnotations; i++) {
+      int randomOffset = random2.nextInt(maxOffset) + 1;
+      UUID annotationUUID = UUID.randomUUID();
+      Position position = new Position()//
+          .setXmlId("p-1")//
+          .setOffset(randomOffset)//
+          .setLength(1); // so there's never an overlap
+      TextRangeAnnotation randomAnnotation = new TextRangeAnnotation()//
+          .setId(annotationUUID)//
+          .setName("tag" + i)//
+          .setAnnotator("ed")//
+          .setPosition(position)//
+      ;
+      annotations.add(randomAnnotation);
+    }
+
+    TextAnnotationImportStatus status = client.addResourceTextRangeAnnotationsSynchronously(resourceUUID, annotations);
+    assertThat(status.getErrors()).isEmpty();
+
+    client.getTextAsDot(resourceUUID);
+    String annotatedXML = client.getTextAsString(resourceUUID);
+    assertThat(annotatedXML).isNotEmpty();
   }
 
   @Test
