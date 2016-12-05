@@ -113,14 +113,10 @@ public class TextGraphUtilTest extends AlexandriaTest {
 
   private void assertFirstOfWorksAsExpected(ImmutableList<String> respPriority, String expected) {
     TextView textView = new TextView();
-    ElementView defaultView = new ElementView()//
-        .setElementMode(ElementMode.hideTag)//
-        .setAttributeMode(AttributeMode.showAll);
     ElementView elementView = new ElementView()//
         .setElementMode(ElementMode.show)//
         .setPreCondition("resp", AttributeFunction.firstOf, respPriority)//
         .setAttributeMode(AttributeMode.showAll);
-    textView.putElementView(":default", defaultView);
     textView.putElementView("note", elementView);
     TextGraphSegment segment = new TextGraphSegment();
     TextAnnotation noteA = new TextAnnotation("note", ImmutableMap.of("xml:id", "note-a", "resp", "#a"), 0);

@@ -236,6 +236,59 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
   }
 
   @Test
+  public void testNLA330() {
+    String rootXml = singleQuotesToDouble("<text>"//
+        + "<p xml:id='p-1'>"//
+        + "Show a, ignore b &amp; c: "//
+        + "<persName xml:id='persName-a1' resp='#a'>"//
+        + "<persName xml:id='persName-b1' resp='#b'>"//
+        + "<persName xml:id='persName-c1' resp='#c'>Sinterklaas</persName></persName></persName>"//
+        + "</p>"//
+
+        + "<p xml:id='p-2'>"//
+        + "Show b, ignore c: "//
+        + "<persName xml:id='persName-b2' resp='#b'>"//
+        + "<persName xml:id='persName-c2' resp='#c'>Pietje Puk</persName></persName>"//
+        + "</p>"//
+
+        + "<p xml:id='p-3'>"//
+        + "Ignore c: "//
+        + "<persName xml:id='persName-c3' resp='#c'>Amerigo</persName>"//
+        + "</p>"//
+        + "</text>");
+    UUID rootResourceUUID = createResourceWithText(rootXml);
+
+    ElementViewDefinition evd = new ElementViewDefinition()//
+        .setElementMode(ElementMode.show)//
+        .setWhen("attribute(resp).firstOf('#a','#b')");
+    TextViewDefinition textView = new TextViewDefinition()//
+        .setDescription("show-resp-a-or-b")//
+        .setElementViewDefinition("persName", evd);
+    client.setResourceTextView(rootResourceUUID, "view1", textView);
+
+    String rootView = client.getTextAsString(rootResourceUUID, "view1");
+    Log.info("rootView = {}", rootView);
+
+    String expected = singleQuotesToDouble("<text>"//
+        + "<p xml:id='p-1'>"//
+        + "Show a, ignore b &amp; c: "//
+        + "<persName xml:id='persName-a1' resp='#a'>Sinterklaas</persName>"//
+        + "</p>"//
+
+        + "<p xml:id='p-2'>"//
+        + "Show b, ignore c: "//
+        + "<persName xml:id='persName-b2' resp='#b'>Pietje Puk</persName>"//
+        + "</p>"//
+
+        + "<p xml:id='p-3'>"//
+        + "Ignore c: "//
+        + "Amerigo"//
+        + "</p>"//
+        + "</text>");
+    assertThat(rootView).isEqualTo(expected);
+  }
+
+  @Test
   public void testTextRangeAnnotationBatch() {
     String xml = singleQuotesToDouble("<text><p xml:id='p-1'>This is another simple paragraph.</p><p xml:id='p-2'>And another one.</p></text>");
     UUID resourceUUID = createResourceWithText(xml);

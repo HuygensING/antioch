@@ -3,6 +3,8 @@ package nl.knaw.huygens.alexandria.api.model.text.view;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.Joiner;
+
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeFunction;
 
 public class AttributePreCondition {
@@ -41,6 +43,11 @@ public class AttributePreCondition {
 
   public List<String> getValues() {
     return values;
+  }
+
+  @Override
+  public String toString() {
+    return "attribute(" + attribute + ")." + function.name() + "(" + Joiner.on(",").join(values) + ")";
   }
 
 }

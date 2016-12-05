@@ -28,8 +28,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.text.view.AttributePreCondition;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeFunction;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.ElementMode;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
@@ -150,7 +152,10 @@ public class TextGraphUtil {
       boolean includeAccordingToElementMode = elementMode.equals(ElementMode.show);
       boolean preConditionIsMet = preConditionIsMet(preCondition, textAnnotation);
       if (!preConditionIsMet) {
-        includeAccordingToElementMode = defaultViewElementMode.equals(ElementMode.show);
+        boolean preConditionIsFirstOfFunction = preCondition.isPresent() && AttributeFunction.firstOf.equals(preCondition.get().getFunction());
+        includeAccordingToElementMode = preConditionIsFirstOfFunction //
+            ? false //
+            : defaultViewElementMode.equals(ElementMode.show);
       }
 
       return notInsideIgnoredElement() && includeAccordingToElementMode;
