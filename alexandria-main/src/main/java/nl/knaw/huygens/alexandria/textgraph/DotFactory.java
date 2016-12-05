@@ -56,7 +56,13 @@ public class DotFactory {
   }
 
   private static void appendTextVertex(StringBuilder stringBuilder, String textSegment, int n) {
-    stringBuilder.append("  t").append(n).append(" [shape=box, label=\"").append(escape(textSegment).replace(" ", "␣")).append("\"];\n");
+    stringBuilder.append("  t")//
+        .append(n)//
+        .append(" [shape=box, label=\"")//
+        .append(escape(textSegment)//
+            .replace(" ", "␣")//
+            .replace("\n", "↵"))//
+        .append("\"];\n");
   }
 
   private static String escape(String textSegment) {
