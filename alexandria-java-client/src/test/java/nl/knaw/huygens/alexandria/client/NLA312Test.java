@@ -11,7 +11,6 @@ import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.net.URI;
 import java.util.Map;
@@ -33,7 +32,7 @@ public class NLA312Test extends AlexandriaTest {
     client.close();
   }
 
-  @Test
+//  @Test
   public void testBugNLA332bw() {
     String xml = singleQuotesToDouble("<TEI>\n"//
       + "<teiHeader>\n"//
