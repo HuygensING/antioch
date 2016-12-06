@@ -1,31 +1,5 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
-import static java.util.stream.Collectors.toList;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-
-import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
-
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.ProcessStatusMap;
@@ -48,6 +22,23 @@ import nl.knaw.huygens.alexandria.textgraph.DotFactory;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphImportTask;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 import nl.knaw.huygens.alexandria.textgraph.TextRangeAnnotationValidatorFactory;
+import org.apache.commons.io.Charsets;
+import org.apache.commons.io.IOUtils;
+
+import javax.inject.Inject;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+
+import static java.util.stream.Collectors.toList;
 
 public class ResourceTextEndpoint extends JSONEndpoint {
   private final AlexandriaService service;
@@ -63,14 +54,14 @@ public class ResourceTextEndpoint extends JSONEndpoint {
 
   @Inject
   public ResourceTextEndpoint(AlexandriaService service, //
-      AlexandriaConfiguration config, //
-      ResourceValidatorFactory validatorFactory, //
-      ExecutorService executorService, //
-      LocationBuilder locationBuilder, //
-      ResourceTextFactory resourceTextFactory, //
-      ProcessStatusMap<TextImportStatus> taskStatusMap, //
-      ProcessStatusMap<TextAnnotationImportStatus> annotationTaskStatusMap, //
-      @PathParam("uuid") final UUIDParam uuidParam) {
+                              AlexandriaConfiguration config, //
+                              ResourceValidatorFactory validatorFactory, //
+                              ExecutorService executorService, //
+                              LocationBuilder locationBuilder, //
+                              ResourceTextFactory resourceTextFactory, //
+                              ProcessStatusMap<TextImportStatus> taskStatusMap, //
+                              ProcessStatusMap<TextAnnotationImportStatus> annotationTaskStatusMap, //
+                              @PathParam("uuid") final UUIDParam uuidParam) {
     this.service = service;
     this.config = config;
     this.executorService = executorService;
@@ -90,8 +81,8 @@ public class ResourceTextEndpoint extends JSONEndpoint {
     assertResourceHasNoText();
     startTextProcessing(xml);
     return Response.accepted()//
-        .location(locationBuilder.locationOf(resource, EndpointPaths.TEXT, "status"))//
-        .build();
+      .location(locationBuilder.locationOf(resource, EndpointPaths.TEXT, "status"))//
+      .build();
   }
 
   @PUT
@@ -119,9 +110,9 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   public Response getTextEntity() {
     assertResourceHasText();
     List<TextViewEntity> textViewEntities = service.getTextViewsForResource(resourceUUID)//
-        .stream()//
-        .map(tv -> textFactory.createTextViewEntity(resourceUUID, tv))//
-        .collect(toList());
+      .stream()//
+      .map(tv -> textFactory.createTextViewEntity(resourceUUID, tv))//
+      .collect(toList());
     TextEntity text = textFactory.createTextEntity(resourceUUID, textViewEntities);
     return ok(text);
   }
@@ -135,7 +126,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @Path("status")
   public Response getTextGraphImportStatus() {
     TextImportStatus textGraphImportTaskStatus = taskStatusMap.get(resourceUUID)//
-        .orElseThrow(NotFoundException::new);
+      .orElseThrow(NotFoundException::new);
     return ok(textGraphImportTaskStatus);
   }
 
@@ -143,10 +134,25 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   @Path("xml")
   @Produces(MediaType.TEXT_XML)
   @ApiOperation("get textgraph as xml")
-  public Response getXML(@QueryParam("view") String view) {
+  public Response getXML(@QueryParam("view") String viewName, @Context UriInfo uriInfo) {
     assertResourceHasText();
-    StreamingOutput outputstream = TextGraphUtil.xmlOutputStream(service, resourceUUID, view);
+    Map<String, String> viewParameters = getViewParameters(uriInfo);
+    StreamingOutput outputstream = TextGraphUtil.xmlOutputStream(service, resourceUUID, viewName, viewParameters);
     return ok(outputstream);
+  }
+
+  private Map<String, String> getViewParameters(@Context UriInfo uriInfo) {
+    MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
+    Map<String, String> viewParameters = new HashMap<>();
+    queryParameters.forEach((k, v) -> {
+      if (v.size() > 1) {
+        throw new BadRequestException("view parameter '" + k + "' has multiple values, should be single-valued");
+      }
+      if (k.startsWith("view.")) {
+        viewParameters.put(k.replace("view.", ""), v.get(0));
+      }
+    });
+    return viewParameters;
   }
 
   @GET
@@ -170,15 +176,15 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   public Response postAnnotationList(@NotNull TextRangeAnnotationList newTextRangeAnnotationList) {
     startAnnotating(newTextRangeAnnotationList);
     return Response.accepted()//
-        .location(locationBuilder.locationOf(resource, EndpointPaths.TEXT, EndpointPaths.ANNOTATIONBATCH, "status"))//
-        .build();
+      .location(locationBuilder.locationOf(resource, EndpointPaths.TEXT, EndpointPaths.ANNOTATIONBATCH, "status"))//
+      .build();
   }
 
   @GET
   @Path(EndpointPaths.ANNOTATIONBATCH + "/status")
   public Response getAnnotationBatchStatus() {
     TextAnnotationImportStatus textAnnotationsImportTaskStatus = annotationTaskStatusMap.get(resourceUUID)//
-        .orElseThrow(NotFoundException::new);
+      .orElseThrow(NotFoundException::new);
     return ok(textAnnotationsImportTaskStatus);
   }
 

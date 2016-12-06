@@ -206,6 +206,9 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
       .setDescription("ignore")//
       .setElementViewDefinition("ignore", evd);
     client.setResourceTextView(rootResourceUUID, "view1", textView);
+    TextViewDefinition resourceTextView = client.getResourceTextView(rootResourceUUID, "view1");
+    List<TextViewDefinition> resourceTextViews = client.getResourceTextViews(rootResourceUUID);
+    Log.info("resourceTextView={}",resourceTextView);
 
     String rootView = client.getTextAsString(rootResourceUUID, "view1");
     Log.info("rootView = {}", rootView);
@@ -260,6 +263,60 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     client.setResourceTextView(rootResourceUUID, "view1", textView);
 
     String rootView = client.getTextAsString(rootResourceUUID, "view1");
+    Log.info("rootView = {}", rootView);
+
+    String expected = singleQuotesToDouble("<text>"//
+      + "<p xml:id='p-1'>"//
+      + "Show a, ignore b &amp; c: "//
+      + "<persName xml:id='persName-a1' resp='#a'>Sinterklaas</persName>"//
+      + "</p>"//
+
+      + "<p xml:id='p-2'>"//
+      + "Show b, ignore c: "//
+      + "<persName xml:id='persName-b2' resp='#b'>Pietje Puk</persName>"//
+      + "</p>"//
+
+      + "<p xml:id='p-3'>"//
+      + "Ignore c: "//
+      + "Amerigo"//
+      + "</p>"//
+      + "</text>");
+    assertThat(rootView).isEqualTo(expected);
+  }
+
+  @Test
+  public void testParameterizedView() {
+    String rootXml = singleQuotesToDouble("<text>"//
+      + "<p xml:id='p-1'>"//
+      + "Show a, ignore b &amp; c: "//
+      + "<persName xml:id='persName-a1' resp='#a'>"//
+      + "<persName xml:id='persName-b1' resp='#b'>"//
+      + "<persName xml:id='persName-c1' resp='#c'>Sinterklaas</persName></persName></persName>"//
+      + "</p>"//
+
+      + "<p xml:id='p-2'>"//
+      + "Show b, ignore c: "//
+      + "<persName xml:id='persName-b2' resp='#b'>"//
+      + "<persName xml:id='persName-c2' resp='#c'>Pietje Puk</persName></persName>"//
+      + "</p>"//
+
+      + "<p xml:id='p-3'>"//
+      + "Ignore c: "//
+      + "<persName xml:id='persName-c3' resp='#c'>Amerigo</persName>"//
+      + "</p>"//
+      + "</text>");
+    UUID rootResourceUUID = createResourceWithText(rootXml);
+
+    ElementViewDefinition evd = new ElementViewDefinition()//
+      .setElementMode(ElementMode.show)//
+      .setWhen("attribute(resp).firstOf({list})");
+    TextViewDefinition textView = new TextViewDefinition()//
+      .setDescription("show-resp-a-or-b")//
+      .setElementViewDefinition("persName", evd);
+    client.setResourceTextView(rootResourceUUID, "view1", textView);
+
+    Map<String,String> viewParameters = ImmutableMap.of("list","'#a','#b'");
+    String rootView = client.getTextAsString(rootResourceUUID, "view1", viewParameters);
     Log.info("rootView = {}", rootView);
 
     String expected = singleQuotesToDouble("<text>"//

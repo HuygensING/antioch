@@ -1,14 +1,16 @@
 package nl.knaw.huygens.alexandria.api.model.text.view;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 @JsonInclude(Include.NON_ABSENT)
 public class ElementView {
+
   public enum ElementMode {
     show, hide, hideTag
   }
@@ -22,8 +24,8 @@ public class ElementView {
   }
 
   public static final ElementView DEFAULT = new ElementView()//
-      .setElementMode(ElementMode.show)//
-      .setAttributeMode(AttributeMode.showAll);
+    .setElementMode(ElementMode.show)//
+    .setAttributeMode(AttributeMode.showAll);
 
   private ElementView.ElementMode elementMode;
   private ElementView.AttributeMode attributeMode;
@@ -75,4 +77,12 @@ public class ElementView {
     return Optional.ofNullable(precondition);
   }
 
+  public void substitute(Map<String, String> viewParameters) {
+    getPreCondition().ifPresent(preconditions -> precondition.substitute(viewParameters));
+  }
+
+  @Override
+  public String toString() {
+    return "elementMode:" + elementMode.name() + ", attributeMode:" + attributeMode.name() + ", when:" + precondition;
+  }
 }

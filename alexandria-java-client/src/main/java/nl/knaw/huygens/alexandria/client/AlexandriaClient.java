@@ -1,32 +1,41 @@
 package nl.knaw.huygens.alexandria.client;
 
-import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import javax.net.ssl.SSLContext;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.SyncInvoker;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.*;
+import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
+import nl.knaw.huygens.alexandria.api.model.text.*;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
+import nl.knaw.huygens.alexandria.client.model.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
+
+import javax.net.ssl.SSLContext;
+import javax.ws.rs.client.*;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
 
 /*
  * #%L
@@ -50,38 +59,6 @@ import org.glassfish.jersey.client.ClientProperties;
  * #L%
  */
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-
-import nl.knaw.huygens.alexandria.api.EndpointPaths;
-import nl.knaw.huygens.alexandria.api.model.AboutEntity;
-import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.api.model.Annotator;
-import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
-import nl.knaw.huygens.alexandria.api.model.CommandResponse;
-import nl.knaw.huygens.alexandria.api.model.CommandStatus;
-import nl.knaw.huygens.alexandria.api.model.StatePrototype;
-import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
-import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
-import nl.knaw.huygens.alexandria.api.model.text.TextAnnotationImportStatus;
-import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
-import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
-import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
-import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
-import nl.knaw.huygens.alexandria.client.model.AnnotationList;
-import nl.knaw.huygens.alexandria.client.model.AnnotationPojo;
-import nl.knaw.huygens.alexandria.client.model.AnnotationPrototype;
-import nl.knaw.huygens.alexandria.client.model.ResourcePojo;
-import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
-import nl.knaw.huygens.alexandria.client.model.SubResourceList;
-import nl.knaw.huygens.alexandria.client.model.SubResourcePojo;
-import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
-
 public class AlexandriaClient implements AutoCloseable {
   private WebTarget rootTarget;
   private String authHeader = "";
@@ -96,8 +73,8 @@ public class AlexandriaClient implements AutoCloseable {
   public AlexandriaClient(final URI alexandriaURI, SSLContext sslContext) {
     this.alexandriaURI = alexandriaURI;
     final ObjectMapper objectMapper = new ObjectMapper()//
-        .registerModule(new Jdk8Module())//
-        .registerModule(new JavaTimeModule());
+      .registerModule(new Jdk8Module())//
+      .registerModule(new JavaTimeModule());
 
     final JacksonJaxbJsonProvider jacksonProvider = new JacksonJaxbJsonProvider();
     jacksonProvider.setMapper(objectMapper);
@@ -108,10 +85,10 @@ public class AlexandriaClient implements AutoCloseable {
 
     ApacheConnectorProvider connectorProvider = new ApacheConnectorProvider();
     ClientConfig clientConfig = new ClientConfig(jacksonProvider)//
-        .connectorProvider(connectorProvider)//
-        .property(ApacheClientProperties.CONNECTION_MANAGER, cm)//
-        .property(ClientProperties.CONNECT_TIMEOUT, 60000)//
-        .property(ClientProperties.READ_TIMEOUT, 60000);
+      .connectorProvider(connectorProvider)//
+      .property(ApacheClientProperties.CONNECTION_MANAGER, cm)//
+      .property(ClientProperties.CONNECT_TIMEOUT, 60000)//
+      .property(ClientProperties.READ_TIMEOUT, 60000);
 
     if (sslContext == null) {
       if ("https".equals(alexandriaURI.getScheme())) {
@@ -121,9 +98,9 @@ public class AlexandriaClient implements AutoCloseable {
 
     } else {
       client = ClientBuilder.newBuilder()//
-          .sslContext(sslContext)//
-          .withConfig(clientConfig)//
-          .build();
+        .sslContext(sslContext)//
+        .withConfig(clientConfig)//
+        .build();
     }
     rootTarget = client.target(alexandriaURI);
   }
@@ -160,12 +137,12 @@ public class AlexandriaClient implements AutoCloseable {
 
   public RestResult<AboutEntity> getAbout() {
     WebTarget path = rootTarget//
-        .path(EndpointPaths.ABOUT);
+      .path(EndpointPaths.ABOUT);
     Supplier<Response> responseSupplier = anonymousGet(path);
     final RestRequester<AboutEntity> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.OK, this::toAboutEntityRestResult)//
-        .getResult();
+      .onStatus(Status.OK, this::toAboutEntityRestResult)//
+      .getResult();
   }
 
   public RestResult<Void> setResource(final UUID resourceId, final ResourcePrototype resource) {
@@ -175,10 +152,10 @@ public class AlexandriaClient implements AutoCloseable {
     final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
 
     return requester//
-        .onStatus(Status.CREATED, voidRestResult())//
-        .onStatus(Status.ACCEPTED, voidRestResult())//
-        .onStatus(Status.NO_CONTENT, voidRestResult())//
-        .getResult();
+      .onStatus(Status.CREATED, voidRestResult())//
+      .onStatus(Status.ACCEPTED, voidRestResult())//
+      .onStatus(Status.NO_CONTENT, voidRestResult())//
+      .getResult();
   }
 
   public RestResult<UUID> addResource(final ResourcePrototype resource) {
@@ -187,8 +164,8 @@ public class AlexandriaClient implements AutoCloseable {
     final Supplier<Response> responseSupplier = authorizedPost(path, entity);
     final RestRequester<UUID> requester = RestRequester.withResponseSupplier(responseSupplier);
     final RestResult<UUID> addResult = requester//
-        .onStatus(Status.CREATED, this::uuidFromLocationHeader)//
-        .getResult();
+      .onStatus(Status.CREATED, this::uuidFromLocationHeader)//
+      .getResult();
     if (autoConfirm && !addResult.hasFailed()) {
       confirmResource(addResult.get());
     }
@@ -199,12 +176,12 @@ public class AlexandriaClient implements AutoCloseable {
   public RestResult<UUID> addSubResource(final UUID parentResourceId, final SubResourcePrototype subresource) {
     final Entity<SubResourcePrototype> entity = Entity.json(subresource);
     final WebTarget path = resourceTarget(parentResourceId)//
-        .path(EndpointPaths.SUBRESOURCES);
+      .path(EndpointPaths.SUBRESOURCES);
     final Supplier<Response> responseSupplier = authorizedPost(path, entity);
     final RestRequester<UUID> requester = RestRequester.withResponseSupplier(responseSupplier);
     final RestResult<UUID> addResult = requester//
-        .onStatus(Status.CREATED, this::uuidFromLocationHeader)//
-        .getResult();
+      .onStatus(Status.CREATED, this::uuidFromLocationHeader)//
+      .getResult();
     if (autoConfirm && !addResult.hasFailed()) {
       confirmResource(addResult.get());
     }
@@ -214,14 +191,14 @@ public class AlexandriaClient implements AutoCloseable {
   public RestResult<Void> setSubResource(final UUID parentResourceId, final UUID subResourceId, final SubResourcePrototype subresource) {
     final Entity<SubResourcePrototype> entity = Entity.json(subresource);
     final WebTarget path = resourceTarget(parentResourceId)//
-        .path(EndpointPaths.SUBRESOURCES)//
-        .path(subResourceId.toString());
+      .path(EndpointPaths.SUBRESOURCES)//
+      .path(subResourceId.toString());
     final Supplier<Response> responseSupplier = authorizedPut(path, entity);
     final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.CREATED, voidRestResult())//
-        .onStatus(Status.NO_CONTENT, voidRestResult())//
-        .getResult();
+      .onStatus(Status.CREATED, voidRestResult())//
+      .onStatus(Status.NO_CONTENT, voidRestResult())//
+      .getResult();
   }
 
   public RestResult<ResourcePojo> getResource(final UUID uuid) {
@@ -229,8 +206,8 @@ public class AlexandriaClient implements AutoCloseable {
     Supplier<Response> responseSupplier = anonymousGet(path);
     final RestRequester<ResourcePojo> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.OK, this::toResourcePojoRestResult)//
-        .getResult();
+      .onStatus(Status.OK, this::toResourcePojoRestResult)//
+      .getResult();
   }
 
   public RestResult<SubResourcePojo> getSubResource(final UUID uuid) {
@@ -238,24 +215,24 @@ public class AlexandriaClient implements AutoCloseable {
     Supplier<Response> responseSupplier = anonymousGet(path);
     final RestRequester<SubResourcePojo> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.OK, this::toSubResourcePojoRestResult)//
-        .getResult();
+      .onStatus(Status.OK, this::toSubResourcePojoRestResult)//
+      .getResult();
   }
 
   public RestResult<AnnotationList> getResourceAnnotations(final UUID resourceUUID) {
     WebTarget path = resourceTarget(resourceUUID).path(EndpointPaths.ANNOTATIONS);
     final RestRequester<AnnotationList> requester = RestRequester.withResponseSupplier(anonymousGet(path));
     return requester//
-        .onStatus(Status.OK, this::toAnnotationListRestResult)//
-        .getResult();
+      .onStatus(Status.OK, this::toAnnotationListRestResult)//
+      .getResult();
   }
 
   public RestResult<SubResourceList> getSubResources(final UUID resourceUUID) {
     WebTarget path = resourceTarget(resourceUUID).path(EndpointPaths.SUBRESOURCES);
     final RestRequester<SubResourceList> requester = RestRequester.withResponseSupplier(anonymousGet(path));
     return requester//
-        .onStatus(Status.OK, this::toSubResourceListRestResult)//
-        .getResult();
+      .onStatus(Status.OK, this::toSubResourceListRestResult)//
+      .getResult();
   }
 
   public RestResult<Void> confirmResource(final UUID resourceUUID) {
@@ -272,9 +249,9 @@ public class AlexandriaClient implements AutoCloseable {
     final Supplier<Response> responseSupplier = authorizedPut(path, entity);
     final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.CREATED, voidRestResult())//
-        .onStatus(Status.NO_CONTENT, voidRestResult())//
-        .getResult();
+      .onStatus(Status.CREATED, voidRestResult())//
+      .onStatus(Status.NO_CONTENT, voidRestResult())//
+      .getResult();
   }
 
   public RestResult<Annotator> getAnnotator(UUID resourceUUID, String code) {
@@ -282,19 +259,19 @@ public class AlexandriaClient implements AutoCloseable {
     final Supplier<Response> responseSupplier = anonymousGet(path);
     final RestRequester<Annotator> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.OK, this::toAnnotatorRestResult)//
-        .getResult();
+      .onStatus(Status.OK, this::toAnnotatorRestResult)//
+      .getResult();
   }
 
   public RestResult<AnnotatorList> getAnnotators(UUID resourceUUID) {
     final WebTarget path = resourceTarget(resourceUUID)//
-        .path(EndpointPaths.ANNOTATORS);
+      .path(EndpointPaths.ANNOTATORS);
 
     final Supplier<Response> responseSupplier = anonymousGet(path);
     final RestRequester<AnnotatorList> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.OK, this::toAnnotatorListRestResult)//
-        .getResult();
+      .onStatus(Status.OK, this::toAnnotatorListRestResult)//
+      .getResult();
   }
 
   public RestResult<Void> setResourceText(final UUID resourceUUID, final File file) throws IOException {
@@ -307,18 +284,18 @@ public class AlexandriaClient implements AutoCloseable {
     final Supplier<Response> responseSupplier = authorizedPut(path, entity);
     final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.ACCEPTED, voidRestResult())//
-        .getResult();
+      .onStatus(Status.ACCEPTED, voidRestResult())//
+      .getResult();
   }
 
   public RestResult<TextImportStatus> getTextImportStatus(final UUID resourceUUID) {
     final WebTarget path = resourceTextTarget(resourceUUID)//
-        .path("status");
+      .path("status");
     final Supplier<Response> responseSupplier = anonymousGet(path);
     final RestRequester<TextImportStatus> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.OK, this::toTextImportStatusRestResult)//
-        .getResult();
+      .onStatus(Status.OK, this::toTextImportStatusRestResult)//
+      .getResult();
   }
 
   public RestResult<TextEntity> getTextInfo(UUID resourceUUID) {
@@ -326,8 +303,8 @@ public class AlexandriaClient implements AutoCloseable {
     final Supplier<Response> responseSupplier = anonymousGet(path);
     final RestRequester<TextEntity> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.OK, this::toTextEntityRestResult)//
-        .getResult();
+      .onStatus(Status.OK, this::toTextEntityRestResult)//
+      .getResult();
   }
 
   public RestResult<String> getTextAsString(final UUID uuid) {
@@ -340,6 +317,17 @@ public class AlexandriaClient implements AutoCloseable {
     return stringResult(path);
   }
 
+  public RestResult<String> getTextAsString(final UUID uuid, final String viewName, final Map<String, String> viewParameters) {
+    WebTarget path = resourceTextTarget(uuid).path("xml").queryParam("view", viewName);
+    Set<Map.Entry<String, String>> entries = viewParameters.entrySet();
+    for (Map.Entry<String, String> entry : entries) {
+      String k = entry.getKey();
+      String v = entry.getValue();
+      path = path.queryParam("view." + k, v);
+    }
+    return stringResult(path);
+  }
+
   public RestResult<String> getTextAsDot(final UUID uuid) {
     WebTarget path = resourceTextTarget(uuid).path("dot");
     return stringResult(path);
@@ -348,79 +336,88 @@ public class AlexandriaClient implements AutoCloseable {
   public RestResult<Void> addResourceTextRangeAnnotations(UUID resourceUUID, TextRangeAnnotationList textAnnotations) {
     final Entity<TextRangeAnnotationList> entity = Entity.json(textAnnotations);
     WebTarget path = resourceTextTarget(resourceUUID)//
-        .path(EndpointPaths.ANNOTATIONBATCH);
+      .path(EndpointPaths.ANNOTATIONBATCH);
     final Supplier<Response> responseSupplier = authorizedPost(path, entity);
     final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.ACCEPTED, voidRestResult())//
-        .getResult();
+      .onStatus(Status.ACCEPTED, voidRestResult())//
+      .getResult();
   }
 
   public RestResult<TextAnnotationImportStatus> getResourceTextRangeAnnotationBatchImportStatus(final UUID resourceUUID) {
     final WebTarget path = resourceTextTarget(resourceUUID)//
-        .path(EndpointPaths.ANNOTATIONBATCH)//
-        .path("status");
+      .path(EndpointPaths.ANNOTATIONBATCH)//
+      .path("status");
     final Supplier<Response> responseSupplier = anonymousGet(path);
     final RestRequester<TextAnnotationImportStatus> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.OK, this::toTextAnnotationImportStatusRestResult)//
-        .getResult();
+      .onStatus(Status.OK, this::toTextAnnotationImportStatusRestResult)//
+      .getResult();
   }
 
   public RestResult<TextRangeAnnotationInfo> setResourceTextRangeAnnotation(UUID resourceUUID, TextRangeAnnotation textAnnotation) {
     final Entity<TextRangeAnnotation> entity = Entity.json(textAnnotation);
     WebTarget path = resourceTextTarget(resourceUUID)//
-        .path(EndpointPaths.ANNOTATIONS)//
-        .path(textAnnotation.getId().toString());
+      .path(EndpointPaths.ANNOTATIONS)//
+      .path(textAnnotation.getId().toString());
     final Supplier<Response> responseSupplier = authorizedPut(path, entity);
     final RestRequester<TextRangeAnnotationInfo> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.CREATED, this::toTextRangeAnnotationInfoRestResult)//
-        .onStatus(Status.NO_CONTENT, this::toTextRangeAnnotationInfoRestResult)//
-        .getResult();
+      .onStatus(Status.CREATED, this::toTextRangeAnnotationInfoRestResult)//
+      .onStatus(Status.NO_CONTENT, this::toTextRangeAnnotationInfoRestResult)//
+      .getResult();
   }
 
   public RestResult<TextRangeAnnotation> getResourceTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID) {
     WebTarget path = resourceTextTarget(resourceUUID)//
-        .path(EndpointPaths.ANNOTATIONS)//
-        .path(annotationUUID.toString());
+      .path(EndpointPaths.ANNOTATIONS)//
+      .path(annotationUUID.toString());
     final Supplier<Response> responseSupplier = anonymousGet(path);
     final RestRequester<TextRangeAnnotation> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.OK, this::toTextRangeAnnotationRestResult)//
-        .getResult();
+      .onStatus(Status.OK, this::toTextRangeAnnotationRestResult)//
+      .getResult();
   }
 
   public RestResult<TextRangeAnnotationList> getResourceTextRangeAnnotations(UUID resourceUUID) {
     WebTarget path = resourceTextTarget(resourceUUID)//
-        .path(EndpointPaths.ANNOTATIONS);
+      .path(EndpointPaths.ANNOTATIONS);
     final Supplier<Response> responseSupplier = anonymousGet(path);
     final RestRequester<TextRangeAnnotationList> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.OK, this::toTextRangeAnnotationListRestResult)//
-        .getResult();
+      .onStatus(Status.OK, this::toTextRangeAnnotationListRestResult)//
+      .getResult();
   }
 
   public RestResult<Void> setResourceTextView(final UUID resourceUUID, final String textViewName, final TextViewDefinition textView) {
     final Entity<TextViewDefinition> entity = Entity.json(textView);
     final WebTarget path = resourceTextTarget(resourceUUID)//
-        .path(EndpointPaths.TEXTVIEWS)//
-        .path(textViewName);
+      .path(EndpointPaths.TEXTVIEWS)//
+      .path(textViewName);
     final Supplier<Response> responseSupplier = authorizedPut(path, entity);
     final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.CREATED, voidRestResult())//
-        .onStatus(Status.NO_CONTENT, voidRestResult())//
-        .getResult();
+      .onStatus(Status.CREATED, voidRestResult())//
+      .onStatus(Status.NO_CONTENT, voidRestResult())//
+      .getResult();
   }
 
-  public RestResult<TextView> getResourceTextView(final UUID uuid) {
+  public RestResult<TextViewDefinition> getResourceTextView(final UUID uuid, final String textViewName) {
+    WebTarget path = resourceTextTarget(uuid).path(EndpointPaths.TEXTVIEWS).path(textViewName);
+    Supplier<Response> anonymousGet = anonymousGet(path);
+    final RestRequester<TextViewDefinition> requester = RestRequester.withResponseSupplier(anonymousGet);
+    return requester//
+      .onStatus(Status.OK, this::toTextViewDefinitionRestResult)//
+      .getResult();
+  }
+
+  public RestResult<List> getResourceTextViews(final UUID uuid) {
     WebTarget path = resourceTextTarget(uuid).path(EndpointPaths.TEXTVIEWS);
     Supplier<Response> anonymousGet = anonymousGet(path);
-    final RestRequester<TextView> requester = RestRequester.withResponseSupplier(anonymousGet);
+    final RestRequester<List> requester = RestRequester.withResponseSupplier(anonymousGet);
     return requester//
-        .onStatus(Status.OK, this::toTextViewRestResult)//
-        .getResult();
+      .onStatus(Status.OK, this::toTextViewListRestResult)//
+      .getResult();
   }
 
   public RestResult<UUID> annotateResource(final UUID resourceUUID, final AnnotationPrototype annotationPrototype) {
@@ -445,8 +442,8 @@ public class AlexandriaClient implements AutoCloseable {
     WebTarget path = annotationTarget(annotationUUID).path(EndpointPaths.ANNOTATIONS);
     final RestRequester<AnnotationList> requester = RestRequester.withResponseSupplier(anonymousGet(path));
     return requester//
-        .onStatus(Status.OK, this::toAnnotationListRestResult)//
-        .getResult();
+      .onStatus(Status.OK, this::toAnnotationListRestResult)//
+      .getResult();
   }
 
   public RestResult<UUID> addSearch(AlexandriaQuery query) {
@@ -455,8 +452,8 @@ public class AlexandriaClient implements AutoCloseable {
     final Supplier<Response> responseSupplier = authorizedPost(path, entity);
     final RestRequester<UUID> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.CREATED, this::uuidFromLocationHeader)//
-        .getResult();
+      .onStatus(Status.CREATED, this::uuidFromLocationHeader)//
+      .getResult();
   }
 
   public RestResult<SearchResultPage> getSearchResultPage(UUID searchId) {
@@ -465,14 +462,14 @@ public class AlexandriaClient implements AutoCloseable {
 
   public RestResult<SearchResultPage> getSearchResultPage(UUID searchId, Integer page) {
     final WebTarget path = rootTarget//
-        .path(EndpointPaths.SEARCHES)//
-        .path(searchId.toString())//
-        .path(EndpointPaths.RESULTPAGES)//
-        .path(page.toString());
+      .path(EndpointPaths.SEARCHES)//
+      .path(searchId.toString())//
+      .path(EndpointPaths.RESULTPAGES)//
+      .path(page.toString());
     final RestRequester<SearchResultPage> requester = RestRequester.withResponseSupplier(anonymousGet(path));
     return requester//
-        .onStatus(Status.OK, this::toSearchResultPageRestResult)//
-        .getResult();
+      .onStatus(Status.OK, this::toSearchResultPageRestResult)//
+      .getResult();
   }
 
   public RestResult<CommandResponse> doCommand(String commandName, Map<String, Object> parameters) {
@@ -481,29 +478,29 @@ public class AlexandriaClient implements AutoCloseable {
     final Supplier<Response> responseSupplier = authorizedPost(path, entity);
     final RestRequester<CommandResponse> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.OK, this::toCommandResponseRestResult)//
-        .onStatus(Status.ACCEPTED, this::extractCommandStatusId)//
-        .getResult();
+      .onStatus(Status.OK, this::toCommandResponseRestResult)//
+      .onStatus(Status.ACCEPTED, this::extractCommandStatusId)//
+      .getResult();
   }
 
   public RestResult<CommandStatus> getCommandStatus(final String commandName, final UUID resourceUUID) {
     final WebTarget path = rootTarget.path(EndpointPaths.COMMANDS)//
-        .path(commandName)//
-        .path(resourceUUID.toString())//
-        .path("status");
+      .path(commandName)//
+      .path(resourceUUID.toString())//
+      .path("status");
     final Supplier<Response> responseSupplier = anonymousGet(path);
     final RestRequester<CommandStatus> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.OK, this::toCommandStatusRestResult)//
-        .getResult();
+      .onStatus(Status.OK, this::toCommandStatusRestResult)//
+      .getResult();
   }
 
   public RestResult<Void> deprecateAnnotation(UUID uuid) {
     WebTarget path = annotationTarget(uuid);
     final RestRequester<Void> requester = RestRequester.withResponseSupplier(authorizedDelete(path));
     return requester//
-        .onStatus(Status.NO_CONTENT, voidRestResult())//
-        .getResult();
+      .onStatus(Status.NO_CONTENT, voidRestResult())//
+      .getResult();
   }
 
   // private methods
@@ -511,15 +508,15 @@ public class AlexandriaClient implements AutoCloseable {
   private RestResult<UUID> annotate(final UUID annotatableUuid, final AnnotationPrototype annotationPrototype, final String annotatablePath) {
     final Entity<AnnotationPrototype> entity = Entity.json(annotationPrototype);
     final WebTarget path = rootTarget//
-        .path(annotatablePath)//
-        .path(annotatableUuid.toString())//
-        .path(EndpointPaths.ANNOTATIONS);
+      .path(annotatablePath)//
+      .path(annotatableUuid.toString())//
+      .path(EndpointPaths.ANNOTATIONS);
     final Supplier<Response> responseSupplier = authorizedPost(path, entity);
 
     final RestRequester<UUID> requester = RestRequester.withResponseSupplier(responseSupplier);
     final RestResult<UUID> annotateResult = requester//
-        .onStatus(Status.CREATED, this::uuidFromLocationHeader)//
-        .getResult();
+      .onStatus(Status.CREATED, this::uuidFromLocationHeader)//
+      .getResult();
     if (autoConfirm && !annotateResult.hasFailed()) {
       confirmAnnotation(annotateResult.get());
     }
@@ -532,22 +529,22 @@ public class AlexandriaClient implements AutoCloseable {
 
   private WebTarget resourceTarget(final UUID uuid) {
     return rootTarget//
-        .path(EndpointPaths.RESOURCES)//
-        .path(uuid.toString());
+      .path(EndpointPaths.RESOURCES)//
+      .path(uuid.toString());
   }
 
   private RestResult<Void> confirm(final String endpoint, final UUID resourceUUID) {
     final StatePrototype state = new StatePrototype().setState(AlexandriaState.CONFIRMED);
     final Entity<StatePrototype> confirmation = Entity.json(state);
     final WebTarget path = rootTarget//
-        .path(endpoint)//
-        .path(resourceUUID.toString())//
-        .path("state");
+      .path(endpoint)//
+      .path(resourceUUID.toString())//
+      .path("state");
     final Supplier<Response> responseSupplier = authorizedPut(path, confirmation);
     final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.NO_CONTENT, voidRestResult())//
-        .getResult();
+      .onStatus(Status.NO_CONTENT, voidRestResult())//
+      .getResult();
   }
 
   private RestResult<String> toStringRestResult(final Response response) {
@@ -594,8 +591,12 @@ public class AlexandriaClient implements AutoCloseable {
     return toEntityRestResult(response, TextEntity.class);
   }
 
-  private RestResult<TextView> toTextViewRestResult(final Response response) {
-    return toEntityRestResult(response, TextView.class);
+  private RestResult<TextViewDefinition> toTextViewDefinitionRestResult(final Response response) {
+    return toEntityRestResult(response, TextViewDefinition.class);
+  }
+
+  private RestResult<List> toTextViewListRestResult(final Response response) {
+    return toEntityRestResult(response, List.class);
   }
 
   private RestResult<SearchResultPage> toSearchResultPageRestResult(final Response response) {
@@ -677,16 +678,16 @@ public class AlexandriaClient implements AutoCloseable {
 
   private SyncInvoker authorizedRequest(final WebTarget target) {
     return target.request()//
-        .accept(MediaType.APPLICATION_JSON_TYPE)//
-        .header(HEADER_AUTH, authHeader);
+      .accept(MediaType.APPLICATION_JSON_TYPE)//
+      .header(HEADER_AUTH, authHeader);
   }
 
   private RestResult<String> stringResult(WebTarget path) {
     Supplier<Response> responseSupplier = anonymousGet(path);
     final RestRequester<String> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
-        .onStatus(Status.OK, this::toStringRestResult)//
-        .getResult();
+      .onStatus(Status.OK, this::toStringRestResult)//
+      .getResult();
   }
 
   private WebTarget annotationTarget(final UUID uuid) {
@@ -696,14 +697,14 @@ public class AlexandriaClient implements AutoCloseable {
   private RestResult<AnnotationPojo> getAnnotationRestResult(WebTarget path) {
     final RestRequester<AnnotationPojo> requester = RestRequester.withResponseSupplier(anonymousGet(path));
     return requester//
-        .onStatus(Status.OK, this::toAnnotationPojoRestResult)//
-        .getResult();
+      .onStatus(Status.OK, this::toAnnotationPojoRestResult)//
+      .getResult();
   }
 
   private WebTarget annotatorsTarget(UUID resourceUUID, String code) {
     return resourceTarget(resourceUUID)//
-        .path(EndpointPaths.ANNOTATORS)//
-        .path(code);
+      .path(EndpointPaths.ANNOTATORS)//
+      .path(code);
   }
 
   private Function<Response, RestResult<Void>> voidRestResult() {

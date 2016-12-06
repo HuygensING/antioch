@@ -1,14 +1,13 @@
 package nl.knaw.huygens.alexandria.api.model.text.view;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class TextView {
   private String description = "";
@@ -65,4 +64,7 @@ public class TextView {
     return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
 
+  public void substitute(Map<String, String> viewParameters) {
+    elementViewMap.values().forEach(elementView -> elementView.substitute(viewParameters));
+  }
 }
