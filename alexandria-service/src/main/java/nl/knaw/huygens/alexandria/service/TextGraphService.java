@@ -1,37 +1,10 @@
 package nl.knaw.huygens.alexandria.service;
 
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.tinkerpop.gremlin.process.traversal.Order;
-import org.apache.tinkerpop.gremlin.process.traversal.P;
-import org.apache.tinkerpop.gremlin.process.traversal.Traverser;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
-import org.apache.tinkerpop.gremlin.structure.Direction;
-import org.apache.tinkerpop.gremlin.structure.Edge;
-import org.apache.tinkerpop.gremlin.structure.T;
-import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.apache.tinkerpop.gremlin.structure.VertexProperty;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.AbsolutePosition;
@@ -44,7 +17,22 @@ import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphSegment;
 import nl.knaw.huygens.alexandria.textgraph.XmlAnnotation;
 import nl.knaw.huygens.alexandria.util.StreamUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.tinkerpop.gremlin.process.traversal.Order;
+import org.apache.tinkerpop.gremlin.process.traversal.P;
+import org.apache.tinkerpop.gremlin.process.traversal.Traverser;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
+import org.apache.tinkerpop.gremlin.structure.*;
 import peapod.FramedGraphTraversal;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 public class TextGraphService {
   private static Storage storage;
@@ -254,7 +242,6 @@ public class TextGraphService {
     int endOffset = 0;
     String text = "";
     Vertex textSegment = parentTextAnnotationVertex.vertices(Direction.OUT, EdgeLabels.FIRST_TEXT_SEGMENT).next();
-    Log.debug("first textSegment={}", visualizeVertex(textSegment));
     boolean parentTextAnnotationIsMilestone = parentTextAnnotationIsMilestone(parentTextAnnotationVertex, textSegment);
 
     if (parentTextAnnotationIsMilestone) {
@@ -311,7 +298,7 @@ public class TextGraphService {
   private boolean parentTextAnnotationIsMilestone(Vertex parentTextAnnotationVertex, Vertex textSegment) {
     Vertex lastTextSegment = parentTextAnnotationVertex.vertices(Direction.OUT, EdgeLabels.LAST_TEXT_SEGMENT).next();
     String firstText = getStringValue(textSegment, TextSegment.Properties.text);
-    boolean parentTextAnnotationIsMilestone = firstText.isEmpty() && textSegment == lastTextSegment;
+    boolean parentTextAnnotationIsMilestone = firstText.isEmpty() && textSegment.equals(lastTextSegment);
     return parentTextAnnotationIsMilestone;
   }
 
