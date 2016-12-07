@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.endpoint.iiif;
 
+import static nl.knaw.huygens.alexandria.api.w3c.WebAnnotationConstants.IIIF_PROFILE;
 import static nl.knaw.huygens.alexandria.api.w3c.WebAnnotationConstants.JSONLD_MEDIATYPE;
 
 import java.net.URI;
@@ -21,7 +22,7 @@ public abstract class AbstractIIIFEndpoint extends JSONEndpoint {
 
   public Map<String, Object> baseMap() {
     Map<String, Object> map = new LinkedHashMap<>();
-    map.put(TechnicalProperties.context, "http://iiif.io/api/presentation/2/context.json");
+    map.put(TechnicalProperties.context, IIIF_PROFILE);
     map.put(TechnicalProperties.id, id);
     map.put(TechnicalProperties.type, getType());
     map.put("label", "some label");
