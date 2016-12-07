@@ -1,14 +1,15 @@
 package nl.knaw.huygens.alexandria.api.model.text.view;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeFunction;
+import static java.util.stream.Collectors.joining;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.stream.Collectors.joining;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeFunction;
 
 public class AttributePreCondition {
   private String attribute;
@@ -50,14 +51,20 @@ public class AttributePreCondition {
 
   @Override
   public String toString() {
-    return "attribute(" + attribute + ")." + function.name() + "(" + values.stream().map(v->"'"+v+"'").collect(joining(",")) + ")";
+    return "attribute(" + attribute + ")." + function.name() + "(" + values.stream().map(v -> "'" + v + "'").collect(joining(",")) + ")";
   }
 
   public void substitute(Map<String, String> viewParameters) {
     String valueString = Joiner.on(",").join(values);
-    for (Map.Entry<String, String> kv : viewParameters.entrySet()) {
-      valueString = valueString.replace("{" + kv.getKey() + "}", kv.getValue().replace("'",""));
-    }
+    valueString = substitute(viewParameters, valueString);
     setValues(Splitter.on(",").splitToList(valueString));
+    attribute = substitute(viewParameters, attribute);
+  }
+
+  private String substitute(Map<String, String> viewParameters, String valueString) {
+    for (Map.Entry<String, String> kv : viewParameters.entrySet()) {
+      valueString = valueString.replace("{" + kv.getKey() + "}", kv.getValue().replace("'", ""));
+    }
+    return valueString;
   }
 }

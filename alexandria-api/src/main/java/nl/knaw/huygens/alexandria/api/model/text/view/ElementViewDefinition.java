@@ -1,6 +1,9 @@
 package nl.knaw.huygens.alexandria.api.model.text.view;
 
+import java.util.Map;
 import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -58,6 +61,14 @@ public class ElementViewDefinition {
   public ElementViewDefinition setWhen(String when) {
     this.when = when;
     return this;
+  }
+
+  public void substitute(Map<String, String> viewParameters) {
+    if (StringUtils.isNotEmpty(when)) {
+      for (Map.Entry<String, String> kv : viewParameters.entrySet()) {
+        when = when.replace("{" + kv.getKey() + "}", kv.getValue());
+      }
+    }
   }
 
 }

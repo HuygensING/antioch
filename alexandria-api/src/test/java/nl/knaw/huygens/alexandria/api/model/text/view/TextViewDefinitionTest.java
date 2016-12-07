@@ -177,7 +177,7 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     TextViewDefinition tvd = new TextViewDefinition();
     ElementViewDefinition evd = new ElementViewDefinition()//
         .setElementMode(ElementView.ElementMode.show)//
-        .setWhen("attribute(resp).is('#ed1')");
+        .setWhen("attribute({resp}).is('#ed1')");
     tvd.getElementViewDefinitions().put("element", evd);
 
     TextViewDefinitionParser tvdp = new TextViewDefinitionParser(tvd);
@@ -194,7 +194,7 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     assertThat(elementView.getRelevantAttributes()).isEmpty();
 
     AttributePreCondition preCondition = elementView.getPreCondition().get();
-    assertThat(preCondition.getAttribute()).isEqualTo("resp");
+    assertThat(preCondition.getAttribute()).isEqualTo("{resp}");
     assertThat(preCondition.getFunction()).isEqualTo(AttributeFunction.is);
     assertThat(preCondition.getValues()).containsExactly("#ed1");
     testJsonSerialization(textView);

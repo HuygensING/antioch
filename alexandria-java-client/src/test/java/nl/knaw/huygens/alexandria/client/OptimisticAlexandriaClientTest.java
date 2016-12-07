@@ -1,19 +1,8 @@
 package nl.knaw.huygens.alexandria.client;
 
-import com.google.common.collect.ImmutableMap;
-import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.api.model.AboutEntity;
-import nl.knaw.huygens.alexandria.api.model.Annotator;
-import nl.knaw.huygens.alexandria.api.model.text.*;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
-import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.ElementMode;
-import nl.knaw.huygens.alexandria.api.model.text.view.ElementViewDefinition;
-import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
-import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static java.util.stream.Collectors.joining;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -21,11 +10,33 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
-import static java.util.stream.Collectors.joining;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import com.google.common.collect.ImmutableMap;
+
+import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.model.AboutEntity;
+import nl.knaw.huygens.alexandria.api.model.Annotator;
+import nl.knaw.huygens.alexandria.api.model.text.TextAnnotationImportStatus;
+import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.ElementMode;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementViewDefinition;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
+import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 
 public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer {
 
@@ -309,13 +320,15 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
 
     ElementViewDefinition evd = new ElementViewDefinition()//
       .setElementMode(ElementMode.show)//
-      .setWhen("attribute(resp).firstOf({list})");
+        .setWhen("attribute({a}).firstOf({list})");
     TextViewDefinition textView = new TextViewDefinition()//
       .setDescription("show-resp-a-or-b")//
       .setElementViewDefinition("persName", evd);
     client.setResourceTextView(rootResourceUUID, "view1", textView);
 
-    Map<String,String> viewParameters = ImmutableMap.of("list","'#a','#b'");
+    Map<String, String> viewParameters = ImmutableMap.of("list", "'#a','#b'", "a", "resp");
+    client.getResourceTextView(rootResourceUUID, "view1", viewParameters);
+
     String rootView = client.getTextAsString(rootResourceUUID, "view1", viewParameters);
     Log.info("rootView = {}", rootView);
 

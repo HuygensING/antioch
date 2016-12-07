@@ -1,5 +1,37 @@
 package nl.knaw.huygens.alexandria.endpoint.resource;
 
+import static java.util.stream.Collectors.toList;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+
+import javax.inject.Inject;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.UriInfo;
+
+import org.apache.commons.io.Charsets;
+import org.apache.commons.io.IOUtils;
+
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.ProcessStatusMap;
@@ -22,23 +54,6 @@ import nl.knaw.huygens.alexandria.textgraph.DotFactory;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphImportTask;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 import nl.knaw.huygens.alexandria.textgraph.TextRangeAnnotationValidatorFactory;
-import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
-
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-
-import static java.util.stream.Collectors.toList;
 
 public class ResourceTextEndpoint extends JSONEndpoint {
   private final AlexandriaService service;
@@ -141,7 +156,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
     return ok(outputstream);
   }
 
-  private Map<String, String> getViewParameters(@Context UriInfo uriInfo) {
+  static Map<String, String> getViewParameters(UriInfo uriInfo) {
     MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
     Map<String, String> viewParameters = new HashMap<>();
     queryParameters.forEach((k, v) -> {

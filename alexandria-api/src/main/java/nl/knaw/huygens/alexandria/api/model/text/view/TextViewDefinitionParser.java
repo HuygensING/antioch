@@ -120,7 +120,7 @@ public class TextViewDefinitionParser {
     return parameters;
   }
 
-  static final Pattern WHEN_PATTERN = Pattern.compile("attribute\\((\\w+)\\)\\.(\\w+)\\((.*)\\)");
+  static final Pattern WHEN_PATTERN = Pattern.compile("attribute\\((\\w+|\\{\\w+\\})\\)\\.(\\w+)\\((.*)\\)");
 
   private void parseWhen(final String elementName, final Optional<String> optionalWhen, final ElementView elementView) {
     if (optionalWhen.isPresent()) {

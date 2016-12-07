@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -13,8 +14,10 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import com.google.common.base.Joiner;
 
@@ -61,9 +64,11 @@ public class ResourceTextViewEndpoint extends JSONEndpoint {
 
   @GET
   @Path("{viewId}")
-  public Response getTextViewDefinition(@PathParam("viewId") String viewId) {
+  public Response getTextViewDefinition(@PathParam("viewId") String viewId, @Context UriInfo uriInfo) {
+    Map<String, String> viewParameters = ResourceTextEndpoint.getViewParameters(uriInfo);
     TextViewDefinition textView = service.getTextViewDefinition(resourceId, viewId)//
         .orElseThrow(() -> new NotFoundException("No view '" + viewId + "' found for this resource."));
+    textView.substitute(viewParameters);
     return ok(textView);
   }
 

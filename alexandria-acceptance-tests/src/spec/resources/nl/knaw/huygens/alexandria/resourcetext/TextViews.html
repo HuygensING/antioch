@@ -643,9 +643,6 @@
             "textView": {
               "description": "On lang, resp a preferred, b otherwise, not c",
               "elements": {
-                ":default": { "elementMode": "hideTag" },
-                "text":     { "elementMode": "show", "attributeMode" : "showAll" },
-                "p":        { "elementMode": "show", "attributeMode" : "showAll" },
                 "lang":     { "elementMode": "show", "attributeMode" : "showAll", "when" : "attribute(resp).firstOf('#a','#b')" }
           } } }
         </h:jsonBody>
@@ -1494,6 +1491,90 @@
      </h:xmlResponse>
      <small>(formatting added for increased readability)</small><br/>
   </h:request>
+</div>
+
+<div id="variable-use" c:execute="clearStorage()"
+     data-desc="How do I use variables in a view definition?">
+
+  Given a resource
+  with id <code c:set="#resourceId9">00000000-0000-0000-0000-000000000009</code>
+  <span c:execute="resourceExists(#resourceId9)">exists</span>,<br/>
+  which has
+  <span c:execute="resourceHasText(#resourceId9,#text4)">text<br/>
+    <code c:set="#text4">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;&lt;lang resp=&quot;#b&quot; value=&quot;it&quot;&gt;&lt;lang resp=&quot;#a&quot; value=&quot;la&quot;&gt;Maecenas consectetur odio at dolor porttitor.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;&lt;p xml:id=&quot;p-2&quot;&gt;&lt;lang resp=&quot;#a&quot; value=&quot;la&quot;&gt;&lt;lang resp=&quot;#b&quot; value=&quot;it&quot;&gt;Aliquam a dapibus massa.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;&lt;p xml:id=&quot;p-3&quot;&gt;&lt;lang resp=&quot;#b&quot; value=&quot;en&quot;&gt;&lt;lang resp=&quot;#c&quot; value=&quot;fr&quot;&gt;Aenean efficitur purus ut dui molestie fermentum.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;&lt;p xml:id=&quot;p-4&quot;&gt;&lt;lang resp=&quot;#c&quot; value=&quot;fr&quot;&gt;Fusce congue mauris augue.&lt;/lang&gt;&lt;/p&gt;&lt;/text&gt;</code>
+  </span><br/>
+  <br/>
+
+	<h:request>
+	    When I define a view <code c:set="#view">prioritized</code> by
+	    <h:put>/resources/$resourceId9/text/views/$view</h:put>
+	    the body:
+	    <h:jsonBody>
+	      {
+	        "textView": {
+	          "description": "On lang, priorities to add on usage",
+	          "elements": {
+	            "lang":     { "elementMode": "show", "attributeMode" : "showAll", "when" : "attribute({attr}).firstOf({list})" }
+	      } } }
+	    </h:jsonBody>
+	    using
+	    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+	    then I should receive
+	    <ul>
+	      <li>status <h:status>201 Created</h:status></li>
+	      <li>location header
+	          <h:location>https://{host}/resources/$resourceId9/text/views/$view</h:location>
+	      </li>
+	      <li>and the response body is <h:responseBody/></li>
+	    </ul>
+	  I've used variables <code>attr</code> and <code>list</code> in this definition, the value of which will be set when using this view.
+	</h:request>
+	<br/>
+
+  <h:request>
+     Then a
+     <h:get>/resources/$resourceId9/text/xml?view=$view&amp;view.attr=resp&amp;view.list='%23a','%23b'</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     (the <code>#</code> need to be url-escaped)
+     <h:success>successfully</h:success>
+     yields response body:
+     <h:xmlResponse>
+<![CDATA[
+<text>
+  <p xml:id="p-1"><lang resp="#a" value="la">Maecenas consectetur odio at dolor porttitor.</lang></p>
+  <p xml:id="p-2"><lang resp="#a" value="la">Aliquam a dapibus massa.</lang></p>
+  <p xml:id="p-3"><lang resp="#b" value="en">Aenean efficitur purus ut dui molestie fermentum.</lang></p>
+  <p xml:id="p-4">Fusce congue mauris augue.</p>
+</text>]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+  
+  <h:request>
+    We can verify what the view definition is for given value(s) for the variable(s) bij adding parameters to the query:
+    When I
+    <h:get>/resources/$resourceId9/text/views/prioritized?view.list='%23c','%23b'&amp;view.attr=who</h:get>
+    Then I should receive
+    <ul>
+        <li>status
+            <h:status>200 OK</h:status>
+        </li>
+        <li>and body
+            <h:jsonResponse>
+        {
+          "textView": {
+            "description": "On lang, priorities to add on usage",
+            "elements": {
+              "lang":     { "elementMode": "show", "attributeMode" : "showAll", "when" : "attribute(who).firstOf('#c','#b')" }
+        } } }
+            </h:jsonResponse>
+        </li>
+    </ul>
+	</h:request>
+	<br/>
+  
+  
 </div>
 
 </body>

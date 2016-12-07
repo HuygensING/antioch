@@ -1,13 +1,14 @@
 package nl.knaw.huygens.alexandria.api.model.text.view;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+
 import nl.knaw.huygens.alexandria.api.JsonTypeNames;
 import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 import nl.knaw.huygens.alexandria.api.model.Prototype;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @JsonTypeName(JsonTypeNames.TEXTVIEW)
 public class TextViewDefinition extends JsonWrapperObject implements Prototype {
@@ -45,4 +46,7 @@ public class TextViewDefinition extends JsonWrapperObject implements Prototype {
     return this;
   }
 
+  public void substitute(Map<String, String> viewParameters) {
+    elementViewDefinitions.values().forEach(elementView -> elementView.substitute(viewParameters));
+  }
 }

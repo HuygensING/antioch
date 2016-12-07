@@ -1,12 +1,14 @@
 package nl.knaw.huygens.alexandria.api.model.text.view;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 
 @JsonInclude(Include.NON_ABSENT)
 public class ElementView {
@@ -78,7 +80,12 @@ public class ElementView {
   }
 
   public void substitute(Map<String, String> viewParameters) {
-    getPreCondition().ifPresent(preconditions -> precondition.substitute(viewParameters));
+    String relevantAttributesString = Joiner.on(",").join(relevantAttributes);
+    for (Map.Entry<String, String> kv : viewParameters.entrySet()) {
+      relevantAttributesString = relevantAttributesString.replace("{" + kv.getKey() + "}", kv.getValue().replace("'", ""));
+    }
+    setRelevantAttributes(Splitter.on(",").splitToList(relevantAttributesString));
+    getPreCondition().ifPresent(precondition -> precondition.substitute(viewParameters));
   }
 
   @Override
