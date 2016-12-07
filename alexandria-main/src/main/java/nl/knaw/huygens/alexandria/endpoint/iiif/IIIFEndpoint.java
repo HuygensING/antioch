@@ -92,7 +92,7 @@ public class IIIFEndpoint extends JSONEndpoint {
   // AnnotationList {scheme}://{host}/{prefix}/{identifier}/list/{name}
   @Path("{identifier}/list/{name}")
   public IIIFAnnotationListEndpoint getIIIFAnnotationListEndpoint(@PathParam("identifier") String identifier, @PathParam("name") String name) {
-    return new IIIFAnnotationListEndpoint(identifier, name, service, uriInfo.getAbsolutePath());
+    return new IIIFAnnotationListEndpoint(identifier, name, service, config, uriInfo.getAbsolutePath());
   }
 
   // Range {scheme}://{host}/{prefix}/{identifier}/range/{name}
