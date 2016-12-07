@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
@@ -327,7 +328,9 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     client.setResourceTextView(rootResourceUUID, "view1", textView);
 
     Map<String, String> viewParameters = ImmutableMap.of("list", "'#a','#b'", "a", "resp");
-    client.getResourceTextView(rootResourceUUID, "view1", viewParameters);
+    TextViewDefinition resourceTextViewDefinition = client.getResourceTextView(rootResourceUUID, "view1", viewParameters);
+    Optional<String> when = resourceTextViewDefinition.getElementViewDefinitions().get("persName").getWhen();
+    assertThat(when.get()).isEqualTo("attribute(resp).firstOf('#a','#b')");
 
     String rootView = client.getTextAsString(rootResourceUUID, "view1", viewParameters);
     Log.info("rootView = {}", rootView);
