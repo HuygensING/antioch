@@ -27,6 +27,8 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 
 import nl.knaw.huygens.alexandria.concordion.AlexandriaAcceptanceTest;
+import nl.knaw.huygens.alexandria.endpoint.iiif.IIIFAnnotationListEndpoint;
+import nl.knaw.huygens.alexandria.endpoint.iiif.IIIFEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.webannotation.WebAnnotationsEndpoint;
 import nl.knaw.huygens.alexandria.jersey.exceptionmappers.WebApplicationExceptionMapper;
 
@@ -36,6 +38,8 @@ public class WebAnnotationFixture extends AlexandriaAcceptanceTest {
   public static void registerEndpoint() {
     register(WebAnnotationsEndpoint.class);
     register(WebApplicationExceptionMapper.class);
+    register(IIIFAnnotationListEndpoint.class);
+    register(IIIFEndpoint.class);
   }
 
 }

@@ -55,4 +55,13 @@ public abstract class JSONEndpoint {
   protected Response ok(Object entity) {
     return Response.ok(entity).build();
   }
+
+  protected Response notImplemented() {
+    return Response.status(Status.NOT_IMPLEMENTED).build();
+  }
+
+  protected Response notImplemented(Object entity) {
+    return Response.status(Status.NOT_IMPLEMENTED).entity(entity).build();
+  }
+
 }

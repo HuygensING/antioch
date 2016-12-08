@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint.webannotation;
+package nl.knaw.huygens.alexandria.api.model.w3c;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;

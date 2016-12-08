@@ -44,6 +44,7 @@ public final class EndpointPaths {
   public static final String ANNOTATORS = "annotators";
 
   public static final String WEB_ANNOTATIONS = "webannotations";
+  public static final String IIIF = "iiif";
 
   private EndpointPaths() {
     throw new AssertionError("Paths shall not be instantiated");

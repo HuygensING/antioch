@@ -172,6 +172,222 @@
         <h:status>410 Gone</h:status><br/>
       </h:request>
     </div>
+    
+    <div id="annotationlist" data-desc="Batch upload: AnnotationList (IIIF)">
+      <h:request>
+        To add a batch of annotations, I can wrap them in an AnnotionList as defined by <a href="http://iiif.io/api/presentation/2.1/#annotation-list">IIIF</a>:<br/>  
+        <h:post>/iiif/identifier/list/name</h:post><a href="#identifier">(*)</a><br/>
+        the following body:
+        <h:jsonBody>{
+   "@context":"http://iiif.io/api/presentation/2/context.json",
+   "@type":"sc:AnnotationList",
+   "resources":[
+      {
+         "@type":"oa:Annotation",
+         "motivation":[
+            "oa:tagging",
+            "oa:commenting"
+         ],
+         "resource":[
+            {
+               "@type":"oa:Tag",
+               "chars":"Square"
+            },
+            {
+               "@type":"dctypes:Text",
+               "format":"text/html",
+               "chars":"&lt;p&gt;Interesting!&lt;/p&gt;"
+            }
+         ],
+         "on":{
+            "@type":"oa:SpecificResource",
+            "full":"https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-007.json",
+            "selector":{
+               "@type":"oa:SvgSelector",
+               "value":"some svg selector"
+            },
+            "within":{
+               "@id":"https://iiif.lib.harvard.edu/manifests/drs:5981093",
+               "@type":"sc:Manifest"
+            }
+         }
+      },
+      {
+         "@type":"oa:Annotation",
+         "motivation":[
+            "oa:tagging",
+            "oa:commenting"
+         ],
+         "resource":[
+            {
+               "@type":"oa:Tag",
+               "chars":"Circle"
+            },
+            {
+               "@type":"dctypes:Text",
+               "format":"text/html",
+               "chars":"&lt;p&gt;Fascinating!&lt;/p&gt;"
+            }
+         ],
+         "on":{
+            "@type":"oa:SpecificResource",
+            "full":"https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-5981120.json",
+            "selector":{
+               "@type":"oa:SvgSelector",
+               "value":"some other svg selector"
+            },
+            "within":{
+               "@id":"https://iiif.lib.harvard.edu/manifests/drs:5981093",
+               "@type":"sc:Manifest"
+            }
+         }
+      },
+      {
+         "@type":"oa:Annotation",
+         "motivation":[
+            "oa:tagging",
+            "oa:commenting"
+         ],
+         "resource":[
+            {
+               "@type":"oa:Tag",
+               "chars":"Triangle"
+            },
+            {
+               "@type":"dctypes:Text",
+               "format":"text/html",
+               "chars":"&lt;p&gt;Unexpected!&lt;\/p&gt;"
+            }
+         ],
+         "on":{
+            "@type":"oa:SpecificResource",
+            "full":"https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-5981120.json",
+            "selector":{
+               "@type":"oa:SvgSelector",
+               "value":"some third svg selector"
+            },
+            "within":{
+               "@id":"https://iiif.lib.harvard.edu/manifests/drs:5981093",
+               "@type":"sc:Manifest"
+            }
+         }
+      }
+   ]
+}</h:jsonBody>
+        using headers
+        Accept: <h:setHeader name="Accept">application/ld+json</h:setHeader> <br/>
+        and
+        Content-type: <h:setHeader name="Content-type">application/ld+json</h:setHeader>,<br/>
+        
+        then I should receive:
+        <ul>
+          <li>status <h:status>200 OK</h:status></li>
+          <li>and the response body should contain:
+            <h:jsonResponse>{
+   "@context":"http://iiif.io/api/presentation/2/context.json",
+   "@type":"sc:AnnotationList",
+   "resources":[
+      {
+         "@type":"oa:Annotation",
+         "motivation":[
+            "oa:tagging",
+            "oa:commenting"
+         ],
+         "resource":[
+            {
+               "@type":"oa:Tag",
+               "chars":"Square"
+            },
+            {
+               "@type":"dctypes:Text",
+               "format":"text/html",
+               "chars":"&lt;p&gt;Interesting!&lt;/p&gt;"
+            }
+         ],
+         "on":{
+            "@type":"oa:SpecificResource",
+            "full":"https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-007.json",
+            "selector":{
+               "@type":"oa:SvgSelector",
+               "value":"some svg selector"
+            },
+            "within":{
+               "@id":"https://iiif.lib.harvard.edu/manifests/drs:5981093",
+               "@type":"sc:Manifest"
+            }
+         }
+      },
+      {
+         "@type":"oa:Annotation",
+         "motivation":[
+            "oa:tagging",
+            "oa:commenting"
+         ],
+         "resource":[
+            {
+               "@type":"oa:Tag",
+               "chars":"Circle"
+            },
+            {
+               "@type":"dctypes:Text",
+               "format":"text/html",
+               "chars":"&lt;p&gt;Fascinating!&lt;/p&gt;"
+            }
+         ],
+         "on":{
+            "@type":"oa:SpecificResource",
+            "full":"https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-5981120.json",
+            "selector":{
+               "@type":"oa:SvgSelector",
+               "value":"some other svg selector"
+            },
+            "within":{
+               "@id":"https://iiif.lib.harvard.edu/manifests/drs:5981093",
+               "@type":"sc:Manifest"
+            }
+         }
+      },
+      {
+         "@type":"oa:Annotation",
+         "motivation":[
+            "oa:tagging",
+            "oa:commenting"
+         ],
+         "resource":[
+            {
+               "@type":"oa:Tag",
+               "chars":"Triangle"
+            },
+            {
+               "@type":"dctypes:Text",
+               "format":"text/html",
+               "chars":"&lt;p&gt;Unexpected!&lt;\/p&gt;"
+            }
+         ],
+         "on":{
+            "@type":"oa:SpecificResource",
+            "full":"https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-5981120.json",
+            "selector":{
+               "@type":"oa:SvgSelector",
+               "value":"some third svg selector"
+            },
+            "within":{
+               "@id":"https://iiif.lib.harvard.edu/manifests/drs:5981093",
+               "@type":"sc:Manifest"
+            }
+         }
+      }
+   ]
+}</h:jsonResponse>
+  Additionally, each annotation in resources has an <code>@id</code> like:
+          <code>"@id" : "https://{host}/webannotations/{uuid}"</code>
+          </li>
+        </ul>
+        <p id="identifier">(*) For now, you can use any valid pathname for <i>identifier</i> and <i>name</i>.</p>
+      </h:request>
+      
+    </div>
+    
 
 	</body>
 </html>

@@ -494,5 +494,114 @@ function a-search-web-annotations-with-uri {
 	curl ${be}/webannotations/search?uri=${uri} | jq "."
 }
 
+function a-add-web-annotationlist {
+  curl \
+    -H "${authheader}" \
+    -H 'Accept: application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"' \
+    -H 'Content-type: application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"' \
+    --data-binary "$1" \
+    ${be}/iiif/identifier/list/name | jq "."
+}
+
+function a-add-sample-web-annotationlist {
+  a-add-web-annotationlist '{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+	"@type": "sc:AnnotationList",
+
+	"resources": [
+	{
+		"@type": "oa:Annotation",
+	  "motivation": [
+	    "oa:tagging",
+	    "oa:commenting"
+	  ],
+	  "resource": [
+	    {
+	      "@type": "oa:Tag",
+	      "chars": "Guten Tag!"
+	    },
+	    {
+	      "@type": "dctypes:Text",
+	      "format": "text/html",
+	      "chars": "<p>Goodbye World!</p>"
+	    }
+	  ],
+	  "on": {
+	    "@type": "oa:SpecificResource",
+	    "full": "https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-007.json",
+	    "selector": {
+	      "@type": "oa:SvgSelector",
+	      "value": "<svg xmlns=\"http://www.w3.org/2000/svg\"><path xmlns=\"http://www.w3.org/2000/svg\" d=\"M2839.67004,1958.16283l603.4384,0l0,0l603.4384,0l0,372.12034l0,372.12034l-603.4384,0l-603.4384,0l0,-372.12034z\" data-paper-data=\"{&quot;defaultStrokeValue&quot;:1,&quot;editStrokeValue&quot;:5,&quot;currentStrokeValue&quot;:1,&quot;rotation&quot;:0,&quot;deleteIcon&quot;:null,&quot;rotationIcon&quot;:null,&quot;group&quot;:null,&quot;editable&quot;:true,&quot;annotation&quot;:null}\" id=\"rectangle_d8e37e58-64d5-47b5-934a-760f5f05129c\" fill-opacity=\"0\" fill=\"#00bfff\" fill-rule=\"nonzero\" stroke=\"#00bfff\" stroke-width=\"6.70487\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-miterlimit=\"10\" stroke-dasharray=\"\" stroke-dashoffset=\"0\" font-family=\"sans-serif\" font-weight=\"normal\" font-size=\"12\" text-anchor=\"start\" style=\"mix-blend-mode: normal\"/></svg>"
+	    },
+	    "within": {
+	      "@id": "https://iiif.lib.harvard.edu/manifests/drs:5981093",
+	      "@type": "sc:Manifest"
+	    }
+  }},
+
+	{
+		"@type": "oa:Annotation",
+	  "motivation": [
+	    "oa:tagging",
+	    "oa:commenting"
+	  ],
+	  "resource": [
+	    {
+	      "@type": "oa:Tag",
+	      "chars": "Tag"
+	    },
+	    {
+	      "@type": "dctypes:Text",
+	      "format": "text/html",
+	      "chars": "<p>Test 1c &amp; d</p>"
+	    }
+	  ],
+	  "on": {
+	    "@type": "oa:SpecificResource",
+	    "full": "https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-5981120.json",
+	    "selector": {
+	      "@type": "oa:SvgSelector",
+	      "value": "<svg xmlns=\"http://www.w3.org/2000/svg\"><path xmlns=\"http://www.w3.org/2000/svg\" d=\"M2839.67004,1958.16283l603.4384,0l0,0l603.4384,0l0,372.12034l0,372.12034l-603.4384,0l-603.4384,0l0,-372.12034z\" data-paper-data=\"{&quot;defaultStrokeValue&quot;:1,&quot;editStrokeValue&quot;:5,&quot;currentStrokeValue&quot;:1,&quot;rotation&quot;:0,&quot;deleteIcon&quot;:null,&quot;rotationIcon&quot;:null,&quot;group&quot;:null,&quot;editable&quot;:true,&quot;annotation&quot;:null}\" id=\"rectangle_d8e37e58-64d5-47b5-934a-760f5f05129c\" fill-opacity=\"0\" fill=\"#00bfff\" fill-rule=\"nonzero\" stroke=\"#00bfff\" stroke-width=\"6.70487\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-miterlimit=\"10\" stroke-dasharray=\"\" stroke-dashoffset=\"0\" font-family=\"sans-serif\" font-weight=\"normal\" font-size=\"12\" text-anchor=\"start\" style=\"mix-blend-mode: normal\"/></svg>"
+	    },
+	    "within": {
+	      "@id": "https://iiif.lib.harvard.edu/manifests/drs:5981093",
+	      "@type": "sc:Manifest"
+	    }
+  }},
+
+	{
+		"@type": "oa:Annotation",
+	  "motivation": [
+	    "oa:tagging",
+	    "oa:commenting"
+	  ],
+	  "resource": [
+	    {
+	      "@type": "oa:Tag",
+	      "chars": "TestTag"
+	    },
+	    {
+	      "@type": "dctypes:Text",
+	      "format": "text/html",
+	      "chars": "<p>TestAnnotatie<\/p>"
+	    }
+	  ],
+	  "on": {
+	    "@type": "oa:SpecificResource",
+	    "full": "https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-5981120.json",
+	    "selector": {
+	      "@type": "oa:SvgSelector",
+	      "value": "<svg xmlns=\"http://www.w3.org/2000/svg\"><path xmlns=\"http://www.w3.org/2000/svg\" d=\"M2544.65571,871.97372l539.74212,0l0,0l539.74212,0l0,331.89112l0,331.89112l-539.74212,0l-539.74212,0l0,-331.89112z\" data-paper-data=\"{&quot;defaultStrokeValue&quot;:1,&quot;editStrokeValue&quot;:5,&quot;currentStrokeValue&quot;:1,&quot;rotation&quot;:0,&quot;deleteIcon&quot;:null,&quot;rotationIcon&quot;:null,&quot;group&quot;:null,&quot;editable&quot;:true,&quot;annotation&quot;:null}\" id=\"rectangle_0403bd67-c6af-4b48-b5bf-f845fd5b5944\" fill-opacity=\"0\" fill=\"#00bfff\" fill-rule=\"nonzero\" stroke=\"#00bfff\" stroke-width=\"6.70487\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-miterlimit=\"10\" stroke-dasharray=\"\" stroke-dashoffset=\"0\" font-family=\"sans-serif\" font-weight=\"normal\" font-size=\"12\" text-anchor=\"start\" style=\"mix-blend-mode: normal\"/></svg>"
+	    },
+	    "within": {
+	      "@id": "https://iiif.lib.harvard.edu/manifests/drs:5981093",
+	      "@type": "sc:Manifest"
+	    }
+  }}
+
+	]
+}'
+}
+
 
 a-use-localhost
