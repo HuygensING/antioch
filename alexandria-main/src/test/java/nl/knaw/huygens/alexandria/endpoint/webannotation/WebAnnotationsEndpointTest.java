@@ -35,7 +35,7 @@ public class WebAnnotationsEndpointTest {
     Log.info("expanded={}",expanded);
 
     String context2 = "http://iiif.io/api/presentation/2/context.json";
-    Object compacted = (Map<String, Object>) JsonLdProcessor.compact(jsonObject, context2, options);
+    Object compacted = JsonLdProcessor.compact(jsonObject, context2, options);
     Log.info("compacted={}",compacted);
   }
 }

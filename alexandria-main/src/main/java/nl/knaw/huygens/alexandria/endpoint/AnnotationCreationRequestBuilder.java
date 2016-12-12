@@ -86,8 +86,7 @@ public class AnnotationCreationRequestBuilder {
 
   protected void validateId(AnnotationPrototype prototype) {
     Log.trace("Validating id");
-    return; // missing or empty Id means client does not override server
-            // generated value.
+    // generated value.
   }
 
   protected void validateType(AnnotationPrototype prototype) {
@@ -97,13 +96,11 @@ public class AnnotationCreationRequestBuilder {
 
   protected void validateValue(AnnotationPrototype prototype) {
     Log.trace("Validating value");
-    return; // missing or empty value is ok (means annotation is a Tag)
   }
 
   protected void validateProvenance(AnnotationPrototype prototype) {
     Log.trace("Validating provenance");
-    return; // missing or empty provenance means client does not override server
-            // set value.
+    // set value.
   }
 
   // protected void validateAnnotations(AnnotationPrototype prototype) {

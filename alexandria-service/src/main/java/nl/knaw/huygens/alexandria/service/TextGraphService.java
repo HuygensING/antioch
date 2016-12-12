@@ -76,7 +76,7 @@ public class TextGraphService {
       Vertex textSegment = getVertexTraversalFromResource(resourceUUID)//
           .out(EdgeLabels.HAS_TEXTGRAPH)//
           .out(EdgeLabels.FIRST_TEXT_SEGMENT)//
-          .next();// because there can only be one
+          .next();// because there can be only one
 
       @Override
       public boolean hasNext() {
@@ -298,8 +298,7 @@ public class TextGraphService {
   private boolean parentTextAnnotationIsMilestone(Vertex parentTextAnnotationVertex, Vertex textSegment) {
     Vertex lastTextSegment = parentTextAnnotationVertex.vertices(Direction.OUT, EdgeLabels.LAST_TEXT_SEGMENT).next();
     String firstText = getStringValue(textSegment, TextSegment.Properties.text);
-    boolean parentTextAnnotationIsMilestone = firstText.isEmpty() && textSegment.equals(lastTextSegment);
-    return parentTextAnnotationIsMilestone;
+    return firstText.isEmpty() && textSegment.equals(lastTextSegment);
   }
 
   private Vertex createNewTextAnnotation(TextRangeAnnotationVF textRangeAnnotationVF, TextRangeAnnotation textRangeAnnotation) {
@@ -715,7 +714,7 @@ public class TextGraphService {
     return Lists.reverse(getTextAnnotations(textSegment, EdgeLabels.LAST_TEXT_SEGMENT));
   }
 
-  private static final Comparator<TextAnnotation> BY_INCREASING_DEPTH = (e1, e2) -> e1.getDepth().compareTo(e2.getDepth());
+  private static final Comparator<TextAnnotation> BY_INCREASING_DEPTH = Comparator.comparing(TextAnnotation::getDepth);
 
   private List<TextAnnotation> getTextAnnotations(Vertex textSegment, String edgeLabel) {
     return StreamUtil.stream(textSegment.vertices(Direction.IN, edgeLabel))//

@@ -363,7 +363,7 @@ public class TinkerPopService implements AlexandriaService {
   public void deprecateTextRangeAnnotation(UUID annotationUUID, TextRangeAnnotation newTextRangeAnnotation) {
     storage.runInTransaction(() -> {
       TextRangeAnnotationVF oldVF = storage.readVF(TextRangeAnnotationVF.class, annotationUUID)//
-          .orElseThrow(() -> new NotFoundException());
+          .orElseThrow(NotFoundException::new);
       Integer revision = oldVF.getRevision();
       oldVF.setUuid(annotationUUID.toString() + "." + revision);
       ResourceVF resourceVF = oldVF.getResource();
@@ -1013,9 +1013,7 @@ public class TinkerPopService implements AlexandriaService {
         vf.setLength(position.getLength().get());
       }
     });
-    position.getTargetAnnotationId().ifPresent(targetId -> {
-      vf.setTargetAnnotationId(targetId.toString());
-    });
+    position.getTargetAnnotationId().ifPresent(targetId -> vf.setTargetAnnotationId(targetId.toString()));
     AbsolutePosition absolutePosition = annotation.getAbsolutePosition();
     vf.setAbsoluteXmlId(absolutePosition.getXmlId());
     vf.setAbsoluteOffset(absolutePosition.getOffset());

@@ -121,12 +121,7 @@ public class Storage {
 
   private ThreadLocal<Boolean> getTransactionOpen() {
     if (transactionOpen == null) {
-      transactionOpen = new ThreadLocal<Boolean>() {
-        @Override
-        protected Boolean initialValue() {
-          return false;
-        }
-      };
+      transactionOpen = ThreadLocal.withInitial(() -> false);
     }
     return transactionOpen;
   }

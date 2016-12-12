@@ -115,8 +115,7 @@ public class WebAnnotationService {
       resourceUUID = UUID.fromString(resourceId);
     }
 
-    AlexandriaResource alexandriaResource = service.readResource(resourceUUID).get();
-    return alexandriaResource;
+    return service.readResource(resourceUUID).get();
   }
 
   private AlexandriaAnnotation createWebAnnotation(String json, AlexandriaResource alexandriaResource) {

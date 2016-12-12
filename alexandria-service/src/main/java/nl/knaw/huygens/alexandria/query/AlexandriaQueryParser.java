@@ -233,9 +233,7 @@ public class AlexandriaQueryParser {
           .map(String.class::cast)//
           .map(UUID::fromString)//
           .collect(toList());
-      return storage -> {
-        return toAnnotationVFStream(uuidSet, storage);
-      };
+      return storage -> toAnnotationVFStream(uuidSet, storage);
 
     }
     return null;
@@ -368,14 +366,11 @@ public class AlexandriaQueryParser {
         Object propertyValue = getter.apply(avf);
         if (propertyValue instanceof String) {
           return ((String) propertyValue).compareTo((String) lowerLimit) >= 0//
-              && ((String) propertyValue).compareTo((String) upperLimit) <= 0;
+                  && ((String) propertyValue).compareTo((String) upperLimit) <= 0;
         }
-        if (propertyValue instanceof Long) {
-          return ((Long) propertyValue).compareTo((Long) lowerLimit) >= 0//
-              && ((Long) propertyValue).compareTo((Long) upperLimit) <= 0;
-
-        }
-        return true;
+        //
+        return !(propertyValue instanceof Long) || ((Long) propertyValue).compareTo((Long) lowerLimit) >= 0//
+                && ((Long) propertyValue).compareTo((Long) upperLimit) <= 0;
       };
     }
 

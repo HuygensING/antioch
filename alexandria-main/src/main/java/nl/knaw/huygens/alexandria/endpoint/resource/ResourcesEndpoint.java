@@ -137,7 +137,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
     protoType.setState(AlexandriaState.CONFIRMED);
     protoType.setId(uuid); // in case the prototype has no id, get it from the Path
     Optional<AlexandriaResource> existingResource = service.readResource(uuid.getValue());
-    if (existingResource.isPresent() && !isConfirmed(existingResource.get())) {
+    if (existingResource.isPresent() && isNotConfirmed(existingResource.get())) {
       throw new ConflictException("This resource has state " + existingResource.get().getState() + "; only CONFIRMED resources can be updated.");
     }
     final ResourceCreationRequest request = requestBuilder.build(protoType);
@@ -199,13 +199,13 @@ public class ResourcesEndpoint extends JSONEndpoint {
     return service.readResource(id.getValue()).orElseThrow(resourceNotFoundForId(id));
   }
 
-  private boolean isConfirmed(AlexandriaResource resource) {
-    return resource.getState().equals(AlexandriaState.CONFIRMED);
+  private boolean isNotConfirmed(AlexandriaResource resource) {
+    return !resource.getState().equals(AlexandriaState.CONFIRMED);
   }
 
   private void assertResourceIsConfirmed(UUIDParam uuidParam) {
     AlexandriaResource resource = readExistingResource(uuidParam);
-    if (!isConfirmed(resource)) {
+    if (isNotConfirmed(resource)) {
       throw new ConflictException("This resource has state " + resource.getState() + "; it needs to be CONFIRMED first.");
     }
   }

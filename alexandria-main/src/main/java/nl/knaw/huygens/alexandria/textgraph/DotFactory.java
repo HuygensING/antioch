@@ -27,7 +27,7 @@ public class DotFactory {
         appendNextTextEdge(stringBuilder, tn);
       }
       List<TextAnnotation> textAnnotationsToOpen = s.getTextAnnotationsToOpen();
-      s.getMilestoneTextAnnotation().ifPresent(textAnnotation -> textAnnotationsToOpen.add(textAnnotation));
+      s.getMilestoneTextAnnotation().ifPresent(textAnnotationsToOpen::add);
       for (TextAnnotation textAnnotation : textAnnotationsToOpen) {
         int an = annotationCounter.getAndIncrement();
         appendAnnotationVertex(stringBuilder, an, textAnnotation);

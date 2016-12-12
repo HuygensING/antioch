@@ -92,7 +92,7 @@ public class TinkerpopAlexandriaServiceTest {
     IdentifiablePointer<AlexandriaAnnotation> ap = new IdentifiablePointer<>(AlexandriaAnnotation.class, id.toString());
 
     Optional<? extends Accountable> optional = service.dereference(ap);
-    assertThat(optional.isPresent());
+    assertThat(optional).isPresent();
     AlexandriaAnnotation annotation = (AlexandriaAnnotation) optional.get();
     assertThat(annotation.getId()).isEqualTo(id);
   }
@@ -117,7 +117,7 @@ public class TinkerpopAlexandriaServiceTest {
     IdentifiablePointer<AlexandriaResource> ap = new IdentifiablePointer<>(AlexandriaResource.class, id.toString());
 
     Optional<? extends Accountable> optional = service.dereference(ap);
-    assertThat(optional.isPresent());
+    assertThat(optional).isPresent();
     AlexandriaResource annotation = (AlexandriaResource) optional.get();
     assertThat(annotation.getId()).isEqualTo(id);
   }

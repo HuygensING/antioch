@@ -13,5 +13,5 @@ public class WebAnnotationConstants {
   public static final String JSONLD_MEDIATYPE = "application/ld+json";
   public static final String RESOURCE_TYPE_URI = "http://www.w3.org/ns/ldp#Resource";
   public static final String ANNOTATION_TYPE_URI = "http://www.w3.org/ns/oa#Annotation";
-  public static final Set<String> ALLOWED_METHODS = ImmutableSet.<String> of("PUT", "GET", "OPTIONS", "HEAD", "DELETE");
+  public static final Set<String> ALLOWED_METHODS = ImmutableSet.of("PUT", "GET", "OPTIONS", "HEAD", "DELETE");
 }

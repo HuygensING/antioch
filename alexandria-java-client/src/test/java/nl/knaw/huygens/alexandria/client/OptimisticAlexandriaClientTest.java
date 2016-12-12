@@ -494,7 +494,6 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
       .setAnnotator("ckcc")//
       .setPosition(position1)//
       .setAttributes(attributes1);
-    ;
 
     UUID annotationUUID2 = UUID.randomUUID();
     Position position2 = new Position()//
@@ -614,7 +613,6 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
       .setAnnotator("ckcc")//
       .setPosition(position1)//
       .setAttributes(attributes1);
-    ;
     TextRangeAnnotationInfo info1 = client.setResourceTextRangeAnnotation(resourceUUID, closerAnnotation);
     assertThat(info1.getAnnotates()).isEqualTo("");
     String textAfterFirstAnnotation = client.getTextAsString(resourceUUID);

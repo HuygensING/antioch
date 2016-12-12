@@ -88,7 +88,7 @@ public class Neo4JService extends TinkerPopService {
       Object next = traversal.next();
       Log.info("next={}", next);
     }
-  };
+  }
 
   private static void createWhenAbsent(String dataDir) {
     File file = new File(dataDir);

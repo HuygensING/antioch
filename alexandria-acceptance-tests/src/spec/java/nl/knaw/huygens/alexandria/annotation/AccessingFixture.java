@@ -97,12 +97,7 @@ public class AccessingFixture extends AnnotationsBase {
   }
 
   public void setUpAnnotation(String id, String tag) {
-    List<String> tags = annotatedReferences.get(id);
-
-    if (tags == null) {
-      tags = Lists.newArrayList();
-      annotatedReferences.put(id, tags);
-    }
+    List<String> tags = annotatedReferences.computeIfAbsent(id, k -> Lists.newArrayList());
 
     tags.add(tag);
   }
@@ -112,11 +107,7 @@ public class AccessingFixture extends AnnotationsBase {
       return "400 Bad Request";
     }
 
-    List<String> tags = annotatedReferences.get(id);
-    if (tags == null) {
-      tags = Lists.newArrayList();
-      annotatedReferences.put(id, tags);
-    }
+    List<String> tags = annotatedReferences.computeIfAbsent(id, k -> Lists.newArrayList());
 
     if (tags.contains(tag)) {
       return "409 Conflict";

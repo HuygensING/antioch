@@ -165,7 +165,7 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
   public Response deleteWebAnnotation(@PathParam("uuid") UUIDParam uuidParam) {
     UUID annotationUUID = uuidParam.getValue();
     AlexandriaAnnotation annotation = service.readAnnotation(annotationUUID)//
-        .orElseThrow(() -> new NotFoundException());
+        .orElseThrow(NotFoundException::new);
     service.deleteAnnotation(annotation);
     return Response.noContent().build();
   }
