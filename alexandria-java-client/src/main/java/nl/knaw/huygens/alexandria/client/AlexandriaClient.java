@@ -1,29 +1,16 @@
 package nl.knaw.huygens.alexandria.client;
 
-import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import javax.net.ssl.SSLContext;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.SyncInvoker;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.*;
+import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
+import nl.knaw.huygens.alexandria.api.model.text.*;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
+import nl.knaw.huygens.alexandria.client.model.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.glassfish.jersey.apache.connector.ApacheClientProperties;
@@ -31,36 +18,21 @@ import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import javax.net.ssl.SSLContext;
+import javax.ws.rs.client.*;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
-import nl.knaw.huygens.alexandria.api.EndpointPaths;
-import nl.knaw.huygens.alexandria.api.model.AboutEntity;
-import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.api.model.Annotator;
-import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
-import nl.knaw.huygens.alexandria.api.model.CommandResponse;
-import nl.knaw.huygens.alexandria.api.model.CommandStatus;
-import nl.knaw.huygens.alexandria.api.model.StatePrototype;
-import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
-import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
-import nl.knaw.huygens.alexandria.api.model.text.TextAnnotationImportStatus;
-import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
-import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
-import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
-import nl.knaw.huygens.alexandria.client.model.AnnotationList;
-import nl.knaw.huygens.alexandria.client.model.AnnotationPojo;
-import nl.knaw.huygens.alexandria.client.model.AnnotationPrototype;
-import nl.knaw.huygens.alexandria.client.model.ResourcePojo;
-import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
-import nl.knaw.huygens.alexandria.client.model.SubResourceList;
-import nl.knaw.huygens.alexandria.client.model.SubResourcePojo;
-import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
+import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
 
 /*
  * #%L
@@ -85,6 +57,8 @@ import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
  */
 
 public class AlexandriaClient implements AutoCloseable {
+  public static final Map<String,String> NO_VIEW_PARAMETERS = Collections.emptyMap();
+
   private WebTarget rootTarget;
   private String authHeader = "";
   private final Client client;
@@ -423,8 +397,7 @@ public class AlexandriaClient implements AutoCloseable {
   }
 
   public RestResult<TextViewDefinition> getResourceTextView(final UUID uuid, final String textViewName) {
-    Map<String, String> viewParameters = new HashMap<>();
-    return getResourceTextView(uuid, textViewName, viewParameters);
+    return getResourceTextView(uuid, textViewName, NO_VIEW_PARAMETERS);
   }
 
   public RestResult<TextViewDefinition> getResourceTextView(final UUID uuid, final String textViewName, final Map<String, String> viewParameters) {
