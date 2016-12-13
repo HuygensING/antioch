@@ -209,7 +209,8 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     client.setResourceTextView(rootResourceUUID, "view1", textView);
     TextViewDefinition resourceTextView = client.getResourceTextView(rootResourceUUID, "view1");
     TextViewList resourceTextViews = client.getResourceTextViews(rootResourceUUID);
-    Log.info("resourceTextView={}",resourceTextView);
+    Log.info("resourceTextView={}", resourceTextView);
+    assertThat(resourceTextViews.isEmpty()).isFalse();
 
     String rootView = client.getTextAsString(rootResourceUUID, "view1");
     Log.info("rootView = {}", rootView);
@@ -310,7 +311,7 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
 
     ElementViewDefinition evd = new ElementViewDefinition()//
       .setElementMode(ElementMode.show)//
-        .setWhen("attribute({a}).firstOf({list})");
+      .setWhen("attribute({a}).firstOf({list})");
     TextViewDefinition textView = new TextViewDefinition()//
       .setDescription("show-resp-a-or-b")//
       .setElementViewDefinition("persName", evd);

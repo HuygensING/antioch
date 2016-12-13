@@ -12,128 +12,167 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 @JsonTypeName(JsonTypeNames.TEXTVIEWLIST)
-public class TextViewList {
+public class TextViewList implements List<TextViewEntity> {
   @JsonIgnore
-  List<TextViewDefinition> delegate = Lists.newArrayList();
+  List<TextViewEntity> delegate = Lists.newArrayList();
 
+  @Override
   public int size() {
     return delegate.size();
   }
 
-  @JsonIgnore
+  @Override
   public boolean isEmpty() {
     return delegate.isEmpty();
   }
 
+  @Override
   public boolean contains(Object o) {
     return delegate.contains(o);
   }
 
-  public Iterator<TextViewDefinition> iterator() {
+  @Override
+  public Iterator<TextViewEntity> iterator() {
     return delegate.iterator();
   }
 
+  @Override
   public Object[] toArray() {
     return delegate.toArray();
   }
 
+  @Override
   public <T> T[] toArray(T[] a) {
     return delegate.toArray(a);
   }
 
-  public boolean add(TextViewDefinition textViewDefinition) {
-    return delegate.add(textViewDefinition);
+  @Override
+  public boolean add(TextViewEntity textViewEntity) {
+    return delegate.add(textViewEntity);
   }
 
+  @Override
   public boolean remove(Object o) {
     return delegate.remove(o);
   }
 
+  @Override
   public boolean containsAll(Collection<?> c) {
     return delegate.containsAll(c);
   }
 
-  public boolean addAll(Collection<? extends TextViewDefinition> c) {
+  @Override
+  public boolean addAll(Collection<? extends TextViewEntity> c) {
     return delegate.addAll(c);
   }
 
-  public boolean addAll(int index, Collection<? extends TextViewDefinition> c) {
+  @Override
+  public boolean addAll(int index, Collection<? extends TextViewEntity> c) {
     return delegate.addAll(index, c);
   }
 
+  @Override
   public boolean removeAll(Collection<?> c) {
     return delegate.removeAll(c);
   }
 
+  @Override
   public boolean retainAll(Collection<?> c) {
     return delegate.retainAll(c);
   }
 
-  public void replaceAll(UnaryOperator<TextViewDefinition> operator) {
+  @Override
+  public void replaceAll(UnaryOperator<TextViewEntity> operator) {
     delegate.replaceAll(operator);
   }
 
-  public void sort(Comparator<? super TextViewDefinition> c) {
+  @Override
+  public void sort(Comparator<? super TextViewEntity> c) {
     delegate.sort(c);
   }
 
+  @Override
   public void clear() {
     delegate.clear();
   }
 
-  public TextViewDefinition get(int index) {
+  @Override
+  public boolean equals(Object o) {
+    return delegate.equals(o);
+  }
+
+  @Override
+  public int hashCode() {
+    return delegate.hashCode();
+  }
+
+  @Override
+  public TextViewEntity get(int index) {
     return delegate.get(index);
   }
 
-  public TextViewDefinition set(int index, TextViewDefinition element) {
+  @Override
+  public TextViewEntity set(int index, TextViewEntity element) {
     return delegate.set(index, element);
   }
 
-  public void add(int index, TextViewDefinition element) {
+  @Override
+  public void add(int index, TextViewEntity element) {
     delegate.add(index, element);
   }
 
-  public TextViewDefinition remove(int index) {
+  @Override
+  public TextViewEntity remove(int index) {
     return delegate.remove(index);
   }
 
+  @Override
   public int indexOf(Object o) {
     return delegate.indexOf(o);
   }
 
+  @Override
   public int lastIndexOf(Object o) {
     return delegate.lastIndexOf(o);
   }
 
-  public ListIterator<TextViewDefinition> listIterator() {
+  @Override
+  public ListIterator<TextViewEntity> listIterator() {
     return delegate.listIterator();
   }
 
-  public ListIterator<TextViewDefinition> listIterator(int index) {
+  @Override
+  public ListIterator<TextViewEntity> listIterator(int index) {
     return delegate.listIterator(index);
   }
 
-  public List<TextViewDefinition> subList(int fromIndex, int toIndex) {
+  @Override
+  public List<TextViewEntity> subList(int fromIndex, int toIndex) {
     return delegate.subList(fromIndex, toIndex);
   }
 
-  public Spliterator<TextViewDefinition> spliterator() {
+  @Override
+  public Spliterator<TextViewEntity> spliterator() {
     return delegate.spliterator();
   }
 
-  public boolean removeIf(Predicate<? super TextViewDefinition> filter) {
+  @Override
+  public boolean removeIf(Predicate<? super TextViewEntity> filter) {
     return delegate.removeIf(filter);
   }
 
-  public Stream<TextViewDefinition> stream() {
+  @Override
+  public Stream<TextViewEntity> stream() {
     return delegate.stream();
   }
 
-  public Stream<TextViewDefinition> parallelStream() {
+  @Override
+  public Stream<TextViewEntity> parallelStream() {
     return delegate.parallelStream();
   }
 
-  public void forEach(Consumer<? super TextViewDefinition> action) {
+  @Override
+  public void forEach(Consumer<? super TextViewEntity> action) {
     delegate.forEach(action);
   }
 }
