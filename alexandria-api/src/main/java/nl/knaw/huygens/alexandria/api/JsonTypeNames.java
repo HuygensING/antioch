@@ -20,4 +20,5 @@ public class JsonTypeNames {
   public static final String QUERY = "query";
   public static final String SEARCHRESULTPAGE = "searchResultPage";
   public static final String TEXTANNOTATIONIMPORTSTATUS = "textAnnotationImportStatus";
+  public static final String TEXTVIEWLIST = "textViews";
 }

@@ -1,18 +1,19 @@
 package nl.knaw.huygens.alexandria.api.model.text;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.google.common.collect.Lists;
+import nl.knaw.huygens.alexandria.api.JsonTypeNames;
+import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.common.collect.Lists;
-
-import nl.knaw.huygens.alexandria.api.JsonTypeNames;
-import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
-
 @JsonTypeName(JsonTypeNames.TEXTANNOTATIONLIST)
 public class TextRangeAnnotationList extends JsonWrapperObject implements List<TextRangeAnnotation> {
+  @JsonIgnore
   List<TextRangeAnnotation> delegate = Lists.newArrayList();
 
   // delegated methods

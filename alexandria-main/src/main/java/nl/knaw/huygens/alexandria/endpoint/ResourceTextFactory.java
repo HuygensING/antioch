@@ -1,18 +1,19 @@
 package nl.knaw.huygens.alexandria.endpoint;
 
-import java.net.URI;
-import java.util.List;
-import java.util.UUID;
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementViewDefinition;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewEntity;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.UriBuilder;
-
-import nl.knaw.huygens.alexandria.api.EndpointPaths;
-import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
-import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
-import nl.knaw.huygens.alexandria.api.model.text.view.TextViewEntity;
-import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import java.net.URI;
+import java.util.List;
+import java.util.UUID;
 
 @Singleton
 public class ResourceTextFactory {
@@ -50,4 +51,17 @@ public class ResourceTextFactory {
     return locationBuilder.locationOf(AlexandriaResource.class, resourceId, EndpointPaths.TEXT, "xml");
   }
 
+  public TextViewDefinition createTextViewDefinition(UUID resourceId, TextView textView) {
+    TextViewDefinition tvd = new TextViewDefinition()//
+      .setDescription(textView.getDescription())//
+      ;
+    textView.getElementViewMap().forEach((k, v) -> {
+      ElementViewDefinition evd = new ElementViewDefinition()//
+        .setElementMode(v.getElementMode()) //
+        .setAttributeMode(v.getAttributeMode().name());
+      v.getPreCondition().ifPresent(precondition -> evd.setWhen(precondition.toString()));
+      tvd.setElementViewDefinition(k, evd);
+    });
+    return tvd;
+  }
 }

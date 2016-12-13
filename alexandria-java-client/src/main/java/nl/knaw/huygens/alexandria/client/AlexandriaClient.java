@@ -10,6 +10,7 @@ import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
 import nl.knaw.huygens.alexandria.api.model.text.*;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewList;
 import nl.knaw.huygens.alexandria.client.model.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -420,10 +421,10 @@ public class AlexandriaClient implements AutoCloseable {
     return path;
   }
 
-  public RestResult<List> getResourceTextViews(final UUID uuid) {
+  public RestResult<TextViewList> getResourceTextViews(final UUID uuid) {
     WebTarget path = resourceTextTarget(uuid).path(EndpointPaths.TEXTVIEWS);
     Supplier<Response> anonymousGet = anonymousGet(path);
-    final RestRequester<List> requester = RestRequester.withResponseSupplier(anonymousGet);
+    final RestRequester<TextViewList> requester = RestRequester.withResponseSupplier(anonymousGet);
     return requester//
         .onStatus(Status.OK, this::toTextViewListRestResult)//
         .getResult();
@@ -604,8 +605,8 @@ public class AlexandriaClient implements AutoCloseable {
     return toEntityRestResult(response, TextViewDefinition.class);
   }
 
-  private RestResult<List> toTextViewListRestResult(final Response response) {
-    return toEntityRestResult(response, List.class);
+  private RestResult<TextViewList> toTextViewListRestResult(final Response response) {
+    return toEntityRestResult(response, TextViewList.class);
   }
 
   private RestResult<SearchResultPage> toSearchResultPageRestResult(final Response response) {
