@@ -5,7 +5,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.CommandResponse;
 import nl.knaw.huygens.alexandria.api.model.Commands;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -36,7 +35,7 @@ public class WrapContentInElementCommand extends TextAnnotationCommand {
     }
 
     public boolean hasRelevantXmlId(TextAnnotation textAnnotation) {
-      Log.info("textAnnotation={}", textAnnotation);
+      // Log.info("textAnnotation={}", textAnnotation);
       String xmlId = textAnnotation.getAttributes().get(TextUtil.XML_ID);
       return xmlIds.contains(xmlId);
     }

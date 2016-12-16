@@ -44,11 +44,12 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.io.IoCore;
 import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.storage.frames.IdentifiableVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
@@ -58,6 +59,7 @@ import peapod.FramedGraphTraversal;
 
 @Singleton
 public class Storage {
+  private static Logger LOG = LoggerFactory.getLogger(Storage.class);
   public static final String IDENTIFIER_PROPERTY = "uuid";
 
   private Graph graph;
@@ -231,7 +233,7 @@ public class Storage {
 
   private void nonGryoWarning(DumpFormat format) {
     if (!DumpFormat.gryo.equals(format)) {
-      Log.warn("restoring from " + format.name() + " may lead to duplicate id errors, use gryo if possible");
+      LOG.warn("restoring from " + format.name() + " may lead to duplicate id errors, use gryo if possible");
     }
   }
 
@@ -260,16 +262,16 @@ public class Storage {
   }
 
   public void destroy() {
-    // Log.info("destroy called");
+    // LOG.info("destroy called");
     try {
-      Log.info("closing graph {}", graph);
+      // LOG.info("closing graph {}", graph);
       graph.close();
-      Log.info("graph closed: {}", graph);
+      // LOG.info("graph closed: {}", graph);
     } catch (Exception e) {
       e.printStackTrace();
       throw new RuntimeException(e);
     }
-    // Log.info("destroy done");
+    // LOG.info("destroy done");
   }
 
   public Vertex addVertex(Object... keyValues) {
@@ -334,7 +336,7 @@ public class Storage {
       } catch (Exception e) {
         // wait
         try {
-          Log.info("exception={}", e);
+          LOG.error("exception={}", e);
           Thread.sleep(500);
         } catch (InterruptedException ie) {
           ie.printStackTrace();
@@ -353,7 +355,7 @@ public class Storage {
       framedGraph.tx().rollback();
       // framedGraph.tx().close();
     } else {
-      Log.error("rollback called, but transactions are not supported by graph {}", graph);
+      LOG.error("rollback called, but transactions are not supported by graph {}", graph);
     }
     setTransactionIsOpen(false);
   }

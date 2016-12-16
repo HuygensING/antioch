@@ -28,7 +28,6 @@ import javax.ws.rs.core.Response;
  */
 
 import io.swagger.annotations.ApiOperation;
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -43,7 +42,7 @@ public abstract class AccountableProvenanceEndpoint extends JSONEndpoint {
     this.locationBuilder = locationBuilder;
     this.service = service;
     this.uuid = uuidParam.getValue();
-    Log.trace("resourceService=[{}], uuidParam=[{}]", service, uuidParam);
+    // Log.trace("resourceService=[{}], uuidParam=[{}]", service, uuidParam);
   }
 
   protected abstract Accountable getAccountable();

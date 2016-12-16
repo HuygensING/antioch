@@ -28,7 +28,6 @@ import java.util.concurrent.Executors;
 import com.google.inject.Scopes;
 import com.google.inject.servlet.ServletModule;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntityBuilder;
 import nl.knaw.huygens.alexandria.endpoint.resource.ResourceEntityBuilder;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
@@ -41,7 +40,7 @@ public abstract class AbstractAlexandriaServletModule extends ServletModule {
   @Override
   protected void configureServlets() {
     // guice binds here
-    Log.trace("configureServlets(): setting up Guice bindings");
+    // Log.trace("configureServlets(): setting up Guice bindings");
     Class<? extends TinkerPopService> tinkerpopServiceClass = getTinkerPopServiceClass();
     bind(AlexandriaService.class).to(tinkerpopServiceClass);
     bind(TinkerPopService.class).to(tinkerpopServiceClass);

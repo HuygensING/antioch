@@ -38,10 +38,9 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang3.StringUtils;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
 
-@Target({ElementType.FIELD, ElementType.PARAMETER})
+@Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ValidAnnotator.Validator.class)
 public @interface ValidAnnotator {
@@ -61,7 +60,7 @@ public @interface ValidAnnotator {
 
     @Override
     public void initialize(ValidAnnotator constraintAnnotation) {
-      Log.info("initialize: annotation={}", constraintAnnotation);
+      // Log.info("initialize: annotation={}", constraintAnnotation);
     }
 
     @Override
@@ -79,7 +78,6 @@ public @interface ValidAnnotator {
     private String value(PathSegment segment) {
       return segment.getPath();
     }
-
 
     private PathSegment annotatorCode() {
       return annotatorCodeSegment(uriSegments());

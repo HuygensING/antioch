@@ -31,11 +31,12 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.AbstractModule;
 import com.squarespace.jersey2.guice.BootstrapUtils;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.config.PropertiesConfiguration;
 import nl.knaw.huygens.alexandria.jersey.AlexandriaApplication;
@@ -44,6 +45,7 @@ import nl.knaw.huygens.alexandria.service.AlexandriaServletModule;
 import nl.knaw.huygens.alexandria.util.Scheduler;
 
 public class Server {
+  private static Logger LOG = LoggerFactory.getLogger(Server.class);
   private static final long ONE_HOUR = Duration.ofHours(1).toMillis();
   private AlexandriaConfiguration config = new ServerConfiguration();
   private static final String PROPERTIES_FILE = "about.properties";
@@ -62,7 +64,7 @@ public class Server {
   private void run() throws IOException {
     URI uri = getBaseURI();
     final HttpServer httpServer = startServer(uri);
-    Log.info("Jersey app started with WADL available at {}/application.wadl\n", uri);
+    LOG.info("Jersey app started with WADL available at {}/application.wadl\n", uri);
     System.out.println("-----------------------------");
     System.out.println("Alexandria server started at " + uri);
     System.out.println("press Ctrl-c to stop");
@@ -95,9 +97,9 @@ public class Server {
     ServiceLocator locator = createServiceLocator();
     // init service
     AlexandriaService service = locator.getService(AlexandriaService.class);
-    Log.info("AlexandriaService {} initialized", service);
+    LOG.info("AlexandriaService {} initialized", service);
     ResourceConfig config = new AlexandriaApplication();
-    Log.info("Starting grizzly at {} ...", uri);
+    LOG.info("Starting grizzly at {} ...", uri);
     Scheduler scheduler = locator.getService(Scheduler.class);
     scheduler.scheduleExpiredTentativesRemoval();
     URI uri0000 = URI.create("http://0.0.0.0:" + uri.getPort());

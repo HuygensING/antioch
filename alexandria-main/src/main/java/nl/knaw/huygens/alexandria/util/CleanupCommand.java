@@ -24,14 +24,17 @@ package nl.knaw.huygens.alexandria.util;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.ProcessStatusMap;
 import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class CleanupCommand implements Runnable {
+  static final Logger LOG = LoggerFactory.getLogger(CleanupCommand.class);
   private AlexandriaService service;
   private ProcessStatusMap<TextImportStatus> taskStatusMap;
 
@@ -45,9 +48,9 @@ public class CleanupCommand implements Runnable {
   public void run() {
     Preconditions.checkNotNull(service);
     Preconditions.checkNotNull(taskStatusMap);
-    Log.info("removing expired textImport statuses");
+    LOG.info("removing expired textImport statuses");
     taskStatusMap.removeExpiredTasks();
-    Log.info("removing expired tentatives");
+    LOG.info("removing expired tentatives");
     service.removeExpiredTentatives();
   }
 }

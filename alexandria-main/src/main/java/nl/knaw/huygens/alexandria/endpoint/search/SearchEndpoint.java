@@ -38,7 +38,6 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
@@ -70,7 +69,7 @@ public class SearchEndpoint extends JSONEndpoint {
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation("create new SearchResult")
   public Response createSearchResult(@NotNull @Valid AlexandriaQuery query) {
-    Log.trace("query=[{}]", query);
+    // Log.trace("query=[{}]", query);
     SearchResult searchResult = service.execute(query);
     SearchResultCache.add(searchResult);
     return created(locationBuilder.locationOf(searchResult));

@@ -13,7 +13,6 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.lang3.StringUtils;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.AbsolutePosition;
@@ -41,7 +40,7 @@ public class TextRangeAnnotationValidatorFactory {
           .setOffset(relativePosition.getOffset().orElse(1))//
           .setLength(relativePosition.getLength().orElse(annotatedText.length()));
     } else {
-      Log.info("relpos={}", relativePosition);
+      // Log.info("relpos={}", relativePosition);
       UUID targetAnnotationUUID = relativePosition.getTargetAnnotationId()//
           .orElseThrow(() -> new BadRequestException("Position has neither xmlId nor targetAnnotationId, it needs one or the other."));
       TextRangeAnnotation targetTextRangeAnnotation = service.readTextRangeAnnotation(resourceUUID, targetAnnotationUUID)//
@@ -54,7 +53,7 @@ public class TextRangeAnnotationValidatorFactory {
       newTextRangeAnnotation.setUseOffset(targetTextRangeAnnotation.getUseOffset());
 
     }
-    Log.info("absolutePosition={}", absolutePosition);
+    // Log.info("absolutePosition={}", absolutePosition);
     newTextRangeAnnotation.setAbsolutePosition(absolutePosition);
   }
 
@@ -76,8 +75,7 @@ public class TextRangeAnnotationValidatorFactory {
   }
 
   public static String getAnnotatedText(Position position, String xml) {
-    String processedXml = xml.replace("&", AMPERSAND_PLACEHOLDER);
-    QueryableDocument qDocument = QueryableDocument.createFromXml(processedXml, true);
+    QueryableDocument qDocument = getQueryableDocument(xml);
     AtomicReference<String> annotated = new AtomicReference<>("");
     position.getXmlId().ifPresent(xmlId -> {
       validate(qDocument, //
@@ -96,14 +94,21 @@ public class TextRangeAnnotationValidatorFactory {
       }
 
       try {
-        Log.debug("xpath = {}", xpath);
+        // Log.debug("xpath = {}", xpath);
         annotated.set(qDocument.evaluateXPathToString(xpath));
       } catch (XPathExpressionException e) {
         e.printStackTrace();
       }
 
     });
-    return annotated.get().replace(AMPERSAND_PLACEHOLDER, "&");
+    return annotated.get().replace(QueryableDocumentCache.AMPERSAND_PLACEHOLDER, "&");
+  }
+
+  private static QueryableDocument getQueryableDocument(String xml) {
+    // String processedXml = xml.replace("&", QueryableDocumentCache.AMPERSAND_PLACEHOLDER);
+    // return QueryableDocument.createFromXml(processedXml, true);
+
+    return QueryableDocumentCache.get(xml);
   }
 
   private void validateNewPosition(TextRangeAnnotation newTextRangeAnnotation, TextRangeAnnotation existingTextRangeAnnotation) {
@@ -158,13 +163,11 @@ public class TextRangeAnnotationValidatorFactory {
     }
   }
 
-  private static String AMPERSAND_PLACEHOLDER = "☢";
-
   private static void validate(QueryableDocument qDocument, String xpath, Double expectation, String errorMessage) {
-    Log.info("xpath = '{}'", xpath);
+    // Log.info("xpath = '{}'", xpath);
     try {
       Double evaluation = qDocument.evaluateXPathToDouble(xpath);
-      Log.info("evaluation = {}", evaluation);
+      // Log.info("evaluation = {}", evaluation);
       if (!evaluation.equals(expectation)) {
         throw new BadRequestException(errorMessage);
       }

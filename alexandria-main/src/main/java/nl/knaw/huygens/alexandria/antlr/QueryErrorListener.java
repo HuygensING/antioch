@@ -31,60 +31,60 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.slf4j.Logger;
 
 import com.google.common.collect.Lists;
 
-import nl.knaw.huygens.Log;
-
 public class QueryErrorListener extends BaseErrorListener {
+  private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(QueryErrorListener.class);
   private Collection<String> parseErrors = Lists.newArrayList();
 
   @Override
   public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) {
-    Log.warn("reportAmbiguity:");
-    Log.warn("recognizer={}", recognizer);
-    Log.warn("dfa={}", dfa);
-    Log.warn("startIndex={}", startIndex);
-    Log.warn("stopIndex={}", stopIndex);
-    Log.warn("exact={}", exact);
-    Log.warn("ambigAlts={}", ambigAlts);
-    Log.warn("configs={}", configs);
+    LOG.warn("reportAmbiguity:");
+    LOG.warn("recognizer={}", recognizer);
+    LOG.warn("dfa={}", dfa);
+    LOG.warn("startIndex={}", startIndex);
+    LOG.warn("stopIndex={}", stopIndex);
+    LOG.warn("exact={}", exact);
+    LOG.warn("ambigAlts={}", ambigAlts);
+    LOG.warn("configs={}", configs);
     parseErrors.add("ambiguity at (" + startIndex + ".." + stopIndex + ")");
   }
 
   @Override
   public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, ATNConfigSet configs) {
-    Log.warn("reportContextSensitivity:");
-    Log.warn("recognizer={}", recognizer);
-    Log.warn("dfa={}", dfa);
-    Log.warn("startIndex={}", startIndex);
-    Log.warn("stopIndex={}", stopIndex);
-    Log.warn("prediction={}", prediction);
-    Log.warn("configs={}", configs);
+    LOG.warn("reportContextSensitivity:");
+    LOG.warn("recognizer={}", recognizer);
+    LOG.warn("dfa={}", dfa);
+    LOG.warn("startIndex={}", startIndex);
+    LOG.warn("stopIndex={}", stopIndex);
+    LOG.warn("prediction={}", prediction);
+    LOG.warn("configs={}", configs);
     parseErrors.add("contextSensitivity at (" + startIndex + ".." + stopIndex + ")");
   }
 
   @Override
   public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, ATNConfigSet configs) {
-    Log.warn("reportAttemptingFullContext:");
-    Log.warn("recognizer={}", recognizer);
-    Log.warn("dfa={}", dfa);
-    Log.warn("startIndex={}", startIndex);
-    Log.warn("stopIndex={}", stopIndex);
-    Log.warn("conflictingAlts={}", conflictingAlts);
-    Log.warn("configs={}", configs);
+    LOG.warn("reportAttemptingFullContext:");
+    LOG.warn("recognizer={}", recognizer);
+    LOG.warn("dfa={}", dfa);
+    LOG.warn("startIndex={}", startIndex);
+    LOG.warn("stopIndex={}", stopIndex);
+    LOG.warn("conflictingAlts={}", conflictingAlts);
+    LOG.warn("configs={}", configs);
     parseErrors.add("attemptingFullContext at (" + startIndex + ".." + stopIndex + ")");
   }
 
   @Override
   public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-    Log.warn("syntaxError:");
-    Log.warn("recognizer={}", recognizer);
-    Log.warn("offendingSymbol={}", offendingSymbol);
-    Log.warn("line={}", line);
-    Log.warn("charPositionInLine={}", charPositionInLine);
-    Log.warn("msg={}", msg);
-    // Log.warn("e={}", e);
+    LOG.warn("syntaxError:");
+    LOG.warn("recognizer={}", recognizer);
+    LOG.warn("offendingSymbol={}", offendingSymbol);
+    LOG.warn("line={}", line);
+    LOG.warn("charPositionInLine={}", charPositionInLine);
+    LOG.warn("msg={}", msg);
+    // LOG.warn("e={}", e);
     parseErrors.add("syntax error at (" + line + ":" + charPositionInLine + ") " + msg);
   }
 

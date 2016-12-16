@@ -66,7 +66,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
@@ -132,7 +131,7 @@ public class TinkerPopService implements AlexandriaService {
 
   @Inject
   public TinkerPopService(Storage storage, LocationBuilder locationBuilder) {
-    Log.trace("{} created, locationBuilder=[{}]", getClass().getSimpleName(), locationBuilder);
+    // Log.trace("{} created, locationBuilder=[{}]", getClass().getSimpleName(), locationBuilder);
     this.locationBuilder = locationBuilder;
     this.alexandriaQueryParser = new AlexandriaQueryParser(locationBuilder);
     setStorage(storage);
@@ -305,7 +304,7 @@ public class TinkerPopService implements AlexandriaService {
       AnnotatorVF avf = frameAnnotator(annotator);
       ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
       avf.setResource(resourceVF);
-      Log.info("avf.resource={}", avf.getResource().getUuid());
+      // Log.info("avf.resource={}", avf.getResource().getUuid());
     });
 
   }
@@ -483,11 +482,11 @@ public class TinkerPopService implements AlexandriaService {
         Integer start1 = absolutePosition.getOffset();
         Integer end1 = start1 + absolutePosition.getLength();
         Predicate<Vertex> overlapsWithAnnotation = t -> {
-          Log.info("t.keys={}", t.keys());
+          // Log.info("t.keys={}", t.keys());
           String xmlId2 = (String) t.property("absoluteXmlId").value();
           Integer start2 = (Integer) t.property("absoluteOffset").value();
           Integer end2 = start2 + (Integer) t.property("absoluteLength").value();
-          Log.info("start1:{} < end2:{} && start2:{} < end1:{}", start1, end2, start2, end1);
+          // Log.info("start1:{} < end2:{} && start2:{} < end1:{}", start1, end2, start2, end1);
           return xmlId1.equals(xmlId2) && start1 < end2 && start2 < end1;
         };
         Predicate<Vertex> hasDifferentUUID = t -> {

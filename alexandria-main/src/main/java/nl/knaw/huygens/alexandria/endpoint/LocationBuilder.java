@@ -29,7 +29,6 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.model.Identifiable;
@@ -84,9 +83,9 @@ public class LocationBuilder {
 
   public URI locationOf(Object... subPaths) {
     UriBuilder uriBuilder = UriBuilder.fromUri(config.getBaseURI());
-    Log.info("subPaths.size={}", subPaths.length);
+    // Log.info("subPaths.size={}", subPaths.length);
     for (Object subPath : subPaths) {
-      Log.info("subPath=[{}]", subPath);
+      // Log.info("subPath=[{}]", subPath);
       uriBuilder = uriBuilder.path(subPath.toString());
     }
     return uriBuilder.build("X");

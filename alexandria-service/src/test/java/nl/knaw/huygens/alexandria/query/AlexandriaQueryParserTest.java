@@ -39,11 +39,12 @@ import java.util.function.Predicate;
 
 import org.assertj.core.data.MapEntry;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.ErrorEntity;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.search.QueryField;
@@ -57,6 +58,7 @@ import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 
 public class AlexandriaQueryParserTest extends AlexandriaTest {
+  private static final Logger LOG = LoggerFactory.getLogger(AlexandriaQueryParserTest.class);
   private AlexandriaQueryParser alexandriaQueryParser = new AlexandriaQueryParser(new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()));
 
   @Test
@@ -68,7 +70,7 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
       fail("AlexandriaQueryParseException expected");
 
     } catch (AlexandriaQueryParseException e) {
-      Log.info("error message: {}", e.getMessage());
+      LOG.info("error message: {}", e.getMessage());
       assertThat(e.getMessage()).contains("foobar");
     }
   }
@@ -82,7 +84,7 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
       fail("AlexandriaQueryParseException expected");
 
     } catch (AlexandriaQueryParseException e) {
-      Log.info("error message: {}", e.getMessage());
+      LOG.info("error message: {}", e.getMessage());
       softly.assertThat(e.getMessage()).contains("huey");
       softly.assertThat(e.getMessage()).contains("dewey");
       softly.assertThat(e.getMessage()).contains("louie");
@@ -99,7 +101,7 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
       fail("AlexandriaQueryParseException expected");
 
     } catch (AlexandriaQueryParseException e) {
-      Log.info("error message: {}", e.getMessage());
+      LOG.info("error message: {}", e.getMessage());
       softly.assertThat(e.getMessage()).contains("huey");
       softly.assertThat(e.getMessage()).contains("dewey");
       softly.assertThat(e.getMessage()).contains("louie");
@@ -172,7 +174,7 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
         + " state:eq(\"CONFIRMED\")"//
         + " resource.id:inSet(\"11111-111-111-11-111\",\"11111-111-111-11-112\")";
     List<WhereToken> tokens = alexandriaQueryParser.tokenize(where);
-    Log.info("errors:{}", alexandriaQueryParser.parseErrors);
+    LOG.info("errors:{}", alexandriaQueryParser.parseErrors);
     assertThat(tokens).hasSize(4);
 
     WhereToken typeToken = tokens.get(0);
@@ -201,7 +203,7 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
     String where = "type:eq(\"Tag)";
     List<WhereToken> tokens = alexandriaQueryParser.tokenize(where);
     List<String> parseErrors = alexandriaQueryParser.parseErrors;
-    Log.info("errors:{}", parseErrors);
+    LOG.info("errors:{}", parseErrors);
     softly.assertThat(parseErrors).isNotEmpty();
     softly.assertThat(tokens).isEmpty();
   }
@@ -211,7 +213,7 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
     String where = "type:not(1)";
     List<WhereToken> tokens = alexandriaQueryParser.tokenize(where);
     List<String> parseErrors = alexandriaQueryParser.parseErrors;
-    Log.info("errors:{}", parseErrors);
+    LOG.info("errors:{}", parseErrors);
     softly.assertThat(parseErrors).isNotEmpty();
     assertThat(tokens).isEmpty();
   }
@@ -337,7 +339,7 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
 
     // test predicate
     Predicate<AnnotationVF> predicate = paq.getPredicate();
-    Log.info("predicate={}", predicate);
+    LOG.info("predicate={}", predicate);
     assertThat(predicate).isNotNull();
     assertThat(predicate.test(passAnnotation)).isTrue();
     assertThat(predicate.test(failAnnotation)).isFalse();
@@ -366,13 +368,13 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
   AtomicInteger alwaysTrueCalled = new AtomicInteger(0);
   Predicate<Object> alwaysTrue = o -> {
     int times = alwaysTrueCalled.incrementAndGet();
-    Log.info("alwaysTrue called {} times", times);
+    LOG.info("alwaysTrue called {} times", times);
     return true;
   };
   AtomicInteger alwaysFalseCalled = new AtomicInteger(0);
   Predicate<Object> alwaysFalse = o -> {
     int times = alwaysFalseCalled.incrementAndGet();
-    Log.info("alwaysFalse called {} times", times);
+    LOG.info("alwaysFalse called {} times", times);
     return false;
   };
 

@@ -28,12 +28,15 @@ import java.nio.file.Paths;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import nl.knaw.huygens.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 
 @Singleton
 public class PersistentTinkerGraphService extends TinkerGraphService {
+  private static Logger LOG = LoggerFactory.getLogger(PersistentTinkerGraphService.class);
   private static final String DUMPFILE = "alexandria.gryo";
 
   @Inject
@@ -42,7 +45,7 @@ public class PersistentTinkerGraphService extends TinkerGraphService {
     String dumpfile = config.getStorageDirectory() + "/" + DUMPFILE;
     STORAGE.setDumpFile(dumpfile);
     if (!STORAGE.supportsPersistence() && Files.exists(Paths.get(dumpfile))) {
-      Log.info("reading stored db from {}", dumpfile);
+      LOG.info("reading stored db from {}", dumpfile);
       STORAGE.loadFromDisk(dumpfile);
     }
   }

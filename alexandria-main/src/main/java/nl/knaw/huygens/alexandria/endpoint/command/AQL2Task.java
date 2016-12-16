@@ -14,7 +14,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 import com.google.common.base.Joiner;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.antlr.AQL2Lexer;
 import nl.knaw.huygens.alexandria.antlr.AQL2Parser;
 import nl.knaw.huygens.alexandria.antlr.QueryErrorListener;
@@ -91,7 +90,7 @@ public class AQL2Task implements Runnable {
     parser.addErrorListener(errorListener);
     parser.setBuildParseTree(true);
     ParseTree tree = parser.root();
-    Log.info("tree={}", tree.toStringTree(parser));
+    // Log.info("tree={}", tree.toStringTree(parser));
     if (errorListener.heardErrors()) {
       parseErrors.addAll(errorListener.getParseErrors().stream()//
           // .map(AlexandriaQueryParser::clarifyParseError)//

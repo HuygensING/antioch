@@ -14,13 +14,15 @@ import java.util.UUID;
 
 import javax.ws.rs.core.UriBuilder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.core.JsonLdProcessor;
 import com.github.jsonldjava.utils.JsonUtils;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
@@ -37,7 +39,7 @@ import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class WebAnnotationService {
-
+  private static final Logger LOG = LoggerFactory.getLogger(WebAnnotationService.class);
   private final AlexandriaService service;
   private final AlexandriaConfiguration config;
 
@@ -75,15 +77,15 @@ public class WebAnnotationService {
   }
 
   private String extractResourceRef(Map<String, Object> jsonObject) throws JsonLdError {
-    Log.info("jsonObject={}", jsonObject);
+    // Log.info("jsonObject={}", jsonObject);
     Map<Object, Object> context = new HashMap<>();
     JsonLdOptions options = new JsonLdOptions();
     Map<String, Object> compacted = JsonLdProcessor.compact(jsonObject, context, options);
-    Log.info("compacted={}", jsonObject);
+    // Log.info("compacted={}", jsonObject);
     Map<String, Object> target = (Map<String, Object>) compacted.get(OA_HAS_TARGET_IRI);
     String resourceRef = "";
     if (target == null) {
-      Log.error("target==null!, compacted={}", compacted); // TODO!
+      LOG.error("target==null!, compacted={}", compacted); // TODO!
     } else {
       if (target.containsKey("@id")) {
         resourceRef = (String) target.get("@id");

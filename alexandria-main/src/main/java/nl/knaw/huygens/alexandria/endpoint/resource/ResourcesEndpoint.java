@@ -46,7 +46,6 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.StatePrototype;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
@@ -76,7 +75,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
     this.locationBuilder = locationBuilder;
     this.entityBuilder = entityBuilder;
     this.requestBuilder = requestBuilder;
-    Log.trace("Resources created, service=[{}]", service);
+    // Log.trace("Resources created, service=[{}]", service);
   }
 
   @GET
@@ -90,7 +89,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation("create new Resource")
   public Response createResource(@NotNull @Valid @WithoutId ResourcePrototype protoType) {
-    Log.trace("protoType=[{}]", protoType);
+    // Log.trace("protoType=[{}]", protoType);
 
     protoType.setState(AlexandriaState.TENTATIVE);
     final ResourceCreationRequest request = requestBuilder.build(protoType);
@@ -108,7 +107,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation(value = "update the state of the resource (only state=CONFIRMED accepted for now)")
   public Response setResourceState(@PathParam("uuid") final UUIDParam uuidParam, @NotNull StatePrototype protoType) {
-    Log.trace("protoType=[{}]", protoType);
+    // Log.trace("protoType=[{}]", protoType);
     AlexandriaResource resource = readExistingResource(uuidParam);
     if (protoType.isConfirmed()) {
       if (!resource.isActive()) {
@@ -132,7 +131,7 @@ public class ResourcesEndpoint extends JSONEndpoint {
   @ApiOperation(value = "update/create the resource with the given uuid")
   public Response setResourceAtSpecificID(@PathParam("uuid") final UUIDParam uuid, //
       @NotNull @Valid @MatchesPathId ResourcePrototype protoType) {
-    Log.trace("protoType=[{}]", protoType);
+    // Log.trace("protoType=[{}]", protoType);
 
     protoType.setState(AlexandriaState.CONFIRMED);
     protoType.setId(uuid); // in case the prototype has no id, get it from the Path

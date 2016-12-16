@@ -1,17 +1,22 @@
 package nl.knaw.huygens.alexandria.app;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.config.AbstractAlexandriaConfigurationUsingAlexandriaProperties;
-import org.slf4j.LoggerFactory;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
+
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import nl.knaw.huygens.alexandria.config.AbstractAlexandriaConfigurationUsingAlexandriaProperties;
 
 /*
  * #%L
@@ -36,6 +41,7 @@ import java.util.Scanner;
  */
 
 public class ServerConfiguration extends AbstractAlexandriaConfigurationUsingAlexandriaProperties {
+  private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(ServerConfiguration.class);
   private static final File ALEXANDRIA_ROOT = new File(System.getProperty("user.home"), ".alexandria");
   private static final File ALEXANDRIA_PROPERTIES_FILE = new File(ALEXANDRIA_ROOT, "alexandria.properties");
 
@@ -98,7 +104,7 @@ public class ServerConfiguration extends AbstractAlexandriaConfigurationUsingAle
       logLevel = Level.toLevel(properties.getProperty(PROPERTY_LOG_LEVEL));
     } catch (IOException e) {
       e.printStackTrace();
-      Log.error("Error reading properties from {}: {}", ALEXANDRIA_PROPERTIES_FILE.getAbsolutePath(), e.getMessage());
+      LOG.error("Error reading properties from {}: {}", ALEXANDRIA_PROPERTIES_FILE.getAbsolutePath(), e.getMessage());
     }
 
   }
@@ -122,7 +128,7 @@ public class ServerConfiguration extends AbstractAlexandriaConfigurationUsingAle
         properties.store(out, "Alexandria settings");
       } catch (IOException e) {
         e.printStackTrace();
-        Log.error("Error writing properties to {}: {}", ALEXANDRIA_PROPERTIES_FILE.getAbsolutePath(), e.getMessage());
+        LOG.error("Error writing properties to {}: {}", ALEXANDRIA_PROPERTIES_FILE.getAbsolutePath(), e.getMessage());
       }
     }
   }

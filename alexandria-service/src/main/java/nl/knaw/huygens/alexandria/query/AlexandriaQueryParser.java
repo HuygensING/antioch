@@ -59,7 +59,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.antlr.AQLLexer;
 import nl.knaw.huygens.alexandria.antlr.AQLParser;
 import nl.knaw.huygens.alexandria.antlr.QueryErrorListener;
@@ -215,7 +214,7 @@ public class AlexandriaQueryParser {
     } else if (resourceWhereTokens.size() == 1 && resourceWhereToken.getFunction().equals(QueryFunction.eq) && resourceWhereToken.getProperty().equals(QueryField.resource_ref)) {
       return storage -> {
         Object cargo = resourceWhereToken.getParameters().get(0);
-        Log.info("cargo={}", cargo);
+        // Log.info("cargo={}", cargo);
         List<ResourceVF> resourceVFs = storage.find(ResourceVF.class)//
             .has(ResourceVF.Properties.CARGO, cargo)//
             .toList();
@@ -224,7 +223,7 @@ public class AlexandriaQueryParser {
             .map(ResourceVF::getUuid)//
             .map(UUID::fromString)//
             .collect(toList());
-        Log.info("resourceUUIDs={}", resourceUUIDs);
+        // Log.info("resourceUUIDs={}", resourceUUIDs);
         return toAnnotationVFStream(resourceUUIDs, storage);
       };
 
@@ -251,7 +250,7 @@ public class AlexandriaQueryParser {
             .collect(toList()));
       });
     }
-    Log.info("annotationList={}", annotationList);
+    // Log.info("annotationList={}", annotationList);
     return annotationList.stream();
   }
 
@@ -271,7 +270,7 @@ public class AlexandriaQueryParser {
   }
 
   List<WhereToken> tokenize(String whereString) {
-    Log.info("whereString=<{}>", whereString);
+    // Log.info("whereString=<{}>", whereString);
     if (StringUtils.isEmpty(whereString)) {
       // parseErrors.add("empty or missing where");
       return Lists.newArrayList();
@@ -287,7 +286,7 @@ public class AlexandriaQueryParser {
     parser.addErrorListener(errorListener);
     parser.setBuildParseTree(true);
     ParseTree tree = parser.root();
-    Log.info("tree={}", tree.toStringTree(parser));
+    // Log.info("tree={}", tree.toStringTree(parser));
     if (errorListener.heardErrors()) {
       parseErrors.addAll(errorListener.getParseErrors().stream()//
           .map(AlexandriaQueryParser::clarifyParseError)//

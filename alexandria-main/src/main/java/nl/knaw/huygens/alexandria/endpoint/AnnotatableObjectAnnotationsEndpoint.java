@@ -18,7 +18,6 @@ import javax.ws.rs.core.Response;
 import com.google.common.collect.ImmutableMap;
 
 import io.swagger.annotations.ApiOperation;
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.JsonTypeNames;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntity;
@@ -42,7 +41,7 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
       AnnotationCreationRequestBuilder requestBuilder, //
       LocationBuilder locationBuilder, //
       final UUIDParam uuidParam) {
-    Log.trace("resourceService=[{}], uuidParam=[{}]", service, uuidParam);
+    // Log.trace("resourceService=[{}], uuidParam=[{}]", service, uuidParam);
     this.service = service;
     this.requestBuilder = requestBuilder;
     this.uuid = uuidParam.getValue();

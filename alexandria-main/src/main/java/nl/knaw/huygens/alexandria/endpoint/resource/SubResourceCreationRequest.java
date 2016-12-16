@@ -27,7 +27,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.UUID;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.endpoint.CreationRequest;
 import nl.knaw.huygens.alexandria.endpoint.ProvenancePrototype;
@@ -50,7 +49,7 @@ class SubResourceCreationRequest implements CreationRequest<AlexandriaResource> 
 
   @Override
   public AlexandriaResource execute(AlexandriaService service) {
-    Log.trace("executing, service=[{}]", service);
+    // Log.trace("executing, service=[{}]", service);
 
     uuid = providedUUID().orElse(UUID.randomUUID());
 
@@ -76,12 +75,12 @@ class SubResourceCreationRequest implements CreationRequest<AlexandriaResource> 
 
   public boolean wasExecutedAsIs() {
     final boolean wasExecutedAsIs = providedUUID().isPresent();// && providedProvenance().isPresent();
-    Log.trace("wasExecutedAsIs: {}", wasExecutedAsIs);
+    // Log.trace("wasExecutedAsIs: {}", wasExecutedAsIs);
     return wasExecutedAsIs;
   }
 
   public boolean newResourceWasCreated() {
-    Log.trace("newResourceWasCreated: {}", subResourceWasCreated);
+    // Log.trace("newResourceWasCreated: {}", subResourceWasCreated);
     return subResourceWasCreated;
   }
 

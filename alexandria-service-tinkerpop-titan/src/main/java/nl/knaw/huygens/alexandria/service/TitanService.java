@@ -35,6 +35,8 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.thinkaurelius.titan.core.PropertyKey;
@@ -51,7 +53,6 @@ import com.thinkaurelius.titan.core.util.TitanCleanup;
 import com.thinkaurelius.titan.graphdb.database.management.GraphIndexStatusReport;
 import com.thinkaurelius.titan.graphdb.database.management.ManagementSystem;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.storage.Storage;
@@ -59,6 +60,7 @@ import nl.knaw.huygens.alexandria.util.StreamUtil;
 
 @Singleton
 public class TitanService extends TinkerPopService {
+  private static final Logger LOG = LoggerFactory.getLogger(TitanService.class);
   private static final boolean UNIQUE = true;
   private static final String PROP_TYPE = "type";
   private static final String PROP_WHO = "who";
@@ -160,11 +162,11 @@ public class TitanService extends TinkerPopService {
         reindex.add(compositeIndex.name);
       }
     }
-    Log.info("saving indexes");
+    LOG.info("saving indexes");
     mgmt.commit();
 
     mgmt = titanGraph.openManagement();
-    Log.info("wait for completion");
+    LOG.info("wait for completion");
     for (VertexCompositeIndex compositeIndex : VertexCompositeIndex.values()) {
       waitForCompletion(mgmt, compositeIndex);
     }
@@ -172,7 +174,7 @@ public class TitanService extends TinkerPopService {
 
     mgmt = titanGraph.openManagement();
     for (String newIndex : reindex) {
-      Log.info("reindexing {}", newIndex);
+      LOG.info("reindexing {}", newIndex);
       try {
         mgmt.updateIndex(mgmt.getGraphIndex(newIndex), SchemaAction.REINDEX).get();
       } catch (InterruptedException | ExecutionException e) {
@@ -191,7 +193,7 @@ public class TitanService extends TinkerPopService {
       String property = compositeIndex.property;
       String label = compositeIndex.label;
       boolean unique = compositeIndex.unique;
-      Log.info("building {} index '{}' for label '{}' + property '{}'", unique ? "unique" : "non-unique", name, label, property);
+      LOG.info("building {} index '{}' for label '{}' + property '{}'", unique ? "unique" : "non-unique", name, label, property);
 
       PropertyKey uuidKey = mgmt.containsPropertyKey(property)//
           ? mgmt.getPropertyKey(property)//
@@ -227,7 +229,7 @@ public class TitanService extends TinkerPopService {
     if (!SchemaStatus.ENABLED.equals(graphIndex.getIndexStatus(propertyKey))) {
       try {
         GraphIndexStatusReport report = ManagementSystem.awaitGraphIndexStatus(titanGraph, name).call();
-        Log.info("report={}", report);
+        LOG.info("report={}", report);
       } catch (InterruptedException e) {
         e.printStackTrace();
         throw new RuntimeException(e);
@@ -240,7 +242,7 @@ public class TitanService extends TinkerPopService {
     // Log.info("destroy called");
     super.destroy();
     if (titanGraph.isOpen()) {
-      Log.info("closing {}:", titanGraph);
+      LOG.info("closing {}:", titanGraph);
       titanGraph.close();
     }
     // Log.info("destroy finished");

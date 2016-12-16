@@ -8,7 +8,6 @@ import javax.inject.Singleton;
 import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 
-import jline.internal.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.storage.Storage;
@@ -86,7 +85,7 @@ public class Neo4JService extends TinkerPopService {
     GraphTraversal<Object, Object> traversal = graph.cypher(cypher);
     if (traversal.hasNext()) {
       Object next = traversal.next();
-      Log.info("next={}", next);
+      // Log.info("next={}", next);
     }
   }
 
