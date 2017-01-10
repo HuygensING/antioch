@@ -725,4 +725,7 @@ public class AlexandriaClient implements AutoCloseable {
     };
   }
 
+  public WebTarget getRootTarget() {
+    return rootTarget;
+  }
 }

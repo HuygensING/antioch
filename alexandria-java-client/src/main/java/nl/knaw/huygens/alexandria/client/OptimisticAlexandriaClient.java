@@ -9,6 +9,7 @@ import nl.knaw.huygens.alexandria.api.model.text.view.TextViewList;
 import nl.knaw.huygens.alexandria.client.model.*;
 
 import javax.net.ssl.SSLContext;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
@@ -69,6 +70,10 @@ public class OptimisticAlexandriaClient {
   public TextAnnotationImportStatus addResourceTextRangeAnnotationsSynchronously(UUID resourceUUID, TextRangeAnnotationList textAnnotations) {
     unwrap(delegate.addResourceTextRangeAnnotations(resourceUUID, textAnnotations));
     return textAnnotationImportStatusWhenFinished(resourceUUID);
+  }
+
+  public WebTarget getRootTarget(){
+    return delegate.getRootTarget();
   }
 
   // delegated methods
