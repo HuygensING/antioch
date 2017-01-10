@@ -755,6 +755,89 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
       System.out.println("ERROR");
     }
   }
+
+  @Test
+  public void testBugNLA340() {
+    String xml = singleQuotesToDouble("<TEI>\n"//
+      + "<teiHeader>\n"//
+      + "<meta type='uuid' value='cd89eced-78d9-4a6a-9fa1-3857011e8ede'/>\n"//
+      + "<meta type='id' value='0001'/>\n"//
+      + "</teiHeader>\n"//
+      + "<text xml:id='text-1' lang='la'>\n"//
+      + "<body>\n"//
+      + "<div xml:id='div-1' type='letter'>\n"//
+      + "<p xml:id='p-1'>... A. McKenna, Sur L.Esprit de M. Arnaud de Pierre Jurieu, Chroniques de Port-Royal, 47 (1998), p.179-238. ...</p>\n"//
+      + "</div>\n"//
+      + "</body>\n"//
+      + "</text>\n"//
+      + "</TEI>");
+    UUID resourceUUID = UUID.randomUUID();
+    client.setResource(resourceUUID, resourceUUID.toString());
+    setResourceText(resourceUUID, xml);
+    client.setAnnotator(resourceUUID, "ckcc", new Annotator().setCode("ckcc").setDescription("CKCC project team"));
+//    client.getTextAsDot(resourceUUID);
+
+    UUID annotationUUID1 = UUID.randomUUID();
+    Position position1 = new Position()//
+      .setXmlId("p-1")//
+      .setOffset(5)//
+      .setLength(54);
+    TextRangeAnnotation titleAnnotation1 = new TextRangeAnnotation()//
+      .setId(annotationUUID1)//
+      .setName("title")//
+      .setAnnotator("ckcc")//
+      .setPosition(position1);
+    TextRangeAnnotationInfo info1 = client.setResourceTextRangeAnnotation(resourceUUID, titleAnnotation1);
+    assertThat(info1.getAnnotates()).isEqualTo("A. McKenna, Sur L.Esprit de M. Arnaud de Pierre Jurieu");
+    System.out.printf("annotated: [%s]%n", info1.getAnnotates());
+
+    String textAfterFirstAnnotation = client.getTextAsString(resourceUUID);
+    String expectation1 = singleQuotesToDouble("<TEI>\n"//
+      + "<teiHeader>\n"//
+      + "<meta type='uuid' value='cd89eced-78d9-4a6a-9fa1-3857011e8ede'/>\n"//
+      + "<meta type='id' value='0001'/>\n"//
+      + "</teiHeader>\n"//
+      + "<text xml:id='text-1' lang='la'>\n"//
+      + "<body>\n"//
+      + "<div xml:id='div-1' type='letter'>\n"//
+      + "<p xml:id='p-1'>... <title resp='#ckcc'>A. McKenna, Sur L.Esprit de M. Arnaud de Pierre Jurieu</title>, Chroniques de Port-Royal, 47 (1998), p.179-238. ...</p>\n"//
+      + "</div>\n"//
+      + "</body>\n"//
+      + "</text>\n"//
+      + "</TEI>");
+    assertThat(textAfterFirstAnnotation).isEqualTo(expectation1);
+
+    UUID annotationUUID2 = UUID.randomUUID();
+    Position position2 = new Position()//
+      .setXmlId("p-1")//
+      .setOffset(21)//
+      .setLength(8);
+    TextRangeAnnotation titleAnnotation2 = new TextRangeAnnotation()//
+      .setId(annotationUUID2)//
+      .setName("title")//
+      .setAnnotator("ckcc")//
+      .setPosition(position2);
+    TextRangeAnnotationInfo info2 = client.setResourceTextRangeAnnotation(resourceUUID, titleAnnotation2);
+    assertThat(info2.getAnnotates()).isEqualTo("L.Esprit");
+    System.out.printf("annotated: [%s]%n", info2.getAnnotates());
+
+    String textAfterSecondAnnotation = client.getTextAsString(resourceUUID);
+    String expectation2 = singleQuotesToDouble("<TEI>\n"//
+      + "<teiHeader>\n"//
+      + "<meta type='uuid' value='cd89eced-78d9-4a6a-9fa1-3857011e8ede'/>\n"//
+      + "<meta type='id' value='0001'/>\n"//
+      + "</teiHeader>\n"//
+      + "<text xml:id='text-1' lang='la'>\n"//
+      + "<body>\n"//
+      + "<div xml:id='div-1' type='letter'>\n"//
+      + "<p xml:id='p-1'>... <title resp='#ckcc'>A. McKenna, Sur <title resp='#ckcc'>L.Esprit</title> de M. Arnaud de Pierre Jurieu</title>, Chroniques de Port-Royal, 47 (1998), p.179-238. ...</p>\n"//
+      + "</div>\n"//
+      + "</body>\n"//
+      + "</text>\n"//
+      + "</TEI>");
+    assertThat(textAfterSecondAnnotation).isEqualTo(expectation2);
+  }
+
   /// end tests
 
   private UUID createResourceWithText(String xml) {
