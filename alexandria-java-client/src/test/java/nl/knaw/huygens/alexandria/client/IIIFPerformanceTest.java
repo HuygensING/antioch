@@ -1,16 +1,33 @@
 package nl.knaw.huygens.alexandria.client;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.google.common.base.Stopwatch;
-import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.ws.rs.client.WebTarget;
-import java.util.concurrent.TimeUnit;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Stopwatch;
+import com.google.common.collect.ImmutableMap;
+
+import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.iiif.IIIFAnnotationList;
+import nl.knaw.huygens.alexandria.api.model.w3c.WebAnnotationPrototype;
+import nl.knaw.huygens.alexandria.api.w3c.WebAnnotationConstants;
 
 public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
   private static OptimisticAlexandriaClient client;
@@ -31,25 +48,96 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
     client.setAutoConfirm(true);
   }
 
+  static final String authHeader = "SimpleAuth " + AUTHKEY;
+
   @Test
   public void testBatchAnnotationUploadOld() {
-    int num = 100;
-    String json = prepareLoad(num);
+    int num = 2000;
+    IIIFAnnotationList list = prepareList(num);
 
-    Stopwatch sw = new Stopwatch();
-    sw.start();
-    WebTarget rootTarget = client.getRootTarget();  
-    rootTarget.path(EndpointPaths.IIIF).request().p
-
+    Stopwatch sw = Stopwatch.createStarted();
+    WebTarget rootTarget = client.getRootTarget();
+    Response response = rootTarget.path(EndpointPaths.IIIF)//
+        .path("identifier")//
+        .path("list")//
+        .path("name")//
+        .request()//
+        .accept(WebAnnotationConstants.JSONLD_MEDIATYPE)//
+        .header(HEADER_AUTH, authHeader)//
+        .post(Entity.entity(list, WebAnnotationConstants.JSONLD_MEDIATYPE));
     sw.stop();
-    long elapsed = sw.elapsed(TimeUnit.SECONDS);
-    Log.info("Uploading a batch of {} annotations took {} seconds.", num, elapsed);
-
+    long elapsed = sw.elapsed(TimeUnit.MILLISECONDS);
+    response.bufferEntity();
+    Log.info("NON-STREAMING: Uploading a batch of {} annotations took {} milliseconds.\nresponse: {}", num, elapsed, response);
   }
 
-  private String prepareLoad(int num) {
-//    JsonFactory jf = new JsonFactory();
-//    jf.createParser()
-//    jf.createGenerator(out)
+  @Test
+  public void testBatchAnnotationUploadNew() throws IOException {
+    int num = 2000;
+    IIIFAnnotationList list = prepareList(num);
+    String json = new ObjectMapper().writeValueAsString(list);
+
+    Stopwatch sw = Stopwatch.createStarted();
+    WebTarget rootTarget = client.getRootTarget();
+    Response response = rootTarget.path(EndpointPaths.IIIF)//
+        .path("identifier")//
+        .path("list")//
+        .path("name")//
+        .path("streaming")//
+        .request()//
+        .accept(WebAnnotationConstants.JSONLD_MEDIATYPE)//
+        .header(HEADER_AUTH, authHeader)//
+        .post(Entity.entity(json, WebAnnotationConstants.JSONLD_MEDIATYPE));
+    sw.stop();
+    InputStream cris = (InputStream) response.getEntity();
+    IIIFAnnotationList responseList = new ObjectMapper().readValue(cris, IIIFAnnotationList.class);
+    assertThat(responseList.getResources()).hasSize(num);
+    long elapsed = sw.elapsed(TimeUnit.MILLISECONDS);
+    Log.info("STREAMING: Uploading a batch of {} annotations took {} milliseconds.\nresponse: {}", num, elapsed, response);
+  }
+
+  private IIIFAnnotationList prepareList(int num) {
+    IIIFAnnotationList list = new IIIFAnnotationList();
+    list.putKeyValue("@context", "http://iiif.io/api/presentation/2/context.json");
+    list.putKeyValue("@type", "sc:AnnotationList");
+    List<WebAnnotationPrototype> resources = new ArrayList<>(num);
+    for (int i = 0; i < num; i++) {
+      WebAnnotationPrototype webannotation = new WebAnnotationPrototype();
+      webannotation.putKeyValue("@type", "oa:Annotation");
+
+      String[] motivation = new String[] { "oa:tagging", "oa:commenting" };
+      webannotation.putKeyValue("motivation", motivation);
+
+      List<Map<String, String>> resourceList = new ArrayList<>(2);
+      resourceList.add(ImmutableMap.<String, String> of(//
+          "@type", "oa:Tag", //
+          "chars", "Triangle"//
+      ));
+      resourceList.add(ImmutableMap.<String, String> of(//
+          "@type", "dctypes:Text", //
+          "format", "text/html", //
+          "chars", "<p>text " + i + "</p>"//
+      ));
+      webannotation.putKeyValue("resource", resourceList);
+
+      Map<String, String> selector = ImmutableMap.of(//
+          "@type", "oa:SvgSelector", //
+          "value", "svg selector " + i);
+      Map<String, Object> specificResource = ImmutableMap.of(//
+          "@type", "oa:SpecificResource", //
+          "full", "https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-5981120.json", //
+          "selector", selector//
+      );
+      webannotation.putKeyValue("on", specificResource);
+
+      Map<String, String> manifest = ImmutableMap.of(//
+          "@id", "https://iiif.lib.harvard.edu/manifests/drs:5981093", //
+          "@type", "sc:Manifest"//
+      );
+      webannotation.putKeyValue("within", manifest);
+      resources.add(webannotation);
+    }
+    list.setResources(resources);
+    return list;
   }
 }
