@@ -413,6 +413,39 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
   }
 
   @Test
+  public void testTextRangeAnnotationBatchWithNonNestingOverlapFails() {
+    String xml = singleQuotesToDouble("<text><p xml:id='p-1'>This is another simple paragraph.</p></text>");
+    UUID resourceUUID = createResourceWithText(xml);
+    client.setAnnotator(resourceUUID, "ed", new Annotator().setCode("ed").setDescription("Eddy Wally"));
+
+    Position position1 = new Position().setXmlId("p-1").setOffset(1).setLength(7); // This is
+    UUID annotationUUID1 = UUID.randomUUID();
+    TextRangeAnnotation textRangeAnnotation1 = new TextRangeAnnotation()//
+        .setId(annotationUUID1)//
+        .setName("tag")//
+        .setAnnotator("ed")//
+        .setPosition(position1)//
+    ;
+
+    Position position2 = new Position().setXmlId("p-1").setOffset(6).setLength(10); // is another
+    UUID annotationUUID2 = UUID.randomUUID();
+    TextRangeAnnotation textRangeAnnotation2 = new TextRangeAnnotation()//
+        .setId(annotationUUID2)//
+        .setName("tag")//
+        .setAnnotator("ed")//
+        .setPosition(position2)//
+    ;
+
+    TextRangeAnnotationList textAnnotations = new TextRangeAnnotationList();
+    textAnnotations.add(textRangeAnnotation1);
+    textAnnotations.add(textRangeAnnotation2);
+    client.addResourceTextRangeAnnotationsSynchronously(resourceUUID, textAnnotations);
+
+    TextAnnotationImportStatus status = client.getResourceTextRangeAnnotationBatchImportStatus(resourceUUID);
+    assertThat(status.getErrors()).isNotEmpty();
+  }
+
+  @Test
   public void testBugNLA332() {
     String xml = singleQuotesToDouble("<text><p xml:id='p-1'>This is a simple paragraph.</p></text>");
     UUID resourceUUID = createResourceWithText(xml);
