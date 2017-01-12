@@ -488,8 +488,10 @@ public class TinkerPopService implements AlexandriaService {
           Integer end2 = start2 + (Integer) t.property("absoluteLength").value();
           // Log.info("start1:{} < end2:{} && start2:{} < end1:{}", start1, end2, start2, end1);
           return xmlId1.equals(xmlId2)//
-              && (start1 < end2 && start2 < end1)//
-              && !(start2 < start1 && start1 < end2 && end1 < end2);
+              && (start1 < end2 && start2 < end1) // annotation overlaps with existing annotation t
+              && !(start1 < start2 && start2 < end1 && end2 < end1) // existing annotation t nested in annotation
+              && !(start2 < start1 && start1 < end2 && end1 < end2) // annotation nested in exisiting annotation t
+          ;
         };
         Predicate<Vertex> hasDifferentUUID = t -> {
           String uuid2 = (String) t.property("uuid").value();
