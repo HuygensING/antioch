@@ -12,8 +12,10 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
+import org.glassfish.jersey.client.ChunkedInput;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -72,8 +74,8 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
   }
 
   @Test
-  public void testBatchAnnotationUploadNew() throws IOException {
-    int num = 2000;
+  public void testBatchAnnotationUploadStreaming() throws IOException {
+    int num = 200;
     IIIFAnnotationList list = prepareList(num);
     String json = new ObjectMapper().writeValueAsString(list);
 
@@ -94,6 +96,38 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
     assertThat(responseList.getResources()).hasSize(num);
     long elapsed = sw.elapsed(TimeUnit.MILLISECONDS);
     Log.info("STREAMING: Uploading a batch of {} annotations took {} milliseconds.\nresponse: {}", num, elapsed, response);
+  }
+
+  @Test
+  public void testBatchAnnotationUploadChunked() throws IOException {
+    int num = 20;
+    IIIFAnnotationList list = prepareList(num);
+    String json = new ObjectMapper().writeValueAsString(list);
+
+    Stopwatch sw = Stopwatch.createStarted();
+    WebTarget rootTarget = client.getRootTarget();
+    Response response = rootTarget.path(EndpointPaths.IIIF)//
+        .path("identifier")//
+        .path("list")//
+        .path("name")//
+        .path("chunked")//
+        .request()//
+        .accept(WebAnnotationConstants.JSONLD_MEDIATYPE)//
+        .header(HEADER_AUTH, authHeader)//
+        .post(Entity.entity(json, WebAnnotationConstants.JSONLD_MEDIATYPE));
+    final ChunkedInput<String> chunkedInput = response.readEntity(new GenericType<ChunkedInput<String>>() {
+    });
+    StringBuilder jsonBuilder = new StringBuilder();
+    String chunk;
+    while ((chunk = chunkedInput.read()) != null) {
+      System.out.println("Next chunk received: " + chunk);
+      jsonBuilder.append(chunk);
+    }
+    sw.stop();
+    IIIFAnnotationList responseList = new ObjectMapper().readValue(jsonBuilder.toString(), IIIFAnnotationList.class);
+    assertThat(responseList.getResources()).hasSize(num);
+    long elapsed = sw.elapsed(TimeUnit.MILLISECONDS);
+    Log.info("CHUNKED: Uploading a batch of {} annotations took {} milliseconds.\nresponse: {}", num, elapsed, response);
   }
 
   private IIIFAnnotationList prepareList(int num) {

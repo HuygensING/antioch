@@ -40,6 +40,7 @@ public class AnnotationListHandler {
 
         } else if ("resources".equals(fieldname)) {
           parseResources(jParser, jGenerator);
+          // jParser.skipChildren();
 
         } else if (fieldname != null) {
           jGenerator.writeFieldName(fieldname);
@@ -69,15 +70,16 @@ public class AnnotationListHandler {
     ObjectMapper mapper = new ObjectMapper();
     boolean first = true;
     while (jParser.nextToken() != JsonToken.END_ARRAY) {
-      jGenerator.flush();
+      // jGenerator.flush();
       if (!first) {
         jGenerator.writeRaw(",");
       }
       ObjectNode resourceNode = mapper.readTree(jParser);
-      // Log.info("resourceNode={}", resourceNode.get("resource").get(1).get("chars"));
+      Log.info("resourceNode={}", resourceNode.get("resource").get(1).get("chars"));
       jGenerator.writeRaw(resourceNode.toString());
       first = false;
     }
+    Log.info("done");
     jGenerator.writeEndArray();
   }
 
