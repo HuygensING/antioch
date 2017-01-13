@@ -895,7 +895,7 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
         + "<text xml:id='text-1' lang='la'>\n"//
         + "<body>\n"//
         + "<div xml:id='div-1' type='letter'>\n"//
-        + "<p xml:id='p-1'>... A. McKenna, Sur L.Esprit de M. Arnaud de Pierre Jurieu, Chroniques de Port-Royal, 47 (1998), p.179-238. ...</p>\n"//
+        + "<p xml:id='p-1'>Mijn spreekbeurt over De Avondén</p>\n"//
         + "</div>\n"//
         + "</body>\n"//
         + "</text>\n"//
@@ -909,15 +909,15 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     UUID annotationUUID1 = UUID.randomUUID();
     Position position1 = new Position()//
         .setXmlId("p-1")//
-        .setOffset(21)//
-        .setLength(8);
+        .setOffset(23)//
+        .setLength(10);
     TextRangeAnnotation titleAnnotation1 = new TextRangeAnnotation()//
         .setId(annotationUUID1)//
         .setName("title")//
         .setAnnotator("ckcc")//
         .setPosition(position1);
     TextRangeAnnotationInfo info1 = client.setResourceTextRangeAnnotation(resourceUUID, titleAnnotation1);
-    assertThat(info1.getAnnotates()).isEqualTo("L.Esprit");
+    assertThat(info1.getAnnotates()).isEqualTo("De Avondén");
     System.out.printf("annotated: [%s]%n", info1.getAnnotates());
 
     String textAfterFirstAnnotation = client.getTextAsString(resourceUUID);
@@ -929,7 +929,7 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
         + "<text xml:id='text-1' lang='la'>\n"//
         + "<body>\n"//
         + "<div xml:id='div-1' type='letter'>\n"//
-        + "<p xml:id='p-1'>... A. McKenna, Sur <title resp='#ckcc'>L.Esprit</title> de M. Arnaud de Pierre Jurieu, Chroniques de Port-Royal, 47 (1998), p.179-238. ...</p>\n"//
+        + "<p xml:id='p-1'>Mijn spreekbeurt over <title resp='#ckcc'>De Avondén</title></p>\n"//
         + "</div>\n"//
         + "</body>\n"//
         + "</text>\n"//
@@ -938,16 +938,14 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
 
     UUID annotationUUID2 = UUID.randomUUID();
     Position position2 = new Position()//
-        .setXmlId("p-1")//
-        .setOffset(5)//
-        .setLength(54);
+        .setXmlId("p-1");
     TextRangeAnnotation titleAnnotation2 = new TextRangeAnnotation()//
         .setId(annotationUUID2)//
         .setName("title")//
         .setAnnotator("ckcc")//
         .setPosition(position2);
     TextRangeAnnotationInfo info2 = client.setResourceTextRangeAnnotation(resourceUUID, titleAnnotation2);
-    assertThat(info2.getAnnotates()).isEqualTo("A. McKenna, Sur L.Esprit de M. Arnaud de Pierre Jurieu");
+    assertThat(info2.getAnnotates()).isEqualTo("Mijn spreekbeurt over De Avondén");
     System.out.printf("annotated: [%s]%n", info2.getAnnotates());
 
     String textAfterSecondAnnotation = client.getTextAsString(resourceUUID);
@@ -959,7 +957,7 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
         + "<text xml:id='text-1' lang='la'>\n"//
         + "<body>\n"//
         + "<div xml:id='div-1' type='letter'>\n"//
-        + "<p xml:id='p-1'>... <title resp='#ckcc'>A. McKenna, Sur <title resp='#ckcc'>L.Esprit</title> de M. Arnaud de Pierre Jurieu</title>, Chroniques de Port-Royal, 47 (1998), p.179-238. ...</p>\n"//
+        + "<p xml:id='p-1'><title resp='#ckcc'>Mijn spreekbeurt over <title resp='#ckcc'>De Avondén</title></title></p>\n"//
         + "</div>\n"//
         + "</body>\n"//
         + "</text>\n"//
