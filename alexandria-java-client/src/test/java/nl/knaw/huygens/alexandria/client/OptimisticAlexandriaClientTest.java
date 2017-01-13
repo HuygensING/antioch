@@ -895,7 +895,7 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
         + "<text xml:id='text-1' lang='la'>\n"//
         + "<body>\n"//
         + "<div xml:id='div-1' type='letter'>\n"//
-        + "<p xml:id='p-1'>Mijn spreekbeurt over De Avondén</p>\n"//
+        + "<p xml:id='p-1'>Mijn spreekbeurt over De Avonden</p>\n"//
         + "</div>\n"//
         + "</body>\n"//
         + "</text>\n"//
@@ -917,7 +917,7 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
         .setAnnotator("ckcc")//
         .setPosition(position1);
     TextRangeAnnotationInfo info1 = client.setResourceTextRangeAnnotation(resourceUUID, titleAnnotation1);
-    assertThat(info1.getAnnotates()).isEqualTo("De Avondén");
+    assertThat(info1.getAnnotates()).isEqualTo("De Avonden");
     System.out.printf("annotated: [%s]%n", info1.getAnnotates());
 
     String textAfterFirstAnnotation = client.getTextAsString(resourceUUID);
@@ -929,7 +929,7 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
         + "<text xml:id='text-1' lang='la'>\n"//
         + "<body>\n"//
         + "<div xml:id='div-1' type='letter'>\n"//
-        + "<p xml:id='p-1'>Mijn spreekbeurt over <title resp='#ckcc'>De Avondén</title></p>\n"//
+        + "<p xml:id='p-1'>Mijn spreekbeurt over <title resp='#ckcc'>De Avonden</title></p>\n"//
         + "</div>\n"//
         + "</body>\n"//
         + "</text>\n"//
@@ -945,7 +945,7 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
         .setAnnotator("ckcc")//
         .setPosition(position2);
     TextRangeAnnotationInfo info2 = client.setResourceTextRangeAnnotation(resourceUUID, titleAnnotation2);
-    assertThat(info2.getAnnotates()).isEqualTo("Mijn spreekbeurt over De Avondén");
+    assertThat(info2.getAnnotates()).isEqualTo("Mijn spreekbeurt over De Avonden");
     System.out.printf("annotated: [%s]%n", info2.getAnnotates());
 
     String textAfterSecondAnnotation = client.getTextAsString(resourceUUID);
@@ -957,7 +957,7 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
         + "<text xml:id='text-1' lang='la'>\n"//
         + "<body>\n"//
         + "<div xml:id='div-1' type='letter'>\n"//
-        + "<p xml:id='p-1'><title resp='#ckcc'>Mijn spreekbeurt over <title resp='#ckcc'>De Avondén</title></title></p>\n"//
+        + "<p xml:id='p-1'><title resp='#ckcc'>Mijn spreekbeurt over <title resp='#ckcc'>De Avonden</title></title></p>\n"//
         + "</div>\n"//
         + "</body>\n"//
         + "</text>\n"//
