@@ -11,6 +11,7 @@ import nl.knaw.huygens.alexandria.api.model.text.TextAnnotationImportStatus;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
+import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
@@ -23,7 +24,6 @@ public class TextAnnotationBatchTask implements Runnable {
   private UUID resourceUUID;
   private TextRangeAnnotationList newTextRangeAnnotationList;
   private TextRangeAnnotationValidatorFactory textRangeAnnotationValidator;
-
 
   public TextAnnotationBatchTask(AlexandriaService service, TextRangeAnnotationList newTextRangeAnnotationList, TextRangeAnnotationValidatorFactory textRangeAnnotationValidator,
       AlexandriaResource resource) {
@@ -68,6 +68,13 @@ public class TextAnnotationBatchTask implements Runnable {
       status.getErrors().add("Exception thrown: " + e);
       status.getErrors().add("Exception message: " + e.getMessage());
       status.getErrors().add("Stacktrace: " + Joiner.on("\n").join(e.getStackTrace()));
+      if (e instanceof ConflictException) {
+        ConflictException conflictException = (ConflictException) e;
+        int httpStatus = conflictException.getResponse().getStatus();
+        status.setBreakingErrorMessage(httpStatus + " " + conflictException.getErrorMessage());
+      } else {
+        status.setBreakingErrorMessage(e.getMessage());
+      }
     }
     status.setDone();
 
