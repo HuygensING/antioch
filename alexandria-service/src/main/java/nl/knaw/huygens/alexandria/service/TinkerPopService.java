@@ -482,14 +482,14 @@ public class TinkerPopService implements AlexandriaService {
         Integer start1 = absolutePosition.getOffset();
         Integer end1 = start1 + absolutePosition.getLength();
         Predicate<Vertex> nonNestingOverlapWithAnnotation = t -> {
-          // Log.info("t.keys={}", t.keys());
           String xmlId2 = (String) t.property("absoluteXmlId").value();
           Integer start2 = (Integer) t.property("absoluteOffset").value();
           Integer end2 = start2 + (Integer) t.property("absoluteLength").value();
-          // Log.info("start1:{} < end2:{} && start2:{} < end1:{}", start1, end2, start2, end1);
           return xmlId1.equals(xmlId2)//
-              && (start1 < end2 && start2 < end1)//
-              && !(start2 < start1 && start1 < end2 && end1 < end2);
+              && (start1 < end2 && start2 < end1) // annotation overlaps with existing annotation t
+              && !((start1 <= start2 && start2 <= end1 && end2 <= end1) && !(start1 == start2 && end1 == end2)) // existing annotation t nested in annotation
+              && !((start2 <= start1 && start1 <= end2 && end1 <= end2) && !(start1 == start2 && end1 == end2)) // annotation nested in exisiting annotation t
+          ;
         };
         Predicate<Vertex> hasDifferentUUID = t -> {
           String uuid2 = (String) t.property("uuid").value();

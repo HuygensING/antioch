@@ -277,7 +277,12 @@ public class OptimisticAlexandriaClient {
   }
 
   public TextAnnotationImportStatus getResourceTextRangeAnnotationBatchImportStatus(UUID uuid) {
-    return unwrap(delegate.getResourceTextRangeAnnotationBatchImportStatus(uuid));
+    TextAnnotationImportStatus textAnnotationImportStatus = unwrap(delegate.getResourceTextRangeAnnotationBatchImportStatus(uuid));
+    // // throw exception when there are errors.
+    if (textAnnotationImportStatus.hasErrors()) {
+      throw new AlexandriaException(textAnnotationImportStatus.getBreakingErrorMessage());
+    }
+    return textAnnotationImportStatus;
   }
   /////// end delegated methods
 
