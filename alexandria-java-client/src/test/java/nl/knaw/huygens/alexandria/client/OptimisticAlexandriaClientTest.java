@@ -965,6 +965,66 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     assertThat(textAfterSecondAnnotation).isEqualTo(expectation2);
   }
 
+  @Test
+  public void testBugNLA340c() {
+    // <title resp="#ed"><title resp="#ed">x</title></title> should not be accepted
+    String xml = singleQuotesToDouble("<TEI>\n"//
+        + "<text xml:id='text-1' lang='la'>\n"//
+        + "<body>\n"//
+        + "<div xml:id='div-1' type='letter'>\n"//
+        + "<p xml:id='p-1'>... x ...</p>\n"//
+        + "</div>\n"//
+        + "</body>\n"//
+        + "</text>\n"//
+        + "</TEI>");
+    UUID resourceUUID = UUID.randomUUID();
+    client.setResource(resourceUUID, resourceUUID.toString());
+    setResourceText(resourceUUID, xml);
+    client.setAnnotator(resourceUUID, "ckcc", new Annotator().setCode("ckcc").setDescription("CKCC project team"));
+
+    UUID annotationUUID1 = UUID.randomUUID();
+    Position position1 = new Position()//
+        .setXmlId("p-1")//
+        .setOffset(5)//
+        .setLength(1);
+    TextRangeAnnotation titleAnnotation1 = new TextRangeAnnotation()//
+        .setId(annotationUUID1)//
+        .setName("title")//
+        .setAnnotator("ckcc")//
+        .setPosition(position1);
+    TextRangeAnnotationInfo info1 = client.setResourceTextRangeAnnotation(resourceUUID, titleAnnotation1);
+    assertThat(info1.getAnnotates()).isEqualTo("x");
+    System.out.printf("annotated: [%s]%n", info1.getAnnotates());
+
+    String textAfterFirstAnnotation = client.getTextAsString(resourceUUID);
+    String expectation1 = singleQuotesToDouble("<TEI>\n"//
+        + "<text xml:id='text-1' lang='la'>\n"//
+        + "<body>\n"//
+        + "<div xml:id='div-1' type='letter'>\n"//
+        + "<p xml:id='p-1'>... <title resp='#ckcc'>x</title> ...</p>\n"//
+        + "</div>\n"//
+        + "</body>\n"//
+        + "</text>\n"//
+        + "</TEI>");
+    assertThat(textAfterFirstAnnotation).isEqualTo(expectation1);
+
+    UUID annotationUUID2 = UUID.randomUUID();
+    TextRangeAnnotation titleAnnotation2 = new TextRangeAnnotation()//
+        .setId(annotationUUID2)//
+        .setName("title")//
+        .setAnnotator("ckcc")//
+        .setPosition(position1);
+    try {
+      TextRangeAnnotationInfo info2 = client.setResourceTextRangeAnnotation(resourceUUID, titleAnnotation2);
+      fail();
+    } catch (AlexandriaException e) {
+      assertThat(e.getMessage()).isEqualTo("409: Overlapping annotations with the same name and responsibility.");
+    }
+
+    String textAfterSecondAnnotation = client.getTextAsString(resourceUUID);
+    assertThat(textAfterSecondAnnotation).isEqualTo(expectation1); // text hasn't changed
+  }
+
   /// end tests
 
   private UUID createResourceWithText(String xml) {
