@@ -100,7 +100,7 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
 
   @Test
   public void testBatchAnnotationUploadChunked() throws IOException {
-    int num = 20;
+    int num = 1000;
     IIIFAnnotationList list = prepareList(num);
     String json = new ObjectMapper().writeValueAsString(list);
 
@@ -120,11 +120,13 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
     StringBuilder jsonBuilder = new StringBuilder();
     String chunk;
     while ((chunk = chunkedInput.read()) != null) {
-      System.out.println("Next chunk received: " + chunk);
+      System.out.println("<" + chunk);
       jsonBuilder.append(chunk);
     }
     sw.stop();
-    IIIFAnnotationList responseList = new ObjectMapper().readValue(jsonBuilder.toString(), IIIFAnnotationList.class);
+    String jsonOut = jsonBuilder.toString();
+    Log.info("jsonOut={}", jsonOut);
+    IIIFAnnotationList responseList = new ObjectMapper().readValue(jsonOut, IIIFAnnotationList.class);
     assertThat(responseList.getResources()).hasSize(num);
     long elapsed = sw.elapsed(TimeUnit.MILLISECONDS);
     Log.info("CHUNKED: Uploading a batch of {} annotations took {} milliseconds.\nresponse: {}", num, elapsed, response);
@@ -137,7 +139,7 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
     List<WebAnnotationPrototype> resources = new ArrayList<>(num);
     for (int i = 0; i < num; i++) {
       WebAnnotationPrototype webannotation = new WebAnnotationPrototype();
-      webannotation.putKeyValue("@type", "oa:Annotation");
+      webannotation.putKeyValue("@type", "sc:Annotation");
 
       String[] motivation = new String[] { "oa:tagging", "oa:commenting" };
       webannotation.putKeyValue("motivation", motivation);
@@ -145,7 +147,7 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
       List<Map<String, String>> resourceList = new ArrayList<>(2);
       resourceList.add(ImmutableMap.<String, String> of(//
           "@type", "oa:Tag", //
-          "chars", "Triangle"//
+          "chars", "Square"//
       ));
       resourceList.add(ImmutableMap.<String, String> of(//
           "@type", "dctypes:Text", //
@@ -153,22 +155,8 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
           "chars", "<p>text " + i + "</p>"//
       ));
       webannotation.putKeyValue("resource", resourceList);
+      webannotation.putKeyValue("on", "https://purl.stanford.edu/wh234bz9013/iiif/canvas-0#xywh=1,2,3," + i);
 
-      Map<String, String> selector = ImmutableMap.of(//
-          "@type", "oa:SvgSelector", //
-          "value", "svg selector " + i);
-      Map<String, Object> specificResource = ImmutableMap.of(//
-          "@type", "oa:SpecificResource", //
-          "full", "https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-5981120.json", //
-          "selector", selector//
-      );
-      webannotation.putKeyValue("on", specificResource);
-
-      Map<String, String> manifest = ImmutableMap.of(//
-          "@id", "https://iiif.lib.harvard.edu/manifests/drs:5981093", //
-          "@type", "sc:Manifest"//
-      );
-      webannotation.putKeyValue("within", manifest);
       resources.add(webannotation);
     }
     list.setResources(resources);

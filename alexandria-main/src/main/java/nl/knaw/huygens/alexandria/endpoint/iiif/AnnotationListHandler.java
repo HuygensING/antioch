@@ -2,85 +2,99 @@ package nl.knaw.huygens.alexandria.endpoint.iiif;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.util.Scanner;
+import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import nl.knaw.huygens.Log;
-
 public class AnnotationListHandler {
 
-  static final PipedInputStream pipedInputStream = new PipedInputStream(2048);
-  Scanner scanner = new Scanner(pipedInputStream, "UTF-8");
+  private JsonParser jParser;
+  private String context;
+  private Deque<String> deque = new ConcurrentLinkedDeque<>();
+  private AtomicBoolean firstField = new AtomicBoolean(true);
 
   public AnnotationListHandler(InputStream inputStream) {
     try {
-      JsonFactory jsonFactory = new JsonFactory();
-      JsonParser jParser = jsonFactory.createParser(inputStream);
-      PipedOutputStream os = new PipedOutputStream(pipedInputStream);
-
-      JsonGenerator jGenerator = jsonFactory.createGenerator(os);
-      String context;
-      jGenerator.writeStartObject();
-      while (jParser.nextToken() != JsonToken.END_OBJECT) {
-        String fieldname = jParser.getCurrentName();
-        Log.info("fieldname={}", fieldname);
-        if ("@context".equals(fieldname)) {
-          jParser.nextToken();
-          context = jParser.getText();
-          jGenerator.writeFieldName("@context");
-          jGenerator.writeString(context);
-
-        } else if ("resources".equals(fieldname)) {
-          parseResources(jParser, jGenerator);
-          // jParser.skipChildren();
-
-        } else if (fieldname != null) {
-          jGenerator.writeFieldName(fieldname);
-          jParser.nextToken();
-          jGenerator.writeString(jParser.getValueAsString());
-        }
-      }
-      jParser.close();
-
-      jGenerator.writeEndObject();
-      jGenerator.flush();
-      jGenerator.close();
+      jParser = new JsonFactory().createParser(inputStream);
+      deque.add("{");
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
 
   public String getNextString() {
-    return scanner.hasNext() ? scanner.next() : null;
+    try {
+      if (jParser.nextToken() != JsonToken.END_OBJECT) {
+        String fieldname = jParser.getCurrentName();
+        if (fieldname != null) {
+          if (!firstField.get()) {
+            deque.add(",");
+          }
+          firstField.set(false);
+
+          switch (fieldname) {
+          case "@context":
+            jParser.nextToken();
+            context = jParser.getText(); // we'll be needing this later
+            deque.add("\"@context\":\"" + context + "\"");
+            break;
+
+          case "resources":
+            parseResources(jParser);
+            break;
+
+          default:
+            jParser.nextToken();
+            deque.add("\"" + fieldname + "\":");
+            JsonToken currentToken = jParser.currentToken();
+            if (currentToken.isStructStart()) {
+              deque.add(new ObjectMapper().readTree(jParser).toString());
+            } else if (currentToken.isNumeric()) {
+              deque.add(jParser.getValueAsString());
+            } else {
+              deque.add("\"" + jParser.getText() + "\"");
+            }
+            break;
+          }
+        }
+
+      } else {
+        close();
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return deque.isEmpty() ? null : deque.pop();
   }
 
-  private void parseResources(JsonParser jParser, JsonGenerator jGenerator) throws IOException {
-    jGenerator.writeFieldName("resources");
+  private void parseResources(JsonParser jParser) throws IOException {
+    deque.add("\"resources\":[");
     jParser.nextToken(); // "["
-    jGenerator.writeStartArray();
     // parse each resource
-    ObjectMapper mapper = new ObjectMapper();
     boolean first = true;
     while (jParser.nextToken() != JsonToken.END_ARRAY) {
-      // jGenerator.flush();
       if (!first) {
-        jGenerator.writeRaw(",");
+        deque.add(",");
       }
-      ObjectNode resourceNode = mapper.readTree(jParser);
-      Log.info("resourceNode={}", resourceNode.get("resource").get(1).get("chars"));
-      jGenerator.writeRaw(resourceNode.toString());
+      ObjectNode resourceNode = new ObjectMapper().readTree(jParser);
+      deque.add(resourceNode.toString());
       first = false;
     }
-    Log.info("done");
-    jGenerator.writeEndArray();
+    deque.add("]");
   }
 
+  private void close() {
+    try {
+      jParser.close();
+      deque.add("}");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 }

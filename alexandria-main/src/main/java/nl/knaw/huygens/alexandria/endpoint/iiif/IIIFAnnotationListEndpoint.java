@@ -30,7 +30,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.jsonldjava.utils.JsonUtils;
 import com.google.common.collect.Maps;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.iiif.IIIFAnnotationList;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.webannotation.WebAnnotation;
@@ -89,7 +88,7 @@ public class IIIFAnnotationListEndpoint extends AbstractIIIFEndpoint {
       jGenerator.writeStartObject();
       while (jParser.nextToken() != JsonToken.END_OBJECT) {
         String fieldname = jParser.getCurrentName();
-        Log.info("fieldname={}", fieldname);
+        // Log.info("fieldname={}", fieldname);
         if ("@context".equals(fieldname)) {
           jParser.nextToken();
           context = jParser.getText();
@@ -127,8 +126,8 @@ public class IIIFAnnotationListEndpoint extends AbstractIIIFEndpoint {
       public void run() {
         try {
           String chunk;
-
           while ((chunk = alh.getNextString()) != null) {
+            System.out.println("> " + chunk);
             output.write(chunk);
           }
         } catch (IOException e) {
@@ -145,7 +144,7 @@ public class IIIFAnnotationListEndpoint extends AbstractIIIFEndpoint {
       }
     }.start();
 
-    // the output will be probably returned even before
+    // the output will probably be returned even before
     // a first chunk is written by the new thread
     return output;
   }
