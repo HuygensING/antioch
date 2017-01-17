@@ -1015,7 +1015,6 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
         .setPosition(position1);
     try {
       TextRangeAnnotationInfo info2 = client.setResourceTextRangeAnnotation(resourceUUID, titleAnnotation2);
-      Log.info("info2={}", info2);
       fail();
     } catch (AlexandriaException e) {
       assertThat(e.getMessage()).isEqualTo("409: Overlapping annotations with the same name and responsibility.");

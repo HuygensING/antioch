@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import javax.net.ssl.SSLContext;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
@@ -92,6 +93,10 @@ public class OptimisticAlexandriaClient {
     }
 
     return finalStatus;
+  }
+
+  public WebTarget getRootTarget(){
+    return delegate.getRootTarget();
   }
 
   // delegated methods
@@ -187,6 +192,7 @@ public class OptimisticAlexandriaClient {
   public String getTextAsString(UUID uuid, String viewName, Map<String, String> viewParameters) {
     return unwrap(delegate.getTextAsString(uuid, viewName, viewParameters));
   }
+
 
   public String getTextAsDot(UUID uuid) {
     return unwrap(delegate.getTextAsDot(uuid));
