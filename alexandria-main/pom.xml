@@ -78,7 +78,7 @@
     <dependency>
       <groupId>com.github.jsonld-java</groupId>
       <artifactId>jsonld-java</artifactId>
-      <version>0.8.3</version>
+      <version>${jsonld.version}</version>
     </dependency>
     <dependency>
       <groupId>io.swagger</groupId>
