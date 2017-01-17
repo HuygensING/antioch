@@ -52,7 +52,7 @@ public class IIIFAnnotationListEndpoint extends AbstractIIIFEndpoint {
   @Consumes(JSONLD_MEDIATYPE)
   public Response postAnnotationList(IIIFAnnotationList annotationList) {
     Map<String, Object> otherProperties = annotationList.getOtherProperties();
-    String context = (String) otherProperties.get("@context");
+    String context = annotationList.getContext();
     Map<String, Object> processedList = Maps.newHashMap(otherProperties);
     List<Map<String, Object>> resources = new ArrayList<>(annotationList.getResources().size());
     annotationList.getResources().forEach(prototype -> {
@@ -74,7 +74,7 @@ public class IIIFAnnotationListEndpoint extends AbstractIIIFEndpoint {
   @Consumes(JSONLD_MEDIATYPE)
   public ChunkedOutput<String> postAnnotationListChunked(InputStream inputStream) throws JsonParseException, JsonMappingException, IOException {
     final ChunkedOutput<String> output = new ChunkedOutput<>(String.class);
-    AnnotationListHandler alh = new AnnotationListHandler(inputStream);
+    AnnotationListHandler alh = new AnnotationListHandler(inputStream, webAnnotationService);
     new Thread() {
       @Override
       public void run() {

@@ -2,6 +2,7 @@ package nl.knaw.huygens.alexandria.endpoint.iiif;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
 import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -11,6 +12,11 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+
+import nl.knaw.huygens.alexandria.api.model.w3c.WebAnnotationPrototype;
+import nl.knaw.huygens.alexandria.endpoint.webannotation.WebAnnotation;
+import nl.knaw.huygens.alexandria.endpoint.webannotation.WebAnnotationService;
 
 public class AnnotationListHandler {
 
@@ -18,8 +24,10 @@ public class AnnotationListHandler {
   private String context;
   private Deque<String> deque = new ConcurrentLinkedDeque<>();
   private AtomicBoolean firstField = new AtomicBoolean(true);
+  private WebAnnotationService webAnnotationService;
 
-  public AnnotationListHandler(InputStream inputStream) {
+  public AnnotationListHandler(InputStream inputStream, WebAnnotationService webAnnotationService) {
+    this.webAnnotationService = webAnnotationService;
     try {
       jParser = new JsonFactory().createParser(inputStream);
       deque.add("{");
@@ -83,6 +91,14 @@ public class AnnotationListHandler {
         deque.add(",");
       }
       ObjectNode resourceNode = new ObjectMapper().readTree(jParser);
+      String created = Instant.now().toString();
+      WebAnnotationPrototype prototype = new WebAnnotationPrototype().setCreated(created);
+      resourceNode.set("http://purl.org/dc/terms/created", new TextNode(created));
+      prototype.putKeyValue("@context", context);
+      resourceNode.fields().forEachRemaining(field -> {
+        prototype.putKeyValue(field.getKey(), field.getValue());
+      });
+      WebAnnotation webAnnotation = webAnnotationService.validateAndStore(prototype);
       deque.add(resourceNode.toString());
       first = false;
     }

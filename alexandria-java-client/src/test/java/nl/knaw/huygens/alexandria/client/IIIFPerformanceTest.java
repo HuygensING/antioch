@@ -4,7 +4,6 @@ import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +62,7 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
         .path("identifier")//
         .path("list")//
         .path("name")//
+        .path("oldway")//
         .request()//
         .accept(WebAnnotationConstants.JSONLD_MEDIATYPE)//
         .header(HEADER_AUTH, authHeader)//
@@ -73,34 +73,34 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
     Log.info("NON-STREAMING: Uploading a batch of {} annotations took {} milliseconds.\nresponse: {}", num, elapsed, response);
   }
 
-  @Test
-  public void testBatchAnnotationUploadStreaming() throws IOException {
-    int num = 200;
-    IIIFAnnotationList list = prepareList(num);
-    String json = new ObjectMapper().writeValueAsString(list);
-
-    Stopwatch sw = Stopwatch.createStarted();
-    WebTarget rootTarget = client.getRootTarget();
-    Response response = rootTarget.path(EndpointPaths.IIIF)//
-        .path("identifier")//
-        .path("list")//
-        .path("name")//
-        .path("streaming")//
-        .request()//
-        .accept(WebAnnotationConstants.JSONLD_MEDIATYPE)//
-        .header(HEADER_AUTH, authHeader)//
-        .post(Entity.entity(json, WebAnnotationConstants.JSONLD_MEDIATYPE));
-    sw.stop();
-    InputStream cris = (InputStream) response.getEntity();
-    IIIFAnnotationList responseList = new ObjectMapper().readValue(cris, IIIFAnnotationList.class);
-    assertThat(responseList.getResources()).hasSize(num);
-    long elapsed = sw.elapsed(TimeUnit.MILLISECONDS);
-    Log.info("STREAMING: Uploading a batch of {} annotations took {} milliseconds.\nresponse: {}", num, elapsed, response);
-  }
+  // @Test
+  // public void testBatchAnnotationUploadStreaming() throws IOException {
+  // int num = 200;
+  // IIIFAnnotationList list = prepareList(num);
+  // String json = new ObjectMapper().writeValueAsString(list);
+  //
+  // Stopwatch sw = Stopwatch.createStarted();
+  // WebTarget rootTarget = client.getRootTarget();
+  // Response response = rootTarget.path(EndpointPaths.IIIF)//
+  // .path("identifier")//
+  // .path("list")//
+  // .path("name")//
+  // .path("streaming")//
+  // .request()//
+  // .accept(WebAnnotationConstants.JSONLD_MEDIATYPE)//
+  // .header(HEADER_AUTH, authHeader)//
+  // .post(Entity.entity(json, WebAnnotationConstants.JSONLD_MEDIATYPE));
+  // sw.stop();
+  // InputStream cris = (InputStream) response.getEntity();
+  // IIIFAnnotationList responseList = new ObjectMapper().readValue(cris, IIIFAnnotationList.class);
+  // assertThat(responseList.getResources()).hasSize(num);
+  // long elapsed = sw.elapsed(TimeUnit.MILLISECONDS);
+  // Log.info("STREAMING: Uploading a batch of {} annotations took {} milliseconds.\nresponse: {}", num, elapsed, response);
+  // }
 
   @Test
   public void testBatchAnnotationUploadChunked() throws IOException {
-    int num = 1000;
+    int num = 2000;
     IIIFAnnotationList list = prepareList(num);
     String json = new ObjectMapper().writeValueAsString(list);
 
@@ -110,7 +110,6 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
         .path("identifier")//
         .path("list")//
         .path("name")//
-        .path("chunked")//
         .request()//
         .accept(WebAnnotationConstants.JSONLD_MEDIATYPE)//
         .header(HEADER_AUTH, authHeader)//
@@ -134,7 +133,7 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
 
   private IIIFAnnotationList prepareList(int num) {
     IIIFAnnotationList list = new IIIFAnnotationList();
-    list.putKeyValue("@context", "http://iiif.io/api/presentation/2/context.json");
+    list.setContext("http://iiif.io/api/presentation/2/context.json");
     list.putKeyValue("@type", "sc:AnnotationList");
     List<WebAnnotationPrototype> resources = new ArrayList<>(num);
     for (int i = 0; i < num; i++) {
