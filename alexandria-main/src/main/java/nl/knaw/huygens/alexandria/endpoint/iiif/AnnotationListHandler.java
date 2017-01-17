@@ -1,23 +1,22 @@
 package nl.knaw.huygens.alexandria.endpoint.iiif;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.Instant;
-import java.util.Deque;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-
 import nl.knaw.huygens.alexandria.api.model.w3c.WebAnnotationPrototype;
 import nl.knaw.huygens.alexandria.endpoint.webannotation.WebAnnotation;
 import nl.knaw.huygens.alexandria.endpoint.webannotation.WebAnnotationService;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.Instant;
+import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AnnotationListHandler {
 
@@ -48,31 +47,31 @@ public class AnnotationListHandler {
           firstField.set(false);
 
           switch (fieldname) {
-          case "@context":
-            jParser.nextToken();
-            context = jParser.getText(); // we'll be needing this later
-            deque.add("\"@context\":\"" + context + "\"");
-            break;
+            case "@context":
+              jParser.nextToken();
+              context = jParser.getText(); // we'll be needing this later
+              deque.add("\"@context\":\"" + context + "\"");
+              break;
 
-          case "resources":
-            if (context == null) {
-              throw new BadRequestException("Missing @context field, should be defined at the start of the json payload.");
-            }
-            parseResources(jParser);
-            break;
+            case "resources":
+              if (context == null) {
+                throw new BadRequestException("Missing @context field, should be defined at the start of the json payload.");
+              }
+              parseResources(jParser);
+              break;
 
-          default:
-            jParser.nextToken();
-            deque.add("\"" + fieldname + "\":");
-            JsonToken currentToken = jParser.currentToken();
-            if (currentToken.isStructStart()) {
-              deque.add(new ObjectMapper().readTree(jParser).toString());
-            } else if (currentToken.isNumeric()) {
-              deque.add(jParser.getValueAsString());
-            } else {
-              deque.add("\"" + jParser.getText() + "\"");
-            }
-            break;
+            default:
+              jParser.nextToken();
+              deque.add("\"" + fieldname + "\":");
+              JsonToken currentToken = jParser.currentToken();
+              if (currentToken.isStructStart()) {
+                deque.add(new ObjectMapper().readTree(jParser).toString());
+              } else if (currentToken.isNumeric()) {
+                deque.add(jParser.getValueAsString());
+              } else {
+                deque.add("\"" + jParser.getText() + "\"");
+              }
+              break;
           }
         }
 

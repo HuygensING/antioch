@@ -1,7 +1,21 @@
 package nl.knaw.huygens.alexandria.endpoint.iiif;
 
-import static nl.knaw.huygens.alexandria.api.w3c.WebAnnotationConstants.JSONLD_MEDIATYPE;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.github.jsonldjava.utils.JsonUtils;
+import com.google.common.collect.Maps;
+import nl.knaw.huygens.alexandria.api.model.iiif.IIIFAnnotationList;
+import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+import nl.knaw.huygens.alexandria.endpoint.webannotation.WebAnnotation;
+import nl.knaw.huygens.alexandria.endpoint.webannotation.WebAnnotationService;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import org.glassfish.jersey.server.ChunkedOutput;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -10,24 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
-
-import org.glassfish.jersey.server.ChunkedOutput;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.github.jsonldjava.utils.JsonUtils;
-import com.google.common.collect.Maps;
-
-import nl.knaw.huygens.alexandria.api.model.iiif.IIIFAnnotationList;
-import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
-import nl.knaw.huygens.alexandria.endpoint.webannotation.WebAnnotation;
-import nl.knaw.huygens.alexandria.endpoint.webannotation.WebAnnotationService;
-import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import static nl.knaw.huygens.alexandria.api.w3c.WebAnnotationConstants.JSONLD_MEDIATYPE;
 
 public class IIIFAnnotationListEndpoint extends AbstractIIIFEndpoint {
 
