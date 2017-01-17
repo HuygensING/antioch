@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import nl.knaw.huygens.alexandria.api.model.w3c.WebAnnotationPrototype;
 import nl.knaw.huygens.alexandria.endpoint.webannotation.WebAnnotation;
 import nl.knaw.huygens.alexandria.endpoint.webannotation.WebAnnotationService;
+import nl.knaw.huygens.alexandria.exception.BadRequestException;
 
 public class AnnotationListHandler {
 
@@ -54,6 +55,9 @@ public class AnnotationListHandler {
             break;
 
           case "resources":
+            if (context == null) {
+              throw new BadRequestException("Missing @context field, should be defined at the start of the json payload.");
+            }
             parseResources(jParser);
             break;
 
