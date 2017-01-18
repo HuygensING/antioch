@@ -7,10 +7,7 @@ import static nl.knaw.huygens.alexandria.api.w3c.WebAnnotationConstants.WEBANNOT
 import java.io.IOException;
 import java.net.URI;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import javax.ws.rs.core.UriBuilder;
 
@@ -144,26 +141,16 @@ public class WebAnnotationService {
 //  }
 
   private AlexandriaResource extractAlexandriaResource(String resourceRef) {
-    TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(ThreadContext.getUserName(), Instant.now(), AlexandriaProvenance.DEFAULT_WHY);
     // first see if there's already a resource with this ref, if so, use this.
-    UUID resourceUUID;
-    AlexandriaQuery query = new AlexandriaQuery()//
-      .setPageSize(2)//
-      .setFind("annotation")//
-      .setWhere("resource.ref:eq(\"" + resourceRef + "\")")//
-      .setReturns(QueryField.resource_id.externalName());
 
-    List<Map<String, Object>> results = service.execute(query).getResults(); // this is too cumbersome a way to check for the existence of a resource with a specific ref.
-    if (results.isEmpty()) {
-      resourceUUID = UUID.randomUUID();
-      service.createOrUpdateResource(resourceUUID, resourceRef, provenance, AlexandriaState.CONFIRMED);
+//    List<Map<String, Object>> results = service.execute(query).getResults(); // this is too cumbersome a way to check for the existence of a resource with a specific ref.
+    AlexandriaResource resourceWithRef = service.readResourceWithUniqueRef(resourceRef).orElseGet(()->{
+      UUID resourceUUID = UUID.randomUUID();
+      TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(ThreadContext.getUserName(), Instant.now(), AlexandriaProvenance.DEFAULT_WHY);
+      return service.createResource(resourceUUID, resourceRef, provenance, AlexandriaState.CONFIRMED);
+    });
 
-    } else {
-      String resourceId = (String) results.get(0).get(QueryField.resource_id.externalName());
-      resourceUUID = UUID.fromString(resourceId);
-    }
-
-    return service.readResource(resourceUUID).get();
+    return resourceWithRef;
   }
 
   private AlexandriaAnnotation createWebAnnotation(String json, AlexandriaResource alexandriaResource) {

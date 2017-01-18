@@ -129,6 +129,7 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
     assertThat(responseList.getResources()).hasSize(num);
     long elapsed = sw.elapsed(TimeUnit.MILLISECONDS);
     Log.info("CHUNKED: Uploading a batch of {} annotations took {} milliseconds.\nresponse: {}", num, elapsed, response);
+    
   }
 
   private IIIFAnnotationList prepareList(int num) {
