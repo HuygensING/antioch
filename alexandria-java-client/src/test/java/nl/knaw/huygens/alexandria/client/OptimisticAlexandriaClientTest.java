@@ -439,10 +439,9 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     TextRangeAnnotationList textAnnotations = new TextRangeAnnotationList();
     textAnnotations.add(textRangeAnnotation1);
     textAnnotations.add(textRangeAnnotation2);
-    client.addResourceTextRangeAnnotationsSynchronously(resourceUUID, textAnnotations);
-
     try {
-      TextAnnotationImportStatus status = client.getResourceTextRangeAnnotationBatchImportStatus(resourceUUID);
+      client.addResourceTextRangeAnnotationsSynchronously(resourceUUID, textAnnotations);
+      fail();
     } catch (AlexandriaException e) {
       assertThat(e.getMessage()).isEqualTo("409 Overlapping annotations with the same name and responsibility.");
     }

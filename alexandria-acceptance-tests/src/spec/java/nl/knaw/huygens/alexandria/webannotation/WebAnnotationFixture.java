@@ -1,5 +1,7 @@
 package nl.knaw.huygens.alexandria.webannotation;
 
+import org.concordion.api.ExpectedToFail;
+
 /*
  * #%L
  * alexandria-acceptance-tests
@@ -33,6 +35,7 @@ import nl.knaw.huygens.alexandria.endpoint.webannotation.WebAnnotationsEndpoint;
 import nl.knaw.huygens.alexandria.jersey.exceptionmappers.WebApplicationExceptionMapper;
 
 @RunWith(ConcordionRunner.class)
+@ExpectedToFail
 public class WebAnnotationFixture extends AlexandriaAcceptanceTest {
   @BeforeClass
   public static void registerEndpoint() {

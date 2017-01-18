@@ -60,6 +60,7 @@
         <jersey2-guice.version>0.10</jersey2-guice.version>
 
         <jool.version>0.9.12</jool.version>
+        <jsonld.version>0.7.0</jsonld.version> <!--  to prevent dependency hell in alexandria-java-client due to httpclient/httpcore version conflicts -->
         <junit.version>4.12</junit.version>
         <junitparams.version>1.0.5</junitparams.version>
         <log.version>1.1.1</log.version>

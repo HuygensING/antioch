@@ -86,7 +86,13 @@ public class OptimisticAlexandriaClient {
 
   public TextAnnotationImportStatus addResourceTextRangeAnnotationsSynchronously(UUID resourceUUID, TextRangeAnnotationList textAnnotations) {
     unwrap(delegate.addResourceTextRangeAnnotations(resourceUUID, textAnnotations));
-    return textAnnotationImportStatusWhenFinished(resourceUUID);
+    TextAnnotationImportStatus finalStatus = textAnnotationImportStatusWhenFinished(resourceUUID);
+    // // throw exception when there are errors.
+    if (finalStatus.hasErrors()) {
+      throw new AlexandriaException(finalStatus.getBreakingErrorMessage());
+    }
+
+    return finalStatus;
   }
 
   public WebTarget getRootTarget(){
@@ -277,12 +283,7 @@ public class OptimisticAlexandriaClient {
   }
 
   public TextAnnotationImportStatus getResourceTextRangeAnnotationBatchImportStatus(UUID uuid) {
-    TextAnnotationImportStatus textAnnotationImportStatus = unwrap(delegate.getResourceTextRangeAnnotationBatchImportStatus(uuid));
-    // // throw exception when there are errors.
-    if (textAnnotationImportStatus.hasErrors()) {
-      throw new AlexandriaException(textAnnotationImportStatus.getBreakingErrorMessage());
-    }
-    return textAnnotationImportStatus;
+    return unwrap(delegate.getResourceTextRangeAnnotationBatchImportStatus(uuid));
   }
   /////// end delegated methods
 
