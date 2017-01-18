@@ -81,7 +81,7 @@ public abstract class ResourceVF extends AlexandriaVF implements FramedVertex<Re
   @Edge(EdgeLabels.PART_OF)
   public abstract void setParentResource(ResourceVF resourceVF);
 
-  public boolean isSubresource() {
+  public boolean isSubResource() {
     return getParentResource() != null;
   }
 

@@ -14,6 +14,9 @@ import java.util.UUID;
 
 import javax.ws.rs.core.UriBuilder;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +51,22 @@ public class WebAnnotationService {
     this.config = config;
   }
 
+  public ObjectNode validateAndStore(ObjectNode annotationNode) {
+    try {
+      String json = new ObjectMapper().writeValueAsString(annotationNode);
+
+      String resourceRef = extractResourceRef(annotationNode);
+      AlexandriaResource alexandriaResource = extractAlexandriaResource(resourceRef);
+      AlexandriaAnnotation annotation = createWebAnnotation(json, alexandriaResource);
+
+      annotationNode.set("@id", new TextNode(webAnnotationURI(annotation.getId()).toString()));
+      return annotationNode;
+
+    } catch (IOException | JsonLdError e) {
+      throw new BadRequestException(e.getMessage());
+    }
+  }
+
   public WebAnnotation validateAndStore(WebAnnotationPrototype prototype) {
     try {
       String json = new ObjectMapper().writeValueAsString(prototype);
@@ -60,54 +79,81 @@ public class WebAnnotationService {
       jsonObject.put("@id", webAnnotationURI(annotation.getId()));
       String json2 = new ObjectMapper().writeValueAsString(jsonObject);
       return new WebAnnotation(annotation.getId())//
-          .setJson(json2)//
-          .setETag(String.valueOf(prototype.getModified().hashCode()));
+        .setJson(json2)//
+        .setETag(String.valueOf(prototype.getModified().hashCode()));
 
     } catch (IOException | JsonLdError e) {
       throw new BadRequestException(e.getMessage());
     }
-
   }
 
   URI webAnnotationURI(UUID annotationUUID) {
     return UriBuilder.fromUri(config.getBaseURI())//
-        .path(EndpointPaths.WEB_ANNOTATIONS)//
-        .path(annotationUUID.toString())//
-        .build();
+      .path(EndpointPaths.WEB_ANNOTATIONS)//
+      .path(annotationUUID.toString())//
+      .build();
   }
 
-  private String extractResourceRef(Map<String, Object> jsonObject) throws JsonLdError {
-    // Log.info("jsonObject={}", jsonObject);
-    Map<Object, Object> context = new HashMap<>();
-    JsonLdOptions options = new JsonLdOptions();
-    Map<String, Object> compacted = JsonLdProcessor.compact(jsonObject, context, options);
-    // Log.info("compacted={}", jsonObject);
-    Map<String, Object> target = (Map<String, Object>) compacted.get(OA_HAS_TARGET_IRI);
-    String resourceRef = "";
-    if (target == null) {
-      LOG.error("target==null!, compacted={}", compacted); // TODO!
-    } else {
-      if (target.containsKey("@id")) {
-        resourceRef = (String) target.get("@id");
-      } else if (target.containsKey(OA_HAS_SOURCE_IRI)) {
-        Map<String, Object> source = (Map<String, Object>) target.get(OA_HAS_SOURCE_IRI);
-        resourceRef = (String) source.get("@id");
+  private String extractResourceRef(Object annotationObject) throws JsonLdError {
+    try {
+      String json = new ObjectMapper().writeValueAsString(annotationObject);
+      Object jsonObject = JsonUtils.fromString(json);
+      JsonLdOptions options = new JsonLdOptions();
+//      LOG.info("annotationObject={}", annotationObject);
+      Map<Object, Object> context = new HashMap<>();
+      Map<String, Object> compacted = JsonLdProcessor.compact(jsonObject, context, options);
+//      LOG.info("compacted={}", compacted);
+      Map<String, Object> target = (Map<String, Object>) compacted.get(OA_HAS_TARGET_IRI);
+      String resourceRef = "";
+      if (target == null) {
+        LOG.error("target==null!, compacted={}", compacted); // TODO!
+      } else {
+        if (target.containsKey("@id")) {
+          resourceRef = (String) target.get("@id");
+        } else if (target.containsKey(OA_HAS_SOURCE_IRI)) {
+          Map<String, Object> source = (Map<String, Object>) target.get(OA_HAS_SOURCE_IRI);
+          resourceRef = (String) source.get("@id");
+        }
       }
+      return resourceRef.replaceFirst("#.*","");
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
     }
-    return resourceRef;
   }
+
+//  private String extractResourceRef(Map<String, Object> jsonObject) throws JsonLdError {
+//    // Log.info("jsonObject={}", jsonObject);
+//    Map<Object, Object> context = new HashMap<>();
+//    JsonLdOptions options = new JsonLdOptions();
+//    Map<String, Object> compacted = JsonLdProcessor.compact(jsonObject, context, options);
+//    // Log.info("compacted={}", jsonObject);
+//    Map<String, Object> target = (Map<String, Object>) compacted.get(OA_HAS_TARGET_IRI);
+//    String resourceRef = "";
+//    if (target == null) {
+//      LOG.error("target==null!, compacted={}", compacted); // TODO!
+//    } else {
+//      if (target.containsKey("@id")) {
+//        resourceRef = (String) target.get("@id");
+//      } else if (target.containsKey(OA_HAS_SOURCE_IRI)) {
+//        Map<String, Object> source = (Map<String, Object>) target.get(OA_HAS_SOURCE_IRI);
+//        resourceRef = (String) source.get("@id");
+//      }
+//    }
+//    return resourceRef;
+//  }
 
   private AlexandriaResource extractAlexandriaResource(String resourceRef) {
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(ThreadContext.getUserName(), Instant.now(), AlexandriaProvenance.DEFAULT_WHY);
     // first see if there's already a resource with this ref, if so, use this.
     UUID resourceUUID;
     AlexandriaQuery query = new AlexandriaQuery()//
-        .setPageSize(2)//
-        .setFind("annotation")//
-        .setWhere("resource.ref:eq(\"" + resourceRef + "\")")//
-        .setReturns(QueryField.resource_id.externalName());
+      .setPageSize(2)//
+      .setFind("annotation")//
+      .setWhere("resource.ref:eq(\"" + resourceRef + "\")")//
+      .setReturns(QueryField.resource_id.externalName());
 
-    List<Map<String, Object>> results = service.execute(query).getResults();
+    List<Map<String, Object>> results = service.execute(query).getResults(); // this is too cumbersome a way to check for the existence of a resource with a specific ref.
     if (results.isEmpty()) {
       resourceUUID = UUID.randomUUID();
       service.createOrUpdateResource(resourceUUID, resourceRef, provenance, AlexandriaState.CONFIRMED);

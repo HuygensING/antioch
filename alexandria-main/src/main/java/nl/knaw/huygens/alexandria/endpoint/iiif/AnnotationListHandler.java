@@ -95,14 +95,10 @@ public class AnnotationListHandler {
       }
       ObjectNode resourceNode = new ObjectMapper().readTree(jParser);
       String created = Instant.now().toString();
-      WebAnnotationPrototype prototype = new WebAnnotationPrototype().setCreated(created);
       resourceNode.set("http://purl.org/dc/terms/created", new TextNode(created));
-      prototype.putKeyValue("@context", context);
-      resourceNode.fields().forEachRemaining(field -> {
-        prototype.putKeyValue(field.getKey(), field.getValue());
-      });
-      WebAnnotation webAnnotation = webAnnotationService.validateAndStore(prototype);
-      deque.add(resourceNode.toString());
+      resourceNode.set("@context", new TextNode(context));
+      ObjectNode storedAnnotation = webAnnotationService.validateAndStore(resourceNode);
+      deque.add(new ObjectMapper().writeValueAsString(storedAnnotation));
       first = false;
     }
     deque.add("]");
