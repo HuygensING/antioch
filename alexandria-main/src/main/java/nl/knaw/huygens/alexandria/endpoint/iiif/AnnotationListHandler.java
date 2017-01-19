@@ -93,11 +93,11 @@ public class AnnotationListHandler {
       if (!first) {
         deque.add(",");
       }
-      ObjectNode resourceNode = new ObjectMapper().readTree(jParser);
+      ObjectNode annotationNode = new ObjectMapper().readTree(jParser);
       String created = Instant.now().toString();
-      resourceNode.set("http://purl.org/dc/terms/created", new TextNode(created));
-      resourceNode.set("@context", new TextNode(context));
-      ObjectNode storedAnnotation = webAnnotationService.validateAndStore(resourceNode);
+      annotationNode.set("http://purl.org/dc/terms/created", new TextNode(created));
+      annotationNode.set("@context", new TextNode(context));
+      ObjectNode storedAnnotation = webAnnotationService.validateAndStore(annotationNode);
       deque.add(new ObjectMapper().writeValueAsString(storedAnnotation));
       first = false;
     }

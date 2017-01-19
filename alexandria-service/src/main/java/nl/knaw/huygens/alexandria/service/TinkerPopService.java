@@ -183,7 +183,7 @@ public class TinkerPopService implements AlexandriaService {
 
   private Optional<AlexandriaResource> getOptionalResourceWithUniqueRef(String ref) {
     FramedGraphTraversal<Object, ResourceVF> traversal = storage.find(ResourceVF.class).has(ResourceVF.Properties.CARGO, ref);
-    AlexandriaResource alexandriaResource = traversal.hasNext() ? deframeResource(traversal.next()) : null;
+    AlexandriaResource alexandriaResource = traversal.hasNext() ? deframeResourceLite(traversal.next()) : null;
     return Optional.ofNullable(alexandriaResource);
   }
 
@@ -978,13 +978,7 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   private AlexandriaResource deframeResource(ResourceVF rvf) {
-    TentativeAlexandriaProvenance provenance = deframeProvenance(rvf);
-    UUID uuid = getUUID(rvf);
-    AlexandriaResource resource = new AlexandriaResource(uuid, provenance);
-    resource.setHasText(rvf.getHasText());
-    resource.setCargo(rvf.getCargo());
-    resource.setState(AlexandriaState.valueOf(rvf.getState()));
-    resource.setStateSince(Instant.ofEpochSecond(rvf.getStateSince()));
+    AlexandriaResource resource = deframeResourceLite(rvf);
     setTextViews(rvf, resource);
 
     for (AnnotationVF annotationVF : rvf.getAnnotatedBy()) {
@@ -1003,7 +997,18 @@ public class TinkerPopService implements AlexandriaService {
       // }
     }
     rvf.getSubResources().stream()//
-      .forEach(vf -> resource.addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
+            .forEach(vf -> resource.addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
+    return resource;
+  }
+
+  private AlexandriaResource deframeResourceLite(ResourceVF rvf) {
+    TentativeAlexandriaProvenance provenance = deframeProvenance(rvf);
+    UUID uuid = getUUID(rvf);
+    AlexandriaResource resource = new AlexandriaResource(uuid, provenance);
+    resource.setHasText(rvf.getHasText());
+    resource.setCargo(rvf.getCargo());
+    resource.setState(AlexandriaState.valueOf(rvf.getState()));
+    resource.setStateSince(Instant.ofEpochSecond(rvf.getStateSince()));
     return resource;
   }
 

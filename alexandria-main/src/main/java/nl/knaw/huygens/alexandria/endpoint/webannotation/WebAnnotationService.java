@@ -7,17 +7,18 @@ import static nl.knaw.huygens.alexandria.api.w3c.WebAnnotationConstants.WEBANNOT
 import java.io.IOException;
 import java.net.URI;
 import java.time.Instant;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import javax.ws.rs.core.UriBuilder;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.core.JsonLdProcessor;
@@ -25,8 +26,6 @@ import com.github.jsonldjava.utils.JsonUtils;
 
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
-import nl.knaw.huygens.alexandria.api.model.search.QueryField;
 import nl.knaw.huygens.alexandria.api.model.w3c.WebAnnotationPrototype;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
@@ -42,6 +41,7 @@ public class WebAnnotationService {
   private static final Logger LOG = LoggerFactory.getLogger(WebAnnotationService.class);
   private final AlexandriaService service;
   private final AlexandriaConfiguration config;
+  private final AlexandriaResourceCache cache = new AlexandriaResourceCache();
 
   public WebAnnotationService(AlexandriaService service, AlexandriaConfiguration config) {
     this.service = service;
@@ -76,8 +76,8 @@ public class WebAnnotationService {
       jsonObject.put("@id", webAnnotationURI(annotation.getId()));
       String json2 = new ObjectMapper().writeValueAsString(jsonObject);
       return new WebAnnotation(annotation.getId())//
-        .setJson(json2)//
-        .setETag(String.valueOf(prototype.getModified().hashCode()));
+              .setJson(json2)//
+              .setETag(String.valueOf(prototype.getModified().hashCode()));
 
     } catch (IOException | JsonLdError e) {
       throw new BadRequestException(e.getMessage());
@@ -86,9 +86,9 @@ public class WebAnnotationService {
 
   URI webAnnotationURI(UUID annotationUUID) {
     return UriBuilder.fromUri(config.getBaseURI())//
-      .path(EndpointPaths.WEB_ANNOTATIONS)//
-      .path(annotationUUID.toString())//
-      .build();
+            .path(EndpointPaths.WEB_ANNOTATIONS)//
+            .path(annotationUUID.toString())//
+            .build();
   }
 
   private String extractResourceRef(Object annotationObject) throws JsonLdError {
@@ -112,7 +112,7 @@ public class WebAnnotationService {
           resourceRef = (String) source.get("@id");
         }
       }
-      return resourceRef.replaceFirst("#.*","");
+      return resourceRef.replaceFirst("#.*", "");
     } catch (IOException e) {
       e.printStackTrace();
       throw new RuntimeException(e);
@@ -142,15 +142,15 @@ public class WebAnnotationService {
 
   private AlexandriaResource extractAlexandriaResource(String resourceRef) {
     // first see if there's already a resource with this ref, if so, use this.
-
-//    List<Map<String, Object>> results = service.execute(query).getResults(); // this is too cumbersome a way to check for the existence of a resource with a specific ref.
-    AlexandriaResource resourceWithRef = service.readResourceWithUniqueRef(resourceRef).orElseGet(()->{
-      UUID resourceUUID = UUID.randomUUID();
-      TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(ThreadContext.getUserName(), Instant.now(), AlexandriaProvenance.DEFAULT_WHY);
-      return service.createResource(resourceUUID, resourceRef, provenance, AlexandriaState.CONFIRMED);
+    return cache.get(resourceRef).orElseGet(() -> {
+      AlexandriaResource resourceWithRef = service.readResourceWithUniqueRef(resourceRef).orElseGet(() -> {
+        UUID resourceUUID = UUID.randomUUID();
+        TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(ThreadContext.getUserName(), Instant.now(), AlexandriaProvenance.DEFAULT_WHY);
+        return service.createResource(resourceUUID, resourceRef, provenance, AlexandriaState.CONFIRMED);
+      });
+      cache.add(resourceWithRef);
+      return resourceWithRef;
     });
-
-    return resourceWithRef;
   }
 
   private AlexandriaAnnotation createWebAnnotation(String json, AlexandriaResource alexandriaResource) {
