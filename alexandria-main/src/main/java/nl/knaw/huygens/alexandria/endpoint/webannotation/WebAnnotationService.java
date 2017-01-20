@@ -119,27 +119,6 @@ public class WebAnnotationService {
     }
   }
 
-//  private String extractResourceRef(Map<String, Object> jsonObject) throws JsonLdError {
-//    // Log.info("jsonObject={}", jsonObject);
-//    Map<Object, Object> context = new HashMap<>();
-//    JsonLdOptions options = new JsonLdOptions();
-//    Map<String, Object> compacted = JsonLdProcessor.compact(jsonObject, context, options);
-//    // Log.info("compacted={}", jsonObject);
-//    Map<String, Object> target = (Map<String, Object>) compacted.get(OA_HAS_TARGET_IRI);
-//    String resourceRef = "";
-//    if (target == null) {
-//      LOG.error("target==null!, compacted={}", compacted); // TODO!
-//    } else {
-//      if (target.containsKey("@id")) {
-//        resourceRef = (String) target.get("@id");
-//      } else if (target.containsKey(OA_HAS_SOURCE_IRI)) {
-//        Map<String, Object> source = (Map<String, Object>) target.get(OA_HAS_SOURCE_IRI);
-//        resourceRef = (String) source.get("@id");
-//      }
-//    }
-//    return resourceRef;
-//  }
-
   private AlexandriaResource extractAlexandriaResource(String resourceRef) {
     // first see if there's already a resource with this ref, if so, use this.
     return cache.get(resourceRef).orElseGet(() -> {
