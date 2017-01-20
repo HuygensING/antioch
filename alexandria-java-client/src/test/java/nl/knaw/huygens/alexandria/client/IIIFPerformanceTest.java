@@ -1,31 +1,34 @@
 package nl.knaw.huygens.alexandria.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Stopwatch;
-import com.google.common.collect.ImmutableMap;
-import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.api.EndpointPaths;
-import nl.knaw.huygens.alexandria.api.model.iiif.IIIFAnnotationList;
-import nl.knaw.huygens.alexandria.api.model.w3c.WebAnnotationPrototype;
-import nl.knaw.huygens.alexandria.api.w3c.WebAnnotationConstants;
-import org.glassfish.jersey.client.ChunkedInput;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
-import static org.assertj.core.api.Assertions.assertThat;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response;
+
+import org.glassfish.jersey.client.ChunkedInput;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Stopwatch;
+import com.google.common.collect.ImmutableMap;
+
+import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.iiif.IIIFAnnotationList;
+import nl.knaw.huygens.alexandria.api.model.w3c.WebAnnotationPrototype;
+import nl.knaw.huygens.alexandria.api.w3c.WebAnnotationConstants;
 
 public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
   private static OptimisticAlexandriaClient client;
@@ -75,7 +78,7 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
 
   @Test
   public void testBatchAnnotationUploadStreaming() throws IOException {
-    int num = 10; // TODO: find out why num=1000 leads to TimeOutException for this test only
+    int num = 2; // TODO: find out why num=1000 leads to TimeOutException for this test only
     IIIFAnnotationList list = prepareList(num);
     String json = new ObjectMapper().writeValueAsString(list);
 
