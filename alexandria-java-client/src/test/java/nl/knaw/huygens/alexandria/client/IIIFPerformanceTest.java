@@ -75,7 +75,7 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
 
   @Test
   public void testBatchAnnotationUploadStreaming() throws IOException {
-    int num = 100; // TODO: find out why num=1000 leads to TimeOutException for this test only
+    int num = 900; // TODO: find out why num=1000 leads to TimeOutException for this test only
     IIIFAnnotationList list = prepareList(num);
     String json = new ObjectMapper().writeValueAsString(list);
 
