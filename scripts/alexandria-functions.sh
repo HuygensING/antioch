@@ -503,6 +503,16 @@ function a-add-web-annotationlist {
     ${be}/iiif/identifier/list/name | jq "."
 }
 
+function a-add-web-annotationlist-raw {
+  curl \
+   --raw \
+    -H "${authheader}" \
+    -H 'Accept: application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"' \
+    -H 'Content-type: application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"' \
+    --data-binary "$1" \
+    ${be}/iiif/identifier/list/name
+}
+
 function a-add-sample-web-annotationlist {
   a-add-web-annotationlist '{
   "@context": "http://iiif.io/api/presentation/2/context.json",

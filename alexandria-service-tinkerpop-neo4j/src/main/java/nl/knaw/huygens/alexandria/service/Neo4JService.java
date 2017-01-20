@@ -59,7 +59,7 @@ public class Neo4JService extends TinkerPopService {
   }
 
   private static void setIndexes() {
-    System.out.print("updating 6 indexes: .");
+    System.out.print("updating 7 indexes: .");
     setUniqueIndex("Resource", Storage.IDENTIFIER_PROPERTY);
     System.out.print(".");
     setUniqueIndex("Annotation", Storage.IDENTIFIER_PROPERTY);
@@ -67,6 +67,8 @@ public class Neo4JService extends TinkerPopService {
     setUniqueIndex("AnnotationBody", Storage.IDENTIFIER_PROPERTY);
     System.out.print(".");
     setUniqueIndex(VertexLabels.TEXTRANGEANNOTATION, Storage.IDENTIFIER_PROPERTY);
+    System.out.print(".");
+    runCypher("create index on :Resource(cargo)");
     System.out.print(".");
     runCypher("create index on :Annotation(who)");
     System.out.print(".");

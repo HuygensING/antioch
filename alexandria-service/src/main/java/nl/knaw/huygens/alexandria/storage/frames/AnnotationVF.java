@@ -120,7 +120,7 @@ public abstract class AnnotationVF extends AlexandriaVF implements FramedVertex<
 
   public String getSubResourceId() {
     ResourceVF annotatedResource = getFirstAnnotatedResource();
-    if (annotatedResource != null && annotatedResource.isSubresource()) {
+    if (annotatedResource != null && annotatedResource.isSubResource()) {
       return annotatedResource.getUuid();
     }
     return NO_VALUE;
@@ -128,7 +128,7 @@ public abstract class AnnotationVF extends AlexandriaVF implements FramedVertex<
 
   public ResourceVF getSubResource() {
     ResourceVF annotatedResource = getFirstAnnotatedResource();
-    if (annotatedResource != null && annotatedResource.isSubresource()) {
+    if (annotatedResource != null && annotatedResource.isSubResource()) {
       return annotatedResource;
     }
     return null;

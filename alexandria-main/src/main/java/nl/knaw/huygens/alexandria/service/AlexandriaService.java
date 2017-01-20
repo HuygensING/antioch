@@ -52,15 +52,19 @@ import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
 
 public interface AlexandriaService {
   // NOTE: should these service methods all be atomic?
+
   /**
-   *
    * @return true if the resource was created, false if it was updated
    */
   boolean createOrUpdateResource(UUID uuid, String ref, TentativeAlexandriaProvenance provenance, AlexandriaState alexandriaState);
 
+  AlexandriaResource createResource(UUID resourceUUID, String resourceRef, TentativeAlexandriaProvenance provenance, AlexandriaState confirmed);
+
   AlexandriaResource createSubResource(UUID uuid, UUID parentUuid, String sub, TentativeAlexandriaProvenance provenance);
 
   Optional<AlexandriaResource> readResource(UUID uuid);
+
+  Optional<AlexandriaResource> readResourceWithUniqueRef(String resourceRef);
 
   List<AlexandriaResource> readSubResources(UUID uuid);
 
@@ -88,10 +92,8 @@ public interface AlexandriaService {
   TemporalAmount getTentativesTimeToLive();
 
   /**
-   * @param oldAnnotationId
-   *          the id of the {@link AlexandriaAnnotation} to deprecate
-   * @param newAnnotation
-   *          the new {@link AlexandriaAnnotation}
+   * @param oldAnnotationId the id of the {@link AlexandriaAnnotation} to deprecate
+   * @param newAnnotation   the new {@link AlexandriaAnnotation}
    * @return the new {@link AlexandriaAnnotation} that deprecates the annotation with id oldAnnotationId
    */
   AlexandriaAnnotation deprecateAnnotation(UUID oldAnnotationId, AlexandriaAnnotation newAnnotation);
@@ -104,8 +106,7 @@ public interface AlexandriaService {
    * If the annotation is TENTATIVE, it will be removed from the database.
    * Otherwise, its status will be set to DELETED
    *
-   * @param annotation
-   *          The Annotation to delete
+   * @param annotation The Annotation to delete
    */
   void deleteAnnotation(AlexandriaAnnotation annotation);
 

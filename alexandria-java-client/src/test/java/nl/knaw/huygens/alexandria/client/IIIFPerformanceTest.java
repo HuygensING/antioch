@@ -53,20 +53,20 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
 
   @Test
   public void testBatchAnnotationUploadOld() {
-    int num = 2000;
+    int num = 1000;
     IIIFAnnotationList list = prepareList(num);
 
     Stopwatch sw = Stopwatch.createStarted();
     WebTarget rootTarget = client.getRootTarget();
     Response response = rootTarget.path(EndpointPaths.IIIF)//
-        .path("identifier")//
-        .path("list")//
-        .path("name")//
-        .path("oldway")//
-        .request()//
-        .accept(WebAnnotationConstants.JSONLD_MEDIATYPE)//
-        .header(HEADER_AUTH, authHeader)//
-        .post(Entity.entity(list, WebAnnotationConstants.JSONLD_MEDIATYPE));
+      .path("identifier")//
+      .path("list")//
+      .path("name")//
+      .path("oldway")//
+      .request()//
+      .accept(WebAnnotationConstants.JSONLD_MEDIATYPE)//
+      .header(HEADER_AUTH, authHeader)//
+      .post(Entity.entity(list, WebAnnotationConstants.JSONLD_MEDIATYPE));
     sw.stop();
     long elapsed = sw.elapsed(TimeUnit.MILLISECONDS);
     response.bufferEntity();
@@ -100,20 +100,20 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
 
   @Test
   public void testBatchAnnotationUploadChunked() throws IOException {
-    int num = 2000;
+    int num = 1000;
     IIIFAnnotationList list = prepareList(num);
     String json = new ObjectMapper().writeValueAsString(list);
 
     Stopwatch sw = Stopwatch.createStarted();
     WebTarget rootTarget = client.getRootTarget();
     Response response = rootTarget.path(EndpointPaths.IIIF)//
-        .path("identifier")//
-        .path("list")//
-        .path("name")//
-        .request()//
-        .accept(WebAnnotationConstants.JSONLD_MEDIATYPE)//
-        .header(HEADER_AUTH, authHeader)//
-        .post(Entity.entity(json, WebAnnotationConstants.JSONLD_MEDIATYPE));
+      .path("identifier")//
+      .path("list")//
+      .path("name")//
+      .request()//
+      .accept(WebAnnotationConstants.JSONLD_MEDIATYPE)//
+      .header(HEADER_AUTH, authHeader)//
+      .post(Entity.entity(json, WebAnnotationConstants.JSONLD_MEDIATYPE));
     final ChunkedInput<String> chunkedInput = response.readEntity(new GenericType<ChunkedInput<String>>() {
     });
     StringBuilder jsonBuilder = new StringBuilder();
@@ -129,6 +129,7 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
     assertThat(responseList.getResources()).hasSize(num);
     long elapsed = sw.elapsed(TimeUnit.MILLISECONDS);
     Log.info("CHUNKED: Uploading a batch of {} annotations took {} milliseconds.\nresponse: {}", num, elapsed, response);
+    
   }
 
   private IIIFAnnotationList prepareList(int num) {
@@ -140,18 +141,18 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
       WebAnnotationPrototype webannotation = new WebAnnotationPrototype();
       webannotation.putKeyValue("@type", "sc:Annotation");
 
-      String[] motivation = new String[] { "oa:tagging", "oa:commenting" };
+      String[] motivation = new String[]{"oa:tagging", "oa:commenting"};
       webannotation.putKeyValue("motivation", motivation);
 
       List<Map<String, String>> resourceList = new ArrayList<>(2);
-      resourceList.add(ImmutableMap.<String, String> of(//
-          "@type", "oa:Tag", //
-          "chars", "Square"//
+      resourceList.add(ImmutableMap.<String, String>of(//
+        "@type", "oa:Tag", //
+        "chars", "Square"//
       ));
-      resourceList.add(ImmutableMap.<String, String> of(//
-          "@type", "dctypes:Text", //
-          "format", "text/html", //
-          "chars", "<p>text " + i + "</p>"//
+      resourceList.add(ImmutableMap.<String, String>of(//
+        "@type", "dctypes:Text", //
+        "format", "text/html", //
+        "chars", "<p>text " + i + "</p>"//
       ));
       webannotation.putKeyValue("resource", resourceList);
       webannotation.putKeyValue("on", "https://purl.stanford.edu/wh234bz9013/iiif/canvas-0#xywh=1,2,3," + i);
