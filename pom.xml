@@ -373,8 +373,8 @@
         <configuration>
           <licenseName>gpl_v3</licenseName>
           <excludes>
-            <exclude>*.json</exclude>
-            <exclude>*.jsonld</exclude>
+            <exclude>**/*.json</exclude>
+            <exclude>**/*.jsonld</exclude>
           </excludes>
           <sectionDelimiter>=======</sectionDelimiter>
           <canUpdateCopyright>true</canUpdateCopyright>
