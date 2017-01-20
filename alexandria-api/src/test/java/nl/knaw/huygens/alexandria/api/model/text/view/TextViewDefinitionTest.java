@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeFunction;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
@@ -259,7 +258,6 @@ public class TextViewDefinitionTest extends AlexandriaTest {
 
   private void testJsonSerialization(TextView textView) throws JsonProcessingException, IOException, JsonParseException, JsonMappingException {
     String json = om.writeValueAsString(textView);
-    Log.info("textview={}", json);
     TextView tv2 = om.readValue(json, TextView.class);
     assertThat(tv2).isEqualToComparingFieldByFieldRecursively(textView);
   }
