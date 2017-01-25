@@ -1682,13 +1682,13 @@
 <text><p xml:id="p-1">This is a <sic resp="#ed"><name resp="#ed">naame</name></sic> with an error.</p></text>
 ]]>
      </h:xmlResponse>
-     Note that the <code>name</code> annotation is wrapped in the <code>sic</code> annotation.
      <small>(formatting added for increased readability)</small><br/>
   </h:request>
   <br/>
      
   <h:request>
-    Now suppose I want a view on the text where the <code>sic</code> annotation is wrapped in the <code>name</code> annotation, I must first
+    Note that the <code>name</code> annotation is wrapped in the <code>sic</code> annotation.
+    Now, suppose I want a view on the text where the <code>sic</code> annotation is wrapped in the <code>name</code> annotation instead, I must first
     <h:put>/resources/$resourceId10/text/views/name-sic</h:put>
     the body:
     <h:jsonBody>
