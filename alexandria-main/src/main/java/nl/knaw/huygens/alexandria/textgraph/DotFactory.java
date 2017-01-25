@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.textgraph;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
@@ -20,7 +21,7 @@ public class DotFactory {
     AtomicInteger annotationCounter = new AtomicInteger(0);
     Stack<Integer> openAnnotations = new Stack<>();
     Multimap<Integer, Integer> annotationDepthMap = ArrayListMultimap.create();
-    service.runInTransaction(() -> service.getTextGraphSegmentStream(resourceId).forEach((s) -> {
+    service.runInTransaction(() -> service.getTextGraphSegmentStream(resourceId, new ArrayList<List<String>>()).forEach((s) -> {
       int tn = textCounter.getAndIncrement();
       appendTextVertex(stringBuilder, s.getTextSegment(), tn);
       if (tn > 0) {

@@ -823,8 +823,8 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceId) {
-    return textGraphService.getTextGraphSegmentStream(resourceId);
+  public Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceId, List<List<String>> orderedLayerTags) {
+    return textGraphService.getTextGraphSegmentStream(resourceId, orderedLayerTags);
   }
 
   @Override

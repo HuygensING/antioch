@@ -1689,12 +1689,18 @@
   <h:request>
     Note that the <code>name</code> annotation is wrapped in the <code>sic</code> annotation.
     Now, suppose I want a view on the text where the <code>sic</code> annotation is wrapped in the <code>name</code> annotation instead, I must first
+    <h:success>successfully</h:success>
     <h:put>/resources/$resourceId10/text/views/name-sic</h:put>
     the body:
     <h:jsonBody>
     {
       "textView": {
-        "description": "wrap sic in name"
+        "description": "wrap sic in name",
+        "annotationLayers" : {
+          "layer1" : ["sic"],
+          "layer2" : ["name"]
+        },
+        "annotationLayerDepthOrder" : ["layer1","layer2"]
     } } }
     </h:jsonBody>
   </h:request>     
