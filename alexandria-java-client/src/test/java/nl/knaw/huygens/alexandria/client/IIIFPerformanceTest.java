@@ -51,7 +51,7 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
 
   static final String authHeader = "SimpleAuth " + AUTHKEY;
 
-  @Test
+  // @Test
   public void testBatchAnnotationUploadOld() {
     int num = 100;
     IIIFAnnotationList list = prepareList(num);
