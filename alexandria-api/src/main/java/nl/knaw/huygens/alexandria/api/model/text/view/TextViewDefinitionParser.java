@@ -75,14 +75,13 @@ public class TextViewDefinitionParser {
     }
   }
 
-  private List<List<String>> parseAnnotationLayers(Map<String, List<String>> annotationLayers, List<String> annotationLayerDepthOrder) {
+  List<List<String>> parseAnnotationLayers(Map<String, List<String>> annotationLayers, List<String> annotationLayerDepthOrder) {
     Set<String> definedLayers = annotationLayers.keySet();
     annotationLayerDepthOrder.forEach(layerName -> {
       if (!definedLayers.contains(layerName)) {
-        errors.add("annotationLayerDepthOrder: " + layerName + "not defined in annotationLayers");
+        errors.add("annotationLayerDepthOrder: " + layerName + " not defined in annotationLayers");
       }
     });
-    // TODO:
     List<List<String>> list = annotationLayerDepthOrder.stream()//
         .map(annotationLayers::get)//
         .collect(toList());
