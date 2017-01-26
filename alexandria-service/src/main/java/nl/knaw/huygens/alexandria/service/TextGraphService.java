@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
@@ -762,25 +763,53 @@ public class TextGraphService {
               overriddenDepth.put(pair.getRight(), leftDepth);
             }
           });
-
     }
-    return textAnnotationVertexList.stream()// this filter should not be necessary
-        .map(this::toTextAnnotation)//
+    Function<Vertex, TextAnnotation> toTextAnnotationWithOverriddenDepth = vertex -> {
+      TextAnnotation textAnnotation = toTextAnnotation(vertex);
+      if (overriddenDepth.containsKey(vertex)) {
+        textAnnotation.setDepth(overriddenDepth.get(vertex));
+      }
+      return textAnnotation;
+    };
+    return textAnnotationVertexList.stream()
+        .map(toTextAnnotationWithOverriddenDepth)//
         .sorted(BY_INCREASING_DEPTH)//
         .collect(toList());
   }
 
-  private List<Pair<Vertex, Vertex>> createPairs(List<List<Vertex>> vertexListPerLayer) {
+  List<Pair<Vertex, Vertex>> createPairs(List<List<Vertex>> vertexListPerLayer) {
     List<Pair<Vertex, Vertex>> pairList = Lists.newArrayList();
     for (int i = 0; i < vertexListPerLayer.size() - 1; i++) {
-      // TODO
+      List<Vertex> vertexLayer1 = vertexListPerLayer.get(i);
+      for (int j = i + 1; j < vertexListPerLayer.size(); j++) {
+        List<Vertex> vertexLayer2 = vertexListPerLayer.get(j);
+        pairList.addAll(createPairs(vertexLayer1, vertexLayer2));
+      }
     }
     return pairList;
   }
 
-  private Boolean hasSameTextRange(Pair<Vertex, Vertex> vertexPair) {
-    // TODO
-    return false;
+  private List<Pair<Vertex, Vertex>> createPairs(List<Vertex> vertexLayer1, List<Vertex> vertexLayer2) {
+    List<Pair<Vertex, Vertex>> list = new ArrayList<>();
+    vertexLayer1.forEach(v1 -> {
+      vertexLayer2.forEach(v2 -> {
+        list.add(Pair.of(v1, v2));
+      });
+    });
+    return list;
+  }
+
+  Boolean hasSameTextRange(Pair<Vertex, Vertex> vertexPair) {
+    Vertex left = vertexPair.getLeft();
+    Vertex leftFirstTextSegment = left.vertices(Direction.OUT, EdgeLabels.FIRST_TEXT_SEGMENT).next();
+    Vertex leftLastTextSegment = left.vertices(Direction.OUT, EdgeLabels.LAST_TEXT_SEGMENT).next();
+
+    Vertex right = vertexPair.getRight();
+    Vertex rightFirstTextSegment = right.vertices(Direction.OUT, EdgeLabels.FIRST_TEXT_SEGMENT).next();
+    Vertex rightLastTextSegment = right.vertices(Direction.OUT, EdgeLabels.LAST_TEXT_SEGMENT).next();
+
+    return leftFirstTextSegment.equals(rightFirstTextSegment) //
+        && leftLastTextSegment.equals(rightLastTextSegment);
   }
 
   private TextAnnotation toTextAnnotation(Vertex vertex) {

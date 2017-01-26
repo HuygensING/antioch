@@ -1,16 +1,20 @@
 package nl.knaw.huygens.alexandria.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.AbstractModule;
-import com.squarespace.jersey2.guice.BootstrapUtils;
-import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
-import nl.knaw.huygens.alexandria.jersey.AlexandriaApplication;
-import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.alexandria.service.AlexandriaServletModule;
-import nl.knaw.huygens.alexandria.service.TinkerPopService;
-import nl.knaw.huygens.alexandria.storage.Storage;
-import nl.knaw.huygens.alexandria.test.AlexandriaTest;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Map;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.apache.tinkerpop.shaded.minlog.Log;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -20,19 +24,18 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
+import com.google.inject.AbstractModule;
+import com.squarespace.jersey2.guice.BootstrapUtils;
+
+import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+import nl.knaw.huygens.alexandria.jersey.AlexandriaApplication;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.service.AlexandriaServletModule;
+import nl.knaw.huygens.alexandria.service.TinkerPopService;
+import nl.knaw.huygens.alexandria.storage.Storage;
+import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 
 public abstract class AlexandriaTestWithTestServer extends AlexandriaTest {
   static final String AUTHKEY = "AUTHKEY";
@@ -124,7 +127,6 @@ public abstract class AlexandriaTestWithTestServer extends AlexandriaTest {
       outputstream.close();
       System.out.println(prettyFormat(outputstream.toString()));
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     Log.info("dumping done");
