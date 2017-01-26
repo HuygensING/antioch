@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -12,9 +13,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.tinkerpop.gremlin.process.traversal.Order;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
 import org.apache.tinkerpop.gremlin.process.traversal.Traverser;
@@ -67,9 +70,9 @@ public class TextGraphService {
     });
   }
 
-  public Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceUUID) {
+  public Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceUUID, List<List<String>> orderedLayerDefinitions) {
     return getTextSegmentVertexStream(resourceUUID)//
-        .map(this::toTextGraphSegment);
+        .map(vertex -> toTextGraphSegment(vertex, orderedLayerDefinitions));
   }
 
   public Stream<TextAnnotation> getTextAnnotationStream(UUID resourceUUID) {
@@ -698,18 +701,18 @@ public class TextGraphService {
     }
   }
 
-  private TextGraphSegment toTextGraphSegment(Vertex textSegment) {
+  private TextGraphSegment toTextGraphSegment(Vertex textSegment, List<List<String>> orderedLayerDefinitions) {
     TextGraphSegment textGraphSegment = new TextGraphSegment();
     if (textSegment.keys().contains(TextSegment.Properties.text)) {
       textGraphSegment.setTextSegment(textSegment.value(TextSegment.Properties.text));
     }
-    List<TextAnnotation> textAnnotationsToOpen = getTextAnnotationsToOpen(textSegment);
-    List<TextAnnotation> textAnnotationsToClose = getTextAnnotationsToClose(textSegment);
+    List<TextAnnotation> textAnnotationsToOpen = getTextAnnotationsToOpen(textSegment, orderedLayerDefinitions);
+    List<TextAnnotation> textAnnotationsToClose = getTextAnnotationsToClose(textSegment, orderedLayerDefinitions);
 
-    if (StringUtils.isEmpty(textGraphSegment.getTextSegment())//
+    boolean isMilestone = StringUtils.isEmpty(textGraphSegment.getTextSegment())//
         && !textAnnotationsToOpen.isEmpty()//
-        && !textAnnotationsToClose.isEmpty()//
-    ) {
+        && !textAnnotationsToClose.isEmpty();
+    if (isMilestone) {
       TextAnnotation lastToOpen = textAnnotationsToOpen.get(textAnnotationsToOpen.size() - 1);
       TextAnnotation firstToClose = textAnnotationsToClose.get(0);
       if (lastToOpen.equals(firstToClose)) {
@@ -723,22 +726,90 @@ public class TextGraphService {
     return textGraphSegment;
   }
 
-  private List<TextAnnotation> getTextAnnotationsToOpen(Vertex textSegment) {
-    return getTextAnnotations(textSegment, EdgeLabels.FIRST_TEXT_SEGMENT);
+  private List<TextAnnotation> getTextAnnotationsToOpen(Vertex textSegment, List<List<String>> orderedLayerDefinitions) {
+    return getTextAnnotations(textSegment, EdgeLabels.FIRST_TEXT_SEGMENT, orderedLayerDefinitions);
   }
 
-  private List<TextAnnotation> getTextAnnotationsToClose(Vertex textSegment) {
-    return Lists.reverse(getTextAnnotations(textSegment, EdgeLabels.LAST_TEXT_SEGMENT));
+  private List<TextAnnotation> getTextAnnotationsToClose(Vertex textSegment, List<List<String>> orderedLayerDefinitions) {
+    return Lists.reverse(getTextAnnotations(textSegment, EdgeLabels.LAST_TEXT_SEGMENT, orderedLayerDefinitions));
   }
 
   private static final Comparator<TextAnnotation> BY_INCREASING_DEPTH = Comparator.comparing(TextAnnotation::getDepth);
 
-  private List<TextAnnotation> getTextAnnotations(Vertex textSegment, String edgeLabel) {
-    return StreamUtil.stream(textSegment.vertices(Direction.IN, edgeLabel))//
-        .filter(v -> v.label().equals(VertexLabels.TEXTANNOTATION))// this filter should not be necessary
-        .map(this::toTextAnnotation)//
+  private List<TextAnnotation> getTextAnnotations(Vertex textSegment, String edgeLabel, List<List<String>> orderedLayerDefinitions) {
+    List<Vertex> textAnnotationVertexList = StreamUtil.stream(textSegment.vertices(Direction.IN, edgeLabel))//
+        .filter(v -> v.label().equals(VertexLabels.TEXTANNOTATION)).collect(toList());
+
+    List<List<Vertex>> vertexListPerLayer = new ArrayList<>();
+    AtomicInteger relevantVertexCount = new AtomicInteger(0);
+    orderedLayerDefinitions.forEach(layerTags -> {
+      List<Vertex> vertexList = textAnnotationVertexList.stream()//
+          .filter(v -> layerTags.contains(v.value(TextAnnotation.Properties.name)))//
+          .collect(toList());
+      vertexListPerLayer.add(vertexList);
+      relevantVertexCount.set(relevantVertexCount.get() + vertexList.size());
+    });
+    boolean useLayerOrder = relevantVertexCount.get() > 1;
+    Map<Vertex, Integer> overriddenDepth = new HashMap<>();
+    if (useLayerOrder) {
+      createPairs(vertexListPerLayer).stream()//
+          .filter(this::hasSameTextRange)//
+          .forEach(pair -> {
+            Integer leftDepth = (Integer) pair.getLeft().value(TextAnnotation.Properties.depth);
+            Integer rightDepth = (Integer) pair.getRight().value(TextAnnotation.Properties.depth);
+            boolean swapDepths = leftDepth < rightDepth;
+            if (swapDepths) {
+              overriddenDepth.put(pair.getLeft(), rightDepth);
+              overriddenDepth.put(pair.getRight(), leftDepth);
+            }
+          });
+    }
+    Function<Vertex, TextAnnotation> toTextAnnotationWithOverriddenDepth = vertex -> {
+      TextAnnotation textAnnotation = toTextAnnotation(vertex);
+      if (overriddenDepth.containsKey(vertex)) {
+        textAnnotation.setDepth(overriddenDepth.get(vertex));
+      }
+      return textAnnotation;
+    };
+    return textAnnotationVertexList.stream()
+        .map(toTextAnnotationWithOverriddenDepth)//
         .sorted(BY_INCREASING_DEPTH)//
         .collect(toList());
+  }
+
+  List<Pair<Vertex, Vertex>> createPairs(List<List<Vertex>> vertexListPerLayer) {
+    List<Pair<Vertex, Vertex>> pairList = Lists.newArrayList();
+    for (int i = 0; i < vertexListPerLayer.size() - 1; i++) {
+      List<Vertex> vertexLayer1 = vertexListPerLayer.get(i);
+      for (int j = i + 1; j < vertexListPerLayer.size(); j++) {
+        List<Vertex> vertexLayer2 = vertexListPerLayer.get(j);
+        pairList.addAll(createPairs(vertexLayer1, vertexLayer2));
+      }
+    }
+    return pairList;
+  }
+
+  private List<Pair<Vertex, Vertex>> createPairs(List<Vertex> vertexLayer1, List<Vertex> vertexLayer2) {
+    List<Pair<Vertex, Vertex>> list = new ArrayList<>();
+    vertexLayer1.forEach(v1 -> {
+      vertexLayer2.forEach(v2 -> {
+        list.add(Pair.of(v1, v2));
+      });
+    });
+    return list;
+  }
+
+  Boolean hasSameTextRange(Pair<Vertex, Vertex> vertexPair) {
+    Vertex left = vertexPair.getLeft();
+    Vertex leftFirstTextSegment = left.vertices(Direction.OUT, EdgeLabels.FIRST_TEXT_SEGMENT).next();
+    Vertex leftLastTextSegment = left.vertices(Direction.OUT, EdgeLabels.LAST_TEXT_SEGMENT).next();
+
+    Vertex right = vertexPair.getRight();
+    Vertex rightFirstTextSegment = right.vertices(Direction.OUT, EdgeLabels.FIRST_TEXT_SEGMENT).next();
+    Vertex rightLastTextSegment = right.vertices(Direction.OUT, EdgeLabels.LAST_TEXT_SEGMENT).next();
+
+    return leftFirstTextSegment.equals(rightFirstTextSegment) //
+        && leftLastTextSegment.equals(rightLastTextSegment);
   }
 
   private TextAnnotation toTextAnnotation(Vertex vertex) {

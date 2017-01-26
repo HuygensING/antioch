@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.api.model.text.view;
 
+import static java.util.stream.Collectors.toList;
 import static nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode.hideAll;
 import static nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode.hideOnly;
 import static nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeMode.showAll;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,9 +46,13 @@ public class TextViewDefinitionParser {
     return errors;
   }
 
-  private void parse(final TextViewDefinition d) {
-    textView.setDescription(d.getDescription());
-    Map<String, ElementViewDefinition> elementViewDefinitions = d.getElementViewDefinitions();
+  private void parse(final TextViewDefinition textViewDefinition) {
+    textView.setDescription(textViewDefinition.getDescription());
+
+    List<List<String>> parseAnnotationLayers = parseAnnotationLayers(textViewDefinition.getAnnotationLayers(), textViewDefinition.getAnnotationLayerDepthOrder());
+    textView.setOrderedLayerTags(parseAnnotationLayers);
+
+    Map<String, ElementViewDefinition> elementViewDefinitions = textViewDefinition.getElementViewDefinitions();
     elementViewDefinitions.putIfAbsent(TextViewDefinition.DEFAULT_ATTRIBUTENAME, ElementViewDefinition.DEFAULT);
     ElementViewDefinition defaultElementViewDefinition = elementViewDefinitions.get(TextViewDefinition.DEFAULT_ATTRIBUTENAME);
     for (final Entry<String, ElementViewDefinition> entry : elementViewDefinitions.entrySet()) {
@@ -67,6 +73,19 @@ public class TextViewDefinitionParser {
       }
       textView.putElementView(elementName, elementView);
     }
+  }
+
+  private List<List<String>> parseAnnotationLayers(Map<String, List<String>> annotationLayers, List<String> annotationLayerDepthOrder) {
+    Set<String> definedLayers = annotationLayers.keySet();
+    annotationLayerDepthOrder.forEach(layerName -> {
+      if (!definedLayers.contains(layerName)) {
+        errors.add("annotationLayerDepthOrder: " + layerName + " not defined in annotationLayers");
+      }
+    });
+    List<List<String>> list = annotationLayerDepthOrder.stream()//
+        .map(annotationLayers::get)//
+        .collect(toList());
+    return list;
   }
 
   private ElementView parseElementViewDefinition(final String elementName, final ElementViewDefinition evd) {

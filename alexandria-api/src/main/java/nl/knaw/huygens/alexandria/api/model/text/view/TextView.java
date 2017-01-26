@@ -1,13 +1,16 @@
 package nl.knaw.huygens.alexandria.api.model.text.view;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TextView {
   private String description = "";
@@ -20,6 +23,8 @@ public class TextView {
 
   @JsonIgnore
   private String name;
+
+  private List<List<String>> orderedLayerTags = new ArrayList<>();
 
   public TextView() {
     elementViewMap.clear();
@@ -59,12 +64,22 @@ public class TextView {
     return this.textViewDefiningResourceId;
   }
 
-  @Override
-  public String toString() {
-    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+  public TextView setOrderedLayerTags(List<List<String>> orderedLayerTags) {
+    this.orderedLayerTags = orderedLayerTags;
+    return this;
+  }
+
+  public List<List<String>> getOrderedLayerTags() {
+    return orderedLayerTags;
   }
 
   public void substitute(Map<String, String> viewParameters) {
     elementViewMap.values().forEach(elementView -> elementView.substitute(viewParameters));
   }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+  }
+
 }

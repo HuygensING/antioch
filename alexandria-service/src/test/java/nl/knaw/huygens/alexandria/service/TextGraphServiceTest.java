@@ -1,19 +1,27 @@
 package nl.knaw.huygens.alexandria.service;
 
 import static java.util.stream.Collectors.joining;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.ws.rs.core.StreamingOutput;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.tinkerpop.gremlin.structure.Direction;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import nl.knaw.huygens.Log;
@@ -25,6 +33,7 @@ import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
+import nl.knaw.huygens.alexandria.storage.EdgeLabels;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
@@ -193,6 +202,96 @@ public class TextGraphServiceTest extends AlexandriaTest {
     assertExpectation(xml, expected, annotationUUID, textRangeAnnotation);
   }
 
+  @Test
+  public void testCreatePairsWithTwoLayers() throws Exception {
+    Vertex v1 = mockVertex("1");
+    Vertex v2 = mockVertex("2");
+    Vertex va = mockVertex("a");
+    Vertex vb = mockVertex("b");
+    List<Vertex> layer1 = ImmutableList.of(v1, v2);
+    List<Vertex> layer2 = ImmutableList.of(va, vb);
+    List<List<Vertex>> vertexListPerLayer = ImmutableList.of(layer1, layer2);
+
+    List<Pair<Vertex, Vertex>> pairs = tgs.createPairs(vertexListPerLayer);
+    Log.info("pairs={}", pairs);
+    assertThat(pairs).containsExactly(//
+        Pair.of(v1, va), //
+        Pair.of(v1, vb), //
+        Pair.of(v2, va), //
+        Pair.of(v2, vb)//
+    );
+  }
+
+  @Test
+  public void testCreatePairsWithThreeLayers() throws Exception {
+    Vertex v1 = mockVertex("1");
+    Vertex v2 = mockVertex("2");
+    Vertex va = mockVertex("a");
+    Vertex vb = mockVertex("b");
+    Vertex vx = mockVertex("X");
+    Vertex vy = mockVertex("Y");
+    List<Vertex> layer1 = ImmutableList.of(v1, v2);
+    List<Vertex> layer2 = ImmutableList.of(va, vb);
+    List<Vertex> layer3 = ImmutableList.of(vx, vy);
+    List<List<Vertex>> vertexListPerLayer = ImmutableList.of(layer1, layer2, layer3);
+
+    List<Pair<Vertex, Vertex>> pairs = tgs.createPairs(vertexListPerLayer);
+    Log.info("pairs={}", pairs);
+    assertThat(pairs).containsExactly(//
+        Pair.of(v1, va), //
+        Pair.of(v1, vb), //
+        Pair.of(v2, va), //
+        Pair.of(v2, vb), //
+        Pair.of(v1, vx), //
+        Pair.of(v1, vy), //
+        Pair.of(v2, vx), //
+        Pair.of(v2, vy), //
+        Pair.of(va, vx), //
+        Pair.of(va, vy), //
+        Pair.of(vb, vx), //
+        Pair.of(vb, vy) //
+    );
+  }
+
+  @Test
+  public void testHasSameTextRangePasses() throws Exception {
+    Vertex firstTextSegment = mock(Vertex.class);
+    List<Vertex> firstTextSegmentList = ImmutableList.of(firstTextSegment);
+
+    Vertex lastTextSegment = mock(Vertex.class);
+    List<Vertex> lastTextSegmentList = ImmutableList.of(lastTextSegment);
+
+    Vertex v1 = mockVertex("1");
+    when(v1.vertices(Direction.OUT, EdgeLabels.FIRST_TEXT_SEGMENT)).thenReturn(firstTextSegmentList.iterator());
+    when(v1.vertices(Direction.OUT, EdgeLabels.LAST_TEXT_SEGMENT)).thenReturn(lastTextSegmentList.iterator());
+
+    Vertex va = mockVertex("a");
+    when(va.vertices(Direction.OUT, EdgeLabels.FIRST_TEXT_SEGMENT)).thenReturn(firstTextSegmentList.iterator());
+    when(va.vertices(Direction.OUT, EdgeLabels.LAST_TEXT_SEGMENT)).thenReturn(lastTextSegmentList.iterator());
+
+    Pair<Vertex, Vertex> pair = Pair.of(v1, va);
+    assertThat(tgs.hasSameTextRange(pair)).isTrue();
+  }
+
+  @Test
+  public void testHasSameTextRangeFails() throws Exception {
+    Vertex firstTextSegment = mock(Vertex.class);
+    List<Vertex> firstTextSegmentList = ImmutableList.of(firstTextSegment);
+
+    Vertex lastTextSegment = mock(Vertex.class);
+    List<Vertex> lastTextSegmentList = ImmutableList.of(lastTextSegment);
+
+    Vertex v1 = mockVertex("1");
+    when(v1.vertices(Direction.OUT, EdgeLabels.FIRST_TEXT_SEGMENT)).thenReturn(firstTextSegmentList.iterator());
+    when(v1.vertices(Direction.OUT, EdgeLabels.LAST_TEXT_SEGMENT)).thenReturn(firstTextSegmentList.iterator());
+
+    Vertex va = mockVertex("a");
+    when(va.vertices(Direction.OUT, EdgeLabels.FIRST_TEXT_SEGMENT)).thenReturn(firstTextSegmentList.iterator());
+    when(va.vertices(Direction.OUT, EdgeLabels.LAST_TEXT_SEGMENT)).thenReturn(lastTextSegmentList.iterator());
+
+    Pair<Vertex, Vertex> pair = Pair.of(v1, va);
+    assertThat(tgs.hasSameTextRange(pair)).isFalse();
+  }
 
   private void assertExpectation(String xml, String expected, UUID resourceUUID, TextRangeAnnotation textRangeAnnotation) {
     Log.info("xml={}", xml);
@@ -303,6 +402,12 @@ public class TextGraphServiceTest extends AlexandriaTest {
     String dot = DotFactory.createDot(service, resourceUUID);
     Log.info("dot={}", dot);
     Log.info("dumping done");
+  }
+
+  private Vertex mockVertex(String value) {
+    Vertex v1 = mock(Vertex.class);
+    when(v1.value("name")).thenReturn(value);
+    return v1;
   }
 
 }

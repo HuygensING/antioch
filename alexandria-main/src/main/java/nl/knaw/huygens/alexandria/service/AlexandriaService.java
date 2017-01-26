@@ -156,7 +156,7 @@ public interface AlexandriaService {
 
   boolean storeTextGraph(UUID resourceId, ParseResult result);
 
-  Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceId);
+  Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceId, List<List<String>> orderedLayerTags);
 
   void runInTransaction(Runnable runner);
 
@@ -167,5 +167,6 @@ public interface AlexandriaService {
   void updateTextAnnotation(TextAnnotation textAnnotation);
 
   void wrapContentInChildTextAnnotation(TextAnnotation existingTextAnnotation, TextAnnotation newChildTextAnnotation);
+
 
 }

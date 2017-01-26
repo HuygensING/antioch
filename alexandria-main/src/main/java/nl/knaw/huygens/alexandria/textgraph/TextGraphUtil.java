@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,7 @@ public class TextGraphUtil {
     return output -> {
       Writer writer = createBufferedUTF8OutputStreamWriter(output);
       Consumer<TextGraphSegment> action = segment -> streamTextGraphSegment(writer, segment);
-      stream(service, resourceId, writer, action);
+      stream(service, resourceId, writer, action, new ArrayList<List<String>>());
     };
   }
 
@@ -121,7 +122,7 @@ public class TextGraphUtil {
       Writer writer = createBufferedUTF8OutputStreamWriter(output);
       TextViewContext textViewContext = new TextViewContext(textView);
       Consumer<TextGraphSegment> action = segment -> streamTextGraphSegment(writer, segment, textViewContext);
-      stream(service, resourceId, writer, action);
+      stream(service, resourceId, writer, action, textView.getOrderedLayerTags());
     };
   }
 
@@ -309,6 +310,18 @@ public class TextGraphUtil {
       } while (group.size() == originalSize && !prioritizedValues.isEmpty());
       return group;
     }
+
+    public List<TextAnnotation> getOrderedTextAnnotationsToOpen(TextGraphSegment segment) {
+      List<TextAnnotation> textAnnotationsToOpen = segment.getTextAnnotationsToOpen();
+      textAnnotationsToOpen.forEach(textAnnotation -> {
+      });
+      return textAnnotationsToOpen;
+    }
+
+    public List<TextAnnotation> getOrderedTextAnnotationsToClose(TextGraphSegment segment) {
+      List<TextAnnotation> textAnnotationsToClose = segment.getTextAnnotationsToClose();
+      return textAnnotationsToClose;
+    }
   }
 
   public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment, TextViewContext textViewContext) {
@@ -354,7 +367,8 @@ public class TextGraphUtil {
   }
 
   private static void writeOpenTags(Writer writer, TextGraphSegment segment, TextViewContext textViewContext) throws IOException {
-    for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
+    List<TextAnnotation> textAnnotationsToOpen = textViewContext.getOrderedTextAnnotationsToOpen(segment);
+    for (TextAnnotation textAnnotation : textAnnotationsToOpen) {
       String name = textAnnotation.getName();
       if (textViewContext.includeTag(name, textAnnotation)) {
         String openTag = getOpenTag(name, textViewContext.includedAttributes(textAnnotation));
@@ -391,8 +405,8 @@ public class TextGraphUtil {
     return new BufferedWriter(new OutputStreamWriter(output, "UTF-8"));
   }
 
-  private static void stream(AlexandriaService service, UUID resourceId, Writer writer, Consumer<TextGraphSegment> action) throws IOException {
-    service.runInTransaction(() -> service.getTextGraphSegmentStream(resourceId).forEach(action));
+  private static void stream(AlexandriaService service, UUID resourceId, Writer writer, Consumer<TextGraphSegment> action, List<List<String>> orderedLayerTags) throws IOException {
+    service.runInTransaction(() -> service.getTextGraphSegmentStream(resourceId, orderedLayerTags).forEach(action));
     writer.flush();
   }
 

@@ -1513,7 +1513,7 @@
   <span c:execute="resourceExists(#resourceId9)">exists</span>,<br/>
   which has
   <span c:execute="resourceHasText(#resourceId9,#text4)">text<br/>
-    <code c:set="#text4">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;&lt;lang resp=&quot;#b&quot; value=&quot;it&quot;&gt;&lt;lang resp=&quot;#a&quot; value=&quot;la&quot;&gt;Maecenas consectetur odio at dolor porttitor.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;&lt;p xml:id=&quot;p-2&quot;&gt;&lt;lang resp=&quot;#a&quot; value=&quot;la&quot;&gt;&lt;lang resp=&quot;#b&quot; value=&quot;it&quot;&gt;Aliquam a dapibus massa.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;&lt;p xml:id=&quot;p-3&quot;&gt;&lt;lang resp=&quot;#b&quot; value=&quot;en&quot;&gt;&lt;lang resp=&quot;#c&quot; value=&quot;fr&quot;&gt;Aenean efficitur purus ut dui molestie fermentum.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;&lt;p xml:id=&quot;p-4&quot;&gt;&lt;lang resp=&quot;#c&quot; value=&quot;fr&quot;&gt;Fusce congue mauris augue.&lt;/lang&gt;&lt;/p&gt;&lt;/text&gt;</code>
+    <code c:set="#text4">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;&lt;lang resp=&quot;#b&quot; valu=&quot;it&quot;&gt;&lt;lang resp=&quot;#a&quot; value=&quot;la&quot;&gt;Maecenas consectetur odio at dolor porttitor.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;&lt;p xml:id=&quot;p-2&quot;&gt;&lt;lang resp=&quot;#a&quot; value=&quot;la&quot;&gt;&lt;lang resp=&quot;#b&quot; value=&quot;it&quot;&gt;Aliquam a dapibus massa.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;&lt;p xml:id=&quot;p-3&quot;&gt;&lt;lang resp=&quot;#b&quot; value=&quot;en&quot;&gt;&lt;lang resp=&quot;#c&quot; value=&quot;fr&quot;&gt;Aenean efficitur purus ut dui molestie fermentum.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;&lt;p xml:id=&quot;p-4&quot;&gt;&lt;lang resp=&quot;#c&quot; value=&quot;fr&quot;&gt;Fusce congue mauris augue.&lt;/lang&gt;&lt;/p&gt;&lt;/text&gt;</code>
   </span><br/>
   <br/>
 
@@ -1585,9 +1585,143 @@
     </ul>
 	</h:request>
 	<br/>
-  
-  
 </div>
+
+<div id="set-annotation-layer-priority" c:execute="clearStorage()"
+     data-desc="How do I control the nesting of annotations over the same text range?">
+
+  Given a resource
+  with id <code c:set="#resourceId10">00000000-0000-0000-0000-000000000010</code>
+  <span c:execute="resourceExists(#resourceId10)">exists</span>,<br/>
+  which has text
+  <span c:execute="resourceHasText(#resourceId10,#text5)"><br/>
+    <code c:set="#text5">&lt;text&gt;&lt;p xml:id=&quot;p-1&quot;&gt;This is a naame with an error.&lt;/p&gt;&lt;/text&gt;</code>
+    and
+  </span><br/>
+  <span c:execute="resourceHasAnnotator(#resourceId10,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>
+  <br/>
+  <h:request>
+    Adding 2 annotations by <h:post>/resources/$resourceId10/text/annotationbatch</h:post>
+    the body:
+    <h:jsonBody> 
+    {
+      "textAnnotationList" : [
+        { "textAnnotation" :
+	        {
+	          "id" : "00000000-0000-0000-0001-000000000010",
+		        "name" : "sic",
+		        "annotator" : "ed",
+		        "position" : {
+		          "xml:id" : "p-1", 
+		          "offset" : 11, 
+		          "length" : 5
+		        }
+		    } },
+        { "textAnnotation" :
+		      {
+            "id" : "00000000-0000-0000-0002-000000000010",
+	          "name" : "name",
+	          "annotator" : "ed",
+	          "position" : {
+	            "xml:id" : "p-1", 
+	            "offset" : 11, 
+	            "length" : 5
+	          }
+		    } } 
+      ]
+    }
+    </h:jsonBody>
+    using
+    <h:setHeader name="Content-Type">application/json</h:setHeader>,<br/>
+    then I should receive
+    <ul>
+      <li>status <h:status>202 Accepted</h:status></li>
+      <li>location header
+          <h:location>https://{host}/resources/$resourceId10/text/annotationbatch/status</h:location>
+      </li>
+    </ul>
+  </h:request>
+  <h:request>
+    I confirm the batch upload by <h:get>/resources/$resourceId10/text/annotationbatch/status</h:get>
+    and receive 
+    <h:jsonResponse>
+        {
+  "textAnnotationImportStatus" : {
+    "done" : true,
+    "state" : "done",
+    "errors" : [ ],
+    "textRangeAnnotationInfoMap" : {
+      "00000000-0000-0000-0001-000000000010" : {
+        "textAnnotationInfo" : {
+          "annotates" : "naame"
+        }
+      },
+      "00000000-0000-0000-0002-000000000010" : {
+        "textAnnotationInfo" : {
+          "annotates" : "naame"
+        }
+      }
+    }
+  }
+}
+    </h:jsonResponse>
+     
+  </h:request>
+
+  <h:request>
+     Then a
+     <h:get>/resources/$resourceId10/text/xml</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     <h:success>successfully</h:success>
+     yields response body:<br/>
+     <h:xmlResponse>
+<![CDATA[
+<text><p xml:id="p-1">This is a <sic resp="#ed"><name resp="#ed">naame</name></sic> with an error.</p></text>
+]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+  <br/>
+     
+  <h:request>
+    Note that the <code>name</code> annotation is wrapped in the <code>sic</code> annotation.
+    Now, suppose I want a view on the text where the <code>sic</code> annotation is wrapped in the <code>name</code> annotation instead, I must first
+    <h:success>successfully</h:success>
+    <h:put>/resources/$resourceId10/text/views/name-sic</h:put>
+    the body:
+    <h:jsonBody>
+    {
+      "textView": {
+        "description": "wrap sic in name",
+        "annotationLayers" : {
+          "layer1" : ["sic"],
+          "layer2" : ["name"]
+        },
+        "annotationLayerDepthOrder" : ["layer1","layer2"]
+    } } }
+    </h:jsonBody>
+  </h:request>     
+     
+  <h:request>
+     Then a
+     <h:get>/resources/$resourceId10/text/xml?view=name-sic</h:get><br/>
+     using
+     <h:setHeader name="Accept">text/xml</h:setHeader><br/>
+     <h:success>successfully</h:success>
+     yields response body:
+     <h:xmlResponse>
+<![CDATA[
+<text><p xml:id="p-1">This is a <name resp="#ed"><sic resp="#ed">naame</sic></name> with an error.</p></text>
+]]>
+     </h:xmlResponse>
+     <small>(formatting added for increased readability)</small><br/>
+  </h:request>
+
+</div>
+
 
 </body>
 </html>

@@ -41,6 +41,7 @@ public class TextViewDefinitionTest extends AlexandriaTest {
     String expected = singleQuotesToDouble("{'textView':"//
         + "{"//
         + "'description':'Test definition',"//
+        + "'annotationLayers':{}," + "'annotationLayerDepthOrder':[],"
         + "'elements':{"//
         + "':default':{'elementMode':'show','attributeMode':'showAll'},"//
         + "'note':{'elementMode':'hide'},"//
