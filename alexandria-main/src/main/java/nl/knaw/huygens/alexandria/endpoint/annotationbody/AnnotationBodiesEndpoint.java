@@ -6,7 +6,6 @@ import java.util.UUID;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -40,34 +39,30 @@ import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
-import nl.knaw.huygens.alexandria.exception.NotFoundException;
-import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 @Path(EndpointPaths.ANNOTATIONBODIES)
 @Api(EndpointPaths.ANNOTATIONBODIES)
 public class AnnotationBodiesEndpoint extends JSONEndpoint {
   private final AlexandriaService service;
-  private final AnnotationBodyEntityBuilder entityBuilder;
   private final AnnotationBodyCreationRequestBuilder requestBuilder;
 
   @Inject
   public AnnotationBodiesEndpoint(AlexandriaService service, //
-      AnnotationBodyCreationRequestBuilder requestBuilder, //
-      AnnotationBodyEntityBuilder entityBuilder) {
+      AnnotationBodyCreationRequestBuilder requestBuilder //
+  ) {
     this.service = service;
     this.requestBuilder = requestBuilder;
-    this.entityBuilder = entityBuilder;
   }
 
-  @GET
-  @Path("{uuid}")
-  @ApiOperation(value = "get the annotation body", response = AnnotationBodyEntity.class)
-  public Response readAnnotationBody(@PathParam("uuid") UUIDParam uuidParam) {
-    final AlexandriaAnnotationBody annotationBody = service.readAnnotationBody(uuidParam.getValue())//
-        .orElseThrow(() -> new NotFoundException("No annotationbody found with id " + uuidParam));
-    return ok(entityBuilder.build(annotationBody));
-  }
+  // @GET
+  // @Path("{uuid}")
+  // @ApiOperation(value = "get the annotation body", response = AnnotationBodyEntity.class)
+  // public Response readAnnotationBody(@PathParam("uuid") UUIDParam uuidParam) {
+  // final AlexandriaAnnotationBody annotationBody = service.readAnnotationBody(uuidParam.getValue())//
+  // .orElseThrow(() -> new NotFoundException("No annotationbody found with id " + uuidParam));
+  // return ok(entityBuilder.build(annotationBody));
+  // }
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
