@@ -75,7 +75,7 @@ public class TextViewDefinitionParser {
     }
   }
 
-  List<List<String>> parseAnnotationLayers(Map<String, List<String>> annotationLayers, List<String> annotationLayerDepthOrder) {
+  private List<List<String>> parseAnnotationLayers(Map<String, List<String>> annotationLayers, List<String> annotationLayerDepthOrder) {
     Set<String> definedLayers = annotationLayers.keySet();
     annotationLayerDepthOrder.forEach(layerName -> {
       if (!definedLayers.contains(layerName)) {

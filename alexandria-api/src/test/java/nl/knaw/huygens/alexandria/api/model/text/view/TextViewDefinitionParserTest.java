@@ -11,8 +11,6 @@ import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 
-import nl.knaw.huygens.Log;
-
 public class TextViewDefinitionParserTest {
   @Test
   public void testParseAnnotationLayers() {
@@ -28,10 +26,7 @@ public class TextViewDefinitionParserTest {
         .setAnnotationLayers(annotationLayers)//
         .setAnnotationLayerDepthOrder(annotationLayerDepthOrder);
     TextViewDefinitionParser parser = new TextViewDefinitionParser(definition);
-    List<List<String>> parsed = parser.parseAnnotationLayers(annotationLayers, annotationLayerDepthOrder);
-    Log.info("parsed={}", parsed);
     assertThat(parser.isValid()).isTrue();
-    assertThat(parsed).hasSize(annotationLayerDepthOrder.size());
     Optional<TextView> oTextView = parser.getTextView();
     assertThat(oTextView).isPresent();
     TextView textView = oTextView.get();
