@@ -1121,7 +1121,7 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
       + "<text xml:id='text-1' lang='la'>\n"//
       + "<body>\n"//
       + "<div xml:id='div-1' type='letter'>\n"//
-      + "<p xml:id=\"p-2\">... bien plus qu'un <hi rend=\"i\">Aristote</hi>...</p>"//
+      + "<p xml:id=\"p-1\">... bien plus qu'un <hi rend=\"i\">Aristote</hi>...</p>"//
       + "</div>\n"//
       + "</body>\n"//
       + "</text>\n"//
@@ -1130,12 +1130,40 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     client.setResource(resourceUUID, resourceUUID.toString());
     setResourceText(resourceUUID, xml);
 
+    client.setAnnotator(resourceUUID, "ckcc", new Annotator().setCode("ckcc").setDescription("CKCC project team"));
+
+    UUID annotationUUID1 = UUID.randomUUID();
+    Position position = new Position()//
+      .setXmlId("p-1")//
+      .setOffset(21)//
+      .setLength(8);
+    TextRangeAnnotation persNameAnnotation = new TextRangeAnnotation()//
+      .setId(annotationUUID1)//
+      .setName("persName")//
+      .setAnnotator("ckcc")//
+      .setPosition(position);
+    TextRangeAnnotationInfo persNameInfo = client.setResourceTextRangeAnnotation(resourceUUID, persNameAnnotation);
+    assertThat(persNameInfo.getAnnotates()).isEqualTo("Aristote");
+
+//    UUID annotationUUID2 = UUID.randomUUID();
+//    Position position2 = new Position()//
+//      .setTargetAnnotationId(annotationUUID1);
+//    TextRangeAnnotation persNameKeyAnnotation = new TextRangeAnnotation()//
+//      .setId(annotationUUID2)//
+//      .setName("persName_key")//
+//      .setAnnotator("ckcc")//
+//      .setAttributes(ImmutableMap.of("value","aristoteles.384bc-322bc"))//
+//      .setPosition(position2);
+//    TextRangeAnnotationInfo persNameKeyInfo = client.setResourceTextRangeAnnotation(resourceUUID, persNameKeyAnnotation);
+//    assertThat(persNameKeyInfo.getAnnotates()).isEqualTo("");
+
+
     String original = client.getTextAsString(resourceUUID);
-    assertThat(original).contains("<persName key=\"aristoteles.384bc-322bc\" resp=\"#ckcc\" resp_key=\"#ckcc\"><hi rend=\"i\">Aristote</hi></persName>");
+    assertThat(original).contains("<persName key=\"aristoteles.384bc-322bc\" resp=\"#ckcc\"><hi rend=\"i\">Aristote</hi></persName>");
 
     client.setResourceTextView(resourceUUID, "view1", defaultDefinition());
     String view1 = client.getTextAsString(resourceUUID, "view1");
-    assertThat(view1).contains("<persName key=\"aristoteles.384bc-322bc\" resp=\"#ckcc\" resp_key=\"#ckcc\"><hi rend=\"i\">Aristote</hi></persName>");
+    assertThat(view1).contains("<persName key=\"aristoteles.384bc-322bc\" resp=\"#ckcc\"><hi rend=\"i\">Aristote</hi></persName>");
   }
 
   private TextViewDefinition defaultDefinition() {
@@ -1152,7 +1180,6 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
 
     return new TextViewDefinition() //
       .setDescription("View used in ePistolarium") //
-//      .setElementViewDefinition(":default", SHOW) //
       // language annotations
       .setElementViewDefinition("head_lang", respPriority) //
       .setElementViewDefinition("lg_lang", respPriority) //
@@ -1164,10 +1191,6 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
       .setElementViewDefinition("persName_key", respPriority) //
       .setElementViewDefinition("placeName_key", respPriority) //
       .setElementViewDefinition("rs_key", respPriority) //
-      // corrections
-      // .setElementViewDefinition("corr", HIDE_TAG) // contains corrected text
-      // .setElementViewDefinition("sic", HIDE_TAG) // contains 'obviously' incorrect text
-      // fix order of annotations with exactly thge same text range
       .setAnnotationLayers(annotationLayers) //
       .setAnnotationLayerDepthOrder(annotationLayerDepthOrder);
   }
