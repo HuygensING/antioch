@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -1112,6 +1113,63 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
         + "</text>\n"//
         + "</TEI>");
     assertThat(viewXML).isEqualTo(expectation3);
+  }
+
+  @Test
+  public void testNLA347(){
+    String xml = singleQuotesToDouble("<TEI>\n"//
+      + "<text xml:id='text-1' lang='la'>\n"//
+      + "<body>\n"//
+      + "<div xml:id='div-1' type='letter'>\n"//
+      + "<p xml:id=\"p-2\">... bien plus qu'un <hi rend=\"i\">Aristote</hi>...</p>"//
+      + "</div>\n"//
+      + "</body>\n"//
+      + "</text>\n"//
+      + "</TEI>");
+    UUID resourceUUID = UUID.randomUUID();
+    client.setResource(resourceUUID, resourceUUID.toString());
+    setResourceText(resourceUUID, xml);
+
+    String original = client.getTextAsString(resourceUUID);
+    assertThat(original).contains("<persName key=\"aristoteles.384bc-322bc\" resp=\"#ckcc\" resp_key=\"#ckcc\"><hi rend=\"i\">Aristote</hi></persName>");
+
+    client.setResourceTextView(resourceUUID, "view1", defaultDefinition());
+    String view1 = client.getTextAsString(resourceUUID, "view1");
+    assertThat(view1).contains("<persName key=\"aristoteles.384bc-322bc\" resp=\"#ckcc\" resp_key=\"#ckcc\"><hi rend=\"i\">Aristote</hi></persName>");
+  }
+
+  private TextViewDefinition defaultDefinition() {
+    Map<String, List<String>> annotationLayers = ImmutableMap.of(//
+      "correctionLayer", ImmutableList.of("corr", "sic"), //
+      "formattingLayer", ImmutableList.of("hi") //
+    );
+    List<String> annotationLayerDepthOrder = ImmutableList.of("correctionLayer", "formattingLayer");
+
+    ElementViewDefinition respPriority = new ElementViewDefinition() //
+      .setElementMode(ElementMode.show) //
+      .setAttributeMode(ElementView.AttributeMode.showAll.name()) // needed?
+      .setWhen("attribute(resp).firstOf({list})");
+
+    return new TextViewDefinition() //
+      .setDescription("View used in ePistolarium") //
+//      .setElementViewDefinition(":default", SHOW) //
+      // language annotations
+      .setElementViewDefinition("head_lang", respPriority) //
+      .setElementViewDefinition("lg_lang", respPriority) //
+      .setElementViewDefinition("p_lang", respPriority) //
+      .setElementViewDefinition("p_type", respPriority) //
+      // named entity annotations
+      .setElementViewDefinition("geogame_key", respPriority) //
+      .setElementViewDefinition("orgName_key", respPriority) //
+      .setElementViewDefinition("persName_key", respPriority) //
+      .setElementViewDefinition("placeName_key", respPriority) //
+      .setElementViewDefinition("rs_key", respPriority) //
+      // corrections
+      // .setElementViewDefinition("corr", HIDE_TAG) // contains corrected text
+      // .setElementViewDefinition("sic", HIDE_TAG) // contains 'obviously' incorrect text
+      // fix order of annotations with exactly thge same text range
+      .setAnnotationLayers(annotationLayers) //
+      .setAnnotationLayerDepthOrder(annotationLayerDepthOrder);
   }
 
   /// end tests
