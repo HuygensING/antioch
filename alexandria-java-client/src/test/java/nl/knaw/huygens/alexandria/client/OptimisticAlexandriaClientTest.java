@@ -1145,25 +1145,12 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     TextRangeAnnotationInfo persNameInfo = client.setResourceTextRangeAnnotation(resourceUUID, persNameAnnotation);
     assertThat(persNameInfo.getAnnotates()).isEqualTo("Aristote");
 
-//    UUID annotationUUID2 = UUID.randomUUID();
-//    Position position2 = new Position()//
-//      .setTargetAnnotationId(annotationUUID1);
-//    TextRangeAnnotation persNameKeyAnnotation = new TextRangeAnnotation()//
-//      .setId(annotationUUID2)//
-//      .setName("persName_key")//
-//      .setAnnotator("ckcc")//
-//      .setAttributes(ImmutableMap.of("value","aristoteles.384bc-322bc"))//
-//      .setPosition(position2);
-//    TextRangeAnnotationInfo persNameKeyInfo = client.setResourceTextRangeAnnotation(resourceUUID, persNameKeyAnnotation);
-//    assertThat(persNameKeyInfo.getAnnotates()).isEqualTo("");
-
-
     String original = client.getTextAsString(resourceUUID);
-    assertThat(original).contains("<persName key=\"aristoteles.384bc-322bc\" resp=\"#ckcc\"><hi rend=\"i\">Aristote</hi></persName>");
+    assertThat(original).contains("<hi rend=\"i\"><persName resp=\"#ckcc\">Aristote</persName></hi>");
 
     client.setResourceTextView(resourceUUID, "view1", defaultDefinition());
     String view1 = client.getTextAsString(resourceUUID, "view1");
-    assertThat(view1).contains("<persName key=\"aristoteles.384bc-322bc\" resp=\"#ckcc\"><hi rend=\"i\">Aristote</hi></persName>");
+    assertThat(view1).contains("<persName resp=\"#ckcc\"><hi rend=\"i\">Aristote</hi></persName>");
   }
 
   private TextViewDefinition defaultDefinition() {
