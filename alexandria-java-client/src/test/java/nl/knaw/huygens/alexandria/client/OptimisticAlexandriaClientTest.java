@@ -18,7 +18,6 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
-import nl.knaw.huygens.alexandria.api.model.text.view.ElementView;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -36,6 +35,7 @@ import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.ElementMode;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementViewDefinition;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
@@ -1116,16 +1116,16 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
   }
 
   @Test
-  public void testNLA347(){
+  public void testNLA343a() {
     String xml = singleQuotesToDouble("<TEI>\n"//
-      + "<text xml:id='text-1' lang='la'>\n"//
-      + "<body>\n"//
-      + "<div xml:id='div-1' type='letter'>\n"//
-      + "<p xml:id=\"p-1\">... bien plus qu'un <hi rend=\"i\">Aristote</hi>...</p>"//
-      + "</div>\n"//
-      + "</body>\n"//
-      + "</text>\n"//
-      + "</TEI>");
+        + "<text xml:id='text-1' lang='la'>\n"//
+        + "<body>\n"//
+        + "<div xml:id='div-1' type='letter'>\n"//
+        + "<p xml:id=\"p-1\">... bien plus qu'un <hi rend=\"i\">Aristote</hi>...</p>"//
+        + "</div>\n"//
+        + "</body>\n"//
+        + "</text>\n"//
+        + "</TEI>");
     UUID resourceUUID = UUID.randomUUID();
     client.setResource(resourceUUID, resourceUUID.toString());
     setResourceText(resourceUUID, xml);
@@ -1134,52 +1134,64 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
 
     UUID annotationUUID1 = UUID.randomUUID();
     Position position = new Position()//
-      .setXmlId("p-1")//
-      .setOffset(21)//
-      .setLength(8);
+        .setXmlId("p-1")//
+        .setOffset(21)//
+        .setLength(8);
     TextRangeAnnotation persNameAnnotation = new TextRangeAnnotation()//
-      .setId(annotationUUID1)//
-      .setName("persName")//
-      .setAnnotator("ckcc")//
-      .setPosition(position);
+        .setId(annotationUUID1)//
+        .setName("persName")//
+        .setAnnotator("ckcc")//
+        .setPosition(position);
     TextRangeAnnotationInfo persNameInfo = client.setResourceTextRangeAnnotation(resourceUUID, persNameAnnotation);
     assertThat(persNameInfo.getAnnotates()).isEqualTo("Aristote");
 
+    UUID annotationUUID2 = UUID.randomUUID();
+    Position position2 = new Position()//
+        .setTargetAnnotationId(annotationUUID1);
+    TextRangeAnnotation persNameKeyAnnotation = new TextRangeAnnotation()//
+        .setId(annotationUUID2)//
+        .setName("persName_key")//
+        .setAnnotator("ckcc")//
+        .setAttributes(ImmutableMap.of("value", "bayle.jacob.1644-1685"))//
+        .setPosition(position2);
+    TextRangeAnnotationInfo persNameKeyInfo = client.setResourceTextRangeAnnotation(resourceUUID, persNameKeyAnnotation);
+    assertThat(persNameKeyInfo.getAnnotates()).isEqualTo("");
+
     String original = client.getTextAsString(resourceUUID);
-    assertThat(original).contains("<hi rend=\"i\"><persName resp=\"#ckcc\">Aristote</persName></hi>");
+    assertThat(original).contains("<hi rend=\"i\"><persName resp=\"#ckcc\"><persName_key value=\"bayle.jacob.1644-1685\" resp=\"#ckcc\">Aristote</persName_key></persName></hi>");
 
     client.setResourceTextView(resourceUUID, "view1", defaultDefinition());
-    String view1 = client.getTextAsString(resourceUUID, "view1");
-    assertThat(view1).contains("<persName resp=\"#ckcc\"><hi rend=\"i\">Aristote</hi></persName>");
+    String view1 = client.getTextAsString(resourceUUID, "view1", ImmutableMap.of("list", "'#ckcc','#abc'"));
+    assertThat(view1).contains("<persName resp=\"#ckcc\"><persName_key value=\"bayle.jacob.1644-1685\" resp=\"#ckcc\"><hi rend=\"i\">Aristote</hi></persName_key></persName>");
   }
 
   private TextViewDefinition defaultDefinition() {
     Map<String, List<String>> annotationLayers = ImmutableMap.of(//
-      "correctionLayer", ImmutableList.of("corr", "sic"), //
-      "formattingLayer", ImmutableList.of("hi") //
+        "correctionLayer", ImmutableList.of("corr", "sic"), //
+        "formattingLayer", ImmutableList.of("hi") //
     );
     List<String> annotationLayerDepthOrder = ImmutableList.of("correctionLayer", "formattingLayer");
 
     ElementViewDefinition respPriority = new ElementViewDefinition() //
-      .setElementMode(ElementMode.show) //
-      .setAttributeMode(ElementView.AttributeMode.showAll.name()) // needed?
-      .setWhen("attribute(resp).firstOf({list})");
+        .setElementMode(ElementMode.show) //
+        .setAttributeMode(ElementView.AttributeMode.showAll.name()) // needed?
+        .setWhen("attribute(resp).firstOf({list})");
 
     return new TextViewDefinition() //
-      .setDescription("View used in ePistolarium") //
-      // language annotations
-      .setElementViewDefinition("head_lang", respPriority) //
-      .setElementViewDefinition("lg_lang", respPriority) //
-      .setElementViewDefinition("p_lang", respPriority) //
-      .setElementViewDefinition("p_type", respPriority) //
-      // named entity annotations
-      .setElementViewDefinition("geogame_key", respPriority) //
-      .setElementViewDefinition("orgName_key", respPriority) //
-      .setElementViewDefinition("persName_key", respPriority) //
-      .setElementViewDefinition("placeName_key", respPriority) //
-      .setElementViewDefinition("rs_key", respPriority) //
-      .setAnnotationLayers(annotationLayers) //
-      .setAnnotationLayerDepthOrder(annotationLayerDepthOrder);
+        .setDescription("View used in ePistolarium") //
+        // language annotations
+        .setElementViewDefinition("head_lang", respPriority) //
+        .setElementViewDefinition("lg_lang", respPriority) //
+        .setElementViewDefinition("p_lang", respPriority) //
+        .setElementViewDefinition("p_type", respPriority) //
+        // named entity annotations
+        .setElementViewDefinition("geogame_key", respPriority) //
+        .setElementViewDefinition("orgName_key", respPriority) //
+        .setElementViewDefinition("persName_key", respPriority) //
+        .setElementViewDefinition("placeName_key", respPriority) //
+        .setElementViewDefinition("rs_key", respPriority) //
+        .setAnnotationLayers(annotationLayers) //
+        .setAnnotationLayerDepthOrder(annotationLayerDepthOrder);
   }
 
   /// end tests
