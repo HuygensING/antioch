@@ -1,5 +1,6 @@
 package nl.knaw.huygens.alexandria.service;
 
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
@@ -327,7 +328,7 @@ public class TextGraphService {
         .put(TextRangeAnnotation.RESPONSIBILITY_ATTRIBUTE, "#" + textRangeAnnotation.getAnnotator())//
         .build();
     TextAnnotation newTextAnnotation = new TextAnnotation(textRangeAnnotation.getName(), attributes, 1000); // 1000 is temporary depth, adjust depth once place in textannotationlist has been
-                                                                                                            // determined
+    // determined
     Vertex newTextAnnotationVertex = toVertex(newTextAnnotation);
 
     // link TextAnnotation to TextRangeAnnotation
@@ -737,16 +738,16 @@ public class TextGraphService {
   private static final Comparator<TextAnnotation> BY_INCREASING_DEPTH = Comparator.comparing(TextAnnotation::getDepth);
 
   private List<TextAnnotation> getTextAnnotations(Vertex textSegment, String edgeLabel, List<List<String>> orderedLayerDefinitions) {
-//    LOG.info("orderedLayerDefinitions:'{}'",orderedLayerDefinitions);
-//    LOG.info("textsegment:'{}'",(String) textSegment.value("text"));
+    // LOG.info("orderedLayerDefinitions:'{}'",orderedLayerDefinitions);
+    // LOG.info("textsegment:'{}'",(String) textSegment.value("text"));
     List<Vertex> textAnnotationVertexList = StreamUtil.stream(textSegment.vertices(Direction.IN, edgeLabel))//
         .filter(v -> v.label().equals(VertexLabels.TEXTANNOTATION)).collect(toList());
-//    LOG.info("textAnnotationVertexList.size={}",textAnnotationVertexList.size());
+    // LOG.info("textAnnotationVertexList.size={}",textAnnotationVertexList.size());
     List<List<Vertex>> vertexListPerLayer = new ArrayList<>();
     AtomicInteger relevantVertexCount = new AtomicInteger(0);
     List<Vertex> otherVertexList = Lists.newArrayList(textAnnotationVertexList);
 
-      // process tags defined in orderedLayerDefinitions
+    // process tags defined in orderedLayerDefinitions
     orderedLayerDefinitions.forEach(layerTags -> {
       List<Vertex> vertexList = textAnnotationVertexList.stream()//
           .filter(v -> layerTags.contains(v.value(TextAnnotation.Properties.name)))//
@@ -755,9 +756,9 @@ public class TextGraphService {
       relevantVertexCount.set(relevantVertexCount.get() + vertexList.size());
       otherVertexList.removeAll(vertexList);
     });
-    // put all other tags in a seperate layer
-//    LOG.info("otherVertexList.size={}",otherVertexList.size());
-    vertexListPerLayer.add(otherVertexList);
+    // put all other tags in separate layers, grouped by depth
+    // LOG.info("otherVertexList.size={}",otherVertexList.size());
+    vertexListPerLayer.addAll(groupByDecreasingDepth(otherVertexList));
     relevantVertexCount.set(relevantVertexCount.get() + otherVertexList.size());
 
     boolean useLayerOrder = relevantVertexCount.get() > 1;
@@ -766,12 +767,14 @@ public class TextGraphService {
       createPairs(vertexListPerLayer).stream()//
           .filter(this::hasSameTextRange)//
           .forEach(pair -> {
-            Integer leftDepth = (Integer) pair.getLeft().value(TextAnnotation.Properties.depth);
-            Integer rightDepth = (Integer) pair.getRight().value(TextAnnotation.Properties.depth);
+            Vertex leftVertex = pair.getLeft();
+            Vertex rightVertex = pair.getRight();
+            Integer leftDepth = getDepth(leftVertex, overriddenDepth);
+            Integer rightDepth = getDepth(rightVertex, overriddenDepth);
             boolean swapDepths = leftDepth < rightDepth;
             if (swapDepths) {
-              overriddenDepth.put(pair.getLeft(), rightDepth);
-              overriddenDepth.put(pair.getRight(), leftDepth);
+              overriddenDepth.put(leftVertex, rightDepth);
+              overriddenDepth.put(rightVertex, leftDepth);
             }
           });
     }
@@ -782,9 +785,24 @@ public class TextGraphService {
       }
       return textAnnotation;
     };
-    return textAnnotationVertexList.stream()
+    return textAnnotationVertexList.stream()//
         .map(toTextAnnotationWithOverriddenDepth)//
         .sorted(BY_INCREASING_DEPTH)//
+        .collect(toList());
+  }
+
+  private Integer getDepth(Vertex leftVertex, Map<Vertex, Integer> overriddenDepth) {
+    return overriddenDepth.containsKey(leftVertex)//
+        ? overriddenDepth.get(leftVertex)//
+        : (Integer) leftVertex.value(TextAnnotation.Properties.depth);
+  }
+
+  List<List<Vertex>> groupByDecreasingDepth(List<Vertex> vertexList) {
+    Map<Integer, List<Vertex>> groupedByDepth = vertexList.stream()//
+        .collect(groupingBy(v -> (Integer) v.value(TextAnnotation.Properties.depth)));
+    return groupedByDepth.keySet().stream()//
+        .sorted((d0, d1) -> d1.compareTo(d0))//
+        .map(d -> groupedByDepth.get(d))//
         .collect(toList());
   }
 

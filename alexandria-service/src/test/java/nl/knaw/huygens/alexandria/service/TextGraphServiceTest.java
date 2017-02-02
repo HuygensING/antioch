@@ -254,6 +254,23 @@ public class TextGraphServiceTest extends AlexandriaTest {
   }
 
   @Test
+  public void testGroupByDecreasingDepth() throws Exception {
+    Vertex v1 = mockVertex("1", 0);
+    Vertex v2 = mockVertex("2", 0);
+    Vertex va = mockVertex("a", 1);
+    Vertex vb = mockVertex("b", 1);
+    Vertex vx = mockVertex("X", 2);
+    Vertex vy = mockVertex("Y", 2);
+
+    List<Vertex> vertexList = ImmutableList.of(va, vb, v1, v2, vx, vy);
+    List<List<Vertex>> layers = tgs.groupByDecreasingDepth(vertexList);
+    List<Vertex> layer0 = ImmutableList.of(v1, v2);
+    List<Vertex> layer1 = ImmutableList.of(va, vb);
+    List<Vertex> layer2 = ImmutableList.of(vx, vy);
+    assertThat(layers).containsExactly(layer2, layer1, layer0);
+  }
+
+  @Test
   public void testHasSameTextRangePasses() throws Exception {
     Vertex firstTextSegment = mock(Vertex.class);
     List<Vertex> firstTextSegmentList = ImmutableList.of(firstTextSegment);
@@ -407,6 +424,12 @@ public class TextGraphServiceTest extends AlexandriaTest {
   private Vertex mockVertex(String value) {
     Vertex v1 = mock(Vertex.class);
     when(v1.value("name")).thenReturn(value);
+    return v1;
+  }
+
+  private Vertex mockVertex(String value, int depth) {
+    Vertex v1 = mockVertex(value);
+    when(v1.value("depth")).thenReturn(depth);
     return v1;
   }
 

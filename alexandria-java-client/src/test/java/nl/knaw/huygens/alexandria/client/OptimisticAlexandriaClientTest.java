@@ -1120,8 +1120,11 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     String xml = singleQuotesToDouble("<TEI>\n"//
         + "<text xml:id='text-1' lang='la'>\n"//
         + "<body>\n"//
-        + "<div xml:id='div-1' type='letter'>\n"//
-        + "<p xml:id=\"p-1\">... bien plus qu'un <hi rend=\"i\">Aristote</hi>...</p>"//
+        + "<div xml:id=\"div-1\" type=\"letter\">\n"//
+        + "<p xml:id=\"p-1\">...<hi rend=\"i\">BAYLE</hi>...</p>\n"//
+        + "<p xml:id=\"p-2\">...BAYLE...</p>\n" //
+        + "<p xml:id=\"p-3\">...<hi rend=\"i\">BAYLE</hi>...</p>\n"//
+        + "<p xml:id=\"p-4\">...<hi rend=\"i\">BAYLE</hi>...</p>\n"//
         + "</div>\n"//
         + "</body>\n"//
         + "</text>\n"//
@@ -1131,38 +1134,48 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     setResourceText(resourceUUID, xml);
 
     client.setAnnotator(resourceUUID, "ckcc", new Annotator().setCode("ckcc").setDescription("CKCC project team"));
+    client.setResourceTextView(resourceUUID, "epistolarium", defaultDefinition());
 
-    UUID annotationUUID1 = UUID.randomUUID();
+    annotateBayle(resourceUUID, "p-4");
+    annotateBayle(resourceUUID, "p-3");
+    annotateBayle(resourceUUID, "p-2");
+    // client.getTextAsDot(resourceUUID);
+
+    // String original = client.getTextAsString(resourceUUID);
+    // assertThat(original).contains("<hi rend=\"i\"><persName resp=\"#ckcc\"><persName_key value=\"bayle.jacob.1644-1685\" resp=\"#ckcc\">BAYLE</persName_key></persName></hi>");
+
+    String view1 = client.getTextAsString(resourceUUID, "epistolarium", ImmutableMap.of("list", "'#ckcc','#abc'"));
+    assertThat(view1).contains("<p xml:id=\"p-1\">...<hi rend=\"i\">BAYLE</hi>...</p>");
+    assertThat(view1).contains("<p xml:id=\"p-2\">...<persName resp=\"#ckcc\"><persName_key value=\"bayle.jacob.1644-1685\" resp=\"#ckcc\">BAYLE</persName_key></persName>...</p>");
+    assertThat(view1).contains("<p xml:id=\"p-3\">...<persName resp=\"#ckcc\"><persName_key value=\"bayle.jacob.1644-1685\" resp=\"#ckcc\"><hi rend=\"i\">BAYLE</hi></persName_key></persName>...</p>");
+    assertThat(view1).contains("<p xml:id=\"p-4\">...<persName resp=\"#ckcc\"><persName_key value=\"bayle.jacob.1644-1685\" resp=\"#ckcc\"><hi rend=\"i\">BAYLE</hi></persName_key></persName>...</p>");
+  }
+
+  private void annotateBayle(UUID resourceUUID, String xmlId) {
+    UUID annotationUUID = UUID.randomUUID();
     Position position = new Position()//
-        .setXmlId("p-1")//
-        .setOffset(21)//
-        .setLength(8);
+        .setXmlId(xmlId)//
+        .setOffset(4)//
+        .setLength(5);
     TextRangeAnnotation persNameAnnotation = new TextRangeAnnotation()//
-        .setId(annotationUUID1)//
+        .setId(annotationUUID)//
         .setName("persName")//
         .setAnnotator("ckcc")//
         .setPosition(position);
     TextRangeAnnotationInfo persNameInfo = client.setResourceTextRangeAnnotation(resourceUUID, persNameAnnotation);
-    assertThat(persNameInfo.getAnnotates()).isEqualTo("Aristote");
+    assertThat(persNameInfo.getAnnotates()).isEqualTo("BAYLE");
 
-    UUID annotationUUID2 = UUID.randomUUID();
+    UUID annotationUUIDkey = UUID.randomUUID();
     Position position2 = new Position()//
-        .setTargetAnnotationId(annotationUUID1);
+        .setTargetAnnotationId(annotationUUID);
     TextRangeAnnotation persNameKeyAnnotation = new TextRangeAnnotation()//
-        .setId(annotationUUID2)//
+        .setId(annotationUUIDkey)//
         .setName("persName_key")//
         .setAnnotator("ckcc")//
         .setAttributes(ImmutableMap.of("value", "bayle.jacob.1644-1685"))//
         .setPosition(position2);
     TextRangeAnnotationInfo persNameKeyInfo = client.setResourceTextRangeAnnotation(resourceUUID, persNameKeyAnnotation);
     assertThat(persNameKeyInfo.getAnnotates()).isEqualTo("");
-
-    String original = client.getTextAsString(resourceUUID);
-    assertThat(original).contains("<hi rend=\"i\"><persName resp=\"#ckcc\"><persName_key value=\"bayle.jacob.1644-1685\" resp=\"#ckcc\">Aristote</persName_key></persName></hi>");
-
-    client.setResourceTextView(resourceUUID, "view1", defaultDefinition());
-    String view1 = client.getTextAsString(resourceUUID, "view1", ImmutableMap.of("list", "'#ckcc','#abc'"));
-    assertThat(view1).contains("<persName resp=\"#ckcc\"><persName_key value=\"bayle.jacob.1644-1685\" resp=\"#ckcc\"><hi rend=\"i\">Aristote</hi></persName_key></persName>");
   }
 
   private TextViewDefinition defaultDefinition() {
