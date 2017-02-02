@@ -737,18 +737,29 @@ public class TextGraphService {
   private static final Comparator<TextAnnotation> BY_INCREASING_DEPTH = Comparator.comparing(TextAnnotation::getDepth);
 
   private List<TextAnnotation> getTextAnnotations(Vertex textSegment, String edgeLabel, List<List<String>> orderedLayerDefinitions) {
+    LOG.info("orderedLayerDefinitions:'{}'",orderedLayerDefinitions);
+    LOG.info("textsegment:'{}'",(String) textSegment.value("text"));
     List<Vertex> textAnnotationVertexList = StreamUtil.stream(textSegment.vertices(Direction.IN, edgeLabel))//
         .filter(v -> v.label().equals(VertexLabels.TEXTANNOTATION)).collect(toList());
-
+    LOG.info("textAnnotationVertexList.size={}",textAnnotationVertexList.size());
     List<List<Vertex>> vertexListPerLayer = new ArrayList<>();
     AtomicInteger relevantVertexCount = new AtomicInteger(0);
+    List<Vertex> otherVertexList = Lists.newArrayList(textAnnotationVertexList);
+
+      // process tags defined in orderedLayerDefinitions
     orderedLayerDefinitions.forEach(layerTags -> {
       List<Vertex> vertexList = textAnnotationVertexList.stream()//
           .filter(v -> layerTags.contains(v.value(TextAnnotation.Properties.name)))//
           .collect(toList());
       vertexListPerLayer.add(vertexList);
       relevantVertexCount.set(relevantVertexCount.get() + vertexList.size());
+      otherVertexList.removeAll(vertexList);
     });
+    // put all other tags in a seperate layer
+    LOG.info("otherVertexList.size={}",otherVertexList.size());
+    vertexListPerLayer.add(otherVertexList);
+    relevantVertexCount.set(relevantVertexCount.get() + otherVertexList.size());
+
     boolean useLayerOrder = relevantVertexCount.get() > 1;
     Map<Vertex, Integer> overriddenDepth = new HashMap<>();
     if (useLayerOrder) {
