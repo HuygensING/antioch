@@ -163,16 +163,19 @@ ins {
 }
 </style><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 
-<title>Querying External Resources</title>
+<title>Alexandria: Querying (External) Resources</title>
 
-<link type="text/css" rel="stylesheet" href="../../../../../codemirror/codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/enable-codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/merge.css" /><script type="text/javascript" src="../../../../../codemirror/codemirror.js"></script><script type="text/javascript" src="../../../../../codemirror/javascript.js"></script><script type="text/javascript" src="../../../../../codemirror/diff_match_patch.js"></script><script type="text/javascript" src="../../../../../codemirror/merge.js"></script><script type="text/javascript" src="../../../../../codemirror/enable-codemirror.js"></script><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/bootstrap.css" /><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/enable-bootstrap.css" /><script type="text/javascript" src="../../../../../jquery/jquery.min.js"></script><script type="text/javascript" src="../../../../../bootstrap/bootstrap.min.js"></script></head><body><span class="breadcrumbs"><a href="../Alexandria.html">Alexandria</a> &gt; <a href="Resource.html">Resources</a> &gt;</span>
-
-
+<link type="text/css" rel="stylesheet" href="../../../../../codemirror/codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/enable-codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/merge.css" /><script type="text/javascript" src="../../../../../codemirror/codemirror.js"></script><script type="text/javascript" src="../../../../../codemirror/javascript.js"></script><script type="text/javascript" src="../../../../../codemirror/diff_match_patch.js"></script><script type="text/javascript" src="../../../../../codemirror/merge.js"></script><script type="text/javascript" src="../../../../../codemirror/enable-codemirror.js"></script><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/bootstrap.css" /><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/enable-bootstrap.css" /><script type="text/javascript" src="../../../../../jquery/jquery.min.js"></script><script type="text/javascript" src="../../../../../bootstrap/bootstrap.min.js"></script></head><body><span class="breadcrumbs"><a href="../Alexandria.html">Alexandria</a> &gt; <a href="Resource.html">Alexandria: Resources</a> &gt;</span>
 
 
 
 
-<div class="container"><div class="jumbotron"><h1>Querying external resources</h1></div><div class="row"><div class="col-md-3"><ul class="nav nav-pills nav-stacked"><li class="active"><a href="#get-non-existent" data-toggle="tab">What happens when I GET a non-existent resource?</a></li><li><a href="#get-all-resource-data" data-toggle="tab">How can I get all data for a given resource?</a></li><li><a href="#get-resource-annotations" data-toggle="tab">How can I GET the annotations of an existing resource?</a></li></ul></div><div class="col-md-9"><div class="tab-content"><div id="get-non-existent" c:execute="clearStorage()" class="tab-pane fade active in"><div class="panel panel-default"><div class="panel-heading"><strong>What happens when I GET a non-existent resource?</strong></div><div class="panel-body">
+
+
+
+
+
+<div class="container"><div class="jumbotron"><h1>Querying (external) resources</h1></div><div class="row"><div class="col-md-3"><ul class="nav nav-pills nav-stacked"><li class="active"><a href="#get-non-existent" data-toggle="tab">1) What happens when I GET a non-existent resource?</a></li><li><a href="#get-all-resource-data" data-toggle="tab">2) How can I get all data for a given resource?</a></li><li><a href="#get-resource-annotations" data-toggle="tab">3) How can I GET the annotations of an existing resource?</a></li><li><a href="#get-resource-by-ref" data-toggle="tab">4) How can I find a resource with a given ref?</a></li></ul></div><div class="col-md-9"><div class="tab-content"><div id="get-non-existent" c:execute="clearStorage()" class="tab-pane fade active in"><div class="panel panel-default"><div class="panel-heading"><strong>1) What happens when I GET a non-existent resource?</strong></div><div class="panel-body">
     Given that no resource exists with ID <code>3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</code>
     <div h:request="">
         When I
@@ -186,13 +189,13 @@ ins {
   }
 }</pre>
     </div>
-</div></div></div><div id="get-all-resource-data" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>How can I get all data for a given resource?</strong></div><div class="panel-body">
+</div></div></div><div id="get-all-resource-data" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>2) How can I get all data for a given resource?</strong></div><div class="panel-body">
     <div h:request="">
         Given I have
         <span h:success="" class="success">successfully</span>
         <code class="put">/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</code>
         the following body:
-        <pre h:jsonBody="" class="json">{
+        <pre class="json">{
   "resource" : {
     "id" : "6e56c868-c0a9-11e4-a762-cb9a664afc01",
     "ref" : "http://www.example.com/titles/path/to/title/resource"
@@ -230,7 +233,7 @@ ins {
   }
 }</pre>
     </div>
-</div></div></div><div id="get-resource-annotations" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>How can I GET the annotations of an existing resource?</strong></div><div class="panel-body">
+</div></div></div><div id="get-resource-annotations" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>3) How can I GET the annotations of an existing resource?</strong></div><div class="panel-body">
 
     <div class="alert alert-warning well-sm" role="alert">
         <strong>Warning:</strong>
@@ -243,7 +246,7 @@ ins {
         <span h:success="" class="success">successfully</span>
         <code class="put">/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</code>
         the following body:
-        <pre h:jsonBody="" class="json">{
+        <pre class="json">{
   "resource" : {
     "id" : "6e56c868-c0a9-11e4-a762-cb9a664afc01",
     "ref" : "http://www.example.com/titles/path/to/title/resource"
@@ -261,5 +264,71 @@ ins {
   "annotations" : [ ]
 }</pre>
     </div>
-</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 262 ms on 06-Sep-2016 at 14:59:11 CEST</div></div></body>
+</div></div></div><div id="get-resource-by-ref" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>4) How can I find a resource with a given ref?</strong></div><div class="panel-body">
+    
+  Given the following resource tree:
+  <ul>
+    <li c:execute="resourceExists(#uuid0,#ref0)">
+      a (confirmed parent) resource exists with uuid: <code c:set="#uuid0">00000000-0000-0000-0000-000000000004</code>
+      and ref: <code c:set="#ref0">Corpus</code>  
+    </li>
+    <li c:execute="#uuid1 = hasSubresource(#uuid0,#sub1)">
+      this resource has a confirmed subresource 1
+      with sub: <code c:set="#sub1">Sub 1</code>
+      and uuid: <code c:echo="#uuid1">c2cca57c-5e88-41a7-b805-d61aa3025ebc</code>
+    </li>
+    <li c:execute="#uuid2 = hasSubresource(#uuid0,#sub2)">
+      and confirmed subresource 2, 
+      with sub: <code c:set="#sub2">Sub 2</code>
+      and uuid: <code c:echo="#uuid2">387074d8-535d-41a1-bb6a-e6ab4959096c</code>
+    </li>
+    <li c:execute="#uuid21 = hasSubresource(#uuid2,#sub21)">
+      which has its own confirmed subresource 2.1,
+      with sub: <code c:set="#sub21">Sub 2.1</code>
+      and uuid: <code c:echo="#uuid21">90e28e41-c9fb-411e-afec-2bd4d19fefaa</code>
+    </li>
+    <li c:execute="resourceExists(#uuid1,#ref1)">
+      and finally a different (confirmed parent) resource exists with uuid: <code c:set="#uuid1">00000000-0000-0000-0000-000000000005</code>
+      and ref: <code c:set="#ref1">Corpus2</code>  
+    </li>
+    <li c:execute="#uuid3 = hasSubresource(#uuid1,#sub21)">
+      with confirmed subresource 3
+      with sub: <code c:set="#sub3">Sub 2.1</code>
+      and uuid: <code c:echo="#uuid3">4c4edf9f-69c2-4fc2-ba1a-8632ed43a782</code>
+    </li>
+  </ul>
+  
+  Now, to find the UUID of the resource in this tree that has ref <code c:echo="#sub21">Sub 2.1</code>,
+  <div h:request="">I
+    <code class="post">/searches</code>
+    the following body
+    <pre class="json">{
+  "query" : {
+    "find" : "resource",
+    "where" : "subresource.sub:eq(\"Sub 2.1\") resource.id:eq(\"00000000-0000-0000-0000-000000000004\")",
+    "return" : "subresource.id"
+  }
+}</pre>
+  </div>
+  
+  <div c:execute="#searchId = uuid()">The uuid for this particular search was:
+      <strong c:echo="#searchId">2b21ec4d-c893-4fc9-b138-43a28fb8e7e1</strong>.
+  </div>
+
+  <div h:request="">We
+    <code class="get">/searches/2b21ec4d-c893-4fc9-b138-43a28fb8e7e1</code>
+    and observe
+    <code h:status="" class="success">200 OK</code>
+    and the relevant subresource <code>id</code>s and <code>sub</code>s in the body
+    <pre class="json rest-success">{
+  "searchResultPage" : {
+    "records" : [ {
+      "subresource.id" : "90e28e41-c9fb-411e-afec-2bd4d19fefaa"
+    } ]
+  }
+}</pre>
+    <small>notice that subresource 3 is not included in the results</small>
+  </div>
+
+</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 557 ms on 08-Feb-2017 at 17:59:20 CET</div></div></body>
 </html>

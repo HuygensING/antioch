@@ -12,7 +12,7 @@
 <a class="jxr_linenumber" name="L4" href="#L4">4</a>   <em class="jxr_comment"> * #%L</em>
 <a class="jxr_linenumber" name="L5" href="#L5">5</a>   <em class="jxr_comment"> * alexandria-main</em>
 <a class="jxr_linenumber" name="L6" href="#L6">6</a>   <em class="jxr_comment"> * =======</em>
-<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <em class="jxr_comment"> * Copyright (C) 2015 - 2016 Huygens ING (KNAW)</em>
+<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <em class="jxr_comment"> * Copyright (C) 2015 - 2017 Huygens ING (KNAW)</em>
 <a class="jxr_linenumber" name="L8" href="#L8">8</a>   <em class="jxr_comment"> * =======</em>
 <a class="jxr_linenumber" name="L9" href="#L9">9</a>   <em class="jxr_comment"> * This program is free software: you can redistribute it and/or modify</em>
 <a class="jxr_linenumber" name="L10" href="#L10">10</a>  <em class="jxr_comment"> * it under the terms of the GNU General Public License as</em>
@@ -38,8 +38,8 @@
 <a class="jxr_linenumber" name="L30" href="#L30">30</a>  
 <a class="jxr_linenumber" name="L31" href="#L31">31</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
 <a class="jxr_linenumber" name="L32" href="#L32">32</a>  
-<a class="jxr_linenumber" name="L33" href="#L33">33</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.config.MockConfiguration;
-<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationsEndpoint;
+<a class="jxr_linenumber" name="L33" href="#L33">33</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.api.EndpointPaths;
+<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.config.MockConfiguration;
 <a class="jxr_linenumber" name="L35" href="#L35">35</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 <a class="jxr_linenumber" name="L36" href="#L36">36</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 <a class="jxr_linenumber" name="L37" href="#L37">37</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.model.AlexandriaResource;
@@ -67,7 +67,7 @@
 <a class="jxr_linenumber" name="L59" href="#L59">59</a>  
 <a class="jxr_linenumber" name="L60" href="#L60">60</a>      URI locationOf = lb.locationOf(AlexandriaAnnotation.<strong class="jxr_keyword">class</strong>, deprecatedId);
 <a class="jxr_linenumber" name="L61" href="#L61">61</a>  
-<a class="jxr_linenumber" name="L62" href="#L62">62</a>      assertThat(locationOf.toString()).isEqualTo(<span class="jxr_string">"http://alexandria.eg/annotations/"</span> + randomUUID + <span class="jxr_string">"/"</span> + AnnotationsEndpoint.REVPATH + <span class="jxr_string">"/0"</span>);
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>      assertThat(locationOf.toString()).isEqualTo(<span class="jxr_string">"http://alexandria.eg/annotations/"</span> + randomUUID + <span class="jxr_string">"/"</span> + EndpointPaths.REV + <span class="jxr_string">"/0"</span>);
 <a class="jxr_linenumber" name="L63" href="#L63">63</a>    }
 <a class="jxr_linenumber" name="L64" href="#L64">64</a>  
 <a class="jxr_linenumber" name="L65" href="#L65">65</a>    @Test
@@ -83,6 +83,6 @@
 <a class="jxr_linenumber" name="L75" href="#L75">75</a>  }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2015&#x2013;2016 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2015&#x2013;2017 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
 </body>
 </html>

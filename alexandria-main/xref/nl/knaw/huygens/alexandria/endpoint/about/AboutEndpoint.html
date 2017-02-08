@@ -12,7 +12,7 @@
 <a class="jxr_linenumber" name="L4" href="#L4">4</a>   <em class="jxr_comment"> * #%L</em>
 <a class="jxr_linenumber" name="L5" href="#L5">5</a>   <em class="jxr_comment"> * alexandria-main</em>
 <a class="jxr_linenumber" name="L6" href="#L6">6</a>   <em class="jxr_comment"> * =======</em>
-<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <em class="jxr_comment"> * Copyright (C) 2015 - 2016 Huygens ING (KNAW)</em>
+<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <em class="jxr_comment"> * Copyright (C) 2015 - 2017 Huygens ING (KNAW)</em>
 <a class="jxr_linenumber" name="L8" href="#L8">8</a>   <em class="jxr_comment"> * =======</em>
 <a class="jxr_linenumber" name="L9" href="#L9">9</a>   <em class="jxr_comment"> * This program is free software: you can redistribute it and/or modify</em>
 <a class="jxr_linenumber" name="L10" href="#L10">10</a>  <em class="jxr_comment"> * it under the terms of the GNU General Public License as</em>
@@ -82,19 +82,19 @@
 <a class="jxr_linenumber" name="L74" href="#L74">74</a>          .setStartedAt(STARTED_AT)<em class="jxr_comment">//</em>
 <a class="jxr_linenumber" name="L75" href="#L75">75</a>          .setTentativesTTL(tentativesTTL.toString())<em class="jxr_comment">//</em>
 <a class="jxr_linenumber" name="L76" href="#L76">76</a>          .setVersion(properties.getProperty(<span class="jxr_string">"version"</span>).get());
-<a class="jxr_linenumber" name="L77" href="#L77">77</a>      <strong class="jxr_keyword">return</strong> Response.ok(about).build();
+<a class="jxr_linenumber" name="L77" href="#L77">77</a>      <strong class="jxr_keyword">return</strong> ok(about);
 <a class="jxr_linenumber" name="L78" href="#L78">78</a>    }
 <a class="jxr_linenumber" name="L79" href="#L79">79</a>  
 <a class="jxr_linenumber" name="L80" href="#L80">80</a>    @GET
 <a class="jxr_linenumber" name="L81" href="#L81">81</a>    @Path(<span class="jxr_string">"service"</span>)
 <a class="jxr_linenumber" name="L82" href="#L82">82</a>    @RolesAllowed({ CERTIFIED, JANITOR })
 <a class="jxr_linenumber" name="L83" href="#L83">83</a>    <strong class="jxr_keyword">public</strong> Response getGraphMetadata() {
-<a class="jxr_linenumber" name="L84" href="#L84">84</a>      <strong class="jxr_keyword">return</strong> Response.ok(service.getMetadata()).build();
+<a class="jxr_linenumber" name="L84" href="#L84">84</a>      <strong class="jxr_keyword">return</strong> ok(service.getMetadata());
 <a class="jxr_linenumber" name="L85" href="#L85">85</a>    }
 <a class="jxr_linenumber" name="L86" href="#L86">86</a>  
 <a class="jxr_linenumber" name="L87" href="#L87">87</a>  }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2015&#x2013;2016 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2015&#x2013;2017 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
 </body>
 </html>

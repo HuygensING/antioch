@@ -12,7 +12,7 @@
 <a class="jxr_linenumber" name="L4" href="#L4">4</a>   <em class="jxr_comment"> * #%L</em>
 <a class="jxr_linenumber" name="L5" href="#L5">5</a>   <em class="jxr_comment"> * alexandria-main</em>
 <a class="jxr_linenumber" name="L6" href="#L6">6</a>   <em class="jxr_comment"> * =======</em>
-<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <em class="jxr_comment"> * Copyright (C) 2015 - 2016 Huygens ING (KNAW)</em>
+<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <em class="jxr_comment"> * Copyright (C) 2015 - 2017 Huygens ING (KNAW)</em>
 <a class="jxr_linenumber" name="L8" href="#L8">8</a>   <em class="jxr_comment"> * =======</em>
 <a class="jxr_linenumber" name="L9" href="#L9">9</a>   <em class="jxr_comment"> * This program is free software: you can redistribute it and/or modify</em>
 <a class="jxr_linenumber" name="L10" href="#L10">10</a>  <em class="jxr_comment"> * it under the terms of the GNU General Public License as</em>
@@ -45,16 +45,21 @@
 <a class="jxr_linenumber" name="L37" href="#L37">37</a>      <strong class="jxr_keyword">return</strong> getAlexandriaPropertiesConfiguration().getAdminKey();
 <a class="jxr_linenumber" name="L38" href="#L38">38</a>    }
 <a class="jxr_linenumber" name="L39" href="#L39">39</a>  
-<a class="jxr_linenumber" name="L40" href="#L40">40</a>    <strong class="jxr_keyword">private</strong> <a href="../../../../../nl/knaw/huygens/alexandria/config/AlexandriaPropertiesConfiguration.html">AlexandriaPropertiesConfiguration</a> getAlexandriaPropertiesConfiguration() {
-<a class="jxr_linenumber" name="L41" href="#L41">41</a>      <strong class="jxr_keyword">if</strong> (alexandriaPropertiesConfiguration == <strong class="jxr_keyword">null</strong>) {
-<a class="jxr_linenumber" name="L42" href="#L42">42</a>        alexandriaPropertiesConfiguration = <strong class="jxr_keyword">new</strong> <a href="../../../../../nl/knaw/huygens/alexandria/config/AlexandriaPropertiesConfiguration.html">AlexandriaPropertiesConfiguration</a>(getStorageDirectory());
-<a class="jxr_linenumber" name="L43" href="#L43">43</a>      }
-<a class="jxr_linenumber" name="L44" href="#L44">44</a>      <strong class="jxr_keyword">return</strong> alexandriaPropertiesConfiguration;
-<a class="jxr_linenumber" name="L45" href="#L45">45</a>    }
-<a class="jxr_linenumber" name="L46" href="#L46">46</a>  
-<a class="jxr_linenumber" name="L47" href="#L47">47</a>  }
+<a class="jxr_linenumber" name="L40" href="#L40">40</a>    @Override
+<a class="jxr_linenumber" name="L41" href="#L41">41</a>    <strong class="jxr_keyword">public</strong> Boolean asynchronousEndpointsAllowed() {
+<a class="jxr_linenumber" name="L42" href="#L42">42</a>      <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">true</strong>;
+<a class="jxr_linenumber" name="L43" href="#L43">43</a>    }
+<a class="jxr_linenumber" name="L44" href="#L44">44</a>  
+<a class="jxr_linenumber" name="L45" href="#L45">45</a>    <strong class="jxr_keyword">private</strong> <a href="../../../../../nl/knaw/huygens/alexandria/config/AlexandriaPropertiesConfiguration.html">AlexandriaPropertiesConfiguration</a> getAlexandriaPropertiesConfiguration() {
+<a class="jxr_linenumber" name="L46" href="#L46">46</a>      <strong class="jxr_keyword">if</strong> (alexandriaPropertiesConfiguration == <strong class="jxr_keyword">null</strong>) {
+<a class="jxr_linenumber" name="L47" href="#L47">47</a>        alexandriaPropertiesConfiguration = <strong class="jxr_keyword">new</strong> <a href="../../../../../nl/knaw/huygens/alexandria/config/AlexandriaPropertiesConfiguration.html">AlexandriaPropertiesConfiguration</a>(getStorageDirectory());
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>      }
+<a class="jxr_linenumber" name="L49" href="#L49">49</a>      <strong class="jxr_keyword">return</strong> alexandriaPropertiesConfiguration;
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>    }
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>  
+<a class="jxr_linenumber" name="L52" href="#L52">52</a>  }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2015&#x2013;2016 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2015&#x2013;2017 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
 </body>
 </html>

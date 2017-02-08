@@ -1,0 +1,2119 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns:c="http://www.concordion.org/2007/concordion" xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test" xmlns:xsi="http://www.w3.org/1999/xhtml" xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test                           http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd"><head><style>* {
+  font-family: Arial;
+}
+body {
+  padding: 32px;  
+}
+pre {
+  padding: 6px 28px 6px 28px;
+  background-color: #E8EEF7;
+}
+pre, pre *, code, code *, kbd {
+  font-family: Courier New, Courier;
+  font-size: 10pt;
+}
+h1, h1 * {
+  font-size: 24pt;	
+}
+p, td, th, li, .breadcrumbs {
+  font-size: 10pt;
+}
+p, li {
+  line-height: 140%;
+  max-width: 720px;
+}
+table {
+  border-collapse: collapse;
+  empty-cells: show;
+  margin: 8px 0px 8px 0px;
+}
+th, td {
+  border: 1px solid black;
+  padding: 3px;
+}
+td {
+  background-color: white;
+  vertical-align: top;
+}
+th {
+  background-color: #C3D9FF;
+}
+li {
+  margin-top: 6px;
+  margin-bottom: 6px; 
+}
+
+.example {
+  padding: 6px 16px 6px 16px;
+  border: 1px solid #C3D9FF;
+  margin: 6px 0px 28px 0px;
+  background-color: #F5F9FD;
+}
+.example h3 {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  font-size: 12pt;
+}
+
+p.success {
+  padding: 2px;
+}
+.success, .success * {
+  background-color: #afa !important;
+}
+.success pre {
+  background-color: #bbffbb;
+}
+.failure, .failure * {
+  background-color: #ffb0b0;
+  padding: 1px;
+}
+.failure .expected {
+  text-decoration: line-through;
+  color: #bb5050;
+}
+.ignored, .ignored * {
+  background-color: #f0f0f0 !important;	
+}
+
+ins {
+  text-decoration: none;	
+}
+
+.exceptionMessage {
+  background-color: #fdd;
+  font-family: Courier New, Courier, Monospace;
+  font-size: 10pt;
+  display: block;
+  font-weight: normal;
+  padding: 4px;
+  text-decoration: none !important;
+}
+.stackTrace, .stackTrace * {
+  font-weight: normal;
+}
+.stackTrace {
+  display: none;
+  padding: 1px 4px 4px 4px;
+  background-color: #fdd;
+  border-top: 1px dotted black;
+}
+.stackTraceExceptionMessage {
+  display: block;
+  font-family: Courier New, Courier, Monospace;
+  font-size: 8pt;
+  white-space: wrap;
+  padding: 1px 0px 1px 0px;
+}
+.stackTraceEntry {
+  white-space: nowrap;
+  font-family: Courier New, Courier, Monospace;
+  display: block;
+  font-size: 8pt;
+  padding: 1px 0px 1px 32px;
+}
+.stackTraceButton {
+  font-size: 8pt;
+  margin: 2px 8px 2px 0px;
+  font-weight: normal;
+  font-family: Arial;
+}
+
+.special {
+  font-style: italic;
+}
+.missing, .missing * {
+  background-color: #ff9999;
+  color:#bb5050;
+  text-decoration: line-through;
+}
+.surplus, .surplus * {
+  background-color: #ff9999;
+}
+.footer {
+  text-align: right;
+  margin-top: 40px;
+  font-size: 8pt;
+  width: 100%;
+  color: #999;
+}
+.footer .testTime {
+  padding: 2px 10px 0px 0px;
+}
+
+.idea {
+  font-size: 9pt;
+  color: #888;
+  font-style: italic;	
+}
+.tight li {
+  margin-top: 1px;
+  margin-bottom: 1px; 
+}
+.commentary {
+  float: right;
+  width: 200px;
+  background-color: #ffffd0;
+  padding:8px;
+  border: 3px solid #eeeeb0;	 
+  margin: 10px 0px 10px 10px;	 
+}
+.commentary, .commentary * {
+  font-size: 8pt;
+}
+</style><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+<title>Alexandria: Views on text</title>
+
+<link type="text/css" rel="stylesheet" href="../../../../../codemirror/codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/enable-codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/merge.css" /><script type="text/javascript" src="../../../../../codemirror/codemirror.js"></script><script type="text/javascript" src="../../../../../codemirror/javascript.js"></script><script type="text/javascript" src="../../../../../codemirror/diff_match_patch.js"></script><script type="text/javascript" src="../../../../../codemirror/merge.js"></script><script type="text/javascript" src="../../../../../codemirror/enable-codemirror.js"></script><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/bootstrap.css" /><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/enable-bootstrap.css" /><script type="text/javascript" src="../../../../../jquery/jquery.min.js"></script><script type="text/javascript" src="../../../../../bootstrap/bootstrap.min.js"></script></head><body><span class="breadcrumbs"><a href="../Alexandria.html">Alexandria</a> &gt;</span>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="container"><div class="jumbotron"><h1>Views on text</h1></div><div class="row"><div class="col-md-3"><ul class="nav nav-pills nav-stacked"><li class="active"><a href="#textview-anatomy" data-toggle="tab">1) Anatomy of a view description</a></li><li><a href="#set-including-view" data-toggle="tab">2) How do I define a view where I indicate which element tags to show?</a></li><li><a href="#view-for-subresource" data-toggle="tab">3) How is the view defined for a subresource?</a></li><li><a href="#set-excluding-view" data-toggle="tab">4) How do I define a view where I only indicate which element tags NOT to show?</a></li><li><a href="#set-conditional-view" data-toggle="tab">5) How do I define a view which for a given element name only shows the elements with a given attribute/value combination?</a></li><li><a href="#set-priority-view" data-toggle="tab">6) How do I define a view which for a given element name only shows the elements where a given attribute has one of several possible values, sorted on priority?</a></li><li><a href="#set-priority-view1" data-toggle="tab">7) How can I select a single element annotation with a preferred annotator?</a></li><li><a href="#set-priority-view2" data-toggle="tab">8) Does it matter in which order element annotations are specified?</a></li><li><a href="#set-priority-view3" data-toggle="tab">9) Can I interleave different kinds of element annotations?</a></li><li><a href="#variable-use" data-toggle="tab">10) How do I use variables in a view definition?</a></li><li><a href="#set-annotation-layer-priority" data-toggle="tab">11) How do I control the nesting of annotations over the same text range?</a></li></ul></div><div class="col-md-9"><div class="tab-content"><div id="textview-anatomy" c:execute="clearStorage()" class="tab-pane fade active in"><div class="panel panel-default"><div class="panel-heading"><strong>1) Anatomy of a view description</strong></div><div class="panel-body">
+    For resource <span c:set="#id">00000000-0000-0000-0000-000000000001</span>:<br />
+    <div h:request="">
+        Given that I have
+        <span h:success="" class="success">successfully</span>
+        <code class="put">/resources/00000000-0000-0000-0000-000000000001</code>
+        the body:
+        <pre class="json">{
+  "resource" : {
+    "id" : "00000000-0000-0000-0000-000000000001",
+    "ref" : "grotius-3160-v1"
+  }
+}</pre>
+    </div>
+    <br />
+    <div h:request="">
+        Then I can set a view called inclusive by
+        <code class="put">/resources/00000000-0000-0000-0000-000000000001/text/views/inclusive</code>
+        the body:
+        <pre class="json">{
+  "textView" : {
+    "description" : "Description of the view",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "hideTag",
+        "attributeMode" : "hideAll"
+      },
+      "div" : {
+        "elementMode" : "show",
+        "attributeMode" : "showOnly id"
+      },
+      "p" : {
+        "elementMode" : "show"
+      },
+      "note" : {
+        "elementMode" : "hide"
+      }
+    }
+  }
+}</pre>
+    </div>
+    <div h:request="">
+        And I can set a view called exclusive by
+        <code class="put">/resources/00000000-0000-0000-0000-000000000001/text/views/exclusive</code>
+        the body:
+        <pre class="json">{
+  "textView" : {
+    "description" : "Description of the view",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "p" : {
+        "elementMode" : "hideTag"
+      },
+      "hi" : {
+        "elementMode" : "hideTag"
+      },
+      "note" : {
+        "elementMode" : "hide"
+      }
+    }
+  }
+}</pre>
+    </div>
+    
+    The textView definition has the following properties:
+    <dl class="dl-horizontal">
+      <dt><code>description</code></dt>
+      <dd>optional. A text describing what the view is for.</dd>
+
+      <dt><code>elements</code></dt>
+      <dd>A map of xml element names and what to do with them in this view. With element name <code>:default</code> you can set view settings for elements not defined here. The properties are:
+         <dl>
+           <dt><code>elementMode</code></dt>
+           <dd />
+
+           <dt><code>attributeMode</code></dt>
+           <dd />
+           
+           <dt><code>when</code></dt>
+           <dd />
+         </dl>
+      </dd>
+        
+    </dl>
+</div></div></div><div id="set-including-view" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>2) How do I define a view where I indicate which element tags to show?</strong></div><div class="panel-body">
+
+  Given a resource
+  with id <code c:set="#resourceId">00000000-0000-0000-0000-000000000002</code>
+  <span c:execute="resourceExists(#resourceId)">exists</span>,<br />
+  which has
+  <span c:execute="resourceHasText(#resourceId,#text1)">text<br />
+    <code c:set="#text1">&lt;text&gt;&lt;div id="div-1" ed="#someone"&gt;&lt;p id="p-1"&gt;Paragraph the First.&lt;/p&gt;&lt;p id="p-2"&gt;Paragraph the Second.&lt;note&gt;Note the first.&lt;/note&gt;&lt;/p&gt;&lt;/div&gt;&lt;/text&gt;</code>
+  </span>,<br />
+  <br />
+
+  <div h:request="">
+     Then a
+     <code class="get">/resources/00000000-0000-0000-0000-000000000002/text/xml</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     <span h:success="" class="success">successfully</span>
+     yields response body:<br />
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;div id="div-1" ed="#someone"&gt;
+    &lt;p id="p-1"&gt;Paragraph the First.&lt;/p&gt;
+    &lt;p id="p-2"&gt;Paragraph the Second.&lt;note&gt;Note the first.&lt;/note&gt;
+    &lt;/p&gt;
+  &lt;/div&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+  <br />
+     
+    <div h:request="">
+        When I
+        <code class="put">/resources/00000000-0000-0000-0000-000000000002/text/views/baselayer</code>
+        the body:
+        <pre class="json">{
+  "textView" : {
+    "description" : "The Base Layer",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "hideTag",
+        "attributeMode" : "hideAll"
+      },
+      "div" : {
+        "elementMode" : "show",
+        "attributeMode" : "showOnly id"
+      },
+      "p" : {
+        "elementMode" : "show"
+      },
+      "text" : {
+        "elementMode" : "show"
+      },
+      "note" : {
+        "elementMode" : "hide"
+      }
+    }
+  }
+}</pre>
+        using
+        <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>,<br />
+        then I should receive
+        <ul>
+          <li>status <code h:status="" class="success">201 Created</code></li>
+          <li>location header
+              <code class="location success">https://{host}/resources/00000000-0000-0000-0000-000000000002/text/views/baselayer</code>
+          </li>
+	        <li>and the response body is <code h:responseBody="" class="empty success"> </code></li>
+        </ul>
+    </div>
+    <br />
+
+    <div h:request="">
+        When I
+        <code class="get">/resources/00000000-0000-0000-0000-000000000002/text/views</code>,<br />
+        then I should receive
+        <ul>
+            <li>status
+                <code h:status="" class="success">200 OK</code>
+            </li>
+            <li>and body
+             <small>(only relevant fields shown for brevity)</small>
+                <pre class="json rest-success">[ {
+  "textView" : {
+    "id" : "baselayer",
+    "^definition" : "https://{host}/resources/00000000-0000-0000-0000-000000000002/text/views/baselayer",
+    "^xml" : "https://{host}/resources/00000000-0000-0000-0000-000000000002/text/xml?view=baselayer"
+  }
+} ]</pre>
+            </li>
+        </ul>
+    </div>
+    <br />
+
+    <div h:request="">
+        If I then
+        <code class="get">/resources/00000000-0000-0000-0000-000000000002/text/views/baselayer</code>
+        Then I should receive
+        <ul>
+            <li>status
+                <code h:status="" class="success">200 OK</code>
+            </li>
+            <li>and body
+                <pre class="json rest-success">{
+  "textView" : {
+    "description" : "The Base Layer",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "hideTag",
+        "attributeMode" : "hideAll"
+      },
+      "div" : {
+        "elementMode" : "show",
+        "attributeMode" : "showOnly id"
+      },
+      "p" : {
+        "elementMode" : "show"
+      },
+      "text" : {
+        "elementMode" : "show"
+      },
+      "note" : {
+        "elementMode" : "hide"
+      }
+    }
+  }
+}</pre>
+            </li>
+        </ul>
+    </div>
+    <br />
+
+  <div h:request="">
+     Then a
+     <code class="get">/resources/00000000-0000-0000-0000-000000000002/text/xml?view=baselayer</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     <span h:success="" class="success">successfully</span>
+     yields response body:
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;div id="div-1"&gt;
+    &lt;p&gt;Paragraph the First.&lt;/p&gt;
+    &lt;p&gt;Paragraph the Second.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+</div></div></div><div id="view-for-subresource" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>3) How is the view defined for a subresource?</strong></div><div class="panel-body">
+    
+    <ul>
+    <li>
+    <div h:request="">
+        Given the previously made resource <code>$resourceId</code> with its baselayer view, 
+        if I add a subresource by  
+        <code class="post">/resources/00000000-0000-0000-0000-000000000002/subresources</code>
+        the body
+        <pre class="json">{
+  "subresource" : {
+    "sub" : "Letter clusius-0012"
+  }
+}</pre>
+        and observe status
+        <code h:status="" class="success">201 Created</code>
+        and a location header starting with
+        <code class="location success">https://{host}/resources/</code>
+        and ending in a generated
+        <code class="location success">well-formed UUID</code>
+        for the newly created subresource.
+    </div>
+
+    <div c:execute="#uuid = uuid()">In this case the generated uuid happened to be:
+        <strong c:echo="#uuid">57aeef83-589e-44ab-82b6-a00089b08f0c</strong>.
+    </div>
+    </li>
+    <li>
+    <div h:request="">
+        To confirm our subresource, we
+        <code class="put">/resources/57aeef83-589e-44ab-82b6-a00089b08f0c/state</code>
+        the body
+        <pre class="json">{
+  "state" : "CONFIRMED"
+}</pre>
+        and observe status
+        <code h:status="" class="success">204 No Content</code>
+    </div>
+    </li>
+    <li>
+    <div h:request="">
+        When I
+        <code class="get">/resources/57aeef83-589e-44ab-82b6-a00089b08f0c/text/views</code>
+        Then I should receive
+        <ul>
+            <li>status
+                <code h:status="" class="success">200 OK</code>
+            </li>
+            <li>and body
+             <small>(only relevant fields shown for brevity)</small>
+                <pre class="json rest-success">[ {
+  "textView" : {
+    "id" : "baselayer",
+    "^definition" : "https://{host}/resources/00000000-0000-0000-0000-000000000002/text/views/baselayer",
+    "^xml" : "https://{host}/resources/57aeef83-589e-44ab-82b6-a00089b08f0c/text/xml?view=baselayer"
+  }
+} ]</pre>
+                (The subresource uses the baseLayerDefinition of <strong>its parent</strong> resource)
+            </li>
+        </ul>
+    </div>
+    </li>
+    <li>
+      <div h:request="">
+        To override this baselayer view, I
+        <code class="put">/resources/57aeef83-589e-44ab-82b6-a00089b08f0c/text/views/baselayer</code>
+        the body:
+        <pre class="json">{
+  "textView" : {
+    "description" : "The Base Layer for the subresource",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "hideTag",
+        "attributeMode" : "hideAll"
+      },
+      "div" : {
+        "elementMode" : "show",
+        "attributeMode" : "showOnly ref"
+      },
+      "p" : {
+        "elementMode" : "show"
+      },
+      "note" : {
+        "elementMode" : "hide"
+      }
+    }
+  }
+}</pre>
+        using
+        <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>,<br />
+        then I should receive
+        <ul>
+          <li>status <code h:status="" class="success">201 Created</code></li>
+          <li>location header
+              <code class="location success">https://{host}/resources/57aeef83-589e-44ab-82b6-a00089b08f0c/text/views/baselayer</code>
+          </li>
+          <li>and the response body is <code h:responseBody="" class="empty success"> </code></li>
+        </ul>
+      </div>
+    </li>
+    <li>
+    <div h:request="">
+        Now when I
+        <code class="get">/resources/57aeef83-589e-44ab-82b6-a00089b08f0c/text/views</code>,<br />
+        then I should receive
+        <ul>
+            <li>status
+                <code h:status="" class="success">200 OK</code>
+            </li>
+            <li>and body
+             <small>(only relevant fields shown for brevity)</small>
+                <pre class="json rest-success">[ {
+  "textView" : {
+    "id" : "baselayer",
+    "^definition" : "https://{host}/resources/57aeef83-589e-44ab-82b6-a00089b08f0c/text/views/baselayer",
+    "^xml" : "https://{host}/resources/57aeef83-589e-44ab-82b6-a00089b08f0c/text/xml?view=baselayer"
+  }
+} ]</pre>
+                (The subresource uses <strong>its own</strong> baseLayerDefinition)
+            </li>
+        </ul>
+    </div>
+    </li>
+  </ul>
+</div></div></div><div id="set-excluding-view" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>4) How do I define a view where I only indicate which element tags NOT to show?</strong></div><div class="panel-body">
+
+  Given a resource
+  with id <code c:set="#resourceId3">00000000-0000-0000-0000-000000000003</code>
+  <span c:execute="resourceExists(#resourceId3)">exists</span>,<br />
+  which has
+  <span c:execute="resourceHasText(#resourceId3,#text3)">text<br />
+    <code c:set="#text3">&lt;text&gt;&lt;div id="div-1" ed="#someone"&gt;&lt;p id="p-1"&gt;Paragraph the &lt;num n="1"&gt;First&lt;/num&gt;.&lt;/p&gt;&lt;p id="p-2"&gt;Paragraph the &lt;num n="2"&gt;Second&lt;/num&gt;.&lt;note&gt;Note the &lt;num n="1"&gt;first&lt;/num&gt;.&lt;/note&gt;&lt;/p&gt;&lt;/div&gt;&lt;/text&gt;</code>
+  </span><br />
+  <br />
+
+  <div h:request="">
+     Then a
+     <code class="get">/resources/00000000-0000-0000-0000-000000000003/text/xml</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     <span h:success="" class="success">successfully</span>
+     yields response body:<br />
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;div id="div-1" ed="#someone"&gt;
+    &lt;p id="p-1"&gt;Paragraph the &lt;num n="1"&gt;First&lt;/num&gt;.&lt;/p&gt;
+    &lt;p id="p-2"&gt;Paragraph the &lt;num n="2"&gt;Second&lt;/num&gt;.&lt;note&gt;Note the &lt;num n="1"&gt;first&lt;/num&gt;.&lt;/note&gt;
+    &lt;/p&gt;
+  &lt;/div&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+  <br />
+     
+    <div h:request="">
+        When I
+        <code class="put">/resources/00000000-0000-0000-0000-000000000003/text/views/no-num</code>
+        the body:
+        <pre class="json">{
+  "textView" : {
+    "description" : "Don't show num tags",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "num" : {
+        "elementMode" : "hideTag"
+      },
+      "note" : {
+        "elementMode" : "hide"
+      }
+    }
+  }
+}</pre>
+        using
+        <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>,<br />
+        then I should receive
+        <ul>
+          <li>status <code h:status="" class="success">201 Created</code></li>
+          <li>location header
+              <code class="location success">https://{host}/resources/00000000-0000-0000-0000-000000000003/text/views/no-num</code>
+          </li>
+          <li>and the response body is <code h:responseBody="" class="empty success"> </code></li>
+        </ul>
+    </div>
+    <br />
+
+    <div h:request="">
+        When I
+        <code class="get">/resources/00000000-0000-0000-0000-000000000003/text/views</code>,<br />
+        then I should receive
+        <ul>
+            <li>status
+                <code h:status="" class="success">200 OK</code>
+            </li>
+            <li>and body
+             <small>(only relevant fields shown for brevity)</small>
+                <pre class="json rest-success">[ {
+  "textView" : {
+    "id" : "no-num",
+    "^definition" : "https://{host}/resources/00000000-0000-0000-0000-000000000003/text/views/no-num",
+    "^xml" : "https://{host}/resources/00000000-0000-0000-0000-000000000003/text/xml?view=no-num"
+  }
+} ]</pre>
+            </li>
+        </ul>
+    </div>
+    <br />
+
+    <div h:request="">
+        If I then
+        <code class="get">/resources/00000000-0000-0000-0000-000000000003/text/views/no-num</code>
+        Then I should receive
+        <ul>
+            <li>status
+                <code h:status="" class="success">200 OK</code>
+            </li>
+            <li>and body
+              <pre class="json rest-success">{
+  "textView" : {
+    "description" : "Don't show num tags",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "num" : {
+        "elementMode" : "hideTag"
+      },
+      "note" : {
+        "elementMode" : "hide"
+      }
+    }
+  }
+}</pre>
+            </li>
+        </ul>
+    </div>
+    <br />
+
+  <div h:request="">
+     Then a
+     <code class="get">/resources/00000000-0000-0000-0000-000000000003/text/xml?view=no-num</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     <span h:success="" class="success">successfully</span>
+     yields response body:
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;div id="div-1" ed="#someone"&gt;
+    &lt;p id="p-1"&gt;Paragraph the First.&lt;/p&gt;
+    &lt;p id="p-2"&gt;Paragraph the Second.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+</div></div></div><div id="set-conditional-view" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>5) How do I define a view which for a given element name only shows the elements with a given attribute/value combination?</strong></div><div class="panel-body">
+
+  Given a resource
+  with id <code c:set="#resourceId4">00000000-0000-0000-0000-000000000004</code>
+  <span c:execute="resourceExists(#resourceId4)">exists</span>,<br />
+  which has
+  <span c:execute="resourceHasText(#resourceId4,#text4)">text<br />
+    <code c:set="#text4">&lt;text&gt;&lt;div id="div-1" n="01"&gt;&lt;p id="p-1a" transcriber="#a"&gt;It was a dark and stormy night&lt;/p&gt;&lt;p id="p-1b" transcriber="#b"&gt;Twas a darke &amp;amp; stormy nite&lt;/p&gt;&lt;/div&gt;&lt;/text&gt;
+</code>
+  </span><br />
+  <br />
+
+  <div h:request="">
+     Then a
+     <code class="get">/resources/00000000-0000-0000-0000-000000000004/text/xml</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     <span h:success="" class="success">successfully</span>
+     yields response body:<br />
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;div id="div-1" n="01"&gt;
+    &lt;p id="p-1a" transcriber="#a"&gt;It was a dark and stormy night&lt;/p&gt;
+    &lt;p id="p-1b" transcriber="#b"&gt;Twas a darke &amp;amp; stormy nite&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+  <br />
+     
+    <div h:request="">
+        When I define a view <code c:set="#view">conditional</code> by
+        <code class="put">/resources/00000000-0000-0000-0000-000000000004/text/views/conditional</code>
+        the body:
+        <pre class="json">{
+  "textView" : {
+    "description" : "Transcriber A preferred",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "div" : {
+        "attributeMode" : "showOnly ref n"
+      },
+      "p" : {
+        "elementMode" : "hide",
+        "when" : "attribute(transcriber).isNot('#a')"
+      },
+      "note" : {
+        "elementMode" : "hide"
+      }
+    }
+  }
+}</pre>
+        using
+        <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>,<br />
+        then I should receive
+        <ul>
+          <li>status <code h:status="" class="success">201 Created</code></li>
+          <li>location header
+              <code class="location success">https://{host}/resources/00000000-0000-0000-0000-000000000004/text/views/conditional</code>
+          </li>
+          <li>and the response body is <code h:responseBody="" class="empty success"> </code></li>
+        </ul>
+    </div>
+    <br />
+
+    <div h:request="">
+        When I
+        <code class="get">/resources/00000000-0000-0000-0000-000000000004/text/views</code>,<br />
+        then I should receive
+        <ul>
+            <li>status
+                <code h:status="" class="success">200 OK</code>
+            </li>
+            <li>and body
+             <small>(only relevant fields shown for brevity)</small>
+                <pre class="json rest-success">[ {
+  "textView" : {
+    "id" : "conditional",
+    "^definition" : "https://{host}/resources/00000000-0000-0000-0000-000000000004/text/views/conditional",
+    "^xml" : "https://{host}/resources/00000000-0000-0000-0000-000000000004/text/xml?view=conditional"
+  }
+} ]</pre>
+            </li>
+        </ul>
+    </div>
+    <br />
+
+    <div h:request="">
+        If I then
+        <code class="get">/resources/00000000-0000-0000-0000-000000000004/text/views/conditional</code>
+        Then I should receive
+        <ul>
+            <li>status
+                <code h:status="" class="success">200 OK</code>
+            </li>
+            <li>and body
+              <pre class="json rest-success">{
+  "textView" : {
+    "description" : "Transcriber A preferred",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "div" : {
+        "attributeMode" : "showOnly ref n"
+      },
+      "p" : {
+        "elementMode" : "hide",
+        "when" : "attribute(transcriber).isNot('#a')"
+      },
+      "note" : {
+        "elementMode" : "hide"
+      }
+    }
+  }
+}</pre>
+            </li>
+        </ul>
+    </div>
+    <br />
+
+  <div h:request="">
+     Then a
+     <code class="get">/resources/00000000-0000-0000-0000-000000000004/text/xml?view=conditional</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     <span h:success="" class="success">successfully</span>
+     yields response body:
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;div n="01"&gt;
+    &lt;p id="p-1a" transcriber="#a"&gt;It was a dark and stormy night&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+     <code>text</code>, <code>div</code> and the first <code>p</code> are shown because the <code>:default</code> <code>elementMode</code> is <code>show</code>.<br />
+     The second <code>p</code> is ignored because the <code>when</code> condition for <code>p</code> is met.<br />
+  </div>
+</div></div></div><div id="set-priority-view" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>6) How do I define a view which for a given element name only shows the elements where a given attribute has one of several possible values, sorted on priority?</strong></div><div class="panel-body">
+
+  Given a resource
+  with id <code c:set="#resourceId5">00000000-0000-0000-0000-000000000005</code>
+  <span c:execute="resourceExists(#resourceId5)">exists</span>,<br />
+  which has
+  <span c:execute="resourceHasText(#resourceId5,#text4)">text<br />
+    <code c:set="#text4">&lt;text&gt;&lt;p xml:id="p-1"&gt;&lt;lang resp="#b" value="it"&gt;&lt;lang resp="#a" value="la"&gt;Maecenas consectetur odio at dolor porttitor.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;&lt;p xml:id="p-2"&gt;&lt;lang resp="#a" value="la"&gt;&lt;lang resp="#b" value="it"&gt;Aliquam a dapibus massa.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;&lt;p xml:id="p-3"&gt;&lt;lang resp="#b" value="en"&gt;&lt;lang resp="#c" value="fr"&gt;Aenean efficitur purus ut dui molestie fermentum.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;&lt;p xml:id="p-4"&gt;&lt;lang resp="#c" value="fr"&gt;Fusce congue mauris augue.&lt;/lang&gt;&lt;/p&gt;&lt;/text&gt;</code>
+  </span><br />
+  <br />
+
+  <div h:request="">
+     Then a
+     <code class="get">/resources/00000000-0000-0000-0000-000000000005/text/xml</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     <span h:success="" class="success">successfully</span>
+     yields response body:<br />
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;
+    &lt;lang resp="#b" value="it"&gt;
+      &lt;lang resp="#a" value="la"&gt;Maecenas consectetur odio at dolor porttitor.&lt;/lang&gt;
+    &lt;/lang&gt;
+  &lt;/p&gt;
+  &lt;p xml:id="p-2"&gt;
+    &lt;lang resp="#a" value="la"&gt;
+      &lt;lang resp="#b" value="it"&gt;Aliquam a dapibus massa.&lt;/lang&gt;
+    &lt;/lang&gt;
+  &lt;/p&gt;
+  &lt;p xml:id="p-3"&gt;
+    &lt;lang resp="#b" value="en"&gt;
+      &lt;lang resp="#c" value="fr"&gt;Aenean efficitur purus ut dui molestie fermentum.&lt;/lang&gt;
+    &lt;/lang&gt;
+  &lt;/p&gt;
+  &lt;p xml:id="p-4"&gt;
+    &lt;lang resp="#c" value="fr"&gt;Fusce congue mauris augue.&lt;/lang&gt;
+  &lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+  <br />
+     
+    <div h:request="">
+        When I define a view <code c:set="#view">prioritized</code> by
+        <code class="put">/resources/00000000-0000-0000-0000-000000000005/text/views/prioritized</code>
+        the body:
+        <pre class="json">{
+  "textView" : {
+    "description" : "On lang, resp a preferred, b otherwise, not c",
+    "elements" : {
+      "lang" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll",
+        "when" : "attribute(resp).firstOf('#a','#b')"
+      }
+    }
+  }
+}</pre>
+        using
+        <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>,<br />
+        then I should receive
+        <ul>
+          <li>status <code h:status="" class="success">201 Created</code></li>
+          <li>location header
+              <code class="location success">https://{host}/resources/00000000-0000-0000-0000-000000000005/text/views/prioritized</code>
+          </li>
+          <li>and the response body is <code h:responseBody="" class="empty success"> </code></li>
+        </ul>
+    </div>
+    <br />
+
+    <div h:request="">
+        When I
+        <code class="get">/resources/00000000-0000-0000-0000-000000000005/text/views</code>,<br />
+        then I should receive
+        <ul>
+            <li>status
+                <code h:status="" class="success">200 OK</code>
+            </li>
+            <li>and body
+             <small>(only relevant fields shown for brevity)</small>
+                <pre class="json rest-success">[ {
+  "textView" : {
+    "id" : "prioritized",
+    "^definition" : "https://{host}/resources/00000000-0000-0000-0000-000000000005/text/views/prioritized",
+    "^xml" : "https://{host}/resources/00000000-0000-0000-0000-000000000005/text/xml?view=prioritized"
+  }
+} ]</pre>
+            </li>
+        </ul>
+    </div>
+    <br />
+
+  <div h:request="">
+     Then a
+     <code class="get">/resources/00000000-0000-0000-0000-000000000005/text/xml?view=prioritized</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     <span h:success="" class="success">successfully</span>
+     yields response body:
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;
+    &lt;lang resp="#a" value="la"&gt;Maecenas consectetur odio at dolor porttitor.&lt;/lang&gt;
+  &lt;/p&gt;
+  &lt;p xml:id="p-2"&gt;
+    &lt;lang resp="#a" value="la"&gt;Aliquam a dapibus massa.&lt;/lang&gt;
+  &lt;/p&gt;
+  &lt;p xml:id="p-3"&gt;
+    &lt;lang resp="#b" value="en"&gt;Aenean efficitur purus ut dui molestie fermentum.&lt;/lang&gt;
+  &lt;/p&gt;
+  &lt;p xml:id="p-4"&gt;Fusce congue mauris augue.&lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+</div></div></div><div id="set-priority-view1" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>7) How can I select a single element annotation with a preferred annotator?</strong></div><div class="panel-body">
+
+  Given a resource
+  with id <code c:set="#resourceId6">00000000-0000-0000-0000-000000000006</code>
+  <span c:execute="resourceExists(#resourceId6)">exists</span>,<br />
+  with annotators
+  <span c:execute="resourceHasAnnotator(#resourceId6,#annotatorCode,#annotatorCode)"><code c:set="#annotatorCode">ckcc</code></span>,
+  <span c:execute="resourceHasAnnotator(#resourceId6,#annotatorCode,#annotatorCode)"><code c:set="#annotatorCode">tool</code></span> and
+  <span c:execute="resourceHasAnnotator(#resourceId6,#annotatorCode,#annotatorCode)"><code c:set="#annotatorCode">dummy</code></span>,
+  and 
+  <span c:execute="resourceHasText(#resourceId6,#text4)">text<br />
+    <code c:set="#text4">&lt;text&gt;&lt;p xml:id="p-1"&gt;Vir clarissime,&lt;/p&gt;&lt;/text&gt;</code>
+  </span><br />
+  <br />
+
+  <div h:request="">
+      To define view <code c:set="#view1">view_ckcc_tool</code>, I
+      <code class="put">/resources/00000000-0000-0000-0000-000000000006/text/views/view_ckcc_tool</code>
+      the body:
+      <pre class="json">{
+  "textView" : {
+    "description" : "view_ckcc_tool",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "hideTag"
+      },
+      "text" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "p" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "lang" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll",
+        "when" : "attribute(resp).firstOf('#ckcc','#tool')"
+      }
+    }
+  }
+}</pre>
+      using
+      <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>,<br />
+      which returns
+      <ul>
+        <li>status <code h:status="" class="success">201 Created</code></li>
+        <li>location header
+            <code class="location success">https://{host}/resources/00000000-0000-0000-0000-000000000006/text/views/view_ckcc_tool</code>
+        </li>
+        <li>and the response body is <code h:responseBody="" class="empty success"> </code></li>
+      </ul>
+  </div>
+  <br />
+
+  <div h:request="">
+      To define a second view <code c:set="#view2">view_ckcc</code>, I
+      <code class="put">/resources/00000000-0000-0000-0000-000000000006/text/views/view_ckcc</code>
+      the body:
+      <pre class="json">{
+  "textView" : {
+    "description" : "view_ckcc",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "hideTag"
+      },
+      "text" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "p" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "lang" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll",
+        "when" : "attribute(resp).firstOf('#ckcc')"
+      }
+    }
+  }
+}</pre>
+      using
+      <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>,<br />
+      which returns
+      <ul>
+        <li>status <code h:status="" class="success">201 Created</code></li>
+        <li>location header
+            <code class="location success">https://{host}/resources/00000000-0000-0000-0000-000000000006/text/views/view_ckcc</code>
+        </li>
+        <li>and the response body is <code h:responseBody="" class="empty success"> </code></li>
+      </ul>
+  </div>
+  <br />
+
+  <div h:request="">
+      To define a third view <code c:set="#view3">view_tool</code>, I
+      <code class="put">/resources/00000000-0000-0000-0000-000000000006/text/views/view_tool</code>
+      the body:
+      <pre class="json">{
+  "textView" : {
+    "description" : "view_tool",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "hideTag"
+      },
+      "text" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "p" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "lang" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll",
+        "when" : "attribute(resp).firstOf('#tool')"
+      }
+    }
+  }
+}</pre>
+      using
+      <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>,<br />
+      which returns
+      <ul>
+        <li>status <code h:status="" class="success">201 Created</code></li>
+        <li>location header
+            <code class="location success">https://{host}/resources/00000000-0000-0000-0000-000000000006/text/views/view_tool</code>
+        </li>
+        <li>and the response body is <code h:responseBody="" class="empty success"> </code></li>
+      </ul>
+  </div>
+  <br />
+
+  <div h:request="">
+      To define a fourth view <code c:set="#view4">view_dummy</code>, I
+      <code class="put">/resources/00000000-0000-0000-0000-000000000006/text/views/view_dummy</code>
+      the body:
+      <pre class="json">{
+  "textView" : {
+    "description" : "view_dummy",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "hideTag"
+      },
+      "text" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "p" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "lang" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll",
+        "when" : "attribute(resp).firstOf('#dummy')"
+      }
+    }
+  }
+}</pre>
+      using
+      <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>,<br />
+      which returns
+      <ul>
+        <li>status <code h:status="" class="success">201 Created</code></li>
+        <li>location header
+            <code class="location success">https://{host}/resources/00000000-0000-0000-0000-000000000006/text/views/view_dummy</code>
+        </li>
+        <li>and the response body is <code h:responseBody="" class="empty success"> </code></li>
+      </ul>
+  </div>
+  <br />
+
+  <div h:request="">
+   When I want to annotate the element with xml:id "p-1" as annotator ckcc with name <code>lang</code> and value <code>la</code>,
+   then I <span h:success="" class="success">successfully</span> <code class="put">/resources/00000000-0000-0000-0000-000000000006/text/annotations/00000000-0000-0000-0000-000000000004</code>
+   the body:
+   <pre class="json">{
+  "textAnnotation" : {
+    "name" : "lang",
+    "annotator" : "ckcc",
+    "attributes" : {
+      "value" : "la"
+    },
+    "position" : {
+      "xml:id" : "p-1"
+    }
+  }
+}</pre>
+   using
+   <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>
+ </div>
+
+  <div h:request="">
+    When I want to annotate the element with xml:id "p-1" as annotator tool with name <code>lang</code> and value <code>?</code>,
+    then I <span h:success="" class="success">successfully</span> <code class="put">/resources/00000000-0000-0000-0000-000000000006/text/annotations/00000000-0000-0000-0000-000000000005</code>
+    the body:
+    <pre class="json">{
+  "textAnnotation" : {
+    "name" : "lang",
+    "annotator" : "tool",
+    "attributes" : {
+      "value" : "?"
+    },
+    "position" : {
+      "xml:id" : "p-1"
+    }
+  }
+}</pre>
+    using
+    <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>
+  </div>
+  <br />
+
+  <div h:request="">
+     Retrieving the text by
+     <code class="get">/resources/00000000-0000-0000-0000-000000000006/text/xml</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     <span h:success="" class="success">successfully</span>
+     yields response body:<br />
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;
+    &lt;lang value="?" resp="#tool"&gt;
+      &lt;lang value="la" resp="#ckcc"&gt;Vir clarissime,&lt;/lang&gt;
+    &lt;/lang&gt;
+  &lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+  <br />
+
+  <div h:request="">
+     Using view <code>view_ckcc_tool</code> by
+     <code class="get">/resources/00000000-0000-0000-0000-000000000006/text/xml?view=view_ckcc_tool</code>
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code>
+     <span h:success="" class="success">successfully</span>
+     yields response body:
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;
+    &lt;lang value="la" resp="#ckcc"&gt;Vir clarissime,&lt;/lang&gt;
+  &lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+  <br />
+
+  <div h:request="">
+     Using view <code>view_ckcc</code> by
+     <code class="get">/resources/00000000-0000-0000-0000-000000000006/text/xml?view=view_ckcc</code>
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code>
+     <span h:success="" class="success">successfully</span>
+     yields response body:
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;
+    &lt;lang value="la" resp="#ckcc"&gt;Vir clarissime,&lt;/lang&gt;
+  &lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+  <br />
+  
+  <div h:request="">
+     Using view <code>view_tool</code> by
+     <code class="get">/resources/00000000-0000-0000-0000-000000000006/text/xml?view=view_tool</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     <span h:success="" class="success">successfully</span>
+     yields response body:
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;
+    &lt;lang value="?" resp="#tool"&gt;Vir clarissime,&lt;/lang&gt;
+  &lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+  <br />
+
+  <div h:request="">
+     Using view <code>view_dummy</code> by
+     <code class="get">/resources/00000000-0000-0000-0000-000000000006/text/xml?view=view_dummy</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     <span h:success="" class="success">successfully</span>
+     yields response body:
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;Vir clarissime,&lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+
+</div></div></div><div id="set-priority-view2" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>8) Does it matter in which order element annotations are specified?</strong></div><div class="panel-body">
+
+  If we start with the same conditions as the previous case, so:
+  Given a resource
+  with id <code c:set="#resourceId7">00000000-0000-0000-0000-000000000007</code>
+  <span c:execute="resourceExists(#resourceId7)">exists</span>,<br />
+  with annotators
+  <span c:execute="resourceHasAnnotator(#resourceId7,#annotatorCode,#annotatorCode)"><code c:set="#annotatorCode">ckcc</code></span>,
+  <span c:execute="resourceHasAnnotator(#resourceId7,#annotatorCode,#annotatorCode)"><code c:set="#annotatorCode">tool</code></span> and
+  <span c:execute="resourceHasAnnotator(#resourceId7,#annotatorCode,#annotatorCode)"><code c:set="#annotatorCode">dummy</code></span>,
+  and 
+  <span c:execute="resourceHasText(#resourceId7,#text4)">text<br />
+    <code c:set="#text4">&lt;text&gt;&lt;p xml:id="p-1"&gt;Vir clarissime,&lt;/p&gt;&lt;/text&gt;</code>
+  </span><br />
+  <br />
+
+  <div h:request="">
+      To define view <code c:set="#view1">view_ckcc_tool</code>, I
+      <code class="put">/resources/00000000-0000-0000-0000-000000000007/text/views/view_ckcc_tool</code>
+      the body:
+      <pre class="json">{
+  "textView" : {
+    "description" : "view_ckcc_tool",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "hideTag"
+      },
+      "text" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "p" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "lang" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll",
+        "when" : "attribute(resp).firstOf('#ckcc','#tool')"
+      }
+    }
+  }
+}</pre>
+      using
+      <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>,<br />
+      which returns
+      <ul>
+        <li>status <code h:status="" class="success">201 Created</code></li>
+        <li>location header
+            <code class="location success">https://{host}/resources/00000000-0000-0000-0000-000000000007/text/views/view_ckcc_tool</code>
+        </li>
+        <li>and the response body is <code h:responseBody="" class="empty success"> </code></li>
+      </ul>
+  </div>
+  <br />
+
+  <div h:request="">
+      To define a second view <code c:set="#view2">view_ckcc</code>, I
+      <code class="put">/resources/00000000-0000-0000-0000-000000000007/text/views/view_ckcc</code>
+      the body:
+      <pre class="json">{
+  "textView" : {
+    "description" : "view_ckcc",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "hideTag"
+      },
+      "text" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "p" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "lang" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll",
+        "when" : "attribute(resp).firstOf('#ckcc')"
+      }
+    }
+  }
+}</pre>
+      using
+      <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>,<br />
+      which returns
+      <ul>
+        <li>status <code h:status="" class="success">201 Created</code></li>
+        <li>location header
+            <code class="location success">https://{host}/resources/00000000-0000-0000-0000-000000000007/text/views/view_ckcc</code>
+        </li>
+        <li>and the response body is <code h:responseBody="" class="empty success"> </code></li>
+      </ul>
+  </div>
+  <br />
+
+  <div h:request="">
+      To define a third view <code c:set="#view3">view_tool</code>, I
+      <code class="put">/resources/00000000-0000-0000-0000-000000000007/text/views/view_tool</code>
+      the body:
+      <pre class="json">{
+  "textView" : {
+    "description" : "view_tool",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "hideTag"
+      },
+      "text" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "p" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "lang" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll",
+        "when" : "attribute(resp).firstOf('#tool')"
+      }
+    }
+  }
+}</pre>
+      using
+      <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>,<br />
+      which returns
+      <ul>
+        <li>status <code h:status="" class="success">201 Created</code></li>
+        <li>location header
+            <code class="location success">https://{host}/resources/00000000-0000-0000-0000-000000000007/text/views/view_tool</code>
+        </li>
+        <li>and the response body is <code h:responseBody="" class="empty success"> </code></li>
+      </ul>
+  </div>
+  <br />
+
+  <div h:request="">
+      To define a fourth view <code c:set="#view4">view_dummy</code>, I
+      <code class="put">/resources/00000000-0000-0000-0000-000000000007/text/views/view_dummy</code>
+      the body:
+      <pre class="json">{
+  "textView" : {
+    "description" : "view_dummy",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "hideTag"
+      },
+      "text" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "p" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "lang" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll",
+        "when" : "attribute(resp).firstOf('#dummy')"
+      }
+    }
+  }
+}</pre>
+      using
+      <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>,<br />
+      which returns
+      <ul>
+        <li>status <code h:status="" class="success">201 Created</code></li>
+        <li>location header
+            <code class="location success">https://{host}/resources/00000000-0000-0000-0000-000000000007/text/views/view_dummy</code>
+        </li>
+        <li>and the response body is <code h:responseBody="" class="empty success"> </code></li>
+      </ul>
+  </div>
+  <br />
+
+  <div h:request="">
+    If we now add the same annotations as in the previous case, but in a different order, so:
+    I want to annotate the element with xml:id "p-1" as annotator tool with name <code>lang</code> and value <code>?</code>,
+    so I <span h:success="" class="success">successfully</span> <code class="put">/resources/00000000-0000-0000-0000-000000000007/text/annotations/10000000-0000-0000-0000-000000000000</code>
+    the body:
+    <pre class="json">{
+  "textAnnotation" : {
+    "name" : "lang",
+    "annotator" : "tool",
+    "attributes" : {
+      "value" : "?"
+    },
+    "position" : {
+      "xml:id" : "p-1"
+    }
+  }
+}</pre>
+    using
+    <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>
+  </div>
+  <br />
+
+  <div h:request="">
+   When I want to annotate the element with xml:id "p-1" as annotator ckcc with name <code>lang</code> and value <code>la</code>,
+   then I <span h:success="" class="success">successfully</span> <code class="put">/resources/00000000-0000-0000-0000-000000000007/text/annotations/2000000-0000-0000-0000-000000000004</code>
+   the body:
+   <pre class="json">{
+  "textAnnotation" : {
+    "name" : "lang",
+    "annotator" : "ckcc",
+    "attributes" : {
+      "value" : "la"
+    },
+    "position" : {
+      "xml:id" : "p-1"
+    }
+  }
+}</pre>
+   using
+   <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>
+ </div>
+
+
+  <div h:request="">
+     Retrieving the text by
+     <code class="get">/resources/00000000-0000-0000-0000-000000000007/text/xml</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     <span h:success="" class="success">successfully</span>
+     yields response body:<br />
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;
+    &lt;lang value="la" resp="#ckcc"&gt;
+      &lt;lang value="?" resp="#tool"&gt;Vir clarissime,&lt;/lang&gt;
+    &lt;/lang&gt;
+  &lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+  <br />
+
+  <div h:request="">
+     I expect the results of using the views to be the same as in the previous case, so:<br />
+     Using view <code>view_ckcc_tool</code> by
+     <code class="get">/resources/00000000-0000-0000-0000-000000000007/text/xml?view=view_ckcc_tool</code>
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code>
+     <span h:success="" class="success">successfully</span>
+     yields response body:
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;
+    &lt;lang value="la" resp="#ckcc"&gt;Vir clarissime,&lt;/lang&gt;
+  &lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+  <br />
+
+  <div h:request="">
+     Using view <code>view_ckcc</code> by
+     <code class="get">/resources/00000000-0000-0000-0000-000000000007/text/xml?view=view_ckcc</code>
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code>
+     <span h:success="" class="success">successfully</span>
+     yields response body:
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;
+    &lt;lang value="la" resp="#ckcc"&gt;Vir clarissime,&lt;/lang&gt;
+  &lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+  <br />
+  
+  <div h:request="">
+     Using view <code>view_tool</code> by
+     <code class="get">/resources/00000000-0000-0000-0000-000000000007/text/xml?view=view_tool</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     <span h:success="" class="success">successfully</span>
+     yields response body:
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;
+    &lt;lang value="?" resp="#tool"&gt;Vir clarissime,&lt;/lang&gt;
+  &lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+  <br />
+
+  <div h:request="">
+     Using view <code>view_dummy</code> by
+     <code class="get">/resources/00000000-0000-0000-0000-000000000007/text/xml?view=view_dummy</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     <span h:success="" class="success">successfully</span>
+     yields response body:
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;Vir clarissime,&lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+
+</div></div></div><div id="set-priority-view3" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>9) Can I interleave different kinds of element annotations?</strong></div><div class="panel-body">
+
+  If we again start with the same conditions as the previous 2 cases, so:
+  Given a resource
+  with id <code c:set="#resourceId8">00000000-0000-0000-0000-000000000008</code>
+  <span c:execute="resourceExists(#resourceId8)">exists</span>,<br />
+  with annotators
+  <span c:execute="resourceHasAnnotator(#resourceId8,#annotatorCode,#annotatorCode)"><code c:set="#annotatorCode">ckcc</code></span>,
+  <span c:execute="resourceHasAnnotator(#resourceId8,#annotatorCode,#annotatorCode)"><code c:set="#annotatorCode">tool</code></span> and
+  <span c:execute="resourceHasAnnotator(#resourceId8,#annotatorCode,#annotatorCode)"><code c:set="#annotatorCode">dummy</code></span>,
+  and 
+  <span c:execute="resourceHasText(#resourceId8,#text4)">text<br />
+    <code c:set="#text4">&lt;text&gt;&lt;p xml:id="p-1"&gt;Vir clarissime,&lt;/p&gt;&lt;/text&gt;</code>
+  </span><br />
+  <br />
+
+  <div h:request="">
+      The views are the same as in the previous case, with the added requirement that the <code>type</code> element is always shown.<br />
+      To define view <code c:set="#view1">view_ckcc_tool</code>, I
+      <code class="put">/resources/00000000-0000-0000-0000-000000000008/text/views/view_ckcc_tool</code>
+      the body:
+      <pre class="json">{
+  "textView" : {
+    "description" : "view_ckcc_tool",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "hideTag"
+      },
+      "text" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "p" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "type" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "lang" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll",
+        "when" : "attribute(resp).firstOf('#ckcc','#tool')"
+      }
+    }
+  }
+}</pre>
+      using
+      <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>,<br />
+      which returns
+      <ul>
+        <li>status <code h:status="" class="success">201 Created</code></li>
+        <li>location header
+            <code class="location success">https://{host}/resources/00000000-0000-0000-0000-000000000008/text/views/view_ckcc_tool</code>
+        </li>
+        <li>and the response body is <code h:responseBody="" class="empty success"> </code></li>
+      </ul>
+  </div>
+  <br />
+
+  <div h:request="">
+      To define a second view <code c:set="#view2">view_ckcc</code>, I
+      <code class="put">/resources/00000000-0000-0000-0000-000000000008/text/views/view_ckcc</code>
+      the body:
+      <pre class="json">{
+  "textView" : {
+    "description" : "view_ckcc",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "hideTag"
+      },
+      "text" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "p" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "type" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "lang" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll",
+        "when" : "attribute(resp).firstOf('#ckcc')"
+      }
+    }
+  }
+}</pre>
+      using
+      <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>,<br />
+      which returns
+      <ul>
+        <li>status <code h:status="" class="success">201 Created</code></li>
+        <li>location header
+            <code class="location success">https://{host}/resources/00000000-0000-0000-0000-000000000008/text/views/view_ckcc</code>
+        </li>
+        <li>and the response body is <code h:responseBody="" class="empty success"> </code></li>
+      </ul>
+  </div>
+  <br />
+
+  <div h:request="">
+      To define a third view <code c:set="#view3">view_tool</code>, I
+      <code class="put">/resources/00000000-0000-0000-0000-000000000008/text/views/view_tool</code>
+      the body:
+      <pre class="json">{
+  "textView" : {
+    "description" : "view_tool",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "hideTag"
+      },
+      "text" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "p" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "type" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "lang" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll",
+        "when" : "attribute(resp).firstOf('#tool')"
+      }
+    }
+  }
+}</pre>
+      using
+      <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>,<br />
+      which returns
+      <ul>
+        <li>status <code h:status="" class="success">201 Created</code></li>
+        <li>location header
+            <code class="location success">https://{host}/resources/00000000-0000-0000-0000-000000000008/text/views/view_tool</code>
+        </li>
+        <li>and the response body is <code h:responseBody="" class="empty success"> </code></li>
+      </ul>
+  </div>
+  <br />
+
+  <div h:request="">
+      To define a fourth view <code c:set="#view4">view_dummy</code>, I
+      <code class="put">/resources/00000000-0000-0000-0000-000000000008/text/views/view_dummy</code>
+      the body:
+      <pre class="json">{
+  "textView" : {
+    "description" : "view_dummy",
+    "elements" : {
+      ":default" : {
+        "elementMode" : "hideTag"
+      },
+      "text" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "p" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "type" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll"
+      },
+      "lang" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll",
+        "when" : "attribute(resp).firstOf('#dummy')"
+      }
+    }
+  }
+}</pre>
+      using
+      <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>,<br />
+      which returns
+      <ul>
+        <li>status <code h:status="" class="success">201 Created</code></li>
+        <li>location header
+            <code class="location success">https://{host}/resources/00000000-0000-0000-0000-000000000008/text/views/view_dummy</code>
+        </li>
+        <li>and the response body is <code h:responseBody="" class="empty success"> </code></li>
+      </ul>
+  </div>
+  <br />
+
+  <div h:request="">
+    In this case we add another annotation in between the ones from the last 2 cases.<br />
+
+    I want to annotate the element with xml:id "p-1" as annotator ckcc with name <code>lang</code> and value <code>la</code>,
+    so I <span h:success="" class="success">successfully</span> <code class="put">/resources/00000000-0000-0000-0000-000000000008/text/annotations/2000000-0000-0000-0000-000000000004</code>
+    the body:
+    <pre class="json">{
+  "textAnnotation" : {
+    "name" : "lang",
+    "annotator" : "ckcc",
+    "attributes" : {
+      "value" : "la"
+    },
+    "position" : {
+      "xml:id" : "p-1"
+    }
+  }
+}</pre>
+    using
+    <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>
+
+  </div>
+  <br />
+
+  <div h:request="">
+    I want to annotate the element with xml:id "p-1" as annotator <code>ckcc</code> with name <code>type</code> and value <code>opener</code>,
+    so I <span h:success="" class="success">successfully</span> <code class="put">/resources/00000000-0000-0000-0000-000000000008/text/annotations/20000000-0000-0000-0000-000000000000</code>
+    the body:
+    <pre class="json">{
+  "textAnnotation" : {
+    "name" : "type",
+    "annotator" : "ckcc",
+    "attributes" : {
+      "value" : "opener"
+    },
+    "position" : {
+      "xml:id" : "p-1"
+    }
+  }
+}</pre>
+    using
+    <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>
+   </div>
+   <br />
+
+  <div h:request="">
+    I want to annotate the element with xml:id "p-1" as annotator tool with name <code>lang</code> and value <code>?</code>,
+    so I <span h:success="" class="success">successfully</span> <code class="put">/resources/00000000-0000-0000-0000-000000000008/text/annotations/30000000-0000-0000-0000-000000000000</code>
+    the body:
+    <pre class="json">{
+  "textAnnotation" : {
+    "name" : "lang",
+    "annotator" : "tool",
+    "attributes" : {
+      "value" : "?"
+    },
+    "position" : {
+      "xml:id" : "p-1"
+    }
+  }
+}</pre>
+    using
+    <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>
+  </div>
+  <br />
+
+  <div h:request="">
+     Retrieving the text by
+     <code class="get">/resources/00000000-0000-0000-0000-000000000008/text/xml</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     <span h:success="" class="success">successfully</span>
+     yields response body:<br />
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;
+    &lt;lang value="?" resp="#tool"&gt;
+      &lt;type value="opener" resp="#ckcc"&gt;
+        &lt;lang value="la" resp="#ckcc"&gt;Vir clarissime,&lt;/lang&gt;
+      &lt;/type&gt;
+    &lt;/lang&gt;
+  &lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+  <br />
+
+  <div h:request="">
+     I expect the results of using the views to be the same as in the previous case, so:<br />
+     Using view <code>view_ckcc_tool</code> by
+     <code class="get">/resources/00000000-0000-0000-0000-000000000008/text/xml?view=view_ckcc_tool</code>
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code>
+     <span h:success="" class="success">successfully</span>
+     yields response body:
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;
+    &lt;type value="opener" resp="#ckcc"&gt;
+      &lt;lang value="la" resp="#ckcc"&gt;Vir clarissime,&lt;/lang&gt;
+    &lt;/type&gt;
+  &lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+  <br />
+
+  <div h:request="">
+     Using view <code>view_ckcc</code> by
+     <code class="get">/resources/00000000-0000-0000-0000-000000000008/text/xml?view=view_ckcc</code>
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code>
+     <span h:success="" class="success">successfully</span>
+     yields response body:
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;
+    &lt;type value="opener" resp="#ckcc"&gt;
+      &lt;lang value="la" resp="#ckcc"&gt;Vir clarissime,&lt;/lang&gt;
+    &lt;/type&gt;
+  &lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+  <br />
+  
+  <div h:request="">
+     Using view <code>view_tool</code> by
+     <code class="get">/resources/00000000-0000-0000-0000-000000000008/text/xml?view=view_tool</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     <span h:success="" class="success">successfully</span>
+     yields response body:
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;
+    &lt;lang value="?" resp="#tool"&gt;
+      &lt;type value="opener" resp="#ckcc"&gt;Vir clarissime,&lt;/type&gt;
+    &lt;/lang&gt;
+  &lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+  <br />
+
+  <div h:request="">
+     Using view <code>view_dummy</code> by
+     <code class="get">/resources/00000000-0000-0000-0000-000000000008/text/xml?view=view_dummy</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     <span h:success="" class="success">successfully</span>
+     yields response body:
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;
+    &lt;type value="opener" resp="#ckcc"&gt;Vir clarissime,&lt;/type&gt;
+  &lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+</div></div></div><div id="variable-use" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>10) How do I use variables in a view definition?</strong></div><div class="panel-body">
+
+  Given a resource
+  with id <code c:set="#resourceId9">00000000-0000-0000-0000-000000000009</code>
+  <span c:execute="resourceExists(#resourceId9)">exists</span>,<br />
+  which has
+  <span c:execute="resourceHasText(#resourceId9,#text4)">text<br />
+    <code c:set="#text4">&lt;text&gt;&lt;p xml:id="p-1"&gt;&lt;lang resp="#b" valu="it"&gt;&lt;lang resp="#a" value="la"&gt;Maecenas consectetur odio at dolor porttitor.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;&lt;p xml:id="p-2"&gt;&lt;lang resp="#a" value="la"&gt;&lt;lang resp="#b" value="it"&gt;Aliquam a dapibus massa.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;&lt;p xml:id="p-3"&gt;&lt;lang resp="#b" value="en"&gt;&lt;lang resp="#c" value="fr"&gt;Aenean efficitur purus ut dui molestie fermentum.&lt;/lang&gt;&lt;/lang&gt;&lt;/p&gt;&lt;p xml:id="p-4"&gt;&lt;lang resp="#c" value="fr"&gt;Fusce congue mauris augue.&lt;/lang&gt;&lt;/p&gt;&lt;/text&gt;</code>
+  </span><br />
+  <br />
+
+	<div h:request="">
+	    When I define a view <code c:set="#view">prioritized</code> by
+	    <code class="put">/resources/00000000-0000-0000-0000-000000000009/text/views/prioritized</code>
+	    the body:
+	    <pre class="json">{
+  "textView" : {
+    "description" : "On lang, priorities to add on usage",
+    "elements" : {
+      "lang" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll",
+        "when" : "attribute({attr}).firstOf({list})"
+      }
+    }
+  }
+}</pre>
+	    using
+	    <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>,<br />
+	    then I should receive
+	    <ul>
+	      <li>status <code h:status="" class="success">201 Created</code></li>
+	      <li>location header
+	          <code class="location success">https://{host}/resources/00000000-0000-0000-0000-000000000009/text/views/prioritized</code>
+	      </li>
+	      <li>and the response body is <code h:responseBody="" class="empty success"> </code></li>
+	    </ul>
+	  I've used variables <code>attr</code> and <code>list</code> in this definition, the value of which will be set when using this view.
+	</div>
+	<br />
+
+  <div h:request="">
+     Then a
+     <code class="get">/resources/00000000-0000-0000-0000-000000000009/text/xml?view=prioritized&amp;view.attr=resp&amp;view.list='%23a','%23b'</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     (the <code>#</code> need to be url-escaped)
+     <span h:success="" class="success">successfully</span>
+     yields response body:
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;
+    &lt;lang resp="#a" value="la"&gt;Maecenas consectetur odio at dolor porttitor.&lt;/lang&gt;
+  &lt;/p&gt;
+  &lt;p xml:id="p-2"&gt;
+    &lt;lang resp="#a" value="la"&gt;Aliquam a dapibus massa.&lt;/lang&gt;
+  &lt;/p&gt;
+  &lt;p xml:id="p-3"&gt;
+    &lt;lang resp="#b" value="en"&gt;Aenean efficitur purus ut dui molestie fermentum.&lt;/lang&gt;
+  &lt;/p&gt;
+  &lt;p xml:id="p-4"&gt;Fusce congue mauris augue.&lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+  
+  <div h:request="">
+    We can verify what the view definition is for given value(s) for the variable(s) bij adding parameters to the query:
+    When I
+    <code class="get">/resources/00000000-0000-0000-0000-000000000009/text/views/prioritized?view.list='%23c','%23b'&amp;view.attr=who</code>
+    Then I should receive
+    <ul>
+        <li>status
+            <code h:status="" class="success">200 OK</code>
+        </li>
+        <li>and body
+            <pre class="json rest-success">{
+  "textView" : {
+    "description" : "On lang, priorities to add on usage",
+    "elements" : {
+      "lang" : {
+        "elementMode" : "show",
+        "attributeMode" : "showAll",
+        "when" : "attribute(who).firstOf('#c','#b')"
+      }
+    }
+  }
+}</pre>
+        </li>
+    </ul>
+	</div>
+	<br />
+</div></div></div><div id="set-annotation-layer-priority" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>11) How do I control the nesting of annotations over the same text range?</strong></div><div class="panel-body">
+
+  Given a resource
+  with id <code c:set="#resourceId10">00000000-0000-0000-0000-000000000010</code>
+  <span c:execute="resourceExists(#resourceId10)">exists</span>,<br />
+  which has text
+  <span c:execute="resourceHasText(#resourceId10,#text5)"><br />
+    <code c:set="#text5">&lt;text&gt;&lt;p xml:id="p-1"&gt;This is a naame with an error.&lt;/p&gt;&lt;/text&gt;</code>
+    and
+  </span><br />
+  <span c:execute="resourceHasAnnotator(#resourceId10,#annotatorCode,#annotatorDescription)">an annotator
+  with code <code c:set="#annotatorCode">ed</code> and description <code c:set="#annotatorDescription">Mr. Ed</code>  
+  </span>
+  <br />
+  <div h:request="">
+    Adding 2 annotations by <code class="post">/resources/00000000-0000-0000-0000-000000000010/text/annotationbatch</code>
+    the body:
+    <pre class="json">{
+  "textAnnotationList" : [ {
+    "textAnnotation" : {
+      "id" : "00000000-0000-0000-0001-000000000010",
+      "name" : "sic",
+      "annotator" : "ed",
+      "position" : {
+        "xml:id" : "p-1",
+        "offset" : 11,
+        "length" : 5
+      }
+    }
+  }, {
+    "textAnnotation" : {
+      "id" : "00000000-0000-0000-0002-000000000010",
+      "name" : "name",
+      "annotator" : "ed",
+      "position" : {
+        "xml:id" : "p-1",
+        "offset" : 11,
+        "length" : 5
+      }
+    }
+  } ]
+}</pre>
+    using
+    <code name="Content-Type" h:setHeader="" class="set-header">application/json</code>,<br />
+    then I should receive
+    <ul>
+      <li>status <code h:status="" class="success">202 Accepted</code></li>
+      <li>location header
+          <code class="location success">https://{host}/resources/00000000-0000-0000-0000-000000000010/text/annotationbatch/status</code>
+      </li>
+    </ul>
+  </div>
+  <div h:request="">
+    I confirm the batch upload by <code class="get">/resources/00000000-0000-0000-0000-000000000010/text/annotationbatch/status</code>
+    and receive 
+    <pre class="json rest-success">{
+  "textAnnotationImportStatus" : {
+    "done" : true,
+    "state" : "done",
+    "errors" : [ ],
+    "textRangeAnnotationInfoMap" : {
+      "00000000-0000-0000-0001-000000000010" : {
+        "textAnnotationInfo" : {
+          "annotates" : "naame"
+        }
+      },
+      "00000000-0000-0000-0002-000000000010" : {
+        "textAnnotationInfo" : {
+          "annotates" : "naame"
+        }
+      }
+    }
+  }
+}</pre>
+     
+  </div>
+
+  <div h:request="">
+     Then a
+     <code class="get">/resources/00000000-0000-0000-0000-000000000010/text/xml</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     <span h:success="" class="success">successfully</span>
+     yields response body:<br />
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;This is a &lt;sic resp="#ed"&gt;
+      &lt;name resp="#ed"&gt;naame&lt;/name&gt;
+    &lt;/sic&gt; with an error.&lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+  <br />
+     
+  <div h:request="">
+    Note that the <code>name</code> annotation is wrapped in the <code>sic</code> annotation.
+    Now, suppose I want a view on the text where the <code>sic</code> annotation is wrapped in the <code>name</code> annotation instead, I must first
+    <span h:success="" class="success">successfully</span>
+    <code class="put">/resources/00000000-0000-0000-0000-000000000010/text/views/name-sic</code>
+    the body:
+    <pre class="json">{
+  "textView" : {
+    "description" : "wrap sic in name",
+    "annotationLayers" : {
+      "layer1" : [ "sic" ],
+      "layer2" : [ "name" ]
+    },
+    "annotationLayerDepthOrder" : [ "layer1", "layer2" ]
+  }
+}</pre>
+  </div>     
+     
+  <div h:request="">
+     Then a
+     <code class="get">/resources/00000000-0000-0000-0000-000000000010/text/xml?view=name-sic</code><br />
+     using
+     <code name="Accept" h:setHeader="" class="set-header">text/xml</code><br />
+     <span h:success="" class="success">successfully</span>
+     yields response body:
+     <pre class="xml rest-success">&lt;text&gt;
+  &lt;p xml:id="p-1"&gt;This is a &lt;name resp="#ed"&gt;
+      &lt;sic resp="#ed"&gt;naame&lt;/sic&gt;
+    &lt;/name&gt; with an error.&lt;/p&gt;
+&lt;/text&gt;
+</pre>
+     <small>(formatting added for increased readability)</small><br />
+  </div>
+
+</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 2051 ms on 08-Feb-2017 at 17:59:28 CET</div></div></body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>XpathCommandTest xref</title>
+<link type="text/css" rel="stylesheet" href="../../../../../../stylesheet.css" />
+</head>
+<body>
+<div id="overview"><a href="../../../../../../../testapidocs/nl/knaw/huygens/alexandria/endpoint/command/XpathCommandTest.html">View Javadoc</a></div><pre>
+<a class="jxr_linenumber" name="L1" href="#L1">1</a>   <strong class="jxr_keyword">package</strong> nl.knaw.huygens.alexandria.endpoint.command;
+<a class="jxr_linenumber" name="L2" href="#L2">2</a>   
+<a class="jxr_linenumber" name="L3" href="#L3">3</a>   <em class="jxr_comment">/*</em>
+<a class="jxr_linenumber" name="L4" href="#L4">4</a>   <em class="jxr_comment"> * #%L</em>
+<a class="jxr_linenumber" name="L5" href="#L5">5</a>   <em class="jxr_comment"> * alexandria-main</em>
+<a class="jxr_linenumber" name="L6" href="#L6">6</a>   <em class="jxr_comment"> * =======</em>
+<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <em class="jxr_comment"> * Copyright (C) 2015 - 2017 Huygens ING (KNAW)</em>
+<a class="jxr_linenumber" name="L8" href="#L8">8</a>   <em class="jxr_comment"> * =======</em>
+<a class="jxr_linenumber" name="L9" href="#L9">9</a>   <em class="jxr_comment"> * This program is free software: you can redistribute it and/or modify</em>
+<a class="jxr_linenumber" name="L10" href="#L10">10</a>  <em class="jxr_comment"> * it under the terms of the GNU General Public License as</em>
+<a class="jxr_linenumber" name="L11" href="#L11">11</a>  <em class="jxr_comment"> * published by the Free Software Foundation, either version 3 of the</em>
+<a class="jxr_linenumber" name="L12" href="#L12">12</a>  <em class="jxr_comment"> * License, or (at your option) any later version.</em>
+<a class="jxr_linenumber" name="L13" href="#L13">13</a>  <em class="jxr_comment"> * </em>
+<a class="jxr_linenumber" name="L14" href="#L14">14</a>  <em class="jxr_comment"> * This program is distributed in the hope that it will be useful,</em>
+<a class="jxr_linenumber" name="L15" href="#L15">15</a>  <em class="jxr_comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</em>
+<a class="jxr_linenumber" name="L16" href="#L16">16</a>  <em class="jxr_comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</em>
+<a class="jxr_linenumber" name="L17" href="#L17">17</a>  <em class="jxr_comment"> * GNU General Public License for more details.</em>
+<a class="jxr_linenumber" name="L18" href="#L18">18</a>  <em class="jxr_comment"> * </em>
+<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <em class="jxr_comment"> * You should have received a copy of the GNU General Public</em>
+<a class="jxr_linenumber" name="L20" href="#L20">20</a>  <em class="jxr_comment"> * License along with this program.  If not, see</em>
+<a class="jxr_linenumber" name="L21" href="#L21">21</a>  <em class="jxr_comment"> * &lt;<a href="http://www.gnu.org/licenses/gpl-3.0.html&gt;" target="alexandria_uri">http://www.gnu.org/licenses/gpl-3.0.html&gt;</a>.</em>
+<a class="jxr_linenumber" name="L22" href="#L22">22</a>  <em class="jxr_comment"> * #L%</em>
+<a class="jxr_linenumber" name="L23" href="#L23">23</a>  <em class="jxr_comment"> */</em>
+<a class="jxr_linenumber" name="L24" href="#L24">24</a>  
+<a class="jxr_linenumber" name="L25" href="#L25">25</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.assertj.core.api.Assertions.assertThat;
+<a class="jxr_linenumber" name="L26" href="#L26">26</a>  
+<a class="jxr_linenumber" name="L27" href="#L27">27</a>  <strong class="jxr_keyword">import</strong> java.util.Collections;
+<a class="jxr_linenumber" name="L28" href="#L28">28</a>  <strong class="jxr_keyword">import</strong> java.util.List;
+<a class="jxr_linenumber" name="L29" href="#L29">29</a>  
+<a class="jxr_linenumber" name="L30" href="#L30">30</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a class="jxr_linenumber" name="L31" href="#L31">31</a>  
+<a class="jxr_linenumber" name="L32" href="#L32">32</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.command.XpathCommand.XPathResult;
+<a class="jxr_linenumber" name="L33" href="#L33">33</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.endpoint.command.XpathCommand.XPathResult.Type;
+<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <strong class="jxr_keyword">import</strong> nl.knaw.huygens.alexandria.test.AlexandriaTest;
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>  
+<a class="jxr_linenumber" name="L36" href="#L36">36</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../nl/knaw/huygens/alexandria/endpoint/command/XpathCommandTest.html">XpathCommandTest</a> <strong class="jxr_keyword">extends</strong> AlexandriaTest {
+<a class="jxr_linenumber" name="L37" href="#L37">37</a>    String EXAMPLE = singleQuotesToDouble(<span class="jxr_string">"&lt;root xmlns:bar='http://www.bar.org' xmlns:foo='http://www.foo.org/'&gt;"</span>//
+<a class="jxr_linenumber" name="L38" href="#L38">38</a>        + <span class="jxr_string">"&lt;employees&gt;"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L39" href="#L39">39</a>        + <span class="jxr_string">"&lt;employee id='1'&gt;Johnny Dapp&lt;/employee&gt;"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L40" href="#L40">40</a>        + <span class="jxr_string">"&lt;employee id='2'&gt;Al Pacino&lt;/employee&gt;"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L41" href="#L41">41</a>        + <span class="jxr_string">"&lt;employee id='3'&gt;Robert De Niro&lt;/employee&gt;"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L42" href="#L42">42</a>        + <span class="jxr_string">"&lt;employee id='4'&gt;Kevin Spacey&lt;/employee&gt;"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L43" href="#L43">43</a>        + <span class="jxr_string">"&lt;employee id='5'&gt;Denzel Washington&lt;/employee&gt;"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L44" href="#L44">44</a>        + <span class="jxr_string">"&lt;/employees&gt;"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L45" href="#L45">45</a>        + <span class="jxr_string">"&lt;foo:companies&gt;"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L46" href="#L46">46</a>        + <span class="jxr_string">"&lt;foo:company id='6'&gt;Tata Consultancy Services&lt;/foo:company&gt;"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L47" href="#L47">47</a>        + <span class="jxr_string">"&lt;foo:company id='7'&gt;Wipro&lt;/foo:company&gt;"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>        + <span class="jxr_string">"&lt;foo:company id='8'&gt;Infosys&lt;/foo:company&gt;"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L49" href="#L49">49</a>        + <span class="jxr_string">"&lt;foo:company id='9'&gt;Microsoft&lt;/foo:company&gt;"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>        + <span class="jxr_string">"&lt;foo:company id='10'&gt;IBM&lt;/foo:company&gt;"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>        + <span class="jxr_string">"&lt;foo:company id='11'&gt;Apple&lt;/foo:company&gt;"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L52" href="#L52">52</a>        + <span class="jxr_string">"&lt;foo:company id='12'&gt;Oracle&lt;/foo:company&gt;"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L53" href="#L53">53</a>        + <span class="jxr_string">"&lt;/foo:companies&gt;"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L54" href="#L54">54</a>        + <span class="jxr_string">"&lt;/root&gt;"</span>);
+<a class="jxr_linenumber" name="L55" href="#L55">55</a>  
+<a class="jxr_linenumber" name="L56" href="#L56">56</a>    @Test
+<a class="jxr_linenumber" name="L57" href="#L57">57</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> selectRootElement() <strong class="jxr_keyword">throws</strong> Exception {
+<a class="jxr_linenumber" name="L58" href="#L58">58</a>      XPathResult result = XpathCommand.testXPath(<span class="jxr_string">"/root"</span>, EXAMPLE);
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>      assertThat(result.getType()).isEqualTo(Type.NODESET);
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>      assertThat(result.getResult()).isInstanceOf(List.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L61" href="#L61">61</a>      assertThat((List&lt;String&gt;) result.getResult()).containsExactly(EXAMPLE);
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>    }
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>  
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>    @Test
+<a class="jxr_linenumber" name="L65" href="#L65">65</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> selectAllEmployeeElementsThatAreDirectChildrenOfTheEmployeesElement() <strong class="jxr_keyword">throws</strong> Exception {
+<a class="jxr_linenumber" name="L66" href="#L66">66</a>      XPathResult result = XpathCommand.testXPath(<span class="jxr_string">"/root/employees/employee"</span>, EXAMPLE);
+<a class="jxr_linenumber" name="L67" href="#L67">67</a>      softly.assertThat(result.getType()).isEqualTo(Type.NODESET);
+<a class="jxr_linenumber" name="L68" href="#L68">68</a>      softly.assertThat(result.getResult()).isInstanceOf(List.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L69" href="#L69">69</a>      softly.assertThat((List&lt;String&gt;) result.getResult()).containsExactly(<em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L70" href="#L70">70</a>          <span class="jxr_string">"&lt;employee id=\&quot;1\&quot;&gt;Johnny Dapp&lt;/employee&gt;"</span>, <em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L71" href="#L71">71</a>          <span class="jxr_string">"&lt;employee id=\&quot;2\&quot;&gt;Al Pacino&lt;/employee&gt;"</span>, <em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L72" href="#L72">72</a>          <span class="jxr_string">"&lt;employee id=\&quot;3\&quot;&gt;Robert De Niro&lt;/employee&gt;"</span>, <em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L73" href="#L73">73</a>          <span class="jxr_string">"&lt;employee id=\&quot;4\&quot;&gt;Kevin Spacey&lt;/employee&gt;"</span>, <em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L74" href="#L74">74</a>          <span class="jxr_string">"&lt;employee id=\&quot;5\&quot;&gt;Denzel Washington&lt;/employee&gt;"</span><em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="L75" href="#L75">75</a>      );
+<a class="jxr_linenumber" name="L76" href="#L76">76</a>    }
+<a class="jxr_linenumber" name="L77" href="#L77">77</a>  
+<a class="jxr_linenumber" name="L78" href="#L78">78</a>    @Test
+<a class="jxr_linenumber" name="L79" href="#L79">79</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> selectTheTextualValueOfTheFirstEmployeeElement() <strong class="jxr_keyword">throws</strong> Exception {
+<a class="jxr_linenumber" name="L80" href="#L80">80</a>      XPathResult result = XpathCommand.testXPath(<span class="jxr_string">"string(//employee[1])"</span>, EXAMPLE);
+<a class="jxr_linenumber" name="L81" href="#L81">81</a>      softly.assertThat(result.getType()).isEqualTo(Type.STRING);
+<a class="jxr_linenumber" name="L82" href="#L82">82</a>      softly.assertThat(result.getResult()).isEqualTo(<span class="jxr_string">"Johnny Dapp"</span>);
+<a class="jxr_linenumber" name="L83" href="#L83">83</a>    }
+<a class="jxr_linenumber" name="L84" href="#L84">84</a>  
+<a class="jxr_linenumber" name="L85" href="#L85">85</a>    @Test
+<a class="jxr_linenumber" name="L86" href="#L86">86</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> selectTheTextualValueOfTheSecondEmployeeElement() <strong class="jxr_keyword">throws</strong> Exception {
+<a class="jxr_linenumber" name="L87" href="#L87">87</a>      XPathResult result = XpathCommand.testXPath(<span class="jxr_string">"//employee[2]/text()"</span>, EXAMPLE);
+<a class="jxr_linenumber" name="L88" href="#L88">88</a>      softly.assertThat(result.getType()).isEqualTo(Type.NODESET);
+<a class="jxr_linenumber" name="L89" href="#L89">89</a>      softly.assertThat(result.getResult()).isEqualTo(Collections.singletonList(<span class="jxr_string">"Al Pacino"</span>));
+<a class="jxr_linenumber" name="L90" href="#L90">90</a>    }
+<a class="jxr_linenumber" name="L91" href="#L91">91</a>  
+<a class="jxr_linenumber" name="L92" href="#L92">92</a>    @Test
+<a class="jxr_linenumber" name="L93" href="#L93">93</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> selectTheNumberOfEmployeeElements() <strong class="jxr_keyword">throws</strong> Exception {
+<a class="jxr_linenumber" name="L94" href="#L94">94</a>      XPathResult result = XpathCommand.testXPath(<span class="jxr_string">"count(//employee)"</span>, EXAMPLE);
+<a class="jxr_linenumber" name="L95" href="#L95">95</a>      softly.assertThat(result.getType()).isEqualTo(Type.NUMBER);
+<a class="jxr_linenumber" name="L96" href="#L96">96</a>      softly.assertThat(result.getResult()).isEqualTo(5.0);
+<a class="jxr_linenumber" name="L97" href="#L97">97</a>    }
+<a class="jxr_linenumber" name="L98" href="#L98">98</a>  
+<a class="jxr_linenumber" name="L99" href="#L99">99</a>    @Test
+<a class="jxr_linenumber" name="L100" href="#L100">100</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> selectTheNumberOfCompanyElements() <strong class="jxr_keyword">throws</strong> Exception {
+<a class="jxr_linenumber" name="L101" href="#L101">101</a>     XPathResult result = XpathCommand.testXPath(<span class="jxr_string">"count(//foo:company)"</span>, EXAMPLE);
+<a class="jxr_linenumber" name="L102" href="#L102">102</a>     softly.assertThat(result.getType()).isEqualTo(Type.NUMBER);
+<a class="jxr_linenumber" name="L103" href="#L103">103</a>     softly.assertThat(result.getResult()).isEqualTo(7.0);
+<a class="jxr_linenumber" name="L104" href="#L104">104</a>   }
+<a class="jxr_linenumber" name="L105" href="#L105">105</a> 
+<a class="jxr_linenumber" name="L106" href="#L106">106</a>   @Test
+<a class="jxr_linenumber" name="L107" href="#L107">107</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> selectTheLocalNameOfTheFirstCompanyElement() <strong class="jxr_keyword">throws</strong> Exception {
+<a class="jxr_linenumber" name="L108" href="#L108">108</a>     XPathResult result = XpathCommand.testXPath(<span class="jxr_string">"local-name(//foo:company[1])"</span>, EXAMPLE);
+<a class="jxr_linenumber" name="L109" href="#L109">109</a>     softly.assertThat(result.getType()).isEqualTo(Type.STRING);
+<a class="jxr_linenumber" name="L110" href="#L110">110</a>     softly.assertThat(result.getResult()).isEqualTo(<span class="jxr_string">"company"</span>);
+<a class="jxr_linenumber" name="L111" href="#L111">111</a>   }
+<a class="jxr_linenumber" name="L112" href="#L112">112</a> 
+<a class="jxr_linenumber" name="L113" href="#L113">113</a>   @Test
+<a class="jxr_linenumber" name="L114" href="#L114">114</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> selectTrue() <strong class="jxr_keyword">throws</strong> Exception {
+<a class="jxr_linenumber" name="L115" href="#L115">115</a>     XPathResult result = XpathCommand.testXPath(<span class="jxr_string">"true()"</span>, EXAMPLE);
+<a class="jxr_linenumber" name="L116" href="#L116">116</a>     softly.assertThat(result.getType()).isEqualTo(Type.BOOLEAN);
+<a class="jxr_linenumber" name="L117" href="#L117">117</a>     softly.assertThat(result.getResult()).isEqualTo(<strong class="jxr_keyword">true</strong>);
+<a class="jxr_linenumber" name="L118" href="#L118">118</a>   }
+<a class="jxr_linenumber" name="L119" href="#L119">119</a> 
+<a class="jxr_linenumber" name="L120" href="#L120">120</a>   @Test
+<a class="jxr_linenumber" name="L121" href="#L121">121</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> selectFalse() <strong class="jxr_keyword">throws</strong> Exception {
+<a class="jxr_linenumber" name="L122" href="#L122">122</a>     XPathResult result = XpathCommand.testXPath(<span class="jxr_string">"false()"</span>, EXAMPLE);
+<a class="jxr_linenumber" name="L123" href="#L123">123</a>     softly.assertThat(result.getType()).isEqualTo(Type.BOOLEAN);
+<a class="jxr_linenumber" name="L124" href="#L124">124</a>     softly.assertThat(result.getResult()).isEqualTo(false);
+<a class="jxr_linenumber" name="L125" href="#L125">125</a>   }
+<a class="jxr_linenumber" name="L126" href="#L126">126</a> 
+<a class="jxr_linenumber" name="L127" href="#L127">127</a>   @Test
+<a class="jxr_linenumber" name="L128" href="#L128">128</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> floor() <strong class="jxr_keyword">throws</strong> Exception {
+<a class="jxr_linenumber" name="L129" href="#L129">129</a>     XPathResult result = XpathCommand.testXPath(<span class="jxr_string">"floor(3.1415926)"</span>, EXAMPLE);
+<a class="jxr_linenumber" name="L130" href="#L130">130</a>     softly.assertThat(result.getType()).isEqualTo(Type.NUMBER);
+<a class="jxr_linenumber" name="L131" href="#L131">131</a>     softly.assertThat(result.getResult()).isEqualTo(3.0);
+<a class="jxr_linenumber" name="L132" href="#L132">132</a>   }
+<a class="jxr_linenumber" name="L133" href="#L133">133</a> 
+<a class="jxr_linenumber" name="L134" href="#L134">134</a>   @Test
+<a class="jxr_linenumber" name="L135" href="#L135">135</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> ceiling() <strong class="jxr_keyword">throws</strong> Exception {
+<a class="jxr_linenumber" name="L136" href="#L136">136</a>     XPathResult result = XpathCommand.testXPath(<span class="jxr_string">"ceiling(3.1415926)"</span>, EXAMPLE);
+<a class="jxr_linenumber" name="L137" href="#L137">137</a>     softly.assertThat(result.getType()).isEqualTo(Type.NUMBER);
+<a class="jxr_linenumber" name="L138" href="#L138">138</a>     softly.assertThat(result.getResult()).isEqualTo(4.0);
+<a class="jxr_linenumber" name="L139" href="#L139">139</a>   }
+<a class="jxr_linenumber" name="L140" href="#L140">140</a> 
+<a class="jxr_linenumber" name="L141" href="#L141">141</a> }
+</pre>
+<hr/>
+<div id="footer">Copyright &#169; 2015&#x2013;2017 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
+</body>
+</html>

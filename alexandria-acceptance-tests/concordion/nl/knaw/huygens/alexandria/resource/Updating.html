@@ -163,19 +163,19 @@ ins {
 }
 </style><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 
-<title>Updating External Resources</title>
+<title>Alexandria: Updating External Resources</title>
 
-<link type="text/css" rel="stylesheet" href="../../../../../codemirror/codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/enable-codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/merge.css" /><script type="text/javascript" src="../../../../../codemirror/codemirror.js"></script><script type="text/javascript" src="../../../../../codemirror/javascript.js"></script><script type="text/javascript" src="../../../../../codemirror/diff_match_patch.js"></script><script type="text/javascript" src="../../../../../codemirror/merge.js"></script><script type="text/javascript" src="../../../../../codemirror/enable-codemirror.js"></script><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/bootstrap.css" /><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/enable-bootstrap.css" /><script type="text/javascript" src="../../../../../jquery/jquery.min.js"></script><script type="text/javascript" src="../../../../../bootstrap/bootstrap.min.js"></script></head><body><span class="breadcrumbs"><a href="../Alexandria.html">Alexandria</a> &gt; <a href="Resource.html">Resources</a> &gt;</span>
-
-
+<link type="text/css" rel="stylesheet" href="../../../../../codemirror/codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/enable-codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/merge.css" /><script type="text/javascript" src="../../../../../codemirror/codemirror.js"></script><script type="text/javascript" src="../../../../../codemirror/javascript.js"></script><script type="text/javascript" src="../../../../../codemirror/diff_match_patch.js"></script><script type="text/javascript" src="../../../../../codemirror/merge.js"></script><script type="text/javascript" src="../../../../../codemirror/enable-codemirror.js"></script><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/bootstrap.css" /><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/enable-bootstrap.css" /><script type="text/javascript" src="../../../../../jquery/jquery.min.js"></script><script type="text/javascript" src="../../../../../bootstrap/bootstrap.min.js"></script></head><body><span class="breadcrumbs"><a href="../Alexandria.html">Alexandria</a> &gt; <a href="Resource.html">Alexandria: Resources</a> &gt;</span>
 
 
 
-<div class="container"><div class="jumbotron"><h1>Updating external resources</h1></div><div class="row"><div class="col-md-3"><ul class="nav nav-pills nav-stacked"><li class="active"><a href="#put-updates-resource" data-toggle="tab">How can I update an external resource?</a></li><li><a href="#empty-put-does-not-delete" data-toggle="tab">What happens when I send an empty PUT to an existing resource?</a></li></ul></div><div class="col-md-9"><div class="tab-content"><div id="put-updates-resource" c:execute="clearStorage()" class="tab-pane fade active in"><div class="panel panel-default"><div class="panel-heading"><strong>How can I update an external resource?</strong></div><div class="panel-body">
+
+
+<div class="container"><div class="jumbotron"><h1>Updating external resources</h1></div><div class="row"><div class="col-md-3"><ul class="nav nav-pills nav-stacked"><li class="active"><a href="#put-updates-resource" data-toggle="tab">1) How can I update an external resource?</a></li><li><a href="#empty-put-does-not-delete" data-toggle="tab">2) What happens when I send an empty PUT to an existing resource?</a></li></ul></div><div class="col-md-9"><div class="tab-content"><div id="put-updates-resource" c:execute="clearStorage()" class="tab-pane fade active in"><div class="panel panel-default"><div class="panel-heading"><strong>1) How can I update an external resource?</strong></div><div class="panel-body">
     <div h:request="">
         Given that I have <span h:success="" class="success">successfully</span>
         <code class="put">/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</code> the body:
-        <pre h:jsonBody="" class="json">{
+        <pre class="json">{
   "resource" : {
     "id" : "c6b96360-c0c9-11e4-b947-6bc57448d166",
     "ref" : "http://www.example.com/titles/path/to/title/resource"
@@ -185,7 +185,7 @@ ins {
 
     <div h:request="">
         When I <code class="put">/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</code> the body:
-        <pre h:jsonBody="" class="json">{
+        <pre class="json">{
   "resource" : {
     "ref" : "http://www.example.com/titles/path/to/UPDATED/title/resource"
   }
@@ -203,7 +203,7 @@ ins {
   }
 }</pre>
     </div>
-</div></div></div><div id="empty-put-does-not-delete" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>What happens when I send an empty PUT to an existing resource?</strong></div><div class="panel-body">
+</div></div></div><div id="empty-put-does-not-delete" c:execute="clearStorage()" class="tab-pane fade"><div class="panel panel-default"><div class="panel-heading"><strong>2) What happens when I send an empty PUT to an existing resource?</strong></div><div class="panel-body">
 
     <div class="alert alert-warning well-sm">
         In other words: will an empty PUT effectively delete an existing resource?
@@ -212,7 +212,7 @@ ins {
     <div h:request="">
         Given that I have <span h:success="" class="success">successfully</span>
         <code class="put">/resources/c6b96360-c0c9-11e4-b947-6bc57448d166</code> the body:
-        <pre h:jsonBody="" class="json">{
+        <pre class="json">{
   "resource" : {
     "id" : "c6b96360-c0c9-11e4-b947-6bc57448d166",
     "ref" : "http://www.example.com/titles/path/to/title/resource"
@@ -234,5 +234,5 @@ ins {
   "message" : "may not be null"
 } ]</pre>
     </div>
-</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 197 ms on 06-Sep-2016 at 14:59:11 CEST</div></div></body>
+</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 231 ms on 08-Feb-2017 at 17:59:20 CET</div></div></body>
 </html>

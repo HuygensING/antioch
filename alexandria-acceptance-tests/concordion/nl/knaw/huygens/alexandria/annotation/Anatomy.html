@@ -163,13 +163,13 @@ ins {
 }
 </style><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 
-<title>Anatomy of a resource</title>
+<title>Alexandria: Anatomy of a resource</title>
 
-<link type="text/css" rel="stylesheet" href="../../../../../codemirror/codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/enable-codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/merge.css" /><script type="text/javascript" src="../../../../../codemirror/codemirror.js"></script><script type="text/javascript" src="../../../../../codemirror/javascript.js"></script><script type="text/javascript" src="../../../../../codemirror/diff_match_patch.js"></script><script type="text/javascript" src="../../../../../codemirror/merge.js"></script><script type="text/javascript" src="../../../../../codemirror/enable-codemirror.js"></script><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/bootstrap.css" /><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/enable-bootstrap.css" /><script type="text/javascript" src="../../../../../jquery/jquery.min.js"></script><script type="text/javascript" src="../../../../../bootstrap/bootstrap.min.js"></script></head><body><span class="breadcrumbs"><a href="../Alexandria.html">Alexandria</a> &gt; <a href="Annotation.html">Annotations</a> &gt;</span>
+<link type="text/css" rel="stylesheet" href="../../../../../codemirror/codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/enable-codemirror.css" /><link type="text/css" rel="stylesheet" href="../../../../../codemirror/merge.css" /><script type="text/javascript" src="../../../../../codemirror/codemirror.js"></script><script type="text/javascript" src="../../../../../codemirror/javascript.js"></script><script type="text/javascript" src="../../../../../codemirror/diff_match_patch.js"></script><script type="text/javascript" src="../../../../../codemirror/merge.js"></script><script type="text/javascript" src="../../../../../codemirror/enable-codemirror.js"></script><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/bootstrap.css" /><link type="text/css" rel="stylesheet" href="../../../../../bootstrap/enable-bootstrap.css" /><script type="text/javascript" src="../../../../../jquery/jquery.min.js"></script><script type="text/javascript" src="../../../../../bootstrap/bootstrap.min.js"></script></head><body><span class="breadcrumbs"><a href="../Alexandria.html">Alexandria</a> &gt; <a href="Annotation.html">Alexandria: Annotations</a> &gt;</span>
 
 
 
-<div class="container"><div class="jumbotron"><h1>Anatomy of an annotation</h1></div><div class="row"><div class="col-md-3"><ul class="nav nav-pills nav-stacked"><li class="active"><a href="#resource-anatomy" data-toggle="tab">What does an annotation look like?</a></li></ul></div><div class="col-md-9"><div class="tab-content"><div id="resource-anatomy" c:execute="clearStorage()" class="tab-pane fade active in"><div class="panel panel-default"><div class="panel-heading"><strong>What does an annotation look like?</strong></div><div class="panel-body">
+<div class="container"><div class="jumbotron"><h1>Anatomy of an annotation</h1></div><div class="row"><div class="col-md-3"><ul class="nav nav-pills nav-stacked"><li class="active"><a href="#resource-anatomy" data-toggle="tab">1) What does an annotation look like?</a></li></ul></div><div class="col-md-9"><div class="tab-content"><div id="resource-anatomy" c:execute="clearStorage()" class="tab-pane fade active in"><div class="panel panel-default"><div class="panel-heading"><strong>1) What does an annotation look like?</strong></div><div class="panel-body">
     When we <code>GET</code> an annotation, what does it look like and what is the meaning of the properties?
     Let us assume that:
     <ul>
@@ -177,18 +177,18 @@ ins {
             a (parent) resource exists with uuid: <code c:set="#resId">c3533708-61c5-11e5-9a91-87af0920e91d</code>
         </li>
         <li c:execute="#annoId = hasAnnotation(#resId)">
-            this resource has an annotation: <code c:echo="#annoId">78c2971d-a955-40db-9be1-3d2e3c30997c</code>
+            this resource has an annotation: <code c:echo="#annoId">4ba49082-2ec1-4c47-b315-ba98bde562a7</code>
         </li>
     </ul>
 
     <div h:request="">When we
-        <code class="get">/annotations/78c2971d-a955-40db-9be1-3d2e3c30997c</code>
+        <code class="get">/annotations/4ba49082-2ec1-4c47-b315-ba98bde562a7</code>
         we receive
         <code h:status="" class="success">200 OK</code>
         and body
         <pre class="json rest-success">{
   "annotation" : {
-    "id" : "78c2971d-a955-40db-9be1-3d2e3c30997c",
+    "id" : "4ba49082-2ec1-4c47-b315-ba98bde562a7",
     "type" : "type",
     "value" : "value",
     "state" : {
@@ -197,11 +197,11 @@ ins {
     },
     "revision" : 0,
     "^deprecates" : "",
-    "^current_version" : "https://{host}/annotations/78c2971d-a955-40db-9be1-3d2e3c30997c",
-    "^versioned_self" : "https://{host}/annotations/78c2971d-a955-40db-9be1-3d2e3c30997c/rev/0",
+    "^current_version" : "https://{host}/annotations/4ba49082-2ec1-4c47-b315-ba98bde562a7",
+    "^versioned_self" : "https://{host}/annotations/4ba49082-2ec1-4c47-b315-ba98bde562a7/rev/0",
     "^annotates" : "https://{host}/resources/c3533708-61c5-11e5-9a91-87af0920e91d",
     "^annotations" : [ ],
-    "^provenance" : "https://{host}/annotations/78c2971d-a955-40db-9be1-3d2e3c30997c/provenance"
+    "^provenance" : "https://{host}/annotations/4ba49082-2ec1-4c47-b315-ba98bde562a7/provenance"
   }
 }</pre>
     </div>
@@ -238,5 +238,5 @@ ins {
             <small>(who-what-when-why was this object created?)</small>
         </li>
     </ul>
-</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 67 ms on 06-Sep-2016 at 14:59:14 CEST</div></div></body>
+</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 110 ms on 08-Feb-2017 at 17:59:23 CET</div></div></body>
 </html>
