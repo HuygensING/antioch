@@ -83,7 +83,7 @@ public class DotFactory {
         .append(n)//
         .append(" [shape=box, label=\"")//
         .append(escape(textSegment)//
-            .replace(" ", "‚?£")//
+            .replace(" ", "‚ê£")//
             .replace("\n", "‚Üµ"))//
         .append("\"];\n");
   }
