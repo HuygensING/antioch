@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.concordion;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -30,6 +30,8 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.ws.rs.core.Application;
@@ -50,6 +52,7 @@ import com.google.inject.Module;
 import com.google.inject.Scopes;
 
 import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -63,8 +66,8 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerGraphService;
 import nl.knaw.huygens.alexandria.service.TinkerPopService;
 import nl.knaw.huygens.alexandria.storage.Storage;
-import nl.knaw.huygens.alexandria.text.InMemoryTextService;
-import nl.knaw.huygens.alexandria.text.TextService;
+import nl.knaw.huygens.alexandria.textgraph.ParseResult;
+import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 import nl.knaw.huygens.cat.RestExtension;
 import nl.knaw.huygens.cat.RestFixture;
 
@@ -75,9 +78,7 @@ public class AlexandriaAcceptanceTest extends RestFixture {
 
   private static LocationBuilder locationBuilder = new LocationBuilder(testConfiguration(), new EndpointPathResolver());
 
-  private static TextService inMemoryTextService = new InMemoryTextService();
-
-  private static TinkerPopService service = new TinkerPopService(storage, locationBuilder, inMemoryTextService);
+  private static TinkerPopService service = new TinkerPopService(storage, locationBuilder);
 
   private final AtomicInteger nextUniqueExpressionNumber = new AtomicInteger();
 
@@ -99,7 +100,7 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     return new Storage(TinkerGraph.open());
   }
 
-  private static AlexandriaConfiguration testConfiguration() {
+  protected static AlexandriaConfiguration testConfiguration() {
     return new AlexandriaConfiguration() {
       @Override
       public URI getBaseURI() {
@@ -125,6 +126,11 @@ public class AlexandriaAcceptanceTest extends RestFixture {
       public String getAdminKey() {
         return "whatever";
       }
+
+      @Override
+      public Boolean asynchronousEndpointsAllowed() {
+        return false;
+      }
     };
   }
 
@@ -136,10 +142,11 @@ public class AlexandriaAcceptanceTest extends RestFixture {
         bind(TinkerPopService.class).to(TinkerGraphService.class);
         bind(AlexandriaService.class).toInstance(service);
         bind(AlexandriaConfiguration.class).toInstance(CONFIG);
-        bind(TextService.class).toInstance(new InMemoryTextService());
         bind(AnnotationEntityBuilder.class).in(Scopes.SINGLETON);
         bind(EndpointPathResolver.class).in(Scopes.SINGLETON);
         bind(ResourceEntityBuilder.class).in(Scopes.SINGLETON);
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        bind(ExecutorService.class).toInstance(executorService);
       }
     };
   }
@@ -159,13 +166,49 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     return Iterables.getLast(Splitter.on('/').split(location().orElse("(not set)")));
   }
 
+
   public void clearStorage() {
     Log.debug("Clearing Storage");
     service.setStorage(tinkerGraphStorage());
   }
 
+  public void wait5seconds() {
+    try {
+      Thread.sleep(5000L);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+
   public void resourceExists(String resId) {
-    service.createOrUpdateResource(fromString(resId), aRef(), aProvenance(), CONFIRMED);
+    resourceExists(resId, aRef());
+  }
+
+  public void resourceExists(String resId, String ref) {
+    service.createOrUpdateResource(fromString(resId), ref, aProvenance(), CONFIRMED);
+  }
+
+  public String hasSubresource(String parentUUID) {
+    return hasSubresource(parentUUID, aSub());
+  }
+
+  public String hasSubresource(String parentUUID, String sub) {
+    final UUID subId = service().createSubResource(randomUUID(), fromString(parentUUID), sub, aProvenance()).getId();
+    service().confirmResource(subId);
+    return subId.toString();
+  }
+
+  public void resourceHasText(String resId, String xml) {
+    ParseResult result = TextGraphUtil.parse(xml);
+    service().storeTextGraph(UUID.fromString(resId), result);
+  }
+
+  public void resourceHasAnnotator(String resId, String code, String description) {
+    service().setResourceAnnotator(UUID.fromString(resId), anAnnotator(code, description));
+  }
+
+  private Annotator anAnnotator(String code, String description) {
+    return new Annotator().setCode(code).setDescription(description);
   }
 
   protected AlexandriaService service() {

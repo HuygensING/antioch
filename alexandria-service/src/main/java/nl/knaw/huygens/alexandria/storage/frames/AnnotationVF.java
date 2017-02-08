@@ -24,22 +24,25 @@ package nl.knaw.huygens.alexandria.storage.frames;
 
 import java.util.List;
 
-import nl.knaw.huygens.alexandria.storage.Labels;
+import nl.knaw.huygens.alexandria.storage.VertexLabels;
+import peapod.FramedVertex;
 import peapod.annotations.Edge;
 import peapod.annotations.In;
 import peapod.annotations.Out;
 import peapod.annotations.Vertex;
 
-@Vertex(Labels.ANNOTATION)
-public abstract class AnnotationVF extends AlexandriaVF {
+@Vertex(VertexLabels.ANNOTATION)
+public abstract class AnnotationVF extends AlexandriaVF implements FramedVertex<AnnotationVF> {
   public static final String NO_VALUE = ":null";
 
-  // TODO: double-check if (update of) peapod supports outgoing edges with the same label to different types of VF
-  // edge labels
-  public static final String ANNOTATES_RESOURCE = "annotates_resource";
-  public static final String ANNOTATES_ANNOTATION = "annotates_annotation";
-  public static final String DEPRECATES = "deprecates";
-  public static final String HAS_BODY = "has_body";
+  public static class EdgeLabels {
+    // TODO: double-check if (update of) peapod supports outgoing edges with the same label to different types of VF
+    // edge labels
+    public static final String ANNOTATES_RESOURCE = "annotates_resource";
+    public static final String ANNOTATES_ANNOTATION = "annotates_annotation";
+    public static final String DEPRECATES = "deprecates";
+    public static final String HAS_BODY = "has_body";
+  }
 
   public abstract void setRevision(Integer revision);
 
@@ -50,43 +53,43 @@ public abstract class AnnotationVF extends AlexandriaVF {
   public abstract String getLocator();
 
   @Out
-  @Edge(HAS_BODY)
+  @Edge(EdgeLabels.HAS_BODY)
   public abstract AnnotationBodyVF getBody();
 
   @Out
-  @Edge(HAS_BODY)
+  @Edge(EdgeLabels.HAS_BODY)
   public abstract void setBody(AnnotationBodyVF body);
 
   @Out
-  @Edge(ANNOTATES_ANNOTATION)
+  @Edge(EdgeLabels.ANNOTATES_ANNOTATION)
   public abstract AnnotationVF getAnnotatedAnnotation();
 
   @Out
-  @Edge(ANNOTATES_ANNOTATION)
+  @Edge(EdgeLabels.ANNOTATES_ANNOTATION)
   public abstract void setAnnotatedAnnotation(AnnotationVF annotationToAnnotate);
 
   @Out
-  @Edge(ANNOTATES_RESOURCE)
+  @Edge(EdgeLabels.ANNOTATES_RESOURCE)
   public abstract ResourceVF getAnnotatedResource();
 
   @Out
-  @Edge(ANNOTATES_RESOURCE)
+  @Edge(EdgeLabels.ANNOTATES_RESOURCE)
   public abstract void setAnnotatedResource(ResourceVF resourceToAnnotate);
 
   @In
-  @Edge(ANNOTATES_ANNOTATION)
+  @Edge(EdgeLabels.ANNOTATES_ANNOTATION)
   public abstract List<AnnotationVF> getAnnotatedBy();
 
   @Out
-  @Edge(DEPRECATES)
+  @Edge(EdgeLabels.DEPRECATES)
   public abstract void setDeprecatedAnnotation(AnnotationVF annotationToDeprecate);
 
   @Out
-  @Edge(DEPRECATES)
+  @Edge(EdgeLabels.DEPRECATES)
   public abstract AnnotationVF getDeprecatedAnnotation();
 
   @In
-  @Edge(DEPRECATES)
+  @Edge(EdgeLabels.DEPRECATES)
   public abstract AnnotationVF getDeprecatedBy();
 
   public String getType() {
@@ -117,7 +120,7 @@ public abstract class AnnotationVF extends AlexandriaVF {
 
   public String getSubResourceId() {
     ResourceVF annotatedResource = getFirstAnnotatedResource();
-    if (annotatedResource != null && annotatedResource.isSubresource()) {
+    if (annotatedResource != null && annotatedResource.isSubResource()) {
       return annotatedResource.getUuid();
     }
     return NO_VALUE;
@@ -125,7 +128,7 @@ public abstract class AnnotationVF extends AlexandriaVF {
 
   public ResourceVF getSubResource() {
     ResourceVF annotatedResource = getFirstAnnotatedResource();
-    if (annotatedResource != null && annotatedResource.isSubresource()) {
+    if (annotatedResource != null && annotatedResource.isSubResource()) {
       return annotatedResource;
     }
     return null;

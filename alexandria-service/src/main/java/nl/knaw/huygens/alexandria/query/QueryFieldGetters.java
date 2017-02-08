@@ -27,7 +27,7 @@ import java.util.function.Function;
 
 import com.google.common.collect.ImmutableMap;
 
-import nl.knaw.huygens.alexandria.model.search.QueryField;
+import nl.knaw.huygens.alexandria.api.model.search.QueryField;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 
 public class QueryFieldGetters {

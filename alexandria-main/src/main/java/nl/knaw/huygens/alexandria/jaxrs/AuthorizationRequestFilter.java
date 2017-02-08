@@ -22,11 +22,7 @@ package nl.knaw.huygens.alexandria.jaxrs;
  * #L%
  */
 
-import static javax.ws.rs.HttpMethod.GET;
-import static javax.ws.rs.HttpMethod.HEAD;
-import static javax.ws.rs.HttpMethod.OPTIONS;
-
-import java.util.Set;
+import com.google.common.collect.Sets;
 
 import javax.annotation.Priority;
 import javax.ws.rs.ForbiddenException;
@@ -34,8 +30,9 @@ import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.SecurityContext;
+import java.util.Set;
 
-import com.google.common.collect.Sets;
+import static javax.ws.rs.HttpMethod.*;
 
 @Priority(Priorities.AUTHORIZATION)
 public class AuthorizationRequestFilter implements ContainerRequestFilter {

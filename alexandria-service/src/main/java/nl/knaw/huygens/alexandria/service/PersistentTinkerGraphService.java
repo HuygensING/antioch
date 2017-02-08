@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.service;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -28,22 +28,24 @@ import java.nio.file.Paths;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import nl.knaw.huygens.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
-import nl.knaw.huygens.alexandria.text.TextService;
 
 @Singleton
 public class PersistentTinkerGraphService extends TinkerGraphService {
-  private static final String DUMPFILE = "alexandria.graphml";
+  private static Logger LOG = LoggerFactory.getLogger(PersistentTinkerGraphService.class);
+  private static final String DUMPFILE = "alexandria.gryo";
 
   @Inject
-  public PersistentTinkerGraphService(AlexandriaConfiguration config, LocationBuilder locationBuilder, TextService textService) {
-    super(locationBuilder, textService);
+  public PersistentTinkerGraphService(AlexandriaConfiguration config, LocationBuilder locationBuilder) {
+    super(locationBuilder);
     String dumpfile = config.getStorageDirectory() + "/" + DUMPFILE;
     STORAGE.setDumpFile(dumpfile);
     if (!STORAGE.supportsPersistence() && Files.exists(Paths.get(dumpfile))) {
-      Log.info("reading stored db from {}", dumpfile);
+      LOG.info("reading stored db from {}", dumpfile);
       STORAGE.loadFromDisk(dumpfile);
     }
   }

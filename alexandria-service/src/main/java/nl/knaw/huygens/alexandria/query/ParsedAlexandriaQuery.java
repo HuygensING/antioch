@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -38,13 +37,11 @@ import com.google.common.collect.Maps;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
+import nl.knaw.huygens.alexandria.util.StreamUtil;
 
 public class ParsedAlexandriaQuery {
   // this is just a container class for the results of processing the AlexandriaQuery parameters
-  private static final Function<Storage, Stream<AnnotationVF>> DEFAULT_ANNOTATIONVF_FINDER = storage -> {
-    Iterable<AnnotationVF> iterable = () -> storage.find(AnnotationVF.class);
-    return StreamSupport.stream(iterable.spliterator(), false);
-  };
+  private static final Function<Storage, Stream<AnnotationVF>> DEFAULT_ANNOTATIONVF_FINDER = storage -> StreamUtil.stream(storage.find(AnnotationVF.class));
 
   private Class<? extends AlexandriaVF> vfClazz;
   private Boolean distinct;
@@ -55,6 +52,8 @@ public class ParsedAlexandriaQuery {
   private Comparator<AnnotationVF> comparator;
   private Function<AnnotationVF, Map<String, Object>> mapper;
   private Function<Storage, Stream<AnnotationVF>> annotationVFFinder = DEFAULT_ANNOTATIONVF_FINDER;
+
+  private Function<Storage, Stream<Map<String, Object>>> resultStreamMapper;
 
   public ParsedAlexandriaQuery setVFClass(Class<? extends AlexandriaVF> vfClass) {
     this.vfClazz = vfClass;
@@ -156,4 +155,21 @@ public class ParsedAlexandriaQuery {
     }
     return null;
   }
+
+  public Function<Storage, Stream<Map<String, Object>>> getResultStreamMapper() {
+    if (vfClazz == AnnotationVF.class) {
+      return (storage) -> annotationVFFinder//
+          .apply(storage)//
+          .filter(predicate)//
+          .sorted(comparator)//
+          .map(mapper);
+    }
+
+    return resultStreamMapper;
+  }
+
+  public void setResultStreamMapper(Function<Storage, Stream<Map<String, Object>>> resultStreamMapper) {
+    this.resultStreamMapper = resultStreamMapper;
+  }
+
 }

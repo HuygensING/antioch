@@ -4,7 +4,7 @@
   <parent>
     <groupId>nl.knaw.huygens.alexandria</groupId>
     <artifactId>alexandria</artifactId>
-    <version>1.1.2-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
   </parent>
   <artifactId>alexandria-service</artifactId>
 
@@ -18,6 +18,11 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>alexandria-aql</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency> <!-- to overrule the version used by gremlin-core -->
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
     </dependency>
 
     <!-- tinkerpop -->
@@ -49,12 +54,6 @@
       <groupId>xml-apis</groupId>
       <artifactId>xml-apis</artifactId>
       <version>${xml-apis.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jooq</groupId>
-      <artifactId>jool</artifactId>
-      <version>${jool.version}</version>
     </dependency>
 
     <!-- Test dependencies -->

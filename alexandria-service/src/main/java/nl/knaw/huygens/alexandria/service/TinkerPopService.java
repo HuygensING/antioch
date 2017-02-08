@@ -1,5 +1,38 @@
 package nl.knaw.huygens.alexandria.service;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.TemporalAmount;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.tinkerpop.gremlin.structure.Direction;
+import org.apache.tinkerpop.gremlin.structure.Edge;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.jooq.lambda.Unchecked;
+
 /*
  * #%L
  * alexandria-service
@@ -10,57 +43,39 @@ package nl.knaw.huygens.alexandria.service;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.TemporalAmount;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-
-import javax.inject.Inject;
-
-import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.jooq.lambda.Unchecked;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinition;
-import nl.knaw.huygens.alexandria.api.model.BaseLayerDefinitionPrototype;
+import nl.knaw.huygens.alexandria.api.model.Annotator;
+import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
+import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.AbsolutePosition;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
@@ -72,7 +87,6 @@ import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
-import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.query.AlexandriaQueryParser;
 import nl.knaw.huygens.alexandria.query.ParsedAlexandriaQuery;
 import nl.knaw.huygens.alexandria.storage.DumpFormat;
@@ -80,30 +94,52 @@ import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
+import nl.knaw.huygens.alexandria.storage.frames.AnnotatorVF;
+import nl.knaw.huygens.alexandria.storage.frames.AnnotatorVF.EdgeLabels;
+import nl.knaw.huygens.alexandria.storage.frames.IdentifiableVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
-import nl.knaw.huygens.alexandria.text.TextService;
+import nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF;
+import nl.knaw.huygens.alexandria.textgraph.ParseResult;
+import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
+import nl.knaw.huygens.alexandria.textgraph.TextGraphSegment;
 import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorFactory;
 import nl.knaw.huygens.alexandria.textlocator.TextLocatorParseException;
+import nl.knaw.huygens.alexandria.util.StreamUtil;
+import peapod.FramedGraphTraversal;
 
+@Singleton
 public class TinkerPopService implements AlexandriaService {
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new Jdk8Module());
+
+  private static final TypeReference<Map<String, TextView>> TEXTVIEW_TYPEREF = new TypeReference<Map<String, TextView>>() {
+  };
+  private static final ObjectReader TEXTVIEW_READER = OBJECT_MAPPER.readerFor(TEXTVIEW_TYPEREF);
+  private static final ObjectWriter TEXTVIEW_WRITER = OBJECT_MAPPER.writerFor(TEXTVIEW_TYPEREF);
+
+  private static final TypeReference<Map<String, TextViewDefinition>> TEXTVIEWDEFINITION_TYPEREF = new TypeReference<Map<String, TextViewDefinition>>() {
+  };
+  private static final ObjectReader TEXTVIEWDEFINITION_READER = OBJECT_MAPPER.readerFor(TEXTVIEWDEFINITION_TYPEREF);
+  private static final ObjectWriter TEXTVIEWDEFINITION_WRITER = OBJECT_MAPPER.writerFor(TEXTVIEWDEFINITION_TYPEREF);
+
   private static final TemporalAmount TENTATIVES_TTL = Duration.ofDays(1);
+
   private Storage storage;
   private LocationBuilder locationBuilder;
   private AlexandriaQueryParser alexandriaQueryParser;
-  private TextService textService;
+  private TextGraphService textGraphService;
 
   @Inject
-  public TinkerPopService(Storage storage, LocationBuilder locationBuilder, TextService textService) {
-    Log.trace("{} created, locationBuilder=[{}]", getClass().getSimpleName(), locationBuilder);
+  public TinkerPopService(Storage storage, LocationBuilder locationBuilder) {
+    // Log.trace("{} created, locationBuilder=[{}]", getClass().getSimpleName(), locationBuilder);
     this.locationBuilder = locationBuilder;
     this.alexandriaQueryParser = new AlexandriaQueryParser(locationBuilder);
-    this.textService = textService;
     setStorage(storage);
   }
 
   public void setStorage(Storage storage) {
     this.storage = storage;
+    this.textGraphService = new TextGraphService(storage);
   }
 
   // - AlexandriaService methods -//
@@ -130,8 +166,25 @@ public class TinkerPopService implements AlexandriaService {
     });
   }
 
+  @Override
+  public AlexandriaResource createResource(UUID resourceUUID, String ref, TentativeAlexandriaProvenance provenance, AlexandriaState state) {
+    return storage.runInTransaction(() -> {
+      AlexandriaResource resource = new AlexandriaResource(resourceUUID, provenance);
+      resource.setCargo(ref);
+      resource.setState(state);
+      createOrUpdateResource(resource);
+      return resource;
+    });
+  }
+
   private Optional<AlexandriaResource> getOptionalResource(UUID uuid) {
     return storage.readVF(ResourceVF.class, uuid).map(this::deframeResource);
+  }
+
+  private Optional<AlexandriaResource> getOptionalResourceWithUniqueRef(String ref) {
+    FramedGraphTraversal<Object, ResourceVF> traversal = storage.find(ResourceVF.class).has(ResourceVF.Properties.CARGO, ref);
+    AlexandriaResource alexandriaResource = traversal.hasNext() ? deframeResourceLite(traversal.next()) : null;
+    return Optional.ofNullable(alexandriaResource);
   }
 
   @Override
@@ -185,6 +238,11 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
+  public Optional<AlexandriaResource> readResourceWithUniqueRef(String resourceRef) {
+    return storage.runInTransaction(() -> getOptionalResourceWithUniqueRef(resourceRef));
+  }
+
+  @Override
   public Optional<AlexandriaAnnotation> readAnnotation(UUID uuid) {
     return storage.runInTransaction(() -> storage.readVF(AnnotationVF.class, uuid).map(this::deframeAnnotation));
   }
@@ -222,10 +280,10 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public Optional<AlexandriaAnnotationBody> findAnnotationBodyWithTypeAndValue(String type, String value) {
     final List<AnnotationBodyVF> results = storage.runInTransaction(//
-        () -> storage.find(AnnotationBodyVF.class)//
-            .has("type", type)//
-            .has("value", value)//
-            .toList());
+      () -> storage.find(AnnotationBodyVF.class)//
+        .has("type", type)//
+        .has("value", value)//
+        .toList());
     if (results.isEmpty()) {
       return Optional.empty();
     }
@@ -235,24 +293,240 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public Optional<AlexandriaResource> findSubresourceWithSubAndParentId(String sub, UUID parentId) {
     return storage.runInTransaction(//
-        () -> storage.getResourceVertexTraversal()//
-            .has(Storage.IDENTIFIER_PROPERTY, parentId.toString())//
-            .in(ResourceVF.PART_OF)//
-            .has(ResourceVF.Properties.CARGO, sub)//
-            .toList()//
-            .parallelStream()//
-            .map(this::deframeResource)//
-            .findAny()//
+      () -> storage.getResourceVertexTraversal()//
+        .has(Storage.IDENTIFIER_PROPERTY, parentId.toString())//
+        .in(ResourceVF.EdgeLabels.PART_OF)//
+        .has(ResourceVF.Properties.CARGO, sub)//
+        .toList()//
+        .stream()//
+        .map(this::deframeResource)//
+        .findAny()//
     );
   }
 
   @Override
-  public Set<AlexandriaResource> readSubResources(UUID uuid) {
-    ResourceVF resourcevf = storage.runInTransaction(() -> storage.readVF(ResourceVF.class, uuid))//
-        .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
+  public List<AlexandriaResource> readSubResources(UUID uuid) {
+    ResourceVF resourcevf = readExistingResourceVF(uuid);
     return resourcevf.getSubResources().stream()//
-        .map(this::deframeResource)//
-        .collect(toSet());
+      .map(this::deframeResource)//
+      .sorted()//
+      .collect(toList());
+  }
+
+  @Override
+  public void setResourceAnnotator(UUID resourceUUID, Annotator annotator) {
+    storage.runInTransaction(() -> {
+      // remove existing annotator for this resource with the same annotator code
+      storage.getResourceVertexTraversal()//
+        .has(Storage.IDENTIFIER_PROPERTY, resourceUUID.toString())//
+        .in(EdgeLabels.HAS_RESOURCE)//
+        .has("code", annotator.getCode())//
+        .toList()//
+        .forEach(Vertex::remove);
+      AnnotatorVF avf = frameAnnotator(annotator);
+      ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
+      avf.setResource(resourceVF);
+      // Log.info("avf.resource={}", avf.getResource().getUuid());
+    });
+
+  }
+
+  @Override
+  public Optional<Annotator> readResourceAnnotator(UUID uuid, String code) {
+    ResourceVF resourcevf = readExistingResourceVF(uuid);
+    return resourcevf.getAnnotators().stream()//
+      .map(this::deframeAnnotator)//
+      .filter(a -> code.equals(a.getCode()))//
+      .findAny();
+  }
+
+  @Override
+  public AnnotatorList readResourceAnnotators(UUID uuid) {
+    List<AnnotatorVF> annotatorVFs = storage.runInTransaction(() -> {
+      ResourceVF resourceVF = readExistingResourceVF(uuid);
+      List<AnnotatorVF> annotatorVFList = Lists.newArrayList();
+      do {
+        annotatorVFList.addAll(resourceVF.getAnnotators());
+        resourceVF = resourceVF.getParentResource();
+      } while (resourceVF != null);
+
+      return annotatorVFList;
+    });
+    AnnotatorList annotators = new AnnotatorList();
+    Set<String> codes = Sets.newHashSet();
+    annotatorVFs.stream().map(this::deframeAnnotator)//
+      .forEach(a -> {
+        if (!codes.contains(a.getCode())) {
+          codes.add(a.getCode());
+          annotators.add(a);
+        }
+      });
+    return annotators;
+  }
+
+  @Override
+  public void setTextRangeAnnotation(UUID resourceUUID, TextRangeAnnotation annotation) {
+    storage.runInTransaction(() -> {
+      TextRangeAnnotationVF vf = storage.readVF(TextRangeAnnotationVF.class, annotation.getId())//
+        .orElseGet(() -> storage.createVF(TextRangeAnnotationVF.class));
+      updateTextRangeAnnotation(vf, annotation);
+      textGraphService.updateTextAnnotationLink(vf, annotation, resourceUUID);
+      vf.setResource(storage.readVF(ResourceVF.class, resourceUUID).get());
+    });
+  }
+
+  @Override
+  public TextRangeAnnotationList readTextRangeAnnotations(UUID resourceUUID) {
+    return storage.runInTransaction(() -> getTextRangeAnnotationList(resourceUUID));
+  }
+
+  @Override
+  public void deprecateTextRangeAnnotation(UUID annotationUUID, TextRangeAnnotation newTextRangeAnnotation) {
+    storage.runInTransaction(() -> {
+      TextRangeAnnotationVF oldVF = storage.readVF(TextRangeAnnotationVF.class, annotationUUID)//
+        .orElseThrow(NotFoundException::new);
+      Integer revision = oldVF.getRevision();
+      oldVF.setUuid(annotationUUID.toString() + "." + revision);
+      ResourceVF resourceVF = oldVF.getResource();
+      oldVF.setResource(null);
+
+      removeTextAnnotationFromChain(oldVF);
+
+      TextRangeAnnotationVF newVF = storage.createVF(TextRangeAnnotationVF.class);
+
+      newTextRangeAnnotation.setRevision(revision + 1);
+      updateTextRangeAnnotation(newVF, newTextRangeAnnotation);
+      UUID resourceUUID = UUID.fromString(resourceVF.getUuid());
+      textGraphService.updateTextAnnotationLink(newVF, newTextRangeAnnotation, resourceUUID);
+      newVF.setResource(resourceVF);
+      newVF.setDeprecatedAnnotation(oldVF);
+    });
+  }
+
+  private void removeTextAnnotationFromChain(TextRangeAnnotationVF oldVF) {
+    FramedGraphTraversal<TextRangeAnnotationVF, Vertex> traversal = oldVF.out(TextRangeAnnotationVF.EdgeLabels.HAS_TEXTANNOTATION);
+
+    // remove the old textAnnotationVertex without breaking the chain.
+    if (traversal.hasNext()) {
+      Vertex textAnnotationVertex = traversal.next();
+      Vertex leftVertex = null; // in the annotation chain, the vertex to the left of this textAnnotationVertex; there is always a left vertex
+      String leftEdgeLabel = null;
+      Vertex rightVertex = null; // in the annotation chain, the vertex to the right of this textAnnotationVertex; there might not be a right vertex
+      // it might be the first in the chain, so it has an incoming FIRST_ANNOTATION edge
+      Iterator<Edge> incomingFirstAnnotationEdgeIterator = textAnnotationVertex.edges(Direction.IN, nl.knaw.huygens.alexandria.storage.EdgeLabels.FIRST_ANNOTATION);
+      if (incomingFirstAnnotationEdgeIterator.hasNext()) {
+        // in that case, remove the edge, and reconnect the chain.
+        Edge incomingEdge = incomingFirstAnnotationEdgeIterator.next();
+        leftVertex = incomingEdge.outVertex();
+        leftEdgeLabel = nl.knaw.huygens.alexandria.storage.EdgeLabels.FIRST_ANNOTATION;
+        incomingEdge.remove();
+
+      } else {
+        // otherwise, it's a NEXT edge
+        Iterator<Edge> incomingNextEdgeIterator = textAnnotationVertex.edges(Direction.IN, nl.knaw.huygens.alexandria.storage.EdgeLabels.NEXT);
+        if (incomingNextEdgeIterator.hasNext()) {
+          Edge incomingNextEdge = incomingNextEdgeIterator.next();
+          leftVertex = incomingNextEdge.outVertex();
+          incomingNextEdge.remove();
+        }
+        leftEdgeLabel = nl.knaw.huygens.alexandria.storage.EdgeLabels.NEXT;
+      }
+
+      Iterator<Edge> outgoingNextEdgeIterator = textAnnotationVertex.edges(Direction.OUT, nl.knaw.huygens.alexandria.storage.EdgeLabels.NEXT);
+      if (outgoingNextEdgeIterator.hasNext()) {
+        Edge outgoingNextEdge = outgoingNextEdgeIterator.next();
+        rightVertex = outgoingNextEdge.inVertex();
+        outgoingNextEdge.remove();
+      }
+
+      if (rightVertex != null) {
+        leftVertex.addEdge(leftEdgeLabel, rightVertex);
+      }
+
+      textAnnotationVertex.remove();
+    }
+  }
+
+  private TextRangeAnnotationList getTextRangeAnnotationList(UUID resourceUUID) {
+    TextRangeAnnotationList list = new TextRangeAnnotationList();
+    storage.readVF(ResourceVF.class, resourceUUID).ifPresent(resourceVF -> {
+      FramedGraphTraversal<ResourceVF, Vertex> traversal = resourceVF.start()//
+        .in(TextRangeAnnotationVF.EdgeLabels.HAS_RESOURCE)//
+        ;
+      StreamUtil.stream(traversal)//
+        .map(v -> storage.frameVertex(v, TextRangeAnnotationVF.class))//
+        .map(this::deframeTextRangeAnnotation)//
+        .forEach(list::add);
+    });
+    return list;
+  }
+
+  @Override
+  public Optional<TextRangeAnnotation> readTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID) {
+    return storage.runInTransaction(() -> getOptionalTextRangeAnnotation(resourceUUID, annotationUUID));
+  }
+
+  @Override
+  public Optional<TextRangeAnnotation> readTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID, Integer revision) {
+    return storage.runInTransaction(() -> {
+      Optional<TextRangeAnnotationVF> versionedAnnotation = storage.readVF(TextRangeAnnotationVF.class, annotationUUID, revision);
+      if (versionedAnnotation.isPresent()) {
+        return versionedAnnotation.map(this::deframeTextRangeAnnotation);
+
+      } else {
+        Optional<TextRangeAnnotationVF> currentAnnotation = storage.readVF(TextRangeAnnotationVF.class, annotationUUID);
+        if (currentAnnotation.isPresent() && currentAnnotation.get().getRevision().equals(revision)) {
+          return currentAnnotation.map(this::deframeTextRangeAnnotation);
+        } else {
+          return Optional.empty();
+        }
+      }
+    });
+  }
+
+  private Optional<TextRangeAnnotation> getOptionalTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID) {
+    return storage.readVF(TextRangeAnnotationVF.class, annotationUUID).map(this::deframeTextRangeAnnotation);
+  }
+
+  @Override
+  public boolean nonNestingOverlapWithExistingTextRangeAnnotationForResource(TextRangeAnnotation annotation, UUID resourceUUID) {
+    return storage.runInTransaction(() -> {
+      AtomicBoolean overlaps = new AtomicBoolean(false);
+      storage.readVF(ResourceVF.class, resourceUUID).ifPresent(resourceVF -> {
+        FramedGraphTraversal<ResourceVF, Vertex> traversal = resourceVF.start()//
+          .in(TextRangeAnnotationVF.EdgeLabels.HAS_RESOURCE)//
+          .has("name", annotation.getName())//
+          .has("annotatorCode", annotation.getAnnotator())//
+          ;
+        AbsolutePosition absolutePosition = annotation.getAbsolutePosition();
+        String uuid1 = annotation.getId().toString();
+        String xmlId1 = absolutePosition.getXmlId();
+        Integer start1 = absolutePosition.getOffset();
+        Integer end1 = start1 + absolutePosition.getLength();
+        Predicate<Vertex> nonNestingOverlapWithAnnotation = t -> {
+          String xmlId2 = (String) t.property("absoluteXmlId").value();
+          Integer start2 = (Integer) t.property("absoluteOffset").value();
+          Integer end2 = start2 + (Integer) t.property("absoluteLength").value();
+          return xmlId1.equals(xmlId2)//
+            && (start1 < end2 && start2 < end1) // annotation overlaps with existing annotation t
+            && !((start1 <= start2 && start2 <= end1 && end2 <= end1) && !(start1 == start2 && end1 == end2)) // existing annotation t nested in annotation
+            && !((start2 <= start1 && start1 <= end2 && end1 <= end2) && !(start1 == start2 && end1 == end2)) // annotation nested in exisiting annotation t
+            ;
+        };
+        Predicate<Vertex> hasDifferentUUID = t -> {
+          String uuid2 = (String) t.property("uuid").value();
+          return !uuid1.equals(uuid2);
+        };
+        overlaps.set(StreamUtil.stream(traversal)//
+          .filter(hasDifferentUUID)//
+          .filter(nonNestingOverlapWithAnnotation)//
+          .findAny()//
+          .isPresent()//
+        );
+
+      });
+      return overlaps.get();
+    });
   }
 
   @Override
@@ -264,7 +538,7 @@ public class TinkerPopService implements AlexandriaService {
   private AnnotationVF deprecateAnnotationVF(UUID annotationId, AlexandriaAnnotation updatedAnnotation) {
     // check if there's an annotation with the given id
     AnnotationVF oldAnnotationVF = storage.readVF(AnnotationVF.class, annotationId)//
-        .orElseThrow(annotationNotFound(annotationId));
+      .orElseThrow(annotationNotFound(annotationId));
     if (oldAnnotationVF.isTentative()) {
       throw incorrectStateException(annotationId, "tentative");
     } else if (oldAnnotationVF.isDeleted()) {
@@ -284,6 +558,9 @@ public class TinkerPopService implements AlexandriaService {
       body = newBody;
     }
 
+    // update the uuid of the (to be) deprecated annotation, so the annotationuuid can be used for the new annotation
+    oldAnnotationVF.setUuid(oldAnnotationVF.getUuid() + "." + oldAnnotationVF.getRevision());
+
     AlexandriaProvenance tmpProvenance = updatedAnnotation.getProvenance();
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance(tmpProvenance.getWho(), tmpProvenance.getWhen(), tmpProvenance.getWhy());
     AlexandriaAnnotation newAnnotation = new AlexandriaAnnotation(updatedAnnotation.getId(), body, provenance);
@@ -302,7 +579,6 @@ public class TinkerPopService implements AlexandriaService {
 
     oldAnnotationVF.setAnnotatedAnnotation(null);
     oldAnnotationVF.setAnnotatedResource(null);
-    oldAnnotationVF.setUuid(oldAnnotationVF.getUuid() + "." + oldAnnotationVF.getRevision());
     updateState(oldAnnotationVF, AlexandriaState.DEPRECATED);
     return newAnnotationVF;
   }
@@ -315,7 +591,7 @@ public class TinkerPopService implements AlexandriaService {
   public void confirmResource(UUID uuid) {
     storage.runInTransaction(() -> {
       ResourceVF resourceVF = storage.readVF(ResourceVF.class, uuid)//
-          .orElseThrow(resourceNotFound(uuid));
+        .orElseThrow(resourceNotFound(uuid));
       updateState(resourceVF, AlexandriaState.CONFIRMED);
     });
   }
@@ -374,27 +650,28 @@ public class TinkerPopService implements AlexandriaService {
 
   @Override
   public Optional<AlexandriaAnnotationBody> readAnnotationBody(UUID uuid) {
-    throw new NotImplementedException();
+    throw new NotImplementedException("readAnnotationBody");
   }
 
   @Override
-  public void setResourceTextFromStream(UUID resourceUUID, InputStream inputStream) {
-    textService.setFromStream(resourceUUID, inputStream);
-    storage.runInTransaction(() -> {
-      ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
-      resourceVF.setHasText(true);
-    });
-  }
-
-  @Override
-  public void setBaseLayerDefinition(UUID resourceUUID, BaseLayerDefinitionPrototype bldPrototype) {
+  public void setTextView(UUID resourceUUID, String viewId, TextView textView, TextViewDefinition textViewDefinition) {
     storage.runInTransaction(() -> {
       ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
       String json;
       try {
-        json = new ObjectMapper().writeValueAsString(bldPrototype);
-        resourceVF.setBaseLayerDefinition(json);
-      } catch (JsonProcessingException e) {
+        String serializedTextViewMap = resourceVF.getSerializedTextViewMap();
+        Map<String, TextView> textViewMap = deserializeToTextViewMap(serializedTextViewMap);
+        textViewMap.put(viewId, textView);
+        json = serializeTextViewMap(textViewMap);
+        resourceVF.setSerializedTextViewMap(json);
+
+        String serializedTextViewDefinitionMap = resourceVF.getSerializedTextViewDefinitionMap();
+        Map<String, TextViewDefinition> textViewDefinitionMap = deserializeToTextViewDefinitionMap(serializedTextViewDefinitionMap);
+        textViewDefinitionMap.put(viewId, textViewDefinition);
+        json = serializeTextViewDefinitionMap(textViewDefinitionMap);
+        resourceVF.setSerializedTextViewDefinitionMap(json);
+
+      } catch (Exception e) {
         e.printStackTrace();
         throw new RuntimeException(e);
       }
@@ -402,38 +679,82 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   @Override
-  public Optional<BaseLayerDefinition> getBaseLayerDefinitionForResource(UUID resourceUUID) {
-    return storage.runInTransaction(() -> {
-      Optional<BaseLayerDefinition> optDef = Optional.empty();
+  public List<TextView> getTextViewsForResource(UUID resourceUUID) {
+    List<TextView> textViews = new ArrayList<>();
+    Set<String> viewNames = Sets.newHashSet();
 
+    return storage.runInTransaction(() -> {
       ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceUUID).get();
-      while (resourceVF != null //
-          && StringUtils.isEmpty(resourceVF.getBaseLayerDefinition())) {
+      while (resourceVF != null) {
+        String serializedTextViews = resourceVF.getSerializedTextViewMap();
+        UUID uuid = UUID.fromString(resourceVF.getUuid());
+        try {
+          deserializeToTextViews(serializedTextViews).stream().filter(v -> !viewNames.contains(v.getName())).forEach((tv) -> {
+            tv.setTextViewDefiningResourceId(uuid);
+            textViews.add(tv);
+            viewNames.add(tv.getName());
+          });
+
+        } catch (Exception e) {
+          e.printStackTrace();
+          throw new RuntimeException(e);
+        }
         resourceVF = resourceVF.getParentResource();
       }
-
-      if (resourceVF != null) {
-        String json = resourceVF.getBaseLayerDefinition();
-        if (StringUtils.isNotEmpty(json)) {
-          BaseLayerDefinition bld;
-          try {
-            bld = deserializeBaseLayerDefinition(json);
-          } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-          }
-          bld.setBaseLayerDefiningResourceId(UUID.fromString(resourceVF.getUuid()));
-          optDef = Optional.of(bld);
-        }
-      }
-      return optDef;
+      return textViews;
     });
   }
 
-  private BaseLayerDefinition deserializeBaseLayerDefinition(String json) throws IOException {
-    BaseLayerDefinitionPrototype prototype = new ObjectMapper().readValue(json, new TypeReference<BaseLayerDefinitionPrototype>() {
+  @Override
+  public Optional<TextView> getTextView(UUID resourceId, String view) {
+    TextView textView = storage.runInTransaction(() -> {
+      ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceId).get();
+      String serializedTextViews = resourceVF.getSerializedTextViewMap();
+      try {
+        Map<String, TextView> textViewMap = deserializeToTextViewMap(serializedTextViews);
+        List<TextView> textViews = textViewMap//
+          .entrySet()//
+          .stream()//
+          .filter(e -> e.getKey().equals(view))//
+          .map(this::setName)//
+          .collect(toList());
+
+        if (textViews.isEmpty()) {
+          ResourceVF parentResourceVF = resourceVF.getParentResource();
+          if (parentResourceVF != null) {
+            UUID parentUUID = UUID.fromString(parentResourceVF.getUuid());
+            return getTextView(parentUUID, view).orElse(null);
+          } else {
+            return null;
+          }
+
+        } else {
+          return textViews.get(0);
+        }
+
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new RuntimeException(e);
+      }
     });
-    return BaseLayerDefinition.withBaseElements(prototype.getBaseElements()).setSubresourceElements(prototype.getSubresourceElements());
+    return Optional.ofNullable(textView);
+  }
+
+  @Override
+  public Optional<TextViewDefinition> getTextViewDefinition(UUID resourceId, String view) {
+    TextViewDefinition textViewDefinition = storage.runInTransaction(() -> {
+      ResourceVF resourceVF = storage.readVF(ResourceVF.class, resourceId).get();
+      String serializedTextViewDefinitions = resourceVF.getSerializedTextViewDefinitionMap();
+      try {
+        Map<String, TextViewDefinition> textViewDefinitionMap = deserializeToTextViewDefinitionMap(serializedTextViewDefinitions);
+        return textViewDefinitionMap.get(view);
+
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new RuntimeException(e);
+      }
+    });
+    return Optional.ofNullable(textViewDefinition);
   }
 
   @Override
@@ -445,10 +766,10 @@ public class TinkerPopService implements AlexandriaService {
       long elapsedMillis = stopwatch.elapsed(TimeUnit.MILLISECONDS);
 
       return new SearchResult(locationBuilder)//
-          .setId(UUID.randomUUID())//
-          .setQuery(query)//
-          .setSearchDurationInMilliseconds(elapsedMillis)//
-          .setResults(processQuery);
+        .setId(UUID.randomUUID())//
+        .setQuery(query)//
+        .setSearchDurationInMilliseconds(elapsedMillis)//
+        .setResults(processQuery);
     });
   }
 
@@ -469,21 +790,6 @@ public class TinkerPopService implements AlexandriaService {
     // Log.info("destroy done");
   }
 
-  // @Override
-  // public void setResourceText(UUID resourceUUID, String text) {
-  // textService.set(resourceUUID, text);
-  // }
-  //
-  // @Override
-  // public Optional<String> getResourceText(UUID resourceUUID) {
-  // return textService.get(resourceUUID);
-  // }
-
-  @Override
-  public Optional<InputStream> getResourceTextAsStream(UUID resourceUUID) {
-    return textService.getAsStream(resourceUUID);
-  }
-
   @Override
   public void exportDb(String format, String filename) {
     storage.runInTransaction(Unchecked.runnable(() -> storage.writeGraph(DumpFormat.valueOf(format), filename)));
@@ -493,6 +799,47 @@ public class TinkerPopService implements AlexandriaService {
   public void importDb(String format, String filename) {
     storage = clearGraph();
     storage.runInTransaction(Unchecked.runnable(() -> storage.readGraph(DumpFormat.valueOf(format), filename)));
+  }
+
+  @Override
+  public void runInTransaction(Runnable runner) {
+    storage.runInTransaction(runner);
+  }
+
+  @Override
+  public <A> A runInTransaction(Supplier<A> supplier) {
+    return storage.runInTransaction(supplier);
+  }
+
+  @Override
+  public boolean storeTextGraph(UUID resourceId, ParseResult result) {
+    if (readResource(resourceId).isPresent()) {
+      textGraphService.storeTextGraph(resourceId, result);
+      return true;
+    }
+    // something went wrong
+    readResource(resourceId).get().setHasText(false);
+    return false;
+  }
+
+  @Override
+  public Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceId, List<List<String>> orderedLayerTags) {
+    return textGraphService.getTextGraphSegmentStream(resourceId, orderedLayerTags);
+  }
+
+  @Override
+  public Stream<TextAnnotation> getTextAnnotationStream(UUID resourceId) {
+    return textGraphService.getTextAnnotationStream(resourceId);
+  }
+
+  @Override
+  public void updateTextAnnotation(TextAnnotation textAnnotation) {
+    textGraphService.updateTextAnnotation(textAnnotation);
+  }
+
+  @Override
+  public void wrapContentInChildTextAnnotation(TextAnnotation existingTextAnnotation, TextAnnotation newTextAnnotation) {
+    textGraphService.wrapContentInChildTextAnnotation(existingTextAnnotation, newTextAnnotation);
   }
 
   // - other public methods -//
@@ -565,7 +912,7 @@ public class TinkerPopService implements AlexandriaService {
 
   Storage clearGraph() {
     storage.runInTransaction(() -> storage.getVertexTraversal()//
-        .forEachRemaining(org.apache.tinkerpop.gremlin.structure.Element::remove));
+      .forEachRemaining(org.apache.tinkerpop.gremlin.structure.Element::remove));
     return storage;
   }
 
@@ -591,20 +938,29 @@ public class TinkerPopService implements AlexandriaService {
     vf.setStateSince(Instant.now().getEpochSecond());
   }
 
-  AnnotationVF frameAnnotation(AlexandriaAnnotation newAnnotation) {
-    AnnotationVF avf = storage.createVF(AnnotationVF.class);
-    setAlexandriaVFProperties(avf, newAnnotation);
-    avf.setRevision(newAnnotation.getRevision());
-    if (newAnnotation.getLocator() != null) {
-      avf.setLocator(newAnnotation.getLocator().toString());
-    }
-    UUID bodyId = newAnnotation.getBody().getId();
-    AnnotationBodyVF bodyVF = storage.readVF(AnnotationBodyVF.class, bodyId).get();
-    avf.setBody(bodyVF);
-    return avf;
+  // - private methods -//
+
+  private String serializeTextViewMap(Map<String, TextView> textViewMap) throws JsonProcessingException {
+    return TEXTVIEW_WRITER.writeValueAsString(textViewMap);
   }
 
-  // - private methods -//
+  private Map<String, TextView> deserializeToTextViewMap(String json) throws IOException {
+    if (StringUtils.isEmpty(json)) {
+      return Maps.newHashMap();
+    }
+    return TEXTVIEW_READER.readValue(json);
+  }
+
+  private String serializeTextViewDefinitionMap(Map<String, TextViewDefinition> textViewDefinitionMap) throws JsonProcessingException {
+    return TEXTVIEWDEFINITION_WRITER.writeValueAsString(textViewDefinitionMap);
+  }
+
+  private Map<String, TextViewDefinition> deserializeToTextViewDefinitionMap(String json) throws JsonProcessingException, IOException {
+    if (StringUtils.isEmpty(json)) {
+      return Maps.newHashMap();
+    }
+    return TEXTVIEWDEFINITION_READER.readValue(json);
+  }
 
   private AlexandriaAnnotation createAnnotation(AlexandriaAnnotationBody annotationbody, TentativeAlexandriaProvenance provenance) {
     return new AlexandriaAnnotation(UUID.randomUUID(), annotationbody, provenance);
@@ -622,14 +978,8 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   private AlexandriaResource deframeResource(ResourceVF rvf) {
-    TentativeAlexandriaProvenance provenance = deframeProvenance(rvf);
-    UUID uuid = getUUID(rvf);
-    AlexandriaResource resource = new AlexandriaResource(uuid, provenance);
-    resource.setHasText(rvf.getHasText());
-    resource.setCargo(rvf.getCargo());
-    resource.setState(AlexandriaState.valueOf(rvf.getState()));
-    resource.setStateSince(Instant.ofEpochSecond(rvf.getStateSince()));
-    setOptionalBaseLayerDefinition(rvf, resource);
+    AlexandriaResource resource = deframeResourceLite(rvf);
+    setTextViews(rvf, resource);
 
     for (AnnotationVF annotationVF : rvf.getAnnotatedBy()) {
       AlexandriaAnnotation annotation = deframeAnnotation(annotationVF);
@@ -638,31 +988,143 @@ public class TinkerPopService implements AlexandriaService {
     ResourceVF parentResource = rvf.getParentResource();
     if (parentResource != null) {
       resource.setParentResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, parentResource.getUuid()));
-      ResourceVF ancestorResource = parentResource;
-      while (ancestorResource != null && StringUtils.isEmpty(ancestorResource.getBaseLayerDefinition())) {
-        ancestorResource = ancestorResource.getParentResource();
-      }
-      if (ancestorResource != null) {
-        resource.setFirstAncestorResourceWithBaseLayerDefinitionPointer(new IdentifiablePointer<>(AlexandriaResource.class, ancestorResource.getUuid()));
-      }
+      // ResourceVF ancestorResource = parentResource;
+      // while (ancestorResource != null && StringUtils.isEmpty(ancestorResource.getSerializedTextViewMap())) {
+      // ancestorResource = ancestorResource.getParentResource();
+      // }
+      // if (ancestorResource != null) {
+      // resource.setFirstAncestorResourceWithBaseLayerDefinitionPointer(new IdentifiablePointer<>(AlexandriaResource.class, ancestorResource.getUuid()));
+      // }
     }
     rvf.getSubResources().stream()//
-        .forEach(vf -> resource.addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
+            .forEach(vf -> resource.addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
     return resource;
   }
 
-  private void setOptionalBaseLayerDefinition(ResourceVF rvf, AlexandriaResource resource) {
-    String baseLayerDefinitionJson = rvf.getBaseLayerDefinition();
-    if (StringUtils.isNotEmpty(baseLayerDefinitionJson)) {
+  private AlexandriaResource deframeResourceLite(ResourceVF rvf) {
+    TentativeAlexandriaProvenance provenance = deframeProvenance(rvf);
+    UUID uuid = getUUID(rvf);
+    AlexandriaResource resource = new AlexandriaResource(uuid, provenance);
+    resource.setHasText(rvf.getHasText());
+    resource.setCargo(rvf.getCargo());
+    resource.setState(AlexandriaState.valueOf(rvf.getState()));
+    resource.setStateSince(Instant.ofEpochSecond(rvf.getStateSince()));
+    return resource;
+  }
+
+  private AnnotatorVF frameAnnotator(Annotator annotator) {
+    AnnotatorVF avf = storage.createVF(AnnotatorVF.class);
+    avf.setCode(annotator.getCode());
+    avf.setDescription(annotator.getDescription());
+    return avf;
+  }
+
+  private Annotator deframeAnnotator(AnnotatorVF avf) {
+    return new Annotator()//
+      .setCode(avf.getCode())//
+      .setDescription(avf.getDescription())//
+      .setResourceURI(locationBuilder.locationOf(AlexandriaResource.class, avf.getResource().getUuid()));
+  }
+
+  private void updateTextRangeAnnotation(TextRangeAnnotationVF vf, TextRangeAnnotation annotation) {
+    vf.setUuid(annotation.getId().toString());
+    vf.setRevision(annotation.getRevision());
+    vf.setName(annotation.getName());
+    vf.setAnnotatorCode(annotation.getAnnotator());
+    Position position = annotation.getPosition();
+    position.getXmlId().ifPresent(xmlId -> {
+      vf.setXmlId(xmlId);
+      if (position.getOffset().isPresent()) {
+        vf.setOffset(position.getOffset().get());
+      }
+      if (position.getLength().isPresent()) {
+        vf.setLength(position.getLength().get());
+      }
+    });
+    position.getTargetAnnotationId().ifPresent(targetId -> vf.setTargetAnnotationId(targetId.toString()));
+    AbsolutePosition absolutePosition = annotation.getAbsolutePosition();
+    vf.setAbsoluteXmlId(absolutePosition.getXmlId());
+    vf.setAbsoluteOffset(absolutePosition.getOffset());
+    vf.setAbsoluteLength(absolutePosition.getLength());
+    vf.setUseOffset(annotation.getUseOffset());
+    try {
+      String json = new ObjectMapper().writeValueAsString(annotation.getAttributes());
+      vf.setAttributesAsJson(json);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+
+  }
+
+  private TextRangeAnnotation deframeTextRangeAnnotation(TextRangeAnnotationVF vf) {
+    String targetAnnotationId = vf.getTargetAnnotationId();
+    UUID targetAnnotationUUID = targetAnnotationId == null ? null : UUID.fromString(targetAnnotationId);
+    Position position = new Position()//
+      .setTargetAnnotationId(targetAnnotationUUID)//
+      .setXmlId(vf.getXmlId())//
+      .setOffset(vf.getOffset())//
+      .setLength(vf.getLength());
+    AbsolutePosition absolutePosition = new AbsolutePosition()//
+      .setXmlId(vf.getAbsoluteXmlId())//
+      .setOffset(vf.getAbsoluteOffset())//
+      .setLength(vf.getAbsoluteLength());
+    Map<String, String> attributes;
+    try {
+      String attributesAsJson = StringUtils.defaultIfBlank(vf.getAttributesAsJson(), "{}");
+      TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {
+      };
+      attributes = new ObjectMapper().readValue(attributesAsJson, typeRef);
+      return new TextRangeAnnotation()//
+        .setId(getUUID(vf))//
+        .setRevision(vf.getRevision())//
+        .setName(vf.getName())//
+        .setAnnotator(vf.getAnnotatorCode())//
+        .setAttributes(attributes)//
+        .setPosition(position)//
+        .setAbsolutePosition(absolutePosition);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void setTextViews(ResourceVF rvf, AlexandriaResource resource) {
+    String textViewsJson = rvf.getSerializedTextViewMap();
+    if (StringUtils.isNotEmpty(textViewsJson)) {
       try {
-        BaseLayerDefinition bld = deserializeBaseLayerDefinition(baseLayerDefinitionJson);
-        resource.setDirectBaseLayerDefinition(bld);
+        List<TextView> textViews = deserializeToTextViews(textViewsJson);
+        resource.setDirectTextViews(textViews);
       } catch (IOException e) {
         e.printStackTrace();
         throw new RuntimeException(e);
       }
     }
+  }
 
+  private List<TextView> deserializeToTextViews(String textViewsJson) throws IOException {
+    Map<String, TextView> textViewMap = deserializeToTextViewMap(textViewsJson);
+    return textViewMap.entrySet()//
+      .stream()//
+      .map(this::setName)//
+      .collect(toList());
+  }
+
+  private TextView setName(Entry<String, TextView> entry) {
+    TextView textView = entry.getValue();
+    textView.setName(entry.getKey());
+    return textView;
+  }
+
+  AnnotationVF frameAnnotation(AlexandriaAnnotation newAnnotation) {
+    AnnotationVF avf = storage.createVF(AnnotationVF.class);
+    setAlexandriaVFProperties(avf, newAnnotation);
+    avf.setRevision(newAnnotation.getRevision());
+    if (newAnnotation.getLocator() != null) {
+      avf.setLocator(newAnnotation.getLocator().toString());
+    }
+    UUID bodyId = newAnnotation.getBody().getId();
+    AnnotationBodyVF bodyVF = storage.readVF(AnnotationBodyVF.class, bodyId).get();
+    avf.setBody(bodyVF);
+    return avf;
   }
 
   private AlexandriaAnnotation deframeAnnotation(AnnotationVF annotationVF) {
@@ -745,56 +1207,35 @@ public class TinkerPopService implements AlexandriaService {
     return new BadRequestException("annotation " + oldAnnotationId + " is " + string);
   }
 
-  private UUID getUUID(AlexandriaVF vf) {
+  private UUID getUUID(IdentifiableVF vf) {
     return UUID.fromString(vf.getUuid().replaceFirst("\\..$", "")); // remove revision suffix for deprecated annotations
   }
 
   private List<Map<String, Object>> processQuery(AlexandriaQuery query) {
     ParsedAlexandriaQuery pQuery = alexandriaQueryParser.parse(query);
 
-    Predicate<AnnotationVF> predicate = pQuery.getPredicate();
-    Comparator<AnnotationVF> comparator = pQuery.getResultComparator();
-    Function<AnnotationVF, Map<String, Object>> mapper = pQuery.getResultMapper();
+    Stream<Map<String, Object>> mapStream = pQuery.getResultStreamMapper().apply(storage);
 
-    Stream<AnnotationVF> stream = pQuery.getAnnotationVFFinder().apply(storage);
-    Log.debug("list={}", stream);
-
-    Stream<Map<String, Object>> mapStream = stream//
-        .filter(predicate)//
-        .sorted(comparator)//
-        .map(mapper);
     if (pQuery.isDistinct()) {
       mapStream = mapStream.distinct();
     }
     if (pQuery.doGrouping()) {
-      Stream<Map<String, Object>> groupByStream = mapStream//
-          .collect(groupingBy(pQuery::concatenateGroupByFieldsValues))//
-          .values().stream()//
-          .map(pQuery::collectListFieldValues);
-      mapStream = groupByStream;
+      mapStream = mapStream//
+        .collect(groupingBy(pQuery::concatenateGroupByFieldsValues))//
+        .values().stream()//
+        .map(pQuery::collectListFieldValues);
     }
-    List<Map<String, Object>> results = mapStream//
-        .collect(toList());
-    Log.debug("results={}", results);
-    return results;
+    return mapStream//
+      .collect(toList());
   }
 
-  // @SuppressWarnings("unchecked")
-  // private void findAllConfirmedAnnotationsRelatedToResource(String uuid) {
-  // // case: find all annotations related to a given resource (or its subresources)
-  // // start with the resource
-  // // from there: find subresources, add them to resource list
-  // // foreach resource in the list, get the confirmed annotations of that resource, add them to annotations list
-  // // foreach annotation in the annotationlist, find the confirmed annotations of that annotation, add them to
-  // annotations list
-  // GraphTraversal<Vertex, Vertex> traversal = storage.getVertexTraversal();
-  // traversal.has("uuid", uuid).in(ResourceVF.PART_OF).in("annotates").has("state", "CONFIRMED").as("a").out
-  // ("has_body").as("b").toList();
-  // traversal.has("uuid", uuid)
-  // .union(//
-  // __.in(ResourceVF.PART_OF).in(AnnotationVF.ANNOTATES_RESOURCE), //
-  // __.in(AnnotationVF.ANNOTATES_RESOURCE)//
-  // ).has("state", AlexandriaState.CONFIRMED.name()).as("a").out(AnnotationVF.HAS_BODY).as("b").toList();
-  // }
+  private ResourceVF readExistingResourceVF(UUID uuid) {
+    return storage.runInTransaction(() -> storage.readVF(ResourceVF.class, uuid))//
+      .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
+  }
+
+  public Storage storage() {
+    return storage;
+  }
 
 }

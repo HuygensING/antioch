@@ -3,7 +3,7 @@
   <parent>
     <groupId>nl.knaw.huygens.alexandria</groupId>
     <artifactId>alexandria</artifactId>
-    <version>1.1.2-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
   </parent>
   <artifactId>alexandria-service-tinkerpop-titan</artifactId>
 
@@ -19,7 +19,20 @@
       <groupId>com.thinkaurelius.titan</groupId>
       <artifactId>titan-core</artifactId>
       <version>${titan.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.tinkerpop</groupId>
+          <artifactId>gremlin-groovy</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
+
+
+    <!-- BerkeleyDB backend -->
     <dependency>
       <groupId>com.thinkaurelius.titan</groupId>
       <artifactId>titan-berkeleyje</artifactId>
@@ -29,6 +42,11 @@
       <groupId>com.sleepycat</groupId>
       <artifactId>je</artifactId>
       <version>${sleepycat.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>1.7.21</version>
     </dependency>
   </dependencies>
 </project>

@@ -53,7 +53,7 @@ function a-test {
   a-generate-resource-with-uuid $id
   url=$(a-annotate-resource "$id" "Tag" "Test annotation for resource $id" | a-location)
   a-confirm $url
-  a-delete $url  
+  a-delete $url
 }
 
 function a-generate-resource-with-uuid {
@@ -82,15 +82,16 @@ function a-generate-confirmed-subresource-with-title {
   echo ${suburi}
 }
 
-function a-set-default-baselayer-definition {
-  a-log "Setting default baselayer definition for ${be}/resources/$ri"
-  curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
-     --data-binary '{"baseLayerDefinition":{
-     	 "subresourceElements": ["note"],
-       "baseElements" : [
-          { "name": "text", "baseAttributes": [ "id" ] },
-          { "name": "p", "baseAttributes": [ "id" ] },
-          { "name": "div", "baseAttributes" : [ "id", "by" ] }
+function a-set-baselayer-textview {
+  a-log "Setting default baselayer textview for ${be}/resources/$ri"
+  curl -i -H "${authheader}" -X PUT $be/resources/$ri/text/views/baselayer -H 'Content-type: application/json' \
+     --data-binary '{"textView":{
+       "description" : "The base layer",
+     	 "ignoredElements": ["note"],
+       "includedElements" : [
+          { "name": "text", "includedAttributes": [ "id" ] },
+          { "name": "p", "includedAttributes": [ "id" ] },
+          { "name": "div", "includedAttributes" : [ "id", "by" ] }
        ]}
      }'
 }
@@ -125,6 +126,12 @@ function a-use-localhost {
   a-set-authkey ${ALEXANDRIA_AUTHKEY_LOCAL}
 }
 
+function a-use-localip {
+  localip=$(ipconfig|grep IPv4|grep -v Autoconfiguration|sed -e "s/.*: //")
+  a-set-backend http://${localip}:2015
+  a-set-authkey ${ALEXANDRIA_AUTHKEY_LOCAL}
+}
+
 function a-use-test {
   a-set-backend http://test.alexandria.huygens.knaw.nl/
   a-set-authkey ${ALEXANDRIA_AUTHKEY_TEST}
@@ -155,28 +162,77 @@ function a-about-service {
 function a-dry-run {
   ri=$(uuidgen)
   a-generate-resource-with-uuid $ri
-  curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
-	--data-binary '{
-	  "baseLayerDefinition": {
-	  	"subresourceElements": ["note"],
-	    "baseElements": [ {
-	      "name": "body"
-	    }, {
-	      "name": "div",
-	      "baseAttributes": [ "type" ]
-	    }, {
-	      "name": "p"
-	    }, {
-	      "name": "sub"
-	    }, {
-	      "name": "sup"
-	    } ]
-	  }
-	}'
+  curl -i -H "${authheader}" -X PUT $be/resources/$ri/text/views/baselayer -H 'Content-type: application/json' \
+  --data-binary '{
+    "textView": {
+      "description" : "The Base Layer",
+      "ignoredElements": ["note"],
+      "includedElements": [ {
+        "name": "body"
+      }, {
+        "name": "div",
+        "includedAttributes": [ "type" ]
+      }, {
+        "name": "text"
+      }, {
+        "name": "p"
+      }, {
+        "name": "table"
+      }, {
+        "name": "row"
+      }, {
+        "name": "cell"
+      }, {
+        "name": "sub"
+      }, {
+        "name": "sup"
+      } ]
+    }
+  }'
   a-log "result uploading text:"
   curl --silent --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:text/xml' --data "$*" | jq "."
   a-log "extracted baselayer:"
-  curl ${be}/resources/${ri}/text
+  curl ${be}/resources/${ri}/text/xml?view=baselayer
+}
+
+function a-dry-run-from-file {
+  ri=$(uuidgen)
+  a-generate-resource-with-uuid $ri
+  a-log "result uploading text:"
+  location=$(curl -i --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:application/octet-stream' --data @"$*" |a-location)
+  a-log "Location: ${location}"
+  curl --silent ${location} | jq "."
+  curl -i -H "${authheader}" -X PUT $be/resources/$ri/text/views/baselayer -H 'Content-type: application/json' \
+  --data-binary '{
+    "textView": {
+      "description" : "The Base Layer",
+      "ignoredElements": ["note"],
+      "includedElements": [ {
+        "name": "body"
+      }, {
+        "name": "div",
+        "includedAttributes": [ "type" ]
+      }, {
+        "name": "text"
+      }, {
+        "name": "p"
+      }, {
+        "name": "table"
+      }, {
+        "name": "row"
+      }, {
+        "name": "cell"
+      }, {
+        "name": "sub"
+      }, {
+        "name": "sup"
+      } ]
+    }
+  }'
+  a-log "extracted baselayer:"
+  curl ${be}/resources/${ri}/text/views/baselayer
+  curl --silent ${location} | jq "."
+  a-log "see status at ${location}"
 }
 
 function a-gutenberg-import-file {
@@ -193,7 +249,7 @@ function a-gutenberg-import-file {
         "name": "TEI"
       }, {
         "name": "div",
-        "baseAttributes": [ "type" ]
+        "includedAttributes": [ "type" ]
       }, {
         "name": "body"
       }, {
@@ -208,11 +264,363 @@ function a-gutenberg-import-file {
     }
   }'
   a-log "result uploading text:"
-  curl --silent --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:application/octet-stream' --data @"$*" | jq "."
-  a-log "extracted baselayer:"
-  curl ${be}/resources/${ri}/text
+  location=$(curl -i --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:application/octet-stream' --data @"$*" |a-location)
+  a-log "Location: ${location}"
+  curl --silent ${location} | jq "."
+  a-log "see status at ${location}"
 }
 
+function a-import-gryo-dump {
+  importfile=$1
+  if [[ ! -e ${importfile} ]]; then
+    echo "importfile ${importfile} not found"
+  else
+    curl -i -H "${authheader}" -X PUT ${be}/admin -H 'Content-type: application/json' \
+    --data-binary "{
+      \"key\" : \"${authkey}\",
+      \"command\" : \"import\",
+      \"parameters\" : {
+        \"format\" : \"gryo\",
+        \"filename\" : \"${importfile}\"
+      }
+    }}"
+  fi
+}
+
+function a-import-gryo-dump {
+  importfile=$1
+  if [[ ! -e ${importfile} ]]; then
+    echo "importfile ${importfile} not found"
+  else
+    curl -i -H "${authheader}" -X PUT ${be}/admin -H 'Content-type: application/json' \
+    --data-binary "{
+      \"key\" : \"${authkey}\",
+      \"command\" : \"import\",
+      \"parameters\" : {
+        \"format\" : \"graphml\",
+        \"filename\" : \"${importfile}\"
+      }
+    }}"
+  fi
+}
+
+function a-import-graphson-dump {
+  importfile=$1
+  if [[ ! -e ${importfile} ]]; then
+    echo "importfile ${importfile} not found"
+  else
+    curl -i -H "${authheader}" -X PUT ${be}/admin -H 'Content-type: application/json' \
+    --data-binary "{
+      \"key\" : \"${authkey}\",
+      \"command\" : \"import\",
+      \"parameters\" : {
+        \"format\" : \"graphson\",
+        \"filename\" : \"${importfile}\"
+      }
+    }}"
+  fi
+}
+
+function a-get-web-annotation {
+  uuid=$1
+  curl -i \
+    -H 'Accept: application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"' \
+    ${be}/webannotations/${uuid}
+}
+
+
+function a-delete-web-annotation {
+  uuid=$1
+  curl -i \
+    -X DELETE \
+    -H "${authheader}" \
+    ${be}/webannotations/${uuid}
+}
+
+function a-add-web-annotation {
+  curl \
+    -H "${authheader}" \
+    -H 'Accept: application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"' \
+    -H 'Content-type: application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"' \
+    --data-binary "$1" \
+    ${be}/webannotations | jq "."
+}
+
+function a-update-web-annotation {
+  curl \
+    -X PUT \
+    -H "${authheader}" \
+    -H 'Accept: application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"' \
+    -H 'Content-type: application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"' \
+    --data-binary "$2" \
+    ${be}/webannotations/$1 | jq "."
+}
+
+
+function a-add-sample-web-annotation1 {
+	a-add-web-annotation '{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@type": "oa:Annotation",
+  "motivation": [
+    "oa:tagging",
+    "oa:commenting"
+  ],
+  "resource": [
+    {
+      "@type": "oa:Tag",
+      "chars": "TestTag"
+    },
+    {
+      "@type": "dctypes:Text",
+      "format": "text/html",
+      "chars": "<p>TestAnnotatie<\/p>"
+    }
+  ],
+  "on": {
+    "@type": "oa:SpecificResource",
+    "full": "https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-5981120.json",
+    "selector": {
+      "@type": "oa:SvgSelector",
+      "value": "<svg xmlns=\"http://www.w3.org/2000/svg\"><path xmlns=\"http://www.w3.org/2000/svg\" d=\"M2544.65571,871.97372l539.74212,0l0,0l539.74212,0l0,331.89112l0,331.89112l-539.74212,0l-539.74212,0l0,-331.89112z\" data-paper-data=\"{&quot;defaultStrokeValue&quot;:1,&quot;editStrokeValue&quot;:5,&quot;currentStrokeValue&quot;:1,&quot;rotation&quot;:0,&quot;deleteIcon&quot;:null,&quot;rotationIcon&quot;:null,&quot;group&quot;:null,&quot;editable&quot;:true,&quot;annotation&quot;:null}\" id=\"rectangle_0403bd67-c6af-4b48-b5bf-f845fd5b5944\" fill-opacity=\"0\" fill=\"#00bfff\" fill-rule=\"nonzero\" stroke=\"#00bfff\" stroke-width=\"6.70487\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-miterlimit=\"10\" stroke-dasharray=\"\" stroke-dashoffset=\"0\" font-family=\"sans-serif\" font-weight=\"normal\" font-size=\"12\" text-anchor=\"start\" style=\"mix-blend-mode: normal\"/></svg>"
+    },
+    "within": {
+      "@id": "https://iiif.lib.harvard.edu/manifests/drs:5981093",
+      "@type": "sc:Manifest"
+    }
+  }}'
+}
+
+function a-add-sample-web-annotation2 {
+	a-add-web-annotation '{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@type": "oa:Annotation",
+  "motivation": [
+    "oa:tagging",
+    "oa:commenting"
+  ],
+  "resource": [
+    {
+      "@type": "oa:Tag",
+      "chars": "Tag"
+    },
+    {
+      "@type": "dctypes:Text",
+      "format": "text/html",
+      "chars": "<p>Test 1c &amp; d</p>"
+    }
+  ],
+  "on": {
+    "@type": "oa:SpecificResource",
+    "full": "https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-5981120.json",
+    "selector": {
+      "@type": "oa:SvgSelector",
+      "value": "<svg xmlns=\"http://www.w3.org/2000/svg\"><path xmlns=\"http://www.w3.org/2000/svg\" d=\"M2839.67004,1958.16283l603.4384,0l0,0l603.4384,0l0,372.12034l0,372.12034l-603.4384,0l-603.4384,0l0,-372.12034z\" data-paper-data=\"{&quot;defaultStrokeValue&quot;:1,&quot;editStrokeValue&quot;:5,&quot;currentStrokeValue&quot;:1,&quot;rotation&quot;:0,&quot;deleteIcon&quot;:null,&quot;rotationIcon&quot;:null,&quot;group&quot;:null,&quot;editable&quot;:true,&quot;annotation&quot;:null}\" id=\"rectangle_d8e37e58-64d5-47b5-934a-760f5f05129c\" fill-opacity=\"0\" fill=\"#00bfff\" fill-rule=\"nonzero\" stroke=\"#00bfff\" stroke-width=\"6.70487\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-miterlimit=\"10\" stroke-dasharray=\"\" stroke-dashoffset=\"0\" font-family=\"sans-serif\" font-weight=\"normal\" font-size=\"12\" text-anchor=\"start\" style=\"mix-blend-mode: normal\"/></svg>"
+    },
+    "within": {
+      "@id": "https://iiif.lib.harvard.edu/manifests/drs:5981093",
+      "@type": "sc:Manifest"
+    }
+  }}'
+}
+
+function a-add-sample-web-annotation3 {
+	a-add-web-annotation '{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@type": "oa:Annotation",
+  "motivation": [
+    "oa:tagging",
+    "oa:commenting"
+  ],
+  "resource": [
+    {
+      "@type": "oa:Tag",
+      "chars": "Tag"
+    },
+    {
+      "@type": "dctypes:Text",
+      "format": "text/html",
+      "chars": "<p>HELLO WORLD</p>"
+    }
+  ],
+  "on": {
+    "@type": "oa:SpecificResource",
+    "full": "https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-007.json",
+    "selector": {
+      "@type": "oa:SvgSelector",
+      "value": "<svg xmlns=\"http://www.w3.org/2000/svg\"><path xmlns=\"http://www.w3.org/2000/svg\" d=\"M2839.67004,1958.16283l603.4384,0l0,0l603.4384,0l0,372.12034l0,372.12034l-603.4384,0l-603.4384,0l0,-372.12034z\" data-paper-data=\"{&quot;defaultStrokeValue&quot;:1,&quot;editStrokeValue&quot;:5,&quot;currentStrokeValue&quot;:1,&quot;rotation&quot;:0,&quot;deleteIcon&quot;:null,&quot;rotationIcon&quot;:null,&quot;group&quot;:null,&quot;editable&quot;:true,&quot;annotation&quot;:null}\" id=\"rectangle_d8e37e58-64d5-47b5-934a-760f5f05129c\" fill-opacity=\"0\" fill=\"#00bfff\" fill-rule=\"nonzero\" stroke=\"#00bfff\" stroke-width=\"6.70487\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-miterlimit=\"10\" stroke-dasharray=\"\" stroke-dashoffset=\"0\" font-family=\"sans-serif\" font-weight=\"normal\" font-size=\"12\" text-anchor=\"start\" style=\"mix-blend-mode: normal\"/></svg>"
+    },
+    "within": {
+      "@id": "https://iiif.lib.harvard.edu/manifests/drs:5981093",
+      "@type": "sc:Manifest"
+    }
+  }}'
+}
+
+function a-update-sample-web-annotation3 {
+  a-update-web-annotation $1 '{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@type": "oa:Annotation",
+  "motivation": [
+    "oa:tagging",
+    "oa:commenting"
+  ],
+  "resource": [
+    {
+      "@type": "oa:Tag",
+      "chars": "Guten Tag!"
+    },
+    {
+      "@type": "dctypes:Text",
+      "format": "text/html",
+      "chars": "<p>Goodbye World!</p>"
+    }
+  ],
+  "on": {
+    "@type": "oa:SpecificResource",
+    "full": "https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-007.json",
+    "selector": {
+      "@type": "oa:SvgSelector",
+      "value": "<svg xmlns=\"http://www.w3.org/2000/svg\"><path xmlns=\"http://www.w3.org/2000/svg\" d=\"M2839.67004,1958.16283l603.4384,0l0,0l603.4384,0l0,372.12034l0,372.12034l-603.4384,0l-603.4384,0l0,-372.12034z\" data-paper-data=\"{&quot;defaultStrokeValue&quot;:1,&quot;editStrokeValue&quot;:5,&quot;currentStrokeValue&quot;:1,&quot;rotation&quot;:0,&quot;deleteIcon&quot;:null,&quot;rotationIcon&quot;:null,&quot;group&quot;:null,&quot;editable&quot;:true,&quot;annotation&quot;:null}\" id=\"rectangle_d8e37e58-64d5-47b5-934a-760f5f05129c\" fill-opacity=\"0\" fill=\"#00bfff\" fill-rule=\"nonzero\" stroke=\"#00bfff\" stroke-width=\"6.70487\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-miterlimit=\"10\" stroke-dasharray=\"\" stroke-dashoffset=\"0\" font-family=\"sans-serif\" font-weight=\"normal\" font-size=\"12\" text-anchor=\"start\" style=\"mix-blend-mode: normal\"/></svg>"
+    },
+    "within": {
+      "@id": "https://iiif.lib.harvard.edu/manifests/drs:5981093",
+      "@type": "sc:Manifest"
+    }
+  }}'
+}
+
+function a-search-web-annotations-with-uri {
+	uri=$1
+	curl ${be}/webannotations/search?uri=${uri} | jq "."
+}
+
+function a-add-web-annotationlist {
+  curl \
+    -H "${authheader}" \
+    -H 'Accept: application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"' \
+    -H 'Content-type: application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"' \
+    --data-binary "$1" \
+    ${be}/iiif/identifier/list/name | jq "."
+}
+
+function a-add-web-annotationlist-async {
+  curl \
+    -H "${authheader}" \
+    -H 'Accept: application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"' \
+    -H 'Content-type: application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"' \
+    --data-binary "$1" \
+    ${be}/iiif/identifier/list/name/async | jq "."
+}
+
+function a-add-web-annotationlist-raw {
+  curl \
+   --raw \
+    -H "${authheader}" \
+    -H 'Accept: application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"' \
+    -H 'Content-type: application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"' \
+    --data-binary "$1" \
+    ${be}/iiif/identifier/list/name
+}
+
+function a-add-sample-web-annotationlist {
+  a-add-web-annotationlist-async '{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+	"@type": "sc:AnnotationList",
+
+	"resources": [
+	{
+		"@type": "oa:Annotation",
+	  "motivation": [
+	    "oa:tagging",
+	    "oa:commenting"
+	  ],
+	  "resource": [
+	    {
+	      "@type": "oa:Tag",
+	      "chars": "Guten Tag!"
+	    },
+	    {
+	      "@type": "dctypes:Text",
+	      "format": "text/html",
+	      "chars": "<p>Goodbye World!</p>"
+	    }
+	  ],
+	  "on": {
+	    "@type": "oa:SpecificResource",
+	    "full": "https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-007.json",
+	    "selector": {
+	      "@type": "oa:SvgSelector",
+	      "value": "<svg xmlns=\"http://www.w3.org/2000/svg\"><path xmlns=\"http://www.w3.org/2000/svg\" d=\"M2839.67004,1958.16283l603.4384,0l0,0l603.4384,0l0,372.12034l0,372.12034l-603.4384,0l-603.4384,0l0,-372.12034z\" data-paper-data=\"{&quot;defaultStrokeValue&quot;:1,&quot;editStrokeValue&quot;:5,&quot;currentStrokeValue&quot;:1,&quot;rotation&quot;:0,&quot;deleteIcon&quot;:null,&quot;rotationIcon&quot;:null,&quot;group&quot;:null,&quot;editable&quot;:true,&quot;annotation&quot;:null}\" id=\"rectangle_d8e37e58-64d5-47b5-934a-760f5f05129c\" fill-opacity=\"0\" fill=\"#00bfff\" fill-rule=\"nonzero\" stroke=\"#00bfff\" stroke-width=\"6.70487\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-miterlimit=\"10\" stroke-dasharray=\"\" stroke-dashoffset=\"0\" font-family=\"sans-serif\" font-weight=\"normal\" font-size=\"12\" text-anchor=\"start\" style=\"mix-blend-mode: normal\"/></svg>"
+	    },
+	    "within": {
+	      "@id": "https://iiif.lib.harvard.edu/manifests/drs:5981093",
+	      "@type": "sc:Manifest"
+	    }
+  }},
+
+	{
+		"@type": "oa:Annotation",
+	  "motivation": [
+	    "oa:tagging",
+	    "oa:commenting"
+	  ],
+	  "resource": [
+	    {
+	      "@type": "oa:Tag",
+	      "chars": "Tag"
+	    },
+	    {
+	      "@type": "dctypes:Text",
+	      "format": "text/html",
+	      "chars": "<p>Test 1c &amp; d</p>"
+	    }
+	  ],
+	  "on": {
+	    "@type": "oa:SpecificResource",
+	    "full": "https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-5981120.json",
+	    "selector": {
+	      "@type": "oa:SvgSelector",
+	      "value": "<svg xmlns=\"http://www.w3.org/2000/svg\"><path xmlns=\"http://www.w3.org/2000/svg\" d=\"M2839.67004,1958.16283l603.4384,0l0,0l603.4384,0l0,372.12034l0,372.12034l-603.4384,0l-603.4384,0l0,-372.12034z\" data-paper-data=\"{&quot;defaultStrokeValue&quot;:1,&quot;editStrokeValue&quot;:5,&quot;currentStrokeValue&quot;:1,&quot;rotation&quot;:0,&quot;deleteIcon&quot;:null,&quot;rotationIcon&quot;:null,&quot;group&quot;:null,&quot;editable&quot;:true,&quot;annotation&quot;:null}\" id=\"rectangle_d8e37e58-64d5-47b5-934a-760f5f05129c\" fill-opacity=\"0\" fill=\"#00bfff\" fill-rule=\"nonzero\" stroke=\"#00bfff\" stroke-width=\"6.70487\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-miterlimit=\"10\" stroke-dasharray=\"\" stroke-dashoffset=\"0\" font-family=\"sans-serif\" font-weight=\"normal\" font-size=\"12\" text-anchor=\"start\" style=\"mix-blend-mode: normal\"/></svg>"
+	    },
+	    "within": {
+	      "@id": "https://iiif.lib.harvard.edu/manifests/drs:5981093",
+	      "@type": "sc:Manifest"
+	    }
+  }},
+
+	{
+		"@type": "oa:Annotation",
+	  "motivation": [
+	    "oa:tagging",
+	    "oa:commenting"
+	  ],
+	  "resource": [
+	    {
+	      "@type": "oa:Tag",
+	      "chars": "TestTag"
+	    },
+	    {
+	      "@type": "dctypes:Text",
+	      "format": "text/html",
+	      "chars": "<p>TestAnnotatie<\/p>"
+	    }
+	  ],
+	  "on": {
+	    "@type": "oa:SpecificResource",
+	    "full": "https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-5981120.json",
+	    "selector": {
+	      "@type": "oa:SvgSelector",
+	      "value": "<svg xmlns=\"http://www.w3.org/2000/svg\"><path xmlns=\"http://www.w3.org/2000/svg\" d=\"M2544.65571,871.97372l539.74212,0l0,0l539.74212,0l0,331.89112l0,331.89112l-539.74212,0l-539.74212,0l0,-331.89112z\" data-paper-data=\"{&quot;defaultStrokeValue&quot;:1,&quot;editStrokeValue&quot;:5,&quot;currentStrokeValue&quot;:1,&quot;rotation&quot;:0,&quot;deleteIcon&quot;:null,&quot;rotationIcon&quot;:null,&quot;group&quot;:null,&quot;editable&quot;:true,&quot;annotation&quot;:null}\" id=\"rectangle_0403bd67-c6af-4b48-b5bf-f845fd5b5944\" fill-opacity=\"0\" fill=\"#00bfff\" fill-rule=\"nonzero\" stroke=\"#00bfff\" stroke-width=\"6.70487\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-miterlimit=\"10\" stroke-dasharray=\"\" stroke-dashoffset=\"0\" font-family=\"sans-serif\" font-weight=\"normal\" font-size=\"12\" text-anchor=\"start\" style=\"mix-blend-mode: normal\"/></svg>"
+	    },
+	    "within": {
+	      "@id": "https://iiif.lib.harvard.edu/manifests/drs:5981093",
+	      "@type": "sc:Manifest"
+	    }
+  }}
+
+	]
+}'
+}
 
 
 a-use-localhost

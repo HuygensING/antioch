@@ -38,12 +38,13 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
-import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 @Singleton
@@ -53,11 +54,14 @@ public class SearchEndpoint extends JSONEndpoint {
 
   private final AlexandriaService service;
   private final LocationBuilder locationBuilder;
+  private SearchFactory searchFactory;
 
   @Inject
   public SearchEndpoint(final AlexandriaService service, //
+      final SearchFactory searchFactory, //
       final LocationBuilder locationBuilder) {
     this.service = service;
+    this.searchFactory = searchFactory;
     this.locationBuilder = locationBuilder;
   }
 
@@ -65,10 +69,10 @@ public class SearchEndpoint extends JSONEndpoint {
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation("create new SearchResult")
   public Response createSearchResult(@NotNull @Valid AlexandriaQuery query) {
-    Log.trace("query=[{}]", query);
+    // Log.trace("query=[{}]", query);
     SearchResult searchResult = service.execute(query);
     SearchResultCache.add(searchResult);
-    return Response.created(locationBuilder.locationOf(searchResult)).build();
+    return created(locationBuilder.locationOf(searchResult));
   }
 
   @GET
@@ -78,10 +82,8 @@ public class SearchEndpoint extends JSONEndpoint {
     return getResultPage(uuid, 1);
   }
 
-  public static final String RESULTPAGES = "pages";
-
   @GET
-  @Path("{uuid}/" + RESULTPAGES + "/{pageNumber:[0-9]+}")
+  @Path("{uuid}/" + EndpointPaths.RESULTPAGES + "/{pageNumber:[0-9]+}")
   @ApiOperation(value = "Get the SearchResultPage with the given uuid and page number", response = SearchResultPage.class)
   public Response getResultPage(@PathParam("uuid") final UUIDParam uuid, @PathParam("pageNumber") int pageNumber) {
     SearchResult searchResult = getSearchResult(uuid);
@@ -92,10 +94,9 @@ public class SearchEndpoint extends JSONEndpoint {
     if (pageNumber < 1 || pageNumber > totalResultPages) {
       throw new NotFoundException("pageNumber should be between 1 and " + totalResultPages);
     }
-    String baseURI = locationBuilder.locationOf(searchResult, RESULTPAGES) + "/";
-    SearchResultPage page = new SearchResultPage(baseURI, pageNumber, searchResult);
-    page.setResults(searchResult.getRecordsForPage(pageNumber));
-    return Response.ok(page).build();
+    String baseURI = locationBuilder.locationOf(searchResult, EndpointPaths.RESULTPAGES) + "/";
+    SearchResultPage page = searchFactory.createSearchResultPage(baseURI, pageNumber, searchResult, searchResult.getRecordsForPage(pageNumber));
+    return ok(page);
   }
 
   private SearchResult getSearchResult(final UUIDParam uuid) {

@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -27,7 +27,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.UUID;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.CreationRequest;
 import nl.knaw.huygens.alexandria.endpoint.ProvenancePrototype;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
@@ -57,7 +56,7 @@ class ResourceCreationRequest implements CreationRequest<AlexandriaResource> {
 
   @Override
   public AlexandriaResource execute(AlexandriaService service) {
-    Log.trace("executing, service=[{}]", service);
+    // Log.trace("executing, service=[{}]", service);
 
     uuid = providedUUID().orElse(UUID.randomUUID());
 
@@ -71,12 +70,12 @@ class ResourceCreationRequest implements CreationRequest<AlexandriaResource> {
 
   public boolean wasExecutedAsIs() {
     final boolean wasExecutedAsIs = providedUUID().isPresent();// && providedProvenance().isPresent();
-    Log.trace("wasExecutedAsIs: {}", wasExecutedAsIs);
+    // Log.trace("wasExecutedAsIs: {}", wasExecutedAsIs);
     return wasExecutedAsIs;
   }
 
   public boolean newResourceWasCreated() {
-    Log.trace("newResourceWasCreated: {}", resourceCreated);
+    // Log.trace("newResourceWasCreated: {}", resourceCreated);
     return resourceCreated;
   }
 

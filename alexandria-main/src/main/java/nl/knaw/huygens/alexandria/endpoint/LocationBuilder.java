@@ -14,12 +14,12 @@ import java.util.function.Supplier;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -29,6 +29,7 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
 
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.model.Identifiable;
 import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
@@ -62,15 +63,15 @@ public class LocationBuilder {
       UriBuilder uriBuilder = UriBuilder.fromUri(config.getBaseURI()) //
           .path(pathOf(identifiableClass)) //
           .path("{uuid}") //
-          .path("rev") //
+          .path(EndpointPaths.REV) //
           .path("{rev}");
       for (String subPath : subPaths) {
         uriBuilder = uriBuilder.path(subPath);
       }
       return uriBuilder //
           .build(parts, true);
-
     }
+
     UriBuilder uriBuilder = UriBuilder.fromUri(config.getBaseURI()) //
         .path(pathOf(identifiableClass)) //
         .path("{uuid}");
@@ -78,6 +79,16 @@ public class LocationBuilder {
       uriBuilder = uriBuilder.path(subPath);
     }
     return uriBuilder.build(uuid);
+  }
+
+  public URI locationOf(Object... subPaths) {
+    UriBuilder uriBuilder = UriBuilder.fromUri(config.getBaseURI());
+    // Log.info("subPaths.size={}", subPaths.length);
+    for (Object subPath : subPaths) {
+      // Log.info("subPath=[{}]", subPath);
+      uriBuilder = uriBuilder.path(subPath.toString());
+    }
+    return uriBuilder.build("X");
   }
 
   // -- private methods --//

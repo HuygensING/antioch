@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.config;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -32,15 +32,17 @@ import java.util.MissingResourceException;
 import java.util.Optional;
 import java.util.PropertyResourceBundle;
 
-import nl.knaw.huygens.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PropertiesConfiguration {
+  private static final Logger LOG = LoggerFactory.getLogger(PropertiesConfiguration.class);
   private PropertyResourceBundle propertyResourceBundle;
 
   public PropertiesConfiguration(String propertiesFile, boolean isResource) {
     try {
-      InputStream inputStream = isResource ? //
-          Thread.currentThread().getContextClassLoader().getResourceAsStream(propertiesFile)//
+      InputStream inputStream = isResource //
+          ? Thread.currentThread().getContextClassLoader().getResourceAsStream(propertiesFile)//
           : new FileInputStream(new File(propertiesFile));
       propertyResourceBundle = new PropertyResourceBundle(inputStream);
     } catch (IOException e) {
@@ -63,9 +65,9 @@ public class PropertiesConfiguration {
     try {
       value = propertyResourceBundle.getString(key);
     } catch (MissingResourceException e) {
-      Log.warn("Missing expected resource: [{}]", key);
+      LOG.warn("Missing expected resource: [{}]", key);
     } catch (ClassCastException e) {
-      Log.warn("Property value for key [{}] cannot be transformed to String", key);
+      LOG.warn("Property value for key [{}] cannot be transformed to String", key);
     }
     return value;
   }

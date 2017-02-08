@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -25,7 +25,6 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
 import static java.util.stream.Collectors.toSet;
 
 import java.net.URI;
-import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -34,7 +33,6 @@ import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
 import nl.knaw.huygens.alexandria.endpoint.AbstractAnnotatableEntity;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 
 public abstract class AbstractResourceEntity extends AbstractAnnotatableEntity {
 
@@ -48,20 +46,7 @@ public abstract class AbstractResourceEntity extends AbstractAnnotatableEntity {
 
   @JsonProperty(PropertyPrefix.LINK + "text")
   public URI getText() {
-    return hasText() ? locationBuilder.locationOf(getResource(), "text") : null;
-  }
-
-  @JsonProperty(PropertyPrefix.LINK + "baseLayerDefinition")
-  public URI getBaseLayerDefinition() {
-    if (getResource().getDirectBaseLayerDefinition().isPresent()) {
-      return locationBuilder.locationOf(getResource(), EndpointPaths.BASELAYERDEFINITION);
-    }
-
-    Optional<IdentifiablePointer<AlexandriaResource>> firstAncestorResourceWithBaseLayerDefinitionPointer = getResource().getFirstAncestorResourceWithBaseLayerDefinitionPointer();
-    if (firstAncestorResourceWithBaseLayerDefinitionPointer.isPresent()) {
-      return locationBuilder.locationOf(firstAncestorResourceWithBaseLayerDefinitionPointer.get(), EndpointPaths.BASELAYERDEFINITION);
-    }
-    return null;
+    return hasText() ? locationBuilder.locationOf(getResource(), EndpointPaths.TEXT) : null;
   }
 
   @JsonProperty(PropertyPrefix.LINK + "subresources")

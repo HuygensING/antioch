@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.endpoint;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -32,7 +32,6 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
@@ -85,25 +84,22 @@ public class AnnotationCreationRequestBuilder {
   }
 
   protected void validateId(AnnotationPrototype prototype) {
-    Log.trace("Validating id");
-    return; // missing or empty Id means client does not override server
-            // generated value.
+    // Log.trace("Validating id");
+    // generated value.
   }
 
   protected void validateType(AnnotationPrototype prototype) {
-    Log.trace("Validating type");
+    // Log.trace("Validating type");
     // prototype.getType().filter(s -> !s.isEmpty()).orElseThrow(missingTypeException());
   }
 
   protected void validateValue(AnnotationPrototype prototype) {
-    Log.trace("Validating value");
-    return; // missing or empty value is ok (means annotation is a Tag)
+    // Log.trace("Validating value");
   }
 
   protected void validateProvenance(AnnotationPrototype prototype) {
-    Log.trace("Validating provenance");
-    return; // missing or empty provenance means client does not override server
-            // set value.
+    // Log.trace("Validating provenance");
+    // set value.
   }
 
   // protected void validateAnnotations(AnnotationPrototype prototype) {
@@ -119,7 +115,7 @@ public class AnnotationCreationRequestBuilder {
   }
 
   protected void validateAnnotationId(UUID uuid) {
-    Log.trace("Validating annotation: [{}]", uuid);
+    // Log.trace("Validating annotation: [{}]", uuid);
     Optional.ofNullable(service.readAnnotation(uuid)).orElseThrow(noSuchAnnotationException(uuid));
   }
 
@@ -136,7 +132,7 @@ public class AnnotationCreationRequestBuilder {
   }
 
   protected BadRequestException badRequestException(String message) {
-    Log.trace(message);
+    // Log.trace(message);
     return new BadRequestException(message);
   }
 

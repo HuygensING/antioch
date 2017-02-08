@@ -37,7 +37,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
 
 public class SearchResultPageTest {
   private static final ImmutableMap<String, String> SAMPLE_MAP = ImmutableMap.of("what", "ever");
@@ -53,12 +54,13 @@ public class SearchResultPageTest {
     return new HashMap<>(SAMPLE_MAP);
   }
 
+  private final SearchFactory searchFactory = new SearchFactory();
+
   @Test
   public void testFirstPageOfSeveral() {
-    SearchResultPage srp = new SearchResultPage(baseURI, 1, mockResult(2, 10));
-    srp.setResults(ten_results);
-    assertThat(srp.getPreviousPage()).isNull();
-    assertThat(srp.getNextPage()).hasToString(baseURI + 2);
+    SearchResultPage srp = searchFactory.createSearchResultPage(baseURI, 1, mockResult(2, 10), ten_results);
+    assertThat(srp.getPreviousPageURI()).isNull();
+    assertThat(srp.getNextPageURI()).hasToString(baseURI + 2);
     List<Map<String, Object>> records = srp.getRecords();
     Log.info("records={}", records);
     assertThat(records).hasSize(10);
@@ -68,10 +70,9 @@ public class SearchResultPageTest {
 
   @Test
   public void testSecondPageOfThree() {
-    SearchResultPage srp = new SearchResultPage(baseURI, 2, mockResult(3, 10));
-    srp.setResults(ten_results);
-    assertThat(srp.getPreviousPage()).hasToString(baseURI + 1);
-    assertThat(srp.getNextPage()).hasToString(baseURI + 3);
+    SearchResultPage srp = searchFactory.createSearchResultPage(baseURI, 2, mockResult(3, 10), ten_results);
+    assertThat(srp.getPreviousPageURI()).hasToString(baseURI + 1);
+    assertThat(srp.getNextPageURI()).hasToString(baseURI + 3);
     List<Map<String, Object>> records = srp.getRecords();
     Log.info("records={}", records);
     assertThat(records).hasSize(10);
@@ -81,10 +82,9 @@ public class SearchResultPageTest {
 
   @Test
   public void testLastPageOfSeveral() {
-    SearchResultPage srp = new SearchResultPage(baseURI, 2, mockResult(2, 10));
-    srp.setResults(five_results);
-    assertThat(srp.getPreviousPage()).hasToString(baseURI + 1);
-    assertThat(srp.getNextPage()).isNull();
+    SearchResultPage srp = searchFactory.createSearchResultPage(baseURI, 2, mockResult(2, 10), five_results);
+    assertThat(srp.getPreviousPageURI()).hasToString(baseURI + 1);
+    assertThat(srp.getNextPageURI()).isNull();
     List<Map<String, Object>> records = srp.getRecords();
     Log.info("records={}", records);
     assertThat(records).hasSize(5);

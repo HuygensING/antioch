@@ -1,0 +1,12 @@
+[
+  {
+    "Content-Location": "http://iiif.io/api/presentation/2/context.json",
+    "X-Classpath": "contexts/iiif.io-api-presentation-2-context.json",
+    "Content-Type": "application/ld+json"
+  },
+  {
+    "Content-Location": "http://www.w3.org/ns/anno.jsonld",
+    "X-Classpath": "contexts/www.w3.org-ns-anno.jsonld",
+    "Content-Type": "application/ld+json"
+  }
+]

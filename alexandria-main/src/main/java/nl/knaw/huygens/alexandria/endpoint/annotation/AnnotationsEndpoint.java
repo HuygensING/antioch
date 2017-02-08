@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.endpoint.annotation;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -39,7 +39,6 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.api.model.StatePrototype;
@@ -54,8 +53,6 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 @Path(EndpointPaths.ANNOTATIONS)
 @Api("annotations")
 public class AnnotationsEndpoint extends JSONEndpoint {
-  public final static String REVPATH = "rev";
-
   private final AlexandriaService service;
   private final AnnotationEntityBuilder entityBuilder;
   private final AnnotationDeprecationRequestBuilder requestBuilder;
@@ -95,7 +92,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   // Sub-resource delegation
 
   @GET
-  @Path("{uuid}/" + REVPATH + "/{revision}")
+  @Path("{uuid}/" + EndpointPaths.REV + "/{revision}")
   @ApiOperation(value = "get the given revision of the annotation", response = AnnotationEntity.class)
   public Response readVersionedAnnotation(@PathParam("uuid") UUIDParam uuidParam, //
                                           @PathParam("revision") Integer revision) {
@@ -134,7 +131,7 @@ public class AnnotationsEndpoint extends JSONEndpoint {
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation(value = "update the state of the annotation (only state=CONFIRMED accepted)")
   public Response setAnnotationState(@PathParam("uuid") final UUIDParam uuidParam, @NotNull StatePrototype protoType) {
-    Log.trace("protoType=[{}]", protoType);
+    // Log.trace("protoType=[{}]", protoType);
     AlexandriaAnnotation annotation = readExistingAnnotation(uuidParam);
     if (protoType.isConfirmed()) {
       if (!annotation.isActive()) {

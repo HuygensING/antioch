@@ -279,24 +279,33 @@ curl -i -H "${authheader}" -X POST $be/annotations/$ai/annotations -H 'Content-t
 
 
 
-curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
+curl -i -H "${authheader}" -X PUT $be/resources/$ri/text/views/baselayer -H 'Content-type: application/json' \
 --data-binary '{
-  "baseLayerDefinition": {
-  	"subresourceElements": ["note"],
-    "baseElements": [ {
-      "name": "body"
-    }, {
-      "name": "div",
-      "baseAttributes": [ "type" ]
-    }, {
-      "name": "p"
-    }, {
-      "name": "sub"
-    }, {
-      "name": "sup"
-    } ]
-  }
-}'
+    "textView": {
+      "description" : "The Base Layer",
+      "ignoredElements": ["note"],
+      "includedElements": [ {
+        "name": "body"
+      }, {
+        "name": "div",
+        "includedAttributes": [ "type" ]
+      }, {
+        "name": "text"
+      }, {
+        "name": "p"
+      }, {
+        "name": "table"
+      }, {
+        "name": "row"
+      }, {
+        "name": "cell"
+      }, {
+        "name": "sub"
+      }, {
+        "name": "sup"
+      } ]
+    }
+  }'
 
 curl -i -H "${authheader}" $be/resources/$ri/baselayerdefinition
 
@@ -350,6 +359,7 @@ curl -i -H "${authheader}" -X POST $be/searches -H 'Content-type: application/js
 "return" : "id,value,resource.id,subresource.id"
 }}'
 
+a-dry-run-from-file scripts/cwg/huyg003-1376.xml
 
 curl -i -H "${authheader}" -X POST $be/searches -H 'Content-type: application/json' \
 --data-binary '{"query":{
@@ -366,3 +376,74 @@ curl -i -H "${authheader}" -X POST $be/searches -H 'Content-type: application/js
 }}'
 
 
+curl -i -H "${authheader}" -X PUT $be/resources/$ri/text/views/no-hi-l -H 'Content-type: application/json' \
+--data-binary '{
+    "textView": {
+      "description" : "Do not show hi or l tags ",
+      "ignoredElements": ["note"],
+      "excludedElements": [ "hi", "l" ]
+    }
+  }'
+
+curl -i -H "${authheader}" -X POST $be/commands/add-unique-id -H 'Content-type: application/json' \
+--data-binary "{
+      \"resourceIds\" : [\"$ri\"],
+      \"elements\": [ \"div\", \"p\" ]
+  }"
+
+curl -i -H "${authheader}" -X POST $be/commands/wrap-content-in-element -H 'Content-type: application/json' \
+--data-binary "{
+      \"resourceIds\" : [\"$ri\"],
+      \"xmlIds\": [ \"\", \"\" ]
+      \"element\": {
+        \"name\" : \"hi\",
+        \"attributes\" : {
+          \"rend\" : \"green\"
+        }
+      }
+  }"
+
+
+##
+
+condition: "attribute(ref).equals(#ed)"
+condition: "attribute(ref).firstOf('#ed','#ad1','')"
+
+{
+    "textView": {
+      "description" : "Do not show hi or l tags ",
+      "elements" : [
+        ":default" : {
+          "elementMode" : "show" # show <element> + children
+          "attributeMode" : "show" # show <element> + children
+        },
+        "note" : {
+          "mode" : "hideElement" # don't show <element> + children
+        },
+        "l" : {
+          "mode" : "hideElementTag" # don't show <element> tag, show children
+        },
+        "hi" : {
+          "mode" : "showElement"
+          "condition" : "attribute(rend).equals('red')" # show according to mode if condition met, use default 
+        }
+      ]
+      "ignoredElements": ["note"],
+      "excludedElements": [ "hi", "l" ]
+    }
+  }
+
+#  elementMode: (optional, use default settings if absent)
+#    show : show <element> + children
+#    hide : don't show <element> + children 
+#    hideTag : don't show <element> tag, show children
+
+#  attributeMode: (optional, use default settings if absent)
+#    showAll : show all attributes
+#    showOnly([attribute1,  ...]) : show only indicated attributes
+#    hideAll : don't show any attribute
+#    hideOnly([attribute1, ...]) : show all attributes except the indicated ones
+
+# when (optional, always when 'when' not given)
+#    attribute(rend).is('red')
+#    attribute(resp).firstOf('#ed0','#ed1','')

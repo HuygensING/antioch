@@ -23,7 +23,6 @@ package nl.knaw.huygens.alexandria.resource;
  */
 
 import static java.util.UUID.fromString;
-import static java.util.UUID.randomUUID;
 
 import java.util.UUID;
 
@@ -34,13 +33,6 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 
 @RunWith(ConcordionRunner.class)
 public class AnatomyFixture extends ResourcesBase {
-
-  public String hasSubresource(String id) {
-    final UUID subId = service().createSubResource(randomUUID(), fromString(id), aSub(), aProvenance())
-                                .getId();
-    service().confirmResource(subId);
-    return subId.toString();
-  }
 
   public String hasAnnotation(String id) {
     final UUID resId = fromString(id);

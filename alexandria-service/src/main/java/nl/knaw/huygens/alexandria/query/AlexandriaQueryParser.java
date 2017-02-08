@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.query;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -28,7 +28,9 @@ import static java.util.stream.Collectors.toSet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,6 +49,9 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -54,21 +59,22 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 
-import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.antlr.AQLLexer;
 import nl.knaw.huygens.alexandria.antlr.AQLParser;
+import nl.knaw.huygens.alexandria.antlr.QueryErrorListener;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.api.model.search.QueryField;
+import nl.knaw.huygens.alexandria.api.model.search.QueryFunction;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.model.search.AlexandriaQuery;
-import nl.knaw.huygens.alexandria.model.search.QueryField;
-import nl.knaw.huygens.alexandria.model.search.QueryFunction;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
+import nl.knaw.huygens.alexandria.util.StreamUtil;
 
 public class AlexandriaQueryParser {
   static final String ALLOWED_FIELDS = ", available fields: " + Joiner.on(", ").join(QueryField.ALL_EXTERNAL_NAMES);
@@ -111,17 +117,61 @@ public class AlexandriaQueryParser {
 
     // any tokens with resource.id or subresource.id need to be filtered out and lead to an annotationVFFinder
     List<WhereToken> resourceWhereTokens = filterResourceWhereTokens(tokens);
-    if (!resourceWhereTokens.isEmpty()) {
-      Function<Storage, Stream<AnnotationVF>> annotationVFFinder = createAnnotationVFFinder(resourceWhereTokens);
-      if (annotationVFFinder != null) {
-        paq.setAnnotationVFFinder(annotationVFFinder);
-      }
-    }
-
     tokens.removeAll(resourceWhereTokens);
+    if (ResourceVF.class == paq.getVFClass()) {
+      paq.setResultStreamMapper(createResultStreamMapper(resourceWhereTokens));
 
-    // create a predicate for filtering the annotationVF stream based on the remaining tokens
-    paq.setPredicate(createPredicate(tokens));
+    } else {
+      if (!resourceWhereTokens.isEmpty()) {
+        Function<Storage, Stream<AnnotationVF>> annotationVFFinder = createAnnotationVFFinder(resourceWhereTokens);
+        if (annotationVFFinder != null) {
+          paq.setAnnotationVFFinder(annotationVFFinder);
+        }
+      }
+
+      // create a predicate for filtering the annotationVF stream based on the remaining tokens
+      paq.setPredicate(createPredicate(tokens));
+    }
+  }
+
+  private Function<Storage, Stream<Map<String, Object>>> createResultStreamMapper(List<WhereToken> resourceWhereTokens) {
+    // TODO extend use of resource queries, current implementation only for implementation of nla-264 case
+    return (storage) -> {
+      GraphTraversal<Vertex, Vertex> traversal = storage.getResourceVertexTraversal();
+
+      Optional<String> rootResourceUUID = resourceWhereTokens.stream()//
+          .filter(t -> t.getProperty().equals(QueryField.resource_id)//
+              && t.getFunction().equals(QueryFunction.eq))//
+          .map(t -> t.getParameters().get(0))//
+          .map(String.class::cast)//
+          .findFirst();
+      if (rootResourceUUID.isPresent()) {
+        traversal = traversal.has(Storage.IDENTIFIER_PROPERTY, rootResourceUUID.get());
+      }
+
+      Optional<String> sub = resourceWhereTokens.stream()//
+          .filter(t -> t.getProperty().equals(QueryField.subresource_sub)//
+              && t.getFunction().equals(QueryFunction.eq))//
+          .map(t -> t.getParameters().get(0))//
+          .map(String.class::cast)//
+          .findFirst();
+      if (sub.isPresent()) {
+        traversal = traversal//
+            .until(__.has(ResourceVF.Properties.CARGO, sub.get()))//
+            .repeat(__.in(ResourceVF.EdgeLabels.PART_OF));
+      }
+
+      return StreamUtil.stream(traversal)//
+          .map(v -> storage.frameVertex(v, ResourceVF.class))//
+          .map(this::toResultMap);
+    };
+  }
+
+  private Map<String, Object> toResultMap(ResourceVF rvf) {
+    Map<String, Object> map = new HashMap<>();
+    map.put(QueryField.subresource_id.externalName(), rvf.getUuid());
+    // map.put(QueryField.subresource_sub.externalName(), rvf.getCargo());
+    return map;
   }
 
   private void addDefaultStateTokenWhenNeeded(List<WhereToken> tokens) {
@@ -144,8 +194,9 @@ public class AlexandriaQueryParser {
   }
 
   private Function<Storage, Stream<AnnotationVF>> createAnnotationVFFinder(List<WhereToken> resourceWhereTokens) {
+    // TODo: refactor
     WhereToken resourceWhereToken = resourceWhereTokens.get(0);
-    if (resourceWhereTokens.size() == 1 && resourceWhereToken.getFunction().equals(QueryFunction.eq)) {
+    if (resourceWhereTokens.size() == 1 && resourceWhereToken.getFunction().equals(QueryFunction.eq) && resourceWhereToken.getProperty().equals(QueryField.resource_id)) {
       String uuid = (String) resourceWhereToken.getParameters().get(0);
       return storage -> {
         Optional<ResourceVF> optionalResource = storage.readVF(ResourceVF.class, UUID.fromString(uuid));
@@ -160,29 +211,47 @@ public class AlexandriaQueryParser {
         return ImmutableList.<AnnotationVF> of().stream();
       };
 
+    } else if (resourceWhereTokens.size() == 1 && resourceWhereToken.getFunction().equals(QueryFunction.eq) && resourceWhereToken.getProperty().equals(QueryField.resource_ref)) {
+      return storage -> {
+        Object cargo = resourceWhereToken.getParameters().get(0);
+        // Log.info("cargo={}", cargo);
+        List<ResourceVF> resourceVFs = storage.find(ResourceVF.class)//
+            .has(ResourceVF.Properties.CARGO, cargo)//
+            .toList();
+
+        List<UUID> resourceUUIDs = resourceVFs.stream()//
+            .map(ResourceVF::getUuid)//
+            .map(UUID::fromString)//
+            .collect(toList());
+        // Log.info("resourceUUIDs={}", resourceUUIDs);
+        return toAnnotationVFStream(resourceUUIDs, storage);
+      };
+
     } else if (resourceWhereToken.getFunction().equals(QueryFunction.inSet)) {
       List<UUID> uuidSet = resourceWhereToken.getParameters().stream()//
           .map(String.class::cast)//
           .map(UUID::fromString)//
           .collect(toList());
-      return storage -> {
-        List<AnnotationVF> annotationList = new ArrayList<>();
-        uuidSet.stream().forEach(uuid -> {
-          Optional<ResourceVF> optionalResource = storage.readVF(ResourceVF.class, uuid);
-          if (optionalResource.isPresent()) {
-            ResourceVF resourceVF = optionalResource.get();
-            annotationList.addAll(resourceVF.getAnnotatedBy());
-            annotationList.addAll(resourceVF.getSubResources().stream()//
-                .map(ResourceVF::getAnnotatedBy)//
-                .flatMap(l -> l.stream())//
-                .collect(toList()));
-          }
-        });
-        return annotationList.stream();
-      };
+      return storage -> toAnnotationVFStream(uuidSet, storage);
 
     }
     return null;
+  }
+
+  private Stream<AnnotationVF> toAnnotationVFStream(List<UUID> uuidSet, Storage storage) {
+    List<AnnotationVF> annotationList = new ArrayList<>();
+    for (UUID uuid : uuidSet) {
+      Optional<ResourceVF> optionalResource = storage.readVF(ResourceVF.class, uuid);
+      optionalResource.ifPresent(resourceVF -> {
+        annotationList.addAll(resourceVF.getAnnotatedBy());
+        annotationList.addAll(resourceVF.getSubResources().stream()//
+            .map(ResourceVF::getAnnotatedBy)//
+            .flatMap(Collection::stream)//
+            .collect(toList()));
+      });
+    }
+    // Log.info("annotationList={}", annotationList);
+    return annotationList.stream();
   }
 
   private Class<? extends AlexandriaVF> parseFind(final String find) {
@@ -191,18 +260,17 @@ public class AlexandriaQueryParser {
       return AnnotationVF.class;
 
     case "resource":
-      parseErrors.add("find: type 'resource' not supported yet");
+      // parseErrors.add("find: type 'resource' not supported yet");
       return ResourceVF.class;
 
     default:
-      parseErrors.add("find: unknown type '" + find + "', should be 'annotation'");
-      // parseErrors.add("unknown type '" + find + "' in find, should be 'annotation' or 'resource'");
+      parseErrors.add("find: unknown type '" + find + "', should be 'annotation' or 'resource'");
       return null;
     }
   }
 
   List<WhereToken> tokenize(String whereString) {
-    Log.info("whereString=<{}>", whereString);
+    // Log.info("whereString=<{}>", whereString);
     if (StringUtils.isEmpty(whereString)) {
       // parseErrors.add("empty or missing where");
       return Lists.newArrayList();
@@ -218,7 +286,7 @@ public class AlexandriaQueryParser {
     parser.addErrorListener(errorListener);
     parser.setBuildParseTree(true);
     ParseTree tree = parser.root();
-    Log.info("tree={}", tree.toStringTree(parser));
+    // Log.info("tree={}", tree.toStringTree(parser));
     if (errorListener.heardErrors()) {
       parseErrors.addAll(errorListener.getParseErrors().stream()//
           .map(AlexandriaQueryParser::clarifyParseError)//
@@ -297,26 +365,23 @@ public class AlexandriaQueryParser {
         Object propertyValue = getter.apply(avf);
         if (propertyValue instanceof String) {
           return ((String) propertyValue).compareTo((String) lowerLimit) >= 0//
-              && ((String) propertyValue).compareTo((String) upperLimit) <= 0;
+                  && ((String) propertyValue).compareTo((String) upperLimit) <= 0;
         }
-        if (propertyValue instanceof Long) {
-          return ((Long) propertyValue).compareTo((Long) lowerLimit) >= 0//
-              && ((Long) propertyValue).compareTo((Long) upperLimit) <= 0;
-
-        }
-        return true;
+        //
+        return !(propertyValue instanceof Long) || ((Long) propertyValue).compareTo((Long) lowerLimit) >= 0//
+                && ((Long) propertyValue).compareTo((Long) upperLimit) <= 0;
       };
     }
 
     return alwaysTrue();
   }
 
-  static final Predicate<Object> INVALID_STATEVALUE_PREDICATE = stateValue -> !(stateValue instanceof String && ALL_STATES.contains(stateValue));
+  static final Predicate<String> INVALID_STATEVALUE_PREDICATE = stateValue -> !(stateValue instanceof String && ALL_STATES.contains(stateValue));
 
   private static void checkForValidStateParameter(WhereToken whereToken) {
     if (QueryField.state.equals(whereToken.getProperty())) {
-      List<Object> invalidValues = whereToken.getParameters().stream()//
-          .filter(INVALID_STATEVALUE_PREDICATE)//
+      List<String> invalidValues = whereToken.getParameters().stream()//
+          .map(String.class::cast).filter(INVALID_STATEVALUE_PREDICATE)//
           .collect(toList());
       if (!invalidValues.isEmpty()) {
         String message = ((invalidValues.size() == 1)//

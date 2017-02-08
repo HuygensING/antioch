@@ -1,0 +1,393 @@
+<!--
+  #%L
+  alexandria-acceptance-tests
+  =======
+  Copyright (C) 2015 - 2016 Huygens ING (KNAW)
+  =======
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public
+  License along with this program.  If not, see     
+  <http://www.gnu.org/licenses/gpl-3.0.html>.
+  #L%
+  -->
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+
+	<title>W3C Web Annotations</title>
+	
+	<body data-desc="W3C Web Annotations">
+	
+		<div id="intro" data-desc="Introduction">
+      Alexandria provides a (limited, for now) implementation of the <a href="https://www.w3.org/TR/2016/CR-annotation-protocol-20160906/">W3C Web Annotation Protocol</a> (W3C Candidate Recommendation 06 September 2016)
+		</div>
+		
+		<div id="create" data-desc="Create a New Annotation">
+	    <h:request>
+        When I 
+        <h:post>/webannotations/</h:post>
+        the following body:
+				<h:jsonBody>{
+				  "@context": "http://www.w3.org/ns/anno.jsonld",
+				  "type": "Annotation",
+				  "body": {
+				    "type": "TextualBody",
+				    "value": "I like this page!"
+				  },
+				  "target": "http://www.example.com/index.html"
+				}
+				</h:jsonBody>
+        using
+        <h:setHeader name="Accept">application/ld+json</h:setHeader> <br/>
+        and
+        <h:setHeader name="Content-type">application/ld+json</h:setHeader>,<br/>
+        
+        then I should receive:
+  	    <ul>
+				  <li>status <h:status>201 Created</h:status></li>
+					<li> a Location header starting with
+					    <h:location type="base">https://{host}/webannotations/</h:location>
+					    and ending in a
+					    <h:location type="uuid">well-formed UUID</h:location>
+					</li>
+					<li>and the response body should contain:
+		        <h:jsonResponse>
+		        {
+		          "@context": "http://www.w3.org/ns/anno.jsonld",
+		          "type": "Annotation",
+		          "body": {
+		            "type": "TextualBody",
+		            "value": "I like this page!"
+		          },
+		          "target": "http://www.example.com/index.html"
+		        }
+		        </h:jsonResponse>
+					</li>
+			  </ul>
+			  
+	    </h:request>
+      <div c:execute="#uuid = uuid()">In this case we got uuid <strong c:echo="#uuid"></strong> as the uuid
+         for the resource we just created.
+      </div>
+		</div>
+		
+    <div id="read" data-desc="Annotation Retrieval">
+      <h:request>
+        Given the webannotation we made earlier, when I 
+        <h:get>/webannotations/$uuid</h:get><br/>
+        using
+        <h:setHeader name="Accept">application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"</h:setHeader>, <br/>
+        then I should receive
+        <ul>
+          <li>status <h:status>200 OK</h:status></li>
+          <li>and the response body should contain:
+            <h:jsonResponse>
+            {
+              "@context": "http://www.w3.org/ns/anno.jsonld",
+              "id" : "https://{host}/webannotations/$uuid",
+              "type": "Annotation",
+              "body": {
+                "type": "TextualBody",
+                "value": "I like this page!"
+              },
+              "target": "http://www.example.com/index.html"
+            }
+            </h:jsonResponse>
+          </li>
+        </ul>
+      </h:request>
+    </div>
+
+		<div id="update" data-desc="Update an Exisiting Annotation">
+	    <h:request>
+        To change the webannotation we made earlier, I 
+        <h:put>/webannotations/$uuid</h:put>
+        the following body:
+        <h:jsonBody>{
+          "@context": "http://www.w3.org/ns/anno.jsonld",
+          "type": "Annotation",
+          "body": {
+            "type": "TextualBody",
+            "value": "On second thought, it's a boring page!"
+          },
+          "target": "http://www.example.com/index.html"
+        }
+        </h:jsonBody>
+        using
+        <h:setHeader name="Accept">application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"</h:setHeader> <br/>
+        and
+        <h:setHeader name="Content-type">application/ld+json</h:setHeader>,<br/>
+        
+        then I should receive status
+        <h:status>200 OK</h:status><br/>
+	    </h:request>
+
+      <h:request>
+        Now when I 
+        <h:get>/webannotations/$uuid</h:get><br/>
+        using
+        <h:setHeader name="Accept">application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"</h:setHeader>, <br/>
+        the response body should contain:
+        <h:jsonResponse>
+        {
+          "@context": "http://www.w3.org/ns/anno.jsonld",
+          "id" : "https://{host}/webannotations/$uuid",
+          "type": "Annotation",
+          "body": {
+            "type": "TextualBody",
+            "value": "On second thought, it's a boring page!"
+          },
+          "target": "http://www.example.com/index.html"
+        }
+        </h:jsonResponse>
+      </h:request>
+	    
+		</div>
+
+    <div id="delete" data-desc="Delete an Exisiting Annotation">
+      <h:request>
+        When I 
+        <h:delete>/webannotations/$uuid</h:delete>,<br/>
+        
+        then I should receive status
+        <h:status>204 No Content</h:status><br/>
+      </h:request>
+      
+      <h:request>
+        After that, <h:get>/webannotations/$uuid</h:get><br/>
+        using
+        <h:setHeader name="Accept">application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"</h:setHeader>, <br/>
+        should give me status
+        <h:status>410 Gone</h:status><br/>
+      </h:request>
+    </div>
+    
+    <div id="annotationlist" data-desc="Batch upload: AnnotationList (IIIF)">
+      <h:request>
+        To add a batch of annotations, I can wrap them in an AnnotionList as defined by <a href="http://iiif.io/api/presentation/2.1/#annotation-list">IIIF</a>:<br/>  
+        <h:post>/iiif/identifier/list/name</h:post><a href="#identifier">(*)</a><br/>
+        the following body:
+        <h:jsonBody>{
+   "@context":"http://iiif.io/api/presentation/2/context.json",
+   "@type":"sc:AnnotationList",
+   "resources":[
+      {
+         "@type":"oa:Annotation",
+         "motivation":[
+            "oa:tagging",
+            "oa:commenting"
+         ],
+         "resource":[
+            {
+               "@type":"oa:Tag",
+               "chars":"Square"
+            },
+            {
+               "@type":"dctypes:Text",
+               "format":"text/html",
+               "chars":"&lt;p&gt;Interesting!&lt;/p&gt;"
+            }
+         ],
+         "on":{
+            "@type":"oa:SpecificResource",
+            "full":"https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-007.json",
+            "selector":{
+               "@type":"oa:SvgSelector",
+               "value":"some svg selector"
+            },
+            "within":{
+               "@id":"https://iiif.lib.harvard.edu/manifests/drs:5981093",
+               "@type":"sc:Manifest"
+            }
+         }
+      },
+      {
+         "@type":"oa:Annotation",
+         "motivation":[
+            "oa:tagging",
+            "oa:commenting"
+         ],
+         "resource":[
+            {
+               "@type":"oa:Tag",
+               "chars":"Circle"
+            },
+            {
+               "@type":"dctypes:Text",
+               "format":"text/html",
+               "chars":"&lt;p&gt;Fascinating!&lt;/p&gt;"
+            }
+         ],
+         "on":{
+            "@type":"oa:SpecificResource",
+            "full":"https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-5981120.json",
+            "selector":{
+               "@type":"oa:SvgSelector",
+               "value":"some other svg selector"
+            },
+            "within":{
+               "@id":"https://iiif.lib.harvard.edu/manifests/drs:5981093",
+               "@type":"sc:Manifest"
+            }
+         }
+      },
+      {
+         "@type":"oa:Annotation",
+         "motivation":[
+            "oa:tagging",
+            "oa:commenting"
+         ],
+         "resource":[
+            {
+               "@type":"oa:Tag",
+               "chars":"Triangle"
+            },
+            {
+               "@type":"dctypes:Text",
+               "format":"text/html",
+               "chars":"&lt;p&gt;Unexpected!&lt;\/p&gt;"
+            }
+         ],
+         "on":{
+            "@type":"oa:SpecificResource",
+            "full":"https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-5981120.json",
+            "selector":{
+               "@type":"oa:SvgSelector",
+               "value":"some third svg selector"
+            },
+            "within":{
+               "@id":"https://iiif.lib.harvard.edu/manifests/drs:5981093",
+               "@type":"sc:Manifest"
+            }
+         }
+      }
+   ]
+}</h:jsonBody>
+        using headers
+        Accept: <h:setHeader name="Accept">application/ld+json</h:setHeader> <br/>
+        and
+        Content-type: <h:setHeader name="Content-type">application/ld+json</h:setHeader>,<br/>
+        
+        then I should receive:
+        <ul>
+          <li>status <h:status>200 OK</h:status></li>
+          <li>and the (streaming) response body should contain:
+            <h:jsonResponse>{
+   "@context":"http://iiif.io/api/presentation/2/context.json",
+   "@type":"sc:AnnotationList",
+   "resources":[
+      {
+         "@type":"oa:Annotation",
+         "motivation":[
+            "oa:tagging",
+            "oa:commenting"
+         ],
+         "resource":[
+            {
+               "@type":"oa:Tag",
+               "chars":"Square"
+            },
+            {
+               "@type":"dctypes:Text",
+               "format":"text/html",
+               "chars":"&lt;p&gt;Interesting!&lt;/p&gt;"
+            }
+         ],
+         "on":{
+            "@type":"oa:SpecificResource",
+            "full":"https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-007.json",
+            "selector":{
+               "@type":"oa:SvgSelector",
+               "value":"some svg selector"
+            },
+            "within":{
+               "@id":"https://iiif.lib.harvard.edu/manifests/drs:5981093",
+               "@type":"sc:Manifest"
+            }
+         }
+      },
+      {
+         "@type":"oa:Annotation",
+         "motivation":[
+            "oa:tagging",
+            "oa:commenting"
+         ],
+         "resource":[
+            {
+               "@type":"oa:Tag",
+               "chars":"Circle"
+            },
+            {
+               "@type":"dctypes:Text",
+               "format":"text/html",
+               "chars":"&lt;p&gt;Fascinating!&lt;/p&gt;"
+            }
+         ],
+         "on":{
+            "@type":"oa:SpecificResource",
+            "full":"https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-5981120.json",
+            "selector":{
+               "@type":"oa:SvgSelector",
+               "value":"some other svg selector"
+            },
+            "within":{
+               "@id":"https://iiif.lib.harvard.edu/manifests/drs:5981093",
+               "@type":"sc:Manifest"
+            }
+         }
+      },
+      {
+         "@type":"oa:Annotation",
+         "motivation":[
+            "oa:tagging",
+            "oa:commenting"
+         ],
+         "resource":[
+            {
+               "@type":"oa:Tag",
+               "chars":"Triangle"
+            },
+            {
+               "@type":"dctypes:Text",
+               "format":"text/html",
+               "chars":"&lt;p&gt;Unexpected!&lt;\/p&gt;"
+            }
+         ],
+         "on":{
+            "@type":"oa:SpecificResource",
+            "full":"https://iiif.lib.harvard.edu/manifests/drs:5981093/canvas/canvas-5981120.json",
+            "selector":{
+               "@type":"oa:SvgSelector",
+               "value":"some third svg selector"
+            },
+            "within":{
+               "@id":"https://iiif.lib.harvard.edu/manifests/drs:5981093",
+               "@type":"sc:Manifest"
+            }
+         }
+      }
+   ]
+}</h:jsonResponse>
+  Additionally, each annotation in resources has an <code>@id</code> like:
+          <code>"@id" : "https://{host}/webannotations/{uuid}"</code>
+          </li>
+        </ul>
+        <p id="identifier">(*) For now, you can use any valid pathname for <i>identifier</i> and <i>name</i>.</p>
+      </h:request>
+      
+    </div>
+    
+
+	</body>
+</html>

@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -39,8 +39,6 @@ import nl.knaw.huygens.alexandria.config.AbstractAlexandriaConfigurationUsingAle
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.config.PropertiesConfiguration;
 import nl.knaw.huygens.alexandria.service.AlexandriaServletModule;
-import nl.knaw.huygens.alexandria.text.FileSystemTextService;
-import nl.knaw.huygens.alexandria.text.TextService;
 import nl.knaw.huygens.alexandria.util.Scheduler;
 
 @WebListener
@@ -56,7 +54,7 @@ public class ContextListener extends JerseyGuiceServletContextListener {
 
   @Override
   public void contextInitialized(ServletContextEvent servletContextEvent) {
-    Scheduler.scheduleExpiredTentativesRemoval();
+    getInjector().getInstance(Scheduler.class).scheduleExpiredTentativesRemoval();
   }
 
   @Override
@@ -75,8 +73,6 @@ public class ContextListener extends JerseyGuiceServletContextListener {
       protected void configure() {
         AlexandriaConfiguration configuration = cache(propertyBackedConfiguration());
         bind(AlexandriaConfiguration.class).toInstance(configuration);
-        FileSystemTextService fsTextService = new FileSystemTextService(configuration.getStorageDirectory() + "/texts");
-        bind(TextService.class).toInstance(fsTextService);
       }
     };
   }
@@ -105,7 +101,6 @@ public class ContextListener extends JerseyGuiceServletContextListener {
       public String getStorageDirectory() {
         return getProperties().getProperty(STORAGE_DIRECTORY_PROP).get();
       }
-
     };
   }
 
