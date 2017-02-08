@@ -6,7 +6,7 @@ import nl.knaw.huygens.alexandria.api.model.search.QueryField;
  * #%L
  * alexandria-service
  * =======
- * Copyright (C) 2015 - 2016 Huygens ING (KNAW)
+ * Copyright (C) 2015 - 2017 Huygens ING (KNAW)
  * =======
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
