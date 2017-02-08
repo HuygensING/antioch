@@ -1,7 +1,28 @@
 package nl.knaw.huygens.alexandria.endpoint.iiif;
 
-import static nl.knaw.huygens.alexandria.api.w3c.WebAnnotationConstants.JSONLD_MEDIATYPE;
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.github.jsonldjava.utils.JsonUtils;
+import com.google.common.collect.Maps;
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.ProcessStatusMap;
+import nl.knaw.huygens.alexandria.api.model.iiif.IIIFAnnotationList;
+import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
+import nl.knaw.huygens.alexandria.endpoint.webannotation.WebAnnotation;
+import nl.knaw.huygens.alexandria.endpoint.webannotation.WebAnnotationService;
+import nl.knaw.huygens.alexandria.exception.BadRequestException;
+import nl.knaw.huygens.alexandria.exception.NotFoundException;
+import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import org.glassfish.jersey.server.ChunkedOutput;
 
+import javax.inject.Singleton;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -9,46 +30,36 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-
-import org.glassfish.jersey.server.ChunkedOutput;
-
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import com.github.jsonldjava.utils.JsonUtils;
-import com.google.common.collect.Maps;
-
-import nl.knaw.huygens.alexandria.api.model.iiif.IIIFAnnotationList;
-import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
-import nl.knaw.huygens.alexandria.endpoint.webannotation.WebAnnotation;
-import nl.knaw.huygens.alexandria.endpoint.webannotation.WebAnnotationService;
-import nl.knaw.huygens.alexandria.exception.BadRequestException;
-import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import static nl.knaw.huygens.alexandria.api.w3c.WebAnnotationConstants.JSONLD_MEDIATYPE;
 
 public class IIIFAnnotationListEndpoint extends AbstractIIIFEndpoint {
 
+  private final String listId;
   private String name;
+  private AlexandriaConfiguration config;
   private String identifier;
   private WebAnnotationService webAnnotationService;
+  private final ProcessStatusMap<AnnotationListImportStatus> taskStatusMap;
+  private final ExecutorService executorService;
 
-  public IIIFAnnotationListEndpoint(String identifier, String name, AlexandriaService service, AlexandriaConfiguration config, URI id) {
+  public IIIFAnnotationListEndpoint(String identifier,
+                                    String name,
+                                    AlexandriaService service,
+                                    AlexandriaConfiguration config,
+                                    URI id,
+                                    ProcessStatusMap<AnnotationListImportStatus> taskStatusMap,
+                                    ExecutorService executorService) {
     super(id);
     this.identifier = identifier;
     this.name = name;
+    this.config = config;
+    this.taskStatusMap = taskStatusMap;
+    this.executorService = executorService;
     this.webAnnotationService = new WebAnnotationService(service, config);
+    this.listId = identifier + ":" + name;
   }
 
   @GET
@@ -154,6 +165,53 @@ public class IIIFAnnotationListEndpoint extends AbstractIIIFEndpoint {
     processedList.put("resources", resources);
     return ok(processedList);
   }
+
+  @POST
+  @Path("async")
+  @Consumes(JSONLD_MEDIATYPE)
+  public Response postAnnotationListAsynchronously(IIIFAnnotationList annotationList) {
+    UUID statusId = startAnnotationListImport(annotationList);
+    URI statusURI = UriBuilder.fromUri(config.getBaseURI())
+            .path(EndpointPaths.IIIF)
+            .path(identifier)
+            .path("list")
+            .path(name)
+            .path("async")
+            .path("status")
+            .path(statusId.toString())
+            .build();
+    return Response.accepted()//
+            .location(statusURI)//
+            .build();
+  }
+
+  private UUID startAnnotationListImport(IIIFAnnotationList annotationList) {
+    AnnotationListImportTask task = new AnnotationListImportTask(annotationList, webAnnotationService);
+    UUID statusUUID = UUID.randomUUID();
+    taskStatusMap.put(statusUUID, task.getStatus());
+    runTask(task);
+    return statusUUID;
+
+
+  }
+
+  private void runTask(Runnable task) {
+    if (config.asynchronousEndpointsAllowed()) {
+      executorService.execute(task);
+    } else {
+      // For now, for the acceptance tests.
+      task.run();
+    }
+  }
+
+  @GET
+  @Path("async/status/{uuid}")
+  public Response getAnnotationListImportStatus(@PathParam("uuid") UUID uuid) {
+    AnnotationListImportStatus annotationListImportTaskStatus = taskStatusMap.get(uuid)//
+            .orElseThrow(NotFoundException::new);
+    return ok(annotationListImportTaskStatus);
+  }
+
 
   private void parseResources(JsonParser jParser, JsonGenerator jGenerator, String context) throws IOException {
     jGenerator.writeFieldName("resources");

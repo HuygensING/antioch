@@ -2,8 +2,10 @@ package nl.knaw.huygens.alexandria.endpoint.iiif;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -16,18 +18,22 @@ import com.google.common.collect.ImmutableMap;
 
 import io.swagger.annotations.Api;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.ProcessStatusMap;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
+@Singleton
 @Path(EndpointPaths.IIIF)
-@Api("webannotations")
+@Api(EndpointPaths.IIIF)
 public class IIIFEndpoint extends JSONEndpoint {
 
   private final AlexandriaService service;
   private LocationBuilder locationBuilder;
   private AlexandriaConfiguration config;
+  private ExecutorService executorService;
+  private ProcessStatusMap<AnnotationListImportStatus> taskStatusMap;
 
   @Context
   UriInfo uriInfo;
@@ -35,10 +41,14 @@ public class IIIFEndpoint extends JSONEndpoint {
   @Inject
   public IIIFEndpoint(AlexandriaService service, //
       LocationBuilder locationBuilder, //
-      AlexandriaConfiguration config) {
+      AlexandriaConfiguration config, //
+      ProcessStatusMap<AnnotationListImportStatus> taskStatusMap,//
+      ExecutorService executorService) {
     this.service = service;
     this.locationBuilder = locationBuilder;
     this.config = config;
+    this.taskStatusMap = taskStatusMap;
+    this.executorService = executorService;
   }
 
   @GET
@@ -92,7 +102,7 @@ public class IIIFEndpoint extends JSONEndpoint {
   // AnnotationList {scheme}://{host}/{prefix}/{identifier}/list/{name}
   @Path("{identifier}/list/{name}")
   public IIIFAnnotationListEndpoint getIIIFAnnotationListEndpoint(@PathParam("identifier") String identifier, @PathParam("name") String name) {
-    return new IIIFAnnotationListEndpoint(identifier, name, service, config, uriInfo.getAbsolutePath());
+    return new IIIFAnnotationListEndpoint(identifier, name, service, config, uriInfo.getAbsolutePath(), taskStatusMap, executorService);
   }
 
   // Range {scheme}://{host}/{prefix}/{identifier}/range/{name}
