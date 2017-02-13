@@ -53,6 +53,7 @@ import org.w3c.dom.NodeList;
 
 import nl.knaw.huygens.alexandria.api.model.CommandResponse;
 import nl.knaw.huygens.alexandria.api.model.Commands;
+import nl.knaw.huygens.alexandria.api.model.text.ResourcesCommand;
 import nl.knaw.huygens.alexandria.endpoint.command.XpathCommand.XPathResult.Type;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;

@@ -31,6 +31,7 @@ import nl.knaw.huygens.alexandria.api.model.CommandResponse;
 import nl.knaw.huygens.alexandria.api.model.CommandStatus;
 import nl.knaw.huygens.alexandria.api.model.Commands;
 import nl.knaw.huygens.alexandria.api.model.ProcessStatusMap;
+import nl.knaw.huygens.alexandria.api.model.text.ResourcesCommand;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 

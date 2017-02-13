@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint.command;
+package nl.knaw.huygens.alexandria.api.model.text;
 
 /*
  * #%L
@@ -29,6 +29,8 @@ import java.util.*;
 import com.google.common.base.Splitter;
 
 import nl.knaw.huygens.alexandria.api.model.CommandResponse;
+import nl.knaw.huygens.alexandria.endpoint.command.AlexandriaCommand;
+import nl.knaw.huygens.alexandria.endpoint.command.ResourceViewId;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 

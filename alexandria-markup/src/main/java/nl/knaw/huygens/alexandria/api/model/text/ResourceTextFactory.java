@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint;
+package nl.knaw.huygens.alexandria.api.model.text;
 
 /*
  * #%L
@@ -23,9 +23,9 @@ package nl.knaw.huygens.alexandria.endpoint;
  */
 
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
-import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewEntity;
+import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 
 import javax.inject.Inject;

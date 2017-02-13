@@ -24,6 +24,7 @@ package nl.knaw.huygens.alexandria.endpoint.command;
 
 import static nl.knaw.huygens.alexandria.text.TextUtil.XML_ID;
 
+import nl.knaw.huygens.alexandria.api.model.text.ResourcesCommand;
 import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
 
 public abstract class TextAnnotationCommand extends ResourcesCommand {

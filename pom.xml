@@ -23,6 +23,7 @@
     <module>alexandria-service</module>
     <module>alexandria-test</module>
     <module>alexandria-webapp</module>
+    <module>alexandria-markup</module>
   </modules>
 
   <properties>

@@ -41,6 +41,7 @@ import javax.ws.rs.core.UriInfo;
 import com.google.common.base.Joiner;
 
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.text.ResourceTextFactory;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinitionParser;
@@ -48,7 +49,6 @@ import nl.knaw.huygens.alexandria.api.model.text.view.TextViewEntity;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewList;
 import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
-import nl.knaw.huygens.alexandria.endpoint.ResourceTextFactory;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;

@@ -1,31 +1,6 @@
 package nl.knaw.huygens.alexandria.client;
 
-/*
- * #%L
- * alexandria-java-client
- * =======
- * Copyright (C) 2015 - 2017 Huygens ING (KNAW)
- * =======
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
-
-import java.io.File;
-import java.io.IOException;
 import java.net.URI;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,20 +9,8 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
-import nl.knaw.huygens.alexandria.api.model.Annotator;
-import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
-import nl.knaw.huygens.alexandria.api.model.CommandResponse;
-import nl.knaw.huygens.alexandria.api.model.CommandStatus;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
-import nl.knaw.huygens.alexandria.api.model.text.TextAnnotationImportStatus;
-import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
-import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
-import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
-import nl.knaw.huygens.alexandria.api.model.text.view.TextViewList;
 import nl.knaw.huygens.alexandria.client.model.AnnotationList;
 import nl.knaw.huygens.alexandria.client.model.AnnotationPojo;
 import nl.knaw.huygens.alexandria.client.model.AnnotationPrototype;
@@ -96,30 +59,32 @@ public class OptimisticAlexandriaClient {
     setSubResource(parentResourceId, subResourceId, subResourceWithSub(sub));
   }
 
-  public TextImportStatus setResourceTextSynchronously(UUID resourceUUID, File file) throws IOException {
-    unwrap(delegate.setResourceText(resourceUUID, file));
-    return textImportStatusWhenFinished(resourceUUID);
-  }
-
-  public TextImportStatus setResourceTextSynchronously(UUID resourceUUID, String xml) {
-    unwrap(delegate.setResourceText(resourceUUID, xml));
-    return textImportStatusWhenFinished(resourceUUID);
-  }
-
-  public TextAnnotationImportStatus addResourceTextRangeAnnotationsSynchronously(UUID resourceUUID, TextRangeAnnotationList textAnnotations) {
-    unwrap(delegate.addResourceTextRangeAnnotations(resourceUUID, textAnnotations));
-    TextAnnotationImportStatus finalStatus = textAnnotationImportStatusWhenFinished(resourceUUID);
-    // // throw exception when there are errors.
-    if (finalStatus.hasErrors()) {
-      throw new AlexandriaException(finalStatus.getBreakingErrorMessage());
-    }
-
-    return finalStatus;
-  }
-
-  public WebTarget getRootTarget(){
+  public WebTarget getRootTarget() {
     return delegate.getRootTarget();
   }
+
+  // TODO: move to markup module
+  // public TextImportStatus setResourceTextSynchronously(UUID resourceUUID, File file) throws IOException {
+  // unwrap(delegate.setResourceText(resourceUUID, file));
+  // return textImportStatusWhenFinished(resourceUUID);
+  // }
+  //
+  // public TextImportStatus setResourceTextSynchronously(UUID resourceUUID, String xml) {
+  // unwrap(delegate.setResourceText(resourceUUID, xml));
+  // return textImportStatusWhenFinished(resourceUUID);
+  // }
+  //
+  // public TextAnnotationImportStatus addResourceTextRangeAnnotationsSynchronously(UUID resourceUUID, TextRangeAnnotationList textAnnotations) {
+  // unwrap(delegate.addResourceTextRangeAnnotations(resourceUUID, textAnnotations));
+  // TextAnnotationImportStatus finalStatus = textAnnotationImportStatusWhenFinished(resourceUUID);
+  // // // throw exception when there are errors.
+  // if (finalStatus.hasErrors()) {
+  // throw new AlexandriaException(finalStatus.getBreakingErrorMessage());
+  // }
+  //
+  // return finalStatus;
+  // }
+
 
   // delegated methods
 
@@ -175,79 +140,6 @@ public class OptimisticAlexandriaClient {
     unwrap(delegate.confirmAnnotation(annotationUuid));
   }
 
-  public void setAnnotator(UUID resourceUUID, String code, Annotator annotator) {
-    unwrap(delegate.setAnnotator(resourceUUID, code, annotator));
-  }
-
-  public Annotator getAnnotator(UUID resourceUUID, String code) {
-    return unwrap(delegate.getAnnotator(resourceUUID, code));
-  }
-
-  public AnnotatorList getAnnotators(UUID resourceUUID) {
-    return unwrap(delegate.getAnnotators(resourceUUID));
-  }
-
-  public void setResourceText(UUID resourceUUID, File file) throws IOException {
-    unwrap(delegate.setResourceText(resourceUUID, file));
-  }
-
-  public void setResourceText(UUID resourceUUID, String xml) {
-    unwrap(delegate.setResourceText(resourceUUID, xml));
-  }
-
-  public TextImportStatus getTextImportStatus(UUID resourceUUID) {
-    return unwrap(delegate.getTextImportStatus(resourceUUID));
-  }
-
-  public TextEntity getTextInfo(UUID resourceUUID) {
-    return unwrap(delegate.getTextInfo(resourceUUID));
-  }
-
-  public String getTextAsString(UUID uuid) {
-    return unwrap(delegate.getTextAsString(uuid));
-  }
-
-  public String getTextAsString(UUID uuid, String viewName) {
-    return unwrap(delegate.getTextAsString(uuid, viewName));
-  }
-
-  public String getTextAsString(UUID uuid, String viewName, Map<String, String> viewParameters) {
-    return unwrap(delegate.getTextAsString(uuid, viewName, viewParameters));
-  }
-
-
-  public String getTextAsDot(UUID uuid) {
-    return unwrap(delegate.getTextAsDot(uuid));
-  }
-
-  public void addResourceTextRangeAnnotations(UUID resourceUUID, TextRangeAnnotationList textAnnotations) {
-    unwrap(delegate.addResourceTextRangeAnnotations(resourceUUID, textAnnotations));
-  }
-
-  public TextRangeAnnotationInfo setResourceTextRangeAnnotation(UUID resourceUUID, TextRangeAnnotation textAnnotation) {
-    return unwrap(delegate.setResourceTextRangeAnnotation(resourceUUID, textAnnotation));
-  }
-
-  public TextRangeAnnotation getResourceTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID) {
-    return unwrap(delegate.getResourceTextRangeAnnotation(resourceUUID, annotationUUID));
-  }
-
-  public void setResourceTextView(UUID resourceUUID, String textViewName, TextViewDefinition textView) {
-    unwrap(delegate.setResourceTextView(resourceUUID, textViewName, textView));
-  }
-
-  public TextViewList getResourceTextViews(UUID uuid) {
-    return unwrap(delegate.getResourceTextViews(uuid));
-  }
-
-  public TextViewDefinition getResourceTextView(UUID uuid, String textViewName) {
-    return unwrap(delegate.getResourceTextView(uuid, textViewName));
-  }
-
-  public TextViewDefinition getResourceTextView(UUID uuid, String textViewName, Map<String, String> viewParameters) {
-    return unwrap(delegate.getResourceTextView(uuid, textViewName, viewParameters));
-  }
-
   public UUID annotateResource(UUID resourceUUID, AnnotationPrototype annotationPrototype) {
     return unwrap(delegate.annotateResource(resourceUUID, annotationPrototype));
   }
@@ -276,14 +168,6 @@ public class OptimisticAlexandriaClient {
     return unwrap(delegate.getSearchResultPage(searchId, page));
   }
 
-  public CommandResponse doCommand(String commandName, Map<String, Object> parameters) {
-    return unwrap(delegate.doCommand(commandName, parameters));
-  }
-
-  public CommandStatus getCommandStatus(String string, UUID uuid) {
-    return unwrap(delegate.getCommandStatus(string, uuid));
-  }
-
   public AnnotationList getResourceAnnotations(UUID uuid) {
     return unwrap(delegate.getResourceAnnotations(uuid));
   }
@@ -300,13 +184,93 @@ public class OptimisticAlexandriaClient {
     unwrap(delegate.deprecateAnnotation(uuid));
   }
 
-  public TextRangeAnnotationList getResourceTextRangeAnnotations(UUID uuid) {
-    return unwrap(delegate.getResourceTextRangeAnnotations(uuid));
-  }
+  // TODO: move to markup module
+  // public void setAnnotator(UUID resourceUUID, String code, Annotator annotator) {
+  // unwrap(delegate.setAnnotator(resourceUUID, code, annotator));
+  // }
+  // public Annotator getAnnotator(UUID resourceUUID, String code) {
+  // return unwrap(delegate.getAnnotator(resourceUUID, code));
+  // }
+  //
+  // public AnnotatorList getAnnotators(UUID resourceUUID) {
+  // return unwrap(delegate.getAnnotators(resourceUUID));
+  // }
+  //
+  // public void setResourceText(UUID resourceUUID, File file) throws IOException {
+  // unwrap(delegate.setResourceText(resourceUUID, file));
+  // }
+  //
+  // public void setResourceText(UUID resourceUUID, String xml) {
+  // unwrap(delegate.setResourceText(resourceUUID, xml));
+  // }
+  //
+  // public TextImportStatus getTextImportStatus(UUID resourceUUID) {
+  // return unwrap(delegate.getTextImportStatus(resourceUUID));
+  // }
+  //
+  // public TextEntity getTextInfo(UUID resourceUUID) {
+  // return unwrap(delegate.getTextInfo(resourceUUID));
+  // }
+  //
+  // public String getTextAsString(UUID uuid) {
+  // return unwrap(delegate.getTextAsString(uuid));
+  // }
+  //
+  // public String getTextAsString(UUID uuid, String viewName) {
+  // return unwrap(delegate.getTextAsString(uuid, viewName));
+  // }
+  //
+  // public String getTextAsString(UUID uuid, String viewName, Map<String, String> viewParameters) {
+  // return unwrap(delegate.getTextAsString(uuid, viewName, viewParameters));
+  // }
+  //
+  //
+  // public String getTextAsDot(UUID uuid) {
+  // return unwrap(delegate.getTextAsDot(uuid));
+  // }
+  //
+  // public void addResourceTextRangeAnnotations(UUID resourceUUID, TextRangeAnnotationList textAnnotations) {
+  // unwrap(delegate.addResourceTextRangeAnnotations(resourceUUID, textAnnotations));
+  // }
+  //
+  // public TextRangeAnnotationInfo setResourceTextRangeAnnotation(UUID resourceUUID, TextRangeAnnotation textAnnotation) {
+  // return unwrap(delegate.setResourceTextRangeAnnotation(resourceUUID, textAnnotation));
+  // }
+  //
+  // public TextRangeAnnotation getResourceTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID) {
+  // return unwrap(delegate.getResourceTextRangeAnnotation(resourceUUID, annotationUUID));
+  // }
+  //
+  // public void setResourceTextView(UUID resourceUUID, String textViewName, TextViewDefinition textView) {
+  // unwrap(delegate.setResourceTextView(resourceUUID, textViewName, textView));
+  // }
+  //
+  // public TextViewList getResourceTextViews(UUID uuid) {
+  // return unwrap(delegate.getResourceTextViews(uuid));
+  // }
+  //
+  // public TextViewDefinition getResourceTextView(UUID uuid, String textViewName) {
+  // return unwrap(delegate.getResourceTextView(uuid, textViewName));
+  // }
+  //
+  // public TextViewDefinition getResourceTextView(UUID uuid, String textViewName, Map<String, String> viewParameters) {
+  // return unwrap(delegate.getResourceTextView(uuid, textViewName, viewParameters));
+  // }
+  // public TextRangeAnnotationList getResourceTextRangeAnnotations(UUID uuid) {
+  // return unwrap(delegate.getResourceTextRangeAnnotations(uuid));
+  // }
+  //
+  // public TextAnnotationImportStatus getResourceTextRangeAnnotationBatchImportStatus(UUID uuid) {
+  // return unwrap(delegate.getResourceTextRangeAnnotationBatchImportStatus(uuid));
+  // }
+  // public CommandResponse doCommand(String commandName, Map<String, Object> parameters) {
+  // return unwrap(delegate.doCommand(commandName, parameters));
+  // }
+  //
+  // public CommandStatus getCommandStatus(String string, UUID uuid) {
+  // return unwrap(delegate.getCommandStatus(string, uuid));
+  // }
 
-  public TextAnnotationImportStatus getResourceTextRangeAnnotationBatchImportStatus(UUID uuid) {
-    return unwrap(delegate.getResourceTextRangeAnnotationBatchImportStatus(uuid));
-  }
   /////// end delegated methods
 
   private <T> T unwrap(RestResult<T> restResult) {
@@ -327,34 +291,35 @@ public class OptimisticAlexandriaClient {
     return new SubResourcePrototype().setSub(sub);
   }
 
-  private TextImportStatus textImportStatusWhenFinished(UUID resourceUUID) {
-    TextImportStatus status = null;
-    boolean goOn = true;
-    while (goOn) {
-      try {
-        Thread.sleep(500);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-      status = unwrap(delegate.getTextImportStatus(resourceUUID));
-      goOn = !status.isDone();
-    }
-    return status;
-  }
-
-  private TextAnnotationImportStatus textAnnotationImportStatusWhenFinished(UUID resourceUUID) {
-    TextAnnotationImportStatus status = null;
-    boolean goOn = true;
-    while (goOn) {
-      try {
-        Thread.sleep(500);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-      status = unwrap(delegate.getResourceTextRangeAnnotationBatchImportStatus(resourceUUID));
-      goOn = !status.isDone();
-    }
-    return status;
-  }
+  // TODO move to markup module
+  // private TextImportStatus textImportStatusWhenFinished(UUID resourceUUID) {
+  // TextImportStatus status = null;
+  // boolean goOn = true;
+  // while (goOn) {
+  // try {
+  // Thread.sleep(500);
+  // } catch (InterruptedException e) {
+  // e.printStackTrace();
+  // }
+  // status = unwrap(delegate.getTextImportStatus(resourceUUID));
+  // goOn = !status.isDone();
+  // }
+  // return status;
+  // }
+  //
+  // private TextAnnotationImportStatus textAnnotationImportStatusWhenFinished(UUID resourceUUID) {
+  // TextAnnotationImportStatus status = null;
+  // boolean goOn = true;
+  // while (goOn) {
+  // try {
+  // Thread.sleep(500);
+  // } catch (InterruptedException e) {
+  // e.printStackTrace();
+  // }
+  // status = unwrap(delegate.getResourceTextRangeAnnotationBatchImportStatus(resourceUUID));
+  // goOn = !status.isDone();
+  // }
+  // return status;
+  // }
 
 }

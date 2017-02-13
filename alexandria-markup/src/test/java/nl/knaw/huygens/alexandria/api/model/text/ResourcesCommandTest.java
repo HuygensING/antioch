@@ -1,4 +1,4 @@
-package nl.knaw.huygens.alexandria.endpoint.command;
+package nl.knaw.huygens.alexandria.api.model.text;
 
 /*
  * #%L
@@ -31,6 +31,8 @@ import java.util.UUID;
 import org.junit.Test;
 
 import nl.knaw.huygens.alexandria.api.model.CommandResponse;
+import nl.knaw.huygens.alexandria.endpoint.command.ResourceViewId;
+import nl.knaw.huygens.alexandria.api.model.text.ResourcesCommand;
 
 public class ResourcesCommandTest {
 

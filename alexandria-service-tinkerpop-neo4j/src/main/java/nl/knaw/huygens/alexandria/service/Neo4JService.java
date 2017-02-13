@@ -11,7 +11,6 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.storage.Storage;
-import nl.knaw.huygens.alexandria.storage.VertexLabels;
 
 /*
  * #%L
@@ -23,12 +22,12 @@ import nl.knaw.huygens.alexandria.storage.VertexLabels;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -66,8 +65,8 @@ public class Neo4JService extends TinkerPopService {
     System.out.print(".");
     setUniqueIndex("AnnotationBody", Storage.IDENTIFIER_PROPERTY);
     System.out.print(".");
-    setUniqueIndex(VertexLabels.TEXTRANGEANNOTATION, Storage.IDENTIFIER_PROPERTY);
-    System.out.print(".");
+    // setUniqueIndex(VertexLabels.TEXTRANGEANNOTATION, Storage.IDENTIFIER_PROPERTY);
+    // System.out.print(".");
     runCypher("create index on :Resource(cargo)");
     System.out.print(".");
     runCypher("create index on :Annotation(who)");
