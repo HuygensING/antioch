@@ -1,9 +1,1 @@
-Er was eens een meisje uit Son,
-
-Die baalde al toen ze begon.
-
-Ze had dyslexie,
-
-Dus haat poëzie.
-
-Toch knap dat ze dit dan verzon.
+There once was a runner named Dwight / Who could speed even faster than light. / He set out one day / In a relative way / And returned on the previous night.
