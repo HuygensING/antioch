@@ -2,13 +2,9 @@ package nl.knaw.huygens.alexandria.client;
 
 import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -23,7 +19,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
@@ -38,21 +33,9 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import nl.knaw.huygens.alexandria.api.EndpointPaths;
 import nl.knaw.huygens.alexandria.api.model.AboutEntity;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.api.model.Annotator;
-import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
-import nl.knaw.huygens.alexandria.api.model.CommandResponse;
-import nl.knaw.huygens.alexandria.api.model.CommandStatus;
 import nl.knaw.huygens.alexandria.api.model.StatePrototype;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
-import nl.knaw.huygens.alexandria.api.model.text.TextAnnotationImportStatus;
-import nl.knaw.huygens.alexandria.api.model.text.TextEntity;
-import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
-import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
-import nl.knaw.huygens.alexandria.api.model.text.view.TextViewList;
 import nl.knaw.huygens.alexandria.client.model.AnnotationList;
 import nl.knaw.huygens.alexandria.client.model.AnnotationPojo;
 import nl.knaw.huygens.alexandria.client.model.AnnotationPrototype;
@@ -72,12 +55,12 @@ import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -270,192 +253,215 @@ public class AlexandriaClient implements AutoCloseable {
     return confirm(EndpointPaths.ANNOTATIONS, annotationUuid);
   }
 
-  public RestResult<Void> setAnnotator(UUID resourceUUID, String code, Annotator annotator) {
-    final Entity<Annotator> entity = Entity.json(annotator);
-    final WebTarget path = annotatorsTarget(resourceUUID, code);
-    final Supplier<Response> responseSupplier = authorizedPut(path, entity);
-    final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
-    return requester//
-        .onStatus(Status.CREATED, voidRestResult())//
-        .onStatus(Status.NO_CONTENT, voidRestResult())//
-        .getResult();
-  }
-
-  public RestResult<Annotator> getAnnotator(UUID resourceUUID, String code) {
-    final WebTarget path = annotatorsTarget(resourceUUID, code);
-    final Supplier<Response> responseSupplier = anonymousGet(path);
-    final RestRequester<Annotator> requester = RestRequester.withResponseSupplier(responseSupplier);
-    return requester//
-        .onStatus(Status.OK, this::toAnnotatorRestResult)//
-        .getResult();
-  }
-
-  public RestResult<AnnotatorList> getAnnotators(UUID resourceUUID) {
-    final WebTarget path = resourceTarget(resourceUUID)//
-        .path(EndpointPaths.ANNOTATORS);
-
-    final Supplier<Response> responseSupplier = anonymousGet(path);
-    final RestRequester<AnnotatorList> requester = RestRequester.withResponseSupplier(responseSupplier);
-    return requester//
-        .onStatus(Status.OK, this::toAnnotatorListRestResult)//
-        .getResult();
-  }
-
-  public RestResult<Void> setResourceText(final UUID resourceUUID, final File file) throws IOException {
-    return setResourceText(resourceUUID, FileUtils.readFileToString(file, StandardCharsets.UTF_8));
-  }
-
-  public RestResult<Void> setResourceText(final UUID resourceUUID, final String xml) {
-    final Entity<String> entity = Entity.entity(xml, MediaType.TEXT_XML);
-    WebTarget path = resourceTextTarget(resourceUUID);
-    final Supplier<Response> responseSupplier = authorizedPut(path, entity);
-    final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
-    return requester//
-        .onStatus(Status.ACCEPTED, voidRestResult())//
-        .getResult();
-  }
-
-  public RestResult<TextImportStatus> getTextImportStatus(final UUID resourceUUID) {
-    final WebTarget path = resourceTextTarget(resourceUUID)//
-        .path("status");
-    final Supplier<Response> responseSupplier = anonymousGet(path);
-    final RestRequester<TextImportStatus> requester = RestRequester.withResponseSupplier(responseSupplier);
-    return requester//
-        .onStatus(Status.OK, this::toTextImportStatusRestResult)//
-        .getResult();
-  }
-
-  public RestResult<TextEntity> getTextInfo(UUID resourceUUID) {
-    WebTarget path = resourceTextTarget(resourceUUID);
-    final Supplier<Response> responseSupplier = anonymousGet(path);
-    final RestRequester<TextEntity> requester = RestRequester.withResponseSupplier(responseSupplier);
-    return requester//
-        .onStatus(Status.OK, this::toTextEntityRestResult)//
-        .getResult();
-  }
-
-  public RestResult<String> getTextAsString(final UUID uuid) {
-    WebTarget path = resourceTextTarget(uuid).path("xml");
-    return stringResult(path);
-  }
-
-  public RestResult<String> getTextAsString(final UUID uuid, final String viewName) {
-    WebTarget path = resourceTextTarget(uuid).path("xml").queryParam("view", viewName);
-    return stringResult(path);
-  }
-
-  public RestResult<String> getTextAsString(final UUID uuid, final String viewName, final Map<String, String> viewParameters) {
-    WebTarget path = resourceTextTarget(uuid).path("xml").queryParam("view", viewName);
-    path = addViewParameters(viewParameters, path);
-    return stringResult(path);
-  }
-
-  public RestResult<String> getTextAsDot(final UUID uuid) {
-    WebTarget path = resourceTextTarget(uuid).path("dot");
-    return stringResult(path);
-  }
-
-  public RestResult<Void> addResourceTextRangeAnnotations(UUID resourceUUID, TextRangeAnnotationList textAnnotations) {
-    final Entity<TextRangeAnnotationList> entity = Entity.json(textAnnotations);
-    WebTarget path = resourceTextTarget(resourceUUID)//
-        .path(EndpointPaths.ANNOTATIONBATCH);
-    final Supplier<Response> responseSupplier = authorizedPost(path, entity);
-    final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
-    return requester//
-        .onStatus(Status.ACCEPTED, voidRestResult())//
-        .getResult();
-  }
-
-  public RestResult<TextAnnotationImportStatus> getResourceTextRangeAnnotationBatchImportStatus(final UUID resourceUUID) {
-    final WebTarget path = resourceTextTarget(resourceUUID)//
-        .path(EndpointPaths.ANNOTATIONBATCH)//
-        .path("status");
-    final Supplier<Response> responseSupplier = anonymousGet(path);
-    final RestRequester<TextAnnotationImportStatus> requester = RestRequester.withResponseSupplier(responseSupplier);
-    return requester//
-        .onStatus(Status.OK, this::toTextAnnotationImportStatusRestResult)//
-        .getResult();
-  }
-
-  public RestResult<TextRangeAnnotationInfo> setResourceTextRangeAnnotation(UUID resourceUUID, TextRangeAnnotation textAnnotation) {
-    final Entity<TextRangeAnnotation> entity = Entity.json(textAnnotation);
-    WebTarget path = resourceTextTarget(resourceUUID)//
-        .path(EndpointPaths.ANNOTATIONS)//
-        .path(textAnnotation.getId().toString());
-    final Supplier<Response> responseSupplier = authorizedPut(path, entity);
-    final RestRequester<TextRangeAnnotationInfo> requester = RestRequester.withResponseSupplier(responseSupplier);
-    return requester//
-        .onStatus(Status.CREATED, this::toTextRangeAnnotationInfoRestResult)//
-        .onStatus(Status.NO_CONTENT, this::toTextRangeAnnotationInfoRestResult)//
-        .getResult();
-  }
-
-  public RestResult<TextRangeAnnotation> getResourceTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID) {
-    WebTarget path = resourceTextTarget(resourceUUID)//
-        .path(EndpointPaths.ANNOTATIONS)//
-        .path(annotationUUID.toString());
-    final Supplier<Response> responseSupplier = anonymousGet(path);
-    final RestRequester<TextRangeAnnotation> requester = RestRequester.withResponseSupplier(responseSupplier);
-    return requester//
-        .onStatus(Status.OK, this::toTextRangeAnnotationRestResult)//
-        .getResult();
-  }
-
-  public RestResult<TextRangeAnnotationList> getResourceTextRangeAnnotations(UUID resourceUUID) {
-    WebTarget path = resourceTextTarget(resourceUUID)//
-        .path(EndpointPaths.ANNOTATIONS);
-    final Supplier<Response> responseSupplier = anonymousGet(path);
-    final RestRequester<TextRangeAnnotationList> requester = RestRequester.withResponseSupplier(responseSupplier);
-    return requester//
-        .onStatus(Status.OK, this::toTextRangeAnnotationListRestResult)//
-        .getResult();
-  }
-
-  public RestResult<Void> setResourceTextView(final UUID resourceUUID, final String textViewName, final TextViewDefinition textView) {
-    final Entity<TextViewDefinition> entity = Entity.json(textView);
-    final WebTarget path = resourceTextTarget(resourceUUID)//
-        .path(EndpointPaths.TEXTVIEWS)//
-        .path(textViewName);
-    final Supplier<Response> responseSupplier = authorizedPut(path, entity);
-    final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
-    return requester//
-        .onStatus(Status.CREATED, voidRestResult())//
-        .onStatus(Status.NO_CONTENT, voidRestResult())//
-        .getResult();
-  }
-
-  public RestResult<TextViewDefinition> getResourceTextView(final UUID uuid, final String textViewName) {
-    return getResourceTextView(uuid, textViewName, NO_VIEW_PARAMETERS);
-  }
-
-  public RestResult<TextViewDefinition> getResourceTextView(final UUID uuid, final String textViewName, final Map<String, String> viewParameters) {
-    WebTarget path = resourceTextTarget(uuid).path(EndpointPaths.TEXTVIEWS).path(textViewName);
-    path = addViewParameters(viewParameters, path);
-    Supplier<Response> anonymousGet = anonymousGet(path);
-    final RestRequester<TextViewDefinition> requester = RestRequester.withResponseSupplier(anonymousGet);
-    return requester//
-        .onStatus(Status.OK, this::toTextViewDefinitionRestResult)//
-        .getResult();
-  }
-
-  private WebTarget addViewParameters(final Map<String, String> viewParameters, WebTarget path) {
-    Set<Map.Entry<String, String>> entries = viewParameters.entrySet();
-    for (Map.Entry<String, String> entry : entries) {
-      String k = entry.getKey();
-      String v = entry.getValue();
-      path = path.queryParam("view." + k, v);
-    }
-    return path;
-  }
-
-  public RestResult<TextViewList> getResourceTextViews(final UUID uuid) {
-    WebTarget path = resourceTextTarget(uuid).path(EndpointPaths.TEXTVIEWS);
-    Supplier<Response> anonymousGet = anonymousGet(path);
-    final RestRequester<TextViewList> requester = RestRequester.withResponseSupplier(anonymousGet);
-    return requester//
-        .onStatus(Status.OK, this::toTextViewListRestResult)//
-        .getResult();
-  }
+  // TODO move to markup module
+  // public RestResult<Void> setAnnotator(UUID resourceUUID, String code, Annotator annotator) {
+  // final Entity<Annotator> entity = Entity.json(annotator);
+  // final WebTarget path = annotatorsTarget(resourceUUID, code);
+  // final Supplier<Response> responseSupplier = authorizedPut(path, entity);
+  // final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
+  // return requester//
+  // .onStatus(Status.CREATED, voidRestResult())//
+  // .onStatus(Status.NO_CONTENT, voidRestResult())//
+  // .getResult();
+  // }
+  //
+  // public RestResult<Annotator> getAnnotator(UUID resourceUUID, String code) {
+  // final WebTarget path = annotatorsTarget(resourceUUID, code);
+  // final Supplier<Response> responseSupplier = anonymousGet(path);
+  // final RestRequester<Annotator> requester = RestRequester.withResponseSupplier(responseSupplier);
+  // return requester//
+  // .onStatus(Status.OK, this::toAnnotatorRestResult)//
+  // .getResult();
+  // }
+  //
+  // public RestResult<AnnotatorList> getAnnotators(UUID resourceUUID) {
+  // final WebTarget path = resourceTarget(resourceUUID)//
+  // .path(EndpointPaths.ANNOTATORS);
+  //
+  // final Supplier<Response> responseSupplier = anonymousGet(path);
+  // final RestRequester<AnnotatorList> requester = RestRequester.withResponseSupplier(responseSupplier);
+  // return requester//
+  // .onStatus(Status.OK, this::toAnnotatorListRestResult)//
+  // .getResult();
+  // }
+  //
+  // public RestResult<Void> setResourceText(final UUID resourceUUID, final File file) throws IOException {
+  // return setResourceText(resourceUUID, FileUtils.readFileToString(file, StandardCharsets.UTF_8));
+  // }
+  //
+  // public RestResult<Void> setResourceText(final UUID resourceUUID, final String xml) {
+  // final Entity<String> entity = Entity.entity(xml, MediaType.TEXT_XML);
+  // WebTarget path = resourceTextTarget(resourceUUID);
+  // final Supplier<Response> responseSupplier = authorizedPut(path, entity);
+  // final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
+  // return requester//
+  // .onStatus(Status.ACCEPTED, voidRestResult())//
+  // .getResult();
+  // }
+  //
+  // public RestResult<TextImportStatus> getTextImportStatus(final UUID resourceUUID) {
+  // final WebTarget path = resourceTextTarget(resourceUUID)//
+  // .path("status");
+  // final Supplier<Response> responseSupplier = anonymousGet(path);
+  // final RestRequester<TextImportStatus> requester = RestRequester.withResponseSupplier(responseSupplier);
+  // return requester//
+  // .onStatus(Status.OK, this::toTextImportStatusRestResult)//
+  // .getResult();
+  // }
+  //
+  // public RestResult<TextEntity> getTextInfo(UUID resourceUUID) {
+  // WebTarget path = resourceTextTarget(resourceUUID);
+  // final Supplier<Response> responseSupplier = anonymousGet(path);
+  // final RestRequester<TextEntity> requester = RestRequester.withResponseSupplier(responseSupplier);
+  // return requester//
+  // .onStatus(Status.OK, this::toTextEntityRestResult)//
+  // .getResult();
+  // }
+  //
+  // public RestResult<String> getTextAsString(final UUID uuid) {
+  // WebTarget path = resourceTextTarget(uuid).path("xml");
+  // return stringResult(path);
+  // }
+  //
+  // public RestResult<String> getTextAsString(final UUID uuid, final String viewName) {
+  // WebTarget path = resourceTextTarget(uuid).path("xml").queryParam("view", viewName);
+  // return stringResult(path);
+  // }
+  //
+  // public RestResult<String> getTextAsString(final UUID uuid, final String viewName, final Map<String, String> viewParameters) {
+  // WebTarget path = resourceTextTarget(uuid).path("xml").queryParam("view", viewName);
+  // path = addViewParameters(viewParameters, path);
+  // return stringResult(path);
+  // }
+  //
+  // public RestResult<String> getTextAsDot(final UUID uuid) {
+  // WebTarget path = resourceTextTarget(uuid).path("dot");
+  // return stringResult(path);
+  // }
+  //
+  // public RestResult<Void> addResourceTextRangeAnnotations(UUID resourceUUID, TextRangeAnnotationList textAnnotations) {
+  // final Entity<TextRangeAnnotationList> entity = Entity.json(textAnnotations);
+  // WebTarget path = resourceTextTarget(resourceUUID)//
+  // .path(EndpointPaths.ANNOTATIONBATCH);
+  // final Supplier<Response> responseSupplier = authorizedPost(path, entity);
+  // final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
+  // return requester//
+  // .onStatus(Status.ACCEPTED, voidRestResult())//
+  // .getResult();
+  // }
+  //
+  // public RestResult<TextAnnotationImportStatus> getResourceTextRangeAnnotationBatchImportStatus(final UUID resourceUUID) {
+  // final WebTarget path = resourceTextTarget(resourceUUID)//
+  // .path(EndpointPaths.ANNOTATIONBATCH)//
+  // .path("status");
+  // final Supplier<Response> responseSupplier = anonymousGet(path);
+  // final RestRequester<TextAnnotationImportStatus> requester = RestRequester.withResponseSupplier(responseSupplier);
+  // return requester//
+  // .onStatus(Status.OK, this::toTextAnnotationImportStatusRestResult)//
+  // .getResult();
+  // }
+  //
+  // public RestResult<TextRangeAnnotationInfo> setResourceTextRangeAnnotation(UUID resourceUUID, TextRangeAnnotation textAnnotation) {
+  // final Entity<TextRangeAnnotation> entity = Entity.json(textAnnotation);
+  // WebTarget path = resourceTextTarget(resourceUUID)//
+  // .path(EndpointPaths.ANNOTATIONS)//
+  // .path(textAnnotation.getId().toString());
+  // final Supplier<Response> responseSupplier = authorizedPut(path, entity);
+  // final RestRequester<TextRangeAnnotationInfo> requester = RestRequester.withResponseSupplier(responseSupplier);
+  // return requester//
+  // .onStatus(Status.CREATED, this::toTextRangeAnnotationInfoRestResult)//
+  // .onStatus(Status.NO_CONTENT, this::toTextRangeAnnotationInfoRestResult)//
+  // .getResult();
+  // }
+  //
+  // public RestResult<TextRangeAnnotation> getResourceTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID) {
+  // WebTarget path = resourceTextTarget(resourceUUID)//
+  // .path(EndpointPaths.ANNOTATIONS)//
+  // .path(annotationUUID.toString());
+  // final Supplier<Response> responseSupplier = anonymousGet(path);
+  // final RestRequester<TextRangeAnnotation> requester = RestRequester.withResponseSupplier(responseSupplier);
+  // return requester//
+  // .onStatus(Status.OK, this::toTextRangeAnnotationRestResult)//
+  // .getResult();
+  // }
+  //
+  // public RestResult<TextRangeAnnotationList> getResourceTextRangeAnnotations(UUID resourceUUID) {
+  // WebTarget path = resourceTextTarget(resourceUUID)//
+  // .path(EndpointPaths.ANNOTATIONS);
+  // final Supplier<Response> responseSupplier = anonymousGet(path);
+  // final RestRequester<TextRangeAnnotationList> requester = RestRequester.withResponseSupplier(responseSupplier);
+  // return requester//
+  // .onStatus(Status.OK, this::toTextRangeAnnotationListRestResult)//
+  // .getResult();
+  // }
+  //
+  // public RestResult<Void> setResourceTextView(final UUID resourceUUID, final String textViewName, final TextViewDefinition textView) {
+  // final Entity<TextViewDefinition> entity = Entity.json(textView);
+  // final WebTarget path = resourceTextTarget(resourceUUID)//
+  // .path(EndpointPaths.TEXTVIEWS)//
+  // .path(textViewName);
+  // final Supplier<Response> responseSupplier = authorizedPut(path, entity);
+  // final RestRequester<Void> requester = RestRequester.withResponseSupplier(responseSupplier);
+  // return requester//
+  // .onStatus(Status.CREATED, voidRestResult())//
+  // .onStatus(Status.NO_CONTENT, voidRestResult())//
+  // .getResult();
+  // }
+  //
+  // public RestResult<TextViewDefinition> getResourceTextView(final UUID uuid, final String textViewName) {
+  // return getResourceTextView(uuid, textViewName, NO_VIEW_PARAMETERS);
+  // }
+  //
+  // public RestResult<TextViewDefinition> getResourceTextView(final UUID uuid, final String textViewName, final Map<String, String> viewParameters) {
+  // WebTarget path = resourceTextTarget(uuid).path(EndpointPaths.TEXTVIEWS).path(textViewName);
+  // path = addViewParameters(viewParameters, path);
+  // Supplier<Response> anonymousGet = anonymousGet(path);
+  // final RestRequester<TextViewDefinition> requester = RestRequester.withResponseSupplier(anonymousGet);
+  // return requester//
+  // .onStatus(Status.OK, this::toTextViewDefinitionRestResult)//
+  // .getResult();
+  // }
+  //
+  // private WebTarget addViewParameters(final Map<String, String> viewParameters, WebTarget path) {
+  // Set<Map.Entry<String, String>> entries = viewParameters.entrySet();
+  // for (Map.Entry<String, String> entry : entries) {
+  // String k = entry.getKey();
+  // String v = entry.getValue();
+  // path = path.queryParam("view." + k, v);
+  // }
+  // return path;
+  // }
+  //
+  // public RestResult<TextViewList> getResourceTextViews(final UUID uuid) {
+  // WebTarget path = resourceTextTarget(uuid).path(EndpointPaths.TEXTVIEWS);
+  // Supplier<Response> anonymousGet = anonymousGet(path);
+  // final RestRequester<TextViewList> requester = RestRequester.withResponseSupplier(anonymousGet);
+  // return requester//
+  // .onStatus(Status.OK, this::toTextViewListRestResult)//
+  // .getResult();
+  // }
+  // public RestResult<CommandResponse> doCommand(String commandName, Map<String, Object> parameters) {
+  // final Entity<Map<String, Object>> entity = Entity.json(parameters);
+  // final WebTarget path = rootTarget.path(EndpointPaths.COMMANDS).path(commandName);
+  // final Supplier<Response> responseSupplier = authorizedPost(path, entity);
+  // final RestRequester<CommandResponse> requester = RestRequester.withResponseSupplier(responseSupplier);
+  // return requester//
+  // .onStatus(Status.OK, this::toCommandResponseRestResult)//
+  // .onStatus(Status.ACCEPTED, this::extractCommandStatusId)//
+  // .getResult();
+  // }
+  //
+  // public RestResult<CommandStatus> getCommandStatus(final String commandName, final UUID resourceUUID) {
+  // final WebTarget path = rootTarget.path(EndpointPaths.COMMANDS)//
+  // .path(commandName)//
+  // .path(resourceUUID.toString())//
+  // .path("status");
+  // final Supplier<Response> responseSupplier = anonymousGet(path);
+  // final RestRequester<CommandStatus> requester = RestRequester.withResponseSupplier(responseSupplier);
+  // return requester//
+  // .onStatus(Status.OK, this::toCommandStatusRestResult)//
+  // .getResult();
+  // }
 
   public RestResult<UUID> annotateResource(final UUID resourceUUID, final AnnotationPrototype annotationPrototype) {
     return annotate(resourceUUID, annotationPrototype, EndpointPaths.RESOURCES);
@@ -509,28 +515,6 @@ public class AlexandriaClient implements AutoCloseable {
         .getResult();
   }
 
-  public RestResult<CommandResponse> doCommand(String commandName, Map<String, Object> parameters) {
-    final Entity<Map<String, Object>> entity = Entity.json(parameters);
-    final WebTarget path = rootTarget.path(EndpointPaths.COMMANDS).path(commandName);
-    final Supplier<Response> responseSupplier = authorizedPost(path, entity);
-    final RestRequester<CommandResponse> requester = RestRequester.withResponseSupplier(responseSupplier);
-    return requester//
-        .onStatus(Status.OK, this::toCommandResponseRestResult)//
-        .onStatus(Status.ACCEPTED, this::extractCommandStatusId)//
-        .getResult();
-  }
-
-  public RestResult<CommandStatus> getCommandStatus(final String commandName, final UUID resourceUUID) {
-    final WebTarget path = rootTarget.path(EndpointPaths.COMMANDS)//
-        .path(commandName)//
-        .path(resourceUUID.toString())//
-        .path("status");
-    final Supplier<Response> responseSupplier = anonymousGet(path);
-    final RestRequester<CommandStatus> requester = RestRequester.withResponseSupplier(responseSupplier);
-    return requester//
-        .onStatus(Status.OK, this::toCommandStatusRestResult)//
-        .getResult();
-  }
 
   public RestResult<Void> deprecateAnnotation(UUID uuid) {
     WebTarget path = annotationTarget(uuid);
@@ -600,61 +584,91 @@ public class AlexandriaClient implements AutoCloseable {
     return toEntityRestResult(response, SubResourcePojo.class);
   }
 
-  private RestResult<Annotator> toAnnotatorRestResult(final Response response) {
-    return toEntityRestResult(response, Annotator.class);
-  }
+  // TODO move to markup module
+  // private RestResult<Annotator> toAnnotatorRestResult(final Response response) {
+  // return toEntityRestResult(response, Annotator.class);
+  // }
+  //
+  // private RestResult<AnnotatorList> toAnnotatorListRestResult(final Response response) {
+  // return toEntityRestResult(response, AnnotatorList.class);
+  // }
+  // private RestResult<TextImportStatus> toTextImportStatusRestResult(final Response response) {
+  // return toEntityRestResult(response, TextImportStatus.class);
+  // }
+  //
+  // private RestResult<TextAnnotationImportStatus> toTextAnnotationImportStatusRestResult(final Response response) {
+  // return toEntityRestResult(response, TextAnnotationImportStatus.class);
+  // }
+  //
+  // private RestResult<CommandStatus> toCommandStatusRestResult(final Response response) {
+  // return toEntityRestResult(response, CommandStatus.class);
+  // }
+  // private RestResult<TextEntity> toTextEntityRestResult(final Response response) {
+  // return toEntityRestResult(response, TextEntity.class);
+  // }
+  //
+  // private RestResult<TextViewDefinition> toTextViewDefinitionRestResult(final Response response) {
+  // return toEntityRestResult(response, TextViewDefinition.class);
+  // }
+  //
+  // private RestResult<TextViewList> toTextViewListRestResult(final Response response) {
+  // return toEntityRestResult(response, TextViewList.class);
+  // }
+  // private RestResult<TextRangeAnnotation> toTextRangeAnnotationRestResult(final Response response) {
+  // return toEntityRestResult(response, TextRangeAnnotation.class);
+  // }
+  //
+  // private RestResult<TextRangeAnnotationList> toTextRangeAnnotationListRestResult(final Response response) {
+  // return toEntityRestResult(response, TextRangeAnnotationList.class);
+  // }
+  //
+  // private RestResult<TextRangeAnnotationInfo> toTextRangeAnnotationInfoRestResult(final Response response) {
+  // return toEntityRestResult(response, TextRangeAnnotationInfo.class);
+  // }
+  // private RestResult<CommandResponse> extractCommandStatusId(final Response response) {
+  // final String location = response.getHeaderString("Location");
+  // String[] parts = location.split("/");
+  // UUID statusId = UUID.fromString(parts[parts.length - 2]);
+  // CommandResponse commandResponse = new CommandResponse();
+  // commandResponse.setStatusId(statusId);
+  // final RestResult<CommandResponse> result = new RestResult<>();
+  // return result.setCargo(commandResponse);
+  // }
+  //
+  // private RestResult<URI> uriFromLocationHeader(final Response response) {
+  // final RestResult<URI> result = new RestResult<>();
+  // final String location = response.getHeaderString("Location");
+  // final URI uri = URI.create(location);
+  // result.setCargo(uri);
+  // return result;
+  // }
+  // private RestResult<CommandResponse> toCommandResponseRestResult(final Response response) {
+  // return toEntityRestResult(response, CommandResponse.class);
+  // }
+  // private WebTarget annotatorsTarget(UUID resourceUUID, String code) {
+  // return resourceTarget(resourceUUID)//
+  // .path(EndpointPaths.ANNOTATORS)//
+  // .path(code);
+  // }
+  // private RestResult<String> stringResult(WebTarget path) {
+  // Supplier<Response> responseSupplier = anonymousGet(path);
+  // final RestRequester<String> requester = RestRequester.withResponseSupplier(responseSupplier);
+  // return requester//
+  // .onStatus(Status.OK, this::toStringRestResult)//
+  // .getResult();
+  // }
 
-  private RestResult<AnnotatorList> toAnnotatorListRestResult(final Response response) {
-    return toEntityRestResult(response, AnnotatorList.class);
-  }
 
   private RestResult<AnnotationPojo> toAnnotationPojoRestResult(final Response response) {
     return toEntityRestResult(response, AnnotationPojo.class);
   }
 
-  private RestResult<TextImportStatus> toTextImportStatusRestResult(final Response response) {
-    return toEntityRestResult(response, TextImportStatus.class);
-  }
-
-  private RestResult<TextAnnotationImportStatus> toTextAnnotationImportStatusRestResult(final Response response) {
-    return toEntityRestResult(response, TextAnnotationImportStatus.class);
-  }
-
-  private RestResult<CommandStatus> toCommandStatusRestResult(final Response response) {
-    return toEntityRestResult(response, CommandStatus.class);
-  }
-
-  private RestResult<TextEntity> toTextEntityRestResult(final Response response) {
-    return toEntityRestResult(response, TextEntity.class);
-  }
-
-  private RestResult<TextViewDefinition> toTextViewDefinitionRestResult(final Response response) {
-    return toEntityRestResult(response, TextViewDefinition.class);
-  }
-
-  private RestResult<TextViewList> toTextViewListRestResult(final Response response) {
-    return toEntityRestResult(response, TextViewList.class);
-  }
 
   private RestResult<SearchResultPage> toSearchResultPageRestResult(final Response response) {
     return toEntityRestResult(response, SearchResultPage.class);
   }
 
-  private RestResult<CommandResponse> toCommandResponseRestResult(final Response response) {
-    return toEntityRestResult(response, CommandResponse.class);
-  }
 
-  private RestResult<TextRangeAnnotation> toTextRangeAnnotationRestResult(final Response response) {
-    return toEntityRestResult(response, TextRangeAnnotation.class);
-  }
-
-  private RestResult<TextRangeAnnotationList> toTextRangeAnnotationListRestResult(final Response response) {
-    return toEntityRestResult(response, TextRangeAnnotationList.class);
-  }
-
-  private RestResult<TextRangeAnnotationInfo> toTextRangeAnnotationInfoRestResult(final Response response) {
-    return toEntityRestResult(response, TextRangeAnnotationInfo.class);
-  }
 
   private RestResult<AnnotationList> toAnnotationListRestResult(Response response) {
     return toEntityRestResult(response, AnnotationList.class);
@@ -668,24 +682,6 @@ public class AlexandriaClient implements AutoCloseable {
     final RestResult<E> result = new RestResult<>();
     final E cargo = response.readEntity(entityClass);
     result.setCargo(cargo);
-    return result;
-  }
-
-  private RestResult<CommandResponse> extractCommandStatusId(final Response response) {
-    final String location = response.getHeaderString("Location");
-    String[] parts = location.split("/");
-    UUID statusId = UUID.fromString(parts[parts.length - 2]);
-    CommandResponse commandResponse = new CommandResponse();
-    commandResponse.setStatusId(statusId);
-    final RestResult<CommandResponse> result = new RestResult<>();
-    return result.setCargo(commandResponse);
-  }
-
-  private RestResult<URI> uriFromLocationHeader(final Response response) {
-    final RestResult<URI> result = new RestResult<>();
-    final String location = response.getHeaderString("Location");
-    final URI uri = URI.create(location);
-    result.setCargo(uri);
     return result;
   }
 
@@ -719,14 +715,6 @@ public class AlexandriaClient implements AutoCloseable {
         .header(HEADER_AUTH, authHeader);
   }
 
-  private RestResult<String> stringResult(WebTarget path) {
-    Supplier<Response> responseSupplier = anonymousGet(path);
-    final RestRequester<String> requester = RestRequester.withResponseSupplier(responseSupplier);
-    return requester//
-        .onStatus(Status.OK, this::toStringRestResult)//
-        .getResult();
-  }
-
   private WebTarget annotationTarget(final UUID uuid) {
     return rootTarget.path(EndpointPaths.ANNOTATIONS).path(uuid.toString());
   }
@@ -736,12 +724,6 @@ public class AlexandriaClient implements AutoCloseable {
     return requester//
         .onStatus(Status.OK, this::toAnnotationPojoRestResult)//
         .getResult();
-  }
-
-  private WebTarget annotatorsTarget(UUID resourceUUID, String code) {
-    return resourceTarget(resourceUUID)//
-        .path(EndpointPaths.ANNOTATORS)//
-        .path(code);
   }
 
   private Function<Response, RestResult<Void>> voidRestResult() {

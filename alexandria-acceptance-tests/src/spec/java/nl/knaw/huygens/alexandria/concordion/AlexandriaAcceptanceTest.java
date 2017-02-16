@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.concordion;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -52,7 +52,6 @@ import com.google.inject.Module;
 import com.google.inject.Scopes;
 
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -66,8 +65,6 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerGraphService;
 import nl.knaw.huygens.alexandria.service.TinkerPopService;
 import nl.knaw.huygens.alexandria.storage.Storage;
-import nl.knaw.huygens.alexandria.textgraph.ParseResult;
-import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 import nl.knaw.huygens.cat.RestExtension;
 import nl.knaw.huygens.cat.RestFixture;
 
@@ -198,18 +195,19 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     return subId.toString();
   }
 
-  public void resourceHasText(String resId, String xml) {
-    ParseResult result = TextGraphUtil.parse(xml);
-    service().storeTextGraph(UUID.fromString(resId), result);
-  }
-
-  public void resourceHasAnnotator(String resId, String code, String description) {
-    service().setResourceAnnotator(UUID.fromString(resId), anAnnotator(code, description));
-  }
-
-  private Annotator anAnnotator(String code, String description) {
-    return new Annotator().setCode(code).setDescription(description);
-  }
+  // TODO: move to markup module
+  // public void resourceHasText(String resId, String xml) {
+  // ParseResult result = TextGraphUtil.parse(xml);
+  // service().storeTextGraph(UUID.fromString(resId), result);
+  // }
+  //
+  // public void resourceHasAnnotator(String resId, String code, String description) {
+  // service().setResourceAnnotator(UUID.fromString(resId), anAnnotator(code, description));
+  // }
+  //
+  // private Annotator anAnnotator(String code, String description) {
+  // return new Annotator().setCode(code).setDescription(description);
+  // }
 
   protected AlexandriaService service() {
     return service;
