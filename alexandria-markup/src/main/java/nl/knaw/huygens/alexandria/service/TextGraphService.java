@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.service;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -62,9 +62,9 @@ import com.google.common.collect.Sets;
 
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.AbsolutePosition;
+import nl.knaw.huygens.alexandria.markup.storage.MarkupVertexLabels;
 import nl.knaw.huygens.alexandria.storage.EdgeLabels;
 import nl.knaw.huygens.alexandria.storage.Storage;
-import nl.knaw.huygens.alexandria.storage.VertexLabels;
 import nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF;
 import nl.knaw.huygens.alexandria.textgraph.ParseResult;
 import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
@@ -84,7 +84,7 @@ public class TextGraphService {
   public void storeTextGraph(UUID resourceUUID, ParseResult result) {
     storage.runInTransaction(() -> {
       Vertex resource = getResourceVertex(resourceUUID);
-      Vertex text = storage.addVertex(T.label, VertexLabels.TEXTGRAPH);
+      Vertex text = storage.addVertex(T.label, MarkupVertexLabels.TEXTGRAPH);
       resource.addEdge(EdgeLabels.HAS_TEXTGRAPH, text);
       resource.property("hasText", true);
       List<Vertex> textSegments = storeTextSegments(result.getTextSegments(), text);
@@ -196,7 +196,7 @@ public class TextGraphService {
     Vertex textSegment = firstTextSegment;
     while (goOn) {
       StreamUtil.stream(textSegment.vertices(Direction.IN, EdgeLabels.FIRST_TEXT_SEGMENT))//
-          .filter(v -> VertexLabels.TEXTANNOTATION.equals(v.label()))//
+          .filter(v -> MarkupVertexLabels.TEXTANNOTATION.equals(v.label()))//
           .filter(v -> !updatedVertices.contains(v))//
           .forEach(v -> {
             // LOG.debug("v={}", v);
@@ -409,7 +409,7 @@ public class TextGraphService {
       // LOG.debug("startingTextSegment={}", visualizeVertex(startingTextSegment));
       Vertex parentVertex = storage.getVertexTraversal(startingTextSegment)//
           .in(EdgeLabels.FIRST_TEXT_SEGMENT)//
-          .hasLabel(VertexLabels.TEXTANNOTATION)//
+          .hasLabel(MarkupVertexLabels.TEXTANNOTATION)//
           .has(TextAnnotation.Properties.xmlid, parentXmlId)//
           .next();
       // LOG.debug("parentVertex={}", visualizeVertex(parentVertex));
@@ -436,7 +436,7 @@ public class TextGraphService {
         GraphTraversal<Vertex, Vertex> tailTraversal = storage.getVertexTraversal(textSegment)//
             // find TextAnnotations that start here
             .in(EdgeLabels.FIRST_TEXT_SEGMENT)//
-            .hasLabel(VertexLabels.TEXTANNOTATION)//
+            .hasLabel(MarkupVertexLabels.TEXTANNOTATION)//
             // that are not the newTextAnnotation
             .not(__.hasId(newTextAnnotationVertex.id()))//
             // and that don't end before endingTextSegment
@@ -468,7 +468,7 @@ public class TextGraphService {
       //
       // Iterator<Vertex> vertices = startingTextSegment.vertices(Direction.IN, EdgeLabels.FIRST_TEXT_SEGMENT);
       // StreamUtil.stream(vertices)//
-      // .filter(v -> v.label().equals(VertexLabels.TEXTANNOTATION))//
+      // .filter(v -> v.label().equals(MarkupVertexLabels.TEXTANNOTATION))//
       // .filter(v -> !v.equals(newTextAnnotationVertex))//
       // .filter(v -> getDepth(v) > parentDepth)//
       // .forEach(this::incrementDepth);
@@ -492,12 +492,12 @@ public class TextGraphService {
     // // then increase depth of the annotations that are children of the new textannotation
     // GraphTraversal<Vertex, Vertex> tail = storage.getVertexTraversal(startingTextSegment)//
     // .in(EdgeLabels.FIRST_TEXT_SEGMENT)//
-    // .hasLabel(VertexLabels.TEXTANNOTATION)//
+    // .hasLabel(MarkupVertexLabels.TEXTANNOTATION)//
     // .order().by(TextAnnotation.Properties.depth, Order.incr)//
     // .tail(2L);
     // if (tail.hasNext()) {
     // Vertex deepestTextAnnotationVertex = tail.next();
-    // checkVertexLabel(deepestTextAnnotationVertex, VertexLabels.TEXTANNOTATION);
+    // checkVertexLabel(deepestTextAnnotationVertex, MarkupVertexLabels.TEXTANNOTATION);
     // int depth = getDepth(deepestTextAnnotationVertex);
     // setDepth(newTextAnnotationVertex, depth + 1);
     // deepestTextAnnotationVertex.addEdge(EdgeLabels.NEXT, newTextAnnotationVertex);
@@ -523,7 +523,7 @@ public class TextGraphService {
     void processFirstTextSegmentInRange(Traverser<Vertex> t) {
       LOG.debug("processFirstTextSegmentInRange()");
       Vertex textSegmentVertex = t.get();
-      checkVertexLabel(textSegmentVertex, VertexLabels.TEXTSEGMENT);
+      checkVertexLabel(textSegmentVertex, MarkupVertexLabels.TEXTSEGMENT);
 
       // if needed, split up the textsegment, preserving the TextAnnotation links
       int tailLength = Math.min(textSize, textSize - rangeStart + 1);
@@ -543,7 +543,7 @@ public class TextGraphService {
     void processLastTextSegmentInRange(Traverser<Vertex> t) {
       LOG.debug("processLastTextSegmentInRange");
       Vertex textSegmentVertex = t.get();
-      checkVertexLabel(textSegmentVertex, VertexLabels.TEXTSEGMENT);
+      checkVertexLabel(textSegmentVertex, MarkupVertexLabels.TEXTSEGMENT);
 
       // if needed, split up the textsegment, preserving the TextAnnotation links
       int tailLength = textSize - rangeEnd;
@@ -556,7 +556,7 @@ public class TextGraphService {
 
     private void incTextSize(Traverser<Vertex> t) {
       Vertex textSegmentVertex = t.get();
-      checkVertexLabel(textSegmentVertex, VertexLabels.TEXTSEGMENT);
+      checkVertexLabel(textSegmentVertex, MarkupVertexLabels.TEXTSEGMENT);
       String text = getStringValue(textSegmentVertex, TextSegment.Properties.text);
       // LOG.debug("text=\"{}\"", text);
       textSize += text.length();
@@ -564,7 +564,7 @@ public class TextGraphService {
     }
 
     private Vertex detachTail(Vertex textSegment, int tailLength) {
-      Preconditions.checkArgument(textSegment.label().equals(VertexLabels.TEXTSEGMENT));
+      Preconditions.checkArgument(textSegment.label().equals(MarkupVertexLabels.TEXTSEGMENT));
       String text = getStringValue(textSegment, TextSegment.Properties.text);
       int length = text.length();
       textSize = textSize - length;
@@ -600,7 +600,7 @@ public class TextGraphService {
     }
 
     private Vertex detachHead(Vertex textSegment, int tailLength) {
-      Preconditions.checkArgument(textSegment.label().equals(VertexLabels.TEXTSEGMENT));
+      Preconditions.checkArgument(textSegment.label().equals(MarkupVertexLabels.TEXTSEGMENT));
       String text = getStringValue(textSegment, TextSegment.Properties.text);
       int length = text.length();
       int headLength = length - tailLength;
@@ -700,7 +700,7 @@ public class TextGraphService {
   }
 
   private static Vertex toVertex(TextAnnotation textAnnotation) {
-    Vertex v = storage.addVertex(T.label, VertexLabels.TEXTANNOTATION);
+    Vertex v = storage.addVertex(T.label, MarkupVertexLabels.TEXTANNOTATION);
     update(v, textAnnotation);
     return v;
   }
@@ -763,7 +763,7 @@ public class TextGraphService {
     // LOG.info("orderedLayerDefinitions:'{}'",orderedLayerDefinitions);
     // LOG.info("textsegment:'{}'",(String) textSegment.value("text"));
     List<Vertex> textAnnotationVertexList = StreamUtil.stream(textSegment.vertices(Direction.IN, edgeLabel))//
-        .filter(v -> v.label().equals(VertexLabels.TEXTANNOTATION)).collect(toList());
+        .filter(v -> v.label().equals(MarkupVertexLabels.TEXTANNOTATION)).collect(toList());
     // LOG.info("textAnnotationVertexList.size={}",textAnnotationVertexList.size());
     List<List<Vertex>> vertexListPerLayer = new ArrayList<>();
     AtomicInteger relevantVertexCount = new AtomicInteger(0);
@@ -887,7 +887,7 @@ public class TextGraphService {
   }
 
   private static Vertex newTextSegmentVertex(String s) {
-    return storage.addVertex(T.label, VertexLabels.TEXTSEGMENT, TextSegment.Properties.text, s);
+    return storage.addVertex(T.label, MarkupVertexLabels.TEXTSEGMENT, TextSegment.Properties.text, s);
   }
 
   private static void checkVertexLabel(Vertex vertex, String label) {

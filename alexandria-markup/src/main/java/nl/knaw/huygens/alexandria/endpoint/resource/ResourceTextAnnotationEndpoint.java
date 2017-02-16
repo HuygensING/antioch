@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -46,20 +46,20 @@ import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.service.MarkupService;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 import nl.knaw.huygens.alexandria.textgraph.TextRangeAnnotationValidatorFactory;
 
 public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
 
   private LocationBuilder locationBuilder;
-  private AlexandriaService service;
+  private MarkupService service;
   private AlexandriaResource resource;
   private UUID resourceUUID;
   private TextRangeAnnotationValidatorFactory textRangeAnnotationValidator;
 
   @Inject
-  public ResourceTextAnnotationEndpoint(AlexandriaService service, //
+  public ResourceTextAnnotationEndpoint(MarkupService service, //
       ResourceValidatorFactory validatorFactory, //
       LocationBuilder locationBuilder, //
       @PathParam("uuid") final UUIDParam uuidParam) {
@@ -133,7 +133,7 @@ public class ResourceTextAnnotationEndpoint extends JSONEndpoint {
   }
 
   private String getXML() {
-    StreamingOutput outputStream = TextGraphUtil.streamXML(service, resourceUUID);
+    StreamingOutput outputStream = TextGraphUtil.streamingOutputXML(service, resourceUUID);
     return TextGraphUtil.asString(outputStream);
   }
 

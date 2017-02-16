@@ -248,18 +248,14 @@ public class TinkerPopServiceTest extends AlexandriaTest {
     assertThat(annotation.getState()).isEqualTo(AlexandriaState.DELETED);
   }
 
-
   private TentativeAlexandriaProvenance copyOf(AlexandriaProvenance provenance) {
     return new TentativeAlexandriaProvenance(provenance.getWho(), provenance.getWhen(), provenance.getWhy());
   }
-
-
 
   private AlexandriaResource aResource() {
     UUID resourceId = UUID.randomUUID();
     TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
     return new AlexandriaResource(resourceId, provenance);
   }
-
 
 }

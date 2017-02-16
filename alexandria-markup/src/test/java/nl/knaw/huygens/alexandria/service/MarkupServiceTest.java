@@ -1,12 +1,12 @@
 package nl.knaw.huygens.alexandria.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -24,12 +24,16 @@ import nl.knaw.huygens.alexandria.api.model.text.view.ElementDefinition;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
 import nl.knaw.huygens.alexandria.endpoint.command.WrapContentInElementCommand;
+import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
+import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 import nl.knaw.huygens.alexandria.textgraph.ParseResult;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 
-public class MarkupServiceTest {
+public class MarkupServiceTest extends AlexandriaTest {
+  MarkupService service = null;
+
   @Test
   public void testGetTextViewDefinitionsForResourceReturnsTheFirstDefinitionUpTheResourceChain() {
     AlexandriaResource resource = aResource();
@@ -154,11 +158,20 @@ public class MarkupServiceTest {
   }
 
   private String getResourceXml(UUID resourceId) throws IOException {
-    StreamingOutput streamXML = TextGraphUtil.streamXML(service, resourceId);
+    StreamingOutput streamXML = TextGraphUtil.streamingOutputXML(service, resourceId);
     OutputStream output = new ByteArrayOutputStream();
     streamXML.write(output);
     output.flush();
     return output.toString();
   }
 
+  private TentativeAlexandriaProvenance copyOf(AlexandriaProvenance provenance) {
+    return new TentativeAlexandriaProvenance(provenance.getWho(), provenance.getWhen(), provenance.getWhy());
+  }
+
+  private AlexandriaResource aResource() {
+    UUID resourceId = UUID.randomUUID();
+    TentativeAlexandriaProvenance provenance = new TentativeAlexandriaProvenance("who", Instant.now(), "why");
+    return new AlexandriaResource(resourceId, provenance);
+  }
 }

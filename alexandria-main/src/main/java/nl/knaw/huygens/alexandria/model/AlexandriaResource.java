@@ -77,14 +77,6 @@ public class AlexandriaResource extends AbstractAnnotatable implements Comparabl
     }
   }
 
-  // public List<TextView> getDirectTextViews() {
-  // return directTextViews;
-  // }
-  //
-  // public void setDirectTextViews(List<TextView> textViews) {
-  // this.directTextViews = textViews;
-  // }
-
   @Override
   public int compareTo(AlexandriaResource other) {
     return cargo.compareToIgnoreCase(other.getCargo());

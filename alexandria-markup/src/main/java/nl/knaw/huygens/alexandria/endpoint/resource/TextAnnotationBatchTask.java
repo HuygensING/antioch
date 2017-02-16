@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -35,19 +35,19 @@ import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.service.MarkupService;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 import nl.knaw.huygens.alexandria.textgraph.TextRangeAnnotationValidatorFactory;
 
 public class TextAnnotationBatchTask implements Runnable {
 
-  private AlexandriaService service;
+  private MarkupService service;
   private TextAnnotationImportStatus status;
   private UUID resourceUUID;
   private TextRangeAnnotationList newTextRangeAnnotationList;
   private TextRangeAnnotationValidatorFactory textRangeAnnotationValidator;
 
-  public TextAnnotationBatchTask(AlexandriaService service, TextRangeAnnotationList newTextRangeAnnotationList, TextRangeAnnotationValidatorFactory textRangeAnnotationValidator,
+  public TextAnnotationBatchTask(MarkupService service, TextRangeAnnotationList newTextRangeAnnotationList, TextRangeAnnotationValidatorFactory textRangeAnnotationValidator,
       AlexandriaResource resource) {
     this.service = service;
     this.resourceUUID = resource.getId();
@@ -103,7 +103,7 @@ public class TextAnnotationBatchTask implements Runnable {
   }
 
   private String getXML() {
-    StreamingOutput outputStream = TextGraphUtil.streamXML(service, resourceUUID);
+    StreamingOutput outputStream = TextGraphUtil.streamingOutputXML(service, resourceUUID);
     return TextGraphUtil.asString(outputStream);
   }
 

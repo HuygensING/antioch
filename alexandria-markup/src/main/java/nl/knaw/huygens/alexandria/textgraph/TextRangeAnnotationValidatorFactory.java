@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.textgraph;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -40,16 +40,16 @@ import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.AbsolutePosition;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
-import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.service.MarkupService;
 import nl.knaw.huygens.alexandria.util.XMLUtil;
 import nl.knaw.huygens.tei.QueryableDocument;
 
 public class TextRangeAnnotationValidatorFactory {
 
-  private AlexandriaService service;
+  private MarkupService service;
   private UUID resourceUUID;
 
-  public TextRangeAnnotationValidatorFactory(AlexandriaService service, UUID resourceUUID) {
+  public TextRangeAnnotationValidatorFactory(MarkupService service, UUID resourceUUID) {
     this.service = service;
     this.resourceUUID = resourceUUID;
   }

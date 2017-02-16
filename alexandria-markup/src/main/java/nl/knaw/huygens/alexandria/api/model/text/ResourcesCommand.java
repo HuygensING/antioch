@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.api.model.text;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -24,7 +24,12 @@ package nl.knaw.huygens.alexandria.api.model.text;
 
 import static java.util.stream.Collectors.toList;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import com.google.common.base.Splitter;
 
@@ -32,13 +37,13 @@ import nl.knaw.huygens.alexandria.api.model.CommandResponse;
 import nl.knaw.huygens.alexandria.endpoint.command.AlexandriaCommand;
 import nl.knaw.huygens.alexandria.endpoint.command.ResourceViewId;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.service.MarkupService;
 
 public abstract class ResourcesCommand implements AlexandriaCommand {
 
   private static final String RESOURCE_IDS = "resourceIds";
 
-  List<ResourceViewId> validateResourceViewIds(Map<String, Object> parameterMap, CommandResponse commandResponse, AlexandriaService service) {
+  protected List<ResourceViewId> validateResourceViewIds(Map<String, Object> parameterMap, CommandResponse commandResponse, MarkupService mService) {
     List<ResourceViewId> resourceViewIds = new ArrayList<>();
 
     if (!parameterMap.containsKey(RESOURCE_IDS)) {
@@ -58,14 +63,14 @@ public abstract class ResourcesCommand implements AlexandriaCommand {
 
     for (ResourceViewId resourceViewId : resourceViewIds) {
       UUID resourceId = resourceViewId.getResourceId();
-      Optional<AlexandriaResource> optionalResource = service.readResource(resourceId);
+      Optional<AlexandriaResource> optionalResource = mService.readResource(resourceId);
       if (optionalResource.isPresent()) {
         if (!optionalResource.get().hasText()) {
           commandResponse.addErrorLine("resource '" + resourceId + "' does not have a text.");
         }
 
         resourceViewId.getTextViewName().ifPresent(viewId -> {
-          boolean viewExists = service.getTextViewsForResource(resourceId)//
+          boolean viewExists = mService.getTextViewsForResource(resourceId)//
               .stream()//
               .anyMatch(tv -> tv.getName().equals(viewId));
           if (!viewExists) {

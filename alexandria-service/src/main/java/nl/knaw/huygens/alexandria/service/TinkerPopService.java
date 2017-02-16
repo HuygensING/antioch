@@ -23,8 +23,6 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.jooq.lambda.Unchecked;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
 
@@ -57,13 +55,10 @@ import peapod.FramedGraphTraversal;
 
 @Singleton
 public class TinkerPopService implements AlexandriaService {
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new Jdk8Module());
-
-
   private static final TemporalAmount TENTATIVES_TTL = Duration.ofDays(1);
 
-  private Storage storage;
-  private LocationBuilder locationBuilder;
+  protected Storage storage;
+  protected LocationBuilder locationBuilder;
   private AlexandriaQueryParser alexandriaQueryParser;
 
   @Inject
@@ -677,7 +672,7 @@ public class TinkerPopService implements AlexandriaService {
     return new BadRequestException("annotation " + oldAnnotationId + " is " + string);
   }
 
-  private UUID getUUID(IdentifiableVF vf) {
+  protected UUID getUUID(IdentifiableVF vf) {
     return UUID.fromString(vf.getUuid().replaceFirst("\\..$", "")); // remove revision suffix for deprecated annotations
   }
 
@@ -699,7 +694,7 @@ public class TinkerPopService implements AlexandriaService {
       .collect(toList());
   }
 
-  private ResourceVF readExistingResourceVF(UUID uuid) {
+  protected ResourceVF readExistingResourceVF(UUID uuid) {
     return storage.runInTransaction(() -> storage.readVF(ResourceVF.class, uuid))//
       .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
   }

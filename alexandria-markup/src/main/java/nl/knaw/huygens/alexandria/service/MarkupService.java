@@ -26,6 +26,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -34,23 +35,28 @@ import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.AbsolutePosition;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
 import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
+import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotatorVF;
-import nl.knaw.huygens.alexandria.storage.frames.AnnotatorVF.EdgeLabels;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF;
+import nl.knaw.huygens.alexandria.storage.frames.TextRangeAnnotationVF.EdgeLabels;
 import nl.knaw.huygens.alexandria.textgraph.ParseResult;
 import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphSegment;
 import nl.knaw.huygens.alexandria.util.StreamUtil;
 import peapod.FramedGraphTraversal;
 
-public class MarkupService implements IMarkupService {
+public class MarkupService extends TinkerPopService implements IMarkupService {
+
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new Jdk8Module());
+
   private TextGraphService textGraphService;
   private static final TypeReference<Map<String, TextView>> TEXTVIEW_TYPEREF = new TypeReference<Map<String, TextView>>() {
   };
@@ -61,6 +67,10 @@ public class MarkupService implements IMarkupService {
   };
   private static final ObjectReader TEXTVIEWDEFINITION_READER = OBJECT_MAPPER.readerFor(TEXTVIEWDEFINITION_TYPEREF);
   private static final ObjectWriter TEXTVIEWDEFINITION_WRITER = OBJECT_MAPPER.writerFor(TEXTVIEWDEFINITION_TYPEREF);
+
+  public MarkupService(Storage storage, LocationBuilder locationBuilder) {
+    super(storage, locationBuilder);
+  }
 
   @Override
   public void setResourceAnnotator(UUID resourceUUID, Annotator annotator) {
@@ -493,12 +503,23 @@ public class MarkupService implements IMarkupService {
     if (StringUtils.isNotEmpty(textViewsJson)) {
       try {
         List<TextView> textViews = deserializeToTextViews(textViewsJson);
-        resource.setDirectTextViews(textViews);
+        setDirectTextViews(resource, textViews);
       } catch (IOException e) {
         e.printStackTrace();
         throw new RuntimeException(e);
       }
     }
+  }
+  // public List<TextView> getDirectTextViews() {
+  // return directTextViews;
+  // }
+  //
+  // public void setDirectTextViews(List<TextView> textViews) {
+  // this.directTextViews = textViews;
+  // }
+
+  private void setDirectTextViews(AlexandriaResource resource, List<TextView> textViews) {
+
   }
 
   private List<TextView> deserializeToTextViews(String textViewsJson) throws IOException {

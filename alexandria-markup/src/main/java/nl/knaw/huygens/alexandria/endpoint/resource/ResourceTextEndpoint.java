@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -70,7 +70,7 @@ import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
-import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.service.MarkupService;
 import nl.knaw.huygens.alexandria.text.TextPrototype;
 import nl.knaw.huygens.alexandria.textgraph.DotFactory;
 import nl.knaw.huygens.alexandria.textgraph.TextGraphImportTask;
@@ -78,7 +78,7 @@ import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 import nl.knaw.huygens.alexandria.textgraph.TextRangeAnnotationValidatorFactory;
 
 public class ResourceTextEndpoint extends JSONEndpoint {
-  private final AlexandriaService service;
+  private final MarkupService service;
   private final UUID resourceUUID;
   private final AlexandriaResource resource;
   private ExecutorService executorService;
@@ -90,7 +90,7 @@ public class ResourceTextEndpoint extends JSONEndpoint {
   private TextRangeAnnotationValidatorFactory textRangeAnnotationValidator;
 
   @Inject
-  public ResourceTextEndpoint(AlexandriaService service, //
+  public ResourceTextEndpoint(MarkupService service, //
                               AlexandriaConfiguration config, //
                               ResourceValidatorFactory validatorFactory, //
                               ExecutorService executorService, //

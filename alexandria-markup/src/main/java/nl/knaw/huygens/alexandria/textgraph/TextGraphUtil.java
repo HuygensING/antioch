@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.textgraph;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -60,7 +60,7 @@ import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.ElementMode;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
 import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
-import nl.knaw.huygens.alexandria.service.AlexandriaService;
+import nl.knaw.huygens.alexandria.service.MarkupService;
 import nl.knaw.huygens.tei.Document;
 
 public class TextGraphUtil {
@@ -74,7 +74,7 @@ public class TextGraphUtil {
     return result;
   }
 
-  public static StreamingOutput streamXML(AlexandriaService service, UUID resourceId) {
+  public static StreamingOutput streamingOutputXML(MarkupService service, UUID resourceId) {
     return output -> {
       Writer writer = createBufferedUTF8OutputStreamWriter(output);
       Consumer<TextGraphSegment> action = segment -> streamTextGraphSegment(writer, segment);
@@ -94,12 +94,12 @@ public class TextGraphUtil {
     }
   }
 
-  public static StreamingOutput xmlOutputStream(AlexandriaService service, UUID resourceId, String viewName) {
+  public static StreamingOutput xmlOutputStream(MarkupService service, UUID resourceId, String viewName) {
     Map<String, String> viewParameters = new HashMap<>();
     return xmlOutputStream(service, resourceId, viewName, viewParameters);
   }
 
-  public static StreamingOutput xmlOutputStream(AlexandriaService service, UUID resourceId, String viewName, Map<String, String> viewParameters) {
+  public static StreamingOutput xmlOutputStream(MarkupService service, UUID resourceId, String viewName, Map<String, String> viewParameters) {
     if (StringUtils.isNotBlank(viewName)) {
       TextView textView = service.getTextView(resourceId, viewName)//
           .orElseThrow(() -> new NotFoundException("No view '" + viewName + "' found for this resource."));
@@ -107,7 +107,7 @@ public class TextGraphUtil {
       // Log.info("textView={}", textView);
       return streamTextViewXML(service, resourceId, textView);
     }
-    return streamXML(service, resourceId);
+    return streamingOutputXML(service, resourceId);
   }
 
   private static void writeOpenTags(Writer writer, TextGraphSegment segment) throws IOException {
@@ -139,7 +139,7 @@ public class TextGraphUtil {
     }
   }
 
-  public static StreamingOutput streamTextViewXML(AlexandriaService service, UUID resourceId, TextView textView) {
+  public static StreamingOutput streamTextViewXML(MarkupService service, UUID resourceId, TextView textView) {
     return output -> {
       Writer writer = createBufferedUTF8OutputStreamWriter(output);
       TextViewContext textViewContext = new TextViewContext(textView);
@@ -427,7 +427,7 @@ public class TextGraphUtil {
     return new BufferedWriter(new OutputStreamWriter(output, "UTF-8"));
   }
 
-  private static void stream(AlexandriaService service, UUID resourceId, Writer writer, Consumer<TextGraphSegment> action, List<List<String>> orderedLayerTags) throws IOException {
+  private static void stream(MarkupService service, UUID resourceId, Writer writer, Consumer<TextGraphSegment> action, List<List<String>> orderedLayerTags) throws IOException {
     service.runInTransaction(() -> service.getTextGraphSegmentStream(resourceId, orderedLayerTags).forEach(action));
     writer.flush();
   }
