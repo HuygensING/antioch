@@ -1,1 +1,1 @@
-There once was a runner named Dwight / Who could speed even faster than light. / He set out one day / In a relative way / And returned on the previous night.
+There was an old girl of Genoa / And I blush when I think that Iowa; / She's gone to her rest, / It's all for the best, / Otherwise I would borrow Samoa.
