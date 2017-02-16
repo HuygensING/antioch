@@ -70,6 +70,7 @@ public class MarkupService extends TinkerPopService implements IMarkupService {
 
   public MarkupService(Storage storage, LocationBuilder locationBuilder) {
     super(storage, locationBuilder);
+    textGraphService = new TextGraphService(storage);
   }
 
   @Override
