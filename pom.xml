@@ -13,7 +13,6 @@
     <module>alexandria-acceptance-tests</module>
     <module>alexandria-api</module>
     <module>alexandria-aql</module>
-    <module>alexandria-aql2</module>
     <module>alexandria-java-client</module>
     <module>alexandria-main</module>
     <module>alexandria-server</module>

@@ -22,23 +22,7 @@ package nl.knaw.huygens.alexandria.endpoint;
  * #L%
  */
 
-import static java.util.stream.Collectors.toList;
-
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import com.google.common.collect.ImmutableMap;
-
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.api.JsonTypeNames;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
@@ -46,11 +30,20 @@ import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntity;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
-import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
-import nl.knaw.huygens.alexandria.textlocator.TextLocatorFactory;
-import nl.knaw.huygens.alexandria.textlocator.TextLocatorParseException;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import static java.util.stream.Collectors.toList;
 
 public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint {
 
@@ -106,34 +99,11 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation("add annotation")
   public Response addAnnotation(@NotNull @Valid AnnotationPrototype prototype) {
-    validateLocator(prototype);
     prototype.setState(AlexandriaState.TENTATIVE);
     AnnotationCreationRequest request = getAnnotationCreationRequestBuilder().build(prototype);
     AlexandriaAnnotation annotation = request.execute(service);
     return created(locationBuilder.locationOf(annotation));
   }
 
-  private void validateLocator(AnnotationPrototype prototype) {
-    if (prototype.getLocator().isPresent()) {
-      if (!(getAnnotatableObject() instanceof AlexandriaResource)) {
-        throw new BadRequestException("locators are only allowed on resource annotations");
-      }
-
-      AlexandriaResource resource = (AlexandriaResource) getAnnotatableObject();
-      if (!resource.hasText()) {
-        throw new BadRequestException("The resource has no attached text to use the locator on.");
-      }
-
-      String locatorString = prototype.getLocator().get();
-      try {
-        TextLocatorFactory textLocatorFactory = new TextLocatorFactory(service);
-        AlexandriaTextLocator locator = textLocatorFactory.fromString(locatorString);
-        textLocatorFactory.validate(locator, resource);
-      } catch (TextLocatorParseException e) {
-        throw new BadRequestException(e.getMessage());
-      }
-    }
-
-  }
 
 }

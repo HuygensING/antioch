@@ -22,31 +22,20 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
  * #L%
  */
 
-import static java.util.stream.Collectors.toSet;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
+import nl.knaw.huygens.alexandria.endpoint.AbstractAnnotatableEntity;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 
 import java.net.URI;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import nl.knaw.huygens.alexandria.api.EndpointPaths;
-import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
-import nl.knaw.huygens.alexandria.endpoint.AbstractAnnotatableEntity;
-import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import static java.util.stream.Collectors.toSet;
 
 public abstract class AbstractResourceEntity extends AbstractAnnotatableEntity {
 
   public AbstractResourceEntity() {
     super();
-  }
-
-  public Boolean hasText() {
-    return getResource().hasText();
-  }
-
-  @JsonProperty(PropertyPrefix.LINK + "text")
-  public URI getText() {
-    return hasText() ? locationBuilder.locationOf(getResource(), EndpointPaths.TEXT) : null;
   }
 
   @JsonProperty(PropertyPrefix.LINK + "subresources")

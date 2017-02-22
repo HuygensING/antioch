@@ -27,8 +27,6 @@ public final class EndpointPaths {
 
   public static final String RESOURCES = "resources";
   public static final String SUBRESOURCES = "subresources";
-  public static final String TEXT = "text";
-  public static final String TEXTVIEWS = "views";
 
   public static final String ANNOTATIONS = "annotations";
   public static final String ANNOTATIONBATCH = "annotationbatch";
@@ -40,8 +38,6 @@ public final class EndpointPaths {
   public static final String COMMANDS = "commands";
 
   public static final String RESULTPAGES = "pages";
-
-  public static final String ANNOTATORS = "annotators";
 
   public static final String WEB_ANNOTATIONS = "webannotations";
   public static final String IIIF = "iiif";

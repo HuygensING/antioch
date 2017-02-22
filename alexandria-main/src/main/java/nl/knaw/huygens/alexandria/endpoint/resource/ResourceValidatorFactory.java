@@ -22,12 +22,6 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
  * #L%
  */
 
-import java.util.UUID;
-import java.util.function.Supplier;
-
-import javax.inject.Inject;
-import javax.ws.rs.WebApplicationException;
-
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
 import nl.knaw.huygens.alexandria.endpoint.UUIDParam;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
@@ -35,6 +29,11 @@ import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.exception.TentativeObjectException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+
+import javax.inject.Inject;
+import javax.ws.rs.WebApplicationException;
+import java.util.UUID;
+import java.util.function.Supplier;
 
 public class ResourceValidatorFactory {
   private final AlexandriaService service;
@@ -96,12 +95,6 @@ public class ResourceValidatorFactory {
       return this;
     }
 
-    public ResourceValidator hasText() {
-      if (!resource.hasText()) {
-        throw new ConflictException("Resource should have a text, but doesn't.");
-      }
-      return this;
-    }
   }
 
 }
