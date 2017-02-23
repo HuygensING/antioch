@@ -1,13 +1,12 @@
 # Alexandria
 
-Primarily developed in the context of the [Nederlab project](https://www.nederlab.nl/), Alexandria 
-is a *graph-based text and annotation repository*. While in its primary context, it serves as a store
-for annotations targeted at *linguistic corpora*, Alexandria's conceptual design of texts, annotations
-and their relationships has the potential to be applied in other domains and use cases as well,
+Alexandria is a *graph-based text and annotation repository* currently serving as a store
+for annotations targeted at *linguistic corpora*.
+However, Alexandria's conceptual design of texts, annotations, and their relationships has the potential to be applied in other domains and use cases as well,
 for instance in the field of *literary studies*. This project aims at leveraging Alexandria's
 potential value as a generic storage and query facility for annotated texts by
 
-1. *abstracting* from Nederlab-specific requirements of linguistic annotation,
+1. *abstracting* from [Nederlab](https://www.nederlab.nl/)-specific requirements of linguistic annotation,
 1. *building* a repository software with state-of-the-art, web-based technologies, and
 1. *connecting* Alexandria to similar initiatives by providing a rich set of data interchange options.
 
@@ -36,7 +35,9 @@ Being a web-based solution, Alexandria
 
 ## Download
 
-...
+* [Alexandria Server JAR file](https://cdn.huygens.knaw.nl/alexandria/master/alexandria-server.jar)
+* [Alexandria Java Client JAR file](https://cdn.huygens.knaw.nl/alexandria/master/alexandria-java-client.jar)
+
 
 ## Texts as Graphs: Research/ Bibliography
 
