@@ -16,7 +16,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>alexandria-aql2</artifactId>
+      <artifactId>alexandria-aql</artifactId>
       <version>${project.version}</version>
     </dependency>
 
