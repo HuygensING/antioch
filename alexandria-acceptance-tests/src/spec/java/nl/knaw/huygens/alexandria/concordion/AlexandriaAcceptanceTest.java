@@ -22,27 +22,6 @@ package nl.knaw.huygens.alexandria.concordion;
  * #L%
  */
 
-import static java.util.UUID.fromString;
-import static java.util.UUID.randomUUID;
-import static nl.knaw.huygens.alexandria.api.model.AlexandriaState.CONFIRMED;
-
-import java.net.URI;
-import java.time.Instant;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.UriBuilder;
-
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
-import org.concordion.api.Resource;
-import org.concordion.api.extension.ConcordionExtension;
-import org.concordion.api.extension.Extension;
-import org.junit.BeforeClass;
-
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
@@ -50,9 +29,7 @@ import com.google.common.collect.Iterables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
-
 import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.api.model.Annotator;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
@@ -66,10 +43,27 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.TinkerGraphService;
 import nl.knaw.huygens.alexandria.service.TinkerPopService;
 import nl.knaw.huygens.alexandria.storage.Storage;
-import nl.knaw.huygens.alexandria.textgraph.ParseResult;
-import nl.knaw.huygens.alexandria.textgraph.TextGraphUtil;
 import nl.knaw.huygens.cat.RestExtension;
 import nl.knaw.huygens.cat.RestFixture;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.concordion.api.Resource;
+import org.concordion.api.extension.ConcordionExtension;
+import org.concordion.api.extension.Extension;
+import org.junit.BeforeClass;
+
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
+import java.time.Instant;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static java.util.UUID.fromString;
+import static java.util.UUID.randomUUID;
+import static nl.knaw.huygens.alexandria.api.model.AlexandriaState.CONFIRMED;
 
 public class AlexandriaAcceptanceTest extends RestFixture {
   private static final AlexandriaConfiguration CONFIG = testConfiguration();
@@ -196,19 +190,6 @@ public class AlexandriaAcceptanceTest extends RestFixture {
     final UUID subId = service().createSubResource(randomUUID(), fromString(parentUUID), sub, aProvenance()).getId();
     service().confirmResource(subId);
     return subId.toString();
-  }
-
-  public void resourceHasText(String resId, String xml) {
-    ParseResult result = TextGraphUtil.parse(xml);
-    service().storeTextGraph(UUID.fromString(resId), result);
-  }
-
-  public void resourceHasAnnotator(String resId, String code, String description) {
-    service().setResourceAnnotator(UUID.fromString(resId), anAnnotator(code, description));
-  }
-
-  private Annotator anAnnotator(String code, String description) {
-    return new Annotator().setCode(code).setDescription(description);
   }
 
   protected AlexandriaService service() {

@@ -22,18 +22,16 @@ package nl.knaw.huygens.alexandria.client;
  * #L%
  */
 
-import static org.assertj.core.api.Assertions.assertThat;
+import nl.knaw.huygens.alexandria.client.model.AnnotationPrototype;
+import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
+import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
 import java.net.URI;
 import java.util.UUID;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-
-import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
-import nl.knaw.huygens.alexandria.client.model.AnnotationPrototype;
-import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
-import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class AlexandriaClientTest extends AlexandriaTestWithTestServer {
   static final String AUTHKEY = "AUTHKEY";
@@ -73,27 +71,6 @@ public abstract class AlexandriaClientTest extends AlexandriaTestWithTestServer 
     RestResult<UUID> result = client.addSubResource(resourceUuid, subresource);
     assertRequestSucceeded(result);
     return result.get();
-  }
-
-  protected TextImportStatus setResourceText(UUID resourceUuid, String xml) {
-    RestResult<Void> result = client.setResourceText(resourceUuid, xml);
-    assertThat(result).isNotNull();
-    assertThat(result.hasFailed()).isFalse();
-
-    TextImportStatus textGraphImportStatus = null;
-    boolean goOn = true;
-    while (goOn) {
-      try {
-        Thread.sleep(1000);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-      RestResult<TextImportStatus> result2 = client.getTextImportStatus(resourceUuid);
-      assertThat(result2.hasFailed()).isFalse();
-      textGraphImportStatus = result2.get();
-      goOn = !textGraphImportStatus.isDone();
-    }
-    return textGraphImportStatus;
   }
 
   protected UUID annotateResource(UUID resourceUuid, String annotationType, String annotationValue) {

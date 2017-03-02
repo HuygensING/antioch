@@ -22,20 +22,15 @@ package nl.knaw.huygens.alexandria.endpoint;
  * #L%
  */
 
-import java.util.Optional;
-import java.util.UUID;
-
-import javax.ws.rs.BadRequestException;
-
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
-import nl.knaw.huygens.alexandria.textlocator.TextLocatorFactory;
-import nl.knaw.huygens.alexandria.textlocator.TextLocatorParseException;
+
+import java.util.Optional;
+import java.util.UUID;
 
 public class AnnotationCreationRequest implements CreationRequest<AlexandriaAnnotation> {
 
@@ -66,16 +61,6 @@ public class AnnotationCreationRequest implements CreationRequest<AlexandriaAnno
         .orElseGet(() -> service.createAnnotationBody(annotationBodyUuid, type, providedValue(), provenance));
 
     if (resource.isPresent()) {
-      if (prototype.getLocator().isPresent()) {
-        String textLocatorString = prototype.getLocator().get();
-        AlexandriaTextLocator textLocator;
-        try {
-          textLocator = new TextLocatorFactory(service).fromString(textLocatorString);
-          return service.annotate(resource.get(), textLocator, body, provenance);
-        } catch (TextLocatorParseException e) {
-          throw new BadRequestException(e.getMessage());
-        }
-      }
       return service.annotate(resource.get(), body, provenance);
     }
 

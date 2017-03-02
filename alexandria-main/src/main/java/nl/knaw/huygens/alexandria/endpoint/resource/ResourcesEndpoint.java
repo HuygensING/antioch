@@ -21,28 +21,6 @@ package nl.knaw.huygens.alexandria.endpoint.resource;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-import static nl.knaw.huygens.alexandria.api.EndpointPaths.ANNOTATIONS;
-import static nl.knaw.huygens.alexandria.api.EndpointPaths.ANNOTATORS;
-import static nl.knaw.huygens.alexandria.api.EndpointPaths.RESOURCES;
-import static nl.knaw.huygens.alexandria.api.EndpointPaths.SUBRESOURCES;
-import static nl.knaw.huygens.alexandria.api.EndpointPaths.TEXT;
-import static nl.knaw.huygens.alexandria.endpoint.resource.ResourceValidatorFactory.resourceNotFoundForId;
-
-import java.util.Optional;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -55,6 +33,18 @@ import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.exception.ConflictException;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.Optional;
+
+import static nl.knaw.huygens.alexandria.api.EndpointPaths.*;
+import static nl.knaw.huygens.alexandria.endpoint.resource.ResourceValidatorFactory.resourceNotFoundForId;
 
 @Singleton
 @Path(RESOURCES)
@@ -165,18 +155,6 @@ public class ResourcesEndpoint extends JSONEndpoint {
   public Class<ResourceAnnotationsEndpoint> getAnnotationsEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
     assertResourceIsConfirmed(uuidParam);
     return ResourceAnnotationsEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
-  }
-
-  @Path("{uuid}/" + ANNOTATORS)
-  public Class<ResourceAnnotatorsEndpoint> getAnnotatorsEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
-    assertResourceIsConfirmed(uuidParam);
-    return ResourceAnnotatorsEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
-  }
-
-  @Path("{uuid}/" + TEXT)
-  public Class<ResourceTextEndpoint> getResourceTextEndpoint(@PathParam("uuid") final UUIDParam uuidParam) {
-    assertResourceIsConfirmed(uuidParam);
-    return ResourceTextEndpoint.class; // no instantiation of our own; let Jersey handle the lifecycle
   }
 
   @Path("{uuid}/provenance")

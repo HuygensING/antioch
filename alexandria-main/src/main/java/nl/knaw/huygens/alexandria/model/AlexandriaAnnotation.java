@@ -22,18 +22,15 @@ package nl.knaw.huygens.alexandria.model;
  * #L%
  */
 
-import java.util.UUID;
-
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
-import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
+import java.util.UUID;
 
 public class AlexandriaAnnotation extends AbstractAnnotatable implements Comparable<AlexandriaAnnotation> {
 
   private final AlexandriaAnnotationBody body;
   private IdentifiablePointer<?> annotatedPointer;
   private Integer rev = 0;
-  private AlexandriaTextLocator locator;
 
   public AlexandriaAnnotation(UUID id, AlexandriaAnnotationBody body, TentativeAlexandriaProvenance provenance) {
     super(id, provenance);
@@ -58,14 +55,6 @@ public class AlexandriaAnnotation extends AbstractAnnotatable implements Compara
 
   public void setRevision(Integer rev) {
     this.rev = rev;
-  }
-
-  public AlexandriaTextLocator getLocator() {
-    return locator;
-  }
-
-  public void setLocator(AlexandriaTextLocator locator) {
-    this.locator = locator;
   }
 
   @Override
