@@ -61,9 +61,11 @@ public class Server {
     System.out.println("file.encoding : " + fileEncoding);
     System.out.println("-----------------------------");
     if (!"UTF-8".equals(fileEncoding)) {
-      throw new RuntimeException("Invalid file.encoding '" + fileEncoding + "', should be 'UTF-8'.");
+      System.err.println("Can't start: Invalid file.encoding '" + fileEncoding + "', should be 'UTF-8'.");
+      System.exit(-1);
+    } else {
+      new Server().run();
     }
-    new Server().run();
   }
 
   private void run() throws IOException {
