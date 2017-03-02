@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.app;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -54,10 +54,15 @@ public class Server {
     System.out.println("-----------------------------");
     System.out.println("Starting Alexandria server...");
     PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration(PROPERTIES_FILE, true);
-    System.out.println("version  : " + propertiesConfiguration.getProperty("version").get());
-    System.out.println("buildDate: " + propertiesConfiguration.getProperty("buildDate").get());
-    System.out.println("commitId : " + propertiesConfiguration.getProperty("commitId").get());
+    System.out.println("version       : " + propertiesConfiguration.getProperty("version").get());
+    System.out.println("buildDate     : " + propertiesConfiguration.getProperty("buildDate").get());
+    System.out.println("commitId      : " + propertiesConfiguration.getProperty("commitId").get());
+    String fileEncoding = System.getProperty("file.encoding");
+    System.out.println("file.encoding : " + fileEncoding);
     System.out.println("-----------------------------");
+    if (!"UTF-8".equals(fileEncoding)) {
+      throw new RuntimeException("Invalid file.encoding '" + fileEncoding + "', should be 'UTF-8'.");
+    }
     new Server().run();
   }
 
