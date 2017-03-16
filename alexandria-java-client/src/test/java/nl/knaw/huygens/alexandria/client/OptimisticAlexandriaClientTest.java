@@ -150,6 +150,65 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     client.deprecateAnnotation(annotationUUID3);
   }
 
+  @Test
+  public void testNLA369() throws InterruptedException {
+    // A user requests a list of all their annotations.
+    // Current situation: Results are shown grouped by resource and sorted by the date of
+    // the first annotation added to that resource.
+    // Desired situation: Results are shown grouped by resource, but sorted by date of
+    // last modification (any modification) of annotations on that resource (changes,
+    // additions and deletions). This also includes annotations on subresources.
+    UUID resource1UUID = createResource("ref1");
+    UUID subResource1UUID = createSubResource(resource1UUID, "ref1.1");
+    UUID resource2UUID = createResource("ref2");
+
+    UUID annotationUUID1 = annotateResource(resource1UUID, "type1", "value1");
+    Thread.sleep(1000); // to increase creation time diff.
+    UUID annotationUUID2 = annotateResource(resource2UUID, "type2", "value2");
+    Thread.sleep(1000);
+    UUID annotationUUID3 = annotateResource(subResource1UUID, "type3", "value3");
+
+    AlexandriaQuery query = new AlexandriaQuery()//
+        .setFind("annotation")//
+        .setWhere("who:eq(\"testuser\")")//
+        .setReturns("resource.id,list(id,who,type,value,when)")//
+        .setSort("-when")//
+    ;
+    UUID searchUUID = client.addSearch(query);
+    SearchResultPage searchResultPage = client.getSearchResultPage(searchUUID);
+    Log.info("searchResultPage={}", searchResultPage);
+    List<Map<String, Object>> records = searchResultPage.getRecords();
+    assertThat(records).hasSize(2); // 2 (non-sub) resources
+
+    Map<String, Object> record1 = records.get(0);
+    assertThat(record1.get("resource.id")).isEqualTo(resource1UUID.toString()); // since annotationUUID3 was created last, and it's an annotation on a subresource of resource1
+
+    Map<String, Object> record2 = records.get(1);
+    assertThat(record2.get("resource.id")).isEqualTo(resource2UUID.toString());
+
+    List<Map<String, Object>> list1 = (List<Map<String, Object>>) record1.get("_list");
+    assertThat(list1).hasSize(2); // 2 annotations for resource1
+
+    Log.info("list1={}", list1);
+
+    Map<String, Object> record11 = list1.get(0);
+    assertThat(record11.get("id")).isEqualTo(annotationUUID3.toString());
+
+    Map<String, Object> record12 = list1.get(1);
+    assertThat(record12.get("id")).isEqualTo(annotationUUID1.toString());
+
+    List<Map<String, Object>> list2 = (List<Map<String, Object>>) record2.get("_list");
+    assertThat(list2).hasSize(1); // 1 annotation for resource1
+
+    Map<String, Object> record21 = list2.get(0);
+    assertThat(record21.get("id")).isEqualTo(annotationUUID2.toString());
+
+    // cleanup
+    client.deprecateAnnotation(annotationUUID1);
+    client.deprecateAnnotation(annotationUUID2);
+    client.deprecateAnnotation(annotationUUID3);
+  }
+
   /// end tests
 
   protected UUID createResource(String resourceRef) {
