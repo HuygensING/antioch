@@ -1,33 +1,14 @@
 package nl.knaw.huygens.alexandria.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.google.common.base.Stopwatch;
-import com.google.common.collect.Maps;
-import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
-import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
-import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
-import nl.knaw.huygens.alexandria.exception.BadRequestException;
-import nl.knaw.huygens.alexandria.exception.NotFoundException;
-import nl.knaw.huygens.alexandria.model.*;
-import nl.knaw.huygens.alexandria.query.AlexandriaQueryParser;
-import nl.knaw.huygens.alexandria.query.ParsedAlexandriaQuery;
-import nl.knaw.huygens.alexandria.storage.DumpFormat;
-import nl.knaw.huygens.alexandria.storage.Storage;
-import nl.knaw.huygens.alexandria.storage.frames.*;
-import org.apache.commons.lang3.NotImplementedException;
-import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.jooq.lambda.Unchecked;
-import peapod.FramedGraphTraversal;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,8 +17,41 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.jooq.lambda.Unchecked;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.google.common.base.Stopwatch;
+import com.google.common.collect.Maps;
+
+import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
+import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
+import nl.knaw.huygens.alexandria.exception.BadRequestException;
+import nl.knaw.huygens.alexandria.exception.NotFoundException;
+import nl.knaw.huygens.alexandria.model.Accountable;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
+import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
+import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
+import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
+import nl.knaw.huygens.alexandria.query.AlexandriaQueryParser;
+import nl.knaw.huygens.alexandria.query.ParsedAlexandriaQuery;
+import nl.knaw.huygens.alexandria.storage.DumpFormat;
+import nl.knaw.huygens.alexandria.storage.Storage;
+import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
+import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
+import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
+import nl.knaw.huygens.alexandria.storage.frames.IdentifiableVF;
+import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
+import peapod.FramedGraphTraversal;
 
 /*
  * #%L
@@ -214,10 +228,10 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public Optional<AlexandriaAnnotationBody> findAnnotationBodyWithTypeAndValue(String type, String value) {
     final List<AnnotationBodyVF> results = storage.runInTransaction(//
-      () -> storage.find(AnnotationBodyVF.class)//
-        .has("type", type)//
-        .has("value", value)//
-        .toList());
+        () -> storage.find(AnnotationBodyVF.class)//
+            .has("type", type)//
+            .has("value", value)//
+            .toList());
     if (results.isEmpty()) {
       return Optional.empty();
     }
@@ -227,14 +241,14 @@ public class TinkerPopService implements AlexandriaService {
   @Override
   public Optional<AlexandriaResource> findSubresourceWithSubAndParentId(String sub, UUID parentId) {
     return storage.runInTransaction(//
-      () -> storage.getResourceVertexTraversal()//
-        .has(Storage.IDENTIFIER_PROPERTY, parentId.toString())//
-        .in(ResourceVF.EdgeLabels.PART_OF)//
-        .has(ResourceVF.Properties.CARGO, sub)//
-        .toList()//
-        .stream()//
-        .map(this::deframeResource)//
-        .findAny()//
+        () -> storage.getResourceVertexTraversal()//
+            .has(Storage.IDENTIFIER_PROPERTY, parentId.toString())//
+            .in(ResourceVF.EdgeLabels.PART_OF)//
+            .has(ResourceVF.Properties.CARGO, sub)//
+            .toList()//
+            .stream()//
+            .map(this::deframeResource)//
+            .findAny()//
     );
   }
 
@@ -242,11 +256,10 @@ public class TinkerPopService implements AlexandriaService {
   public List<AlexandriaResource> readSubResources(UUID uuid) {
     ResourceVF resourcevf = readExistingResourceVF(uuid);
     return resourcevf.getSubResources().stream()//
-      .map(this::deframeResource)//
-      .sorted()//
-      .collect(toList());
+        .map(this::deframeResource)//
+        .sorted()//
+        .collect(toList());
   }
-
 
   @Override
   public AlexandriaAnnotation deprecateAnnotation(UUID annotationId, AlexandriaAnnotation updatedAnnotation) {
@@ -257,7 +270,7 @@ public class TinkerPopService implements AlexandriaService {
   private AnnotationVF deprecateAnnotationVF(UUID annotationId, AlexandriaAnnotation updatedAnnotation) {
     // check if there's an annotation with the given id
     AnnotationVF oldAnnotationVF = storage.readVF(AnnotationVF.class, annotationId)//
-      .orElseThrow(annotationNotFound(annotationId));
+        .orElseThrow(annotationNotFound(annotationId));
     if (oldAnnotationVF.isTentative()) {
       throw incorrectStateException(annotationId, "tentative");
     } else if (oldAnnotationVF.isDeleted()) {
@@ -310,7 +323,7 @@ public class TinkerPopService implements AlexandriaService {
   public void confirmResource(UUID uuid) {
     storage.runInTransaction(() -> {
       ResourceVF resourceVF = storage.readVF(ResourceVF.class, uuid)//
-        .orElseThrow(resourceNotFound(uuid));
+          .orElseThrow(resourceNotFound(uuid));
       updateState(resourceVF, AlexandriaState.CONFIRMED);
     });
   }
@@ -376,15 +389,15 @@ public class TinkerPopService implements AlexandriaService {
   public SearchResult execute(AlexandriaQuery query) {
     return storage.runInTransaction(() -> {
       Stopwatch stopwatch = Stopwatch.createStarted();
-      List<Map<String, Object>> processQuery = processQuery(query);
+      List<Map<String, Object>> results = processQuery(query);
       stopwatch.stop();
       long elapsedMillis = stopwatch.elapsed(TimeUnit.MILLISECONDS);
 
       return new SearchResult(locationBuilder)//
-        .setId(UUID.randomUUID())//
-        .setQuery(query)//
-        .setSearchDurationInMilliseconds(elapsedMillis)//
-        .setResults(processQuery);
+          .setId(UUID.randomUUID())//
+          .setQuery(query)//
+          .setSearchDurationInMilliseconds(elapsedMillis)//
+          .setResults(results);
     });
   }
 
@@ -425,7 +438,6 @@ public class TinkerPopService implements AlexandriaService {
   public <A> A runInTransaction(Supplier<A> supplier) {
     return storage.runInTransaction(supplier);
   }
-
 
   // - other public methods -//
 
@@ -497,7 +509,7 @@ public class TinkerPopService implements AlexandriaService {
 
   Storage clearGraph() {
     storage.runInTransaction(() -> storage.getVertexTraversal()//
-      .forEachRemaining(org.apache.tinkerpop.gremlin.structure.Element::remove));
+        .forEachRemaining(org.apache.tinkerpop.gremlin.structure.Element::remove));
     return storage;
   }
 
@@ -553,7 +565,7 @@ public class TinkerPopService implements AlexandriaService {
       // }
     }
     rvf.getSubResources().stream()//
-            .forEach(vf -> resource.addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
+        .forEach(vf -> resource.addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
     return resource;
   }
 
@@ -664,17 +676,17 @@ public class TinkerPopService implements AlexandriaService {
     }
     if (pQuery.doGrouping()) {
       mapStream = mapStream//
-        .collect(groupingBy(pQuery::concatenateGroupByFieldsValues))//
-        .values().stream()//
-        .map(pQuery::collectListFieldValues);
+          .collect(groupingBy(pQuery::concatenateGroupByFieldsValues, LinkedHashMap::new, toList()))//
+          .values().stream()//
+          .map(pQuery::collectListFieldValues);
     }
     return mapStream//
-      .collect(toList());
+        .collect(toList());
   }
 
   private ResourceVF readExistingResourceVF(UUID uuid) {
     return storage.runInTransaction(() -> storage.readVF(ResourceVF.class, uuid))//
-      .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
+        .orElseThrow(() -> new NotFoundException("no resource found with uuid " + uuid));
   }
 
   public Storage storage() {
