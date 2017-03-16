@@ -1,26 +1,7 @@
 package nl.knaw.huygens.alexandria.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-import nl.knaw.huygens.alexandria.api.EndpointPaths;
-import nl.knaw.huygens.alexandria.api.model.*;
-import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
-import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
-import nl.knaw.huygens.alexandria.client.model.*;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.glassfish.jersey.apache.connector.ApacheClientProperties;
-import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.client.ClientProperties;
+import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
 
-import javax.net.ssl.SSLContext;
-import javax.ws.rs.client.*;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
@@ -28,7 +9,43 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
+import javax.net.ssl.SSLContext;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.SyncInvoker;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.glassfish.jersey.apache.connector.ApacheClientProperties;
+import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientProperties;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+
+import nl.knaw.huygens.alexandria.api.EndpointPaths;
+import nl.knaw.huygens.alexandria.api.model.AboutEntity;
+import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
+import nl.knaw.huygens.alexandria.api.model.CommandResponse;
+import nl.knaw.huygens.alexandria.api.model.CommandStatus;
+import nl.knaw.huygens.alexandria.api.model.StatePrototype;
+import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
+import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
+import nl.knaw.huygens.alexandria.client.model.AnnotationList;
+import nl.knaw.huygens.alexandria.client.model.AnnotationPojo;
+import nl.knaw.huygens.alexandria.client.model.AnnotationPrototype;
+import nl.knaw.huygens.alexandria.client.model.ResourcePojo;
+import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
+import nl.knaw.huygens.alexandria.client.model.SubResourceList;
+import nl.knaw.huygens.alexandria.client.model.SubResourcePojo;
+import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
 
 /*
  * #%L
@@ -40,12 +57,12 @@ import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -53,7 +70,7 @@ import static nl.knaw.huygens.alexandria.api.ApiConstants.HEADER_AUTH;
  */
 
 public class AlexandriaClient implements AutoCloseable {
-  public static final Map<String,String> NO_VIEW_PARAMETERS = Collections.emptyMap();
+  public static final Map<String, String> NO_VIEW_PARAMETERS = Collections.emptyMap();
 
   private WebTarget rootTarget;
   private String authHeader = "";
@@ -310,6 +327,15 @@ public class AlexandriaClient implements AutoCloseable {
     final RestRequester<CommandStatus> requester = RestRequester.withResponseSupplier(responseSupplier);
     return requester//
         .onStatus(Status.OK, this::toCommandStatusRestResult)//
+        .getResult();
+  }
+
+  public RestResult<Void> updateAnnotation(final UUID annotatableUuid, final AnnotationPrototype annotationPrototype) {
+    WebTarget path = annotationTarget(annotatableUuid);
+    final Entity<AnnotationPrototype> entity = Entity.json(annotationPrototype);
+    final RestRequester<Void> requester = RestRequester.withResponseSupplier(authorizedPut(path, entity));
+    return requester//
+        .onStatus(Status.NO_CONTENT, voidRestResult())//
         .getResult();
   }
 
