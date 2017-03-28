@@ -61,18 +61,18 @@ public class TextGraphUtil {
   public static StreamingOutput streamXML(AlexandriaService service, UUID resourceId) {
     return output -> {
       Writer writer = createBufferedUTF8OutputStreamWriter(output);
-      XmlStreamContext context = new XmlStreamContext();
-      Consumer<TextGraphSegment> action = segment -> streamTextGraphSegment(writer, segment);
+      XmlStreamContext context = new XmlStreamContext(writer);
+      Consumer<TextGraphSegment> action = segment -> streamTextGraphSegment(context, segment);
       stream(service, resourceId, writer, action, new ArrayList<List<String>>());
     };
   }
 
-  public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment) {
+  public static void streamTextGraphSegment(XmlStreamContext context, TextGraphSegment segment) {
     try {
-      writeOpenTags(writer, segment);
-      writeMilestoneTags(writer, segment);
-      writeText(writer, segment);
-      writeCloseTags(writer, segment);
+      writeOpenTags(context, segment);
+      writeMilestoneTags(context.getWriter(), segment);
+      writeText(context.getWriter(), segment);
+      writeCloseTags(context, segment);
 
     } catch (IOException ioe) {
       throw new RuntimeException(ioe);
@@ -95,11 +95,12 @@ public class TextGraphUtil {
     return streamXML(service, resourceId);
   }
 
-  private static void writeOpenTags(Writer writer, TextGraphSegment segment) throws IOException {
+  private static void writeOpenTags(XmlStreamContext context, TextGraphSegment segment) throws IOException {
     for (TextAnnotation textAnnotation : segment.getTextAnnotationsToOpen()) {
       String name = textAnnotation.getName();
+      context.openTag(name);
       String openTag = getOpenTag(name, textAnnotation.getAttributes());
-      writer.write(openTag);
+      context.getWriter().write(openTag);
     }
   }
 
@@ -116,11 +117,12 @@ public class TextGraphUtil {
     writer.write(segment.getTextSegment());
   }
 
-  private static void writeCloseTags(Writer writer, TextGraphSegment segment) throws IOException {
+  private static void writeCloseTags(XmlStreamContext context, TextGraphSegment segment) throws IOException {
     for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
       String name = textAnnotation.getName();
+      context.closeTag(name);
       String closeTag = getCloseTag(name);
-      writer.write(closeTag);
+      context.getWriter().write(closeTag);
     }
   }
 
