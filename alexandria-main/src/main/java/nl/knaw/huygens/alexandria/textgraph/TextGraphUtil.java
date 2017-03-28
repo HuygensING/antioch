@@ -22,36 +22,9 @@ package nl.knaw.huygens.alexandria.textgraph;
  * #L%
  */
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
-
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Stack;
-import java.util.UUID;
-import java.util.function.Consumer;
-
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.StreamingOutput;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import nl.knaw.huygens.alexandria.api.model.text.view.AttributePreCondition;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView;
 import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.AttributeFunction;
@@ -62,6 +35,17 @@ import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
 import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.tei.Document;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.StreamingOutput;
+import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 public class TextGraphUtil {
 
@@ -77,6 +61,7 @@ public class TextGraphUtil {
   public static StreamingOutput streamXML(AlexandriaService service, UUID resourceId) {
     return output -> {
       Writer writer = createBufferedUTF8OutputStreamWriter(output);
+      XmlStreamContext context = new XmlStreamContext();
       Consumer<TextGraphSegment> action = segment -> streamTextGraphSegment(writer, segment);
       stream(service, resourceId, writer, action, new ArrayList<List<String>>());
     };

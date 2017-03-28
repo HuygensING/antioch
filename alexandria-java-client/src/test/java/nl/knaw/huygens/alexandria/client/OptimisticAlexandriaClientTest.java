@@ -1197,7 +1197,6 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     String xml2 = client.getTextAsString(resourceUUID);
 
     assertThat(xml2).isEqualTo("<title xml:id=\"jlc\"><a resp=\"#ckcc\">Joany <b resp=\"#ckcc\">loves</a> Chachi</b></title>");
-
   }
 
   private void annotateBayle(UUID resourceUUID, String xmlId) {
