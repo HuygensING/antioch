@@ -22,9 +22,23 @@ package nl.knaw.huygens.alexandria.client;
  * #L%
  */
 
-import static java.util.stream.Collectors.joining;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import nl.knaw.huygens.Log;
+import nl.knaw.huygens.alexandria.api.model.AboutEntity;
+import nl.knaw.huygens.alexandria.api.model.Annotator;
+import nl.knaw.huygens.alexandria.api.model.text.*;
+import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.ElementMode;
+import nl.knaw.huygens.alexandria.api.model.text.view.ElementViewDefinition;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
+import nl.knaw.huygens.alexandria.api.model.text.view.TextViewList;
+import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -32,37 +46,11 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
-import nl.knaw.huygens.Log;
-import nl.knaw.huygens.alexandria.api.model.AboutEntity;
-import nl.knaw.huygens.alexandria.api.model.Annotator;
-import nl.knaw.huygens.alexandria.api.model.text.TextAnnotationImportStatus;
-import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation.Position;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationInfo;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
-import nl.knaw.huygens.alexandria.api.model.text.view.ElementView;
-import nl.knaw.huygens.alexandria.api.model.text.view.ElementView.ElementMode;
-import nl.knaw.huygens.alexandria.api.model.text.view.ElementViewDefinition;
-import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
-import nl.knaw.huygens.alexandria.api.model.text.view.TextViewList;
-import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
+import static java.util.stream.Collectors.joining;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer {
 
@@ -1171,6 +1159,45 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     assertThat(view1).contains("<p xml:id=\"p-2\">...<persName resp=\"#ckcc\"><persName_key value=\"bayle.jacob.1644-1685\" resp=\"#ckcc\">BAYLE</persName_key></persName>...</p>");
     assertThat(view1).contains("<p xml:id=\"p-3\">...<persName resp=\"#ckcc\"><persName_key value=\"bayle.jacob.1644-1685\" resp=\"#ckcc\"><hi rend=\"i\">BAYLE</hi></persName_key></persName>...</p>");
     assertThat(view1).contains("<p xml:id=\"p-4\">...<persName resp=\"#ckcc\"><persName_key value=\"bayle.jacob.1644-1685\" resp=\"#ckcc\"><hi rend=\"i\">BAYLE</hi></persName_key></persName>...</p>");
+  }
+
+  @Test
+  public void testNLA367a(){
+    String xml = singleQuotesToDouble("<title xml:id='jlc'>Joany loves Chachi</title>");
+    UUID resourceUUID = UUID.randomUUID();
+    client.setResource(resourceUUID, resourceUUID.toString());
+    setResourceText(resourceUUID, xml);
+
+    client.setAnnotator(resourceUUID, "ckcc", new Annotator().setCode("ckcc").setDescription("CKCC project team"));
+
+    UUID annotationUUIDa = UUID.randomUUID();
+    Position positionA = new Position()//
+      .setXmlId("jlc")//
+      .setOffset(1)//
+      .setLength(11);
+    TextRangeAnnotation aAnnotation = new TextRangeAnnotation()//
+      .setId(annotationUUIDa)//
+      .setName("a")//
+      .setAnnotator("ckcc")//
+      .setPosition(positionA);
+    TextRangeAnnotationInfo aInfo = client.setResourceTextRangeAnnotation(resourceUUID, aAnnotation);
+
+    UUID annotationUUIDb = UUID.randomUUID();
+    Position positionB = new Position()//
+      .setXmlId("jlc")//
+      .setOffset(7)//
+      .setLength(12);
+    TextRangeAnnotation bAnnotation = new TextRangeAnnotation()//
+      .setId(annotationUUIDb)//
+      .setName("b")//
+      .setAnnotator("ckcc")//
+      .setPosition(positionB);
+    TextRangeAnnotationInfo bInfo = client.setResourceTextRangeAnnotation(resourceUUID, bAnnotation);
+
+    String xml2 = client.getTextAsString(resourceUUID);
+
+    assertThat(xml2).isEqualTo("<title xml:id=\"jlc\"><a resp=\"#ckcc\">Joany <b resp=\"#ckcc\">loves</a> Chachi</b></title>");
+
   }
 
   private void annotateBayle(UUID resourceUUID, String xmlId) {
