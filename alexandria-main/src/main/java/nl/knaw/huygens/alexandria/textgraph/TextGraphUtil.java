@@ -408,7 +408,7 @@ public class TextGraphUtil {
 
   private static void addNameAndIdentifier(TextAnnotation textAnnotation, Map<String, String> attributes) {
     attributes.put("name", textAnnotation.getName());
-    attributes.put(MILESTONE_IDENTIFIER, textAnnotation.getId().toString());
+    attributes.put(MILESTONE_IDENTIFIER, textAnnotation.getUUID().toString());
   }
 
   private static String getClosingMilestoneTag(TextAnnotation textAnnotation) {

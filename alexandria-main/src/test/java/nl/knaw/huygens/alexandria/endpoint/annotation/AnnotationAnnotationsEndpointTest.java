@@ -92,7 +92,7 @@ public class AnnotationAnnotationsEndpointTest {
 
     List<AnnotationEntity> list = extractList(response);
     assertThat(list).hasSize(1);
-    // assertThat(list.iterator().next().getId()).isEqualTo(uuid1);
+    // assertThat(list.iterator().next().getGraphId()).isEqualTo(uuid1);
   }
 
   private List<AnnotationEntity> extractList(Response response) {

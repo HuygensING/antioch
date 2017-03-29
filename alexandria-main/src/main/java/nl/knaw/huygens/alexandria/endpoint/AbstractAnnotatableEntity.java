@@ -55,7 +55,7 @@ public abstract class AbstractAnnotatableEntity extends JsonWrapperObject implem
   }
 
   private URI annotationURI(AlexandriaAnnotation annotation) {
-    // Log.debug("annotationURI for: [{}], id=[{}]", annotation, annotation.getId());
+    // Log.debug("annotationURI for: [{}], id=[{}]", annotation, annotation.getGraphId());
     return locationBuilder.locationOf(annotation);
   }
 

@@ -10,12 +10,12 @@ package nl.knaw.huygens.alexandria.textgraph;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -23,6 +23,7 @@ package nl.knaw.huygens.alexandria.textgraph;
  */
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -42,8 +43,9 @@ public class TextAnnotation {
   private String name;
   private Map<String, String> attributes;
   private int depth;
-  private Object id;
+  private Object graphId;
   private String xmlId;
+  private UUID uuid;
 
   public TextAnnotation(String name, Map<String, String> attributes, int depth) {
     this.name = name;
@@ -52,12 +54,12 @@ public class TextAnnotation {
     this.depth = depth;
   }
 
-  public void setId(Object object) {
-    this.id = object;
+  public void setGraphId(Object object) {
+    this.graphId = object;
   }
 
-  public Object getId() {
-    return id;
+  public Object getGraphId() {
+    return graphId;
   }
 
   public String getName() {
@@ -70,6 +72,14 @@ public class TextAnnotation {
 
   public Map<String, String> getAttributes() {
     return attributes;
+  }
+
+  public void setUUID(UUID uuid) {
+    this.uuid = uuid;
+  }
+
+  public UUID getUUID() {
+    return uuid;
   }
 
   // TODO:: does this need to be stored?
