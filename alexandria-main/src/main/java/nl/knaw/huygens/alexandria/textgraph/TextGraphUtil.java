@@ -49,6 +49,8 @@ import static java.util.stream.Collectors.toList;
 
 public class TextGraphUtil {
 
+  public static final String MILESTONE_IDENTIFIER = "id";
+
   public static ParseResult parse(String xml) {
     ParseResult result = new ParseResult();
     Document document = Document.createFromXml(xml, true);
@@ -87,7 +89,7 @@ public class TextGraphUtil {
   public static StreamingOutput xmlOutputStream(AlexandriaService service, UUID resourceId, String viewName, Map<String, String> viewParameters) {
     if (StringUtils.isNotBlank(viewName)) {
       TextView textView = service.getTextView(resourceId, viewName)//
-          .orElseThrow(() -> new NotFoundException("No view '" + viewName + "' found for this resource."));
+              .orElseThrow(() -> new NotFoundException("No view '" + viewName + "' found for this resource."));
       textView.substitute(viewParameters);
       // Log.info("textView={}", textView);
       return streamTextViewXML(service, resourceId, textView);
@@ -164,11 +166,11 @@ public class TextGraphUtil {
       ElementMode elementMode = elementView.getElementMode();
       ElementMode defaultViewElementMode = defaultElementView.getElementMode();
       Optional<AttributePreCondition> preCondition = elementView.getPreCondition();
-      boolean includeAccordingToElementMode = elementMode.equals(ElementMode.show);
+      boolean includeAccordingToElementMode = elementMode.equals(ElementMode.show) || elementMode.equals(ElementMode.asMilestones);
       boolean preConditionIsMet = preConditionIsMet(preCondition, textAnnotation);
       if (!preConditionIsMet) {
         boolean preConditionIsFirstOfFunction = preCondition.isPresent() //
-            && AttributeFunction.firstOf.equals(preCondition.get().getFunction());
+                && AttributeFunction.firstOf.equals(preCondition.get().getFunction());
         includeAccordingToElementMode = !preConditionIsFirstOfFunction && defaultViewElementMode.equals(ElementMode.show);
       }
 
@@ -185,16 +187,16 @@ public class TextGraphUtil {
         List<String> values = attributePreCondition.getValues();
         String actualValue = textAnnotation.getAttributes().get(attribute);
         switch (attributePreCondition.getFunction()) {
-        case is:
-          return values.contains(actualValue);
-        case isNot:
-          return !values.contains(actualValue);
-        case firstOf:
-          // TODO
-          break;
-        default:
-          // TODO
-          break;
+          case is:
+            return values.contains(actualValue);
+          case isNot:
+            return !values.contains(actualValue);
+          case firstOf:
+            // TODO
+            break;
+          default:
+            // TODO
+            break;
         }
 
       }
@@ -208,30 +210,30 @@ public class TextGraphUtil {
       AttributeMode attributeMode = elementView.getAttributeMode();
 
       switch (attributeMode) {
-      case showAll:
-        return allAttributes;
+        case showAll:
+          return allAttributes;
 
-      case hideAll:
-        break;
+        case hideAll:
+          break;
 
-      case showOnly:
-        allAttributes.forEach((k, v) -> {
-          if (elementView.getRelevantAttributes().contains(k)) {
-            attributesToInclude.put(k, v);
-          }
-        });
-        break;
+        case showOnly:
+          allAttributes.forEach((k, v) -> {
+            if (elementView.getRelevantAttributes().contains(k)) {
+              attributesToInclude.put(k, v);
+            }
+          });
+          break;
 
-      case hideOnly:
-        allAttributes.forEach((k, v) -> {
-          if (!elementView.getRelevantAttributes().contains(k)) {
-            attributesToInclude.put(k, v);
-          }
-        });
-        break;
+        case hideOnly:
+          allAttributes.forEach((k, v) -> {
+            if (!elementView.getRelevantAttributes().contains(k)) {
+              attributesToInclude.put(k, v);
+            }
+          });
+          break;
 
-      default:
-        throw new RuntimeException("unexpected attributemode: " + attributeMode);
+        default:
+          throw new RuntimeException("unexpected attributemode: " + attributeMode);
       }
       return attributesToInclude;
     }
@@ -275,24 +277,23 @@ public class TextGraphUtil {
      * - that name is used in a firstOf function in the viewDefinition
      * So they can be handled properly in includeTag
      *
-     * @param segment
-     *          the TextGraphSegment to analyze
+     * @param segment the TextGraphSegment to analyze
      */
     public void registerCompetingTextAnnotations(TextGraphSegment segment) {
       List<String> relevantElementNames = elementViewMap.entrySet().stream()//
-          .filter(this::hasFirstOfAttributeFunction)//
-          .map(Entry::getKey)//
-          .collect(toList());
+              .filter(this::hasFirstOfAttributeFunction)//
+              .map(Entry::getKey)//
+              .collect(toList());
       Set<TextAnnotation> segmentTextAnnotations = Sets.newHashSet(segment.textAnnotationsToOpen);
       segmentTextAnnotations.addAll(segment.textAnnotationsToClose);
       segmentTextAnnotations.removeIf(ta -> !relevantElementNames.contains(ta.getName()));
       overruledTextAnnotations = segmentTextAnnotations.stream()//
-          .collect(groupingBy(this::textAnnotationGrouping))//
-          .values()//
-          .stream()//
-          .map(this::overruledTextAnnotations)//
-          .flatMap(List::stream)//
-          .collect(toList());
+              .collect(groupingBy(this::textAnnotationGrouping))//
+              .values()//
+              .stream()//
+              .map(this::overruledTextAnnotations)//
+              .flatMap(List::stream)//
+              .collect(toList());
     }
     // TODO: handle consecutive milestones
 
@@ -309,7 +310,7 @@ public class TextGraphUtil {
     private List<TextAnnotation> overruledTextAnnotations(List<TextAnnotation> group) {
       String elementName = group.get(0).getName();
       AttributePreCondition attributePreCondition = elementViewMap.get(elementName)//
-          .getPreCondition().get();
+              .getPreCondition().get();
       String attribute = attributePreCondition.getAttribute();
       List<String> prioritizedValues = Lists.newArrayList(attributePreCondition.getValues());
       int originalSize = group.size();
@@ -331,6 +332,13 @@ public class TextGraphUtil {
       List<TextAnnotation> textAnnotationsToClose = segment.getTextAnnotationsToClose();
       return textAnnotationsToClose;
     }
+
+    public boolean asMilestones(String name) {
+      ElementView defaultElementView = elementViewMap.get(TextViewDefinition.DEFAULT_ATTRIBUTENAME);
+      ElementView elementView = elementViewMap.getOrDefault(name, defaultElementView);
+      ElementMode elementMode = elementView.getElementMode();
+      return ElementMode.asMilestones.equals(elementMode);
+    }
   }
 
   public static void streamTextGraphSegment(Writer writer, TextGraphSegment segment, TextViewContext textViewContext) {
@@ -350,7 +358,9 @@ public class TextGraphUtil {
     for (TextAnnotation textAnnotation : segment.getTextAnnotationsToClose()) {
       String name = textAnnotation.getName();
       if (textViewContext.includeTag(name, textAnnotation)) {
-        String closeTag = getCloseTag(name);
+        String closeTag = textViewContext.asMilestones(name)//
+                ? getClosingMilestoneTag(textAnnotation) //
+                : getCloseTag(name);
         writer.write(closeTag);
       }
       textViewContext.popWhenIgnoring(textAnnotation);
@@ -380,11 +390,31 @@ public class TextGraphUtil {
     for (TextAnnotation textAnnotation : textAnnotationsToOpen) {
       String name = textAnnotation.getName();
       if (textViewContext.includeTag(name, textAnnotation)) {
-        String openTag = getOpenTag(name, textViewContext.includedAttributes(textAnnotation));
+        String openTag = textViewContext.asMilestones(name)//
+                ? getOpeningMilestoneTag(textAnnotation) //
+                : getOpenTag(name, textViewContext.includedAttributes(textAnnotation));
         writer.write(openTag);
       }
       textViewContext.pushWhenIgnoring(textAnnotation);
     }
+  }
+
+  private static String getOpeningMilestoneTag(TextAnnotation textAnnotation) {
+    Map<String, String> attributes = new HashMap<>(textAnnotation.getAttributes());
+    addNameAndIdentifier(textAnnotation, attributes);
+    attributes.put("metaCount", "0");
+    return openingTagBuilder("annotation", attributes).append("/>").toString();
+  }
+
+  private static void addNameAndIdentifier(TextAnnotation textAnnotation, Map<String, String> attributes) {
+    attributes.put("name", textAnnotation.getName());
+    attributes.put(MILESTONE_IDENTIFIER, textAnnotation.getId().toString());
+  }
+
+  private static String getClosingMilestoneTag(TextAnnotation textAnnotation) {
+    Map<String, String> attributes = new HashMap<>();
+    addNameAndIdentifier(textAnnotation, attributes);
+    return openingTagBuilder("annotation", attributes).append("/>").toString();
   }
 
   public static String getMilestoneTag(String name, Map<String, String> attributes) {
@@ -430,18 +460,18 @@ public class TextGraphUtil {
     for (int i = 0; i < n; i++) {
       char c = value.charAt(i);
       switch (c) {
-      case '<':
-        builder.append("&lt;");
-        break;
-      case '>':
-        builder.append("&gt;");
-        break;
-      case '&':
-        builder.append("&amp;");
-        break;
-      default:
-        builder.append(c);
-        break;
+        case '<':
+          builder.append("&lt;");
+          break;
+        case '>':
+          builder.append("&gt;");
+          break;
+        case '&':
+          builder.append("&amp;");
+          break;
+        default:
+          builder.append(c);
+          break;
       }
     }
   }

@@ -1216,13 +1216,13 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     client.setResourceTextView(resourceUUID, textViewName2, useMilestones);
     String viewXML2 = client.getTextAsString(resourceUUID, textViewName2);
     String expected = "<title xml:id=\"jlc\">"//
-            + "<annotation name=\"a\" resp=\"#ckcc\" id=\"" + annotationUUIDa + "\" metaCount=\"0\"/>"//
-            + "Joany" //
-            + "<annotation name=\"b\" resp=\"#ckcc\" id=\"" + annotationUUIDb + "\" metaCount=\"0\"/>"//
-            + " loves"//
-            + "<annotation name=\"a\" id=\"\" + annotationUUIDa + \"\">"
+            + "<annotation name=\"a\" id=\"" + annotationUUIDa + "\" resp=\"#ckcc\" metaCount=\"0\"/>"//
+            + "Joany " //
+            + "<annotation name=\"b\" id=\"" + annotationUUIDb + "\" resp=\"#ckcc\" metaCount=\"0\"/>"//
+            + "loves"//
+            + "<annotation name=\"a\" id=\"" + annotationUUIDa + "\"/>"
             + " Chachi" //
-            + "<annotation name=\"b\" id=\"\" + annotationUUIDb + \"\">"
+            + "<annotation name=\"b\" id=\"" + annotationUUIDb + "\"/>"
             + "</title>";
     assertThat(viewXML2).isEqualTo(expected);
 
