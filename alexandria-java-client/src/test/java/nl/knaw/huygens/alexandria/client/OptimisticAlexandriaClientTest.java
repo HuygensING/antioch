@@ -1197,17 +1197,43 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
     try {
       String xml2 = client.getTextAsString(resourceUUID);
       fail();
-//    assertThat(xml2).isEqualTo("<title xml:id=\"jlc\"><a resp=\"#ckcc\">Joany <b resp=\"#ckcc\">loves</a> Chachi</b></title>");
     } catch (AlexandriaException ae) {
       assertThat(ae.getMessage()).isEqualTo("500: Cannot close a before b is closed first.");
     }
 
+    String textViewName1 = "hideBTag";
     TextViewDefinition hideBTag = new TextViewDefinition()//
-    .setElementViewDefinition("b",new ElementViewDefinition().setElementMode(ElementMode.hideTag));
-
-    client.setResourceTextView(resourceUUID, "hideBTag", hideBTag);
-    String viewXML = client.getTextAsString(resourceUUID, "hideBTag");
+            .setElementViewDefinition("b", new ElementViewDefinition().setElementMode(ElementMode.hideTag));
+    client.setResourceTextView(resourceUUID, textViewName1, hideBTag);
+    String viewXML = client.getTextAsString(resourceUUID, textViewName1);
     assertThat(viewXML).isEqualTo("<title xml:id=\"jlc\"><a resp=\"#ckcc\">Joany loves</a> Chachi</title>");
+
+    String textViewName2 = "abAsMilestone";
+    TextViewDefinition useMilestones = new TextViewDefinition()//
+            .setElementViewDefinition("a", new ElementViewDefinition().setElementMode(ElementMode.asMilestones))//
+            .setElementViewDefinition("b", new ElementViewDefinition().setElementMode(ElementMode.asMilestones))//
+            ;
+    client.setResourceTextView(resourceUUID, textViewName2, useMilestones);
+    String viewXML2 = client.getTextAsString(resourceUUID, textViewName2);
+    String expected = "<title xml:id=\"jlc\">"//
+            + "<annotation name=\"a\" resp=\"#ckcc\" id=\"" + annotationUUIDa + "\" metaCount=\"0\"/>"//
+            + "Joany" //
+            + "<annotation name=\"b\" resp=\"#ckcc\" id=\"" + annotationUUIDb + "\" metaCount=\"0\"/>"//
+            + " loves"//
+            + "<annotation name=\"a\" id=\"\" + annotationUUIDa + \"\">"
+            + " Chachi" //
+            + "<annotation name=\"b\" id=\"\" + annotationUUIDb + \"\">"
+            + "</title>";
+    assertThat(viewXML2).isEqualTo(expected);
+
+    String textViewName3 = "abAsMilestone2";
+    TextViewDefinition useMilestonesAsDefault = new TextViewDefinition()//
+            .setElementViewDefinition(":default", new ElementViewDefinition().setElementMode(ElementMode.asMilestones))//
+            .setElementViewDefinition("title", new ElementViewDefinition().setElementMode(ElementMode.show))//
+            ;
+    client.setResourceTextView(resourceUUID, textViewName3, useMilestonesAsDefault);
+    String viewXML3 = client.getTextAsString(resourceUUID, textViewName3);
+    assertThat(viewXML3).isEqualTo(expected);
   }
 
   private void annotateBayle(UUID resourceUUID, String xmlId) {
