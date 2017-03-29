@@ -36,7 +36,7 @@ import com.google.common.base.Splitter;
 public class ElementView {
 
   public enum ElementMode {
-    show, hide, hideTag
+    show, hide, hideTag, asMilestones
   }
 
   public enum AttributeMode {
