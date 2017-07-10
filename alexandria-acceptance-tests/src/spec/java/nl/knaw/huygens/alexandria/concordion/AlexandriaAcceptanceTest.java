@@ -6,42 +6,19 @@ package nl.knaw.huygens.alexandria.concordion;
  * =======
  * Copyright (C) 2015 - 2017 Huygens ING (KNAW)
  * =======
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  * #L%
  */
-
-import static java.util.UUID.fromString;
-import static java.util.UUID.randomUUID;
-import static nl.knaw.huygens.alexandria.api.model.AlexandriaState.CONFIRMED;
-
-import java.net.URI;
-import java.time.Instant;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.UriBuilder;
-
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
-import org.concordion.api.Resource;
-import org.concordion.api.extension.ConcordionExtension;
-import org.concordion.api.extension.Extension;
-import org.junit.BeforeClass;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
@@ -50,7 +27,6 @@ import com.google.common.collect.Iterables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
-
 import nl.knaw.huygens.Log;
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
@@ -67,6 +43,25 @@ import nl.knaw.huygens.alexandria.service.TinkerPopService;
 import nl.knaw.huygens.alexandria.storage.Storage;
 import nl.knaw.huygens.cat.RestExtension;
 import nl.knaw.huygens.cat.RestFixture;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.concordion.api.Resource;
+import org.concordion.api.extension.ConcordionExtension;
+import org.concordion.api.extension.Extension;
+import org.junit.BeforeClass;
+
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
+import java.time.Instant;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static java.util.UUID.fromString;
+import static java.util.UUID.randomUUID;
+import static nl.knaw.huygens.alexandria.api.model.AlexandriaState.CONFIRMED;
 
 public class AlexandriaAcceptanceTest extends RestFixture {
   private static final AlexandriaConfiguration CONFIG = testConfiguration();

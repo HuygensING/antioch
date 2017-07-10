@@ -13,7 +13,6 @@
     <module>alexandria-acceptance-tests</module>
     <module>alexandria-api</module>
     <module>alexandria-aql</module>
-    <module>alexandria-aql2</module>
     <module>alexandria-java-client</module>
     <module>alexandria-main</module>
     <module>alexandria-server</module>
@@ -23,7 +22,6 @@
     <module>alexandria-service</module>
     <module>alexandria-test</module>
     <module>alexandria-webapp</module>
-    <module>alexandria-markup</module>
   </modules>
 
   <properties>
@@ -367,13 +365,15 @@
           <execution>
             <phase>verify</phase>
             <goals>
+              <goal>update-project-license</goal>
               <goal>update-file-header</goal>
             </goals>
           </execution>
         </executions>
         <configuration>
-          <licenseName>gpl_v3</licenseName>
+          <licenseName>apache_v2</licenseName>
           <excludes>
+            <exclude>**/*.xml</exclude>
             <exclude>**/*.json</exclude>
             <exclude>**/*.jsonld</exclude>
           </excludes>

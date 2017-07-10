@@ -22,10 +22,10 @@ package nl.knaw.huygens.alexandria.endpoint.command;
  * #L%
  */
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.util.Optional;
 import java.util.UUID;
-
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class ResourceViewId {
   private UUID resourceId;

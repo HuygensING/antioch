@@ -1,21 +1,19 @@
 package nl.knaw.huygens.alexandria.endpoint.command;
 
-import static java.util.stream.Collectors.toList;
-import static nl.knaw.huygens.alexandria.text.TextUtil.XML_ID;
+import com.google.common.collect.Lists;
+import nl.knaw.huygens.alexandria.api.model.CommandResponse;
+import nl.knaw.huygens.alexandria.api.model.Commands;
+import nl.knaw.huygens.alexandria.service.MarkupService;
+import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
 
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.inject.Inject;
-
-import com.google.common.collect.Lists;
-
-import nl.knaw.huygens.alexandria.api.model.CommandResponse;
-import nl.knaw.huygens.alexandria.api.model.Commands;
-import nl.knaw.huygens.alexandria.service.MarkupService;
-import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
+import static java.util.stream.Collectors.toList;
+import static nl.knaw.huygens.alexandria.text.TextUtil.XML_ID;
 
 public class AddUniqueIdCommand extends TextAnnotationCommand {
   private static final String PARAMETER_ELEMENTS = "elements";

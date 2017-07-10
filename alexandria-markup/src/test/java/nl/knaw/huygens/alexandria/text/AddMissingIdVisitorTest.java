@@ -22,13 +22,12 @@ package nl.knaw.huygens.alexandria.text;
  * #L%
  */
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.google.common.collect.ImmutableList;
+import org.junit.Test;
 
 import java.util.List;
 
-import org.junit.Test;
-
-import com.google.common.collect.ImmutableList;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AddMissingIdVisitorTest extends AlexandriaVisitorTest {
   @Test
