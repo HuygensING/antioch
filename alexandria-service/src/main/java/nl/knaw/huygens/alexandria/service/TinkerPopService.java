@@ -697,6 +697,9 @@ public class TinkerPopService implements AlexandriaService {
         .values().stream()//
         .map(pQuery::collectListFieldValues)//
         .map(this::addListSize);
+      if (pQuery.sortOnListSize()){
+        mapStream = mapStream.sorted(pQuery.getListSizeComparator());
+      }
     }
     return mapStream//
       .collect(toList());

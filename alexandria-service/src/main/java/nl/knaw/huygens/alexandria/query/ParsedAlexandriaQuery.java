@@ -1,5 +1,19 @@
 package nl.knaw.huygens.alexandria.query;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import nl.knaw.huygens.alexandria.storage.Storage;
+import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
+import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
+import nl.knaw.huygens.alexandria.util.StreamUtil;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
 import static java.util.stream.Collectors.joining;
 
 /*
@@ -11,9 +25,9 @@ import static java.util.stream.Collectors.joining;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,22 +36,12 @@ import static java.util.stream.Collectors.joining;
  * #L%
  */
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
-import nl.knaw.huygens.alexandria.storage.Storage;
-import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
-import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
-import nl.knaw.huygens.alexandria.util.StreamUtil;
-
 public class ParsedAlexandriaQuery {
+
+  enum ListSizeSortOrder {
+    none, ascending, descending
+  }
+
   // this is just a container class for the results of processing the AlexandriaQuery parameters
   private static final Function<Storage, Stream<AnnotationVF>> DEFAULT_ANNOTATIONVF_FINDER = storage -> StreamUtil.stream(storage.find(AnnotationVF.class));
 
@@ -50,6 +54,8 @@ public class ParsedAlexandriaQuery {
   private Comparator<AnnotationVF> comparator;
   private Function<AnnotationVF, Map<String, Object>> mapper;
   private Function<Storage, Stream<AnnotationVF>> annotationVFFinder = DEFAULT_ANNOTATIONVF_FINDER;
+
+  private ListSizeSortOrder listSizeSortOrder = ListSizeSortOrder.none;
 
   private Function<Storage, Stream<Map<String, Object>>> resultStreamMapper;
 
@@ -127,11 +133,11 @@ public class ParsedAlexandriaQuery {
   public String concatenateGroupByFieldsValues(Map<String, Object> map) {
     if (doGrouping()) {
       return returnFields.stream()//
-          .filter(f -> !fieldsToGroup.contains(f))//
-          .sorted()//
-          .map(map::get)//
-          .map(Object::toString)//
-          .collect(joining());
+        .filter(f -> !fieldsToGroup.contains(f))//
+        .sorted()//
+        .map(map::get)//
+        .map(Object::toString)//
+        .collect(joining());
     }
     return null;
   }
@@ -157,10 +163,10 @@ public class ParsedAlexandriaQuery {
   public Function<Storage, Stream<Map<String, Object>>> getResultStreamMapper() {
     if (vfClazz == AnnotationVF.class) {
       return (storage) -> annotationVFFinder//
-          .apply(storage)//
-          .filter(predicate)//
-          .sorted(comparator)//
-          .map(mapper);
+        .apply(storage)//
+        .filter(predicate)//
+        .sorted(comparator)//
+        .map(mapper);
     }
 
     return resultStreamMapper;
@@ -170,4 +176,27 @@ public class ParsedAlexandriaQuery {
     this.resultStreamMapper = resultStreamMapper;
   }
 
+  public ParsedAlexandriaQuery setListSizeSortOrder(ListSizeSortOrder listSizeSortOrder) {
+    this.listSizeSortOrder = listSizeSortOrder;
+    return this;
+  }
+
+  public Comparator<Map<String, Object>> getListSizeComparator() {
+    switch (listSizeSortOrder) {
+      case ascending:
+        return Comparator.comparing(this::getListSize);
+      case descending:
+        return Comparator.comparing(this::getListSize).reversed();
+      default:
+        return null;
+    }
+  }
+
+  private int getListSize(Map<String, Object> resultMap) {
+    return (Integer) resultMap.get("_list.size");
+  }
+
+  public boolean sortOnListSize() {
+    return !ListSizeSortOrder.none.equals(listSizeSortOrder);
+  }
 }

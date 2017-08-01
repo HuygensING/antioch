@@ -20,43 +20,11 @@ package nl.knaw.huygens.alexandria.query;
  * #L%
  */
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
-
-import javax.inject.Inject;
-
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
-import org.apache.tinkerpop.gremlin.structure.Vertex;
-
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
-
 import nl.knaw.huygens.alexandria.antlr.AQLLexer;
 import nl.knaw.huygens.alexandria.antlr.AQLParser;
 import nl.knaw.huygens.alexandria.antlr.QueryErrorListener;
@@ -73,6 +41,28 @@ import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import nl.knaw.huygens.alexandria.util.StreamUtil;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
+
+import javax.inject.Inject;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.*;
+import static nl.knaw.huygens.alexandria.query.ParsedAlexandriaQuery.*;
+import static nl.knaw.huygens.alexandria.query.ParsedAlexandriaQuery.ListSizeSortOrder.*;
+import static nl.knaw.huygens.alexandria.query.ParsedAlexandriaQuery.ListSizeSortOrder.ascending;
+import static nl.knaw.huygens.alexandria.query.ParsedAlexandriaQuery.ListSizeSortOrder.descending;
 
 public class AlexandriaQueryParser {
   static final String ALLOWED_FIELDS = ", available fields: " + Joiner.on(", ").join(QueryField.ALL_EXTERNAL_NAMES);
@@ -90,9 +80,16 @@ public class AlexandriaQueryParser {
   public ParsedAlexandriaQuery parse(final AlexandriaQuery query) {
     parseErrors.clear();
 
+    String querySort = query.getSort();
+    ListSizeSortOrder listSizeSortOrder = none;
+    if (querySort.contains("_list.size")) {
+      listSizeSortOrder = (querySort.contains("-_list.size")) ? descending : ascending;
+      querySort = querySort.replaceFirst("-?_list.size", "");
+    }
     final ParsedAlexandriaQuery paq = new ParsedAlexandriaQuery()//
-        .setVFClass(parseFind(query.getFind()))//
-        .setResultComparator(parseSort(query.getSort()));
+      .setVFClass(parseFind(query.getFind()))//
+      .setResultComparator(parseSort(querySort))//
+      .setListSizeSortOrder(listSizeSortOrder);
 
     setFilter(paq, query.getWhere());
 
@@ -138,30 +135,30 @@ public class AlexandriaQueryParser {
       GraphTraversal<Vertex, Vertex> traversal = storage.getResourceVertexTraversal();
 
       Optional<String> rootResourceUUID = resourceWhereTokens.stream()//
-          .filter(t -> t.getProperty().equals(QueryField.resource_id)//
-              && t.getFunction().equals(QueryFunction.eq))//
-          .map(t -> t.getParameters().get(0))//
-          .map(String.class::cast)//
-          .findFirst();
+        .filter(t -> t.getProperty().equals(QueryField.resource_id)//
+          && t.getFunction().equals(QueryFunction.eq))//
+        .map(t -> t.getParameters().get(0))//
+        .map(String.class::cast)//
+        .findFirst();
       if (rootResourceUUID.isPresent()) {
         traversal = traversal.has(Storage.IDENTIFIER_PROPERTY, rootResourceUUID.get());
       }
 
       Optional<String> sub = resourceWhereTokens.stream()//
-          .filter(t -> t.getProperty().equals(QueryField.subresource_sub)//
-              && t.getFunction().equals(QueryFunction.eq))//
-          .map(t -> t.getParameters().get(0))//
-          .map(String.class::cast)//
-          .findFirst();
+        .filter(t -> t.getProperty().equals(QueryField.subresource_sub)//
+          && t.getFunction().equals(QueryFunction.eq))//
+        .map(t -> t.getParameters().get(0))//
+        .map(String.class::cast)//
+        .findFirst();
       if (sub.isPresent()) {
         traversal = traversal//
-            .until(__.has(ResourceVF.Properties.CARGO, sub.get()))//
-            .repeat(__.in(ResourceVF.EdgeLabels.PART_OF));
+          .until(__.has(ResourceVF.Properties.CARGO, sub.get()))//
+          .repeat(__.in(ResourceVF.EdgeLabels.PART_OF));
       }
 
       return StreamUtil.stream(traversal)//
-          .map(v -> storage.frameVertex(v, ResourceVF.class))//
-          .map(this::toResultMap);
+        .map(v -> storage.frameVertex(v, ResourceVF.class))//
+        .map(this::toResultMap);
     };
   }
 
@@ -174,12 +171,12 @@ public class AlexandriaQueryParser {
 
   private void addDefaultStateTokenWhenNeeded(List<WhereToken> tokens) {
     boolean addStateToken = tokens.stream()//
-        .noneMatch(token -> QueryField.state.equals(token.getProperty()));
+      .noneMatch(token -> QueryField.state.equals(token.getProperty()));
     if (addStateToken) {
       WhereToken defaultStateToken = new WhereToken(//
-          QueryField.state, //
-          QueryFunction.eq, //
-          ImmutableList.of(AlexandriaState.CONFIRMED.name())//
+        QueryField.state, //
+        QueryFunction.eq, //
+        ImmutableList.of(AlexandriaState.CONFIRMED.name())//
       );
       tokens.add(defaultStateToken);
     }
@@ -187,8 +184,8 @@ public class AlexandriaQueryParser {
 
   private List<WhereToken> filterResourceWhereTokens(List<WhereToken> tokens) {
     return tokens.stream()//
-        .filter(WhereToken::hasResourceProperty)//
-        .collect(toList());
+      .filter(WhereToken::hasResourceProperty)//
+      .collect(toList());
   }
 
   private Function<Storage, Stream<AnnotationVF>> createAnnotationVFFinder(List<WhereToken> resourceWhereTokens) {
@@ -202,11 +199,11 @@ public class AlexandriaQueryParser {
           ResourceVF resourceVF = optionalResource.get();
           Stream<AnnotationVF> resourceAnnotationsStream = resourceVF.getAnnotatedBy().stream();
           Stream<AnnotationVF> subresourceAnnotationsStream = resourceVF.getSubResources().stream()//
-              .flatMap(rvf -> rvf.getAnnotatedBy().stream());
+            .flatMap(rvf -> rvf.getAnnotatedBy().stream());
           return Stream.concat(resourceAnnotationsStream, subresourceAnnotationsStream);
         }
         // Should return error, since no resource found with given uuid
-        return ImmutableList.<AnnotationVF> of().stream();
+        return ImmutableList.<AnnotationVF>of().stream();
       };
 
     } else if (resourceWhereTokens.size() == 1 && resourceWhereToken.getFunction().equals(QueryFunction.eq) && resourceWhereToken.getProperty().equals(QueryField.resource_ref)) {
@@ -214,22 +211,22 @@ public class AlexandriaQueryParser {
         Object cargo = resourceWhereToken.getParameters().get(0);
         // Log.info("cargo={}", cargo);
         List<ResourceVF> resourceVFs = storage.find(ResourceVF.class)//
-            .has(ResourceVF.Properties.CARGO, cargo)//
-            .toList();
+          .has(ResourceVF.Properties.CARGO, cargo)//
+          .toList();
 
         List<UUID> resourceUUIDs = resourceVFs.stream()//
-            .map(ResourceVF::getUuid)//
-            .map(UUID::fromString)//
-            .collect(toList());
+          .map(ResourceVF::getUuid)//
+          .map(UUID::fromString)//
+          .collect(toList());
         // Log.info("resourceUUIDs={}", resourceUUIDs);
         return toAnnotationVFStream(resourceUUIDs, storage);
       };
 
     } else if (resourceWhereToken.getFunction().equals(QueryFunction.inSet)) {
       List<UUID> uuidSet = resourceWhereToken.getParameters().stream()//
-          .map(String.class::cast)//
-          .map(UUID::fromString)//
-          .collect(toList());
+        .map(String.class::cast)//
+        .map(UUID::fromString)//
+        .collect(toList());
       return storage -> toAnnotationVFStream(uuidSet, storage);
 
     }
@@ -243,9 +240,9 @@ public class AlexandriaQueryParser {
       optionalResource.ifPresent(resourceVF -> {
         annotationList.addAll(resourceVF.getAnnotatedBy());
         annotationList.addAll(resourceVF.getSubResources().stream()//
-            .map(ResourceVF::getAnnotatedBy)//
-            .flatMap(Collection::stream)//
-            .collect(toList()));
+          .map(ResourceVF::getAnnotatedBy)//
+          .flatMap(Collection::stream)//
+          .collect(toList()));
       });
     }
     // Log.info("annotationList={}", annotationList);
@@ -254,16 +251,16 @@ public class AlexandriaQueryParser {
 
   private Class<? extends AlexandriaVF> parseFind(final String find) {
     switch (find) {
-    case "annotation":
-      return AnnotationVF.class;
+      case "annotation":
+        return AnnotationVF.class;
 
-    case "resource":
-      // parseErrors.add("find: type 'resource' not supported yet");
-      return ResourceVF.class;
+      case "resource":
+        // parseErrors.add("find: type 'resource' not supported yet");
+        return ResourceVF.class;
 
-    default:
-      parseErrors.add("find: unknown type '" + find + "', should be 'annotation' or 'resource'");
-      return null;
+      default:
+        parseErrors.add("find: unknown type '" + find + "', should be 'annotation' or 'resource'");
+        return null;
     }
   }
 
@@ -287,8 +284,8 @@ public class AlexandriaQueryParser {
     // Log.info("tree={}", tree.toStringTree(parser));
     if (errorListener.heardErrors()) {
       parseErrors.addAll(errorListener.getParseErrors().stream()//
-          .map(AlexandriaQueryParser::clarifyParseError)//
-          .collect(toList()));
+        .map(AlexandriaQueryParser::clarifyParseError)//
+        .collect(toList()));
       return Lists.newArrayList();
     }
 
@@ -317,8 +314,8 @@ public class AlexandriaQueryParser {
     }
 
     return tokens.stream()//
-        .map(AlexandriaQueryParser::toPredicate)//
-        .reduce(alwaysTrue(), Predicate::and);
+      .map(AlexandriaQueryParser::toPredicate)//
+      .reduce(alwaysTrue(), Predicate::and);
   }
 
   static Set<String> ALL_STATES = Arrays.stream(AlexandriaState.values()).map(AlexandriaState::name).collect(toSet());
@@ -363,11 +360,11 @@ public class AlexandriaQueryParser {
         Object propertyValue = getter.apply(avf);
         if (propertyValue instanceof String) {
           return ((String) propertyValue).compareTo((String) lowerLimit) >= 0//
-                  && ((String) propertyValue).compareTo((String) upperLimit) <= 0;
+            && ((String) propertyValue).compareTo((String) upperLimit) <= 0;
         }
         //
         return !(propertyValue instanceof Long) || ((Long) propertyValue).compareTo((Long) lowerLimit) >= 0//
-                && ((Long) propertyValue).compareTo((Long) upperLimit) <= 0;
+          && ((Long) propertyValue).compareTo((Long) upperLimit) <= 0;
       };
     }
 
@@ -379,13 +376,13 @@ public class AlexandriaQueryParser {
   private static void checkForValidStateParameter(WhereToken whereToken) {
     if (QueryField.state.equals(whereToken.getProperty())) {
       List<String> invalidValues = whereToken.getParameters().stream()//
-          .map(String.class::cast).filter(INVALID_STATEVALUE_PREDICATE)//
-          .collect(toList());
+        .map(String.class::cast).filter(INVALID_STATEVALUE_PREDICATE)//
+        .collect(toList());
       if (!invalidValues.isEmpty()) {
         String message = ((invalidValues.size() == 1)//
-            ? invalidValues.get(0) + " is not a valid value"//
-            : Joiner.on(", ").join(invalidValues) + " are not valid values")//
-            + " for " + QueryField.state.externalName();
+          ? invalidValues.get(0) + " is not a valid value"//
+          : Joiner.on(", ").join(invalidValues) + " are not valid values")//
+          + " for " + QueryField.state.externalName();
         throw new BadRequestException(message);
       }
     }
@@ -436,8 +433,8 @@ public class AlexandriaQueryParser {
       return null;
     }
     List<Ordering<AnnotationVF>> orderings = sortTokens.stream()//
-        .map(AlexandriaQueryParser::ordering)//
-        .collect(toList());
+      .map(AlexandriaQueryParser::ordering)//
+      .collect(toList());
     Ordering<AnnotationVF> order = orderings.remove(0);
     for (final Ordering<AnnotationVF> suborder : orderings) {
       order = order.compound(suborder);
@@ -453,8 +450,8 @@ public class AlexandriaQueryParser {
       @Override
       public int compare(final AnnotationVF left, final AnnotationVF right) {
         return ascending//
-            ? ((Comparable<Object>) function.apply(left)).compareTo(function.apply(right))//
-            : ((Comparable<Object>) function.apply(right)).compareTo(function.apply(left));
+          ? ((Comparable<Object>) function.apply(left)).compareTo(function.apply(right))//
+          : ((Comparable<Object>) function.apply(right)).compareTo(function.apply(left));
       }
     };
   }
@@ -463,26 +460,26 @@ public class AlexandriaQueryParser {
     List<String> sortTokenStrings = splitToList(sortString);
 
     List<String> sortParseErrors = sortTokenStrings.stream()//
-        .map(AlexandriaQueryParser::extractExternalName)//
-        .filter(externalName -> !QueryField.ALL_EXTERNAL_NAMES.contains(externalName))//
-        .map(invalidFieldName -> "sort: unknown field: " + invalidFieldName + ALLOWED_FIELDS)//
-        .collect(toList());
+      .map(AlexandriaQueryParser::extractExternalName)//
+      .filter(externalName -> !QueryField.ALL_EXTERNAL_NAMES.contains(externalName))//
+      .map(invalidFieldName -> "sort: unknown field: " + invalidFieldName + ALLOWED_FIELDS)//
+      .collect(toList());
     if (!sortParseErrors.isEmpty()) {
       parseErrors.addAll(sortParseErrors);
       return null;
     }
 
     return sortTokenStrings.stream()//
-        .map(AlexandriaQueryParser::sortToken)//
-        .collect(toList());
+      .map(AlexandriaQueryParser::sortToken)//
+      .collect(toList());
   }
 
   static SortToken sortToken(final String f) {
     boolean ascending = !f.startsWith("-");
     String externalName = extractExternalName(f);
     return new SortToken()//
-        .setAscending(ascending)//
-        .setField(QueryField.fromExternalName(externalName));
+      .setAscending(ascending)//
+      .setField(QueryField.fromExternalName(externalName));
   }
 
   private static String extractExternalName(final String sortParameter) {
@@ -503,7 +500,7 @@ public class AlexandriaQueryParser {
       paq.setFieldsToGroup(listFields);
 
       final Function<AnnotationVF, Map<String, Object>> mapper = avf -> fields.stream()//
-          .collect(toMap(Function.identity(), f -> QueryFieldGetters.get(QueryField.fromExternalName(f)).apply(avf)));
+        .collect(toMap(Function.identity(), f -> QueryFieldGetters.get(QueryField.fromExternalName(f)).apply(avf)));
       // TODO: cache resultmapper?
       paq.setResultMapper(mapper);
     }
@@ -519,9 +516,9 @@ public class AlexandriaQueryParser {
 
   private static List<String> splitToList(final String fieldString) {
     return Splitter.on(",")//
-        .trimResults()//
-        .omitEmptyStrings()//
-        .splitToList(fieldString.replace("list(", "").replace(")", ""));
+      .trimResults()//
+      .omitEmptyStrings()//
+      .splitToList(fieldString.replace("list(", "").replace(")", ""));
   }
 
 }

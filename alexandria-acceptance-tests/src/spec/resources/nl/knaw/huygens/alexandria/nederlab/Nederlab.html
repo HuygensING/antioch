@@ -1153,6 +1153,7 @@
         with value
         <mark><strong>angst</strong></mark>
         grouped by <mark><strong>resource.id</strong></mark>
+        and sorted on the amount of annotations per resource, in descending order.
     </div>
 
     <h:request>
@@ -1163,6 +1164,7 @@
             "query": {
             "find": "annotation",
             "where": "type:eq(\"Tag\") value:eq(\"angst\")",
+            "sort": "-_list.size",
             "return": "resource.id, list(id,who)"
             } }
         </h:jsonBody>
@@ -1188,14 +1190,6 @@
                 "records" : [
                 {
                     "_resultNumber" : 1,
-                    "resource.id" : "deadbeef-5b7f-11e5-8fb4-5371419560ec",
-                    "_list.size" : 1,
-                    "_list" : [ {
-                        "id" : "{uuid.anyValid}",
-                        "who" : "peer-1337"
-                    } ]
-                }, {
-                    "_resultNumber" : 2,
                     "resource.id" : "00000003-5b7f-11e5-898c-237ee1c6d1d4",
                     "_list.size" : 2,
                     "_list" : [ {
@@ -1204,6 +1198,14 @@
                     }, {
                         "id" : "{uuid.anyValid}",
                         "who" : "user-4243"
+                    } ]
+                }, {
+                    "_resultNumber" : 2,
+                    "resource.id" : "deadbeef-5b7f-11e5-8fb4-5371419560ec",
+                    "_list.size" : 1,
+                    "_list" : [ {
+                        "id" : "{uuid.anyValid}",
+                        "who" : "peer-1337"
                     } ]
             } ] } }
         </h:jsonResponse>
