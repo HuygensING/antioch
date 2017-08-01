@@ -1088,6 +1088,126 @@
     Note that, due to the grouping, the annotations are only sorted by <code>-when</code> within the group determined by <code>resource.id</code>
 </div>
 
+<div id="listsize" data-desc="How can I sort on groupsize?" c:execute="clearStorage()">
+    Given the following annotated resources (for brevity, all annotations are considered to be of type 'Tag')
+    in order of creation timestamp
+    <table class="table"
+           c:execute="resourceExistsWithTagForUserAtInstant(#resId, #value, #who, #when)">
+        <thead>
+        <tr>
+            <th c:set="#resId">Resource Id</th>
+            <th c:set="#value">Annotation value</th>
+            <th c:set="#who">Owner</th>
+            <th c:set="#when">Created at</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>verdriet</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-06-06T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>verdriet</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-06-07T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>angst</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-07-07T07:07:07+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
+            <td><code>angst</code></td>
+            <td><code>peer-1337</code></td>
+            <td><code>2015-08-08T08:08:08+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>angst</code></td>
+            <td><code>user-4243</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>blijdschap</code></td>
+            <td><code>user-4241</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
+            <td><code>blijdschap</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="alert alert-info sm">
+        We show how to find the annotation values of all annotations of type
+        <mark><strong>Tag</strong></mark>
+        belonging to resources
+        <mark><strong>00000001-5ba6-11e5-9054-ab0dd746f7f7</strong></mark>
+        or
+        <mark><strong>00000003-5b7f-11e5-898c-237ee1c6d1d4</strong></mark>
+    </div>
+
+    <h:request>
+        We
+        <h:post>/searches</h:post>
+        the body
+        <h:jsonBody>{
+            "query": {
+            "find": "annotation",
+            "where": "type:eq(\"Tag\") value:eq(\"angst\")",
+            "return": "resource.id, list(id,who)"
+            } }
+        </h:jsonBody>
+        and observe status
+        <h:status>201 Created</h:status>
+        with the Location header pointing to the results of our query.
+    </h:request>
+
+    <div c:execute="#searchId = uuid()">&#160;</div>
+
+    <h:request>We follow the Location header and
+        <h:get>/searches/$searchId</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "searchResultPage" : {
+            "pageNumber": 1,
+            "searchInfo": {
+            "totalResults" : 2,
+            "totalPages" : 1
+            },
+            "records" : [
+            {
+                "_resultNumber" : 1,
+                "resource.id" : "deadbeef-5b7f-11e5-8fb4-5371419560ec",
+                "_list.size" : 1,
+                "_list" : [ {
+                    "who" : "peer-1337"
+                } ]
+            }, {
+                "_resultNumber" : 2,
+                "resource.id" : "00000003-5b7f-11e5-898c-237ee1c6d1d4",
+                "_list.size" : 2,
+                "_list" : [ {
+                    "who" : "user-4242"
+                }, {
+                    "who" : "user-4243"
+                } ]
+            } ] } }
+        </h:jsonResponse>
+    </h:request>
+
+</div>
 
 </body>
 </html>
