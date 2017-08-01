@@ -1111,7 +1111,7 @@
         <tr>
             <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
             <td><code>verdriet</code></td>
-            <td><code>user-4242</code></td>
+            <td><code>user-4243</code></td>
             <td><code>2015-06-07T06:06:06+02:00</code></td>
         </tr>
         <tr>
@@ -1119,12 +1119,6 @@
             <td><code>angst</code></td>
             <td><code>user-4242</code></td>
             <td><code>2015-07-07T07:07:07+02:00</code></td>
-        </tr>
-        <tr>
-            <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
-            <td><code>angst</code></td>
-            <td><code>peer-1337</code></td>
-            <td><code>2015-08-08T08:08:08+02:00</code></td>
         </tr>
         <tr>
             <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
@@ -1140,6 +1134,12 @@
         </tr>
         <tr>
             <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
+            <td><code>angst</code></td>
+            <td><code>peer-1337</code></td>
+            <td><code>2015-08-08T08:08:08+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
             <td><code>blijdschap</code></td>
             <td><code>user-4242</code></td>
             <td><code>2015-09-09T09:09:09+02:00</code></td>
@@ -1148,12 +1148,11 @@
     </table>
 
     <div class="alert alert-info sm">
-        We show how to find the annotation values of all annotations of type
+        We show how to find the annotations of type
         <mark><strong>Tag</strong></mark>
-        belonging to resources
-        <mark><strong>00000001-5ba6-11e5-9054-ab0dd746f7f7</strong></mark>
-        or
-        <mark><strong>00000003-5b7f-11e5-898c-237ee1c6d1d4</strong></mark>
+        with value
+        <mark><strong>angst</strong></mark>
+        grouped by <mark><strong>resource.id</strong></mark>
     </div>
 
     <h:request>
@@ -1181,28 +1180,31 @@
         and body
         <h:jsonResponse>{
             "searchResultPage" : {
-            "pageNumber": 1,
-            "searchInfo": {
-            "totalResults" : 2,
-            "totalPages" : 1
-            },
-            "records" : [
-            {
-                "_resultNumber" : 1,
-                "resource.id" : "deadbeef-5b7f-11e5-8fb4-5371419560ec",
-                "_list.size" : 1,
-                "_list" : [ {
-                    "who" : "peer-1337"
-                } ]
-            }, {
-                "_resultNumber" : 2,
-                "resource.id" : "00000003-5b7f-11e5-898c-237ee1c6d1d4",
-                "_list.size" : 2,
-                "_list" : [ {
-                    "who" : "user-4242"
+                "pageNumber": 1,
+                "searchInfo": {
+                    "totalResults" : 2,
+                    "totalPages" : 1
+                },
+                "records" : [
+                {
+                    "_resultNumber" : 1,
+                    "resource.id" : "deadbeef-5b7f-11e5-8fb4-5371419560ec",
+                    "_list.size" : 1,
+                    "_list" : [ {
+                        "id" : "{uuid.anyValid}",
+                        "who" : "peer-1337"
+                    } ]
                 }, {
-                    "who" : "user-4243"
-                } ]
+                    "_resultNumber" : 2,
+                    "resource.id" : "00000003-5b7f-11e5-898c-237ee1c6d1d4",
+                    "_list.size" : 2,
+                    "_list" : [ {
+                        "id" : "{uuid.anyValid}",
+                        "who" : "user-4242"
+                    }, {
+                        "id" : "{uuid.anyValid}",
+                        "who" : "user-4243"
+                    } ]
             } ] } }
         </h:jsonResponse>
     </h:request>
