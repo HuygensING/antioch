@@ -6,23 +6,37 @@ package nl.knaw.huygens.alexandria.endpoint;
  * =======
  * Copyright (C) 2015 - 2017 Huygens ING (KNAW)
  * =======
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  * 
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  * #L%
  */
 
+import static java.util.stream.Collectors.toList;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import com.google.common.collect.ImmutableMap;
+
 import io.swagger.annotations.ApiOperation;
 import nl.knaw.huygens.alexandria.api.JsonTypeNames;
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
@@ -30,20 +44,11 @@ import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationEntity;
 import nl.knaw.huygens.alexandria.endpoint.annotation.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.model.AbstractAnnotatable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
+import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import static java.util.stream.Collectors.toList;
+import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
+import nl.knaw.huygens.alexandria.textlocator.TextLocatorFactory;
+import nl.knaw.huygens.alexandria.textlocator.TextLocatorParseException;
 
 public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint {
 
@@ -99,11 +104,34 @@ public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint 
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation("add annotation")
   public Response addAnnotation(@NotNull @Valid AnnotationPrototype prototype) {
+    validateLocator(prototype);
     prototype.setState(AlexandriaState.TENTATIVE);
     AnnotationCreationRequest request = getAnnotationCreationRequestBuilder().build(prototype);
     AlexandriaAnnotation annotation = request.execute(service);
     return created(locationBuilder.locationOf(annotation));
   }
 
+  private void validateLocator(AnnotationPrototype prototype) {
+    if (prototype.getLocator().isPresent()) {
+      if (!(getAnnotatableObject() instanceof AlexandriaResource)) {
+        throw new BadRequestException("locators are only allowed on resource annotations");
+      }
+
+      AlexandriaResource resource = (AlexandriaResource) getAnnotatableObject();
+      if (!resource.hasText()) {
+        throw new BadRequestException("The resource has no attached text to use the locator on.");
+      }
+
+      String locatorString = prototype.getLocator().get();
+      try {
+        TextLocatorFactory textLocatorFactory = new TextLocatorFactory(service);
+        AlexandriaTextLocator locator = textLocatorFactory.fromString(locatorString);
+        textLocatorFactory.validate(locator, resource);
+      } catch (TextLocatorParseException e) {
+        throw new BadRequestException(e.getMessage());
+      }
+    }
+
+  }
 
 }

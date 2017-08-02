@@ -365,13 +365,15 @@
           <execution>
             <phase>verify</phase>
             <goals>
+              <goal>update-project-license</goal>
               <goal>update-file-header</goal>
             </goals>
           </execution>
         </executions>
         <configuration>
-          <licenseName>gpl_v3</licenseName>
+          <licenseName>apache_v2</licenseName>
           <excludes>
+            <exclude>**/*.xml</exclude>
             <exclude>**/*.json</exclude>
             <exclude>**/*.jsonld</exclude>
           </excludes>
