@@ -7,9 +7,9 @@
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
-  
+
        http://www.apache.org/licenses/LICENSE-2.0
-  
+
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -828,9 +828,9 @@
             } ] } }
         </h:jsonResponse>
     </h:request>
-    
+
     Notice that the resource.id <code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code> is returned twice, since this resource has been annotated twice by the user.
-    
+
     <h:request>
         To make sure each resource.id is returned only once, we add the <code>distinct</code> parameter, we
         <h:post>/searches</h:post>
@@ -849,7 +849,7 @@
     </h:request>
 
     <div c:execute="#searchId = uuid()">&#160;</div>
-    
+
     <h:request>We now can get
         <h:get>/searches/$searchId/pages/1</h:get>
         expecting
@@ -924,9 +924,9 @@
     <div class="alert alert-info sm">
         We show how to find the annotation values of all annotations of type
         <mark><strong>Tag</strong></mark>
-        belonging to resources 
+        belonging to resources
         <mark><strong>00000001-5ba6-11e5-9054-ab0dd746f7f7</strong></mark>
-        or 
+        or
         <mark><strong>00000003-5b7f-11e5-898c-237ee1c6d1d4</strong></mark>
     </div>
 
@@ -1018,7 +1018,7 @@
             } ] } }
         </h:jsonResponse>
     </h:request>
-    
+
     Notice that the resource.id <code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code> and <code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code> are each returned twice.
 
     <div class="alert alert-warning sm">
@@ -1028,7 +1028,7 @@
             </li>
         </ul>
     </div>
-    
+
     <h:request>
         We
         <h:post>/searches</h:post>
@@ -1084,11 +1084,11 @@
 	              } ] } }
         </h:jsonResponse>
     </h:request>
-    
+
     Note that, due to the grouping, the annotations are only sorted by <code>-when</code> within the group determined by <code>resource.id</code>
 </div>
 
-<div id="listsize" data-desc="How can I sort on groupsize?" c:execute="clearStorage()">
+<div id="nla374_1" data-desc="How can I sort on groupsize?" c:execute="clearStorage()">
     Given the following annotated resources (for brevity, all annotations are considered to be of type 'Tag')
     in order of creation timestamp
     <table class="table"
@@ -1211,6 +1211,284 @@
         </h:jsonResponse>
     </h:request>
 
+</div>
+
+<div id="nla374_2" data-desc="How do I group the results on annotation value, sorted by groupsize?" c:execute="clearStorage()">
+    Given the following annotated resources (for brevity, all annotations are considered to be of type 'Tag')
+    in order of creation timestamp
+    <table class="table"
+           c:execute="resourceExistsWithTagForUserAtInstant(#resId, #value, #who, #when)">
+        <thead>
+        <tr>
+            <th c:set="#resId">Resource Id</th>
+            <th c:set="#value">Annotation value</th>
+            <th c:set="#who">Owner</th>
+            <th c:set="#when">Created at</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>verdriet</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-06-06T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>verdriet</code></td>
+            <td><code>user-4243</code></td>
+            <td><code>2015-06-07T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>angst</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-07-07T07:07:07+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>angst</code></td>
+            <td><code>user-4243</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>blijdschap</code></td>
+            <td><code>user-4241</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
+            <td><code>angst</code></td>
+            <td><code>peer-1337</code></td>
+            <td><code>2015-08-08T08:08:08+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
+            <td><code>blijdschap</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="alert alert-info sm">
+        We show how to find the annotations of type
+        <mark><strong>Tag</strong></mark>
+        grouped by <mark><strong>value</strong></mark>
+        and sorted on the amount of annotations per value, in descending order.
+    </div>
+
+    <h:request>
+        We
+        <h:post>/searches</h:post>
+        the body
+        <h:jsonBody>{
+            "query": {
+                "find": "annotation",
+                "where": "type:eq(\"Tag\")",
+                "sort": "-_list.size resource.id",
+                "return": "value, list(resource.id,id,who)"
+            } }
+        </h:jsonBody>
+        and observe status
+        <h:status>201 Created</h:status>
+        with the Location header pointing to the results of our query.
+    </h:request>
+
+    <div c:execute="#searchId = uuid()">&#160;</div>
+
+    <h:request>We follow the Location header and
+        <h:get>/searches/$searchId</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+   "searchResultPage":{
+      "pageNumber":1,
+      "searchInfo":{
+         "totalResults":3,
+         "totalPages":1
+      },
+      "records":[
+         {
+            "_resultNumber":1,
+            "value":"angst",
+            "_list.size":3,
+            "_list":[
+               {
+                 "resource.id":"00000003-5b7f-11e5-898c-237ee1c6d1d4",
+                  "id":"{uuid.anyValid}",
+                  "who":"user-4243"
+               },
+               {
+                 "resource.id":"00000003-5b7f-11e5-898c-237ee1c6d1d4",
+                  "id":"{uuid.anyValid}",
+                  "who":"user-4242"
+               },
+               {
+                 "resource.id":"deadbeef-5b7f-11e5-8fb4-5371419560ec",
+                  "id":"{uuid.anyValid}",
+                  "who":"peer-1337"
+               }
+            ]
+         },
+         {
+            "_resultNumber":2,
+            "value":"verdriet",
+            "_list.size":2,
+            "_list":[
+               {
+                  "id":"{uuid.anyValid}",
+                  "resource.id":"00000001-5ba6-11e5-9054-ab0dd746f7f7",
+                  "who":"user-4242"
+               },
+               {
+                  "id":"{uuid.anyValid}",
+                  "resource.id":"00000001-5ba6-11e5-9054-ab0dd746f7f7",
+                  "who":"user-4243"
+               }
+            ]
+         },
+         {
+            "_resultNumber":3,
+            "value":"blijdschap",
+            "_list.size":2,
+            "_list":[
+               {
+                  "id":"{uuid.anyValid}",
+                  "resource.id":"00000003-5b7f-11e5-898c-237ee1c6d1d4",
+                  "who":"user-4241"
+               },
+               {
+                  "id":"{uuid.anyValid}",
+                  "resource.id":"deadbeef-5b7f-11e5-8fb4-5371419560ec",
+                  "who":"user-4242"
+               }
+            ]
+         }
+      ]
+   }
+}
+        </h:jsonResponse>
+    </h:request>
+</div>
+
+<div id="nla374_3" data-desc="How do I get all the values for a given annotation type?" c:execute="clearStorage()">
+    Given the following annotated resources (for brevity, all annotations are considered to be of type 'Tag')
+    in order of creation timestamp
+    <table class="table"
+           c:execute="resourceExistsWithTagForUserAtInstant(#resId, #value, #who, #when)">
+        <thead>
+        <tr>
+            <th c:set="#resId">Resource Id</th>
+            <th c:set="#value">Annotation value</th>
+            <th c:set="#who">Owner</th>
+            <th c:set="#when">Created at</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>verdriet</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-06-06T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>verdriet</code></td>
+            <td><code>user-4243</code></td>
+            <td><code>2015-06-07T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>angst</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-07-07T07:07:07+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>angst</code></td>
+            <td><code>user-4243</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>blijdschap</code></td>
+            <td><code>user-4241</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
+            <td><code>angst</code></td>
+            <td><code>peer-1337</code></td>
+            <td><code>2015-08-08T08:08:08+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
+            <td><code>blijdschap</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="alert alert-info sm">
+        We show how to find the unique annotation values of type
+        <mark><strong>Tag</strong></mark>
+    </div>
+
+    <h:request>
+        We
+        <h:post>/searches</h:post>
+        the body
+        <h:jsonBody>{
+            "query": {
+                "find": "annotation",
+                "distinct": "true",
+                "where": "type:eq(\"Tag\")",
+                "sort": "value",
+                "return": "value"
+            } }
+        </h:jsonBody>
+        and observe status
+        <h:status>201 Created</h:status>
+        with the Location header pointing to the results of our query.
+    </h:request>
+
+    <div c:execute="#searchId = uuid()">&#160;</div>
+
+    <h:request>We follow the Location header and
+        <h:get>/searches/$searchId</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>
+{
+   "searchResultPage":{
+      "pageNumber":1,
+      "searchInfo":{
+         "totalResults":3,
+         "totalPages":1
+      },
+      "records":[
+         {
+            "_resultNumber":1,
+            "value":"angst"
+         },
+         {
+            "_resultNumber":2,
+            "value":"blijdschap"
+         },
+         {
+            "_resultNumber":3,
+            "value":"verdriet"
+         }
+      ]
+   }
+}
+        </h:jsonResponse>
+    </h:request>
 </div>
 
 </body>
