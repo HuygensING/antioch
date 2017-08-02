@@ -85,6 +85,68 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
   }
 
   @Test
+  public void testNLA368() {
+    // Request all annotations.
+    // Show results per page,
+    // sorted by date of last modification.
+    // This should be an easy way for editors to check which annotations have been added/modified.
+    UUID resource1UUID = createResource("ref1");
+    UUID subResource1UUID = createSubResource(resource1UUID, "ref1.1");
+    UUID resource2UUID = createResource("ref2");
+
+    UUID annotationUUID1 = annotateResource(resource1UUID, "type1", "value1");
+    UUID annotationUUID2 = annotateResource(resource2UUID, "type2", "value2");
+    UUID annotationUUID3 = annotateResource(subResource1UUID, "type3", "value3");
+
+    AlexandriaQuery query = new AlexandriaQuery()//
+        .setFind("annotation")//
+        .setReturns("id,who,type,value")//
+        .setSort("-when")//
+        ;
+    UUID searchUUID = client.addSearch(query);
+    SearchResultPage searchResultPage = client.getSearchResultPage(searchUUID);
+    Log.info("searchResultPage={}", searchResultPage);
+    List<Map<String, Object>> records = searchResultPage.getRecords();
+    assertThat(records).hasSize(3);
+    assertThat(records.get(0).get("id")).isEqualTo(annotationUUID3.toString());
+    assertThat(records.get(1).get("id")).isEqualTo(annotationUUID2.toString());
+    assertThat(records.get(2).get("id")).isEqualTo(annotationUUID1.toString());
+    client.deprecateAnnotation(annotationUUID1);
+    client.deprecateAnnotation(annotationUUID2);
+    client.deprecateAnnotation(annotationUUID3);
+  }
+
+  @Test
+  public void testNLA368a() {
+    UUID resource1UUID = createResource("ref1");
+    UUID subResource1UUID = createSubResource(resource1UUID, "ref1.1");
+    UUID resource2UUID = createResource("ref2");
+
+    UUID annotationUUID1 = annotateResource(resource1UUID, "type1", "value1");
+    UUID annotationUUID2 = annotateResource(resource2UUID, "type2", "value2");
+    UUID annotationUUID3 = annotateResource(subResource1UUID, "type3", "value3");
+    updateAnnotation(annotationUUID2, "type2", "value4");
+
+    AlexandriaQuery query = new AlexandriaQuery()//
+        .setFind("annotation")//
+        .setReturns("id,who,type,value")//
+        .setSort("-when")//
+        ;
+    UUID searchUUID = client.addSearch(query);
+    SearchResultPage searchResultPage = client.getSearchResultPage(searchUUID);
+    Log.info("searchResultPage={}", searchResultPage);
+    List<Map<String, Object>> records = searchResultPage.getRecords();
+    assertThat(records).hasSize(3);
+    assertThat(records.get(0).get("id")).isEqualTo(annotationUUID2.toString());
+    assertThat(records.get(1).get("id")).isEqualTo(annotationUUID3.toString());
+    assertThat(records.get(2).get("id")).isEqualTo(annotationUUID1.toString());
+    assertThat(records.get(0).get("value")).isEqualTo("value4");
+    client.deprecateAnnotation(annotationUUID1);
+    client.deprecateAnnotation(annotationUUID2);
+    client.deprecateAnnotation(annotationUUID3);
+  }
+
+  @Test
   public void testNLA369() throws InterruptedException {
     // A user requests a list of all their annotations.
     // Current situation: Results are shown grouped by resource and sorted by the date of
@@ -163,6 +225,13 @@ public class OptimisticAlexandriaClientTest extends AlexandriaTestWithTestServer
         .setType(annotationType)//
         .setValue(annotationValue);
     return client.annotateResource(resourceUuid, annotationPrototype);
+  }
+
+  protected void updateAnnotation(UUID annotationUUID, String annotationType, String annotationValue) {
+    AnnotationPrototype annotationPrototype = new AnnotationPrototype()//
+        .setType(annotationType)//
+        .setValue(annotationValue);
+    client.updateAnnotation(annotationUUID, annotationPrototype);
   }
 
   boolean returnsRestResult(Method method) {
