@@ -433,7 +433,7 @@ public class AlexandriaQueryParser {
         .map(AlexandriaQueryParser::ordering)//
         .collect(toList());
     if (orderings.isEmpty()) {
-      return ordering(new SortToken().setField(QueryField.id));
+      return ordering(new SortToken().setField(QueryField.when).setAscending(false));
     }
     Ordering<AnnotationVF> order = orderings.remove(0);
     for (final Ordering<AnnotationVF> suborder : orderings) {
