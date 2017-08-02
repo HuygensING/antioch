@@ -52,16 +52,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
 
 @Singleton
 public class TinkerPopService implements AlexandriaService {
@@ -569,7 +562,7 @@ public class TinkerPopService implements AlexandriaService {
       // }
     }
     rvf.getSubResources()//
-            .forEach(vf -> resource.addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
+        .forEach(vf -> resource.addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
     return resource;
   }
 
@@ -692,11 +685,11 @@ public class TinkerPopService implements AlexandriaService {
     }
     if (pQuery.doGrouping()) {
       mapStream = mapStream//
-        .collect(groupingBy(pQuery::concatenateGroupByFieldsValues))//
-        .values().stream()//
-        .map(pQuery::collectListFieldValues)//
-        .map(this::addListSize);
-      if (pQuery.sortOnListSize()){
+          .collect(groupingBy(pQuery::concatenateGroupByFieldsValues, LinkedHashMap::new, toList()))//
+          .values().stream()//
+          .map(pQuery::collectListFieldValues)//
+          .map(this::addListSize);
+      if (pQuery.sortOnListSize()) {
         mapStream = mapStream.sorted(pQuery.getListSizeComparator());
       }
     }
@@ -704,7 +697,7 @@ public class TinkerPopService implements AlexandriaService {
         .collect(toList());
   }
 
-  private Map<String, Object> addListSize(Map<String, Object> resultMap){
+  private Map<String, Object> addListSize(Map<String, Object> resultMap) {
     resultMap.put("_list.size", ((List<Object>) resultMap.get("_list")).size());
     return resultMap;
   }
