@@ -33,7 +33,7 @@ import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 
 @JsonTypeName(JsonTypeNames.ANNOTATIONLIST)
 public class AnnotationList extends JsonWrapperObject implements List<AnnotationPojo> {
-  List<AnnotationPojo> delegate = Lists.newArrayList();
+  final List<AnnotationPojo> delegate = Lists.newArrayList();
 
   // delegated methods
 

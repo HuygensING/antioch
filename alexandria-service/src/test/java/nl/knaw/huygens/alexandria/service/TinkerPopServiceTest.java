@@ -51,7 +51,7 @@ import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 
 public class TinkerPopServiceTest extends AlexandriaTest {
 
-  TinkerPopService service = new TinkerGraphService(new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()));
+  final TinkerPopService service = new TinkerGraphService(new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()));
 
   @Test
   public void testReadAfterCreateIsIdentity() {

@@ -49,7 +49,7 @@ public class ProcessStatusMap<T extends ProcessStatus> {
     List<UUID> expiredEntries = map.keySet().stream()//
         .filter(uuid -> map.get(uuid).isExpired())//
         .collect(toList());
-    expiredEntries.forEach(key -> map.remove(key));
+    expiredEntries.forEach(map::remove);
   }
 
 }

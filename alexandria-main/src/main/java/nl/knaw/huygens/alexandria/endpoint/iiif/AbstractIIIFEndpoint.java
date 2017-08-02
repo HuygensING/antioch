@@ -34,7 +34,7 @@ import nl.knaw.huygens.alexandria.endpoint.JSONEndpoint;
 @Produces(JSONLD_MEDIATYPE)
 public abstract class AbstractIIIFEndpoint extends JSONEndpoint {
 
-  private URI id;
+  private final URI id;
 
   public AbstractIIIFEndpoint(URI id) {
     this.id = id;

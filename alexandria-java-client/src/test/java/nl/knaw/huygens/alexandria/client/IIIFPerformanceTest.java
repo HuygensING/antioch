@@ -171,11 +171,11 @@ public class IIIFPerformanceTest extends AlexandriaTestWithTestServer {
       webannotation.putKeyValue("motivation", motivation);
 
       List<Map<String, String>> resourceList = new ArrayList<>(2);
-      resourceList.add(ImmutableMap.<String, String>of(//
+      resourceList.add(ImmutableMap.of(//
               "@type", "oa:Tag", //
               "chars", "Square"//
       ));
-      resourceList.add(ImmutableMap.<String, String>of(//
+      resourceList.add(ImmutableMap.of(//
               "@type", "dctypes:Text", //
               "format", "text/html", //
               "chars", "<p>text " + i + "</p>"//

@@ -64,7 +64,7 @@ public abstract class AbstractAccountable implements Accountable {
     this.stateSince = Instant.now();
   }
 
-  Set<AlexandriaState> ACTIVE_STATES = ImmutableSet.of(AlexandriaState.CONFIRMED, AlexandriaState.TENTATIVE);
+  final Set<AlexandriaState> ACTIVE_STATES = ImmutableSet.of(AlexandriaState.CONFIRMED, AlexandriaState.TENTATIVE);
 
   public boolean isActive() {
     return ACTIVE_STATES.contains(this.state);
