@@ -33,9 +33,9 @@ import nl.knaw.huygens.alexandria.api.model.search.QueryField;
 import nl.knaw.huygens.alexandria.api.model.search.QueryFunction;
 
 public class QueryVisitor extends AQLBaseVisitor<Void> {
-  public static final String QUOTE = String.valueOf('"');
+  private static final String QUOTE = String.valueOf('"');
 
-  private List<WhereToken> whereTokens = Lists.newArrayList();
+  private final List<WhereToken> whereTokens = Lists.newArrayList();
 
   @Override
   public Void visitSubQuery(SubQueryContext ctx) {

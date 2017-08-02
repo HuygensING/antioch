@@ -35,7 +35,7 @@ public class SearchEntity implements Entity {
     return searchResult;
   }
 
-  public void setSearchResult(SearchResult searchResult) {
+  private void setSearchResult(SearchResult searchResult) {
     this.searchResult = searchResult;
   }
 

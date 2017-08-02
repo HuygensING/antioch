@@ -31,8 +31,8 @@ import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 
 public class TextLocatorFactoryTest extends AlexandriaTest {
 
-  private AlexandriaService service = Mockito.mock(AlexandriaService.class);
-  private TextLocatorFactory textLocatorFactory = new TextLocatorFactory(service);
+  private final AlexandriaService service = Mockito.mock(AlexandriaService.class);
+  private final TextLocatorFactory textLocatorFactory = new TextLocatorFactory(service);
 
   @Test
   public void testInPrefixReturnsByIdTextLocator() throws TextLocatorParseException {

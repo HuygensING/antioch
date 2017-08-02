@@ -32,13 +32,10 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class IIIFManifestEndpoint extends AbstractIIIFEndpoint {
 
-  private AlexandriaService service;
-  private String identifier;
-
   public IIIFManifestEndpoint(String identifier, AlexandriaService service, URI id) {
     super(id);
-    this.identifier = identifier;
-    this.service = service;
+    String identifier1 = identifier;
+    AlexandriaService service1 = service;
   }
 
   @GET

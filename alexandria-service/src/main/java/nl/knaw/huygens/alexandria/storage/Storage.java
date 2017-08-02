@@ -57,7 +57,7 @@ import peapod.FramedGraphTraversal;
 
 @Singleton
 public class Storage {
-  private static Logger LOG = LoggerFactory.getLogger(Storage.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Storage.class);
   public static final String IDENTIFIER_PROPERTY = "uuid";
 
   private Graph graph;
@@ -76,7 +76,7 @@ public class Storage {
   // - public methods - //
 
   // This is for the acceptancetest's benefit, so the tests kan start with a clear graph
-  public void setGraph(final Graph graph) {
+  private void setGraph(final Graph graph) {
     this.graph = graph;
     this.framedGraph = new FramedGraph(graph, ResourceVF.class.getPackage());
     final GraphFeatures graphFeatures = graph.features().graph();
@@ -84,7 +84,7 @@ public class Storage {
     this.supportsTransactions = graphFeatures.supportsTransactions();
   }
 
-  public boolean supportsTransactions() {
+  private boolean supportsTransactions() {
     return supportsTransactions;
   }
 
@@ -244,7 +244,7 @@ public class Storage {
     }
   }
 
-  public void saveToDisk(final String file) {
+  private void saveToDisk(final String file) {
     if (file != null) {
       System.out.println("storing db to " + file + "...");
       try {

@@ -26,8 +26,8 @@ import java.util.regex.Pattern;
 import com.google.common.collect.Lists;
 
 public class XMLUtil {
-  static final Pattern ELEMENTNAME_PATTERN1 = Pattern.compile("[_a-zA-Z].*");
-  static final Pattern ELEMENTNAME_PATTERN2 = Pattern.compile("[\\w-\\.:]+");
+  private static final Pattern ELEMENTNAME_PATTERN1 = Pattern.compile("[_a-zA-Z].*");
+  private static final Pattern ELEMENTNAME_PATTERN2 = Pattern.compile("[\\w-\\.:]+");
 
   public static List<String> validateElementName(final String elementName) {
     List<String> validationErrors = Lists.newArrayList();

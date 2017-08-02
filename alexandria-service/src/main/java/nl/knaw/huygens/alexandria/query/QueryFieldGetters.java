@@ -28,8 +28,8 @@ import com.google.common.collect.ImmutableMap;
 import nl.knaw.huygens.alexandria.api.model.search.QueryField;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 
-public class QueryFieldGetters {
-  static final Map<QueryField, Function<AnnotationVF, Object>> getterMap = ImmutableMap.<QueryField, Function<AnnotationVF, Object>> builder()//
+class QueryFieldGetters {
+  private static final Map<QueryField, Function<AnnotationVF, Object>> getterMap = ImmutableMap.<QueryField, Function<AnnotationVF, Object>> builder()//
       .put(QueryField.id, AlexandriaQueryParser::getAnnotationId) //
       .put(QueryField.url, AlexandriaQueryParser::getAnnotationURL) //
       .put(QueryField.when, AnnotationVF::getProvenanceWhen) //

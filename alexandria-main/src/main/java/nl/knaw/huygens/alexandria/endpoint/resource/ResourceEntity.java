@@ -39,7 +39,7 @@ import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 public class ResourceEntity extends AbstractResourceEntity {
 
   @JsonIgnore
-  final AlexandriaResource resource;
+  private final AlexandriaResource resource;
 
   public static ResourceEntity of(AlexandriaResource someResource) {
     return new ResourceEntity(someResource);

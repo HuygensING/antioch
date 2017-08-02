@@ -30,7 +30,7 @@ import com.google.common.cache.CacheBuilder;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 
 public class AlexandriaResourceCache {
-  static Cache<String, Optional<AlexandriaResource>> cache = CacheBuilder.newBuilder()//
+  private static final Cache<String, Optional<AlexandriaResource>> cache = CacheBuilder.newBuilder()//
       .maximumSize(1000)//
       .build();
 
@@ -38,7 +38,7 @@ public class AlexandriaResourceCache {
     cache.put(resource.getCargo(), Optional.of(resource));
   }
 
-  static final Callable<Optional<AlexandriaResource>> EMPTY_WHEN_MISSING = Optional::empty;
+  private static final Callable<Optional<AlexandriaResource>> EMPTY_WHEN_MISSING = Optional::empty;
 
   public Optional<AlexandriaResource> get(String cargo) {
     Optional<AlexandriaResource> oResource = Optional.empty();

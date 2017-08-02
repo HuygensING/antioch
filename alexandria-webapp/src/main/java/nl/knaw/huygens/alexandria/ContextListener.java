@@ -41,9 +41,9 @@ import nl.knaw.huygens.alexandria.util.Scheduler;
 
 @WebListener
 public class ContextListener extends JerseyGuiceServletContextListener {
-  public static final String CONFIG_FILE = "config.properties";
-  public static final String BASE_URI_PROP = "baseURI";
-  public static final String STORAGE_DIRECTORY_PROP = "storageDirectory";
+  private static final String CONFIG_FILE = "config.properties";
+  private static final String BASE_URI_PROP = "baseURI";
+  private static final String STORAGE_DIRECTORY_PROP = "storageDirectory";
 
   @Override
   protected List<? extends Module> modules() {

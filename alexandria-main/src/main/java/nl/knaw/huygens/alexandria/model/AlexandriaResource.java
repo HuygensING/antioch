@@ -29,7 +29,7 @@ import jersey.repackaged.com.google.common.collect.Lists;
 public class AlexandriaResource extends AbstractAnnotatable implements Comparable<AlexandriaResource> {
   private String cargo; // ref for resource, sub for subresource
   private Optional<IdentifiablePointer<AlexandriaResource>> parentResourcePointer = Optional.empty(); // only used in subresources
-  private Collection<IdentifiablePointer<AlexandriaResource>> subResourcePointers = Lists.newArrayList();
+  private final Collection<IdentifiablePointer<AlexandriaResource>> subResourcePointers = Lists.newArrayList();
   // private List<TextView> directTextViews = new ArrayList<>();
   private boolean hasText = false;
 

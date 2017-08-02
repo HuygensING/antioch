@@ -28,8 +28,8 @@ public class AlexandriaPropertiesConfiguration {
   private static final String PROPERTIES_FILE = "alexandria.properties";
   private static final String PROPERTY_ADMINKEY = "adminkey";
   private static final String PROPERTY_AUTHKEY_PREFIX = "authkey.";
-  private Map<String, String> authKeyIndex;
-  private String adminKey;
+  private final Map<String, String> authKeyIndex;
+  private final String adminKey;
 
   public AlexandriaPropertiesConfiguration(String storageDirectory) {
     PropertiesConfiguration properties = new PropertiesConfiguration(storageDirectory + "/" + PROPERTIES_FILE, false);

@@ -29,8 +29,8 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import com.google.common.collect.Lists;
 
 public class CommandResponse {
-  private List<String> errorLines = Lists.newArrayList();
-  boolean parametersAreValid = false;
+  private final List<String> errorLines = Lists.newArrayList();
+  private boolean parametersAreValid = false;
   private Object result;
   private boolean async = false;
   private UUID statusId;

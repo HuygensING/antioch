@@ -20,7 +20,7 @@ package nl.knaw.huygens.alexandria.endpoint.search;
  * #L%
  */
 
-public class SearchResultEntityBuilder {
+class SearchResultEntityBuilder {
 
   public SearchEntity build(SearchResult searchResult) {
     return SearchEntity.of(searchResult);

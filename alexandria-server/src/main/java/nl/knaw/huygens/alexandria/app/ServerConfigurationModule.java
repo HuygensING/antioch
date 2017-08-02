@@ -24,7 +24,7 @@ import com.google.inject.AbstractModule;
 
 import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 
-public class ServerConfigurationModule extends AbstractModule {
+class ServerConfigurationModule extends AbstractModule {
 
   @Override
   protected void configure() {

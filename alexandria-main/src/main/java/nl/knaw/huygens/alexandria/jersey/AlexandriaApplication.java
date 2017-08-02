@@ -41,7 +41,7 @@ import nl.knaw.huygens.alexandria.jaxrs.CORSFilter;
 
 @ApplicationPath("/")
 public class AlexandriaApplication extends ResourceConfig {
-  static final Logger LOG = LoggerFactory.getLogger(AlexandriaApplication.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AlexandriaApplication.class);
   public static final String START_TIME_PROPERTY = "alexandria.startTime";
 
   public AlexandriaApplication() {

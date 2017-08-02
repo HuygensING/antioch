@@ -25,8 +25,8 @@ import java.util.Map;
 
 public class ThreadContext {
   private static final String DEFAULT_USERNAME = "nederlab"; // TODO: remove the need for this.
-  private static ThreadLocal<Map<String, Object>> threadLocalMap = new ThreadLocal<>();
-  private static ThreadLocal<String> threadLocalUsername = new ThreadLocal<>();
+  private static final ThreadLocal<Map<String, Object>> threadLocalMap = new ThreadLocal<>();
+  private static final ThreadLocal<String> threadLocalUsername = new ThreadLocal<>();
 
   public static void put(String key, Object value) {
     getMap().put(key, value);

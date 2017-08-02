@@ -44,7 +44,7 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 @Api("admin")
 public class AdminEndpoint extends JSONEndpoint {
   private final AlexandriaService service;
-  private String adminKey;
+  private final String adminKey;
   private static String storageDirectory;
 
   @Inject

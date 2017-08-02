@@ -30,17 +30,12 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class IIIFContentEndpoint extends AbstractIIIFEndpoint {
 
-  private AlexandriaService service;
-  private String name;
-  private String identifier;
-  private String format;
-
   public IIIFContentEndpoint(String identifier, String name, String format, AlexandriaService service, URI id) {
     super(id);
-    this.identifier = identifier;
-    this.name = name;
-    this.format = format;
-    this.service = service;
+    String identifier1 = identifier;
+    String name1 = name;
+    String format1 = format;
+    AlexandriaService service1 = service;
   }
 
   @GET

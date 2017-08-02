@@ -28,7 +28,7 @@ import nl.knaw.huygens.alexandria.api.model.ErrorEntity;
 
 public class ConflictException extends WebApplicationException {
   private static final long serialVersionUID = 1L;
-  static final ErrorEntity DEFAULT_ENTITY = ErrorEntityBuilder.build("");
+  private static final ErrorEntity DEFAULT_ENTITY = ErrorEntityBuilder.build("");
   private String message;
 
   public ConflictException() {

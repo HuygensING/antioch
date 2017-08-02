@@ -32,7 +32,7 @@ public class ProvenancePrototype {
   private InstantParam when;
   private String why;
 
-  public Optional<String> getWho() {
+  private Optional<String> getWho() {
     return Optional.ofNullable(who);
   }
 
@@ -40,7 +40,7 @@ public class ProvenancePrototype {
     return when == null ? Instant.now() : when.getValue();
   }
 
-  public Optional<String> getWhy() {
+  private Optional<String> getWhy() {
     return Optional.ofNullable(why);
   }
 

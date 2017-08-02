@@ -54,7 +54,7 @@ public class ResourceValidatorFactory {
     return validateExistingResource(uuidParam.getValue());
   }
 
-  public ResourceValidator validateExistingResource(UUID uuid) {
+  private ResourceValidator validateExistingResource(UUID uuid) {
     return new ResourceValidator(uuid);
   }
 

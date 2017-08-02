@@ -30,7 +30,7 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
 
 public class AnnotationEntityBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(AnnotationEntityBuilder.class);
-  private LocationBuilder locationBuilder;
+  private final LocationBuilder locationBuilder;
 
   @Inject
   public AnnotationEntityBuilder(LocationBuilder locationBuilder) {

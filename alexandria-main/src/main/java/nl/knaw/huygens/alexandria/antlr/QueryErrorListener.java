@@ -35,7 +35,7 @@ import com.google.common.collect.Lists;
 
 public class QueryErrorListener extends BaseErrorListener {
   private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(QueryErrorListener.class);
-  private Collection<String> parseErrors = Lists.newArrayList();
+  private final Collection<String> parseErrors = Lists.newArrayList();
 
   @Override
   public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) {

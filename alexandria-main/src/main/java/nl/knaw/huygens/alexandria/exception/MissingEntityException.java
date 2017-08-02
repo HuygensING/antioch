@@ -20,7 +20,7 @@ package nl.knaw.huygens.alexandria.exception;
  * #L%
  */
 
-public class MissingEntityException extends BadRequestException {
+class MissingEntityException extends BadRequestException {
   private static final long serialVersionUID = 1L;
 
   public MissingEntityException() {

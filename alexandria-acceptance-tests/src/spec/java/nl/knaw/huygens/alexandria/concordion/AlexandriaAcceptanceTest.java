@@ -66,11 +66,11 @@ import static nl.knaw.huygens.alexandria.api.model.AlexandriaState.CONFIRMED;
 public class AlexandriaAcceptanceTest extends RestFixture {
   private static final AlexandriaConfiguration CONFIG = testConfiguration();
 
-  private static Storage storage = tinkerGraphStorage();
+  private static final Storage storage = tinkerGraphStorage();
 
-  private static LocationBuilder locationBuilder = new LocationBuilder(testConfiguration(), new EndpointPathResolver());
+  private static final LocationBuilder locationBuilder = new LocationBuilder(testConfiguration(), new EndpointPathResolver());
 
-  private static TinkerPopService service = new TinkerPopService(storage, locationBuilder);
+  private static final TinkerPopService service = new TinkerPopService(storage, locationBuilder);
 
   private final AtomicInteger nextUniqueExpressionNumber = new AtomicInteger();
 

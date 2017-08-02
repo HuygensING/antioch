@@ -52,7 +52,7 @@ public class SearchEndpoint extends JSONEndpoint {
 
   private final AlexandriaService service;
   private final LocationBuilder locationBuilder;
-  private SearchFactory searchFactory;
+  private final SearchFactory searchFactory;
 
   @Inject
   public SearchEndpoint(final AlexandriaService service, //

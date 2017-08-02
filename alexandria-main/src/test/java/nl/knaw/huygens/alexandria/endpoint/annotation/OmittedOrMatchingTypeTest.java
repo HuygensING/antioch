@@ -37,8 +37,6 @@ import org.junit.Test;
 public class OmittedOrMatchingTypeTest {
   private final UUIDParam uuidParam = new UUIDParam(UUID.randomUUID().toString());
 
-  private AlexandriaService service;
-  private AlexandriaAnnotation annotation;
   private OmittedOrMatchingType.Validator validator;
   private AnnotationPrototype mockPrototype;
 
@@ -47,10 +45,10 @@ public class OmittedOrMatchingTypeTest {
     final AlexandriaAnnotationBody annotationBody = mock(AlexandriaAnnotationBody.class);
     when(annotationBody.getType()).thenReturn("some type");
 
-    annotation = mock(AlexandriaAnnotation.class);
+    AlexandriaAnnotation annotation = mock(AlexandriaAnnotation.class);
     when(annotation.getBody()).thenReturn(annotationBody);
 
-    service = mock(AlexandriaService.class);
+    AlexandriaService service = mock(AlexandriaService.class);
     when(service.readAnnotation(uuidParam.getValue())).thenReturn(Optional.of(annotation));
 
     validator = new OmittedOrMatchingType.Validator(service, uuidParam);

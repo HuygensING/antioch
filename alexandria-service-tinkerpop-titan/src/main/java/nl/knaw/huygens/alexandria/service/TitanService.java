@@ -73,10 +73,10 @@ public class TitanService extends TinkerPopService {
     IDX_ANNOTATIONBODY_UUID("AnnotationBody", Storage.IDENTIFIER_PROPERTY, UNIQUE), //
     IDX_ANNOTATIONBODY_TYPE("AnnotationBody", PROP_TYPE, !UNIQUE);
 
-    public String label;
-    public String property;
-    public boolean unique;
-    public String name;
+    public final String label;
+    public final String property;
+    public final boolean unique;
+    public final String name;
 
     VertexCompositeIndex(String label, String property, boolean unique) {
       this.label = label;
@@ -88,13 +88,13 @@ public class TitanService extends TinkerPopService {
   }
 
   private static TitanGraph titanGraph;
-  private AlexandriaConfiguration configuration;
+  private final AlexandriaConfiguration configuration;
 
   static class IndexInfo {
-    private String name;
-    private String backingIndex;
-    private Class<? extends Element> indexedElement;
-    private SchemaStatus indexStatus;
+    private final String name;
+    private final String backingIndex;
+    private final Class<? extends Element> indexedElement;
+    private final SchemaStatus indexStatus;
 
     public IndexInfo(TitanGraphIndex index) {
       name = index.name();

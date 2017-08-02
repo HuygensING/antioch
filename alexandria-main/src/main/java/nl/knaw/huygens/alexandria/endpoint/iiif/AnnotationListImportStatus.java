@@ -28,7 +28,7 @@ import java.util.Map;
 
 public class AnnotationListImportStatus extends ProcessStatus {
   private Map<String, Object> processedList;
-  private List<String> errors = Lists.newArrayList();
+  private final List<String> errors = Lists.newArrayList();
 
   public void setProcessedList(Map<String, Object> processedList) {
     this.processedList = processedList;

@@ -31,7 +31,7 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class TextLocatorFactory {
 
-  static Map<String, Function<String, ? extends AlexandriaTextLocator>> prefix2locator = new HashMap<>();
+  private static final Map<String, Function<String, ? extends AlexandriaTextLocator>> prefix2locator = new HashMap<>();
 
   static {
     prefix2locator.put(ByIdTextLocator.PREFIX, (string) -> new ByIdTextLocator().withId(string));

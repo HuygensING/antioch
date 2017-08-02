@@ -30,13 +30,10 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class IIIFCollectionEndpoint extends AbstractIIIFEndpoint {
 
-  private String name;
-  private AlexandriaService service;
-
   public IIIFCollectionEndpoint(String name, AlexandriaService service, URI id) {
     super(id);
-    this.name = name;
-    this.service = service;
+    String name1 = name;
+    AlexandriaService service1 = service;
   }
 
   @GET

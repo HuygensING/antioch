@@ -40,22 +40,20 @@ import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
 
 @JsonInclude(Include.NON_NULL)
 @JsonTypeName("searchResultPage")
-public class SearchResultPage extends JsonWrapperObject {
-  private int pageNumber;
+class SearchResultPage extends JsonWrapperObject {
+  private final int pageNumber;
   @JsonIgnore
-  private String baseURI;
+  private final String baseURI;
   @JsonIgnore
-  private boolean isLast;
+  private final boolean isLast;
   @JsonIgnore
   private List<Map<String, Object>> recordList;
   @JsonIgnore
-  private Function<Map<String, Object>, Integer> counterFunction;
+  private final AtomicInteger counter;
   @JsonIgnore
-  private AtomicInteger counter;
-  @JsonIgnore
-  private int lastPageNumber;
+  private final int lastPageNumber;
 
-  private Map<String, Object> searchInfo;
+  private final Map<String, Object> searchInfo;
 
   public SearchResultPage(String baseURI, int pageNumber, SearchResult searchResult) {
     this.baseURI = baseURI;
@@ -63,7 +61,7 @@ public class SearchResultPage extends JsonWrapperObject {
     this.lastPageNumber = Math.max(1, searchResult.getTotalPages());
     this.isLast = pageNumber == lastPageNumber;
     this.counter = new AtomicInteger(searchResult.getPageSize() * (pageNumber - 1));
-    this.counterFunction = t -> counter.incrementAndGet();
+    Function<Map<String, Object>, Integer> counterFunction = t -> counter.incrementAndGet();
     this.searchInfo = ImmutableMap.<String, Object> builder()//
         .put("id", searchResult.getId())//
         .put("query", searchResult.getQuery())//
@@ -95,10 +93,7 @@ public class SearchResultPage extends JsonWrapperObject {
   }
 
   public void setResults(List<Map<String, Object>> results) {
-    recordList = results.stream().map(r -> {
-      r.put("_resultNumber", counter.incrementAndGet());
-      return r;
-    }).collect(toList());
+    recordList = results.stream().peek(r -> r.put("_resultNumber", counter.incrementAndGet())).collect(toList());
   }
 
   public List<Map<String, Object>> getRecords() {

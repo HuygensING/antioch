@@ -33,8 +33,8 @@ import nl.knaw.huygens.alexandria.config.AlexandriaConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 
 @Singleton
-public class PersistentTinkerGraphService extends TinkerGraphService {
-  private static Logger LOG = LoggerFactory.getLogger(PersistentTinkerGraphService.class);
+class PersistentTinkerGraphService extends TinkerGraphService {
+  private static final Logger LOG = LoggerFactory.getLogger(PersistentTinkerGraphService.class);
   private static final String DUMPFILE = "alexandria.gryo";
 
   @Inject

@@ -64,9 +64,9 @@ import static java.util.stream.Collectors.toList;
 public class TinkerPopService implements AlexandriaService {
   private static final TemporalAmount TENTATIVES_TTL = Duration.ofDays(1);
 
-  protected Storage storage;
-  protected LocationBuilder locationBuilder;
-  private AlexandriaQueryParser alexandriaQueryParser;
+  private Storage storage;
+  private final LocationBuilder locationBuilder;
+  private final AlexandriaQueryParser alexandriaQueryParser;
 
   @Inject
   public TinkerPopService(Storage storage, LocationBuilder locationBuilder) {
@@ -527,7 +527,7 @@ public class TinkerPopService implements AlexandriaService {
     });
   }
 
-  void updateState(AlexandriaVF vf, AlexandriaState newState) {
+  private void updateState(AlexandriaVF vf, AlexandriaState newState) {
     vf.setState(newState.name());
     vf.setStateSince(Instant.now().getEpochSecond());
   }
@@ -569,7 +569,7 @@ public class TinkerPopService implements AlexandriaService {
       // resource.setFirstAncestorResourceWithBaseLayerDefinitionPointer(new IdentifiablePointer<>(AlexandriaResource.class, ancestorResource.getUuid()));
       // }
     }
-    rvf.getSubResources().stream()//
+    rvf.getSubResources()//
             .forEach(vf -> resource.addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
     return resource;
   }
@@ -586,7 +586,7 @@ public class TinkerPopService implements AlexandriaService {
   }
 
 
-  AnnotationVF frameAnnotation(AlexandriaAnnotation newAnnotation) {
+  private AnnotationVF frameAnnotation(AlexandriaAnnotation newAnnotation) {
     AnnotationVF avf = storage.createVF(AnnotationVF.class);
     setAlexandriaVFProperties(avf, newAnnotation);
     avf.setRevision(newAnnotation.getRevision());

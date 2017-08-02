@@ -25,13 +25,13 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class SearchInfo {
-  UUID id;
-  Long searchDurationInMs;
-  int totalPages;
-  int pageSize;
-  int totalResults;
+  private UUID id;
+  private Long searchDurationInMs;
+  private int totalPages;
+  private int pageSize;
+  private int totalResults;
 
-  Object query; // Object, because AlexandriaQuery is wrapped in {"query":{...}} because it's a JsonWrapper
+  private Object query; // Object, because AlexandriaQuery is wrapped in {"query":{...}} because it's a JsonWrapper
 
   public UUID getId() {
     return id;

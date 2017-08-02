@@ -20,7 +20,7 @@ package nl.knaw.huygens.alexandria.storage;
  * #L%
  */
 
-public class EdgeLabels {
+class EdgeLabels {
   public static final String HAS_TEXTGRAPH = "hasTextGraph";
   public static final String FIRST_ANNOTATION = "firstAnnotation";
   public static final String FIRST_TEXT_SEGMENT = "firstTextSegment";

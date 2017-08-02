@@ -46,7 +46,7 @@ public class LocationBuilder {
     return locationOf(identifiable.getClass(), identifiable.getId(), subPaths);
   }
 
-  public URI locationOf(Class<? extends Identifiable> identifiableClass, UUID uuid, String... subPaths) {
+  private URI locationOf(Class<? extends Identifiable> identifiableClass, UUID uuid, String... subPaths) {
     return locationOf(identifiableClass, uuid.toString(), subPaths);
   }
 

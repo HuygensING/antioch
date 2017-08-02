@@ -54,8 +54,8 @@ public class StreamUtil {
   }
 
   public static class NodeIterator implements Iterator<Node> {
-    private NodeList nodelist;
-    private int size;
+    private final NodeList nodelist;
+    private final int size;
     private int i;
 
     NodeIterator(NodeList nodelist) {

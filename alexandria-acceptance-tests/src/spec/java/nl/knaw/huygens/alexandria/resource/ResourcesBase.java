@@ -27,7 +27,7 @@ import nl.knaw.huygens.alexandria.endpoint.resource.ResourcesEndpoint;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchEndpoint;
 import nl.knaw.huygens.alexandria.jersey.exceptionmappers.WebApplicationExceptionMapper;
 
-public class ResourcesBase extends AlexandriaAcceptanceTest {
+class ResourcesBase extends AlexandriaAcceptanceTest {
   @BeforeClass
   public static void registerEndpoint() {
     register(ResourcesEndpoint.class);
