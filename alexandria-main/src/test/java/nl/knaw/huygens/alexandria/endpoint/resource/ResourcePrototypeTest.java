@@ -38,7 +38,7 @@ import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 
 public class ResourcePrototypeTest extends AlexandriaTest {
 
-  private ObjectMapper om = new ObjectMapper();
+  private final ObjectMapper om = new ObjectMapper();
 
   @Test
   public void testJsonRepresentation() throws JsonProcessingException {

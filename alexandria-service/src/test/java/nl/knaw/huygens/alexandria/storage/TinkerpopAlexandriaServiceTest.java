@@ -52,7 +52,7 @@ import nl.knaw.huygens.alexandria.service.TinkerPopService;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 
 public class TinkerpopAlexandriaServiceTest {
-  private static Storage mockStorage = mock(Storage.class);
+  private static final Storage mockStorage = mock(Storage.class);
   private final TinkerPopService service = new TinkerPopService(mockStorage, new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()));
 
   @SuppressWarnings("unchecked")

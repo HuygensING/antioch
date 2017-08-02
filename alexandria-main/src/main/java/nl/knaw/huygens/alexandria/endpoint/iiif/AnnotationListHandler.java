@@ -29,7 +29,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -42,10 +41,10 @@ public class AnnotationListHandler {
 
   private JsonParser jParser;
   private String context;
-  private Deque<String> deque = new ConcurrentLinkedDeque<>();
-  private AtomicBoolean firstField = new AtomicBoolean(true);
-  private AtomicBoolean inResources = new AtomicBoolean(false);
-  private WebAnnotationService webAnnotationService;
+  private final Deque<String> deque = new ConcurrentLinkedDeque<>();
+  private final AtomicBoolean firstField = new AtomicBoolean(true);
+  private final AtomicBoolean inResources = new AtomicBoolean(false);
+  private final WebAnnotationService webAnnotationService;
 
   public AnnotationListHandler(InputStream inputStream, WebAnnotationService webAnnotationService) {
     this.webAnnotationService = webAnnotationService;
@@ -71,7 +70,7 @@ public class AnnotationListHandler {
     return deque.isEmpty() ? null : deque.pop();
   }
 
-  private void handleRootFields() throws IOException, JsonProcessingException {
+  private void handleRootFields() throws IOException {
     if (jParser.nextToken() != JsonToken.END_OBJECT) {
       String fieldname = jParser.getCurrentName();
       if (fieldname != null) {
@@ -118,7 +117,7 @@ public class AnnotationListHandler {
     }
   }
 
-  private void handleNextResource() throws IOException, JsonProcessingException {
+  private void handleNextResource() throws IOException {
     if (jParser.nextToken() != JsonToken.END_ARRAY) {
       if (!firstField.get()) {
         deque.add(",");

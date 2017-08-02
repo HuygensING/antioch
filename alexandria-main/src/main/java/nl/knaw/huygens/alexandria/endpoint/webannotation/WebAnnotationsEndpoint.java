@@ -83,9 +83,8 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 public class WebAnnotationsEndpoint extends JSONEndpoint {
 
   private final AlexandriaService service;
-  private LocationBuilder locationBuilder;
-  private AlexandriaConfiguration config;
-  private WebAnnotationService webAnnotationService;
+  private final LocationBuilder locationBuilder;
+  private final WebAnnotationService webAnnotationService;
 
   @Inject
   public WebAnnotationsEndpoint(AlexandriaService service, //
@@ -93,7 +92,6 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
       AlexandriaConfiguration config) {
     this.service = service;
     this.locationBuilder = locationBuilder;
-    this.config = config;
     this.webAnnotationService = new WebAnnotationService(service, config);
   }
 
@@ -301,7 +299,7 @@ public class WebAnnotationsEndpoint extends JSONEndpoint {
     return json;
   }
 
-  static Supplier<NotFoundException> annotationNotFoundForId(Object id) {
+  private static Supplier<NotFoundException> annotationNotFoundForId(Object id) {
     return () -> new NotFoundException(NoAnnotationFoundWithId(id));
   }
 

@@ -30,7 +30,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 // Thanks to Christoffer Sawicki (qerub) for https://gist.github.com/qerub/9299fce67ab74e114633
-public class Optionals {
+class Optionals {
   private Optionals() {
   }
 
@@ -53,12 +53,12 @@ public class Optionals {
    * This will be included in Java 9, but until then...
    * (https://bugs.openjdk.java.net/browse/JDK-8050820)
    */
-  public static <T> Stream<T> stream(Optional<T> self) {
+  private static <T> Stream<T> stream(Optional<T> self) {
     return self.map(Stream::of).orElseGet(Stream::empty);
   }
 
   @SafeVarargs
-  public static <T> Optional<T> or(Optional<T>... xs) {
+  private static <T> Optional<T> or(Optional<T>... xs) {
     return Arrays.stream(xs).flatMap(Optionals::stream).findFirst();
   }
 }

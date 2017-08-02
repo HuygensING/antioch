@@ -26,7 +26,7 @@ import nl.knaw.huygens.alexandria.api.JsonTypeNames;
 
 @JsonTypeName(JsonTypeNames.RESOURCE)
 public class ResourcePrototype extends Prototype {
-  ResourcePojo delegate = new ResourcePojo();
+  final ResourcePojo delegate = new ResourcePojo();
 
   public ResourcePrototype setRef(String ref) {
     delegate.setRef(ref);

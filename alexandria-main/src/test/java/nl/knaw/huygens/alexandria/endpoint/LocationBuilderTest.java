@@ -36,7 +36,7 @@ import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
 
 public class LocationBuilderTest {
-  LocationBuilder lb = new LocationBuilder(new MockConfiguration(), new EndpointPathResolver());
+  private final LocationBuilder lb = new LocationBuilder(new MockConfiguration(), new EndpointPathResolver());
 
   @Test
   public void testGetLocationOfAlexandriaAnnotationWithUUID() {

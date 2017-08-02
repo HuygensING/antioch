@@ -45,20 +45,20 @@ function a-generate-random-resource-with-annotation {
   id=$(uuidgen)
   a-generate-resource-with-uuid ${id}
   url=$(a-annotate-resource "$id" "Tag" "Test annotation for resource $id" | a-location)
-  a-confirm $url
+  a-confirm ${url}
 }
 
 function a-test {
   id=$(uuidgen)
-  a-generate-resource-with-uuid $id
+  a-generate-resource-with-uuid ${id}
   url=$(a-annotate-resource "$id" "Tag" "Test annotation for resource $id" | a-location)
-  a-confirm $url
-  a-delete $url
+  a-confirm ${url}
+  a-delete ${url}
 }
 
 function a-generate-resource-with-uuid {
   id=$1
-  curl -i -X PUT $be/resources/$id --header "${authheader}" --header 'Content-type: application/json' \
+  curl -i -X PUT ${be}/resources/${id} --header "${authheader}" --header 'Content-type: application/json' \
   --data-binary "{\"resource\":{
     \"id\":\"$id\",
     \"ref\":\"reference $n\"
@@ -68,7 +68,7 @@ function a-generate-resource-with-uuid {
 function a-generate-resource-with-uuid-and-ref {
   id=$1
   ref=$2
-  curl -i -X PUT $be/resources/$id --header "${authheader}" --header 'Content-type: application/json' \
+  curl -i -X PUT ${be}/resources/${id} --header "${authheader}" --header 'Content-type: application/json' \
   --data-binary "{\"resource\":{
     \"id\":\"$id\",
     \"ref\":\"${ref}\"
@@ -76,7 +76,7 @@ function a-generate-resource-with-uuid-and-ref {
 }
 
 function a-generate-confirmed-subresource-with-title {
-  suburi=$(curl -i --header "${authheader}" -X POST $be/resources/$ri/subresources --header 'Content-type: application/json' \
+  suburi=$(curl -i --header "${authheader}" -X POST ${be}/resources/${ri}/subresources --header 'Content-type: application/json' \
     --data-binary '{"subresource":{ "sub":"$1" }}' | a-location )
   a-confirm ${suburi}
   echo ${suburi}
@@ -84,7 +84,7 @@ function a-generate-confirmed-subresource-with-title {
 
 function a-set-baselayer-textview {
   a-log "Setting default baselayer textview for ${be}/resources/$ri"
-  curl -i -H "${authheader}" -X PUT $be/resources/$ri/text/views/baselayer -H 'Content-type: application/json' \
+  curl -i -H "${authheader}" -X PUT ${be}/resources/${ri}/text/views/baselayer -H 'Content-type: application/json' \
      --data-binary '{"textView":{
        "description" : "The base layer",
      	 "ignoredElements": ["note"],
@@ -152,17 +152,17 @@ function a-show-backend {
 }
 
 function a-about {
-  curl $be/about
+  curl ${be}/about
 }
 
 function a-about-service {
-  curl --header "${authheader}" $be/about/service
+  curl --header "${authheader}" ${be}/about/service
 }
 
 function a-dry-run {
   ri=$(uuidgen)
-  a-generate-resource-with-uuid $ri
-  curl -i -H "${authheader}" -X PUT $be/resources/$ri/text/views/baselayer -H 'Content-type: application/json' \
+  a-generate-resource-with-uuid ${ri}
+  curl -i -H "${authheader}" -X PUT ${be}/resources/${ri}/text/views/baselayer -H 'Content-type: application/json' \
   --data-binary '{
     "textView": {
       "description" : "The Base Layer",
@@ -197,12 +197,12 @@ function a-dry-run {
 
 function a-dry-run-from-file {
   ri=$(uuidgen)
-  a-generate-resource-with-uuid $ri
+  a-generate-resource-with-uuid ${ri}
   a-log "result uploading text:"
   location=$(curl -i --header "${authheader}" -X PUT ${be}/resources/${ri}/text --header 'Content-Type:application/octet-stream' --data @"$*" |a-location)
   a-log "Location: ${location}"
   curl --silent ${location} | jq "."
-  curl -i -H "${authheader}" -X PUT $be/resources/$ri/text/views/baselayer -H 'Content-type: application/json' \
+  curl -i -H "${authheader}" -X PUT ${be}/resources/${ri}/text/views/baselayer -H 'Content-type: application/json' \
   --data-binary '{
     "textView": {
       "description" : "The Base Layer",
@@ -240,8 +240,8 @@ function a-gutenberg-import-file {
   shift
   a-log ${title}
   ri=$(uuidgen)
-  a-generate-resource-with-uuid-and-ref $ri "gutenberg:${title}"
-  curl -i -H "${authheader}" -X PUT $be/resources/$ri/baselayerdefinition -H 'Content-type: application/json' \
+  a-generate-resource-with-uuid-and-ref ${ri} "gutenberg:${title}"
+  curl -i -H "${authheader}" -X PUT ${be}/resources/${ri}/baselayerdefinition -H 'Content-type: application/json' \
   --data-binary '{
     "baseLayerDefinition": {
       "subresourceElements": ["note"],
@@ -287,7 +287,7 @@ function a-import-gryo-dump {
   fi
 }
 
-function a-import-gryo-dump {
+function a-import-graphml-dump {
   importfile=$1
   if [[ ! -e ${importfile} ]]; then
     echo "importfile ${importfile} not found"

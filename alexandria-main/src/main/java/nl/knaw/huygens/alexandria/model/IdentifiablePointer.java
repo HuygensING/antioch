@@ -21,8 +21,8 @@ package nl.knaw.huygens.alexandria.model;
  */
 
 public class IdentifiablePointer<T extends Identifiable> {
-  Class<T> clazz;
-  String identifier;
+  private final Class<T> clazz;
+  private final String identifier;
 
   public IdentifiablePointer(Class<T> clazz, String identifier) {
     this.clazz = clazz;

@@ -29,7 +29,7 @@ import nl.knaw.huygens.alexandria.api.model.ErrorEntity;
 
 public class NotFoundException extends WebApplicationException {
   private static final long serialVersionUID = 1L;
-  static final ErrorEntity DEFAULT_ENTITY = ErrorEntityBuilder.build("Not Found");
+  private static final ErrorEntity DEFAULT_ENTITY = ErrorEntityBuilder.build("Not Found");
 
   public NotFoundException() {
     super(Response.status(Status.NOT_FOUND).entity(DEFAULT_ENTITY).build());

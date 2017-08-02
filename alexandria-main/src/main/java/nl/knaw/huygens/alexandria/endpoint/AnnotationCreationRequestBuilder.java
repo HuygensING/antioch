@@ -37,9 +37,9 @@ import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class AnnotationCreationRequestBuilder {
-  public static final String MISSING_TYPE_MESSAGE = "Annotation MUST have a type";
-  public static final String NO_SUCH_ANNOTATION_FORMAT = "Supposedly existing annotation [%s] not found";
-  public static final String MISSING_ANNOTATION_BODY_MESSAGE = "Missing or empty annotation request body";
+  private static final String MISSING_TYPE_MESSAGE = "Annotation MUST have a type";
+  private static final String NO_SUCH_ANNOTATION_FORMAT = "Supposedly existing annotation [%s] not found";
+  private static final String MISSING_ANNOTATION_BODY_MESSAGE = "Missing or empty annotation request body";
 
   // public static AnnotationCreationRequestBuilder servedBy(AlexandriaService service) {
   // return new AnnotationCreationRequestBuilder(service);
@@ -74,11 +74,9 @@ public class AnnotationCreationRequestBuilder {
     // validateCreatedOn(prototype);
     // validateAnnotations(prototype);
 
-    if (resource.isPresent()) {
-      return new AnnotationCreationRequest(resource.get(), prototype);
-    }
+    return resource.map(alexandriaResource -> new AnnotationCreationRequest(alexandriaResource, prototype))//
+        .orElseGet(() -> new AnnotationCreationRequest(annotation.get(), prototype));
 
-    return new AnnotationCreationRequest(annotation.get(), prototype);
   }
 
   protected void validateId(AnnotationPrototype prototype) {
@@ -125,11 +123,11 @@ public class AnnotationCreationRequestBuilder {
     return () -> badRequestException(MISSING_TYPE_MESSAGE);
   }
 
-  protected Supplier<BadRequestException> noSuchAnnotationException(UUID uuid) {
+  private Supplier<BadRequestException> noSuchAnnotationException(UUID uuid) {
     return () -> badRequestException(String.format(NO_SUCH_ANNOTATION_FORMAT, uuid.toString()));
   }
 
-  protected BadRequestException badRequestException(String message) {
+  private BadRequestException badRequestException(String message) {
     // Log.trace(message);
     return new BadRequestException(message);
   }

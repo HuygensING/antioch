@@ -34,9 +34,9 @@ import java.util.List;
 import java.util.Map;
 
 public class AnnotationListImportTask implements Runnable {
-  private IIIFAnnotationList annotationList;
+  private final IIIFAnnotationList annotationList;
   private final WebAnnotationService webAnnotationService;
-  private AnnotationListImportStatus status;
+  private final AnnotationListImportStatus status;
 
   public AnnotationListImportTask(IIIFAnnotationList annotationList, WebAnnotationService webAnnotationService) {
     this.annotationList = annotationList;

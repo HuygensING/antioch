@@ -24,9 +24,9 @@ import java.util.UUID;
 
 public class WebAnnotation {
 
+  private final UUID uuid;
   private String json = "";
   private String eTag = "";
-  private UUID uuid;
 
   public WebAnnotation(UUID id) {
     this.uuid = id;

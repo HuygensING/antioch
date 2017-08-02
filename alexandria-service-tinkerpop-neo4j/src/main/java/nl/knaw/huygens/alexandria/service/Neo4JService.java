@@ -33,7 +33,7 @@ import nl.knaw.huygens.alexandria.storage.Storage;
  */
 
 @Singleton
-public class Neo4JService extends TinkerPopService {
+class Neo4JService extends TinkerPopService {
 
   private static Neo4jGraph graph;
 

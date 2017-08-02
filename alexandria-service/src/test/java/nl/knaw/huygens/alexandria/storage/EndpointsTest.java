@@ -55,7 +55,7 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class EndpointsTest extends TinkergraphServiceEndpointTest {
   private static final String ROOTPATH = EndpointPaths.RESOURCES;
-  static ObjectMapper om = new ObjectMapper();
+  private static final ObjectMapper om = new ObjectMapper();
 
   @BeforeClass
   public static void registerEndpoint() {

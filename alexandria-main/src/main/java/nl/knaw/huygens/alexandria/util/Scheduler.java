@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 public class Scheduler {
-  private CleanupCommand cleanupCommand;
+  private final CleanupCommand cleanupCommand;
 
   @Inject
   private Scheduler(CleanupCommand cleanupCommand) {

@@ -28,7 +28,7 @@ import nl.knaw.huygens.alexandria.api.JsonTypeNames;
 
 @JsonTypeName(JsonTypeNames.COMMANDSTATUS)
 @JsonInclude(Include.NON_NULL)
-public class CommandStatus extends ProcessStatus {
+class CommandStatus extends ProcessStatus {
 
   private Object result;
   private boolean success = false;

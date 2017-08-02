@@ -33,7 +33,7 @@ import com.google.common.collect.Maps;
 
 @Singleton
 public class ProcessStatusMap<T extends ProcessStatus> {
-  private Map<UUID, T> map = Maps.newHashMap();
+  private final Map<UUID, T> map = Maps.newHashMap();
 
   public void put(UUID id, T status) {
     removeExpiredTasks();
@@ -45,11 +45,11 @@ public class ProcessStatusMap<T extends ProcessStatus> {
     return Optional.ofNullable(map.get(id));
   }
 
-  public void removeExpiredTasks() {
+  private void removeExpiredTasks() {
     List<UUID> expiredEntries = map.keySet().stream()//
         .filter(uuid -> map.get(uuid).isExpired())//
         .collect(toList());
-    expiredEntries.forEach(key -> map.remove(key));
+    expiredEntries.forEach(map::remove);
   }
 
 }

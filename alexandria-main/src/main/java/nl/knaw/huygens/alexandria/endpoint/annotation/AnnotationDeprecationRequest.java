@@ -34,7 +34,7 @@ public class AnnotationDeprecationRequest implements CreationRequest<AlexandriaA
 
   private final AnnotationPrototype prototype;
 
-  private AlexandriaAnnotation originalAnnotation;
+  private final AlexandriaAnnotation originalAnnotation;
 
   public AnnotationDeprecationRequest(AlexandriaAnnotation originalAnnotation, AnnotationPrototype prototype) {
     this.prototype = prototype;

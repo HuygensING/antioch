@@ -31,7 +31,7 @@ import nl.knaw.huygens.tei.QueryableDocument;
 
 public class ByIdTextLocator implements AlexandriaTextLocator {
   static final String PREFIX = "id";
-  String id;
+  private String id;
 
   public String getId() {
     return id;

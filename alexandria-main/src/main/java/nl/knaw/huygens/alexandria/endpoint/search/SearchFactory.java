@@ -34,7 +34,7 @@ import nl.knaw.huygens.alexandria.api.model.search.SearchInfo;
 import nl.knaw.huygens.alexandria.api.model.search.SearchResultPage;
 
 @Singleton
-public class SearchFactory {
+class SearchFactory {
 
   @Inject
   public SearchFactory() {
@@ -53,10 +53,7 @@ public class SearchFactory {
         .setTotalResults(searchResult.getTotalResults());
 
     final AtomicInteger counter = new AtomicInteger(pageSize * (pageNumber - 1));
-    final List<Map<String, Object>> records = results.stream().map(r -> {
-      r.put("_resultNumber", counter.incrementAndGet());
-      return r;
-    }).collect(toList());
+    final List<Map<String, Object>> records = results.stream().peek(r -> r.put("_resultNumber", counter.incrementAndGet())).collect(toList());
 
     final SearchResultPage searchResultPage = new SearchResultPage()//
         .setPageNumber(pageNumber)//

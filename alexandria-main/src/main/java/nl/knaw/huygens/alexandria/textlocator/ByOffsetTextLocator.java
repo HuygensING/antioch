@@ -31,8 +31,8 @@ import nl.knaw.huygens.tei.QueryableDocument;
 
 public class ByOffsetTextLocator implements AlexandriaTextLocator {
   static final String PREFIX = "offset";
-  Long start = 0L;
-  Long length = 0L;
+  private Long start = 0L;
+  private Long length = 0L;
 
   public ByOffsetTextLocator(Long start, Long length) {
     setStart(start);

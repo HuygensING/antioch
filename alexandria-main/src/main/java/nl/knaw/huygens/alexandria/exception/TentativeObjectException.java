@@ -29,7 +29,7 @@ import nl.knaw.huygens.alexandria.api.model.ErrorEntity;
 
 public class TentativeObjectException extends WebApplicationException {
   private static final long serialVersionUID = 1L;
-  static final ErrorEntity DEFAULT_ENTITY = ErrorEntityBuilder.build("Object is tentative");
+  private static final ErrorEntity DEFAULT_ENTITY = ErrorEntityBuilder.build("Object is tentative");
 
   public TentativeObjectException() {
     super(responseWithErrorEntity(DEFAULT_ENTITY));

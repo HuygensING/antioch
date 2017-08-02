@@ -53,7 +53,7 @@ import nl.knaw.huygens.alexandria.textlocator.TextLocatorParseException;
 public abstract class AnnotatableObjectAnnotationsEndpoint extends JSONEndpoint {
 
   protected final AlexandriaService service;
-  protected final LocationBuilder locationBuilder;
+  private final LocationBuilder locationBuilder;
   protected final AnnotationCreationRequestBuilder requestBuilder;
   protected final UUID uuid;
 

@@ -60,9 +60,9 @@ import nl.knaw.huygens.alexandria.test.AlexandriaTest;
 public abstract class AlexandriaTestWithTestServer extends AlexandriaTest {
   static final String AUTHKEY = "AUTHKEY";
 
-  protected static URI testURI = URI.create("http://localhost:2016/");
+  protected static final URI testURI = URI.create("http://localhost:2016/");
   private static HttpServer testServer;
-  private static AlexandriaConfiguration testConfig = new AlexandriaConfiguration() {
+  private static final AlexandriaConfiguration testConfig = new AlexandriaConfiguration() {
     @Override
     public String getStorageDirectory() {
       return System.getProperty("java.io.tmpdir");

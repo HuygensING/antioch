@@ -28,8 +28,8 @@ import java.util.concurrent.ExecutionException;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
-public class SearchResultCache {
-  static Cache<UUID, Optional<SearchResult>> cache = CacheBuilder.newBuilder()//
+class SearchResultCache {
+  private static final Cache<UUID, Optional<SearchResult>> cache = CacheBuilder.newBuilder()//
       .maximumSize(1000)//
       .build();
 
@@ -37,7 +37,7 @@ public class SearchResultCache {
     cache.put(searchResult.getId(), Optional.of(searchResult));
   }
 
-  static final Callable<Optional<SearchResult>> EMPTY_WHEN_MISSING = Optional::empty;
+  private static final Callable<Optional<SearchResult>> EMPTY_WHEN_MISSING = Optional::empty;
 
   public static Optional<SearchResult> get(UUID id) {
     Optional<SearchResult> oSearchResult = Optional.empty();

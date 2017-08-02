@@ -21,7 +21,6 @@ package nl.knaw.huygens.alexandria.endpoint.iiif;
  */
 
 import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -38,7 +37,6 @@ import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import org.glassfish.jersey.server.ChunkedOutput;
 
-import javax.inject.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
@@ -57,11 +55,10 @@ import static nl.knaw.huygens.alexandria.api.w3c.WebAnnotationConstants.JSONLD_M
 
 public class IIIFAnnotationListEndpoint extends AbstractIIIFEndpoint {
 
-  private final String listId;
-  private String name;
-  private AlexandriaConfiguration config;
-  private String identifier;
-  private WebAnnotationService webAnnotationService;
+  private final String name;
+  private final AlexandriaConfiguration config;
+  private final String identifier;
+  private final WebAnnotationService webAnnotationService;
   private final ProcessStatusMap<AnnotationListImportStatus> taskStatusMap;
   private final ExecutorService executorService;
 
@@ -79,7 +76,7 @@ public class IIIFAnnotationListEndpoint extends AbstractIIIFEndpoint {
     this.taskStatusMap = taskStatusMap;
     this.executorService = executorService;
     this.webAnnotationService = new WebAnnotationService(service, config);
-    this.listId = identifier + ":" + name;
+    String listId = identifier + ":" + name;
   }
 
   @GET
@@ -90,7 +87,7 @@ public class IIIFAnnotationListEndpoint extends AbstractIIIFEndpoint {
   @POST
   // @Path("streaming")
   @Consumes(JSONLD_MEDIATYPE)
-  public Response postAnnotationListStreaming(InputStream inputStream) throws JsonParseException, JsonMappingException, IOException {
+  public Response postAnnotationListStreaming(InputStream inputStream) throws IOException {
     StreamingOutput outStream = os -> {
       JsonFactory jsonFactory = new JsonFactory();
       JsonParser jParser = jsonFactory.createParser(inputStream);
@@ -137,29 +134,26 @@ public class IIIFAnnotationListEndpoint extends AbstractIIIFEndpoint {
   @POST
   @Path("chunked")
   @Consumes(JSONLD_MEDIATYPE)
-  public ChunkedOutput<String> postAnnotationListChunked(InputStream inputStream) throws JsonParseException, JsonMappingException, IOException {
+  public ChunkedOutput<String> postAnnotationListChunked(InputStream inputStream) throws IOException {
     final ChunkedOutput<String> output = new ChunkedOutput<>(String.class);
     AnnotationListHandler alh = new AnnotationListHandler(inputStream, webAnnotationService);
-    new Thread() {
-      @Override
-      public void run() {
+    new Thread(() -> {
+      try {
+        String chunk;
+        while ((chunk = alh.getNextString()) != null) {
+          output.write(chunk);
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+        throw new RuntimeException(e);
+      } finally {
         try {
-          String chunk;
-          while ((chunk = alh.getNextString()) != null) {
-            output.write(chunk);
-          }
+          output.close();
         } catch (IOException e) {
           e.printStackTrace();
-          throw new RuntimeException(e);
-        } finally {
-          try {
-            output.close();
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
         }
       }
-    }.start();
+    }).start();
     return output;
   }
 

@@ -26,7 +26,7 @@ import nl.knaw.huygens.alexandria.api.JsonTypeNames;
 
 @JsonTypeName(JsonTypeNames.SUBRESOURCE)
 public class SubResourcePrototype extends Prototype {
-  ResourcePojo delegate = new ResourcePojo();
+  final ResourcePojo delegate = new ResourcePojo();
 
   public SubResourcePrototype setSub(String ref) {
     delegate.setRef(ref);

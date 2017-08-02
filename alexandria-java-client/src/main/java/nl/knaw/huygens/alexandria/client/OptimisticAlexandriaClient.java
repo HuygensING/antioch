@@ -41,7 +41,7 @@ import nl.knaw.huygens.alexandria.client.model.SubResourcePojo;
 import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
 
 public class OptimisticAlexandriaClient {
-  AlexandriaClient delegate;
+  final AlexandriaClient delegate;
 
   // constructors
 
@@ -296,7 +296,7 @@ public class OptimisticAlexandriaClient {
   private <T> T unwrap(RestResult<T> restResult) {
     if (restResult.hasFailed()) {
       Optional<Response> response = restResult.getResponse();
-      String status = response.isPresent() ? response.get().getStatus() + ": " : "";
+      String status = response.map(response1 -> response1.getStatus() + ": ").orElse("");
       String message = status + restResult.getFailureCause().orElse("Unspecified error");
       throw new AlexandriaException(message);
     }

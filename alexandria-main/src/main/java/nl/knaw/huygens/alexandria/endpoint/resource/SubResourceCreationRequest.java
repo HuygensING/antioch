@@ -36,8 +36,8 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 class SubResourceCreationRequest implements CreationRequest<AlexandriaResource> {
 
   private boolean subResourceWasCreated;
-  private UUID parentId;
-  private SubResourcePrototype prototype;
+  private final UUID parentId;
+  private final SubResourcePrototype prototype;
   private UUID uuid;
 
   public SubResourceCreationRequest(UUID parentId, SubResourcePrototype prototype) {

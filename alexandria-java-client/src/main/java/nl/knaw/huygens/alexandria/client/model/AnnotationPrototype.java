@@ -26,7 +26,7 @@ import nl.knaw.huygens.alexandria.api.JsonTypeNames;
 
 @JsonTypeName(JsonTypeNames.ANNOTATION)
 public class AnnotationPrototype extends Prototype {
-  AnnotationPojo delegate = new AnnotationPojo();
+  final AnnotationPojo delegate = new AnnotationPojo();
 
   public AnnotationPrototype setType(String type) {
     delegate.setType(type);

@@ -51,7 +51,7 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public abstract class EndpointTest extends JerseyTest {
   private static final AlexandriaConfiguration CONFIG = testConfiguration();
-  static TestApplication application;
+  private static TestApplication application;
 
   protected static void setupWithModule(Module baseModule) {
     Log.debug("Setting up Jersey");
@@ -122,7 +122,7 @@ public abstract class EndpointTest extends JerseyTest {
   }
 
   public static class TestModule extends AbstractModule {
-    private AlexandriaService serviceInstance;
+    private final AlexandriaService serviceInstance;
 
     public TestModule(AlexandriaService serviceInstance) {
       this.serviceInstance = serviceInstance;

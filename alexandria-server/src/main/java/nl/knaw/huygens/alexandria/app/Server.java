@@ -42,10 +42,10 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.AlexandriaServletModule;
 import nl.knaw.huygens.alexandria.util.Scheduler;
 
-public class Server {
-  private static Logger LOG = LoggerFactory.getLogger(Server.class);
+class Server {
+  private static final Logger LOG = LoggerFactory.getLogger(Server.class);
   private static final long ONE_HOUR = Duration.ofHours(1).toMillis();
-  private AlexandriaConfiguration config = new ServerConfiguration();
+  private final AlexandriaConfiguration config = new ServerConfiguration();
   private static final String PROPERTIES_FILE = "about.properties";
 
   public static void main(String[] args) throws IOException {
@@ -91,7 +91,7 @@ public class Server {
     return config.getBaseURI();
   }
 
-  protected HttpServer startServer(URI uri) throws IOException {
+  private HttpServer startServer(URI uri) throws IOException {
     ServiceLocator locator = createServiceLocator();
     // init service
     AlexandriaService service = locator.getService(AlexandriaService.class);

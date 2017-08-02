@@ -24,7 +24,7 @@ import nl.knaw.huygens.alexandria.api.model.ErrorEntity;
 
 public class ExceptionErrorEntity extends ErrorEntity {
 
-  private Exception exception;
+  private final Exception exception;
 
   private ExceptionErrorEntity(Exception e) {
     super(e.getMessage());

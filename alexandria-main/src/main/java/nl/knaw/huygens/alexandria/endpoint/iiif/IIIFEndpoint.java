@@ -50,10 +50,9 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 public class IIIFEndpoint extends JSONEndpoint {
 
   private final AlexandriaService service;
-  private LocationBuilder locationBuilder;
-  private AlexandriaConfiguration config;
-  private ExecutorService executorService;
-  private ProcessStatusMap<AnnotationListImportStatus> taskStatusMap;
+  private final AlexandriaConfiguration config;
+  private final ExecutorService executorService;
+  private final ProcessStatusMap<AnnotationListImportStatus> taskStatusMap;
 
   @Context
   UriInfo uriInfo;
@@ -65,7 +64,7 @@ public class IIIFEndpoint extends JSONEndpoint {
       ProcessStatusMap<AnnotationListImportStatus> taskStatusMap,//
       ExecutorService executorService) {
     this.service = service;
-    this.locationBuilder = locationBuilder;
+    LocationBuilder locationBuilder1 = locationBuilder;
     this.config = config;
     this.taskStatusMap = taskStatusMap;
     this.executorService = executorService;

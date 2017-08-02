@@ -33,7 +33,7 @@ import nl.knaw.huygens.alexandria.api.model.JsonWrapperObject;
 
 @JsonTypeName(JsonTypeNames.SUBRESOURCELIST)
 public class SubResourceList extends JsonWrapperObject implements List<SubResourcePojo> {
-  List<SubResourcePojo> delegate = Lists.newArrayList();
+  final List<SubResourcePojo> delegate = Lists.newArrayList();
 
   // delegated methods
 

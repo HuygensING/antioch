@@ -33,8 +33,12 @@ import nl.knaw.huygens.alexandria.exception.BadRequestException;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.assertj.core.data.MapEntry;
+import static org.junit.Assert.fail;
 import org.junit.Test;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,14 +47,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 public class AlexandriaQueryParserTest extends AlexandriaTest {
   private static final Logger LOG = LoggerFactory.getLogger(AlexandriaQueryParserTest.class);
-  private AlexandriaQueryParser alexandriaQueryParser = new AlexandriaQueryParser(new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()));
+  private final AlexandriaQueryParser alexandriaQueryParser = new AlexandriaQueryParser(new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()));
 
   @Test
   public void testUnknownFindValueThrowsException() {
@@ -356,14 +355,14 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
     );
   }
 
-  AtomicInteger alwaysTrueCalled = new AtomicInteger(0);
-  Predicate<Object> alwaysTrue = o -> {
+  private final AtomicInteger alwaysTrueCalled = new AtomicInteger(0);
+  private final Predicate<Object> alwaysTrue = o -> {
     int times = alwaysTrueCalled.incrementAndGet();
     LOG.info("alwaysTrue called {} times", times);
     return true;
   };
-  AtomicInteger alwaysFalseCalled = new AtomicInteger(0);
-  Predicate<Object> alwaysFalse = o -> {
+  private final AtomicInteger alwaysFalseCalled = new AtomicInteger(0);
+  private final Predicate<Object> alwaysFalse = o -> {
     int times = alwaysFalseCalled.incrementAndGet();
     LOG.info("alwaysFalse called {} times", times);
     return false;
@@ -444,5 +443,65 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
       String responseMessage = ((ErrorEntity) e.getResponse().getEntity()).getMessage();
       assertThat(responseMessage).isEqualTo("RUBBISH, GARBAGE are not valid values for state");
     }
+  }
+
+  @Test
+  public void testNLA347a() {
+    AlexandriaQuery aQuery = new AlexandriaQuery();
+    String value = "tired";
+    aQuery.setFind("annotation");
+    aQuery.setWhere(//
+        "type:eq(\"Tag\")"//
+            + " value:eq(\"" + value + "\")"//
+            + " state:eq(\"CONFIRMED\")"//
+    );
+    aQuery.setSort("-_list.size id");
+    aQuery.setReturns("resource.id,list(id,who)");
+    ParsedAlexandriaQuery paq = alexandriaQueryParser.parse(aQuery);
+    assertThat(paq.sortOnListSize()).isTrue();
+
+    Comparator<Map<String, Object>> listSizeComparator = paq.getListSizeComparator();
+    Map<String, Object> result1 = new HashMap<>();
+    result1.put("_list.size", 1);
+    Map<String, Object> result2 = new HashMap<>();
+    result2.put("_list.size", 2);
+    int compare1 = listSizeComparator.compare(result1, result2);
+    assertThat(compare1).isEqualTo(1);
+
+    int compare2 = listSizeComparator.compare(result2, result1);
+    assertThat(compare2).isEqualTo(-1);
+
+    Comparator<AnnotationVF> resultComparator = paq.getResultComparator();
+    assertThat(resultComparator).isNotNull();
+  }
+
+  @Test
+  public void testNLA347b() {
+    AlexandriaQuery aQuery = new AlexandriaQuery();
+    String value = "tired";
+    aQuery.setFind("annotation");
+    aQuery.setWhere(//
+        "type:eq(\"Tag\")"//
+            + " value:eq(\"" + value + "\")"//
+            + " state:eq(\"CONFIRMED\")"//
+    );
+    aQuery.setSort("_list.size");
+    aQuery.setReturns("resource.id,list(id,who)");
+    ParsedAlexandriaQuery paq = alexandriaQueryParser.parse(aQuery);
+    assertThat(paq.sortOnListSize()).isTrue();
+
+    Comparator<Map<String, Object>> listSizeComparator = paq.getListSizeComparator();
+    Map<String, Object> result1 = new HashMap<>();
+    result1.put("_list.size", 1);
+    Map<String, Object> result2 = new HashMap<>();
+    result2.put("_list.size", 2);
+    int compare1 = listSizeComparator.compare(result1, result2);
+    assertThat(compare1).isEqualTo(-1);
+
+    int compare2 = listSizeComparator.compare(result2, result1);
+    assertThat(compare2).isEqualTo(1);
+
+    Comparator<AnnotationVF> resultComparator = paq.getResultComparator();
+    assertThat(resultComparator).isNotNull();
   }
 }

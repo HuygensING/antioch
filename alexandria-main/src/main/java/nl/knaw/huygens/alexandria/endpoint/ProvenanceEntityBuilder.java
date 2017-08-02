@@ -24,7 +24,7 @@ import javax.inject.Inject;
 
 import nl.knaw.huygens.alexandria.model.AlexandriaProvenance;
 
-public class ProvenanceEntityBuilder {
+class ProvenanceEntityBuilder {
   private final LocationBuilder locationBuilder;
 
   @Inject

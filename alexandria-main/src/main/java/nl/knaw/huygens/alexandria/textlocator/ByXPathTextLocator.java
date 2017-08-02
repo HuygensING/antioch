@@ -31,7 +31,7 @@ import nl.knaw.huygens.tei.QueryableDocument;
 
 public class ByXPathTextLocator implements AlexandriaTextLocator {
   static final String PREFIX = "xpath";
-  String xpath;
+  private String xpath;
 
   public String getXPath() {
     return xpath;

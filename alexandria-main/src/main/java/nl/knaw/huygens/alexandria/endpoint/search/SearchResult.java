@@ -50,7 +50,7 @@ public class SearchResult implements Identifiable {
   private Long searchDurationInMs;
 
   @JsonIgnore
-  private LocationBuilder locationBuilder;
+  private final LocationBuilder locationBuilder;
 
   @Inject
   public SearchResult(LocationBuilder locationBuilder) {

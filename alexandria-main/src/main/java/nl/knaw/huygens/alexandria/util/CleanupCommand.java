@@ -30,8 +30,8 @@ import com.google.common.base.Preconditions;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 
 public class CleanupCommand implements Runnable {
-  static final Logger LOG = LoggerFactory.getLogger(CleanupCommand.class);
-  private AlexandriaService service;
+  private static final Logger LOG = LoggerFactory.getLogger(CleanupCommand.class);
+  private final AlexandriaService service;
   // private ProcessStatusMap<TextImportStatus> taskStatusMap;
 
   @Inject

@@ -52,18 +52,24 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 @Singleton
 public class TinkerPopService implements AlexandriaService {
   private static final TemporalAmount TENTATIVES_TTL = Duration.ofDays(1);
 
-  protected Storage storage;
-  protected LocationBuilder locationBuilder;
-  private AlexandriaQueryParser alexandriaQueryParser;
+  private Storage storage;
+  private final LocationBuilder locationBuilder;
+  private final AlexandriaQueryParser alexandriaQueryParser;
 
   @Inject
   public TinkerPopService(Storage storage, LocationBuilder locationBuilder) {
@@ -520,7 +526,7 @@ public class TinkerPopService implements AlexandriaService {
     });
   }
 
-  void updateState(AlexandriaVF vf, AlexandriaState newState) {
+  private void updateState(AlexandriaVF vf, AlexandriaState newState) {
     vf.setState(newState.name());
     vf.setStateSince(Instant.now().getEpochSecond());
   }
@@ -562,8 +568,8 @@ public class TinkerPopService implements AlexandriaService {
       // resource.setFirstAncestorResourceWithBaseLayerDefinitionPointer(new IdentifiablePointer<>(AlexandriaResource.class, ancestorResource.getUuid()));
       // }
     }
-    rvf.getSubResources().stream()//
-        .forEach(vf -> resource.addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
+    rvf.getSubResources()//
+            .forEach(vf -> resource.addSubResourcePointer(new IdentifiablePointer<>(AlexandriaResource.class, vf.getUuid())));
     return resource;
   }
 
@@ -579,7 +585,7 @@ public class TinkerPopService implements AlexandriaService {
   }
 
 
-  AnnotationVF frameAnnotation(AlexandriaAnnotation newAnnotation) {
+  private AnnotationVF frameAnnotation(AlexandriaAnnotation newAnnotation) {
     AnnotationVF avf = storage.createVF(AnnotationVF.class);
     setAlexandriaVFProperties(avf, newAnnotation);
     avf.setRevision(newAnnotation.getRevision());
@@ -686,12 +692,21 @@ public class TinkerPopService implements AlexandriaService {
     }
     if (pQuery.doGrouping()) {
       mapStream = mapStream//
-          .collect(groupingBy(pQuery::concatenateGroupByFieldsValues, LinkedHashMap::new, toList()))//
-          .values().stream()//
-          .map(pQuery::collectListFieldValues);
+        .collect(groupingBy(pQuery::concatenateGroupByFieldsValues))//
+        .values().stream()//
+        .map(pQuery::collectListFieldValues)//
+        .map(this::addListSize);
+      if (pQuery.sortOnListSize()){
+        mapStream = mapStream.sorted(pQuery.getListSizeComparator());
+      }
     }
     return mapStream//
         .collect(toList());
+  }
+
+  private Map<String, Object> addListSize(Map<String, Object> resultMap){
+    resultMap.put("_list.size", ((List<Object>) resultMap.get("_list")).size());
+    return resultMap;
   }
 
   protected ResourceVF readExistingResourceVF(UUID uuid) {

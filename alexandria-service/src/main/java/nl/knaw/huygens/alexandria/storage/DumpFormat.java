@@ -28,7 +28,7 @@ public enum DumpFormat {
   graphml(IoCore.graphml()), //
   graphson(IoCore.graphson());
 
-  public Builder<?> builder;
+  public final Builder<?> builder;
 
   DumpFormat(Builder<?> builder) {
     this.builder = builder;
