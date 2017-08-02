@@ -24,7 +24,8 @@
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-json-jackson</artifactId>
-      <version>${jersey-client.version}</version>
+<!--      <version>${jersey-client.version}</version>-->
+      <version>${jersey.version}</version>
       <exclusions>
         <exclusion>
           <artifactId>jackson-jaxrs-base</artifactId>
@@ -39,12 +40,14 @@
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
       <artifactId>jersey-container-grizzly2-http</artifactId>
-      <version>${jersey-client.version}</version>
+      <!--      <version>${jersey-client.version}</version>-->
+      <version>${jersey.version}</version>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.connectors</groupId>
       <artifactId>jersey-apache-connector</artifactId>
-      <version>${jersey-client.version}</version>
+      <!--      <version>${jersey-client.version}</version>-->
+      <version>${jersey.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
