@@ -698,7 +698,7 @@ public class TinkerPopService implements AlexandriaService {
   }
 
   private Map<String, Object> addListSize(Map<String, Object> resultMap) {
-    resultMap.put("_list.size", ((List<Object>) resultMap.get("_list")).size());
+    resultMap.put(AlexandriaQueryParser.LIST_SIZE, ((List<Object>) resultMap.get("_list")).size());
     return resultMap;
   }
 

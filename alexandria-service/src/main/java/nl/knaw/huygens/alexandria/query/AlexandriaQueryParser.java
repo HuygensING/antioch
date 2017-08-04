@@ -64,6 +64,7 @@ import java.util.stream.Stream;
 public class AlexandriaQueryParser {
   private static final String ALLOWED_FIELDS = ", available fields: " + Joiner.on(", ").join(QueryField.ALL_EXTERNAL_NAMES);
   private static final String ALLOWED_FUNCTIONS = ", available functions: " + Joiner.on(", ").join(QueryFunction.values());
+  public static final String LIST_SIZE = "_list.size";
 
   private static LocationBuilder locationBuilder;
 
@@ -79,9 +80,9 @@ public class AlexandriaQueryParser {
 
     String querySort = query.getSort();
     ListSizeSortOrder listSizeSortOrder = none;
-    if (querySort.contains("_list.size")) {
-      listSizeSortOrder = (querySort.contains("-_list.size")) ? descending : ascending;
-      querySort = querySort.replaceFirst("-?_list.size", "");
+    if (querySort.contains(LIST_SIZE)) {
+      listSizeSortOrder = (querySort.contains("-" + LIST_SIZE)) ? descending : ascending;
+      querySort = querySort.replaceFirst("-?" + LIST_SIZE, "");
     }
     final ParsedAlexandriaQuery paq = new ParsedAlexandriaQuery()//
         .setVFClass(parseFind(query.getFind()))//

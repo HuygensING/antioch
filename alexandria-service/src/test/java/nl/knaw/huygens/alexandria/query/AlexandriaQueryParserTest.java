@@ -30,6 +30,7 @@ import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
+import static nl.knaw.huygens.alexandria.query.AlexandriaQueryParser.LIST_SIZE;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
@@ -455,16 +456,16 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
             + " value:eq(\"" + value + "\")"//
             + " state:eq(\"CONFIRMED\")"//
     );
-    aQuery.setSort("-_list.size id");
+    aQuery.setSort("-" + LIST_SIZE);
     aQuery.setReturns("resource.id,list(id,who)");
     ParsedAlexandriaQuery paq = alexandriaQueryParser.parse(aQuery);
     assertThat(paq.sortOnListSize()).isTrue();
 
     Comparator<Map<String, Object>> listSizeComparator = paq.getListSizeComparator();
     Map<String, Object> result1 = new HashMap<>();
-    result1.put("_list.size", 1);
+    result1.put(LIST_SIZE, 1);
     Map<String, Object> result2 = new HashMap<>();
-    result2.put("_list.size", 2);
+    result2.put(LIST_SIZE, 2);
     int compare1 = listSizeComparator.compare(result1, result2);
     assertThat(compare1).isEqualTo(1);
 
@@ -485,16 +486,16 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
             + " value:eq(\"" + value + "\")"//
             + " state:eq(\"CONFIRMED\")"//
     );
-    aQuery.setSort("_list.size");
+    aQuery.setSort(LIST_SIZE);
     aQuery.setReturns("resource.id,list(id,who)");
     ParsedAlexandriaQuery paq = alexandriaQueryParser.parse(aQuery);
     assertThat(paq.sortOnListSize()).isTrue();
 
     Comparator<Map<String, Object>> listSizeComparator = paq.getListSizeComparator();
     Map<String, Object> result1 = new HashMap<>();
-    result1.put("_list.size", 1);
+    result1.put(LIST_SIZE, 1);
     Map<String, Object> result2 = new HashMap<>();
-    result2.put("_list.size", 2);
+    result2.put(LIST_SIZE, 2);
     int compare1 = listSizeComparator.compare(result1, result2);
     assertThat(compare1).isEqualTo(-1);
 

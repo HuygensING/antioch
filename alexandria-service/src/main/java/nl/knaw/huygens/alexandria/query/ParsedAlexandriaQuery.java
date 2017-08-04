@@ -193,7 +193,7 @@ public class ParsedAlexandriaQuery {
   }
 
   private int getListSize(Map<String, Object> resultMap) {
-    return (Integer) resultMap.get("_list.size");
+    return (Integer) resultMap.get(AlexandriaQueryParser.LIST_SIZE);
   }
 
   public boolean sortOnListSize() {
