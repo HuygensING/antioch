@@ -6,59 +6,25 @@ package nl.knaw.huygens.alexandria.query;
  * =======
  * Copyright (C) 2015 - 2017 Huygens ING (KNAW)
  * =======
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  * 
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  * #L%
  */
-
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
-
-import javax.inject.Inject;
-
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
-import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
-
 import nl.knaw.huygens.alexandria.antlr.AQLLexer;
 import nl.knaw.huygens.alexandria.antlr.AQLParser;
 import nl.knaw.huygens.alexandria.antlr.QueryErrorListener;
@@ -75,14 +41,35 @@ import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.storage.frames.ResourceVF;
 import nl.knaw.huygens.alexandria.util.StreamUtil;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
+
+import javax.inject.Inject;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.*;
+import static nl.knaw.huygens.alexandria.query.ParsedAlexandriaQuery.ListSizeSortOrder;
+import static nl.knaw.huygens.alexandria.query.ParsedAlexandriaQuery.ListSizeSortOrder.*;
 
 public class AlexandriaQueryParser {
-  static final String ALLOWED_FIELDS = ", available fields: " + Joiner.on(", ").join(QueryField.ALL_EXTERNAL_NAMES);
-  static final String ALLOWED_FUNCTIONS = ", available functions: " + Joiner.on(", ").join(QueryFunction.values());
+  private static final String ALLOWED_FIELDS = ", available fields: " + Joiner.on(", ").join(QueryField.ALL_EXTERNAL_NAMES);
+  private static final String ALLOWED_FUNCTIONS = ", available functions: " + Joiner.on(", ").join(QueryFunction.values());
+  public static final String LIST_SIZE = "_list.size";
 
   private static LocationBuilder locationBuilder;
 
-  List<String> parseErrors = Lists.newArrayList();
+  final List<String> parseErrors = Lists.newArrayList();
 
   @Inject
   public AlexandriaQueryParser(final LocationBuilder locationBuilder) {
@@ -92,9 +79,16 @@ public class AlexandriaQueryParser {
   public ParsedAlexandriaQuery parse(final AlexandriaQuery query) {
     parseErrors.clear();
 
+    String querySort = query.getSort();
+    ListSizeSortOrder listSizeSortOrder = none;
+    if (querySort.contains(LIST_SIZE)) {
+      listSizeSortOrder = (querySort.contains("-" + LIST_SIZE)) ? descending : ascending;
+      querySort = querySort.replaceFirst("-?" + LIST_SIZE, "");
+    }
     final ParsedAlexandriaQuery paq = new ParsedAlexandriaQuery()//
         .setVFClass(parseFind(query.getFind()))//
-        .setResultComparator(parseSort(query.getSort()));
+        .setResultComparator(parseSort(querySort))//
+        .setListSizeSortOrder(listSizeSortOrder);
 
     setFilter(paq, query.getWhere());
 
@@ -208,7 +202,7 @@ public class AlexandriaQueryParser {
           return Stream.concat(resourceAnnotationsStream, subresourceAnnotationsStream);
         }
         // Should return error, since no resource found with given uuid
-        return ImmutableList.<AnnotationVF> of().stream();
+        return ImmutableList.<AnnotationVF>of().stream();
       };
 
     } else if (resourceWhereTokens.size() == 1 && resourceWhereToken.getFunction().equals(QueryFunction.eq) && resourceWhereToken.getProperty().equals(QueryField.resource_ref)) {
@@ -256,16 +250,16 @@ public class AlexandriaQueryParser {
 
   private Class<? extends AlexandriaVF> parseFind(final String find) {
     switch (find) {
-    case "annotation":
-      return AnnotationVF.class;
+      case "annotation":
+        return AnnotationVF.class;
 
-    case "resource":
-      // parseErrors.add("find: type 'resource' not supported yet");
-      return ResourceVF.class;
+      case "resource":
+        // parseErrors.add("find: type 'resource' not supported yet");
+        return ResourceVF.class;
 
-    default:
-      parseErrors.add("find: unknown type '" + find + "', should be 'annotation' or 'resource'");
-      return null;
+      default:
+        parseErrors.add("find: unknown type '" + find + "', should be 'annotation' or 'resource'");
+        return null;
     }
   }
 
@@ -323,7 +317,7 @@ public class AlexandriaQueryParser {
         .reduce(alwaysTrue(), Predicate::and);
   }
 
-  static Set<String> ALL_STATES = Arrays.stream(AlexandriaState.values()).map(AlexandriaState::name).collect(toSet());
+  private static final Set<String> ALL_STATES = Arrays.stream(AlexandriaState.values()).map(AlexandriaState::name).collect(toSet());
 
   static Predicate<AnnotationVF> toPredicate(WhereToken whereToken) {
     Function<AnnotationVF, Object> getter = QueryFieldGetters.get(whereToken.getProperty());
@@ -365,18 +359,18 @@ public class AlexandriaQueryParser {
         Object propertyValue = getter.apply(avf);
         if (propertyValue instanceof String) {
           return ((String) propertyValue).compareTo((String) lowerLimit) >= 0//
-                  && ((String) propertyValue).compareTo((String) upperLimit) <= 0;
+              && ((String) propertyValue).compareTo((String) upperLimit) <= 0;
         }
         //
         return !(propertyValue instanceof Long) || ((Long) propertyValue).compareTo((Long) lowerLimit) >= 0//
-                && ((Long) propertyValue).compareTo((Long) upperLimit) <= 0;
+            && ((Long) propertyValue).compareTo((Long) upperLimit) <= 0;
       };
     }
 
     return alwaysTrue();
   }
 
-  static final Predicate<String> INVALID_STATEVALUE_PREDICATE = stateValue -> !(stateValue instanceof String && ALL_STATES.contains(stateValue));
+  private static final Predicate<String> INVALID_STATEVALUE_PREDICATE = stateValue -> !(stateValue instanceof String && ALL_STATES.contains(stateValue));
 
   private static void checkForValidStateParameter(WhereToken whereToken) {
     if (QueryField.state.equals(whereToken.getProperty())) {
@@ -440,6 +434,9 @@ public class AlexandriaQueryParser {
     List<Ordering<AnnotationVF>> orderings = sortTokens.stream()//
         .map(AlexandriaQueryParser::ordering)//
         .collect(toList());
+    if (orderings.isEmpty()) {
+      return ordering(new SortToken().setField(QueryField.when).setAscending(false));
+    }
     Ordering<AnnotationVF> order = orderings.remove(0);
     for (final Ordering<AnnotationVF> suborder : orderings) {
       order = order.compound(suborder);
@@ -511,7 +508,7 @@ public class AlexandriaQueryParser {
     }
   }
 
-  static final Pattern LISTPATTERN = Pattern.compile("list\\((.*)\\)");
+  private static final Pattern LISTPATTERN = Pattern.compile("list\\((.*)\\)");
 
   private List<String> extractListfields(String fieldString) {
     Matcher matcher = LISTPATTERN.matcher(fieldString);

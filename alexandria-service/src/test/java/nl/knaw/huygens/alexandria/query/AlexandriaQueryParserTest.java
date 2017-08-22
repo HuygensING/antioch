@@ -6,45 +6,22 @@ package nl.knaw.huygens.alexandria.query;
  * =======
  * Copyright (C) 2015 - 2017 Huygens ING (KNAW)
  * =======
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  * 
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  * #L%
  */
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
-import org.assertj.core.data.MapEntry;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-
 import nl.knaw.huygens.alexandria.api.model.ErrorEntity;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
 import nl.knaw.huygens.alexandria.api.model.search.QueryField;
@@ -53,13 +30,27 @@ import nl.knaw.huygens.alexandria.config.MockConfiguration;
 import nl.knaw.huygens.alexandria.endpoint.EndpointPathResolver;
 import nl.knaw.huygens.alexandria.endpoint.LocationBuilder;
 import nl.knaw.huygens.alexandria.exception.BadRequestException;
+import static nl.knaw.huygens.alexandria.query.AlexandriaQueryParser.LIST_SIZE;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationBodyVF;
 import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
 import nl.knaw.huygens.alexandria.test.AlexandriaTest;
+import static org.assertj.core.api.Assertions.assertThat;
+import org.assertj.core.data.MapEntry;
+import static org.junit.Assert.fail;
+import org.junit.Test;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class AlexandriaQueryParserTest extends AlexandriaTest {
   private static final Logger LOG = LoggerFactory.getLogger(AlexandriaQueryParserTest.class);
-  private AlexandriaQueryParser alexandriaQueryParser = new AlexandriaQueryParser(new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()));
+  private final AlexandriaQueryParser alexandriaQueryParser = new AlexandriaQueryParser(new LocationBuilder(new MockConfiguration(), new EndpointPathResolver()));
 
   @Test
   public void testUnknownFindValueThrowsException() {
@@ -365,14 +356,14 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
     );
   }
 
-  AtomicInteger alwaysTrueCalled = new AtomicInteger(0);
-  Predicate<Object> alwaysTrue = o -> {
+  private final AtomicInteger alwaysTrueCalled = new AtomicInteger(0);
+  private final Predicate<Object> alwaysTrue = o -> {
     int times = alwaysTrueCalled.incrementAndGet();
     LOG.info("alwaysTrue called {} times", times);
     return true;
   };
-  AtomicInteger alwaysFalseCalled = new AtomicInteger(0);
-  Predicate<Object> alwaysFalse = o -> {
+  private final AtomicInteger alwaysFalseCalled = new AtomicInteger(0);
+  private final Predicate<Object> alwaysFalse = o -> {
     int times = alwaysFalseCalled.incrementAndGet();
     LOG.info("alwaysFalse called {} times", times);
     return false;
@@ -453,5 +444,65 @@ public class AlexandriaQueryParserTest extends AlexandriaTest {
       String responseMessage = ((ErrorEntity) e.getResponse().getEntity()).getMessage();
       assertThat(responseMessage).isEqualTo("RUBBISH, GARBAGE are not valid values for state");
     }
+  }
+
+  @Test
+  public void testNLA347a() {
+    AlexandriaQuery aQuery = new AlexandriaQuery();
+    String value = "tired";
+    aQuery.setFind("annotation");
+    aQuery.setWhere(//
+        "type:eq(\"Tag\")"//
+            + " value:eq(\"" + value + "\")"//
+            + " state:eq(\"CONFIRMED\")"//
+    );
+    aQuery.setSort("-" + LIST_SIZE);
+    aQuery.setReturns("resource.id,list(id,who)");
+    ParsedAlexandriaQuery paq = alexandriaQueryParser.parse(aQuery);
+    assertThat(paq.sortOnListSize()).isTrue();
+
+    Comparator<Map<String, Object>> listSizeComparator = paq.getListSizeComparator();
+    Map<String, Object> result1 = new HashMap<>();
+    result1.put(LIST_SIZE, 1);
+    Map<String, Object> result2 = new HashMap<>();
+    result2.put(LIST_SIZE, 2);
+    int compare1 = listSizeComparator.compare(result1, result2);
+    assertThat(compare1).isEqualTo(1);
+
+    int compare2 = listSizeComparator.compare(result2, result1);
+    assertThat(compare2).isEqualTo(-1);
+
+    Comparator<AnnotationVF> resultComparator = paq.getResultComparator();
+    assertThat(resultComparator).isNotNull();
+  }
+
+  @Test
+  public void testNLA347b() {
+    AlexandriaQuery aQuery = new AlexandriaQuery();
+    String value = "tired";
+    aQuery.setFind("annotation");
+    aQuery.setWhere(//
+        "type:eq(\"Tag\")"//
+            + " value:eq(\"" + value + "\")"//
+            + " state:eq(\"CONFIRMED\")"//
+    );
+    aQuery.setSort(LIST_SIZE);
+    aQuery.setReturns("resource.id,list(id,who)");
+    ParsedAlexandriaQuery paq = alexandriaQueryParser.parse(aQuery);
+    assertThat(paq.sortOnListSize()).isTrue();
+
+    Comparator<Map<String, Object>> listSizeComparator = paq.getListSizeComparator();
+    Map<String, Object> result1 = new HashMap<>();
+    result1.put(LIST_SIZE, 1);
+    Map<String, Object> result2 = new HashMap<>();
+    result2.put(LIST_SIZE, 2);
+    int compare1 = listSizeComparator.compare(result1, result2);
+    assertThat(compare1).isEqualTo(-1);
+
+    int compare2 = listSizeComparator.compare(result2, result1);
+    assertThat(compare2).isEqualTo(1);
+
+    Comparator<AnnotationVF> resultComparator = paq.getResultComparator();
+    assertThat(resultComparator).isNotNull();
   }
 }

@@ -6,19 +6,17 @@ package nl.knaw.huygens.alexandria.service;
  * =======
  * Copyright (C) 2015 - 2017 Huygens ING (KNAW)
  * =======
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  * 
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  * #L%
  */
 
@@ -28,16 +26,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import nl.knaw.huygens.alexandria.api.model.AlexandriaState;
-import nl.knaw.huygens.alexandria.api.model.Annotator;
-import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
 import nl.knaw.huygens.alexandria.api.model.search.AlexandriaQuery;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotation;
-import nl.knaw.huygens.alexandria.api.model.text.TextRangeAnnotationList;
-import nl.knaw.huygens.alexandria.api.model.text.view.TextView;
-import nl.knaw.huygens.alexandria.api.model.text.view.TextViewDefinition;
 import nl.knaw.huygens.alexandria.endpoint.search.SearchResult;
 import nl.knaw.huygens.alexandria.model.Accountable;
 import nl.knaw.huygens.alexandria.model.AlexandriaAnnotation;
@@ -45,9 +36,6 @@ import nl.knaw.huygens.alexandria.model.AlexandriaAnnotationBody;
 import nl.knaw.huygens.alexandria.model.AlexandriaResource;
 import nl.knaw.huygens.alexandria.model.IdentifiablePointer;
 import nl.knaw.huygens.alexandria.model.TentativeAlexandriaProvenance;
-import nl.knaw.huygens.alexandria.textgraph.ParseResult;
-import nl.knaw.huygens.alexandria.textgraph.TextAnnotation;
-import nl.knaw.huygens.alexandria.textgraph.TextGraphSegment;
 import nl.knaw.huygens.alexandria.textlocator.AlexandriaTextLocator;
 
 public interface AlexandriaService {
@@ -125,48 +113,8 @@ public interface AlexandriaService {
 
   void importDb(String format, String filename);
 
-  void setResourceAnnotator(UUID resourceUUID, Annotator annotator);
-
-  Optional<Annotator> readResourceAnnotator(UUID resourceUUID, String annotatorCode);
-
-  AnnotatorList readResourceAnnotators(UUID id);
-
-  void setTextRangeAnnotation(UUID resourceUUID, TextRangeAnnotation annotation);
-
-  TextRangeAnnotationList readTextRangeAnnotations(UUID resourceUUID);
-
-  void deprecateTextRangeAnnotation(UUID annotationUUID, TextRangeAnnotation newTextRangeAnnotation);
-
-  Optional<TextRangeAnnotation> readTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID);
-
-  Optional<TextRangeAnnotation> readTextRangeAnnotation(UUID resourceUUID, UUID annotationUUID, Integer revision);
-
-  boolean nonNestingOverlapWithExistingTextRangeAnnotationForResource(TextRangeAnnotation annotation, UUID resourceUUID);
-
-  void setTextView(UUID resourceUUID, String viewId, TextView textView, TextViewDefinition textViewDefinition);
-
-  Optional<TextViewDefinition> getTextViewDefinition(UUID resourceId, String viewId);
-
-  Optional<TextView> getTextView(UUID resourceId, String view);
-
-  /**
-   * Gets the textviews for the resource and all its ancestors
-   */
-  List<TextView> getTextViewsForResource(UUID resourceUUID);
-
-  boolean storeTextGraph(UUID resourceId, ParseResult result);
-
-  Stream<TextGraphSegment> getTextGraphSegmentStream(UUID resourceId, List<List<String>> orderedLayerTags);
-
   void runInTransaction(Runnable runner);
 
   <A> A runInTransaction(Supplier<A> supplier);
-
-  Stream<TextAnnotation> getTextAnnotationStream(UUID resourceId);
-
-  void updateTextAnnotation(TextAnnotation textAnnotation);
-
-  void wrapContentInChildTextAnnotation(TextAnnotation existingTextAnnotation, TextAnnotation newChildTextAnnotation);
-
 
 }

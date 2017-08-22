@@ -6,19 +6,17 @@ package nl.knaw.huygens.alexandria.endpoint.search;
  * =======
  * Copyright (C) 2015 - 2017 Huygens ING (KNAW)
  * =======
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  * 
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  * #L%
  */
 
@@ -42,22 +40,20 @@ import nl.knaw.huygens.alexandria.api.model.PropertyPrefix;
 
 @JsonInclude(Include.NON_NULL)
 @JsonTypeName("searchResultPage")
-public class SearchResultPage extends JsonWrapperObject {
-  private int pageNumber;
+class SearchResultPage extends JsonWrapperObject {
+  private final int pageNumber;
   @JsonIgnore
-  private String baseURI;
+  private final String baseURI;
   @JsonIgnore
-  private boolean isLast;
+  private final boolean isLast;
   @JsonIgnore
   private List<Map<String, Object>> recordList;
   @JsonIgnore
-  private Function<Map<String, Object>, Integer> counterFunction;
+  private final AtomicInteger counter;
   @JsonIgnore
-  private AtomicInteger counter;
-  @JsonIgnore
-  private int lastPageNumber;
+  private final int lastPageNumber;
 
-  private Map<String, Object> searchInfo;
+  private final Map<String, Object> searchInfo;
 
   public SearchResultPage(String baseURI, int pageNumber, SearchResult searchResult) {
     this.baseURI = baseURI;
@@ -65,7 +61,7 @@ public class SearchResultPage extends JsonWrapperObject {
     this.lastPageNumber = Math.max(1, searchResult.getTotalPages());
     this.isLast = pageNumber == lastPageNumber;
     this.counter = new AtomicInteger(searchResult.getPageSize() * (pageNumber - 1));
-    this.counterFunction = t -> counter.incrementAndGet();
+    Function<Map<String, Object>, Integer> counterFunction = t -> counter.incrementAndGet();
     this.searchInfo = ImmutableMap.<String, Object> builder()//
         .put("id", searchResult.getId())//
         .put("query", searchResult.getQuery())//
@@ -97,10 +93,7 @@ public class SearchResultPage extends JsonWrapperObject {
   }
 
   public void setResults(List<Map<String, Object>> results) {
-    recordList = results.stream().map(r -> {
-      r.put("_resultNumber", counter.incrementAndGet());
-      return r;
-    }).collect(toList());
+    recordList = results.stream().peek(r -> r.put("_resultNumber", counter.incrementAndGet())).collect(toList());
   }
 
   public List<Map<String, Object>> getRecords() {
