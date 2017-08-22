@@ -14,64 +14,62 @@
 <a class="jxr_linenumber" name="L6" href="#L6">6</a>   <em class="jxr_comment"> * =======</em>
 <a class="jxr_linenumber" name="L7" href="#L7">7</a>   <em class="jxr_comment"> * Copyright (C) 2015 - 2017 Huygens ING (KNAW)</em>
 <a class="jxr_linenumber" name="L8" href="#L8">8</a>   <em class="jxr_comment"> * =======</em>
-<a class="jxr_linenumber" name="L9" href="#L9">9</a>   <em class="jxr_comment"> * This program is free software: you can redistribute it and/or modify</em>
-<a class="jxr_linenumber" name="L10" href="#L10">10</a>  <em class="jxr_comment"> * it under the terms of the GNU General Public License as</em>
-<a class="jxr_linenumber" name="L11" href="#L11">11</a>  <em class="jxr_comment"> * published by the Free Software Foundation, either version 3 of the</em>
-<a class="jxr_linenumber" name="L12" href="#L12">12</a>  <em class="jxr_comment"> * License, or (at your option) any later version.</em>
-<a class="jxr_linenumber" name="L13" href="#L13">13</a>  <em class="jxr_comment"> * </em>
-<a class="jxr_linenumber" name="L14" href="#L14">14</a>  <em class="jxr_comment"> * This program is distributed in the hope that it will be useful,</em>
-<a class="jxr_linenumber" name="L15" href="#L15">15</a>  <em class="jxr_comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</em>
-<a class="jxr_linenumber" name="L16" href="#L16">16</a>  <em class="jxr_comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</em>
-<a class="jxr_linenumber" name="L17" href="#L17">17</a>  <em class="jxr_comment"> * GNU General Public License for more details.</em>
-<a class="jxr_linenumber" name="L18" href="#L18">18</a>  <em class="jxr_comment"> * </em>
-<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <em class="jxr_comment"> * You should have received a copy of the GNU General Public</em>
-<a class="jxr_linenumber" name="L20" href="#L20">20</a>  <em class="jxr_comment"> * License along with this program.  If not, see</em>
-<a class="jxr_linenumber" name="L21" href="#L21">21</a>  <em class="jxr_comment"> * &lt;<a href="http://www.gnu.org/licenses/gpl-3.0.html&gt;" target="alexandria_uri">http://www.gnu.org/licenses/gpl-3.0.html&gt;</a>.</em>
-<a class="jxr_linenumber" name="L22" href="#L22">22</a>  <em class="jxr_comment"> * #L%</em>
-<a class="jxr_linenumber" name="L23" href="#L23">23</a>  <em class="jxr_comment"> */</em>
-<a class="jxr_linenumber" name="L24" href="#L24">24</a>  
-<a class="jxr_linenumber" name="L25" href="#L25">25</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> java.util.stream.Collectors.toList;
-<a class="jxr_linenumber" name="L26" href="#L26">26</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> java.util.stream.Collectors.toSet;
-<a class="jxr_linenumber" name="L27" href="#L27">27</a>  
-<a class="jxr_linenumber" name="L28" href="#L28">28</a>  <strong class="jxr_keyword">import</strong> java.util.Arrays;
-<a class="jxr_linenumber" name="L29" href="#L29">29</a>  <strong class="jxr_keyword">import</strong> java.util.List;
-<a class="jxr_linenumber" name="L30" href="#L30">30</a>  <strong class="jxr_keyword">import</strong> java.util.Optional;
-<a class="jxr_linenumber" name="L31" href="#L31">31</a>  <strong class="jxr_keyword">import</strong> java.util.Set;
-<a class="jxr_linenumber" name="L32" href="#L32">32</a>  <strong class="jxr_keyword">import</strong> java.util.stream.Stream;
-<a class="jxr_linenumber" name="L33" href="#L33">33</a>  
-<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <em class="jxr_comment">// Thanks to Christoffer Sawicki (qerub) for https://gist.github.com/qerub/9299fce67ab74e114633</em>
-<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/util/Optionals.html">Optionals</a> {
-<a class="jxr_linenumber" name="L36" href="#L36">36</a>    <strong class="jxr_keyword">private</strong> <a href="../../../../../nl/knaw/huygens/alexandria/util/Optionals.html">Optionals</a>() {
-<a class="jxr_linenumber" name="L37" href="#L37">37</a>    }
-<a class="jxr_linenumber" name="L38" href="#L38">38</a>  
-<a class="jxr_linenumber" name="L39" href="#L39">39</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">void</strong> main(String[] args) {
-<a class="jxr_linenumber" name="L40" href="#L40">40</a>      Optional&lt;String&gt; opt1 = Optional.of(<span class="jxr_string">"1"</span>);
-<a class="jxr_linenumber" name="L41" href="#L41">41</a>      Optional&lt;String&gt; opt2 = Optional.of(<span class="jxr_string">"2"</span>);
-<a class="jxr_linenumber" name="L42" href="#L42">42</a>      Optional&lt;String&gt; opt3 = Optional.empty();
-<a class="jxr_linenumber" name="L43" href="#L43">43</a>  
-<a class="jxr_linenumber" name="L44" href="#L44">44</a>      <em class="jxr_comment">// Transform an optional into something else via a stream:</em>
-<a class="jxr_linenumber" name="L45" href="#L45">45</a>      Set&lt;String&gt; res1 = stream(opt1).collect(toSet());
-<a class="jxr_linenumber" name="L46" href="#L46">46</a>  
-<a class="jxr_linenumber" name="L47" href="#L47">47</a>      <em class="jxr_comment">// Flatten a collection of optionals:</em>
-<a class="jxr_linenumber" name="L48" href="#L48">48</a>      List&lt;String&gt; res2 = Stream.of(opt1, opt2, opt3).flatMap(Optionals::stream).collect(toList());
-<a class="jxr_linenumber" name="L49" href="#L49">49</a>  
-<a class="jxr_linenumber" name="L50" href="#L50">50</a>      <em class="jxr_comment">// Combining multiple optionals, keeping the first present value:</em>
-<a class="jxr_linenumber" name="L51" href="#L51">51</a>      Optional&lt;String&gt; res3 = or(opt1, opt2, opt3);
-<a class="jxr_linenumber" name="L52" href="#L52">52</a>    }
-<a class="jxr_linenumber" name="L53" href="#L53">53</a>  
-<a class="jxr_linenumber" name="L54" href="#L54">54</a>    <em class="jxr_comment">/*</em>
-<a class="jxr_linenumber" name="L55" href="#L55">55</a>  <em class="jxr_comment">   * This will be included in Java 9, but until then...</em>
-<a class="jxr_linenumber" name="L56" href="#L56">56</a>  <em class="jxr_comment">   * (https://bugs.openjdk.java.net/browse/JDK-8050820)</em>
-<a class="jxr_linenumber" name="L57" href="#L57">57</a>  <em class="jxr_comment">   */</em>
-<a class="jxr_linenumber" name="L58" href="#L58">58</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> &lt;T&gt; Stream&lt;T&gt; stream(Optional&lt;T&gt; self) {
-<a class="jxr_linenumber" name="L59" href="#L59">59</a>      <strong class="jxr_keyword">return</strong> self.map(Stream::of).orElseGet(Stream::empty);
-<a class="jxr_linenumber" name="L60" href="#L60">60</a>    }
-<a class="jxr_linenumber" name="L61" href="#L61">61</a>  
-<a class="jxr_linenumber" name="L62" href="#L62">62</a>    @SafeVarargs
-<a class="jxr_linenumber" name="L63" href="#L63">63</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> &lt;T&gt; Optional&lt;T&gt; or(Optional&lt;T&gt;... xs) {
-<a class="jxr_linenumber" name="L64" href="#L64">64</a>      <strong class="jxr_keyword">return</strong> Arrays.stream(xs).flatMap(Optionals::stream).findFirst();
-<a class="jxr_linenumber" name="L65" href="#L65">65</a>    }
-<a class="jxr_linenumber" name="L66" href="#L66">66</a>  }
+<a class="jxr_linenumber" name="L9" href="#L9">9</a>   <em class="jxr_comment"> * Licensed under the Apache License, Version 2.0 (the "License");</em>
+<a class="jxr_linenumber" name="L10" href="#L10">10</a>  <em class="jxr_comment"> * you may not use this file except in compliance with the License.</em>
+<a class="jxr_linenumber" name="L11" href="#L11">11</a>  <em class="jxr_comment"> * You may obtain a copy of the License at</em>
+<a class="jxr_linenumber" name="L12" href="#L12">12</a>  <em class="jxr_comment"> * </em>
+<a class="jxr_linenumber" name="L13" href="#L13">13</a>  <em class="jxr_comment"> *      <a href="http://www.apache.org/licenses/LICENSE-2." target="alexandria_uri">http://www.apache.org/licenses/LICENSE-2.</a>0</em>
+<a class="jxr_linenumber" name="L14" href="#L14">14</a>  <em class="jxr_comment"> * </em>
+<a class="jxr_linenumber" name="L15" href="#L15">15</a>  <em class="jxr_comment"> * Unless required by applicable law or agreed to in writing, software</em>
+<a class="jxr_linenumber" name="L16" href="#L16">16</a>  <em class="jxr_comment"> * distributed under the License is distributed on an "AS IS" BASIS,</em>
+<a class="jxr_linenumber" name="L17" href="#L17">17</a>  <em class="jxr_comment"> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</em>
+<a class="jxr_linenumber" name="L18" href="#L18">18</a>  <em class="jxr_comment"> * See the License for the specific language governing permissions and</em>
+<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <em class="jxr_comment"> * limitations under the License.</em>
+<a class="jxr_linenumber" name="L20" href="#L20">20</a>  <em class="jxr_comment"> * #L%</em>
+<a class="jxr_linenumber" name="L21" href="#L21">21</a>  <em class="jxr_comment"> */</em>
+<a class="jxr_linenumber" name="L22" href="#L22">22</a>  
+<a class="jxr_linenumber" name="L23" href="#L23">23</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> java.util.stream.Collectors.toList;
+<a class="jxr_linenumber" name="L24" href="#L24">24</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> java.util.stream.Collectors.toSet;
+<a class="jxr_linenumber" name="L25" href="#L25">25</a>  
+<a class="jxr_linenumber" name="L26" href="#L26">26</a>  <strong class="jxr_keyword">import</strong> java.util.Arrays;
+<a class="jxr_linenumber" name="L27" href="#L27">27</a>  <strong class="jxr_keyword">import</strong> java.util.List;
+<a class="jxr_linenumber" name="L28" href="#L28">28</a>  <strong class="jxr_keyword">import</strong> java.util.Optional;
+<a class="jxr_linenumber" name="L29" href="#L29">29</a>  <strong class="jxr_keyword">import</strong> java.util.Set;
+<a class="jxr_linenumber" name="L30" href="#L30">30</a>  <strong class="jxr_keyword">import</strong> java.util.stream.Stream;
+<a class="jxr_linenumber" name="L31" href="#L31">31</a>  
+<a class="jxr_linenumber" name="L32" href="#L32">32</a>  <em class="jxr_comment">// Thanks to Christoffer Sawicki (qerub) for https://gist.github.com/qerub/9299fce67ab74e114633</em>
+<a class="jxr_linenumber" name="L33" href="#L33">33</a>  <strong class="jxr_keyword">class</strong> <a href="../../../../../nl/knaw/huygens/alexandria/util/Optionals.html">Optionals</a> {
+<a class="jxr_linenumber" name="L34" href="#L34">34</a>    <strong class="jxr_keyword">private</strong> <a href="../../../../../nl/knaw/huygens/alexandria/util/Optionals.html">Optionals</a>() {
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>    }
+<a class="jxr_linenumber" name="L36" href="#L36">36</a>  
+<a class="jxr_linenumber" name="L37" href="#L37">37</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">void</strong> main(String[] args) {
+<a class="jxr_linenumber" name="L38" href="#L38">38</a>      Optional&lt;String&gt; opt1 = Optional.of(<span class="jxr_string">"1"</span>);
+<a class="jxr_linenumber" name="L39" href="#L39">39</a>      Optional&lt;String&gt; opt2 = Optional.of(<span class="jxr_string">"2"</span>);
+<a class="jxr_linenumber" name="L40" href="#L40">40</a>      Optional&lt;String&gt; opt3 = Optional.empty();
+<a class="jxr_linenumber" name="L41" href="#L41">41</a>  
+<a class="jxr_linenumber" name="L42" href="#L42">42</a>      <em class="jxr_comment">// Transform an optional into something else via a stream:</em>
+<a class="jxr_linenumber" name="L43" href="#L43">43</a>      Set&lt;String&gt; res1 = stream(opt1).collect(toSet());
+<a class="jxr_linenumber" name="L44" href="#L44">44</a>  
+<a class="jxr_linenumber" name="L45" href="#L45">45</a>      <em class="jxr_comment">// Flatten a collection of optionals:</em>
+<a class="jxr_linenumber" name="L46" href="#L46">46</a>      List&lt;String&gt; res2 = Stream.of(opt1, opt2, opt3).flatMap(Optionals::stream).collect(toList());
+<a class="jxr_linenumber" name="L47" href="#L47">47</a>  
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>      <em class="jxr_comment">// Combining multiple optionals, keeping the first present value:</em>
+<a class="jxr_linenumber" name="L49" href="#L49">49</a>      Optional&lt;String&gt; res3 = or(opt1, opt2, opt3);
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>    }
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>  
+<a class="jxr_linenumber" name="L52" href="#L52">52</a>    <em class="jxr_comment">/*</em>
+<a class="jxr_linenumber" name="L53" href="#L53">53</a>  <em class="jxr_comment">   * This will be included in Java 9, but until then...</em>
+<a class="jxr_linenumber" name="L54" href="#L54">54</a>  <em class="jxr_comment">   * (https://bugs.openjdk.java.net/browse/JDK-8050820)</em>
+<a class="jxr_linenumber" name="L55" href="#L55">55</a>  <em class="jxr_comment">   */</em>
+<a class="jxr_linenumber" name="L56" href="#L56">56</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> &lt;T&gt; Stream&lt;T&gt; stream(Optional&lt;T&gt; self) {
+<a class="jxr_linenumber" name="L57" href="#L57">57</a>      <strong class="jxr_keyword">return</strong> self.map(Stream::of).orElseGet(Stream::empty);
+<a class="jxr_linenumber" name="L58" href="#L58">58</a>    }
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>  
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>    @SafeVarargs
+<a class="jxr_linenumber" name="L61" href="#L61">61</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> &lt;T&gt; Optional&lt;T&gt; or(Optional&lt;T&gt;... xs) {
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>      <strong class="jxr_keyword">return</strong> Arrays.stream(xs).flatMap(Optionals::stream).findFirst();
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>    }
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>  }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2015&#x2013;2017 <a href="http://www.huygens.knaw.nl">Huygens ING (KNAW)</a>. All rights reserved.</div>
