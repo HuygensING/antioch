@@ -18,7 +18,7 @@
     </dependency>
 
     <!-- <dependency> <groupId>org.glassfish.hk2</groupId> <artifactId>guice-bridge</artifactId> 
-      <version>${guice-bridge.version}</version> </dependency> -->¤
+      <version>${guice-bridge.version}</version> </dependency> -->
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
       <artifactId>jersey-container-servlet</artifactId>
