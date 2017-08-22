@@ -1,28 +1,11 @@
 package nl.knaw.huygens.alexandria.query;
 
-import static java.util.stream.Collectors.joining;
-
-/*
- * #%L
- * alexandria-service
- * =======
- * Copyright (C) 2015 - 2017 Huygens ING (KNAW)
- * =======
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import nl.knaw.huygens.alexandria.storage.Storage;
+import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
+import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
+import nl.knaw.huygens.alexandria.util.StreamUtil;
 
 import java.util.Comparator;
 import java.util.List;
@@ -31,15 +14,34 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import static java.util.stream.Collectors.joining;
 
-import nl.knaw.huygens.alexandria.storage.Storage;
-import nl.knaw.huygens.alexandria.storage.frames.AlexandriaVF;
-import nl.knaw.huygens.alexandria.storage.frames.AnnotationVF;
-import nl.knaw.huygens.alexandria.util.StreamUtil;
+/*
+ * #%L
+ * alexandria-service
+ * =======
+ * Copyright (C) 2015 - 2017 Huygens ING (KNAW)
+ * =======
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 
 public class ParsedAlexandriaQuery {
+
+  enum ListSizeSortOrder {
+    none, ascending, descending
+  }
+
   // this is just a container class for the results of processing the AlexandriaQuery parameters
   private static final Function<Storage, Stream<AnnotationVF>> DEFAULT_ANNOTATIONVF_FINDER = storage -> StreamUtil.stream(storage.find(AnnotationVF.class));
 
@@ -52,6 +54,8 @@ public class ParsedAlexandriaQuery {
   private Comparator<AnnotationVF> comparator;
   private Function<AnnotationVF, Map<String, Object>> mapper;
   private Function<Storage, Stream<AnnotationVF>> annotationVFFinder = DEFAULT_ANNOTATIONVF_FINDER;
+
+  private ListSizeSortOrder listSizeSortOrder = ListSizeSortOrder.none;
 
   private Function<Storage, Stream<Map<String, Object>>> resultStreamMapper;
 
@@ -129,11 +133,11 @@ public class ParsedAlexandriaQuery {
   public String concatenateGroupByFieldsValues(Map<String, Object> map) {
     if (doGrouping()) {
       return returnFields.stream()//
-          .filter(f -> !fieldsToGroup.contains(f))//
-          .sorted()//
-          .map(map::get)//
-          .map(Object::toString)//
-          .collect(joining());
+        .filter(f -> !fieldsToGroup.contains(f))//
+        .sorted()//
+        .map(map::get)//
+        .map(Object::toString)//
+        .collect(joining());
     }
     return null;
   }
@@ -159,10 +163,10 @@ public class ParsedAlexandriaQuery {
   public Function<Storage, Stream<Map<String, Object>>> getResultStreamMapper() {
     if (vfClazz == AnnotationVF.class) {
       return (storage) -> annotationVFFinder//
-          .apply(storage)//
-          .filter(predicate)//
-          .sorted(comparator)//
-          .map(mapper);
+        .apply(storage)//
+        .filter(predicate)//
+        .sorted(comparator)//
+        .map(mapper);
     }
 
     return resultStreamMapper;
@@ -172,4 +176,27 @@ public class ParsedAlexandriaQuery {
     this.resultStreamMapper = resultStreamMapper;
   }
 
+  public ParsedAlexandriaQuery setListSizeSortOrder(ListSizeSortOrder listSizeSortOrder) {
+    this.listSizeSortOrder = listSizeSortOrder;
+    return this;
+  }
+
+  public Comparator<Map<String, Object>> getListSizeComparator() {
+    switch (listSizeSortOrder) {
+      case ascending:
+        return Comparator.comparing(this::getListSize);
+      case descending:
+        return Comparator.comparing(this::getListSize).reversed();
+      default:
+        return null;
+    }
+  }
+
+  private int getListSize(Map<String, Object> resultMap) {
+    return (Integer) resultMap.get(AlexandriaQueryParser.LIST_SIZE);
+  }
+
+  public boolean sortOnListSize() {
+    return !ListSizeSortOrder.none.equals(listSizeSortOrder);
+  }
 }

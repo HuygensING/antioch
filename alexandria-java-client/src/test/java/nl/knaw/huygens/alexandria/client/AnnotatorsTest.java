@@ -6,85 +6,74 @@ package nl.knaw.huygens.alexandria.client;
  * =======
  * Copyright (C) 2015 - 2017 Huygens ING (KNAW)
  * =======
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  * 
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  * #L%
  */
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.UUID;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import nl.knaw.huygens.alexandria.api.model.Annotator;
-import nl.knaw.huygens.alexandria.api.model.AnnotatorList;
-
 public class AnnotatorsTest extends AlexandriaClientTest {
-  @Before
-  public void before() {
-    client.setAuthKey(AUTHKEY);
-    client.setAutoConfirm(true);
-  }
-
-  @Test
-  public void testSetThenGetAnnotator() {
-    String resourceRef = "test";
-    UUID resourceUuid = createResource(resourceRef);
-    String code = "abc";
-    String description = "Annotator description";
-    setResourceAnnotator(resourceUuid, code, description);
-
-    RestResult<Annotator> getResult = client.getAnnotator(resourceUuid, code);
-    assertRequestSucceeded(getResult);
-    Annotator annotator2 = getResult.get();
-    assertThat(annotator2.getCode()).isEqualTo(code);
-    assertThat(annotator2.getDescription()).isEqualTo(description);
-    assertThat(annotator2.getResourceURI()).hasToString("http://localhost:2016/resources/" + resourceUuid);
-  }
-
-  private void setResourceAnnotator(UUID resourceUuid, String code, String description) {
-    Annotator annotator = new Annotator().setDescription(description);
-    RestResult<Void> putResult = client.setAnnotator(resourceUuid, code, annotator);
-    assertRequestSucceeded(putResult);
-    // URI uri = putResult.get();
-    // assertThat(uri).hasToString("http://localhost:2016/resources/" + resourceUuid + "/annotators/abc");
-  }
-
-  @Test
-  public void testAnnotators() {
-    String resourceRef = "test";
-    UUID resourceUUID = createResource(resourceRef);
-    AnnotatorList annotatorList = getAnnotatorList(resourceUUID);
-    assertThat(annotatorList).isEmpty();
-
-    UUID subresourceUUID = createSubResource(resourceUUID, "ref");
-    String code = "abc";
-    String description = "Annotator abc";
-    setResourceAnnotator(resourceUUID, code, description);
-    AnnotatorList annotatorList2 = getAnnotatorList(subresourceUUID);
-    assertThat(annotatorList2).hasSize(1);
-    Annotator annotator = annotatorList2.get(0);
-    assertThat(annotator.getCode()).isEqualTo(code);
-    assertThat(annotator.getDescription()).isEqualTo(description);
-  }
-
-  private AnnotatorList getAnnotatorList(UUID resourceUUID) {
-    RestResult<AnnotatorList> result = client.getAnnotators(resourceUUID);
-    assertRequestSucceeded(result);
-    return result.get();
-  }
+  // TODO move to markup module
+  // @Before
+  // public void before() {
+  // client.setAuthKey(AUTHKEY);
+  // client.setAutoConfirm(true);
+  // }
+  //
+  // @Test
+  // public void testSetThenGetAnnotator() {
+  // String resourceRef = "test";
+  // UUID resourceUuid = createResource(resourceRef);
+  // String code = "abc";
+  // String description = "Annotator description";
+  // setResourceAnnotator(resourceUuid, code, description);
+  //
+  // RestResult<Annotator> getResult = client.getAnnotator(resourceUuid, code);
+  // assertRequestSucceeded(getResult);
+  // Annotator annotator2 = getResult.get();
+  // assertThat(annotator2.getCode()).isEqualTo(code);
+  // assertThat(annotator2.getDescription()).isEqualTo(description);
+  // assertThat(annotator2.getResourceURI()).hasToString("http://localhost:2016/resources/" + resourceUuid);
+  // }
+  //
+  // private void setResourceAnnotator(UUID resourceUuid, String code, String description) {
+  // Annotator annotator = new Annotator().setDescription(description);
+  // RestResult<Void> putResult = client.setAnnotator(resourceUuid, code, annotator);
+  // assertRequestSucceeded(putResult);
+  // // URI uri = putResult.get();
+  // // assertThat(uri).hasToString("http://localhost:2016/resources/" + resourceUuid + "/annotators/abc");
+  // }
+  //
+  // @Test
+  // public void testAnnotators() {
+  // String resourceRef = "test";
+  // UUID resourceUUID = createResource(resourceRef);
+  // AnnotatorList annotatorList = getAnnotatorList(resourceUUID);
+  // assertThat(annotatorList).isEmpty();
+  //
+  // UUID subresourceUUID = createSubResource(resourceUUID, "ref");
+  // String code = "abc";
+  // String description = "Annotator abc";
+  // setResourceAnnotator(resourceUUID, code, description);
+  // AnnotatorList annotatorList2 = getAnnotatorList(subresourceUUID);
+  // assertThat(annotatorList2).hasSize(1);
+  // Annotator annotator = annotatorList2.get(0);
+  // assertThat(annotator.getCode()).isEqualTo(code);
+  // assertThat(annotator.getDescription()).isEqualTo(description);
+  // }
+  //
+  // private AnnotatorList getAnnotatorList(UUID resourceUUID) {
+  // RestResult<AnnotatorList> result = client.getAnnotators(resourceUUID);
+  // assertRequestSucceeded(result);
+  // return result.get();
+  // }
 
 }

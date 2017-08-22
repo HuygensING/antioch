@@ -6,19 +6,17 @@ package nl.knaw.huygens.alexandria.app;
  * =======
  * Copyright (C) 2015 - 2017 Huygens ING (KNAW)
  * =======
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  * #L%
  */
 
@@ -44,10 +42,10 @@ import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import nl.knaw.huygens.alexandria.service.AlexandriaServletModule;
 import nl.knaw.huygens.alexandria.util.Scheduler;
 
-public class Server {
-  private static Logger LOG = LoggerFactory.getLogger(Server.class);
+class Server {
+  private static final Logger LOG = LoggerFactory.getLogger(Server.class);
   private static final long ONE_HOUR = Duration.ofHours(1).toMillis();
-  private AlexandriaConfiguration config = new ServerConfiguration();
+  private final AlexandriaConfiguration config = new ServerConfiguration();
   private static final String PROPERTIES_FILE = "about.properties";
 
   public static void main(String[] args) throws IOException {
@@ -100,7 +98,7 @@ public class Server {
     return config.getBaseURI();
   }
 
-  protected HttpServer startServer(URI uri) throws IOException {
+  private HttpServer startServer(URI uri) throws IOException {
     ServiceLocator locator = createServiceLocator();
     // init service
     AlexandriaService service = locator.getService(AlexandriaService.class);

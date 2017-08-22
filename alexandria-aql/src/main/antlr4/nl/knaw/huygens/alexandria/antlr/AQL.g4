@@ -11,17 +11,17 @@ subQuery
 FIELD_NAME
   : 'id'
   | 'url'
-  | 'type'
+  | 'type' 
   | 'value'
-  | 'resource.id'
+  | 'resource.id' 
   | 'subresource.id'
-  | 'resource.url'
+  | 'resource.url' 
   | 'subresource.url'
-  | 'resource.ref'
+  | 'resource.ref' 
   | 'subresource.sub'
   | 'state'
-  | 'who'
-  | 'when'
+  | 'who' 
+  | 'when' 
   | 'why'
   ;
 

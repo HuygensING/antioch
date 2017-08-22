@@ -6,19 +6,17 @@ package nl.knaw.huygens.alexandria.client;
  * =======
  * Copyright (C) 2015 - 2017 Huygens ING (KNAW)
  * =======
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  * 
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  * #L%
  */
 
@@ -30,7 +28,6 @@ import java.util.UUID;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import nl.knaw.huygens.alexandria.api.model.text.TextImportStatus;
 import nl.knaw.huygens.alexandria.client.model.AnnotationPrototype;
 import nl.knaw.huygens.alexandria.client.model.ResourcePrototype;
 import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
@@ -38,7 +35,7 @@ import nl.knaw.huygens.alexandria.client.model.SubResourcePrototype;
 public abstract class AlexandriaClientTest extends AlexandriaTestWithTestServer {
   static final String AUTHKEY = "AUTHKEY";
 
-  protected static URI testURI = URI.create("http://localhost:2016/");
+  protected static final URI testURI = URI.create("http://localhost:2016/");
 
   static AlexandriaClient client;
 
@@ -75,26 +72,27 @@ public abstract class AlexandriaClientTest extends AlexandriaTestWithTestServer 
     return result.get();
   }
 
-  protected TextImportStatus setResourceText(UUID resourceUuid, String xml) {
-    RestResult<Void> result = client.setResourceText(resourceUuid, xml);
-    assertThat(result).isNotNull();
-    assertThat(result.hasFailed()).isFalse();
-
-    TextImportStatus textGraphImportStatus = null;
-    boolean goOn = true;
-    while (goOn) {
-      try {
-        Thread.sleep(1000);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-      RestResult<TextImportStatus> result2 = client.getTextImportStatus(resourceUuid);
-      assertThat(result2.hasFailed()).isFalse();
-      textGraphImportStatus = result2.get();
-      goOn = !textGraphImportStatus.isDone();
-    }
-    return textGraphImportStatus;
-  }
+  // TODO move to Markup module
+  // protected TextImportStatus setResourceText(UUID resourceUuid, String xml) {
+  // RestResult<Void> result = client.setResourceText(resourceUuid, xml);
+  // assertThat(result).isNotNull();
+  // assertThat(result.hasFailed()).isFalse();
+  //
+  // TextImportStatus textGraphImportStatus = null;
+  // boolean goOn = true;
+  // while (goOn) {
+  // try {
+  // Thread.sleep(1000);
+  // } catch (InterruptedException e) {
+  // e.printStackTrace();
+  // }
+  // RestResult<TextImportStatus> result2 = client.getTextImportStatus(resourceUuid);
+  // assertThat(result2.hasFailed()).isFalse();
+  // textGraphImportStatus = result2.get();
+  // goOn = !textGraphImportStatus.isDone();
+  // }
+  // return textGraphImportStatus;
+  // }
 
   protected UUID annotateResource(UUID resourceUuid, String annotationType, String annotationValue) {
     AnnotationPrototype annotationPrototype = new AnnotationPrototype()//

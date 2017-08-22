@@ -6,24 +6,21 @@ package nl.knaw.huygens.alexandria.endpoint.iiif;
  * =======
  * Copyright (C) 2015 - 2017 Huygens ING (KNAW)
  * =======
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  * 
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  * #L%
  */
 
 import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -40,7 +37,6 @@ import nl.knaw.huygens.alexandria.exception.NotFoundException;
 import nl.knaw.huygens.alexandria.service.AlexandriaService;
 import org.glassfish.jersey.server.ChunkedOutput;
 
-import javax.inject.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
@@ -59,11 +55,10 @@ import static nl.knaw.huygens.alexandria.api.w3c.WebAnnotationConstants.JSONLD_M
 
 public class IIIFAnnotationListEndpoint extends AbstractIIIFEndpoint {
 
-  private final String listId;
-  private String name;
-  private AlexandriaConfiguration config;
-  private String identifier;
-  private WebAnnotationService webAnnotationService;
+  private final String name;
+  private final AlexandriaConfiguration config;
+  private final String identifier;
+  private final WebAnnotationService webAnnotationService;
   private final ProcessStatusMap<AnnotationListImportStatus> taskStatusMap;
   private final ExecutorService executorService;
 
@@ -81,7 +76,7 @@ public class IIIFAnnotationListEndpoint extends AbstractIIIFEndpoint {
     this.taskStatusMap = taskStatusMap;
     this.executorService = executorService;
     this.webAnnotationService = new WebAnnotationService(service, config);
-    this.listId = identifier + ":" + name;
+    String listId = identifier + ":" + name;
   }
 
   @GET
@@ -92,7 +87,7 @@ public class IIIFAnnotationListEndpoint extends AbstractIIIFEndpoint {
   @POST
   // @Path("streaming")
   @Consumes(JSONLD_MEDIATYPE)
-  public Response postAnnotationListStreaming(InputStream inputStream) throws JsonParseException, JsonMappingException, IOException {
+  public Response postAnnotationListStreaming(InputStream inputStream) throws IOException {
     StreamingOutput outStream = os -> {
       JsonFactory jsonFactory = new JsonFactory();
       JsonParser jParser = jsonFactory.createParser(inputStream);
@@ -139,29 +134,26 @@ public class IIIFAnnotationListEndpoint extends AbstractIIIFEndpoint {
   @POST
   @Path("chunked")
   @Consumes(JSONLD_MEDIATYPE)
-  public ChunkedOutput<String> postAnnotationListChunked(InputStream inputStream) throws JsonParseException, JsonMappingException, IOException {
+  public ChunkedOutput<String> postAnnotationListChunked(InputStream inputStream) throws IOException {
     final ChunkedOutput<String> output = new ChunkedOutput<>(String.class);
     AnnotationListHandler alh = new AnnotationListHandler(inputStream, webAnnotationService);
-    new Thread() {
-      @Override
-      public void run() {
+    new Thread(() -> {
+      try {
+        String chunk;
+        while ((chunk = alh.getNextString()) != null) {
+          output.write(chunk);
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+        throw new RuntimeException(e);
+      } finally {
         try {
-          String chunk;
-          while ((chunk = alh.getNextString()) != null) {
-            output.write(chunk);
-          }
+          output.close();
         } catch (IOException e) {
           e.printStackTrace();
-          throw new RuntimeException(e);
-        } finally {
-          try {
-            output.close();
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
         }
       }
-    }.start();
+    }).start();
     return output;
   }
 
