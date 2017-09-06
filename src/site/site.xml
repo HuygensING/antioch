@@ -78,7 +78,7 @@
         <name>
           <![CDATA[<span class="color-highlight">Antioch</span> Text Annotation Repository]]>
         </name>
-        <href>http://antioch.huygens.knaw.nl</href>
+        <href>http://alexandria.huygens.knaw.nl</href>
       </brand>
       <slogan>Enrich and explore any Text with any Annotation</slogan>
       <titleTemplate>%2$s | %1$s</titleTemplate>

@@ -68,7 +68,7 @@ public class InitializationTest {
         .trustStoreFile("../truststore.jks")//
         .trustStorePassword("secret")//
         .createSSLContext();
-    AntiochClient client = new AntiochClient(URI.create("https://acc.antioch.huygens.knaw.nl"), sslContext);
+    AntiochClient client = new AntiochClient(URI.create("https://acc.alexandria.huygens.knaw.nl"), sslContext);
     client.setAutoConfirm(true);
     RestResult<AboutEntity> aboutResult = client.getAbout();
     Log.info("result={}", aboutResult);

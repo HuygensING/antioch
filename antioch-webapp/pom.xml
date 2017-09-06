@@ -100,7 +100,7 @@
     <profile>
       <id>test</id>
       <properties>
-        <config.baseURI>http://test.antioch.huygens.knaw.nl/</config.baseURI>
+        <config.baseURI>http://test.alexandria.huygens.knaw.nl/</config.baseURI>
         <config.storageDirectory>/data/antioch/storage/test/</config.storageDirectory>
         <tomcat.server>tomcat.hi23</tomcat.server>
         <tomcat.manager.url>${tc23-manager}</tomcat.manager.url>
@@ -111,7 +111,7 @@
     <profile>
       <id>acc</id>
       <properties>
-        <config.baseURI>https://acc.antioch.huygens.knaw.nl/</config.baseURI>
+        <config.baseURI>https://acc.alexandria.huygens.knaw.nl/</config.baseURI>
         <config.storageDirectory>/data/antioch/storage/acceptance</config.storageDirectory>
         <tomcat.server>tomcat.hi24alex</tomcat.server>
         <tomcat.manager.url>${tc24alex-manager}</tomcat.manager.url>
@@ -122,7 +122,7 @@
     <profile>
       <id>prod</id>
       <properties>
-        <config.baseURI>https://antioch.huygens.knaw.nl/</config.baseURI>
+        <config.baseURI>https://alexandria.huygens.knaw.nl/</config.baseURI>
         <config.storageDirectory>/data/antioch/storage/production</config.storageDirectory>
         <tomcat.server>tomcat.hi23</tomcat.server>
         <tomcat.manager.url>${tc23-manager}</tomcat.manager.url>

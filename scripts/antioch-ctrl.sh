@@ -81,4 +81,4 @@ esac
 
 exit $?
 
-# antioch-ctrl.sh export test http://test.antioch.huygens.knaw.nl "@NimdaCle#"
+# antioch-ctrl.sh export test http://test.alexandria.huygens.knaw.nl "@NimdaCle#"
