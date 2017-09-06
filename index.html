@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Alexandria | Antioch Text Annotation Repository</title>
+		<title>Welcome | Antioch Text Annotation Repository</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -33,7 +33,7 @@
 
 	</head>
 
-	<body class="page-index project-alexandria" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-index project-antioch" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -43,7 +43,7 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</a>
-					<a class="brand" href="http://alexandria.huygens.knaw.nl"><span class="color-highlight">Antioch</span> Text Annotation Repository</a>
+					<a class="brand" href="http://antioch.huygens.knaw.nl"><span class="color-highlight">Antioch</span> Text Annotation Repository</a>
 					<div class="nav-collapse collapse" id="top-nav-collapse">
 						<ul class="nav pull-right">
 							<li ><a href="http://github.com/HuygensING/antioch/" title="GitHub project" class="externalLink">GitHub project</a></li>
@@ -57,7 +57,7 @@
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Documentation <b class="caret"></b></a>
 								<ul class="dropdown-menu">
-									<li ><a href="alexandria-acceptance-tests/concordion/nl/knaw/huygens/alexandria/Alexandria.html" title="REST Acceptance Tests">REST Acceptance Tests</a></li>
+									<li ><a href="antioch-acceptance-tests/concordion/nl/knaw/huygens/antioch/Antioch.html" title="REST Acceptance Tests">REST Acceptance Tests</a></li>
 								</ul>
 							</li>
 						</ul>
@@ -84,43 +84,13 @@
 			</div>
 		</div>
 	</div>
-		<div>
-			<ul class="breadcrumb">
-				<li><a href="./" title="Antioch">Antioch</a></li>
-				<li class="divider">/</li>
-				<li>Alexandria</li>
-			</ul>
-		</div>
-		<hr class="toc-separator" />
-		<div id="toc-bar" class="navbar" data-spy="affix" data-offset-top="250">
-			<div class="navbar-inner">
-				<div id="toc-scroll-target" class="container">
-					<a class="btn btn-navbar" data-toggle="collapse" data-target="#toc-nav-collapse">
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-					</a>
-					<div class="nav-collapse collapse" id="toc-nav-collapse">
-						<ul id="toc" class="nav">
-						<li class="toplevel"><a href="#alexandria" title="Alexandria">Alexandria</a></li>
-						<li class="toplevel"><a href="#Features" title="Features">Features</a></li>
-						<li class="toplevel"><a href="#Software_Architecture" title="Software Architecture">Software Architecture</a></li>
-						<li class="toplevel"><a href="#Download" title="Download">Download</a></li>
-						<li class="toplevel"><a href="#Texts_as_Graphs_Research_Bibliography" title="Texts as Graphs: Research/ Bibliography">Texts as Graphs: Research/ Bibliography</a></li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
 	</header>
 
 	<div class="main-body">
 	<div class="row">
 		<div class="span12">
 			<div class="body-content">
-<div class="page-header">
- <h1 id="alexandria">Alexandria</h1>
-</div> 
+				<h1>Alexandria</h1> 
 <p>Alexandria is a <i>graph-based text and annotation repository</i> currently serving as a store for annotations targeted at <i>linguistic corpora</i>. However, Alexandria’s conceptual design of texts, annotations, and their relationships has the potential to be applied in other domains and use cases as well, for instance in the field of <i>literary studies</i>. This project aims at leveraging Alexandria’s potential value as a generic storage and query facility for annotated texts by</p> 
 <ol style="list-style-type: decimal"> 
  <li><i>abstracting</i> from <a class="externalLink" href="https://www.nederlab.nl/">Nederlab</a>-specific requirements of linguistic annotation,</li> 
@@ -137,7 +107,7 @@
   <li>provide information about the <i>provenance</i> of its stored resources,</li> 
   <li>annotate resources within the same repository as well as <i>remote resources</i>, and</li> 
   <li>structure resources hierarchically or as networked entities.</li> 
- </ul> 
+ </ul>
 </div> 
 <div class="section"> 
  <h2 id="Software_Architecture">Software Architecture</h2> 
@@ -147,17 +117,17 @@
   <li>supports several <i>graph database backends</i> for the storage of its data, from small, embedded databases to clustered setups for larger datasets,</li> 
   <li>offers various export formats, and</li> 
   <li>has its own, domain-specific query language.</li> 
- </ul> 
+ </ul>
 </div> 
 <div class="section"> 
  <h2 id="Download">Download</h2> 
  <ul> 
   <li><a class="externalLink" href="https://cdn.huygens.knaw.nl/alexandria/master/alexandria-server.jar">Alexandria Server JAR file</a></li> 
   <li><a class="externalLink" href="https://cdn.huygens.knaw.nl/alexandria/master/alexandria-java-client.jar">Alexandria Java Client JAR file</a></li> 
- </ul> 
+ </ul>
 </div> 
 <div class="section"> 
- <h2 id="Texts_as_Graphs_Research_Bibliography">Texts as Graphs: Research/ Bibliography</h2> 
+ <h2 id="Texts_as_Graphs:_Research_Bibliography">Texts as Graphs: Research/ Bibliography</h2> 
  <p>Alexandria is part of a larger community interested in the annotation of textual resources. As such it draws inspiration from many sources, some of which are:</p> 
  <ul> 
   <li> <p>W3C Web Annotation Working Group. <a class="externalLink" href="https://www.w3.org/annotation/">Homepage</a></p></li> 
@@ -165,7 +135,7 @@
   <li> <p>Schmidt, D. and Colomb, R. ‘A data structure for representing multi-version texts online’. International Journal of Human-Computer Studies. 67.6: 2009, 497-514. <a class="externalLink" href="http://dx.doi.org/10.1016/j.ijhcs.2009.02.001">doi:10.1016/j.ijhcs.2009.02.001</a>.</p></li> 
   <li> <p>C. M. Sperberg-McQueen 1 and Claus Huitfeldt: GODDAG: A Data Structure for Overlapping Hierarchies. DDEP-PODDP 2000, ed. P. King and E.V. Munson, Lecture Notes in Computer Science 2023 (Berlin: Springer, 2004). pp. 139-160. <a class="externalLink" href="http://cmsmcq.com/2000/poddp2000.html">Online preprint</a></p></li> 
   <li> <p>Nancy Ide, Keith Suderman. GrAF: A Graph-based Format for Linguistic Annotations. <a class="externalLink" href="http://aclweb.org/anthology/W/W07/W07-1501.pdf">Online</a>.</p></li> 
- </ul> 
+ </ul>
 </div>
 			</div>
 		</div>
@@ -208,7 +178,7 @@
 					<ul class="nav nav-list">
 						<li class="nav-header">Documentation</li>
 						<li >
-							<a href="alexandria-acceptance-tests/concordion/nl/knaw/huygens/alexandria/Alexandria.html" title="REST Acceptance Tests">REST Acceptance Tests</a>
+							<a href="antioch-acceptance-tests/concordion/nl/knaw/huygens/antioch/Antioch.html" title="REST Acceptance Tests">REST Acceptance Tests</a>
 						</li>
 					</ul>
 				</div>

@@ -1,0 +1,6 @@
+nl.knaw.huygens.antioch.config
+nl.knaw.huygens.antioch.jersey.exceptionmappers
+nl.knaw.huygens.antioch.query
+nl.knaw.huygens.antioch.service
+nl.knaw.huygens.antioch.storage
+nl.knaw.huygens.antioch.storage.frames
