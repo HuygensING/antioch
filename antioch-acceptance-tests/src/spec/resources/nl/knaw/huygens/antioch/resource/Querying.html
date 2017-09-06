@@ -1,0 +1,204 @@
+<!--
+  #%L
+  antioch-acceptance-tests
+  =======
+  Copyright (C) 2015 - 2017 Huygens ING (KNAW)
+  =======
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/antioch/xsd/concordion-rest.xsd">
+
+<title>Antioch: Querying (External) Resources</title>
+
+<body data-desc="Querying (external) resources">
+
+<div id="get-non-existent" data-desc="What happens when I GET a non-existent resource?" c:execute="clearStorage()">
+    Given that no resource exists with ID <code>3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</code>
+    <h:request>
+        When I
+        <h:get>/resources/3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44</h:get>
+        then I should receive
+        <h:status>404 Not Found</h:status>
+        and the response body should contain:
+        <h:jsonResponse>{
+            "error": {
+            "message": "No resource found with id 3ed4faaa-c0cd-11e4-a84e-83ef41cbdc44"
+            }
+            }
+        </h:jsonResponse>
+    </h:request>
+</div>
+
+<div id="get-all-resource-data" data-desc="How can I get all data for a given resource?" c:execute="clearStorage()">
+    <h:request>
+        Given I have
+        <h:success>successfully</h:success>
+        <h:put>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:put>
+        the following body:
+        <h:jsonBody>{
+            "resource": {
+            "id": "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+            "ref": "http://www.example.com/titles/path/to/title/resource"
+            }
+            }
+        </h:jsonBody>
+    </h:request>
+
+    <h:request>
+        When I
+        <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:get>
+        I should receive
+        <h:status>200 OK</h:status>
+        with a response body containing
+        <h:jsonResponse>{
+            "resource": {
+            "id" : "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+            "ref": "http://www.example.com/titles/path/to/title/resource",
+            "^provenance": "https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/provenance"
+            }
+            }
+        </h:jsonResponse>
+    </h:request>
+
+    <h:request>
+        And
+        <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/provenance</h:get>
+        should return
+        <h:status>200 OK</h:status>
+        with a response body containing
+        <h:jsonResponse>{
+            "provenance": {
+            "who": "nederlab",
+            "why": "",
+            "when": "{date.beforeNow}",
+            "^what": "https://{host}/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01"
+            }
+            }
+        </h:jsonResponse>
+    </h:request>
+</div>
+
+<div id="get-resource-annotations" c:execute="clearStorage()"
+     data-desc="How can I GET the annotations of an existing resource?">
+
+    <div class="alert alert-warning well-sm" role="alert">
+        <strong>Warning:</strong>
+        This is currently a dressed-down example showing only an empty annotations array.
+        It needs to use real annotations to show that you get <code>^annotation</code> results.
+    </div>
+
+    <h:request>
+        Given I have
+        <h:success>successfully</h:success>
+        <h:put>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01</h:put>
+        the following body:
+        <h:jsonBody>{
+            "resource": {
+            "id": "6e56c868-c0a9-11e4-a762-cb9a664afc01",
+            "ref": "http://www.example.com/titles/path/to/title/resource"
+            }
+            }
+        </h:jsonBody>
+    </h:request>
+
+    <h:request>
+        When I
+        <h:get>/resources/6e56c868-c0a9-11e4-a762-cb9a664afc01/annotations</h:get>
+        I should receive
+        <h:status>200 OK</h:status>
+        with a response body containing
+        <h:jsonResponse>{
+            "annotations": []
+            }
+        </h:jsonResponse>
+    </h:request>
+</div>
+
+<div id="get-resource-by-ref" c:execute="clearStorage()"
+     data-desc="How can I find a resource with a given ref?">
+    
+  Given the following resource tree:
+  <ul>
+    <li c:execute="resourceExists(#uuid0,#ref0)">
+      a (confirmed parent) resource exists with uuid: <code c:set="#uuid0">00000000-0000-0000-0000-000000000004</code>
+      and ref: <code c:set="#ref0">Corpus</code>  
+    </li>
+    <li c:execute="#uuid1 = hasSubresource(#uuid0,#sub1)">
+      this resource has a confirmed subresource 1
+      with sub: <code c:set="#sub1">Sub 1</code>
+      and uuid: <code c:echo="#uuid1"></code>
+    </li>
+    <li c:execute="#uuid2 = hasSubresource(#uuid0,#sub2)">
+      and confirmed subresource 2, 
+      with sub: <code c:set="#sub2">Sub 2</code>
+      and uuid: <code c:echo="#uuid2"></code>
+    </li>
+    <li c:execute="#uuid21 = hasSubresource(#uuid2,#sub21)">
+      which has its own confirmed subresource 2.1,
+      with sub: <code c:set="#sub21">Sub 2.1</code>
+      and uuid: <code c:echo="#uuid21"></code>
+    </li>
+    <li c:execute="resourceExists(#uuid1,#ref1)">
+      and finally a different (confirmed parent) resource exists with uuid: <code c:set="#uuid1">00000000-0000-0000-0000-000000000005</code>
+      and ref: <code c:set="#ref1">Corpus2</code>  
+    </li>
+    <li c:execute="#uuid3 = hasSubresource(#uuid1,#sub21)">
+      with confirmed subresource 3
+      with sub: <code c:set="#sub3">Sub 2.1</code>
+      and uuid: <code c:echo="#uuid3"></code>
+    </li>
+  </ul>
+  
+  Now, to find the UUID of the resource in this tree that has ref <code c:echo="#sub21"></code>,
+  <h:request>I
+    <h:post>/searches</h:post>
+    the following body
+    <h:jsonBody>
+    {
+      "query": {
+        "find": "resource",
+        "where": "subresource.sub:eq(\"$sub21\") resource.id:eq(\"$uuid0\")",
+        "return": "subresource.id"
+    } }
+    </h:jsonBody>
+  </h:request>
+  
+  <div c:execute="#searchId = uuid()">The uuid for this particular search was:
+      <strong c:echo="#searchId"></strong>.
+  </div>
+
+  <h:request>We
+    <h:get>/searches/$searchId</h:get>
+    and observe
+    <h:status>200 OK</h:status>
+    and the relevant subresource <code>id</code>s and <code>sub</code>s in the body
+    <h:jsonResponse>
+    { "searchResultPage": {
+        "records": [
+	        {
+		        "subresource.id": "$uuid21"
+	        }
+    ] } }
+    </h:jsonResponse>
+    <small>notice that subresource 3 is not included in the results</small>
+  </h:request>
+
+</div>
+
+</body>
+</html>

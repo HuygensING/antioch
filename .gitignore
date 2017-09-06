@@ -14,7 +14,8 @@
 /.project
 
 dump.xml
-/alexandria-server.jar
-/alexandria-data*
-/alexandria-server/*.flightcontrol
+/antioch-server.jar
+/antioch-data*
+/antioch-server/*.flightcontrol
 *.jfr
+/.metadata/

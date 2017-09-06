@@ -4,7 +4,7 @@ ad 4 show the user’s tags
 Doel is een ‘tag overzicht’ pagina met alle tags van de gebruiker. Die set van tags is op basis van filteren en verfijnen in te perken. De gebruiker kan daarna een tag aanklikken en in context bekijken (zie scenario 5)
 - gebruiker logt in —> userID bekend
 - gebruiker gaat naar ‘tag overzicht’ pagina
-- REQUEST naar Alexandria: geef eerste pagina met tags voor gebruiker userID terug, op basis van sorteren op ‘time stamp'
+- REQUEST naar Antioch: geef eerste pagina met tags voor gebruiker userID terug, op basis van sorteren op ‘time stamp'
 - op pagina wordt een tabel getoond met:
      - rijen voor de eerste n annotaties. Mogelijke kolommen: resourceID, subresourceID, time stamp, vrije tekstwaarde
      - totaal aantal annotaties en/of pagina's
@@ -21,12 +21,12 @@ Doel is een ‘tag overzicht’ pagina met alle tags van de gebruiker. Die set v
 >> find(annotation).where(type:eq("Tag"),who:eq("$userId"),state:eq("CONFIRMED")).sort(resource.id,when).return(when,value,resource.id,subresource.id)
 
 - gebruiker voert een substring of regexpr in in een invoerveld ‘filter op tekstwaarde'
-- REQUEST naar Alexandria: alle tags zoals bovenstaand, gefilterd op die substring of regexpr
+- REQUEST naar Antioch: alle tags zoals bovenstaand, gefilterd op die substring of regexpr
 
 >> find(annotation).where(type:eq("Tag") who:eq("$userId") state:eq("CONFIRMED") value.match("$regexp")).sort(resource.id,when).return(when,value,resource.id,subresource.id)
 
 - gebruiker specificeert een tijdinterval
-- REQUEST naar Alexandria: alle tags zoals bovenstaand, gefilterd op dat tijdinterval
+- REQUEST naar Antioch: alle tags zoals bovenstaand, gefilterd op dat tijdinterval
 
 >> find(annotation).where(type:eq("Tag") who:eq("$userId") state:eq("CONFIRMED") when.inRange($first,$last)).sort(resource.id,when).return(when,value,resource.id,subresource.id)
 

@@ -1,0 +1,46 @@
+<!--
+  #%L
+  antioch-acceptance-tests
+  =======
+  Copyright (C) 2015 - 2017 Huygens ING (KNAW)
+  =======
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/antioch/xsd/concordion-rest.xsd">
+
+<title>Antioch: Client</title>
+
+<body class="container">
+
+<h2>Client</h2>
+
+<div id="java-client" c:execute="#version=antiochVersion()" data-desc="Java Client">
+<p>There is an Antioch Java client which can be used to access an Antioch Server.</p>
+
+<p>Maven dependency:
+<h:xmlBody><![CDATA[
+<dependency>
+    <groupId>nl.knaw.huygens.antioch</groupId>
+    <artifactId>antioch-client</artifactId>
+    <version>$version</version>
+</dependency>
+]]></h:xmlBody></p>
+</div>
+
+</body>
+</html>

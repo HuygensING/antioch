@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   #%L
-  Alexandria Text Repository
+  Antioch Text Annotation Repository
   =======
   Copyright (C) 2015 - 2017 Huygens ING (KNAW)
   =======
@@ -29,9 +29,9 @@
   <version position="bottom"/>
 
   <bannerLeft>
-    <name><![CDATA[<span class="color-highlight">Alexandria</span> Text Annotation Repository]]>
+    <name><![CDATA[<span class="color-highlight">Antioch</span> Text Annotation Repository]]>
     </name>
-    <href>http://HuygensING.github.io/alexandria</href>
+    <href>http://HuygensING.github.io/antioch</href>
   </bannerLeft>
 
   <skin>
@@ -42,16 +42,16 @@
 
   <body>
     <links>
-      <item name="GitHub project" href="http://github.com/HuygensING/alexandria/"/>
+      <item name="GitHub project" href="http://github.com/HuygensING/antioch/"/>
     </links>
 
     <breadcrumbs>
-      <item name="Alexandria" href="/"/>
+      <item name="Antioch" href="/"/>
     </breadcrumbs>
 
     <menu name="Main" inherit="top">
       <item name="Home" href="./"/>
-      <item name="GitHub project" href="http://github.com/HuygensING/alexandria/"/>
+      <item name="GitHub project" href="http://github.com/HuygensING/antioch/"/>
       <item name="Release notes" href="release-notes.html"/>
     </menu>
     <menu name="Download" inherit="top">
@@ -61,7 +61,7 @@
     <menu name="Documentation" inherit="bottom">
 <!--       <item name="Early REST discussion" href="REST.html"/>  -->
       <item name="REST Acceptance Tests"
-            href="alexandria-acceptance-tests/concordion/nl/knaw/huygens/alexandria/Alexandria.html"/>
+            href="antioch-acceptance-tests/concordion/nl/knaw/huygens/antioch/Antioch.html"/>
     </menu>
     <menu name="Maven documentation" ref="reports" inherit="bottom"/>
   </body>
@@ -76,9 +76,9 @@
       <highlightJsTheme>github</highlightJsTheme>
       <brand>
         <name>
-          <![CDATA[<span class="color-highlight">Alexandria</span> Text Annotation Repository]]>
+          <![CDATA[<span class="color-highlight">Antioch</span> Text Annotation Repository]]>
         </name>
-        <href>http://alexandria.huygens.knaw.nl</href>
+        <href>http://antioch.huygens.knaw.nl</href>
       </brand>
       <slogan>Enrich and explore any Text with any Annotation</slogan>
       <titleTemplate>%2$s | %1$s</titleTemplate>
@@ -92,14 +92,14 @@
         <column>reports</column>
       </bottomNav>
       <bottomDescription>
-        <![CDATA[<span class="color-highlight">Alexandria</span> Text Annotation Repository]]>
+        <![CDATA[<span class="color-highlight">Antioch</span> Text Annotation Repository]]>
         is a repository for adding and querying heterogeneous annotations on any kind of text
         or segment of a text.
         Both texts maintained by the repository as well as texts registered at the repository
         but maintained elsewhere can be annotated and queried.
       </bottomDescription>
       <pages>
-        <index project="alexandria">
+        <index project="antioch">
           <shortTitle>Welcome</shortTitle>
           <breadcrumbs>false</breadcrumbs>
           <markPageHeader>false</markPageHeader>

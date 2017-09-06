@@ -1,7 +1,7 @@
-RESTful Alexandria
+RESTful Antioch
 ==================
 
-Base url: `https://alexandria.huygens.knaw.nl`
+Base url: `https://antioch.huygens.knaw.nl`
 
 Create a resource
 -----------------
@@ -21,7 +21,7 @@ Authorization: auth-token-1234                      # Some token identifying 'ne
 
 ```
 => 201 (Created)
-Location: https://alexandria.huygens.knaw.nl/resources/some-uuid-1
+Location: https://antioch.huygens.knaw.nl/resources/some-uuid-1
 ```
 
 Get a resource
@@ -62,7 +62,7 @@ Authorization: auth-token-1234
 
 ```
 => 201 (Created)
-Location: https://alexandria.huygens.knaw.nl/annotations/anno-id-1
+Location: https://antioch.huygens.knaw.nl/annotations/anno-id-1
 ```
 
 Get a specific annotation
@@ -125,7 +125,7 @@ Authorization: auth-token-1234
 
 ```
 => 201 (Created)
-Location: https://alexandria.huygens.knaw.nl/annotations/anno-id-2
+Location: https://antioch.huygens.knaw.nl/annotations/anno-id-2
 ```
 
 Get annotations on `some-uuid-1` again

@@ -1,0 +1,173 @@
+<!--
+  #%L
+  antioch-acceptance-tests
+  =======
+  Copyright (C) 2015 - 2017 Huygens ING (KNAW)
+  =======
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/antioch/xsd/concordion-rest.xsd">
+
+<title>Antioch: Provenance in Antioch</title>
+
+<body data-desc="Provenance in Antioch">
+
+<!-- TODO: Move to 'cat' and generate -->
+<div class="dropdown">
+    <button class="btn btn-primary pull-right dropdown-toggle" type="button" data-toggle="dropdown">Test Sources
+        <span class="caret"></span></button>
+    <ul class="dropdown-menu dropdown-menu-right">
+        <li>
+            <a href="https://github.com/HuygensING/antioch/blob/master/antioch-acceptance-tests/src/spec/java/nl/knaw/huygens/antioch/provenance/ProvenanceFixture.java">Fixture</a>
+        </li>
+        <li>
+            <a href="https://github.com/HuygensING/antioch/blob/master/antioch-acceptance-tests/src/spec/resources/nl/knaw/huygens/antioch/provenance/Provenance.html">Specification</a>
+        </li>
+    </ul>
+</div>
+
+<div id="provenance-anatomy" data-desc="How is provenance information represented?" c:execute="clearStorage()">
+    <div>
+        <strong>Each and every Antioch
+            <mark>resource</mark>
+            and
+            <mark>annotation</mark>
+            object has provenance information associated with it.</strong>
+
+        <p>
+            This information allows
+            <small>(= can be used to implement, but does not guarantee correctness of)</small>
+            attribution of Antioch objects to a person or entity, as well as keeping track of when annotations have
+            become deprecated due to new revisions. A (brief) rationale for the object's existence or the reason for a
+            change can also be documented.
+        </p>
+
+        Provenance information maintained in Antioch contains the following elements:
+
+        <dl class="dl-horizontal">
+            <dt><code>who</code></dt>
+            <dd>the user information that was passed when the object was created
+                (<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a>)
+            </dd>
+            <dt><code>why</code></dt>
+            <dd>the reason that was passed when the object was created
+                (<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a>)
+            </dd>
+            <dt><code>when</code></dt>
+            <dd>the date and time the object was created
+                (ISO-8601 representation of
+                <a href="https://docs.oracle.com/javase/8/docs/api/java/time/Instant.html">Instant</a>)
+            </dd>
+            <dt><code>^what</code></dt>
+            <dd>a link back to the object that this provenance information is about
+                (<a href="https://docs.oracle.com/javase/8/docs/api/java/net/URL.html">URL</a>)
+            </dd>
+        </dl>
+    </div>
+
+    <div class="alert alert-info sm">
+        In Nederlab scenario's, the provenance fields <code>who</code>, <code>why</code>, and <code>when</code>
+        can be set by providing overriding provenance elements at
+        <a href="../resource/Creation.html">resource creation</a> and annotation creation time, respectively.
+        <br/>
+        <small>The <code>^what</code> field is always set by Antioch to ensure correct linking between an object and
+            its provenance.
+        </small>
+    </div>
+
+    <hr/>
+
+    <div c:execute="resourceExists(#uuid)">Given that a resource with id
+        <code c:set="#uuid">761fd88a-6e66-11e5-8b51-23caeac9ef8a</code> exists.
+    </div>
+
+    <h:request>
+        <strong>(verification)</strong> When we
+        <h:get>/resources/$uuid</h:get>
+        we observe
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "resource": {
+            "id": "$uuid",
+            "^provenance": "https://{host}/resources/$uuid/provenance"
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+    <hr/>
+
+    <h:request>
+        When we
+        <h:get>/resources/$uuid/provenance</h:get>
+        we observe
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "provenance": {
+            "who": "nederlab",
+            "why": "details warranting this object's existence",
+            "when": "{date.beforeNow}",
+            "^what": "https://{host}/resources/$uuid"
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+    <hr/>
+
+    <div class="alert alert-warning sm">
+        <strong>&#9888; Provenance details are immutable</strong>
+        <p>(so be sure to enter the correct details when creating new resources and annotations)</p>
+    </div>
+
+    This implies, for example, that:
+    <ul>
+        <li>the creator of a resource cannot be changed:
+            <h:request>
+                When we
+                <h:put>/resources/$uuid</h:put>
+                <h:jsonBody>{
+                    "resource": {
+                    "provenance": {
+                    "who": "david-lightman"
+                    } } }
+                </h:jsonBody>
+                we observe
+                <h:status>400 Bad Request</h:status>
+            </h:request>
+        </li>
+
+        <li>an explanation cannot be entered retroactively:
+            <h:request>
+                When we
+                <h:put>/resources/$uuid</h:put>
+                <h:jsonBody>{
+                    "resource": {
+                    "provenance": {
+                    "why": "forgot to supply a reason when creating the resource, so now I am hosed"
+                    } } }
+                </h:jsonBody>
+                we also observe
+                <h:status>400 Bad Request</h:status>
+            </h:request>
+        </li>
+    </ul>
+</div>
+
+</body>
+</html>

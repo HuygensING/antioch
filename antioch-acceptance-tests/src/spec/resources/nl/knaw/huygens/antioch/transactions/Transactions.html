@@ -1,0 +1,194 @@
+<!--
+  #%L
+  antioch-acceptance-tests
+  =======
+  Copyright (C) 2015 - 2017 Huygens ING (KNAW)
+  =======
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/antioch/xsd/concordion-rest.xsd">
+
+<title>Antioch: Transactions in Antioch</title>
+
+<body data-desc="Transactions in Antioch">
+
+<!-- TODO: Move to 'cat' and generate -->
+<div class="dropdown">
+    <button class="btn btn-primary pull-right dropdown-toggle" type="button" data-toggle="dropdown">Test Sources
+        <span class="caret"></span></button>
+    <ul class="dropdown-menu dropdown-menu-right">
+        <li>
+            <a href="https://github.com/HuygensING/antioch/blob/master/antioch-acceptance-tests/src/spec/java/nl/knaw/huygens/antioch/transactions/TransactionsFixture.java">Fixture</a>
+        </li>
+        <li>
+            <a href="https://github.com/HuygensING/antioch/blob/master/antioch-acceptance-tests/src/spec/resources/nl/knaw/huygens/antioch/transactions/Transactions.html">Specification</a>
+        </li>
+    </ul>
+</div>
+
+<div id="try-confirm-cancel" data-desc="What is the try-confirm-cancel pattern?" c:execute="clearStorage()">
+    <div class="alert alert-warning sm">
+        The <a href="http://www.atomikos.com/Publications/TryCancelConfirm" target="_blank">try-confirm-cancel</a>
+        pattern dictates we first confirm any newly created resources before using them.
+
+        <p><i>Failure to follow this pattern leads to grief when operating on the resource!</i></p>
+    </div>
+
+    <a href="tcc.svg"><img src="tcc.svg" class="img-responsive" alt="Try-Confirm-Cancel"/></a>
+
+    <br/>
+    <strong>TODO</strong> Add textual explanation
+    <hr/>
+
+    <div c:execute="resourceExists(#uuid)">Given that a resource with id
+        <code c:set="#uuid">6244b9d8-3b5e-11e5-aca2-5befb33d5e4d</code> exists, and that
+        a subresource is
+    </div>
+
+    <h:request>
+        <h:success>successfully</h:success>
+        registered via
+        <h:post>/resources/$uuid/subresources</h:post>
+        with body:
+        <h:jsonBody>{"subresource":{"sub":"/some/folia/path"}}</h:jsonBody>
+    </h:request>
+
+    <div c:execute="#uuid = uuid()">and assume its uuid <code c:echo="#uuid"></code> was passed via the Location header.
+    </div>
+
+    <h:request>
+        To <strong>verify</strong> we
+        <h:get>/resources/$uuid</h:get>
+        and observe its <code>TENTATIVE</code> state
+        <h:jsonResponse>{"subresource":{
+            "id": "$uuid",
+            "sub": "/some/folia/path",
+            "state": { "value": "TENTATIVE",
+            "since" : "{date.beforeNow}"
+            } } }
+        </h:jsonResponse>
+    </h:request>
+
+    <hr/>
+
+    <div class="alert alert-warning sm">While the object is <code>TENTATIVE</code>, it cannot be used properly yet,
+        demonstrated by the following request.
+    </div>
+
+    <h:request>
+        When I
+        <h:post>/resources/$uuid/annotations</h:post>
+        an example annotation body:
+        <h:jsonBody>{"annotation": {"type": "t", "value": "v"}}</h:jsonBody>
+        Then I will get status
+        <h:status>409 Conflict</h:status>
+        and a response body containing:
+        <h:jsonResponse>{"error":{"message": "This resource has state TENTATIVE; it needs to be CONFIRMED first."}}
+        </h:jsonResponse>
+    </h:request>
+
+    <hr/>
+
+    <div class="alert alert-info sm">In order to properly use the newly created object, we need to confirm it as
+        follows.
+    </div>
+
+    <h:request>We
+        <h:put>/resources/$uuid/state</h:put>
+        the body
+        <h:jsonBody>{"state":"CONFIRMED"}</h:jsonBody>
+        to which the server responds with
+        <h:status>204 No Content</h:status>
+    </h:request>
+    <br/>
+
+    <div class="alert alert-info sm">
+        Our resource <code c:echo="#uuid"></code> is now in proper working condition.
+    </div>
+
+    <h:request>
+        To <strong>verify</strong> we
+        <h:get>/resources/$uuid</h:get>
+        and observe its <code>CONFIRMED</code> state
+        <h:jsonResponse>{"subresource":{
+            "id": "$uuid",
+            "sub": "/some/folia/path",
+            "state": { "value": "CONFIRMED",
+            "since" : "{date.beforeNow}"
+            } } }
+        </h:jsonResponse>
+    </h:request>
+
+    <hr/>
+
+    Now we can resubmit our annotation request.
+
+    <h:request>
+        When I
+        <h:post>/resources/$uuid/annotations</h:post>
+        an example annotation body:
+        <h:jsonBody>{"annotation": {"type": "t", "value": "v"}}</h:jsonBody>
+        The server responds with
+        <h:status>201 Created</h:status>
+    </h:request>
+
+    <hr/>
+
+    <div class="alert alert-warning sm">
+        Obviously, this newly created annotation will also be in a <code>TENTATIVE</code> state
+        and will need to be confirmed in its own right.
+    </div>
+
+    <div c:execute="#annoId = uuid()">Assume the annotation's uuid <code c:echo="#annoId"></code>
+        was passed via the Location header.
+    </div>
+
+    <h:request>
+        We
+        <h:put>/annotations/$annoId/state</h:put>
+        the body
+        <h:jsonBody>{"state":"CONFIRMED"}</h:jsonBody>
+        to which the server responds with the now familiar
+        <h:status>204 No Content</h:status>
+    </h:request>
+
+    <h:request>
+        As a final <strong>verification</strong> step we
+        <h:get>/annotations/$annoId</h:get>
+        receiving
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "annotation": {
+            "id" : "$annoId",
+            "state" : {
+            "value" : "CONFIRMED",
+            "since" : "{date.beforeNow}"
+            },
+            "type" : "t",
+            "value" : "v",
+            "^annotates" : "https://{host}/resources/$uuid",
+            "^annotations" : [ ]
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+</div>
+
+</body>
+</html>
