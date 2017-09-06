@@ -27,9 +27,9 @@ import nl.knaw.huygens.antioch.config.AbstractAntiochConfigurationUsingAntiochPr
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,8 +40,8 @@ import nl.knaw.huygens.antioch.config.AbstractAntiochConfigurationUsingAntiochPr
 
 public class ServerConfiguration extends AbstractAntiochConfigurationUsingAntiochProperties {
   private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(ServerConfiguration.class);
-  private static final File ALEXANDRIA_ROOT = new File(System.getProperty("user.home"), ".antioch");
-  private static final File ALEXANDRIA_PROPERTIES_FILE = new File(ALEXANDRIA_ROOT, "antioch.properties");
+  private static final File ANTIOCH_ROOT = new File(System.getProperty("user.home"), ".alexandria");
+  private static final File ANTIOCH_PROPERTIES_FILE = new File(ANTIOCH_ROOT, "alexandria.properties");
 
   private static final String PROPERTY_LOG_LEVEL = "logLevel";
   private static final String PROPERTY_ADMIN_KEY = "adminKey";
@@ -49,7 +49,7 @@ public class ServerConfiguration extends AbstractAntiochConfigurationUsingAntioc
   private static final String PROPERTY_BASE_URI = "baseURI";
 
   private static final String DEFAULT_BASE_URI = "http://localhost:2015/";
-  private static final String DEFAULT_STORAGE_DIRECTORY = new File(ALEXANDRIA_ROOT, "data").getAbsolutePath();
+  private static final String DEFAULT_STORAGE_DIRECTORY = new File(ANTIOCH_ROOT, "data").getAbsolutePath();
   private static final String DEFAULT_ADMIN_KEY = "admin";
 
   private String baseURI = DEFAULT_BASE_URI;
@@ -58,7 +58,7 @@ public class ServerConfiguration extends AbstractAntiochConfigurationUsingAntioc
   private Level logLevel = Level.WARN;
 
   public ServerConfiguration() {
-    if (ALEXANDRIA_PROPERTIES_FILE.exists()) {
+    if (ANTIOCH_PROPERTIES_FILE.exists()) {
       initFromFile();
     } else {
       initFromCommandLine();
@@ -93,8 +93,8 @@ public class ServerConfiguration extends AbstractAntiochConfigurationUsingAntioc
 
   private void initFromFile() {
     Properties properties = new Properties();
-    try (InputStream in = new FileInputStream(ALEXANDRIA_PROPERTIES_FILE)) {
-      System.out.println("Reading properties from " + ALEXANDRIA_PROPERTIES_FILE);
+    try (InputStream in = new FileInputStream(ANTIOCH_PROPERTIES_FILE)) {
+      System.out.println("Reading properties from " + ANTIOCH_PROPERTIES_FILE);
       properties.load(in);
       baseURI = properties.getProperty(PROPERTY_BASE_URI);
       storageDirectory = properties.getProperty(PROPERTY_STORAGE_DIRECTORY);
@@ -102,7 +102,7 @@ public class ServerConfiguration extends AbstractAntiochConfigurationUsingAntioc
       logLevel = Level.toLevel(properties.getProperty(PROPERTY_LOG_LEVEL));
     } catch (IOException e) {
       e.printStackTrace();
-      LOG.error("Error reading properties from {}: {}", ALEXANDRIA_PROPERTIES_FILE.getAbsolutePath(), e.getMessage());
+      LOG.error("Error reading properties from {}: {}", ANTIOCH_PROPERTIES_FILE.getAbsolutePath(), e.getMessage());
     }
 
   }
@@ -113,12 +113,12 @@ public class ServerConfiguration extends AbstractAntiochConfigurationUsingAntioc
       // baseURI = StringUtils.defaultIfBlank(keyboard.nextLine(), DEFAULT_BASE_URI);
 
       Properties properties = new Properties();
-      if (!ALEXANDRIA_ROOT.exists()) {
-        if (!ALEXANDRIA_ROOT.mkdir()) {
-          throw new RuntimeException("Fatal error: couldn't create directory " + ALEXANDRIA_ROOT.getAbsolutePath());
+      if (!ANTIOCH_ROOT.exists()) {
+        if (!ANTIOCH_ROOT.mkdir()) {
+          throw new RuntimeException("Fatal error: couldn't create directory " + ANTIOCH_ROOT.getAbsolutePath());
         }
       }
-      try (OutputStream out = new FileOutputStream(ALEXANDRIA_PROPERTIES_FILE)) {
+      try (OutputStream out = new FileOutputStream(ANTIOCH_PROPERTIES_FILE)) {
         properties.setProperty(PROPERTY_BASE_URI, baseURI);
         properties.setProperty(PROPERTY_STORAGE_DIRECTORY, storageDirectory);
         properties.setProperty(PROPERTY_ADMIN_KEY, adminKey);
@@ -126,7 +126,7 @@ public class ServerConfiguration extends AbstractAntiochConfigurationUsingAntioc
         properties.store(out, "Antioch settings");
       } catch (IOException e) {
         e.printStackTrace();
-        LOG.error("Error writing properties to {}: {}", ALEXANDRIA_PROPERTIES_FILE.getAbsolutePath(), e.getMessage());
+        LOG.error("Error writing properties to {}: {}", ANTIOCH_PROPERTIES_FILE.getAbsolutePath(), e.getMessage());
       }
     }
   }
