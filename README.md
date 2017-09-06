@@ -1,4 +1,4 @@
-See the [generated Maven site](http://huygensING.github.io/alexandria) for documentation on Alexandria.
+See the [generated Maven site](http://huygensING.github.io/antioch) for documentation on Antioch.
 ------
 
 ##### (cheat-sheet to publish the site):
