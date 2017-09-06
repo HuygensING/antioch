@@ -21,11 +21,11 @@
       xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
       xmlns:xsi="http://www.w3.org/1999/xhtml"
       xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
-                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+                          http://huygensing.github.io/antioch/xsd/concordion-rest.xsd">
 
-<title>Alexandria: Provenance in Alexandria</title>
+<title>Antioch: Provenance in Antioch</title>
 
-<body data-desc="Provenance in Alexandria">
+<body data-desc="Provenance in Antioch">
 
 <!-- TODO: Move to 'cat' and generate -->
 <div class="dropdown">
@@ -33,17 +33,17 @@
         <span class="caret"></span></button>
     <ul class="dropdown-menu dropdown-menu-right">
         <li>
-            <a href="https://github.com/HuygensING/alexandria/blob/master/alexandria-acceptance-tests/src/spec/java/nl/knaw/huygens/alexandria/provenance/ProvenanceFixture.java">Fixture</a>
+            <a href="https://github.com/HuygensING/antioch/blob/master/alexandria-acceptance-tests/src/spec/java/nl/knaw/huygens/alexandria/provenance/ProvenanceFixture.java">Fixture</a>
         </li>
         <li>
-            <a href="https://github.com/HuygensING/alexandria/blob/master/alexandria-acceptance-tests/src/spec/resources/nl/knaw/huygens/alexandria/provenance/Provenance.html">Specification</a>
+            <a href="https://github.com/HuygensING/antioch/blob/master/alexandria-acceptance-tests/src/spec/resources/nl/knaw/huygens/alexandria/provenance/Provenance.html">Specification</a>
         </li>
     </ul>
 </div>
 
 <div id="provenance-anatomy" data-desc="How is provenance information represented?" c:execute="clearStorage()">
     <div>
-        <strong>Each and every Alexandria
+        <strong>Each and every Antioch
             <mark>resource</mark>
             and
             <mark>annotation</mark>
@@ -52,12 +52,12 @@
         <p>
             This information allows
             <small>(= can be used to implement, but does not guarantee correctness of)</small>
-            attribution of Alexandria objects to a person or entity, as well as keeping track of when annotations have
+            attribution of Antioch objects to a person or entity, as well as keeping track of when annotations have
             become deprecated due to new revisions. A (brief) rationale for the object's existence or the reason for a
             change can also be documented.
         </p>
 
-        Provenance information maintained in Alexandria contains the following elements:
+        Provenance information maintained in Antioch contains the following elements:
 
         <dl class="dl-horizontal">
             <dt><code>who</code></dt>
@@ -85,7 +85,7 @@
         can be set by providing overriding provenance elements at
         <a href="../resource/Creation.html">resource creation</a> and annotation creation time, respectively.
         <br/>
-        <small>The <code>^what</code> field is always set by Alexandria to ensure correct linking between an object and
+        <small>The <code>^what</code> field is always set by Antioch to ensure correct linking between an object and
             its provenance.
         </small>
     </div>

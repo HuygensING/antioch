@@ -21,13 +21,13 @@
       xmlns:c="http://www.concordion.org/2007/concordion"
       xmlns:xsi="http://www.w3.org/1999/xhtml"
       xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
-                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+                          http://huygensing.github.io/antioch/xsd/concordion-rest.xsd">
 
-<title>Alexandria: About the server</title>
+<title>Antioch: About the server</title>
 
 <body data-desc="About the server">
 
-<div id="about" data-desc="How can I get information about the Alexandria server?" c:execute="#version=projectVersion()">
+<div id="about" data-desc="How can I get information about the Antioch server?" c:execute="#version=projectVersion()">
     <h:request>
         When I
         <h:get>/about</h:get>

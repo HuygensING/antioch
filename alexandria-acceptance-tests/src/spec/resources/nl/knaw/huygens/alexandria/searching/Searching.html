@@ -21,11 +21,11 @@
       xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
       xmlns:xsi="http://www.w3.org/1999/xhtml"
       xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
-                          http://huygensing.github.io/alexandria/xsd/concordion-rest.xsd">
+                          http://huygensing.github.io/antioch/xsd/concordion-rest.xsd">
 
-<title>Alexandria: Searching in Alexandria</title>
+<title>Antioch: Searching in Antioch</title>
 
-<body data-desc="Searching in Alexandria">
+<body data-desc="Searching in Antioch">
 
 <div id="query-anatomy" data-desc="Anatomy of a query" c:execute="clearStorage()">
     <h:request>We can
@@ -46,12 +46,12 @@
     where the properties of <code>query</code> have the following semantics:
     <dl class="dl-horizontal">
         <dt><code>find</code></dt>
-        <dd>the Alexandria concept to look for.
+        <dd>the Antioch concept to look for.
             <small>(currently <code>annotation</code> is the default as well as the only valid value)</small>
         </dd>
         <dt><code>where</code></dt>
         <dd>(<strong>mandatory</strong>) used to filter records. Check the
-            <a href="https://github.com/HuygensING/alexandria/blob/master/alexandria-aql/src/main/antlr4/nl/knaw/huygens/alexandria/antlr/AQL.g4">
+            <a href="https://github.com/HuygensING/antioch/blob/master/alexandria-aql/src/main/antlr4/nl/knaw/huygens/alexandria/antlr/AQL.g4">
                 ANTLR v4 grammar file</a> for syntax, field names and functions.<br/>
             <small>(caveat: multiple <code>where</code> clauses are treated as a conjunction, meaning ALL clauses have
                 to match)
