@@ -101,7 +101,7 @@
       <id>test</id>
       <properties>
         <config.baseURI>http://test.alexandria.huygens.knaw.nl/</config.baseURI>
-        <config.storageDirectory>/data/alexandria/storage/test/</config.storageDirectory>
+        <config.storageDirectory>/data/alexandria/storage/test</config.storageDirectory>
         <tomcat.server>tomcat.hi23</tomcat.server>
         <tomcat.manager.url>${tc23-manager}</tomcat.manager.url>
         <tomcat.path>/test-alexandria</tomcat.path>
@@ -115,7 +115,7 @@
         <config.storageDirectory>/data/alexandria/storage/acceptance</config.storageDirectory>
         <tomcat.server>tomcat.hi24alex</tomcat.server>
         <tomcat.manager.url>${tc24alex-manager}</tomcat.manager.url>
-        <tomcat.path>/antioch</tomcat.path>
+        <tomcat.path>/alexandria</tomcat.path>
       </properties>
     </profile>
 
