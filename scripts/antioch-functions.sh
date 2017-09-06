@@ -123,28 +123,28 @@ function a-set-authkey {
 
 function a-use-localhost {
   a-set-backend http://localhost:2015
-  a-set-authkey ${ALEXANDRIA_AUTHKEY_LOCAL}
+  a-set-authkey ${ANTIOCH_AUTHKEY_LOCAL}
 }
 
 function a-use-localip {
   localip=$(ipconfig|grep IPv4|grep -v Autoconfiguration|sed -e "s/.*: //")
   a-set-backend http://${localip}:2015
-  a-set-authkey ${ALEXANDRIA_AUTHKEY_LOCAL}
+  a-set-authkey ${ANTIOCH_AUTHKEY_LOCAL}
 }
 
 function a-use-test {
   a-set-backend http://test.alexandria.huygens.knaw.nl/
-  a-set-authkey ${ALEXANDRIA_AUTHKEY_TEST}
+  a-set-authkey ${ANTIOCH_AUTHKEY_TEST}
 }
 
 function a-use-acceptance {
   a-set-backend http://tc24alex.huygens.knaw.nl/alexandria
-  a-set-authkey ${ALEXANDRIA_AUTHKEY_ACC}
+  a-set-authkey ${ANTIOCH_AUTHKEY_ACC}
 }
 
 function a-use-production {
   a-set-backend https://alexandria.huygens.knaw.nl/
-  a-set-authkey ${ALEXANDRIA_AUTHKEY_PROD}
+  a-set-authkey ${ANTIOCH_AUTHKEY_PROD}
 }
 
 function a-show-backend {
