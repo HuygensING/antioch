@@ -14,7 +14,7 @@ function a-annotate-resource {
 }
 
 function a-location {
-  grep "Location:"|cut -d\  -f2|tr -d '\r' |sed -e "s/https:\/\/acc.antioch.huygens.knaw.nl/http:\/\/tc24alex.huygens.knaw.nl\/antioch/g"
+  grep "Location:"|cut -d\  -f2|tr -d '\r' |sed -e "s/https:\/\/acc.alexandria.huygens.knaw.nl/http:\/\/tc24alex.huygens.knaw.nl\/antioch/g"
 }
 
 function a-confirm {
@@ -133,17 +133,17 @@ function a-use-localip {
 }
 
 function a-use-test {
-  a-set-backend http://test.antioch.huygens.knaw.nl/
+  a-set-backend http://test.alexandria.huygens.knaw.nl/
   a-set-authkey ${ALEXANDRIA_AUTHKEY_TEST}
 }
 
 function a-use-acceptance {
-  a-set-backend http://tc24alex.huygens.knaw.nl/antioch
+  a-set-backend http://tc24alex.huygens.knaw.nl/alexandria
   a-set-authkey ${ALEXANDRIA_AUTHKEY_ACC}
 }
 
 function a-use-production {
-  a-set-backend https://antioch.huygens.knaw.nl/
+  a-set-backend https://alexandria.huygens.knaw.nl/
   a-set-authkey ${ALEXANDRIA_AUTHKEY_PROD}
 }
 

@@ -5,8 +5,8 @@ source scripts/antioch-functions.sh
 
 # if you get nullpointerexception in the vf code, it's likely caused by eclipse not generating the code: run mvn compile on commandline
 be=http://localhost:2015
-be=https://antioch.huygens.knaw.nl/
-be=http://test.antioch.huygens.knaw.nl/
+be=https://alexandria.huygens.knaw.nl/
+be=http://test.alexandria.huygens.knaw.nl/
 
 uuid1="11111111-1111-1111-1111-111111111111"
 uuid2="22222222-2222-2222-2222-222222222222"
