@@ -1,18 +1,18 @@
-# Alexandria
+# Antioch
 
-Alexandria is a *graph-based text and annotation repository* currently serving as a store
+Antioch is a *graph-based text and annotation repository* currently serving as a store
 for annotations targeted at *linguistic corpora*.
-However, Alexandria's conceptual design of texts, annotations, and their relationships has the potential to be applied in other domains and use cases as well,
-for instance in the field of *literary studies*. This project aims at leveraging Alexandria's
+However, Antioch's conceptual design of texts, annotations, and their relationships has the potential to be applied in other domains and use cases as well,
+for instance in the field of *literary studies*. This project aims at leveraging Antioch's
 potential value as a generic storage and query facility for annotated texts by
 
 1. *abstracting* from [Nederlab](https://www.nederlab.nl/)-specific requirements of linguistic annotation,
 1. *building* a repository software with state-of-the-art, web-based technologies, and
-1. *connecting* Alexandria to similar initiatives by providing a rich set of data interchange options.
+1. *connecting* Antioch to similar initiatives by providing a rich set of data interchange options.
 
 ## Features
 
-Alexandria can
+Antioch can
 
 * model texts and annotations on the same level, allowing for the annotation of texts and
   annotations,
@@ -24,7 +24,7 @@ Alexandria can
 
 ## Software Architecture
 
-Being a web-based solution, Alexandria 
+Being a web-based solution, Antioch 
 
 * is implemented as a *RESTful service*, exposing its functions via HTTP endpoints/resources 
   on the network,
@@ -35,13 +35,13 @@ Being a web-based solution, Alexandria
 
 ## Download
 
-* [Alexandria Server JAR file](https://cdn.huygens.knaw.nl/alexandria/master/alexandria-server.jar)
-* [Alexandria Java Client JAR file](https://cdn.huygens.knaw.nl/alexandria/master/alexandria-java-client.jar)
+* [Antioch Server JAR file](https://cdn.huygens.knaw.nl/alexandria/master/antioch-server.jar)
+* [Antioch Java Client JAR file](https://cdn.huygens.knaw.nl/alexandria/master/antioch-java-client.jar)
 
 
 ## Texts as Graphs: Research/ Bibliography
 
-Alexandria is part of a larger community interested in the annotation of textual resources. As such
+Antioch is part of a larger community interested in the annotation of textual resources. As such
 it draws inspiration from many sources, some of which are:
 
 * W3C Web Annotation Working Group. [Homepage](https://www.w3.org/annotation/)
