@@ -1,0 +1,134 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>nl.knaw.huygens.antioch</groupId>
+    <artifactId>antioch</artifactId>
+    <version>2.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>antioch-webapp</artifactId>
+
+  <packaging>war</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>antioch-service-tinkerpop-neo4j</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- <dependency> <groupId>org.glassfish.hk2</groupId> <artifactId>guice-bridge</artifactId> 
+      <version>${guice-bridge.version}</version> </dependency> -->
+    <dependency>
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-servlet</artifactId>
+      <version>${jersey.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>${servlet-api.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>se.jiderhamn</groupId>
+      <artifactId>classloader-leak-prevention</artifactId>
+      <scope>runtime</scope>
+      <version>${classloader-leak-prevention.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>servlet-api</artifactId>
+          <groupId>javax.servlet</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>${maven-war.version}</version>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+          <dependentWarIncludes>**/*.xml</dependentWarIncludes>
+          <packagingExcludes>WEB-INF/web.xml</packagingExcludes>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.tomcat.maven</groupId>
+        <artifactId>tomcat7-maven-plugin</artifactId>
+        <configuration>
+          <update>true</update>
+          <server>${tomcat.server}</server>
+          <url>${tomcat.manager.url}</url>
+          <path>${tomcat.path}</path>
+        </configuration>
+      </plugin>
+    </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.tomcat.maven</groupId>
+          <artifactId>tomcat7-maven-plugin</artifactId>
+          <version>${tomcat7-maven.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>dev</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <config.baseURI>${antioch-baseURI}</config.baseURI>
+        <config.storageDirectory>${antioch-storage}</config.storageDirectory>
+        <tomcat.server>not-set</tomcat.server>
+        <tomcat.manager.url>not-set</tomcat.manager.url>
+        <tomcat.path>not-set</tomcat.path>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>test</id>
+      <properties>
+        <config.baseURI>http://test.antioch.huygens.knaw.nl/</config.baseURI>
+        <config.storageDirectory>/data/antioch/storage/test/</config.storageDirectory>
+        <tomcat.server>tomcat.hi23</tomcat.server>
+        <tomcat.manager.url>${tc23-manager}</tomcat.manager.url>
+        <tomcat.path>/test-antioch</tomcat.path>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>acc</id>
+      <properties>
+        <config.baseURI>https://acc.antioch.huygens.knaw.nl/</config.baseURI>
+        <config.storageDirectory>/data/antioch/storage/acceptance</config.storageDirectory>
+        <tomcat.server>tomcat.hi24alex</tomcat.server>
+        <tomcat.manager.url>${tc24alex-manager}</tomcat.manager.url>
+        <tomcat.path>/antioch</tomcat.path>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>prod</id>
+      <properties>
+        <config.baseURI>https://antioch.huygens.knaw.nl/</config.baseURI>
+        <config.storageDirectory>/data/antioch/storage/production</config.storageDirectory>
+        <tomcat.server>tomcat.hi23</tomcat.server>
+        <tomcat.manager.url>${tc23-manager}</tomcat.manager.url>
+        <tomcat.path>/antioch</tomcat.path>
+      </properties>
+    </profile>
+  </profiles>
+
+</project>

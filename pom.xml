@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>nl.knaw.huygens.alexandria</groupId>
-  <artifactId>alexandria</artifactId>
+  <groupId>nl.knaw.huygens.antioch</groupId>
+  <artifactId>antioch</artifactId>
   <packaging>pom</packaging>
   <version>2.0-SNAPSHOT</version>
   <name>Antioch Text Annotation Repository</name>
@@ -10,18 +10,18 @@
   <inceptionYear>2015</inceptionYear>
 
   <modules>
-    <module>alexandria-acceptance-tests</module>
-    <module>alexandria-api</module>
-    <module>alexandria-aql</module>
-    <module>alexandria-java-client</module>
-    <module>alexandria-main</module>
-    <module>alexandria-server</module>
-    <module>alexandria-service-tinkerpop-neo4j</module>
-    <module>alexandria-service-tinkerpop-tinkergraph</module>
-    <module>alexandria-service-tinkerpop-titan</module>
-    <module>alexandria-service</module>
-    <module>alexandria-test</module>
-    <module>alexandria-webapp</module>
+    <module>antioch-acceptance-tests</module>
+    <module>antioch-api</module>
+    <module>antioch-aql</module>
+    <module>antioch-java-client</module>
+    <module>antioch-main</module>
+    <module>antioch-server</module>
+    <module>antioch-service-tinkerpop-neo4j</module>
+    <module>antioch-service-tinkerpop-tinkergraph</module>
+    <module>antioch-service-tinkerpop-titan</module>
+    <module>antioch-service</module>
+    <module>antioch-test</module>
+    <module>antioch-webapp</module>
   </modules>
 
   <properties>
@@ -61,7 +61,7 @@
     <jersey2-guice.version>0.10</jersey2-guice.version>
 
     <jool.version>0.9.12</jool.version>
-    <jsonld.version>0.7.0</jsonld.version> <!-- to prevent dependency hell in alexandria-java-client due to httpclient/httpcore 
+    <jsonld.version>0.7.0</jsonld.version> <!-- to prevent dependency hell in antioch-java-client due to httpclient/httpcore 
       version conflicts -->
     <junit.version>4.12</junit.version>
     <junitparams.version>1.0.5</junitparams.version>
@@ -135,7 +135,7 @@
     <!-- Settings for maven-scm-publish-plugin used to publish site to GitHub -->
     <scmpublish.checkinComment>Publishing Site Docs for
       ${project.artifactId}:${project.version}</scmpublish.checkinComment>
-    <scmpublish.pubScmUrl>scm:git:git@github.com:huygensING/alexandria.git</scmpublish.pubScmUrl>
+    <scmpublish.pubScmUrl>scm:git:git@github.com:huygensING/antioch.git</scmpublish.pubScmUrl>
     <scmpublish.scm.branch>gh-pages</scmpublish.scm.branch>
 
     <project.license.name>GNU General Public License</project.license.name>
@@ -283,7 +283,7 @@
 
   <ciManagement>
     <system>jenkins</system>
-    <url>http://ci.huygens.knaw.nl/job/alexandria/</url>
+    <url>http://ci.huygens.knaw.nl/job/antioch/</url>
   </ciManagement>
 
   <distributionManagement>
@@ -301,7 +301,7 @@
     <site>
       <id>huygens.site</id>
       <!-- This is used by maven-scm-publish-plugin -->
-      <url>scm:git:git@github.com:huygensING/alexandria.git</url>
+      <url>scm:git:git@github.com:huygensING/antioch.git</url>
     </site>
   </distributionManagement>
 
@@ -585,14 +585,14 @@
         <version>${maven-concordion-reporting.version}</version>
         <configuration>
           <concordionDir>${concordion.reportDir}</concordionDir>
-          <concordionIndexFile>nl/knaw/huygens/alexandria/Alexandria.html</concordionIndexFile>
+          <concordionIndexFile>nl/knaw/huygens/antioch/Antioch.html</concordionIndexFile>
         </configuration>
       </plugin>
     </plugins>
   </reporting>
 
   <scm>
-    <connection>scm:git:git@github.com:huygensING/alexandria.git</connection>
+    <connection>scm:git:git@github.com:huygensING/antioch.git</connection>
     <tag>HEAD</tag>
   </scm>
 

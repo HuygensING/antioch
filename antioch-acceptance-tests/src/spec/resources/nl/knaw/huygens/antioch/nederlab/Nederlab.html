@@ -1,0 +1,1495 @@
+<!--
+  #%L
+  antioch-acceptance-tests
+  =======
+  Copyright (C) 2015 - 2017 Huygens ING (KNAW)
+  =======
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/antioch/xsd/concordion-rest.xsd">
+
+<title>Antioch: Nederlab Scenarios</title>
+
+<body data-desc="Nederlab Scenarios">
+
+<!-- TODO: Move to 'cat' and generate -->
+<div class="dropdown">
+    <button class="btn btn-primary pull-right dropdown-toggle" type="button" data-toggle="dropdown">Test Sources
+        <span class="caret"></span></button>
+    <ul class="dropdown-menu dropdown-menu-right">
+        <li>
+            <a href="https://github.com/HuygensING/antioch/blob/master/antioch-acceptance-tests/src/spec/java/nl/knaw/huygens/antioch/nederlab/NederlabFixture.java">Fixture</a>
+        </li>
+        <li>
+            <a href="https://github.com/HuygensING/antioch/blob/master/antioch-acceptance-tests/src/spec/resources/nl/knaw/huygens/antioch/nederlab/Nederlab.html">Specification</a>
+        </li>
+    </ul>
+</div>
+
+<div id="create-tag" data-desc="How can I create a tag?" c:execute="clearStorage()">
+    <h4>Register the resource at Antioch
+        <small>(once per resource)</small>
+    </h4>
+
+    <ul>
+        <li>
+            <h:request>
+                We
+                <h:put>/resources/e480f748-3a9d-11e5-abc7-339c977c9f7e</h:put>
+                the body
+                <h:jsonBody>{
+                    "resource": {
+                    "ref": "http://www.example.com/titles/path/to/title/resource",
+                    "provenance": {
+                    "who": "nederlab",
+                    "why": "initial registration",
+                    "when": "2015-08-04T13:46:39+02:00"
+                    } } }
+                </h:jsonBody>
+                and observe status
+                <h:status>201 Created</h:status>
+            </h:request>
+        </li>
+    </ul>
+
+    <h4>Register and confirm the subresource at Antioch
+        <small>(once per subresource)</small>
+    </h4>
+
+    <ul>
+        <li>
+            <h:request>
+                To register, we
+                <h:post>/resources/e480f748-3a9d-11e5-abc7-339c977c9f7e/subresources</h:post>
+                the body
+                <h:jsonBody>{ "subresource": { "sub": "/some/folia/expression/marker" } }</h:jsonBody>
+                and observe status
+                <h:status>201 Created</h:status>
+                and a location header starting with
+                <h:location type="base">https://{host}/resources/</h:location>
+                and ending in a generated
+                <h:location type="uuid">well-formed UUID</h:location>
+                for the newly created subresource.
+            </h:request>
+        </li>
+        <div c:execute="#uuid = uuid()">In this case the generated uuid happened to be:
+            <strong c:echo="#uuid"></strong>.
+        </div>
+        <li>
+            <h:request>
+                To confirm our subresource, we
+                <h:put>/resources/$uuid/state</h:put>
+                the body
+                <h:jsonBody>{"state": "CONFIRMED"}</h:jsonBody>
+                and observe status
+                <h:status>204 No Content</h:status>
+            </h:request>
+        </li>
+        <li>
+            <div class="alert alert-info sm">
+                <strong>Duplicate submission of subresources is allowed</strong>
+                <h:request>
+                    Now that we know the subresource already exists, if we again
+                    <h:post>/resources/e480f748-3a9d-11e5-abc7-339c977c9f7e/subresources</h:post>
+                    the body
+                    <h:jsonBody>{ "subresource": { "sub": "/some/folia/expression/marker" } }</h:jsonBody>
+                    then we receive status
+                    <h:status>204 No Content</h:status>
+                    (instead of <code>201 Created</code>)
+                    with the <strong>same</strong> location header:
+                    <h:location type="full">https://{host}/resources/$uuid</h:location>
+                </h:request>
+            </div>
+        </li>
+    </ul>
+
+    <h4>Register and confirm the annotation at the subresource.</h4>
+
+    <ul>
+        <li>
+            <h:request>
+                To register, we
+                <h:post>/resources/$uuid/annotations</h:post>
+                the body
+                <h:jsonBody>{ "annotation": { "type": "emotion", "value": "happy" } }</h:jsonBody>
+                and observe status
+                <h:status>201 Created</h:status>
+            </h:request>
+        </li>
+        <div c:execute="#anno = uuid()">In this case we got uuid <strong c:echo="#anno"></strong> as the uuid
+            for the annotation we just created.
+        </div>
+        <li>
+            <h:request>
+                <strong>(verification)</strong>
+                We
+                <h:get>/annotations/$anno</h:get>
+                and observe status
+                <h:status>200 OK</h:status>
+                and body:
+                <h:jsonResponse>{
+                    "annotation" : {
+                    "value" : "happy",
+                    "type" : "emotion",
+                    "id" : "$anno",
+                    "state" : {
+                    "value" : "TENTATIVE",
+                    "since" : "{date.beforeNow}"
+                    },
+                    "^annotates" : "https://{host}/resources/$uuid",
+                    "^annotations" : [ ]
+                    } }
+                </h:jsonResponse>
+                <div class="alert alert-info sm">
+                    Note the <code>TENTATIVE</code> state of our newly created annotation.
+                </div>
+            </h:request>
+        </li>
+        <li>
+            <h:request>
+                To confirm, we
+                <h:put>/annotations/$anno/state</h:put>
+                the body
+                <h:jsonBody>{"state": "CONFIRMED"}</h:jsonBody>
+                and observe status
+                <h:status>204 No Content</h:status>
+            </h:request>
+        </li>
+        <li>
+            <h:request>
+                <strong>(verification)</strong>
+                We
+                <h:get>/annotations/$anno</h:get>
+                and observe status
+                <h:status>200 OK</h:status>
+                and body <span class="text-muted">(only relevant fields shown for brevity)</span>
+                <h:jsonResponse> {
+                    "annotation" : {
+                    "value" : "happy",
+                    "type" : "emotion",
+                    "id" : "$anno",
+                    "^annotates" : "https://{host}/resources/$uuid"
+                    } }
+                </h:jsonResponse>
+                <div class="alert alert-info sm">
+                    Note that <code>^annotates</code> indeed points to our subresource.
+                </div>
+            </h:request>
+        </li>
+        <li>
+            <h:request>
+                <strong>(verification)</strong>
+                We
+                <h:get>/resources/$uuid</h:get>
+                and observe status
+                <h:status>200 OK</h:status>
+                and body <span class="text-muted">(again, only relevant fields shown for brevity)</span>
+                <h:jsonResponse> {
+                    "subresource": {
+                    "id": "$uuid",
+                    "^annotations": [
+                    "https://{host}/annotations/$anno"
+                    ] } }
+                </h:jsonResponse>
+                <div class="alert alert-info sm">
+                    Note that <code>^annotations</code> indeed includes our new annotation.
+                </div>
+            </h:request>
+        </li>
+    </ul>
+</div>
+
+<div id="modify-tag" data-desc="How can I modify a tag?" c:execute="clearStorage()">
+    Given a
+    <mark>resource</mark>
+    with id <code c:set="#resId">13e53670-3f3f-11e5-96ef-dff0c5cf4b9b</code>
+    <span c:execute="resourceExists(#resId)">exists</span> which has
+    <span c:execute="#annoId = resourceHasAnnotation(#resId, #type, #value)">an annotation
+        of type <code c:set="#type">res-type</code>
+        and value <code c:set="#value">res-value</code>
+    </span> and which has the following annotated
+    <mark>subresources</mark>
+    <table class="table"
+           c:execute="subResourceExistsWithAnnotation(#subId, #resId, #type, #value)">
+        <thead>
+        <tr>
+            <th c:set="#subId">Subresource Id</th>
+            <th>Subresource Sub</th>
+            <th c:set="#type">Annotation type</th>
+            <th c:set="#value">Annotation value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c</code></td>
+            <td><code>/some/folia/expression/0</code></td>
+            <td><code>subres1-type</code></td>
+            <td><code>subres1-value</code></td>
+        </tr>
+        <tr>
+            <td><code>3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85</code></td>
+            <td><code>/some/folia/expression/1</code></td>
+            <td><code>subres2-type</code></td>
+            <td><code>subres2-value</code></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h4>Retrieve all annotations for all subresources of a given resource</h4>
+
+    <h:request>We
+        <h:post>/searches</h:post>
+        the following body
+        <h:jsonBody>{ "query": {
+            "find": "annotation",
+            "where": "who:eq(\"nederlab\") resource.id:eq(\"13e53670-3f3f-11e5-96ef-dff0c5cf4b9b\")",
+            "return": "id,resource.url,subresource.url,subresource.sub,type,value"
+            } }
+        </h:jsonBody>
+    </h:request>
+
+    <div c:execute="#searchId = uuid()">The uuid for this particular search was:
+        <strong c:echo="#searchId"></strong>.
+    </div>
+
+    <h:request>We
+        <h:get>/searches/$searchId/pages/1</h:get>
+        and observe
+        <h:status>200 OK</h:status>
+        and the relevant resource and subresource <code>url</code>s in the body
+        <h:jsonResponse>{ "searchResultPage": {
+            "records": [
+            {
+            "type": "res-type",
+            "value": "res-value",
+            "resource.url": "https://{host}/resources/13e53670-3f3f-11e5-96ef-dff0c5cf4b9b"
+            },
+            {
+            "type": "subres1-type",
+            "value": "subres1-value",
+            "resource.url": "https://{host}/resources/13e53670-3f3f-11e5-96ef-dff0c5cf4b9b",
+            "subresource.url": "https://{host}/resources/3f4ffa0c-3f4e-11e5-91d3-bfea30e2969c",
+            "subresource.sub": "/some/folia/expression/0"
+            },
+            {
+            "type": "subres2-type",
+            "value": "subres2-value",
+            "resource.url": "https://{host}/resources/13e53670-3f3f-11e5-96ef-dff0c5cf4b9b",
+            "subresource.url": "https://{host}/resources/3570a6ca-3f4f-11e5-8a0d-4b7705ac2d85",
+            "subresource.sub": "/some/folia/expression/1"
+            }
+            ] } }
+        </h:jsonResponse>
+    </h:request>
+
+    <h4>Update the annotation body</h4>
+    <ul>
+        <li>
+            <h:request>
+                We
+                <h:put>/annotations/$annoId</h:put>
+                the body
+                <h:jsonBody>{ "annotation": {
+                    "value": "UPDATED-VALUE"
+                    } }
+                </h:jsonBody>
+                and observe status
+                <h:status>204 No Content</h:status>
+            </h:request>
+        </li>
+        <li>
+            <h:request>
+                <strong>(verification)</strong> We
+                <h:get>/annotations/$annoId</h:get>
+                and observe status
+                <h:status>200 OK</h:status>
+                and the body
+                <h:jsonResponse>{ "annotation": {
+                    "id": "$annoId",
+                    "type": "res-type",
+                    "value": "UPDATED-VALUE",
+                    "state": { "value": "CONFIRMED" },
+                    "revision": 1,
+                    "^annotates": "https://{host}/resources/$resId",
+                    "^deprecates": "https://{host}/annotations/$annoId/rev/0",
+                    "^current_version": "https://{host}/annotations/$annoId",
+                    "^versioned_self": "https://{host}/annotations/$annoId/rev/1"
+                    } }
+                </h:jsonResponse>
+            </h:request>
+            <div class="alert alert-info sm">
+                <ul>
+                    <li>The annotation <code>value</code> is updated, and its <code>type</code> is unchanged</li>
+                    <li>The annotation <code>state</code> is <code>CONFIRMED</code></li>
+                    <li>The revision number has been incremented to <code>1</code></li>
+                    <li>The new revision <code>^deprecates</code> the previous one</li>
+                    <li>Convenience links to both the <code>^current_version</code> and to this particular revision
+                        <code>^versioned_self</code> are included
+                    </li>
+                </ul>
+            </div>
+        </li>
+        <li>
+            <h:request>
+                <strong>(verification)</strong> We
+                <h:get>/resources/$resId</h:get>
+                and observe status
+                <h:status>200 OK</h:status>
+                and the body
+                <h:jsonResponse>{ "resource": {
+                    "id": "$resId",
+                    "^annotations": [ "https://{host}/annotations/$annoId" ]
+                    } }
+                </h:jsonResponse>
+            </h:request>
+            <div class="alert alert-info sm">
+                The resource still points to the same annotation (now containing the updated value).
+            </div>
+        </li>
+        <li>
+            <h:request>
+                <strong>(verification)</strong> We inspect the previous revision of the annotation by
+                <h:get>/annotations/$annoId/rev/0</h:get>
+                and observe the body
+                <h:jsonResponse>{ "annotation": {
+                    "id": "$annoId",
+                    "revision": 0,
+                    "type": "res-type",
+                    "value" : "res-value",
+                    "state": { "value": "DEPRECATED" }
+                    } }
+                </h:jsonResponse>
+            </h:request>
+            <div class="alert alert-info sm">
+                The previous revision of the annotation has indeed become <code>DEPRECATED</code>.
+            </div>
+        </li>
+    </ul>
+</div>
+
+<div id="delete-tag" data-desc="How can I delete a tag?" c:execute="clearStorage()">
+    <h4>Delete the annotation at its REST endpoint</h4>
+
+    <ul>
+        <li>
+            Given a resource with id <code c:set="#resId">349103a0-4006-11e5-8889-e3cb0d4e45c3</code>
+            <span c:execute="resourceExists(#resId)">exists</span> which is
+            <span c:execute="#annoId = resourceHasAnnotation(#resId)">annotated</span>.
+        </li>
+
+        <li>
+            <h:request>
+                <strong>(verification)</strong> We
+                <h:get>/resources/$resId</h:get>
+                and observe status
+                <h:status>200 OK</h:status>
+                and body
+                <h:jsonResponse>{ "resource": {
+                    "id": "$resId",
+                    "^annotations": [
+                    "https://{host}/annotations/$annoId"
+                    ] } }
+                </h:jsonResponse>
+            </h:request>
+        </li>
+
+        <li>
+            <h:request>
+                We
+                <h:delete>/annotations/$annoId</h:delete>
+                and observe status
+                <h:status>204 No Content</h:status>
+                and response body
+                <h:responseBody/>
+            </h:request>
+        </li>
+
+        <li>
+            <h:request>
+                <strong>(verification)</strong> We
+                <h:get>/annotations/$annoId</h:get>
+                and observe status
+                <h:status>200 OK</h:status>
+                and body
+                <h:jsonResponse>{ "annotation": {
+                    "id": "$annoId",
+                    "state" : { "value" : "DELETED", "since" : "{date.beforeNow}" }
+                    } }
+                </h:jsonResponse>
+                <div class="alert alert-info sm">
+                    Note the <code>DELETED</code> state of the annotation.
+                </div>
+            </h:request>
+        </li>
+
+        <li>
+            <h:request>
+                <strong>(verification)</strong> We
+                <h:get>/resources/$resId</h:get>
+                and observe status
+                <h:status>200 OK</h:status>
+                and body
+                <h:jsonResponse>{ "resource": {
+                    "id": "$resId",
+                    "^annotations": [
+                    "https://{host}/annotations/$annoId"
+                    ] } }
+                </h:jsonResponse>
+                <div class="alert alert-info sm">
+                    A <code>DELETED</code> annotation can indeed still be found via the resource it belonged to.
+                </div>
+            </h:request>
+        </li>
+    </ul>
+</div>
+
+<div id="show-tags-for-user" data-desc="How can I show the tags for a specific user?" c:execute="clearStorage()">
+    Given the following annotated resources (for brevity, all annotations are considered to be of type 'Tag')
+    in order of creation timestamp
+    <table class="table"
+           c:execute="resourceExistsWithTagForUserAtInstant(#resId, #value, #who, #when)">
+        <thead>
+        <tr>
+            <th c:set="#resId">Resource Id</th>
+            <th c:set="#value">Annotation value</th>
+            <th c:set="#who">Owner</th>
+            <th c:set="#when">Created at</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>A very early user comment.</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-06-06T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000002-3f4e-11e5-91d3-bfea30e2969c</code></td>
+            <td><code>An early user comment.</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-07-07T07:07:07+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
+            <td><code>Something entirely unrelated.</code></td>
+            <td><code>peer-1337</code></td>
+            <td><code>2015-08-08T08:08:08+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>A more recent user comment.</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h4>I. Get a (paged) overview of all tags owned by a user, sorted on timestamp</h4>
+
+    <div class="alert alert-info sm">
+        We show how to find all annotations of type
+        <mark><strong>Tag</strong></mark>
+        for user with id
+        <mark><strong>user-4242</strong></mark>
+    </div>
+
+    <h:request>
+        We
+        <h:post>/searches</h:post>
+        the body
+        <h:jsonBody>{
+            "query": {
+            "find": "annotation",
+            "where": "who:eq(\"user-4242\") type:eq(\"Tag\")",
+            "return": "id,type,value,resource.url"
+            } }
+        </h:jsonBody>
+        and observe status
+        <h:status>201 Created</h:status>
+        with the Location header pointing to the results of our query.
+    </h:request>
+
+    <div c:execute="#searchId = uuid()">&#160;</div>
+
+    <h:request>We follow the Location header and
+        <h:get>/searches/$searchId</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "searchResultPage" : {
+            "searchInfo" : {
+            "id" : "$searchId",
+            "query" : {
+            "find" : "annotation",
+            "where" : "who:eq(\"user-4242\") type:eq(\"Tag\") state:eq(\"CONFIRMED\")",
+            "sort" : "-when",
+            "return" : "id,type,value,resource.url"
+            },
+            "totalResults" : 3,
+            "totalPages" : 1
+            },
+            "^firstPage": "https://{host}/searches/$searchId/pages/1"
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+    <div class="alert alert-warning sm">
+        <ul>
+            <li>
+                The <code>sort</code> field, which we left unspecified, defaults to <code>"-when"</code>
+                (= reverse timestamp order: "most recent first").
+            </li>
+            <li>
+                The <code>state</code> of the <code>where</code> field, which we left unspecified, defaults to
+                <code>"CONFIRMED"</code>
+            </li>
+        </ul>
+    </div>
+
+    <h:request>We
+        <h:get>/searches/$searchId/pages/1</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{ "searchResultPage": {
+            "pageNumber": 1,
+            "records": [
+            {
+            "id": "{uuid.anyValid}",
+            "type": "Tag",
+            "value": "A more recent user comment.",
+            "resource.url": "https://{host}/resources/00000003-5b7f-11e5-898c-237ee1c6d1d4",
+            "_resultNumber": 1
+            },
+            {
+            "id": "{uuid.anyValid}",
+            "type": "Tag",
+            "value": "An early user comment.",
+            "resource.url": "https://{host}/resources/00000002-3f4e-11e5-91d3-bfea30e2969c",
+            "_resultNumber": 2
+            },
+            {
+            "id": "{uuid.anyValid}",
+            "type": "Tag",
+            "value": "A very early user comment.",
+            "resource.url": "https://{host}/resources/00000001-5ba6-11e5-9054-ab0dd746f7f7",
+            "_resultNumber": 3
+            } ] } }
+        </h:jsonResponse>
+    </h:request>
+
+    <h4>II. Refine these user tags based on a full-text search string</h4>
+
+    <div class="alert alert-info sm">
+        We show how to limit the above query to only include tags containing the text
+        <mark><strong>early</strong></mark>
+    </div>
+
+    <h:request>
+        <h:post>/searches</h:post>
+        the body
+        <h:jsonBody>{
+            "query": {
+            "find": "annotation",
+            "where": "who:eq(\"user-4242\") type:eq(\"Tag\") value:match(\".*early.*\")",
+            "return": "id,type,value,resource.url"
+            } }
+        </h:jsonBody>
+        and observe status
+        <h:status>201 Created</h:status>
+        with the Location header pointing to the results of our query.
+    </h:request>
+
+    <div c:execute="#searchId2 = uuid()">&#160;</div>
+
+    <h:request>We follow the Location header and
+        <h:get>/searches/$searchId2</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <small>(only selected fields shown for brevity)</small>
+        <h:jsonResponse>{ "searchResultPage": {
+            "searchInfo" : {
+            "totalResults" : 2
+            },
+            "^firstPage": "https://{host}/searches/$searchId2/pages/1",
+            "records": [
+            {
+            "value": "An early user comment.",
+            "resource.url": "https://{host}/resources/00000002-3f4e-11e5-91d3-bfea30e2969c",
+            "_resultNumber": 1
+            },
+            {
+            "value": "A very early user comment.",
+            "resource.url": "https://{host}/resources/00000001-5ba6-11e5-9054-ab0dd746f7f7",
+            "_resultNumber": 2
+            } ] } }
+        </h:jsonResponse>
+    </h:request>
+
+    <h4>III. Refine these user tags based on a date / time range</h4>
+
+    <div class="alert alert-info sm">
+        We show how to limit the above query to only include tags that both:
+        <ul>
+            <li>contain the text
+                <mark><strong>early</strong></mark>
+            </li>
+            <li> were created in the month of
+                <mark><strong>July</strong></mark>
+            </li>
+        </ul>
+    </div>
+
+    <h:request>
+        <h:post>/searches</h:post>
+        the body
+        <h:jsonBody>{
+            "query": {
+            "find": "annotation",
+            "where": "who:eq(\"user-4242\") type:eq(\"Tag\") value:match(\".*early.*\") when:inRange(\"2015-07-01T00:00:00\",\"2015-07-31T23:59:59\")",
+            "return": "id,type,value,resource.url"
+            } }
+        </h:jsonBody>
+        and observe status
+        <h:status>201 Created</h:status>
+        with the Location header pointing to the results of our query.
+    </h:request>
+
+    <div c:execute="#searchId3 = uuid()">&#160;</div>
+
+    <h:request>We follow the Location header and
+        <h:get>/searches/$searchId3</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <small>(only selected fields shown for brevity)</small>
+        <h:jsonResponse>{ "searchResultPage": {
+            "searchInfo" : {
+            "totalResults" : 1
+            },
+            "^firstPage": "https://{host}/searches/$searchId3/pages/1",
+            "records": [
+            {
+            "value": "An early user comment.",
+            "resource.url": "https://{host}/resources/00000002-3f4e-11e5-91d3-bfea30e2969c",
+            "_resultNumber": 1
+            } ] } }
+        </h:jsonResponse>
+    </h:request>
+</div>
+
+<div id="show-distinct-resource-id-for-user" data-desc="How can I show the distinct ids of resources annotated by a specific user?" c:execute="clearStorage()">
+    Given the following annotated resources (for brevity, all annotations are considered to be of type 'Tag')
+    in order of creation timestamp
+    <table class="table"
+           c:execute="resourceExistsWithTagForUserAtInstant(#resId, #value, #who, #when)">
+        <thead>
+        <tr>
+            <th c:set="#resId">Resource Id</th>
+            <th c:set="#value">Annotation value</th>
+            <th c:set="#who">Owner</th>
+            <th c:set="#when">Created at</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>A very early user comment.</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-06-06T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>A slightly later user comment.</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-06-07T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000002-3f4e-11e5-91d3-bfea30e2969c</code></td>
+            <td><code>An early user comment.</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-07-07T07:07:07+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
+            <td><code>Something entirely unrelated.</code></td>
+            <td><code>peer-1337</code></td>
+            <td><code>2015-08-08T08:08:08+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>A more recent user comment.</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="alert alert-info sm">
+        We show how to find the resource.ids of all annotations of type
+        <mark><strong>Tag</strong></mark>
+        for user with id
+        <mark><strong>user-4242</strong></mark>
+    </div>
+
+    <h:request>
+        We
+        <h:post>/searches</h:post>
+        the body
+        <h:jsonBody>{
+            "query": {
+            "find": "annotation",
+            "where": "who:eq(\"user-4242\") type:eq(\"Tag\")",
+            "return": "resource.id"
+            } }
+        </h:jsonBody>
+        and observe status
+        <h:status>201 Created</h:status>
+        with the Location header pointing to the results of our query.
+    </h:request>
+
+    <div c:execute="#searchId = uuid()">&#160;</div>
+
+    <h:request>We follow the Location header and
+        <h:get>/searches/$searchId</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "searchResultPage" : {
+            "searchInfo": {
+            "id" : "$searchId",
+            "query" : {
+            "find" : "annotation",
+            "where" : "who:eq(\"user-4242\") type:eq(\"Tag\") state:eq(\"CONFIRMED\")",
+            "sort" : "-when",
+            "return" : "resource.id"
+            },
+            "totalResults" : 4,
+            "totalPages" : 1},
+            "^firstPage": "https://{host}/searches/$searchId/pages/1"
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+    <div class="alert alert-warning sm">
+        <ul>
+            <li>
+                The <code>sort</code> field, which we left unspecified, defaults to <code>"-when"</code>
+                (= reverse timestamp order: "most recent first").
+            </li>
+            <li>
+                The <code>state</code> of the <code>where</code> field, which we left unspecified, defaults to
+                <code>"CONFIRMED"</code>
+            </li>
+        </ul>
+    </div>
+
+    <h:request>We
+        <h:get>/searches/$searchId/pages/1</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{ "searchResultPage": {
+            "pageNumber": 1,
+            "records": [
+            {
+            "resource.id": "00000003-5b7f-11e5-898c-237ee1c6d1d4",
+            "_resultNumber": 1
+            },
+            {
+            "resource.id": "00000002-3f4e-11e5-91d3-bfea30e2969c",
+            "_resultNumber": 2
+            },
+            {
+            "resource.id": "00000001-5ba6-11e5-9054-ab0dd746f7f7",
+            "_resultNumber": 3
+            },
+            {
+            "resource.id": "00000001-5ba6-11e5-9054-ab0dd746f7f7",
+            "_resultNumber": 4
+            } ] } }
+        </h:jsonResponse>
+    </h:request>
+
+    Notice that the resource.id <code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code> is returned twice, since this resource has been annotated twice by the user.
+
+    <h:request>
+        To make sure each resource.id is returned only once, we add the <code>distinct</code> parameter, we
+        <h:post>/searches</h:post>
+        the body
+        <h:jsonBody>{
+            "query": {
+            "find": "annotation",
+            "where": "who:eq(\"user-4242\") type:eq(\"Tag\")",
+            "distinct" : true,
+            "return": "resource.id"
+            } }
+        </h:jsonBody>
+        and observe status
+        <h:status>201 Created</h:status>
+        with the Location header pointing to the results of our query.
+    </h:request>
+
+    <div c:execute="#searchId = uuid()">&#160;</div>
+
+    <h:request>We now can get
+        <h:get>/searches/$searchId/pages/1</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{ "searchResultPage": {
+            "pageNumber": 1,
+            "records": [
+            {
+            "resource.id": "00000003-5b7f-11e5-898c-237ee1c6d1d4",
+            "_resultNumber": 1
+            },
+            {
+            "resource.id": "00000002-3f4e-11e5-91d3-bfea30e2969c",
+            "_resultNumber": 2
+            },
+            {
+            "resource.id": "00000001-5ba6-11e5-9054-ab0dd746f7f7",
+            "_resultNumber": 3
+            } ] } }
+        </h:jsonResponse>
+    </h:request>
+</div>
+
+<div id="show-grouped-annotation-ids" data-desc="How can I group annotation values by resource.id?" c:execute="clearStorage()">
+    Given the following annotated resources (for brevity, all annotations are considered to be of type 'Tag')
+    in order of creation timestamp
+    <table class="table"
+           c:execute="resourceExistsWithTagForUserAtInstant(#resId, #value, #who, #when)">
+        <thead>
+        <tr>
+            <th c:set="#resId">Resource Id</th>
+            <th c:set="#value">Annotation value</th>
+            <th c:set="#who">Owner</th>
+            <th c:set="#when">Created at</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>A very early user comment.</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-06-06T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>A slightly later user comment.</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-06-07T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>An early user comment.</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-07-07T07:07:07+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
+            <td><code>Something entirely unrelated.</code></td>
+            <td><code>peer-1337</code></td>
+            <td><code>2015-08-08T08:08:08+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>A more recent user comment.</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="alert alert-info sm">
+        We show how to find the annotation values of all annotations of type
+        <mark><strong>Tag</strong></mark>
+        belonging to resources
+        <mark><strong>00000001-5ba6-11e5-9054-ab0dd746f7f7</strong></mark>
+        or
+        <mark><strong>00000003-5b7f-11e5-898c-237ee1c6d1d4</strong></mark>
+    </div>
+
+    <h:request>
+        We
+        <h:post>/searches</h:post>
+        the body
+        <h:jsonBody>{
+            "query": {
+            "find": "annotation",
+            "where": "type:eq(\"Tag\") resource.id:inSet(\"00000001-5ba6-11e5-9054-ab0dd746f7f7\",\"00000003-5b7f-11e5-898c-237ee1c6d1d4\") state:eq(\"CONFIRMED\")",
+            "return": "resource.id, value, who"
+            } }
+        </h:jsonBody>
+        and observe status
+        <h:status>201 Created</h:status>
+        with the Location header pointing to the results of our query.
+    </h:request>
+
+    <div c:execute="#searchId = uuid()">&#160;</div>
+
+    <h:request>We follow the Location header and
+        <h:get>/searches/$searchId</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "searchResultPage" : {
+	            "searchInfo": {
+		            "id" : "$searchId",
+		            "query" : {
+			            "find" : "annotation",
+	                "where": "type:eq(\"Tag\") resource.id:inSet(\"00000001-5ba6-11e5-9054-ab0dd746f7f7\",\"00000003-5b7f-11e5-898c-237ee1c6d1d4\") state:eq(\"CONFIRMED\")",
+			            "sort" : "-when",
+	                "return": "resource.id, value, who"
+		            },
+		            "totalResults" : 4,
+		            "totalPages" : 1
+		          },
+	            "^firstPage": "https://{host}/searches/$searchId/pages/1"
+            } }
+        </h:jsonResponse>
+    </h:request>
+
+    <div class="alert alert-warning sm">
+        <ul>
+            <li>
+                The <code>sort</code> field, which we left unspecified, defaults to <code>"-when"</code>
+                (= reverse timestamp order: "most recent first").
+            </li>
+            <li>
+                The <code>state</code> of the <code>where</code> field, which we left unspecified, defaults to
+                <code>"CONFIRMED"</code>
+            </li>
+        </ul>
+    </div>
+
+    <h:request>We
+        <h:get>/searches/$searchId/pages/1</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{ "searchResultPage": {
+            "pageNumber": 1,
+            "records": [
+            {
+            "resource.id": "00000003-5b7f-11e5-898c-237ee1c6d1d4",
+            "value": "A more recent user comment.",
+            "who": "user-4242",
+            "_resultNumber": 1
+            },
+            {
+            "resource.id": "00000003-5b7f-11e5-898c-237ee1c6d1d4",
+            "value": "An early user comment.",
+            "who": "user-4242",
+            "_resultNumber": 2
+            },
+            {
+            "resource.id": "00000001-5ba6-11e5-9054-ab0dd746f7f7",
+            "value": "A slightly later user comment.",
+            "who": "user-4242",
+            "_resultNumber": 3
+            },
+            {
+            "resource.id": "00000001-5ba6-11e5-9054-ab0dd746f7f7",
+            "value": "A very early user comment.",
+            "who": "user-4242",
+            "_resultNumber": 4
+            } ] } }
+        </h:jsonResponse>
+    </h:request>
+
+    Notice that the resource.id <code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code> and <code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code> are each returned twice.
+
+    <div class="alert alert-warning sm">
+        <ul>
+            <li>
+                To group the annotation <code>value</code> and <code>who</code>s by <code>resource.id</code>, we add the <code>list()</code> function to the <code>where</code> part of the query
+            </li>
+        </ul>
+    </div>
+
+    <h:request>
+        We
+        <h:post>/searches</h:post>
+        the body
+        <h:jsonBody>{
+            "query": {
+            "find": "annotation",
+            "where": "type:eq(\"Tag\") resource.id:inSet(\"00000001-5ba6-11e5-9054-ab0dd746f7f7\",\"00000003-5b7f-11e5-898c-237ee1c6d1d4\")",
+            "return": "resource.id, list(value,who)"
+            } }
+        </h:jsonBody>
+        and observe status
+        <h:status>201 Created</h:status>
+        with the Location header pointing to the results of our query.
+    </h:request>
+
+    <div c:execute="#searchId = uuid()">&#160;</div>
+
+    <h:request>We follow the Location header and
+        <h:get>/searches/$searchId</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "searchResultPage" : {
+              "pageNumber": 1,
+              "searchInfo": {
+                "totalResults" : 2,
+                "totalPages" : 1
+              },
+	            "records": [
+		            {
+                  "_resultNumber": 1,
+                  "resource.id": "00000003-5b7f-11e5-898c-237ee1c6d1d4",
+                  "_list": [{
+                    "value" : "A more recent user comment.",
+                    "who" : "user-4242"
+                    },{
+                    "value" : "An early user comment.",
+                    "who" : "user-4242"
+                    }]
+		            },
+		            {
+                  "_resultNumber": 2,
+                  "resource.id": "00000001-5ba6-11e5-9054-ab0dd746f7f7",
+			            "_list": [{
+			              "value" : "A slightly later user comment.",
+			              "who" : "user-4242"
+			              },{
+                          "value" : "A very early user comment.",
+                          "who" : "user-4242"
+			              }]
+	              } ] } }
+        </h:jsonResponse>
+    </h:request>
+
+    Note that, due to the grouping, the annotations are only sorted by <code>-when</code> within the group determined by <code>resource.id</code>
+</div>
+
+<div id="nla374_1" data-desc="How can I sort on groupsize?" c:execute="clearStorage()">
+    Given the following annotated resources (for brevity, all annotations are considered to be of type 'Tag')
+    in order of creation timestamp
+    <table class="table"
+           c:execute="resourceExistsWithTagForUserAtInstant(#resId, #value, #who, #when)">
+        <thead>
+        <tr>
+            <th c:set="#resId">Resource Id</th>
+            <th c:set="#value">Annotation value</th>
+            <th c:set="#who">Owner</th>
+            <th c:set="#when">Created at</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>verdriet</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-06-06T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>verdriet</code></td>
+            <td><code>user-4243</code></td>
+            <td><code>2015-06-07T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>angst</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-07-07T07:07:07+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>angst</code></td>
+            <td><code>user-4243</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>blijdschap</code></td>
+            <td><code>user-4241</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
+            <td><code>angst</code></td>
+            <td><code>peer-1337</code></td>
+            <td><code>2015-08-08T08:08:08+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
+            <td><code>blijdschap</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="alert alert-info sm">
+        We show how to find the annotations of type
+        <mark><strong>Tag</strong></mark>
+        with value
+        <mark><strong>angst</strong></mark>
+        grouped by <mark><strong>resource.id</strong></mark>
+        and sorted on the amount of annotations per resource, in descending order.
+    </div>
+
+    <h:request>
+        We
+        <h:post>/searches</h:post>
+        the body
+        <h:jsonBody>{
+            "query": {
+            "find": "annotation",
+            "where": "type:eq(\"Tag\") value:eq(\"angst\")",
+            "sort": "-_list.size",
+            "return": "resource.id, list(id,who)"
+            } }
+        </h:jsonBody>
+        and observe status
+        <h:status>201 Created</h:status>
+        with the Location header pointing to the results of our query.
+    </h:request>
+
+    <div c:execute="#searchId = uuid()">&#160;</div>
+
+    <h:request>We follow the Location header and
+        <h:get>/searches/$searchId</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "searchResultPage" : {
+                "pageNumber": 1,
+                "searchInfo": {
+                    "totalResults" : 2,
+                    "totalPages" : 1
+                },
+                "records" : [
+                {
+                    "_resultNumber" : 1,
+                    "resource.id" : "00000003-5b7f-11e5-898c-237ee1c6d1d4",
+                    "_list.size" : 2,
+                    "_list" : [ {
+                        "id" : "{uuid.anyValid}",
+                        "who" : "user-4242"
+                    }, {
+                        "id" : "{uuid.anyValid}",
+                        "who" : "user-4243"
+                    } ]
+                }, {
+                    "_resultNumber" : 2,
+                    "resource.id" : "deadbeef-5b7f-11e5-8fb4-5371419560ec",
+                    "_list.size" : 1,
+                    "_list" : [ {
+                        "id" : "{uuid.anyValid}",
+                        "who" : "peer-1337"
+                    } ]
+            } ] } }
+        </h:jsonResponse>
+    </h:request>
+
+</div>
+
+<div id="nla374_2" data-desc="How do I group the results on annotation value, sorted by groupsize?" c:execute="clearStorage()">
+    Given the following annotated resources (for brevity, all annotations are considered to be of type 'Tag')
+    in order of creation timestamp
+    <table class="table"
+           c:execute="resourceExistsWithTagForUserAtInstant(#resId, #value, #who, #when)">
+        <thead>
+        <tr>
+            <th c:set="#resId">Resource Id</th>
+            <th c:set="#value">Annotation value</th>
+            <th c:set="#who">Owner</th>
+            <th c:set="#when">Created at</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>verdriet</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-06-06T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>verdriet</code></td>
+            <td><code>user-4243</code></td>
+            <td><code>2015-06-07T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>angst</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-07-07T07:07:07+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>angst</code></td>
+            <td><code>user-4243</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>blijdschap</code></td>
+            <td><code>user-4241</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
+            <td><code>angst</code></td>
+            <td><code>peer-1337</code></td>
+            <td><code>2015-08-08T08:08:08+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
+            <td><code>blijdschap</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="alert alert-info sm">
+        We show how to find the annotations of type
+        <mark><strong>Tag</strong></mark>
+        grouped by <mark><strong>value</strong></mark>
+        and sorted on the amount of annotations per value, in descending order.
+    </div>
+
+    <h:request>
+        We
+        <h:post>/searches</h:post>
+        the body
+        <h:jsonBody>{
+            "query": {
+                "find": "annotation",
+                "where": "type:eq(\"Tag\")",
+                "sort": "-_list.size resource.id",
+                "return": "value, list(resource.id,id,who)"
+            } }
+        </h:jsonBody>
+        and observe status
+        <h:status>201 Created</h:status>
+        with the Location header pointing to the results of our query.
+    </h:request>
+
+    <div c:execute="#searchId = uuid()">&#160;</div>
+
+    <h:request>We follow the Location header and
+        <h:get>/searches/$searchId</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+   "searchResultPage":{
+      "pageNumber":1,
+      "searchInfo":{
+         "totalResults":3,
+         "totalPages":1
+      },
+      "records":[
+         {
+            "_resultNumber":1,
+            "value":"angst",
+            "_list.size":3,
+            "_list":[
+               {
+                 "resource.id":"00000003-5b7f-11e5-898c-237ee1c6d1d4",
+                  "id":"{uuid.anyValid}",
+                  "who":"user-4243"
+               },
+               {
+                 "resource.id":"00000003-5b7f-11e5-898c-237ee1c6d1d4",
+                  "id":"{uuid.anyValid}",
+                  "who":"user-4242"
+               },
+               {
+                 "resource.id":"deadbeef-5b7f-11e5-8fb4-5371419560ec",
+                  "id":"{uuid.anyValid}",
+                  "who":"peer-1337"
+               }
+            ]
+         },
+         {
+            "_resultNumber":2,
+            "value":"verdriet",
+            "_list.size":2,
+            "_list":[
+               {
+                  "id":"{uuid.anyValid}",
+                  "resource.id":"00000001-5ba6-11e5-9054-ab0dd746f7f7",
+                  "who":"user-4242"
+               },
+               {
+                  "id":"{uuid.anyValid}",
+                  "resource.id":"00000001-5ba6-11e5-9054-ab0dd746f7f7",
+                  "who":"user-4243"
+               }
+            ]
+         },
+         {
+            "_resultNumber":3,
+            "value":"blijdschap",
+            "_list.size":2,
+            "_list":[
+               {
+                  "id":"{uuid.anyValid}",
+                  "resource.id":"00000003-5b7f-11e5-898c-237ee1c6d1d4",
+                  "who":"user-4241"
+               },
+               {
+                  "id":"{uuid.anyValid}",
+                  "resource.id":"deadbeef-5b7f-11e5-8fb4-5371419560ec",
+                  "who":"user-4242"
+               }
+            ]
+         }
+      ]
+   }
+}
+        </h:jsonResponse>
+    </h:request>
+</div>
+
+<div id="nla374_3" data-desc="How do I get all the values for a given annotation type?" c:execute="clearStorage()">
+    Given the following annotated resources (for brevity, all annotations are considered to be of type 'Tag')
+    in order of creation timestamp
+    <table class="table"
+           c:execute="resourceExistsWithTagForUserAtInstant(#resId, #value, #who, #when)">
+        <thead>
+        <tr>
+            <th c:set="#resId">Resource Id</th>
+            <th c:set="#value">Annotation value</th>
+            <th c:set="#who">Owner</th>
+            <th c:set="#when">Created at</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>verdriet</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-06-06T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000001-5ba6-11e5-9054-ab0dd746f7f7</code></td>
+            <td><code>verdriet</code></td>
+            <td><code>user-4243</code></td>
+            <td><code>2015-06-07T06:06:06+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>angst</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-07-07T07:07:07+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>angst</code></td>
+            <td><code>user-4243</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>00000003-5b7f-11e5-898c-237ee1c6d1d4</code></td>
+            <td><code>blijdschap</code></td>
+            <td><code>user-4241</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
+            <td><code>angst</code></td>
+            <td><code>peer-1337</code></td>
+            <td><code>2015-08-08T08:08:08+02:00</code></td>
+        </tr>
+        <tr>
+            <td><code>deadbeef-5b7f-11e5-8fb4-5371419560ec</code></td>
+            <td><code>blijdschap</code></td>
+            <td><code>user-4242</code></td>
+            <td><code>2015-09-09T09:09:09+02:00</code></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="alert alert-info sm">
+        We show how to find the unique annotation values of type
+        <mark><strong>Tag</strong></mark>
+    </div>
+
+    <h:request>
+        We
+        <h:post>/searches</h:post>
+        the body
+        <h:jsonBody>{
+            "query": {
+                "find": "annotation",
+                "distinct": "true",
+                "where": "type:eq(\"Tag\")",
+                "sort": "value",
+                "return": "value"
+            } }
+        </h:jsonBody>
+        and observe status
+        <h:status>201 Created</h:status>
+        with the Location header pointing to the results of our query.
+    </h:request>
+
+    <div c:execute="#searchId = uuid()">&#160;</div>
+
+    <h:request>We follow the Location header and
+        <h:get>/searches/$searchId</h:get>
+        expecting
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>
+{
+   "searchResultPage":{
+      "pageNumber":1,
+      "searchInfo":{
+         "totalResults":3,
+         "totalPages":1
+      },
+      "records":[
+         {
+            "_resultNumber":1,
+            "value":"angst"
+         },
+         {
+            "_resultNumber":2,
+            "value":"blijdschap"
+         },
+         {
+            "_resultNumber":3,
+            "value":"verdriet"
+         }
+      ]
+   }
+}
+        </h:jsonResponse>
+    </h:request>
+</div>
+
+</body>
+</html>

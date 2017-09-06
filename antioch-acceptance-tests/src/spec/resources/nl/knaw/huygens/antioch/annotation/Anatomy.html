@@ -1,0 +1,102 @@
+<!--
+  #%L
+  antioch-acceptance-tests
+  =======
+  Copyright (C) 2015 - 2017 Huygens ING (KNAW)
+  =======
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+<html xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/antioch/xsd/concordion-rest.xsd">
+
+<title>Antioch: Anatomy of a resource</title>
+
+<body data-desc="Anatomy of an annotation">
+
+<div id="resource-anatomy" data-desc="What does an annotation look like?" c:execute="clearStorage()">
+    When we <code>GET</code> an annotation, what does it look like and what is the meaning of the properties?
+    Let us assume that:
+    <ul>
+        <li c:execute="resourceExists(#resId)">
+            a (parent) resource exists with uuid: <code c:set="#resId">c3533708-61c5-11e5-9a91-87af0920e91d</code>
+        </li>
+        <li c:execute="#annoId = hasAnnotation(#resId)">
+            this resource has an annotation: <code c:echo="#annoId"></code>
+        </li>
+    </ul>
+
+    <h:request>When we
+        <h:get>/annotations/$annoId</h:get>
+        we receive
+        <h:status>200 OK</h:status>
+        and body
+        <h:jsonResponse>{
+            "annotation" : {
+            "id" : "$annoId",
+            "type" : "type",
+            "value" : "value",
+            "state" : {
+            "value" : "TENTATIVE",
+            "since" : "{date.beforeNow}"
+            },
+            "revision" : 0,
+            "^deprecates" : "",
+            "^current_version" : "https://{host}/annotations/$annoId",
+            "^versioned_self" : "https://{host}/annotations/$annoId/rev/0",
+            "^annotates" : "https://{host}/resources/$resId",
+            "^annotations" : [ ],
+            "^provenance" : "https://{host}/annotations/$annoId/provenance"
+            } }
+        </h:jsonResponse>
+    </h:request>
+    <ul>
+        <li><code>id</code> shows the uuid of this annotation</li>
+        <li><code>type</code> shows the type (string) of this annotation</li>
+        <li><code>value</code> shows the value (string) of this annotation</li>
+        <li><code>state.value</code> is one of
+            <dl class="dl-horizontal">
+                <dt>TENTATIVE</dt>
+                <dd>the object has just been created, but not confirmed</dd>
+                <dt>CONFIRMED</dt>
+                <dd>the object has been confirmed and is in full operational order</dd>
+                <dt>DELETED</dt>
+                <dd>the object is marked as deleted</dd>
+                <dt>DEPRECATED</dt>
+                <dd>the object (usually an annotation) has been deprecated by a more recent version</dd>
+            </dl>
+        </li>
+        <li><code>state.since</code> is the instant at which this resource's state was set to its current value</li>
+        <li><code>revision</code> shows the revision of this annotation
+            <small>this number is incremented each time this annotation is deprecated by another value</small>
+        </li>
+        <li><code>^deprecates</code> points to the version of this annotation which is deprecated by this revision
+        </li>
+        <li><code>^current_version</code> always points to the most recent revision of this annotation
+        </li>
+        <li><code>^versioned_self</code> points to this particular revision of the annotation</li>
+        <li><code>^annotates</code> points to the resource or annotation which this annotation annotates</li>
+        <li><code>^annotations</code> contains a (possibly empty) array of links to annotations on this annotation.
+            <small>(as annotations can be annotated themselves)</small>
+        </li>
+        <li><code>^provenance</code> contains a link to the provenance object for this annotation
+            <small>(who-what-when-why was this object created?)</small>
+        </li>
+    </ul>
+</div>
+
+</body>
+</html>

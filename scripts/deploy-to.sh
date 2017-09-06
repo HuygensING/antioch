@@ -15,7 +15,7 @@ function divider {
 function deploy {
   profile=$1
   base=$2
-	mvn package tomcat7:redeploy -P ${profile} -pl alexandria-webapp -am &&
+	mvn package tomcat7:redeploy -P ${profile} -pl antioch-webapp -am &&
 	(
 		divider
 		sleep 20 # wait for the server to boot

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   #%L
-  Alexandria Text Repository
+  Antioch Text Annotation Repository
   =======
   Copyright (C) 2015 - 2017 Huygens ING (KNAW)
   =======
@@ -61,7 +61,7 @@
     <menu name="Documentation" inherit="bottom">
 <!--       <item name="Early REST discussion" href="REST.html"/>  -->
       <item name="REST Acceptance Tests"
-            href="alexandria-acceptance-tests/concordion/nl/knaw/huygens/alexandria/Alexandria.html"/>
+            href="antioch-acceptance-tests/concordion/nl/knaw/huygens/antioch/Antioch.html"/>
     </menu>
     <menu name="Maven documentation" ref="reports" inherit="bottom"/>
   </body>
@@ -78,7 +78,7 @@
         <name>
           <![CDATA[<span class="color-highlight">Antioch</span> Text Annotation Repository]]>
         </name>
-        <href>http://alexandria.huygens.knaw.nl</href>
+        <href>http://antioch.huygens.knaw.nl</href>
       </brand>
       <slogan>Enrich and explore any Text with any Annotation</slogan>
       <titleTemplate>%2$s | %1$s</titleTemplate>

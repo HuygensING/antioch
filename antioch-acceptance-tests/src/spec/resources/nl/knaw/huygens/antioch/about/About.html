@@ -1,0 +1,98 @@
+<!--
+  #%L
+  antioch-acceptance-tests
+  =======
+  Copyright (C) 2015 - 2017 Huygens ING (KNAW)
+  =======
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+<html xmlns:h="http://huygens.knaw.nl/concordion-acceptance-test"
+      xmlns:c="http://www.concordion.org/2007/concordion"
+      xmlns:xsi="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://huygens.knaw.nl/concordion-acceptance-test
+                          http://huygensing.github.io/antioch/xsd/concordion-rest.xsd">
+
+<title>Antioch: About the server</title>
+
+<body data-desc="About the server">
+
+<div id="about" data-desc="How can I get information about the Antioch server?" c:execute="#version=projectVersion()">
+    <h:request>
+        When I
+        <h:get>/about</h:get>
+        then I should receive
+        <h:status>200 OK</h:status>
+        and the body contains
+        <h:jsonResponse>{
+            "buildDate": "{date.anyValid}",
+            "commitId": "{git.validCommitId}",
+            "scmBranch": "{git.validBranch}",
+            "startedAt": "{date.beforeNow}",
+            "tentativesTTL": "PT24H",
+            "version": "$version"
+            }
+        </h:jsonResponse>
+    </h:request>
+
+    <div class="alert alert-warning sm">
+        The <code>tentativesTTL</code> value determines the Time to Live for (unconfirmed) tentative objects.
+        <a href="../transactions/Transactions.html">Tentative objects should be confirmed</a> before their allotted
+        life span is over as they risk <strong>automatic purging by the server</strong> any time thereafter.
+    </div>
+</div>
+
+<div id="homepage" data-desc="What resources does the server provide besides REST resources?">
+    <ul>
+        <li>
+            <h:request>
+                When I
+                <h:get>/</h:get>
+                using
+                <h:setHeader name="Accept">text/html</h:setHeader>
+                then I should receive
+                <h:status>200 OK</h:status>
+            </h:request>
+        </li>
+        <li>
+            <h:request>
+                When I
+                <h:get>/application.wadl</h:get>
+                using
+                <h:setHeader name="Accept">application/xml</h:setHeader>
+                then I should receive
+                <h:status>200 OK</h:status>
+            </h:request>
+        </li>
+        <li>
+            <h:request>
+                When I
+                <h:get>/favicon.ico</h:get>
+                then I should receive
+                <h:status>204 No Content</h:status>
+            </h:request>
+        </li>
+        <li>
+            <h:request>
+                When I
+                <h:get>/robots.txt</h:get>
+                then I should receive
+                <h:status>200 OK</h:status>
+            </h:request>
+        </li>
+    </ul>
+</div>
+
+</body>
+
+</html>

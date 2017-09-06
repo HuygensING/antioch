@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   #%L
-  Alexandria Text Repository
+  Antioch Text Repository
   =======
   Copyright (C) 2015 - 2017 Huygens ING (KNAW)
   =======
@@ -37,10 +37,10 @@
       <useAllReactorProjects>true</useAllReactorProjects>
       <!-- Now, select which projects to include in this module-set. -->
       <includes>
-        <include>${project.groupId}:alexandria-server</include>
+        <include>${project.groupId}:antioch-server</include>
       </includes>
       <binaries>
-        <outputDirectory>modules/alexandria-server</outputDirectory>
+        <outputDirectory>modules/antioch-server</outputDirectory>
         <includeDependencies>true</includeDependencies>
         <unpack>false</unpack>
       </binaries>
@@ -49,7 +49,7 @@
 
   <fileSets>
     <fileSet>
-      <directory>alexandria-server/target/generated-resources/appassembler/jsw/alexandria-server/</directory>
+      <directory>antioch-server/target/generated-resources/appassembler/jsw/antioch-server/</directory>
       <outputDirectory />
       <fileMode>0755</fileMode>
       <includes>
@@ -58,7 +58,7 @@
       </includes>
     </fileSet>
     <fileSet>
-      <directory>alexandria-server/target/generated-resources/appassembler/jsw/alexandria-server/</directory>
+      <directory>antioch-server/target/generated-resources/appassembler/jsw/antioch-server/</directory>
       <outputDirectory />
       <excludes>
         <exclude>bin/**</exclude>

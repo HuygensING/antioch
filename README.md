@@ -10,7 +10,7 @@ See the [generated Maven site](http://huygensING.github.io/antioch) for document
     mvn clean verify site:site site:stage scm-publish:publish-scm
 
 ###### Alternatively, use the docker image:
-    docker run -v ${workdir}:/home/alexandria/.alexandria -p${native_port}:2015 huygensing/alexandria-server:latest-develop
+    docker run -v ${workdir}:/home/antioch/.antioch -p${native_port}:2015 huygensing/antioch-server:latest-develop
 
 where workdir is a local directory to persist the db on, and native_port is the port you want the server to be accessed on.
  
