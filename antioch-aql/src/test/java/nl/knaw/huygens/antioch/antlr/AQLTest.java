@@ -20,10 +20,7 @@ package nl.knaw.huygens.antioch.antlr;
  * #L%
  */
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-
+import nl.knaw.huygens.Log;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -31,7 +28,9 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.Test;
 
-import nl.knaw.huygens.Log;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AQLTest {
 

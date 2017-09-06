@@ -52,11 +52,18 @@ class Server {
     System.out.println("-----------------------------");
     System.out.println("Starting Antioch server...");
     PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration(PROPERTIES_FILE, true);
-    System.out.println("version  : " + propertiesConfiguration.getProperty("version").get());
-    System.out.println("buildDate: " + propertiesConfiguration.getProperty("buildDate").get());
-    System.out.println("commitId : " + propertiesConfiguration.getProperty("commitId").get());
+    System.out.println("version       : " + propertiesConfiguration.getProperty("version").get());
+    System.out.println("buildDate     : " + propertiesConfiguration.getProperty("buildDate").get());
+    System.out.println("commitId      : " + propertiesConfiguration.getProperty("commitId").get());
+    String fileEncoding = System.getProperty("file.encoding");
+    System.out.println("file.encoding : " + fileEncoding);
     System.out.println("-----------------------------");
-    new Server().run();
+    if (!"UTF-8".equals(fileEncoding)) {
+      System.err.println("Can't start: Invalid file.encoding '" + fileEncoding + "', should be 'UTF-8'.");
+      System.exit(-1);
+    } else {
+      new Server().run();
+    }
   }
 
   private void run() throws IOException {

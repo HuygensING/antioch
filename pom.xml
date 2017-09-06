@@ -54,6 +54,8 @@
     <javax.inject.version>2.5.0-b30</javax.inject.version>
     <jdk.version>1.8</jdk.version>
 
+    <jersey-client.version>2.25.1</jersey-client.version> <!-- for the java client, can be independent of the other modules -->
+
     <!-- can't update this version until jersey2-guice does -->
     <jersey.version>2.17</jersey.version>
     <jersey2-guice.version>0.10</jersey2-guice.version>

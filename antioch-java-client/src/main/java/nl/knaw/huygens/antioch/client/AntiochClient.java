@@ -80,8 +80,8 @@ public class AntiochClient implements AutoCloseable {
     ClientConfig clientConfig = new ClientConfig(jacksonProvider)//
         .connectorProvider(connectorProvider)//
         .property(ApacheClientProperties.CONNECTION_MANAGER, cm)//
-        .property(ClientProperties.CONNECT_TIMEOUT, 600)//
-        .property(ClientProperties.READ_TIMEOUT, 600);
+        .property(ClientProperties.CONNECT_TIMEOUT, 60000)//
+        .property(ClientProperties.READ_TIMEOUT, 60000);
 
     if (sslContext == null) {
       if ("https".equals(antiochURI.getScheme())) {

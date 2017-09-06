@@ -10,7 +10,7 @@ subQuery
 
 FIELD_NAME
   : 'id'
-  | 'url' 
+  | 'url'
   | 'type' 
   | 'value'
   | 'resource.id' 
@@ -28,7 +28,7 @@ FIELD_NAME
 FUNCTION
   : 'eq'
   | 'match'
-  | 'inSet' 
+  | 'inSet'
   | 'inRange'
   ;
 
