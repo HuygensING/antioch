@@ -251,12 +251,12 @@ ins {
             </div>
         </li>
         <div c:execute="#uuid = uuid()">In this case the generated uuid happened to be:
-            <strong c:echo="#uuid">ecfd4415-7ee8-462d-a8da-2cf3ed79b28c</strong>.
+            <strong c:echo="#uuid">a6a78a6b-69a1-41ef-a43f-25ff927e4aab</strong>.
         </div>
         <li>
             <div h:request="">
                 To confirm our subresource, we
-                <code class="put">/resources/ecfd4415-7ee8-462d-a8da-2cf3ed79b28c/state</code>
+                <code class="put">/resources/a6a78a6b-69a1-41ef-a43f-25ff927e4aab/state</code>
                 the body
                 <pre class="json">{
   "state" : "CONFIRMED"
@@ -281,7 +281,7 @@ ins {
                     <code h:status="" class="success">204 No Content</code>
                     (instead of <code>201 Created</code>)
                     with the <strong>same</strong> location header:
-                    <code class="location success">https://{host}/resources/ecfd4415-7ee8-462d-a8da-2cf3ed79b28c</code>
+                    <code class="location success">https://{host}/resources/a6a78a6b-69a1-41ef-a43f-25ff927e4aab</code>
                 </div>
             </div>
         </li>
@@ -293,7 +293,7 @@ ins {
         <li>
             <div h:request="">
                 To register, we
-                <code class="post">/resources/ecfd4415-7ee8-462d-a8da-2cf3ed79b28c/annotations</code>
+                <code class="post">/resources/a6a78a6b-69a1-41ef-a43f-25ff927e4aab/annotations</code>
                 the body
                 <pre class="json">{
   "annotation" : {
@@ -305,14 +305,14 @@ ins {
                 <code h:status="" class="success">201 Created</code>
             </div>
         </li>
-        <div c:execute="#anno = uuid()">In this case we got uuid <strong c:echo="#anno">14880c33-58e9-4628-92e6-bb1f5992db69</strong> as the uuid
+        <div c:execute="#anno = uuid()">In this case we got uuid <strong c:echo="#anno">6b17f19f-09aa-4bd1-8f53-5cb0c591c597</strong> as the uuid
             for the annotation we just created.
         </div>
         <li>
             <div h:request="">
                 <strong>(verification)</strong>
                 We
-                <code class="get">/annotations/14880c33-58e9-4628-92e6-bb1f5992db69</code>
+                <code class="get">/annotations/6b17f19f-09aa-4bd1-8f53-5cb0c591c597</code>
                 and observe status
                 <code h:status="" class="success">200 OK</code>
                 and body:
@@ -320,12 +320,12 @@ ins {
   "annotation" : {
     "value" : "happy",
     "type" : "emotion",
-    "id" : "14880c33-58e9-4628-92e6-bb1f5992db69",
+    "id" : "6b17f19f-09aa-4bd1-8f53-5cb0c591c597",
     "state" : {
       "value" : "TENTATIVE",
       "since" : "{date.beforeNow}"
     },
-    "^annotates" : "https://{host}/resources/ecfd4415-7ee8-462d-a8da-2cf3ed79b28c",
+    "^annotates" : "https://{host}/resources/a6a78a6b-69a1-41ef-a43f-25ff927e4aab",
     "^annotations" : [ ]
   }
 }</pre>
@@ -337,7 +337,7 @@ ins {
         <li>
             <div h:request="">
                 To confirm, we
-                <code class="put">/annotations/14880c33-58e9-4628-92e6-bb1f5992db69/state</code>
+                <code class="put">/annotations/6b17f19f-09aa-4bd1-8f53-5cb0c591c597/state</code>
                 the body
                 <pre class="json">{
   "state" : "CONFIRMED"
@@ -350,7 +350,7 @@ ins {
             <div h:request="">
                 <strong>(verification)</strong>
                 We
-                <code class="get">/annotations/14880c33-58e9-4628-92e6-bb1f5992db69</code>
+                <code class="get">/annotations/6b17f19f-09aa-4bd1-8f53-5cb0c591c597</code>
                 and observe status
                 <code h:status="" class="success">200 OK</code>
                 and body <span class="text-muted">(only relevant fields shown for brevity)</span>
@@ -358,8 +358,8 @@ ins {
   "annotation" : {
     "value" : "happy",
     "type" : "emotion",
-    "id" : "14880c33-58e9-4628-92e6-bb1f5992db69",
-    "^annotates" : "https://{host}/resources/ecfd4415-7ee8-462d-a8da-2cf3ed79b28c"
+    "id" : "6b17f19f-09aa-4bd1-8f53-5cb0c591c597",
+    "^annotates" : "https://{host}/resources/a6a78a6b-69a1-41ef-a43f-25ff927e4aab"
   }
 }</pre>
                 <div class="alert alert-info sm">
@@ -371,14 +371,14 @@ ins {
             <div h:request="">
                 <strong>(verification)</strong>
                 We
-                <code class="get">/resources/ecfd4415-7ee8-462d-a8da-2cf3ed79b28c</code>
+                <code class="get">/resources/a6a78a6b-69a1-41ef-a43f-25ff927e4aab</code>
                 and observe status
                 <code h:status="" class="success">200 OK</code>
                 and body <span class="text-muted">(again, only relevant fields shown for brevity)</span>
                 <pre class="json rest-success">{
   "subresource" : {
-    "id" : "ecfd4415-7ee8-462d-a8da-2cf3ed79b28c",
-    "^annotations" : [ "https://{host}/annotations/14880c33-58e9-4628-92e6-bb1f5992db69" ]
+    "id" : "a6a78a6b-69a1-41ef-a43f-25ff927e4aab",
+    "^annotations" : [ "https://{host}/annotations/6b17f19f-09aa-4bd1-8f53-5cb0c591c597" ]
   }
 }</pre>
                 <div class="alert alert-info sm">
@@ -437,11 +437,11 @@ ins {
     </div>
 
     <div c:execute="#searchId = uuid()">The uuid for this particular search was:
-        <strong c:echo="#searchId">952a2411-599e-41fd-9cb9-8aecb1c8c5a0</strong>.
+        <strong c:echo="#searchId">c51379ae-543d-4030-b52f-cb35af3a6543</strong>.
     </div>
 
     <div h:request="">We
-        <code class="get">/searches/952a2411-599e-41fd-9cb9-8aecb1c8c5a0/pages/1</code>
+        <code class="get">/searches/c51379ae-543d-4030-b52f-cb35af3a6543/pages/1</code>
         and observe
         <code h:status="" class="success">200 OK</code>
         and the relevant resource and subresource <code>url</code>s in the body
@@ -473,7 +473,7 @@ ins {
         <li>
             <div h:request="">
                 We
-                <code class="put">/annotations/a206fe4d-d22b-4309-a9ed-49b2b3640574</code>
+                <code class="put">/annotations/87688ff4-eb9b-462a-b490-1aa3b988056f</code>
                 the body
                 <pre class="json">{
   "annotation" : {
@@ -487,13 +487,13 @@ ins {
         <li>
             <div h:request="">
                 <strong>(verification)</strong> We
-                <code class="get">/annotations/a206fe4d-d22b-4309-a9ed-49b2b3640574</code>
+                <code class="get">/annotations/87688ff4-eb9b-462a-b490-1aa3b988056f</code>
                 and observe status
                 <code h:status="" class="success">200 OK</code>
                 and the body
                 <pre class="json rest-success">{
   "annotation" : {
-    "id" : "a206fe4d-d22b-4309-a9ed-49b2b3640574",
+    "id" : "87688ff4-eb9b-462a-b490-1aa3b988056f",
     "type" : "res-type",
     "value" : "UPDATED-VALUE",
     "state" : {
@@ -501,9 +501,9 @@ ins {
     },
     "revision" : 1,
     "^annotates" : "https://{host}/resources/13e53670-3f3f-11e5-96ef-dff0c5cf4b9b",
-    "^deprecates" : "https://{host}/annotations/a206fe4d-d22b-4309-a9ed-49b2b3640574/rev/0",
-    "^current_version" : "https://{host}/annotations/a206fe4d-d22b-4309-a9ed-49b2b3640574",
-    "^versioned_self" : "https://{host}/annotations/a206fe4d-d22b-4309-a9ed-49b2b3640574/rev/1"
+    "^deprecates" : "https://{host}/annotations/87688ff4-eb9b-462a-b490-1aa3b988056f/rev/0",
+    "^current_version" : "https://{host}/annotations/87688ff4-eb9b-462a-b490-1aa3b988056f",
+    "^versioned_self" : "https://{host}/annotations/87688ff4-eb9b-462a-b490-1aa3b988056f/rev/1"
   }
 }</pre>
             </div>
@@ -529,7 +529,7 @@ ins {
                 <pre class="json rest-success">{
   "resource" : {
     "id" : "13e53670-3f3f-11e5-96ef-dff0c5cf4b9b",
-    "^annotations" : [ "https://{host}/annotations/a206fe4d-d22b-4309-a9ed-49b2b3640574" ]
+    "^annotations" : [ "https://{host}/annotations/87688ff4-eb9b-462a-b490-1aa3b988056f" ]
   }
 }</pre>
             </div>
@@ -540,11 +540,11 @@ ins {
         <li>
             <div h:request="">
                 <strong>(verification)</strong> We inspect the previous revision of the annotation by
-                <code class="get">/annotations/a206fe4d-d22b-4309-a9ed-49b2b3640574/rev/0</code>
+                <code class="get">/annotations/87688ff4-eb9b-462a-b490-1aa3b988056f/rev/0</code>
                 and observe the body
                 <pre class="json rest-success">{
   "annotation" : {
-    "id" : "a206fe4d-d22b-4309-a9ed-49b2b3640574",
+    "id" : "87688ff4-eb9b-462a-b490-1aa3b988056f",
     "revision" : 0,
     "type" : "res-type",
     "value" : "res-value",
@@ -579,7 +579,7 @@ ins {
                 <pre class="json rest-success">{
   "resource" : {
     "id" : "349103a0-4006-11e5-8889-e3cb0d4e45c3",
-    "^annotations" : [ "https://{host}/annotations/eb574fdf-60f3-4a9c-b2d7-03297a65b57a" ]
+    "^annotations" : [ "https://{host}/annotations/6a85911f-7ace-4c9c-bb1b-774060f9b542" ]
   }
 }</pre>
             </div>
@@ -588,7 +588,7 @@ ins {
         <li>
             <div h:request="">
                 We
-                <code class="delete">/annotations/eb574fdf-60f3-4a9c-b2d7-03297a65b57a</code>
+                <code class="delete">/annotations/6a85911f-7ace-4c9c-bb1b-774060f9b542</code>
                 and observe status
                 <code h:status="" class="success">204 No Content</code>
                 and response body
@@ -599,13 +599,13 @@ ins {
         <li>
             <div h:request="">
                 <strong>(verification)</strong> We
-                <code class="get">/annotations/eb574fdf-60f3-4a9c-b2d7-03297a65b57a</code>
+                <code class="get">/annotations/6a85911f-7ace-4c9c-bb1b-774060f9b542</code>
                 and observe status
                 <code h:status="" class="success">200 OK</code>
                 and body
                 <pre class="json rest-success">{
   "annotation" : {
-    "id" : "eb574fdf-60f3-4a9c-b2d7-03297a65b57a",
+    "id" : "6a85911f-7ace-4c9c-bb1b-774060f9b542",
     "state" : {
       "value" : "DELETED",
       "since" : "{date.beforeNow}"
@@ -628,7 +628,7 @@ ins {
                 <pre class="json rest-success">{
   "resource" : {
     "id" : "349103a0-4006-11e5-8889-e3cb0d4e45c3",
-    "^annotations" : [ "https://{host}/annotations/eb574fdf-60f3-4a9c-b2d7-03297a65b57a" ]
+    "^annotations" : [ "https://{host}/annotations/6a85911f-7ace-4c9c-bb1b-774060f9b542" ]
   }
 }</pre>
                 <div class="alert alert-info sm">
@@ -705,14 +705,14 @@ ins {
     <div c:execute="#searchId = uuid()"> </div>
 
     <div h:request="">We follow the Location header and
-        <code class="get">/searches/73a18e1c-cb3a-4cc7-9a86-8f5e6edc5717</code>
+        <code class="get">/searches/a36f633d-7845-4566-9836-c1e6ab257fe1</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
         <pre class="json rest-success">{
   "searchResultPage" : {
     "searchInfo" : {
-      "id" : "73a18e1c-cb3a-4cc7-9a86-8f5e6edc5717",
+      "id" : "a36f633d-7845-4566-9836-c1e6ab257fe1",
       "query" : {
         "find" : "annotation",
         "where" : "who:eq(\"user-4242\") type:eq(\"Tag\") state:eq(\"CONFIRMED\")",
@@ -722,7 +722,7 @@ ins {
       "totalResults" : 3,
       "totalPages" : 1
     },
-    "^firstPage" : "https://{host}/searches/73a18e1c-cb3a-4cc7-9a86-8f5e6edc5717/pages/1"
+    "^firstPage" : "https://{host}/searches/a36f633d-7845-4566-9836-c1e6ab257fe1/pages/1"
   }
 }</pre>
     </div>
@@ -741,7 +741,7 @@ ins {
     </div>
 
     <div h:request="">We
-        <code class="get">/searches/73a18e1c-cb3a-4cc7-9a86-8f5e6edc5717/pages/1</code>
+        <code class="get">/searches/a36f633d-7845-4566-9836-c1e6ab257fe1/pages/1</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
@@ -796,7 +796,7 @@ ins {
     <div c:execute="#searchId2 = uuid()"> </div>
 
     <div h:request="">We follow the Location header and
-        <code class="get">/searches/312f2781-4bd3-4895-8095-1a1f04834750</code>
+        <code class="get">/searches/9b613fb5-b29e-4ebc-b3a4-091e52baaa80</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
@@ -806,7 +806,7 @@ ins {
     "searchInfo" : {
       "totalResults" : 2
     },
-    "^firstPage" : "https://{host}/searches/312f2781-4bd3-4895-8095-1a1f04834750/pages/1",
+    "^firstPage" : "https://{host}/searches/9b613fb5-b29e-4ebc-b3a4-091e52baaa80/pages/1",
     "records" : [ {
       "value" : "An early user comment.",
       "resource.url" : "https://{host}/resources/00000002-3f4e-11e5-91d3-bfea30e2969c",
@@ -852,7 +852,7 @@ ins {
     <div c:execute="#searchId3 = uuid()"> </div>
 
     <div h:request="">We follow the Location header and
-        <code class="get">/searches/2b243682-5966-4c8c-90f1-23318c3de23d</code>
+        <code class="get">/searches/8f934622-76c4-4636-a4a4-00fffd0f65cf</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
@@ -862,7 +862,7 @@ ins {
     "searchInfo" : {
       "totalResults" : 1
     },
-    "^firstPage" : "https://{host}/searches/2b243682-5966-4c8c-90f1-23318c3de23d/pages/1",
+    "^firstPage" : "https://{host}/searches/8f934622-76c4-4636-a4a4-00fffd0f65cf/pages/1",
     "records" : [ {
       "value" : "An early user comment.",
       "resource.url" : "https://{host}/resources/00000002-3f4e-11e5-91d3-bfea30e2969c",
@@ -943,14 +943,14 @@ ins {
     <div c:execute="#searchId = uuid()"> </div>
 
     <div h:request="">We follow the Location header and
-        <code class="get">/searches/0ed87e65-e332-4dde-b04b-61d6939813af</code>
+        <code class="get">/searches/d4024088-2109-462f-b659-9f4eeee25ffb</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
         <pre class="json rest-success">{
   "searchResultPage" : {
     "searchInfo" : {
-      "id" : "0ed87e65-e332-4dde-b04b-61d6939813af",
+      "id" : "d4024088-2109-462f-b659-9f4eeee25ffb",
       "query" : {
         "find" : "annotation",
         "where" : "who:eq(\"user-4242\") type:eq(\"Tag\") state:eq(\"CONFIRMED\")",
@@ -960,7 +960,7 @@ ins {
       "totalResults" : 4,
       "totalPages" : 1
     },
-    "^firstPage" : "https://{host}/searches/0ed87e65-e332-4dde-b04b-61d6939813af/pages/1"
+    "^firstPage" : "https://{host}/searches/d4024088-2109-462f-b659-9f4eeee25ffb/pages/1"
   }
 }</pre>
     </div>
@@ -979,7 +979,7 @@ ins {
     </div>
 
     <div h:request="">We
-        <code class="get">/searches/0ed87e65-e332-4dde-b04b-61d6939813af/pages/1</code>
+        <code class="get">/searches/d4024088-2109-462f-b659-9f4eeee25ffb/pages/1</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
@@ -1025,7 +1025,7 @@ ins {
     <div c:execute="#searchId = uuid()"> </div>
 
     <div h:request="">We now can get
-        <code class="get">/searches/c70cab4c-6038-43ba-aa86-fb2b90ae4d81/pages/1</code>
+        <code class="get">/searches/bfe0adf5-1e29-4cf4-af69-c8832f8bb6ed/pages/1</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
@@ -1119,14 +1119,14 @@ ins {
     <div c:execute="#searchId = uuid()"> </div>
 
     <div h:request="">We follow the Location header and
-        <code class="get">/searches/390fb466-74fd-4098-9494-e737c9927c6b</code>
+        <code class="get">/searches/82ed4ec0-1a36-42a7-80fc-6e19c4b8ee2b</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
         <pre class="json rest-success">{
   "searchResultPage" : {
     "searchInfo" : {
-      "id" : "390fb466-74fd-4098-9494-e737c9927c6b",
+      "id" : "82ed4ec0-1a36-42a7-80fc-6e19c4b8ee2b",
       "query" : {
         "find" : "annotation",
         "where" : "type:eq(\"Tag\") resource.id:inSet(\"00000001-5ba6-11e5-9054-ab0dd746f7f7\",\"00000003-5b7f-11e5-898c-237ee1c6d1d4\") state:eq(\"CONFIRMED\")",
@@ -1136,7 +1136,7 @@ ins {
       "totalResults" : 4,
       "totalPages" : 1
     },
-    "^firstPage" : "https://{host}/searches/390fb466-74fd-4098-9494-e737c9927c6b/pages/1"
+    "^firstPage" : "https://{host}/searches/82ed4ec0-1a36-42a7-80fc-6e19c4b8ee2b/pages/1"
   }
 }</pre>
     </div>
@@ -1155,7 +1155,7 @@ ins {
     </div>
 
     <div h:request="">We
-        <code class="get">/searches/390fb466-74fd-4098-9494-e737c9927c6b/pages/1</code>
+        <code class="get">/searches/82ed4ec0-1a36-42a7-80fc-6e19c4b8ee2b/pages/1</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
@@ -1216,7 +1216,7 @@ ins {
     <div c:execute="#searchId = uuid()"> </div>
 
     <div h:request="">We follow the Location header and
-        <code class="get">/searches/d6e86614-072a-454c-bea4-fc42186e2f01</code>
+        <code class="get">/searches/daf562e7-8057-4190-8989-3f5f7ebad0b5</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
@@ -1340,7 +1340,7 @@ ins {
     <div c:execute="#searchId = uuid()"> </div>
 
     <div h:request="">We follow the Location header and
-        <code class="get">/searches/7393ebcd-13fe-4518-bc2c-285ecd6c2557</code>
+        <code class="get">/searches/ebcb737f-2ee2-44f2-8849-d031e20b395d</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
@@ -1460,7 +1460,7 @@ ins {
     <div c:execute="#searchId = uuid()"> </div>
 
     <div h:request="">We follow the Location header and
-        <code class="get">/searches/b71ceff1-fbfe-441d-8618-14890baebdd2</code>
+        <code class="get">/searches/58e3798c-1aad-4e37-aa4e-c236be7c3e62</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
@@ -1602,7 +1602,7 @@ ins {
     <div c:execute="#searchId = uuid()"> </div>
 
     <div h:request="">We follow the Location header and
-        <code class="get">/searches/7b00364c-af85-4a1f-a487-67183aa509c9</code>
+        <code class="get">/searches/ea875c0c-3393-462b-b5f9-a7a8d2e94f6e</code>
         expecting
         <code h:status="" class="success">200 OK</code>
         and body
@@ -1626,5 +1626,5 @@ ins {
   }
 }</pre>
     </div>
-</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 2036 ms on 11-Jan-2018 at 10:49:19 CET</div></div></body>
+</div></div></div></div></div></div></div><div class="footer">Results generated by <a href="http://www.concordion.org" style="font-weight: bold; text-decoration: none; color: #89C;">Concordion</a><div class="testTime">in 1558 ms on 23-Jan-2018 at 13:34:14 CET</div></div></body>
 </html>
